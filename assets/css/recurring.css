@@ -579,12 +579,16 @@
 
   /* Form grid mobile */
   .form-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
     gap: 12px;
   }
   
   .form-group {
     margin-bottom: 0;
+  }
+  
+  .form-group-full {
+    grid-column: 1 / -1;
   }
   
   .form-group label {
@@ -625,10 +629,10 @@
     padding: 1.5rem;
   }
 
-  /* 2 cards per row on mobile */
+  /* 1 card per row on mobile for better space utilization */
   .recurring-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
+    grid-template-columns: 1fr;
+    gap: 10px;
   }
 
   .recurring-card {
@@ -704,17 +708,36 @@
 
 @media (max-width: 480px) {
   .recurring-summary {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
   }
 
   .recurring-summary .summary-card:nth-child(3) {
-    grid-column: auto;
+    grid-column: 1 / -1;
+  }
+  
+  .summary-card {
+    padding: 10px;
+  }
+  
+  .summary-icon {
+    font-size: 1.5rem;
+    width: 40px;
+    height: 40px;
+  }
+  
+  .summary-label {
+    font-size: 10px;
+  }
+  
+  .summary-value {
+    font-size: 1.25rem;
   }
 
-  /* Keep 2 cards per row even on small mobile */
+  /* 1 card per row for recurring transactions on small mobile */
   .recurring-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
+    grid-template-columns: 1fr;
+    gap: 10px;
   }
 
   .recurring-card {
@@ -724,6 +747,11 @@
   .recurring-amount {
     font-size: 16px;
   }
+  
+  .recurring-description {
+    font-size: 13px;
+  }
+}
   
   .recurring-description {
     font-size: 13px;

@@ -388,12 +388,16 @@
 
   /* Form grid mobile */
   .form-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
     gap: 12px;
   }
   
   .form-group {
     margin-bottom: 0;
+  }
+  
+  .form-group-full {
+    grid-column: 1 / -1;
   }
   
   .form-group label {
@@ -441,11 +445,30 @@
 
 @media (max-width: 480px) {
   .notes-summary {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
   }
 
   .notes-summary .summary-card:nth-child(3) {
-    grid-column: auto;
+    grid-column: 1 / -1;
+  }
+  
+  .summary-card {
+    padding: 10px;
+  }
+  
+  .summary-icon {
+    font-size: 1.5rem;
+    width: 40px;
+    height: 40px;
+  }
+  
+  .summary-label {
+    font-size: 10px;
+  }
+  
+  .summary-value {
+    font-size: 1.25rem;
   }
 }
 

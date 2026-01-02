@@ -81,6 +81,8 @@ async function initDashboard() {
 // Load dashboard data
 async function loadDashboardData() {
   try {
+    console.log('Loading dashboard data...');
+    
     // Get current month data
     const now = new Date();
     const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -91,17 +93,13 @@ async function loadDashboardData() {
     const lastDayOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
     
     // Fetch expenses and income
+    console.log('Fetching expenses and income...');
     const [expenses, income] = await Promise.all([
       firestoreService.getExpenses(),
       firestoreService.getIncome()
     ]);
     
-    // Show generate data button if no data exists
-    if (expenses.length === 0 && income.length === 0) {
-      generateDataBtn.style.display = 'inline-flex';
-    } else {
-      generateDataBtn.style.display = 'none';
-    }
+    console.log('Expenses:', expenses.length, 'Income:', income.length);
     
     // Calculate current month totals
     const currentMonthExpenses = expenses
@@ -117,6 +115,8 @@ async function loadDashboardData() {
         return date >= firstDayOfMonth && date <= lastDayOfMonth;
       })
       .reduce((sum, i) => sum + i.amount, 0);
+    
+    console.log('Current month - Expenses:', currentMonthExpenses, 'Income:', currentMonthIncome);
     
     // Calculate last month totals
     const lastMonthExpenses = expenses
@@ -164,12 +164,12 @@ async function loadDashboardData() {
     createTrendChart(expenses, income, 6);
     createCategoryChart(expenses, 'current');
     
+    console.log('Dashboard data loaded successfully');
+    
   } catch (error) {
     console.error('Error loading dashboard data:', error);
-    // Only show error if it's not a permission issue for empty data
-    if (error.code !== 'permission-denied') {
-      toast.error('Failed to load dashboard data');
-    }
+    console.error('Error details:', error.message, error.code);
+    toast.error('Failed to load dashboard data: ' + error.message);
   }
 }
 

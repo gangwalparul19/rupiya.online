@@ -746,13 +746,17 @@
   }
 
   .form-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
     gap: 12px;
     margin-bottom: 12px;
   }
   
   .form-group {
     margin-bottom: 0;
+  }
+  
+  .form-group-full {
+    grid-column: 1 / -1;
   }
   
   .form-group label {
