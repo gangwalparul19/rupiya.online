@@ -201,6 +201,44 @@ service cloud.firestore {
     }
     
     // ============================================
+    // USER CATEGORIES (Alternative collection name)
+    // ============================================
+    match /userCategories/{userId} {
+      // User categories document ID is the userId itself
+      // Users can only access their own categories
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId);
+    }
+    
+    // ============================================
+    // USER PREFERENCES
+    // ============================================
+    match /userPreferences/{userId} {
+      // User preferences document ID is the userId itself
+      // Users can only access their own preferences
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId);
+    }
+    
+    // ============================================
+    // PAYMENT METHODS
+    // ============================================
+    match /paymentMethods/{methodId} {
+      // Users can only access their own payment methods
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && 
+                      hasValidUserId() && 
+                      hasValidTimestamps() &&
+                      request.resource.data.keys().hasAll(['type', 'name', 'userId']);
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
+    }
+    
+    // ============================================
     // WALLETS
     // ============================================
     match /wallets/{walletId} {

@@ -166,7 +166,10 @@ async function loadDashboardData() {
     
   } catch (error) {
     console.error('Error loading dashboard data:', error);
-    toast.error('Failed to load dashboard data');
+    // Only show error if it's not a permission issue for empty data
+    if (error.code !== 'permission-denied') {
+      toast.error('Failed to load dashboard data');
+    }
   }
 }
 

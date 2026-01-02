@@ -10,12 +10,12 @@ const env = loadEnvironment();
 
 // Firebase configuration object - uses environment variables
 const firebaseConfig = {
-  apiKey: env.firebaseApiKey || "AIzaSyDdoA4BKaWbJIzmI9P4Se8Rkxsih6LdFvk",
-  authDomain: env.firebaseAuthDomain || "rupiya-abd13.firebaseapp.com",
-  projectId: env.firebaseProjectId || "rupiya-abd13",
-  storageBucket: env.firebaseStorageBucket || "rupiya-abd13.firebasestorage.app",
-  messagingSenderId: env.firebaseMessagingSenderId || "999011154370",
-  appId: env.firebaseAppId || "1:999011154370:web:40faebc7a935cdbf51be5b"
+  apiKey: env.firebaseApiKey,
+  authDomain: env.firebaseAuthDomain,
+  projectId: env.firebaseProjectId,
+  storageBucket: env.firebaseStorageBucket,
+  messagingSenderId: env.firebaseMessagingSenderId,
+  appId: env.firebaseAppId
 };
 
 // Initialize Firebase
