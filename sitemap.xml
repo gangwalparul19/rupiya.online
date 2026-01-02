@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+
+  <!-- Landing Page -->
+  <url>
+    <loc>https://rupiya.app/</loc>
+    <lastmod>2026-01-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- Authentication Pages -->
+  <url>
+    <loc>https://rupiya.app/login.html</loc>
+    <lastmod>2026-01-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://rupiya.app/signup.html</loc>
+    <lastmod>2026-01-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Main Application Pages (require authentication) -->
+  <url>
+    <loc>https://rupiya.app/dashboard.html</loc>
+    <lastmod>2026-01-02</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://rupiya.app/expenses.html</loc>
+    <lastmod>2026-01-02</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://rupiya.app/income.html</loc>
+    <lastmod>2026-01-02</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://rupiya.app/budgets.html</loc>
+    <lastmod>2026-01-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://rupiya.app/goals.html</loc>
+    <lastmod>2026-01-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://rupiya.app/investments.html</loc>
+    <lastmod>2026-01-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://rupiya.app/analytics.html</loc>
+    <lastmod>2026-01-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Asset Management Pages -->
+  <url>
+    <loc>https://rupiya.app/houses.html</loc>
+    <lastmod>2026-01-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://rupiya.app/vehicles.html</loc>
+    <lastmod>2026-01-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://rupiya.app/house-help.html</loc>
+    <lastmod>2026-01-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Utility Pages -->
+  <url>
+    <loc>https://rupiya.app/notes.html</loc>
+    <lastmod>2026-01-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://rupiya.app/documents.html</loc>
+    <lastmod>2026-01-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://rupiya.app/profile.html</loc>
+    <lastmod>2026-01-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+</urlset>

@@ -1,0 +1,38 @@
+# Robots.txt for Rupiya - Personal Finance Tracker
+
+User-agent: *
+Allow: /
+Disallow: /assets/
+Disallow: /components/
+Disallow: /*.js$
+Disallow: /*.css$
+
+# Sitemap location
+Sitemap: https://rupiya.app/sitemap.xml
+
+# Crawl delay (optional)
+Crawl-delay: 1
+
+# Specific bot rules
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+# Block bad bots
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+

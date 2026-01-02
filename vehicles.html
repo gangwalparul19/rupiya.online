@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Rupiya Vehicles - Manage your vehicles and track expenses">
+  <title>Vehicles - Rupiya</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" href="assets/images/logo.png" type="image/png">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="assets/css/common.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/dashboard.css">
+  <link rel="stylesheet" href="assets/css/vehicles.css">
+</head>
+<body>
+  <div class="dashboard-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <img src="assets/images/logo.png" alt="Rupiya">
+        </div>
+        <button class="sidebar-toggle" id="sidebarClose">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <div class="nav-section-title">Main</div>
+          <a href="dashboard.html" class="nav-item">
+            <span class="nav-icon">📊</span>
+            <span>Dashboard</span>
+          </a>
+          <a href="expenses.html" class="nav-item">
+            <span class="nav-icon">💸</span>
+            <span>Expenses</span>
+          </a>
+          <a href="income.html" class="nav-item">
+            <span class="nav-icon">💰</span>
+            <span>Income</span>
+          </a>
+          <a href="budgets.html" class="nav-item">
+            <span class="nav-icon">💳</span>
+            <span>Budgets</span>
+          </a>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-section-title">Tracking</div>
+          <a href="investments.html" class="nav-item">
+            <span class="nav-icon">📈</span>
+            <span>Investments</span>
+          </a>
+          <a href="goals.html" class="nav-item">
+            <span class="nav-icon">🎯</span>
+            <span>Goals</span>
+          </a>
+          <a href="recurring.html" class="nav-item">
+            <span class="nav-icon">🔄</span>
+            <span>Recurring</span>
+          </a>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-section-title">Assets</div>
+          <a href="houses.html" class="nav-item">
+            <span class="nav-icon">🏠</span>
+            <span>Houses</span>
+          </a>
+          <a href="vehicles.html" class="nav-item active">
+            <span class="nav-icon">🚗</span>
+            <span>Vehicles</span>
+          </a>
+          <a href="house-help.html" class="nav-item">
+            <span class="nav-icon">🧹</span>
+            <span>House Help</span>
+          </a>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-section-title">More</div>
+          <a href="notes.html" class="nav-item">
+            <span class="nav-icon">📝</span>
+            <span>Notes</span>
+          </a>
+          <a href="documents.html" class="nav-item">
+            <span class="nav-icon">📄</span>
+            <span>Documents</span>
+          </a>
+          <a href="analytics.html" class="nav-item">
+            <span class="nav-icon">📉</span>
+            <span>Analytics</span>
+          </a>
+          <a href="profile.html" class="nav-item">
+            <span class="nav-icon">⚙️</span>
+            <span>Settings</span>
+          </a>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-profile" id="userProfile">
+          <div class="user-avatar" id="userAvatar">U</div>
+          <div class="user-info">
+            <div class="user-name" id="userName">Loading...</div>
+            <div class="user-email" id="userEmail">Loading...</div>
+          </div>
+        </div>
+        <button class="btn btn-sm btn-outline w-100 mt-3" id="logoutBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+          </svg>
+          Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- Sidebar Overlay (Mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Mobile Header -->
+      <div class="mobile-header">
+        <button class="sidebar-toggle" id="sidebarOpen">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+        <div class="sidebar-logo">
+          <img src="assets/images/logo.png" alt="Rupiya" style="height: 32px;">
+        </div>
+        <div style="width: 24px;"></div>
+      </div>
+
+      <!-- Page Header -->
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Vehicles</h1>
+          <p class="page-subtitle">Manage your vehicles and track maintenance</p>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-primary" id="addVehicleBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Add Vehicle
+          </button>
+        </div>
+      </div>
+
+      <!-- Vehicles Summary Cards -->
+      <div class="vehicles-summary" id="vehiclesSummary">
+        <div class="summary-card">
+          <div class="summary-icon">🚗</div>
+          <div class="summary-content">
+            <div class="summary-label">Total Vehicles</div>
+            <div class="summary-value" id="totalVehicles">0</div>
+          </div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-icon">💸</div>
+          <div class="summary-content">
+            <div class="summary-label">Total Expenses</div>
+            <div class="summary-value" id="totalFuelCost">₹0</div>
+          </div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-icon">💰</div>
+          <div class="summary-content">
+            <div class="summary-label">Total Income</div>
+            <div class="summary-value" id="totalMaintenanceCost">₹0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add Vehicle Form (Inline) -->
+      <div class="add-vehicle-section" id="addVehicleSection">
+        <div class="add-vehicle-header">
+          <h2 class="add-vehicle-title" id="formTitle">Add Vehicle</h2>
+          <button class="modal-close" id="closeFormBtn">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <form id="vehicleForm">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="name">Vehicle Name *</label>
+              <input type="text" id="name" required maxlength="100" placeholder="e.g., My Honda Civic">
+              <span class="error-message" id="nameError"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="type">Vehicle Type *</label>
+              <select id="type" required>
+                <option value="">Select type</option>
+                <option value="Car">Car</option>
+                <option value="Motorcycle">Motorcycle</option>
+                <option value="Truck">Truck</option>
+                <option value="SUV">SUV</option>
+                <option value="Van">Van</option>
+                <option value="Scooter">Scooter</option>
+                <option value="Other">Other</option>
+              </select>
+              <span class="error-message" id="typeError"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="make">Make *</label>
+              <input type="text" id="make" required maxlength="50" placeholder="e.g., Honda">
+              <span class="error-message" id="makeError"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="model">Model *</label>
+              <input type="text" id="model" required maxlength="50" placeholder="e.g., Civic">
+              <span class="error-message" id="modelError"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="year">Year *</label>
+              <input type="number" id="year" required min="1900" max="2100" placeholder="2020">
+              <span class="error-message" id="yearError"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="registrationNumber">Registration Number</label>
+              <input type="text" id="registrationNumber" maxlength="20" placeholder="e.g., ABC-1234">
+              <span class="error-message" id="registrationNumberError"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="currentMileage">Current Odometer Reading (km) *</label>
+              <input type="number" id="currentMileage" step="0.01" min="0" required placeholder="0">
+              <span class="error-message" id="currentMileageError"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="fuelType">Fuel Type *</label>
+              <select id="fuelType" required>
+                <option value="">Select fuel type</option>
+                <option value="Petrol">Petrol</option>
+                <option value="Diesel">Diesel</option>
+                <option value="Electric">Electric</option>
+                <option value="Hybrid">Hybrid</option>
+                <option value="CNG">CNG</option>
+                <option value="LPG">LPG</option>
+              </select>
+              <span class="error-message" id="fuelTypeError"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="insuranceExpiry">Insurance Expiry Date</label>
+              <input type="date" id="insuranceExpiry">
+              <span class="error-message" id="insuranceExpiryError"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="color">Color</label>
+              <input type="text" id="color" maxlength="30" placeholder="e.g., Red">
+              <span class="error-message" id="colorError"></span>
+            </div>
+
+            <div class="form-group form-group-full">
+              <label for="notes">Notes</label>
+              <textarea id="notes" rows="3" maxlength="500" placeholder="Add any additional notes about this vehicle..."></textarea>
+              <span class="error-message" id="notesError"></span>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-outline" id="cancelFormBtn">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="saveFormBtn">
+              <span id="saveFormBtnText">Save Vehicle</span>
+              <span id="saveFormBtnSpinner" class="spinner" style="display: none;"></span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Vehicles List -->
+      <div class="vehicles-container">
+        <div id="vehiclesList" class="vehicles-grid">
+          <!-- Vehicle cards will be loaded here -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="empty-state" style="display: none;">
+          <div class="empty-state-icon">🚗</div>
+          <h3 class="empty-state-title">No vehicles yet</h3>
+          <p class="empty-state-text">Start tracking your vehicles by adding your first one.</p>
+          <button class="btn btn-primary" onclick="document.getElementById('addVehicleBtn').click()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Add Your First Vehicle
+          </button>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="loading-state">
+          <div class="spinner-lg"></div>
+          <p>Loading vehicles...</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal-overlay" id="deleteModal">
+    <div class="modal-container modal-sm">
+      <div class="modal-header">
+        <h2 class="modal-title">Delete Vehicle</h2>
+        <button class="modal-close" id="closeDeleteModalBtn">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p>Are you sure you want to delete this vehicle?</p>
+        <div class="delete-info">
+          <strong id="deleteVehicleName"></strong>
+          <span id="deleteVehicleDetails"></span>
+        </div>
+        <p class="text-danger">This action cannot be undone.</p>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" id="cancelDeleteBtn">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+          <span id="deleteBtnText">Delete</span>
+          <span id="deleteBtnSpinner" class="spinner" style="display: none;"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="assets/js/pages/vehicles.js"></script>
+</body>
+</html>

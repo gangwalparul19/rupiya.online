@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offline - Rupiya</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', 'Segoe UI', 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .offline-container {
+      background: white;
+      border-radius: 16px;
+      padding: 48px 32px;
+      max-width: 500px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .offline-icon {
+      font-size: 80px;
+      margin-bottom: 24px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    h1 {
+      font-size: 32px;
+      color: #2C3E50;
+      margin-bottom: 16px;
+    }
+
+    p {
+      font-size: 18px;
+      color: #7F8C8D;
+      margin-bottom: 32px;
+      line-height: 1.6;
+    }
+
+    .retry-button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 16px 32px;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .retry-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4);
+    }
+
+    .retry-button:active {
+      transform: translateY(0);
+    }
+
+    .status {
+      margin-top: 24px;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .status.checking {
+      background: #FFF3CD;
+      color: #856404;
+    }
+
+    .status.online {
+      background: #D4EDDA;
+      color: #155724;
+    }
+
+    .status.offline {
+      background: #F8D7DA;
+      color: #721C24;
+    }
+
+    .features {
+      margin-top: 32px;
+      text-align: left;
+    }
+
+    .features h3 {
+      font-size: 18px;
+      color: #2C3E50;
+      margin-bottom: 16px;
+    }
+
+    .features ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .features li {
+      padding: 8px 0;
+      color: #7F8C8D;
+      font-size: 14px;
+    }
+
+    .features li::before {
+      content: '✓';
+      color: #27AE60;
+      font-weight: bold;
+      margin-right: 8px;
+    }
+
+    @media (max-width: 576px) {
+      .offline-container {
+        padding: 32px 24px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      p {
+        font-size: 16px;
+      }
+
+      .offline-icon {
+        font-size: 60px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="offline-container">
+    <div class="offline-icon">📡</div>
+    <h1>You're Offline</h1>
+    <p>It looks like you've lost your internet connection. Don't worry, your data is safe!</p>
+    
+    <button class="retry-button" onclick="checkConnection()">
+      Check Connection
+    </button>
+
+    <div id="status" class="status" style="display: none;"></div>
+
+    <div class="features">
+      <h3>What you can do:</h3>
+      <ul>
+        <li>Your data is securely stored</li>
+        <li>Changes will sync when you're back online</li>
+        <li>Previously loaded pages are still accessible</li>
+        <li>Cached data is available for viewing</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    const statusEl = document.getElementById('status');
+
+    function showStatus(message, type) {
+      statusEl.textContent = message;
+      statusEl.className = `status ${type}`;
+      statusEl.style.display = 'block';
+    }
+
+    function checkConnection() {
+      showStatus('Checking connection...', 'checking');
+
+      if (navigator.onLine) {
+        showStatus('You\'re back online! Redirecting...', 'online');
+        setTimeout(() => {
+          window.location.href = '/dashboard.html';
+        }, 1500);
+      } else {
+        showStatus('Still offline. Please check your internet connection.', 'offline');
+      }
+    }
+
+    // Auto-check connection when online
+    window.addEventListener('online', () => {
+      showStatus('Connection restored! Redirecting...', 'online');
+      setTimeout(() => {
+        window.location.href = '/dashboard.html';
+      }, 1500);
+    });
+
+    // Check connection status on load
+    if (navigator.onLine) {
+      checkConnection();
+    }
+  </script>
+</body>
+</html>

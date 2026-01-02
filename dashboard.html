@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Rupiya Dashboard - Manage your finances">
+  <title>Dashboard - Rupiya</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" href="assets/images/logo.png" type="image/png">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="assets/css/common.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/dashboard.css">
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <div class="dashboard-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <img src="assets/images/logo.png" alt="Rupiya">
+        </div>
+        <button class="sidebar-toggle" id="sidebarClose">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <div class="nav-section-title">Main</div>
+          <a href="dashboard.html" class="nav-item active">
+            <span class="nav-icon">📊</span>
+            <span>Dashboard</span>
+          </a>
+          <a href="expenses.html" class="nav-item">
+            <span class="nav-icon">💸</span>
+            <span>Expenses</span>
+          </a>
+          <a href="income.html" class="nav-item">
+            <span class="nav-icon">💰</span>
+            <span>Income</span>
+          </a>
+          <a href="budgets.html" class="nav-item">
+            <span class="nav-icon">💳</span>
+            <span>Budgets</span>
+          </a>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-section-title">Tracking</div>
+          <a href="investments.html" class="nav-item">
+            <span class="nav-icon">📈</span>
+            <span>Investments</span>
+          </a>
+          <a href="goals.html" class="nav-item">
+            <span class="nav-icon">🎯</span>
+            <span>Goals</span>
+          </a>
+          <a href="recurring.html" class="nav-item">
+            <span class="nav-icon">🔄</span>
+            <span>Recurring</span>
+          </a>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-section-title">Assets</div>
+          <a href="houses.html" class="nav-item">
+            <span class="nav-icon">🏠</span>
+            <span>Houses</span>
+          </a>
+          <a href="vehicles.html" class="nav-item">
+            <span class="nav-icon">🚗</span>
+            <span>Vehicles</span>
+          </a>
+          <a href="house-help.html" class="nav-item">
+            <span class="nav-icon">🧹</span>
+            <span>House Help</span>
+          </a>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-section-title">More</div>
+          <a href="notes.html" class="nav-item">
+            <span class="nav-icon">📝</span>
+            <span>Notes</span>
+          </a>
+          <a href="documents.html" class="nav-item">
+            <span class="nav-icon">📄</span>
+            <span>Documents</span>
+          </a>
+          <a href="analytics.html" class="nav-item">
+            <span class="nav-icon">📉</span>
+            <span>Analytics</span>
+          </a>
+          <a href="profile.html" class="nav-item">
+            <span class="nav-icon">⚙️</span>
+            <span>Settings</span>
+          </a>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-profile" id="userProfile">
+          <div class="user-avatar" id="userAvatar">U</div>
+          <div class="user-info">
+            <div class="user-name" id="userName">Loading...</div>
+            <div class="user-email" id="userEmail">Loading...</div>
+          </div>
+        </div>
+        <button class="btn btn-sm btn-outline w-100 mt-3" id="logoutBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+          </svg>
+          Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- Sidebar Overlay (Mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Mobile Header -->
+      <div class="mobile-header">
+        <button class="sidebar-toggle" id="sidebarOpen">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+        <div class="sidebar-logo">
+          <img src="assets/images/logo.png" alt="Rupiya" style="height: 32px;">
+        </div>
+        <div style="width: 24px;"></div>
+      </div>
+
+      <!-- Dashboard Header -->
+      <div class="dashboard-header">
+        <div>
+          <h1 class="dashboard-title">Dashboard</h1>
+          <p class="dashboard-subtitle">Welcome back! Here's your financial overview.</p>
+        </div>
+        <button class="btn btn-sm btn-outline" id="generateDataBtn" style="display: none;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          </svg>
+          Generate Sample Data
+        </button>
+      </div>
+
+      <!-- KPI Cards -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <div>
+              <div class="kpi-title">Income</div>
+            </div>
+            <div class="kpi-icon income">💰</div>
+          </div>
+          <div class="kpi-value" id="incomeValue">₹0</div>
+          <div class="kpi-change positive" id="incomeChange">
+            <span>↑</span>
+            <span>0% from last month</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <div>
+              <div class="kpi-title">Expenses</div>
+            </div>
+            <div class="kpi-icon expense">💸</div>
+          </div>
+          <div class="kpi-value" id="expenseValue">₹0</div>
+          <div class="kpi-change negative" id="expenseChange">
+            <span>↓</span>
+            <span>0% from last month</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <div>
+              <div class="kpi-title">Cash Flow</div>
+            </div>
+            <div class="kpi-icon cashflow">📊</div>
+          </div>
+          <div class="kpi-value" id="cashflowValue">₹0</div>
+          <div class="kpi-change" id="cashflowChange">
+            <span>→</span>
+            <span>Balance</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <div>
+              <div class="kpi-title">Savings Rate</div>
+            </div>
+            <div class="kpi-icon networth">📈</div>
+          </div>
+          <div class="kpi-value" id="savingsValue">0%</div>
+          <div class="kpi-change positive" id="savingsChange">
+            <span>↑</span>
+            <span>Good progress</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Analytics Charts -->
+      <div class="charts-grid">
+        <!-- Income vs Expenses Trend -->
+        <div class="chart-card">
+          <div class="card-header">
+            <h2 class="card-title">Income vs Expenses</h2>
+            <select id="trendPeriod" class="chart-filter">
+              <option value="6">Last 6 Months</option>
+              <option value="12">Last 12 Months</option>
+              <option value="3">Last 3 Months</option>
+            </select>
+          </div>
+          <div class="chart-container">
+            <canvas id="trendChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Expense by Category -->
+        <div class="chart-card">
+          <div class="card-header">
+            <h2 class="card-title">Expense Breakdown</h2>
+            <select id="categoryPeriod" class="chart-filter">
+              <option value="current">This Month</option>
+              <option value="last">Last Month</option>
+              <option value="all">All Time</option>
+            </select>
+          </div>
+          <div class="chart-container">
+            <canvas id="categoryChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Transactions -->
+      <div class="transactions-card">
+        <div class="card-header">
+          <h2 class="card-title">Recent Transactions</h2>
+          <a href="expenses.html" class="btn btn-sm btn-primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Add Transaction
+          </a>
+        </div>
+
+        <div id="transactionsList">
+          <!-- Transactions will be loaded here -->
+          <div class="empty-state">
+            <div class="empty-state-icon">📊</div>
+            <h3 class="empty-state-title">No transactions yet</h3>
+            <p class="empty-state-text">Start tracking your expenses and income to see them here.</p>
+            <a href="expenses.html" class="btn btn-primary">Add Your First Transaction</a>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="assets/js/pages/dashboard.js"></script>
+</body>
+</html>
