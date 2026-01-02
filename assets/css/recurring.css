@@ -215,8 +215,11 @@
   background: white;
   border: 2px solid #4A90E2;
   border-radius: 12px;
-  padding: 1.5rem;
+  padding: 12px 16px;
   transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .recurring-card:hover {
@@ -240,18 +243,17 @@
 .recurring-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 1rem;
+  align-items: center;
+  gap: 12px;
 }
 
 .recurring-type {
   display: inline-block;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 0.75rem;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
-  margin-bottom: 0.5rem;
 }
 
 .recurring-type.expense {
@@ -265,16 +267,18 @@
 }
 
 .recurring-description {
-  font-size: 1.25rem;
+  font-size: 16px;
   font-weight: 700;
   color: #2C3E50;
-  margin-bottom: 0.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .recurring-amount {
-  font-size: 1.5rem;
+  font-size: 20px;
   font-weight: 700;
-  margin-bottom: 1rem;
+  white-space: nowrap;
 }
 
 .recurring-amount.expense {
@@ -287,7 +291,8 @@
 
 .recurring-actions {
   display: flex;
-  gap: 0.5rem;
+  gap: 4px;
+  margin-left: auto;
 }
 
 .btn-icon {
@@ -318,36 +323,35 @@
 }
 
 .recurring-details {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
-  margin-bottom: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .recurring-detail {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 4px;
 }
 
 .recurring-detail-label {
-  font-size: 0.75rem;
+  font-size: 11px;
   color: #7F8C8D;
-  margin-bottom: 0.25rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .recurring-detail-value {
-  font-size: 0.875rem;
+  font-size: 12px;
   font-weight: 600;
   color: #2C3E50;
 }
 
 .recurring-status {
   display: inline-block;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 0.75rem;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 11px;
   font-weight: 600;
 }
 
@@ -362,20 +366,17 @@
 }
 
 .recurring-footer {
-  padding-top: 1rem;
-  border-top: 1px solid #E0E0E0;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.875rem;
+  font-size: 12px;
   color: #7F8C8D;
-  margin-top: 1rem;
 }
 
 .recurring-frequency {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 4px;
 }
 
 .recurring-frequency svg {
@@ -579,15 +580,45 @@
   /* Form grid mobile */
   .form-grid {
     grid-template-columns: 1fr;
-    gap: 1rem;
+    gap: 12px;
+  }
+  
+  .form-group {
+    margin-bottom: 0;
+  }
+  
+  .form-group label {
+    margin-bottom: 4px;
+    font-size: 13px;
+  }
+  
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: 10px 12px;
+    font-size: 14px;
   }
 
   .form-actions {
     flex-direction: column-reverse;
+    gap: 10px;
   }
 
   .form-actions .btn {
     width: 100%;
+  }
+  
+  .modal-body {
+    padding: 12px;
+  }
+  
+  .modal-header {
+    padding: 12px;
+  }
+  
+  .modal-footer {
+    padding: 12px;
+    gap: 10px;
   }
 
   .recurring-container {
@@ -601,7 +632,54 @@
   }
 
   .recurring-card {
-    padding: 1rem;
+    padding: 10px 12px;
+  }
+  
+  .recurring-header {
+    gap: 8px;
+  }
+  
+  .recurring-actions {
+    gap: 2px;
+  }
+  
+  .btn-icon {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .recurring-type {
+    font-size: 10px;
+    padding: 2px 8px;
+  }
+  
+  .recurring-description {
+    font-size: 14px;
+  }
+  
+  .recurring-amount {
+    font-size: 18px;
+  }
+  
+  .recurring-details {
+    gap: 8px;
+  }
+  
+  .recurring-detail-label {
+    font-size: 10px;
+  }
+  
+  .recurring-detail-value {
+    font-size: 11px;
+  }
+  
+  .recurring-status {
+    font-size: 10px;
+    padding: 2px 8px;
+  }
+  
+  .recurring-footer {
+    font-size: 11px;
   }
 
   .recurring-description {
@@ -640,7 +718,15 @@
   }
 
   .recurring-card {
-    padding: 0.75rem;
+    padding: 8px 10px;
+  }
+  
+  .recurring-amount {
+    font-size: 16px;
+  }
+  
+  .recurring-description {
+    font-size: 13px;
   }
 
   .recurring-description {

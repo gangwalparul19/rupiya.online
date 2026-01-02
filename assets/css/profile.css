@@ -322,15 +322,45 @@ ul li {
   /* Form grid mobile */
   .form-grid {
     grid-template-columns: 1fr;
-    gap: 1rem;
+    gap: 12px;
+  }
+  
+  .form-group {
+    margin-bottom: 0;
+  }
+  
+  .form-group label {
+    margin-bottom: 4px;
+    font-size: 13px;
+  }
+  
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: 10px 12px;
+    font-size: 14px;
   }
 
   .form-actions {
     flex-direction: column-reverse;
+    gap: 10px;
   }
 
   .form-actions .btn {
     width: 100%;
+  }
+  
+  .modal-body {
+    padding: 12px;
+  }
+  
+  .modal-header {
+    padding: 12px;
+  }
+  
+  .modal-footer {
+    padding: 12px;
+    gap: 10px;
   }
 
   .input-with-button {

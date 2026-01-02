@@ -172,9 +172,12 @@
   background: var(--white);
   border: 2px solid var(--primary-blue);
   border-radius: var(--border-radius-lg);
-  padding: var(--spacing-lg);
+  padding: 12px 16px;
   transition: all var(--transition-base);
   position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .expense-card:hover {
@@ -186,19 +189,21 @@
 .expense-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: var(--spacing-md);
+  align-items: center;
+  gap: 12px;
 }
 
 .expense-amount {
-  font-size: var(--font-size-2xl);
+  font-size: 20px;
   font-weight: 700;
   color: var(--accent-red);
+  white-space: nowrap;
 }
 
 .expense-actions {
   display: flex;
-  gap: var(--spacing-sm);
+  gap: 4px;
+  margin-left: auto;
 }
 
 .btn-icon {
@@ -230,41 +235,41 @@
 
 .expense-category {
   display: inline-block;
-  padding: 4px 12px;
+  padding: 3px 10px;
   background: rgba(74, 144, 226, 0.1);
   color: var(--primary-blue);
-  border-radius: 20px;
-  font-size: var(--font-size-sm);
+  border-radius: 12px;
+  font-size: 12px;
   font-weight: 600;
-  margin-bottom: var(--spacing-sm);
 }
 
 .expense-description {
-  font-size: var(--font-size-base);
+  font-size: 14px;
   color: var(--text-primary);
-  margin-bottom: var(--spacing-md);
-  line-height: 1.5;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .expense-meta {
   display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
-  padding-top: var(--spacing-md);
-  border-top: 1px solid var(--border-color);
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .expense-meta-item {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
-  font-size: var(--font-size-sm);
+  gap: 4px;
+  font-size: 12px;
   color: var(--text-secondary);
 }
 
 .expense-meta-item svg {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
 }
 
 /* Loading State */
@@ -678,15 +683,51 @@
 
   .expenses-grid {
     grid-template-columns: 1fr;
-    gap: var(--spacing-md);
+    gap: 10px;
   }
 
   .expense-card {
-    padding: var(--spacing-md);
+    padding: 10px 12px;
   }
 
   .expense-amount {
-    font-size: var(--font-size-xl);
+    font-size: 18px;
+  }
+  
+  .expense-header {
+    gap: 8px;
+  }
+  
+  .expense-actions {
+    gap: 2px;
+  }
+  
+  .btn-icon {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .expense-category {
+    font-size: 11px;
+    padding: 2px 8px;
+  }
+  
+  .expense-description {
+    font-size: 13px;
+  }
+  
+  .expense-meta {
+    gap: 8px;
+  }
+  
+  .expense-meta-item {
+    font-size: 11px;
+    gap: 3px;
+  }
+  
+  .expense-meta-item svg {
+    width: 12px;
+    height: 12px;
   }
 
   .pagination-container {
@@ -706,15 +747,46 @@
 
   .form-grid {
     grid-template-columns: 1fr;
-    gap: var(--spacing-md);
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  
+  .form-group {
+    margin-bottom: 0;
+  }
+  
+  .form-group label {
+    margin-bottom: 4px;
+    font-size: 13px;
+  }
+  
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: 10px 12px;
+    font-size: 14px;
   }
 
   .form-actions {
     flex-direction: column-reverse;
+    gap: 10px;
   }
 
   .form-actions .btn {
     width: 100%;
+  }
+  
+  .modal-body {
+    padding: 12px;
+  }
+  
+  .modal-header {
+    padding: 12px;
+  }
+  
+  .modal-footer {
+    padding: 12px;
+    gap: 10px;
   }
 
   .empty-state {
