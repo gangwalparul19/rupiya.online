@@ -70,18 +70,18 @@ function setupEventListeners() {
   const sidebar = document.getElementById('sidebar');
 
   sidebarOpen?.addEventListener('click', () => {
-    sidebar.classList.add('active');
-    sidebarOverlay.classList.add('active');
+    sidebar.classList.add('open');
+    sidebarOverlay.classList.add('show');
   });
 
   sidebarClose?.addEventListener('click', () => {
-    sidebar.classList.remove('active');
-    sidebarOverlay.classList.remove('active');
+    sidebar.classList.remove('open');
+    sidebarOverlay.classList.remove('show');
   });
 
   sidebarOverlay?.addEventListener('click', () => {
-    sidebar.classList.remove('active');
-    sidebarOverlay.classList.remove('active');
+    sidebar.classList.remove('open');
+    sidebarOverlay.classList.remove('show');
   });
 
   document.getElementById('logoutBtn')?.addEventListener('click', handleLogout);
@@ -119,12 +119,12 @@ function showAddForm() {
   }
   
   document.getElementById('status').value = 'Active';
-  addHelpSection.classList.add('active');
+  addHelpSection.classList.add('show');
   addHelpSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function hideForm() {
-  addHelpSection.classList.remove('active');
+  addHelpSection.classList.remove('show');
   helpForm.reset();
   editingHelpId = null;
 }
@@ -142,7 +142,7 @@ function showEditForm(help) {
   document.getElementById('status').value = help.status;
   document.getElementById('notes').value = help.notes || '';
 
-  addHelpSection.classList.add('active');
+  addHelpSection.classList.add('show');
   addHelpSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
@@ -321,11 +321,11 @@ function showDeleteConfirmation(id) {
   deleteHelpId = id;
   deleteHelpName.textContent = help.name;
   deleteHelpRole.textContent = help.role;
-  deleteModal.classList.add('active');
+  deleteModal.classList.add('show');
 }
 
 function hideDeleteModal() {
-  deleteModal.classList.remove('active');
+  deleteModal.classList.remove('show');
   deleteHelpId = null;
 }
 

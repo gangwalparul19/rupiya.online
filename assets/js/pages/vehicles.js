@@ -131,9 +131,9 @@ function showEditForm(vehicle) {
 
   document.getElementById('name').value = vehicle.name;
   document.getElementById('type').value = vehicle.type;
-  document.getElementById('make').value = vehicle.make;
-  document.getElementById('model').value = vehicle.model;
-  document.getElementById('year').value = vehicle.year;
+  document.getElementById('make').value = vehicle.make || '';
+  document.getElementById('model').value = vehicle.model || '';
+  document.getElementById('year').value = vehicle.year || '';
   document.getElementById('registrationNumber').value = vehicle.registrationNumber || '';
   document.getElementById('currentMileage').value = vehicle.currentMileage || 0;
   document.getElementById('fuelType').value = vehicle.fuelType || '';
@@ -151,14 +151,14 @@ async function handleSubmit(e) {
   const formData = {
     name: document.getElementById('name').value.trim(),
     type: document.getElementById('type').value,
-    make: document.getElementById('make').value.trim(),
-    model: document.getElementById('model').value.trim(),
-    year: parseInt(document.getElementById('year').value),
+    make: document.getElementById('make').value.trim() || '',
+    model: document.getElementById('model').value.trim() || '',
+    year: document.getElementById('year').value ? parseInt(document.getElementById('year').value) : null,
     registrationNumber: document.getElementById('registrationNumber').value.trim(),
     currentMileage: parseFloat(document.getElementById('currentMileage').value) || 0,
     fuelType: document.getElementById('fuelType').value,
     insuranceExpiry: document.getElementById('insuranceExpiry').value ? new Date(document.getElementById('insuranceExpiry').value) : null,
-    color: document.getElementById('color').value.trim(),
+    color: document.getElementById('color').value.trim() || '',
     notes: document.getElementById('notes').value.trim()
   };
 
@@ -240,7 +240,13 @@ function renderVehicles() {
           <div class="vehicle-info">
             <div class="vehicle-name">${vehicle.name}</div>
             <span class="vehicle-type">${vehicle.type}</span>
-            <div class="vehicle-details">${vehicle.make} ${vehicle.model} (${vehicle.year})</div>
+            ${(() => {
+              const detailsParts = [];
+              if (vehicle.make) detailsParts.push(vehicle.make);
+              if (vehicle.model) detailsParts.push(vehicle.model);
+              if (vehicle.year) detailsParts.push(`(${vehicle.year})`);
+              return detailsParts.length > 0 ? `<div class="vehicle-details">${detailsParts.join(' ')}</div>` : '';
+            })()}
             ${vehicle.registrationNumber ? `<div class="vehicle-details">Reg: ${vehicle.registrationNumber}</div>` : ''}
             ${vehicle.color ? `<div class="vehicle-details">Color: ${vehicle.color}</div>` : ''}
             ${insuranceStatus}
@@ -331,7 +337,11 @@ function showDeleteConfirmation(id) {
 
   deleteVehicleId = id;
   deleteVehicleName.textContent = vehicle.name;
-  deleteVehicleDetails.textContent = `${vehicle.make} ${vehicle.model} (${vehicle.year})`;
+  const detailsParts = [];
+  if (vehicle.make) detailsParts.push(vehicle.make);
+  if (vehicle.model) detailsParts.push(vehicle.model);
+  if (vehicle.year) detailsParts.push(`(${vehicle.year})`);
+  deleteVehicleDetails.textContent = detailsParts.length > 0 ? detailsParts.join(' ') : vehicle.type;
   deleteModal.classList.add('show');
 }
 
