@@ -32,7 +32,12 @@ async function init() {
   setupEventListeners();
   loadUserProfile(user);
   await loadVehicles();
-  document.getElementById('purchaseDate').valueAsDate = new Date();
+  
+  // Set default date if element exists
+  const purchaseDateInput = document.getElementById('purchaseDate');
+  if (purchaseDateInput) {
+    purchaseDateInput.valueAsDate = new Date();
+  }
 }
 
 function initDOMElements() {

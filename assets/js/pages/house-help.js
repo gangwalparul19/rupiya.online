@@ -29,7 +29,12 @@ async function init() {
   setupEventListeners();
   loadUserProfile(user);
   await loadStaff();
-  document.getElementById('joinDate').valueAsDate = new Date();
+  
+  // Set default date if element exists
+  const joinDateInput = document.getElementById('joinDate');
+  if (joinDateInput) {
+    joinDateInput.valueAsDate = new Date();
+  }
 }
 
 function initDOMElements() {
@@ -106,7 +111,13 @@ function showAddForm() {
   formTitle.textContent = 'Add Staff';
   saveFormBtnText.textContent = 'Save Staff';
   helpForm.reset();
-  document.getElementById('joinDate').valueAsDate = new Date();
+  
+  // Set default date if element exists
+  const joinDateInput = document.getElementById('joinDate');
+  if (joinDateInput) {
+    joinDateInput.valueAsDate = new Date();
+  }
+  
   document.getElementById('status').value = 'Active';
   addHelpSection.classList.add('active');
   addHelpSection.scrollIntoView({ behavior: 'smooth', block: 'start' });

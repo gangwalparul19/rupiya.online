@@ -41,8 +41,11 @@ async function init() {
   // Load investments
   await loadInvestments();
 
-  // Set default date to today
-  document.getElementById('purchaseDate').valueAsDate = new Date();
+  // Set default date to today if element exists
+  const purchaseDateInput = document.getElementById('purchaseDate');
+  if (purchaseDateInput) {
+    purchaseDateInput.valueAsDate = new Date();
+  }
 }
 
 // Initialize DOM elements
@@ -130,7 +133,13 @@ function showAddForm() {
   formTitle.textContent = 'Add Investment';
   saveFormBtnText.textContent = 'Save Investment';
   investmentForm.reset();
-  document.getElementById('purchaseDate').valueAsDate = new Date();
+  
+  // Set default date if element exists
+  const purchaseDateInput = document.getElementById('purchaseDate');
+  if (purchaseDateInput) {
+    purchaseDateInput.valueAsDate = new Date();
+  }
+  
   addInvestmentSection.classList.add('show');
   addInvestmentSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }

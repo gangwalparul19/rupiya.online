@@ -35,7 +35,12 @@ async function init() {
   setupEventListeners();
   loadUserProfile(user);
   await loadDocuments();
-  document.getElementById('documentDate').valueAsDate = new Date();
+  
+  // Set default date if element exists
+  const documentDateInput = document.getElementById('documentDate');
+  if (documentDateInput) {
+    documentDateInput.valueAsDate = new Date();
+  }
 }
 
 function initDOMElements() {
@@ -123,7 +128,13 @@ function showAddForm() {
   formTitle.textContent = 'Add Document';
   saveFormBtnText.textContent = 'Save Document';
   documentForm.reset();
-  document.getElementById('documentDate').valueAsDate = new Date();
+  
+  // Set default date if element exists
+  const documentDateInput = document.getElementById('documentDate');
+  if (documentDateInput) {
+    documentDateInput.valueAsDate = new Date();
+  }
+  
   uploadProgress.style.display = 'none';
   currentFileGroup.style.display = 'none';
   fileInput.required = true;

@@ -40,7 +40,7 @@ service cloud.firestore {
     match /users/{userId} {
       // Users can only read and write their own profile
       allow read: if isOwner(userId);
-      allow create: if isOwner(userId) && hasValidTimestamps();
+      allow create: if isOwner(userId);
       allow update: if isOwner(userId);
       allow delete: if isOwner(userId);
     }
@@ -51,13 +51,8 @@ service cloud.firestore {
     match /expenses/{expenseId} {
       // Users can only access their own expenses
       allow read: if belongsToUser();
-      allow create: if isAuthenticated() && 
-                      hasValidUserId() && 
-                      hasValidTimestamps() &&
-                      request.resource.data.keys().hasAll(['amount', 'category', 'date', 'userId']);
-      allow update: if belongsToUser() && 
-                      userIdNotChanged() &&
-                      request.resource.data.keys().hasAll(['amount', 'category', 'date', 'userId']);
+      allow create: if isAuthenticated() && hasValidUserId();
+      allow update: if belongsToUser() && userIdNotChanged();
       allow delete: if belongsToUser();
     }
     
@@ -67,13 +62,8 @@ service cloud.firestore {
     match /income/{incomeId} {
       // Users can only access their own income records
       allow read: if belongsToUser();
-      allow create: if isAuthenticated() && 
-                      hasValidUserId() && 
-                      hasValidTimestamps() &&
-                      request.resource.data.keys().hasAll(['amount', 'category', 'date', 'userId']);
-      allow update: if belongsToUser() && 
-                      userIdNotChanged() &&
-                      request.resource.data.keys().hasAll(['amount', 'category', 'date', 'userId']);
+      allow create: if isAuthenticated() && hasValidUserId();
+      allow update: if belongsToUser() && userIdNotChanged();
       allow delete: if belongsToUser();
     }
     
@@ -83,10 +73,7 @@ service cloud.firestore {
     match /budgets/{budgetId} {
       // Users can only access their own budgets
       allow read: if belongsToUser();
-      allow create: if isAuthenticated() && 
-                      hasValidUserId() && 
-                      hasValidTimestamps() &&
-                      request.resource.data.keys().hasAll(['category', 'amount', 'userId']);
+      allow create: if isAuthenticated() && hasValidUserId();
       allow update: if belongsToUser() && userIdNotChanged();
       allow delete: if belongsToUser();
     }
@@ -97,10 +84,7 @@ service cloud.firestore {
     match /investments/{investmentId} {
       // Users can only access their own investments
       allow read: if belongsToUser();
-      allow create: if isAuthenticated() && 
-                      hasValidUserId() && 
-                      hasValidTimestamps() &&
-                      request.resource.data.keys().hasAll(['name', 'type', 'amount', 'userId']);
+      allow create: if isAuthenticated() && hasValidUserId();
       allow update: if belongsToUser() && userIdNotChanged();
       allow delete: if belongsToUser();
     }
@@ -111,10 +95,7 @@ service cloud.firestore {
     match /goals/{goalId} {
       // Users can only access their own goals
       allow read: if belongsToUser();
-      allow create: if isAuthenticated() && 
-                      hasValidUserId() && 
-                      hasValidTimestamps() &&
-                      request.resource.data.keys().hasAll(['name', 'targetAmount', 'userId']);
+      allow create: if isAuthenticated() && hasValidUserId();
       allow update: if belongsToUser() && userIdNotChanged();
       allow delete: if belongsToUser();
     }
@@ -125,10 +106,7 @@ service cloud.firestore {
     match /houses/{houseId} {
       // Users can only access their own houses
       allow read: if belongsToUser();
-      allow create: if isAuthenticated() && 
-                      hasValidUserId() && 
-                      hasValidTimestamps() &&
-                      request.resource.data.keys().hasAll(['name', 'userId']);
+      allow create: if isAuthenticated() && hasValidUserId();
       allow update: if belongsToUser() && userIdNotChanged();
       allow delete: if belongsToUser();
     }
@@ -139,10 +117,7 @@ service cloud.firestore {
     match /vehicles/{vehicleId} {
       // Users can only access their own vehicles
       allow read: if belongsToUser();
-      allow create: if isAuthenticated() && 
-                      hasValidUserId() && 
-                      hasValidTimestamps() &&
-                      request.resource.data.keys().hasAll(['name', 'userId']);
+      allow create: if isAuthenticated() && hasValidUserId();
       allow update: if belongsToUser() && userIdNotChanged();
       allow delete: if belongsToUser();
     }
@@ -153,9 +128,7 @@ service cloud.firestore {
     match /houseHelps/{houseHelpId} {
       // Users can only access their own house help records
       allow read: if belongsToUser();
-      allow create: if isAuthenticated() && 
-                      hasValidUserId() && 
-                      hasValidTimestamps();
+      allow create: if isAuthenticated() && hasValidUserId();
       allow update: if belongsToUser() && userIdNotChanged();
       allow delete: if belongsToUser();
     }
@@ -166,10 +139,7 @@ service cloud.firestore {
     match /notes/{noteId} {
       // Users can only access their own notes
       allow read: if belongsToUser();
-      allow create: if isAuthenticated() && 
-                      hasValidUserId() && 
-                      hasValidTimestamps() &&
-                      request.resource.data.keys().hasAll(['title', 'content', 'userId']);
+      allow create: if isAuthenticated() && hasValidUserId();
       allow update: if belongsToUser() && userIdNotChanged();
       allow delete: if belongsToUser();
     }
@@ -180,10 +150,7 @@ service cloud.firestore {
     match /documents/{documentId} {
       // Users can only access their own documents
       allow read: if belongsToUser();
-      allow create: if isAuthenticated() && 
-                      hasValidUserId() && 
-                      hasValidTimestamps() &&
-                      request.resource.data.keys().hasAll(['name', 'fileUrl', 'userId']);
+      allow create: if isAuthenticated() && hasValidUserId();
       allow update: if belongsToUser() && userIdNotChanged();
       allow delete: if belongsToUser();
     }
@@ -195,7 +162,7 @@ service cloud.firestore {
       // Categories document ID is the userId itself
       // Users can only access their own categories
       allow read: if isOwner(userId);
-      allow create: if isOwner(userId) && hasValidTimestamps();
+      allow create: if isOwner(userId);
       allow update: if isOwner(userId);
       allow delete: if isOwner(userId);
     }
@@ -230,10 +197,7 @@ service cloud.firestore {
     match /paymentMethods/{methodId} {
       // Users can only access their own payment methods
       allow read: if belongsToUser();
-      allow create: if isAuthenticated() && 
-                      hasValidUserId() && 
-                      hasValidTimestamps() &&
-                      request.resource.data.keys().hasAll(['type', 'name', 'userId']);
+      allow create: if isAuthenticated() && hasValidUserId();
       allow update: if belongsToUser() && userIdNotChanged();
       allow delete: if belongsToUser();
     }
@@ -244,10 +208,7 @@ service cloud.firestore {
     match /wallets/{walletId} {
       // Users can only access their own wallets
       allow read: if belongsToUser();
-      allow create: if isAuthenticated() && 
-                      hasValidUserId() && 
-                      hasValidTimestamps() &&
-                      request.resource.data.keys().hasAll(['name', 'balance', 'userId']);
+      allow create: if isAuthenticated() && hasValidUserId();
       allow update: if belongsToUser() && userIdNotChanged();
       allow delete: if belongsToUser();
     }
@@ -258,10 +219,7 @@ service cloud.firestore {
     match /recurringTransactions/{recurringId} {
       // Users can only access their own recurring transactions
       allow read: if belongsToUser();
-      allow create: if isAuthenticated() && 
-                      hasValidUserId() && 
-                      hasValidTimestamps() &&
-                      request.resource.data.keys().hasAll(['type', 'amount', 'frequency', 'userId']);
+      allow create: if isAuthenticated() && hasValidUserId();
       allow update: if belongsToUser() && userIdNotChanged();
       allow delete: if belongsToUser();
     }

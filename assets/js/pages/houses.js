@@ -41,8 +41,11 @@ async function init() {
   // Load houses
   await loadHouses();
 
-  // Set default date to today
-  document.getElementById('purchaseDate').valueAsDate = new Date();
+  // Set default date to today if element exists
+  const purchaseDateInput = document.getElementById('purchaseDate');
+  if (purchaseDateInput) {
+    purchaseDateInput.valueAsDate = new Date();
+  }
 }
 
 // Initialize DOM elements

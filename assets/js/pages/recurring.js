@@ -48,8 +48,11 @@ async function init() {
   // Load recurring transactions
   await loadRecurringTransactions();
 
-  // Set default date to today
-  document.getElementById('startDate').valueAsDate = new Date();
+  // Set default date to today if element exists
+  const startDateInput = document.getElementById('startDate');
+  if (startDateInput) {
+    startDateInput.valueAsDate = new Date();
+  }
 }
 
 // Load categories into dropdown
@@ -154,7 +157,13 @@ function showAddForm() {
   formTitle.textContent = 'Add Recurring Transaction';
   saveFormBtnText.textContent = 'Save Recurring';
   recurringForm.reset();
-  document.getElementById('startDate').valueAsDate = new Date();
+  
+  // Set default date if element exists
+  const startDateInput = document.getElementById('startDate');
+  if (startDateInput) {
+    startDateInput.valueAsDate = new Date();
+  }
+  
   addRecurringSection.classList.add('show');
   addRecurringSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }

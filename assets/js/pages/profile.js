@@ -4,7 +4,7 @@ import firestoreService from '../services/firestore-service.js';
 import categoriesService from '../services/categories-service.js';
 import toast from '../components/toast.js';
 import { updateProfile, updatePassword, EmailAuthProvider, reauthenticateWithCredential, deleteUser } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
-
+import paymentMethodsService from '../services/payment-methods-service.js';
 // Helper function for toast
 const showToast = (message, type) => toast.show(message, type);
 
@@ -537,3 +537,341 @@ if (document.readyState === 'loading') {
 } else {
   init();
 }
+
+
+// ============================================
+// PAYMENT METHODS MANAGEMENT
+// ============================================
+
+let paymentMethods = [];
+let editingPaymentMethodId = null;
+let deletePaymentMethodId = null;
+
+// Payment Methods DOM Elements
+let paymentTypeSelect, paymentMethodNameInput;
+let cardFields, upiFields, walletFields, bankFields;
+let cardNumberInput, cardTypeSelect, cardBankNameInput, expiryMonthSelect, expiryYearSelect;
+let upiIdInput, upiProviderSelect;
+let walletProviderSelect, walletNumberInput;
+let bankAccountNumberInput, bankNameInput, ifscCodeInput, accountTypeSelect;
+let addPaymentMethodForm, addPaymentMethodBtn, addPaymentMethodBtnText, addPaymentMethodBtnSpinner;
+let paymentMethodsList;
+let deletePaymentMethodModal, closeDeletePaymentMethodModalBtn, cancelDeletePaymentMethodBtn, confirmDeletePaymentMethodBtn;
+let deletePaymentMethodName, deletePaymentMethodBtnText, deletePaymentMethodBtnSpinner;
+
+// Initialize Payment Methods DOM Elements
+function initPaymentMethodsDOM() {
+  paymentTypeSelect = document.getElementById('paymentType');
+  paymentMethodNameInput = document.getElementById('paymentMethodName');
+  
+  cardFields = document.getElementById('cardFields');
+  upiFields = document.getElementById('upiFields');
+  walletFields = document.getElementById('walletFields');
+  bankFields = document.getElementById('bankFields');
+  
+  cardNumberInput = document.getElementById('cardNumber');
+  cardTypeSelect = document.getElementById('cardType');
+  cardBankNameInput = document.getElementById('cardBankName');
+  expiryMonthSelect = document.getElementById('expiryMonth');
+  expiryYearSelect = document.getElementById('expiryYear');
+  
+  upiIdInput = document.getElementById('upiId');
+  upiProviderSelect = document.getElementById('upiProvider');
+  
+  walletProviderSelect = document.getElementById('walletProvider');
+  walletNumberInput = document.getElementById('walletNumber');
+  
+  bankAccountNumberInput = document.getElementById('bankAccountNumber');
+  bankNameInput = document.getElementById('bankName');
+  ifscCodeInput = document.getElementById('ifscCode');
+  accountTypeSelect = document.getElementById('accountType');
+  
+  addPaymentMethodForm = document.getElementById('addPaymentMethodForm');
+  addPaymentMethodBtn = document.getElementById('addPaymentMethodBtn');
+  addPaymentMethodBtnText = document.getElementById('addPaymentMethodBtnText');
+  addPaymentMethodBtnSpinner = document.getElementById('addPaymentMethodBtnSpinner');
+  
+  paymentMethodsList = document.getElementById('paymentMethodsList');
+  
+  deletePaymentMethodModal = document.getElementById('deletePaymentMethodModal');
+  closeDeletePaymentMethodModalBtn = document.getElementById('closeDeletePaymentMethodModalBtn');
+  cancelDeletePaymentMethodBtn = document.getElementById('cancelDeletePaymentMethodBtn');
+  confirmDeletePaymentMethodBtn = document.getElementById('confirmDeletePaymentMethodBtn');
+  deletePaymentMethodName = document.getElementById('deletePaymentMethodName');
+  deletePaymentMethodBtnText = document.getElementById('deletePaymentMethodBtnText');
+  deletePaymentMethodBtnSpinner = document.getElementById('deletePaymentMethodBtnSpinner');
+  
+  // Populate expiry year dropdown
+  populateExpiryYears();
+}
+
+// Setup Payment Methods Event Listeners
+function setupPaymentMethodsListeners() {
+  if (paymentTypeSelect) {
+    paymentTypeSelect.addEventListener('change', handlePaymentTypeChange);
+  }
+  
+  if (addPaymentMethodForm) {
+    addPaymentMethodForm.addEventListener('submit', handleAddPaymentMethod);
+  }
+  
+  if (closeDeletePaymentMethodModalBtn) {
+    closeDeletePaymentMethodModalBtn.addEventListener('click', hideDeletePaymentMethodModal);
+  }
+  
+  if (cancelDeletePaymentMethodBtn) {
+    cancelDeletePaymentMethodBtn.addEventListener('click', hideDeletePaymentMethodModal);
+  }
+  
+  if (confirmDeletePaymentMethodBtn) {
+    confirmDeletePaymentMethodBtn.addEventListener('click', handleDeletePaymentMethod);
+  }
+}
+
+// Populate expiry years (current year + 20 years)
+function populateExpiryYears() {
+  if (!expiryYearSelect) return;
+  
+  const currentYear = new Date().getFullYear();
+  for (let i = 0; i <= 20; i++) {
+    const year = currentYear + i;
+    const option = document.createElement('option');
+    option.value = year;
+    option.textContent = year;
+    expiryYearSelect.appendChild(option);
+  }
+}
+
+// Handle payment type change
+function handlePaymentTypeChange() {
+  const type = paymentTypeSelect.value;
+  
+  // Hide all fields
+  cardFields.style.display = 'none';
+  upiFields.style.display = 'none';
+  walletFields.style.display = 'none';
+  bankFields.style.display = 'none';
+  
+  // Show relevant fields
+  switch (type) {
+    case 'card':
+      cardFields.style.display = 'block';
+      break;
+    case 'upi':
+      upiFields.style.display = 'block';
+      break;
+    case 'wallet':
+      walletFields.style.display = 'block';
+      break;
+    case 'bank':
+      bankFields.style.display = 'block';
+      break;
+  }
+}
+
+// Load payment methods
+async function loadPaymentMethods() {
+  try {
+    paymentMethods = await paymentMethodsService.getPaymentMethods();
+    renderPaymentMethods();
+  } catch (error) {
+    console.error('Error loading payment methods:', error);
+    showToast('Failed to load payment methods', 'error');
+  }
+}
+
+// Render payment methods list
+function renderPaymentMethods() {
+  if (!paymentMethodsList) return;
+  
+  if (paymentMethods.length === 0) {
+    paymentMethodsList.innerHTML = `
+      <div class="empty-state">
+        <p>No payment methods added yet.</p>
+        <p class="text-muted">Add your first payment method above.</p>
+      </div>
+    `;
+    return;
+  }
+  
+  const html = paymentMethods.map(method => {
+    const icon = paymentMethodsService.getPaymentMethodIcon(method.type);
+    const displayName = paymentMethodsService.getPaymentMethodDisplayName(method);
+    const defaultBadge = method.isDefault ? '<span class="badge badge-primary">Default</span>' : '';
+    
+    return `
+      <div class="payment-method-card">
+        <div class="payment-method-icon">${icon}</div>
+        <div class="payment-method-info">
+          <div class="payment-method-name">${method.name} ${defaultBadge}</div>
+          <div class="payment-method-details">${getPaymentMethodDetails(method)}</div>
+        </div>
+        <div class="payment-method-actions">
+          ${!method.isDefault ? `<button class="btn-icon" onclick="setDefaultPaymentMethod('${method.id}')" title="Set as default">⭐</button>` : ''}
+          <button class="btn-icon" onclick="showDeletePaymentMethodModal('${method.id}')" title="Delete">🗑️</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+  
+  paymentMethodsList.innerHTML = html;
+}
+
+// Get payment method details for display
+function getPaymentMethodDetails(method) {
+  switch (method.type) {
+    case 'card':
+      return `${method.cardType === 'credit' ? 'Credit' : 'Debit'} • ${method.bankName || ''} • **** ${method.cardNumber || ''}`;
+    case 'upi':
+      return `${method.upiId || ''} • ${method.provider || ''}`;
+    case 'wallet':
+      return `${method.walletProvider || ''} • ${method.walletNumber || ''}`;
+    case 'bank':
+      return `${method.bankName || ''} • ${method.accountType || ''} • **** ${method.accountNumber || ''}`;
+    case 'cash':
+      return 'Cash payments';
+    default:
+      return '';
+  }
+}
+
+// Handle add payment method
+async function handleAddPaymentMethod(e) {
+  e.preventDefault();
+  
+  const type = paymentTypeSelect.value;
+  if (!type) {
+    showToast('Please select a payment type', 'error');
+    return;
+  }
+  
+  // Show loading
+  addPaymentMethodBtn.disabled = true;
+  addPaymentMethodBtnText.style.display = 'none';
+  addPaymentMethodBtnSpinner.style.display = 'inline-block';
+  
+  try {
+    const methodData = {
+      type: type,
+      name: paymentMethodNameInput.value.trim()
+    };
+    
+    // Add type-specific fields
+    switch (type) {
+      case 'card':
+        methodData.cardNumber = cardNumberInput.value.trim();
+        methodData.cardType = cardTypeSelect.value;
+        methodData.bankName = cardBankNameInput.value.trim();
+        methodData.expiryMonth = expiryMonthSelect.value;
+        methodData.expiryYear = expiryYearSelect.value;
+        break;
+      case 'upi':
+        methodData.upiId = upiIdInput.value.trim();
+        methodData.provider = upiProviderSelect.value;
+        break;
+      case 'wallet':
+        methodData.walletProvider = walletProviderSelect.value;
+        methodData.walletNumber = walletNumberInput.value.trim();
+        break;
+      case 'bank':
+        methodData.accountNumber = bankAccountNumberInput.value.trim();
+        methodData.bankName = bankNameInput.value.trim();
+        methodData.ifscCode = ifscCodeInput.value.trim().toUpperCase();
+        methodData.accountType = accountTypeSelect.value;
+        break;
+    }
+    
+    const result = await paymentMethodsService.addPaymentMethod(methodData);
+    
+    if (result.success) {
+      showToast('Payment method added successfully', 'success');
+      addPaymentMethodForm.reset();
+      handlePaymentTypeChange(); // Hide all fields
+      await loadPaymentMethods();
+    } else {
+      showToast(result.error || 'Failed to add payment method', 'error');
+    }
+  } catch (error) {
+    console.error('Error adding payment method:', error);
+    showToast('Failed to add payment method', 'error');
+  } finally {
+    addPaymentMethodBtn.disabled = false;
+    addPaymentMethodBtnText.style.display = 'inline';
+    addPaymentMethodBtnSpinner.style.display = 'none';
+  }
+}
+
+// Set default payment method
+window.setDefaultPaymentMethod = async function(methodId) {
+  try {
+    const result = await paymentMethodsService.setDefaultPaymentMethod(methodId);
+    if (result.success) {
+      showToast('Default payment method updated', 'success');
+      await loadPaymentMethods();
+    } else {
+      showToast(result.error || 'Failed to set default', 'error');
+    }
+  } catch (error) {
+    console.error('Error setting default payment method:', error);
+    showToast('Failed to set default payment method', 'error');
+  }
+};
+
+// Show delete payment method modal
+window.showDeletePaymentMethodModal = function(methodId) {
+  const method = paymentMethods.find(m => m.id === methodId);
+  if (!method) return;
+  
+  deletePaymentMethodId = methodId;
+  deletePaymentMethodName.textContent = paymentMethodsService.getPaymentMethodDisplayName(method);
+  deletePaymentMethodModal.classList.add('show');
+};
+
+// Hide delete payment method modal
+function hideDeletePaymentMethodModal() {
+  deletePaymentMethodModal.classList.remove('show');
+  deletePaymentMethodId = null;
+}
+
+// Handle delete payment method
+async function handleDeletePaymentMethod() {
+  if (!deletePaymentMethodId) return;
+  
+  // Show loading
+  confirmDeletePaymentMethodBtn.disabled = true;
+  deletePaymentMethodBtnText.style.display = 'none';
+  deletePaymentMethodBtnSpinner.style.display = 'inline-block';
+  
+  try {
+    const result = await paymentMethodsService.deletePaymentMethod(deletePaymentMethodId);
+    
+    if (result.success) {
+      showToast('Payment method deleted successfully', 'success');
+      hideDeletePaymentMethodModal();
+      await loadPaymentMethods();
+    } else {
+      showToast(result.error || 'Failed to delete payment method', 'error');
+    }
+  } catch (error) {
+    console.error('Error deleting payment method:', error);
+    showToast('Failed to delete payment method', 'error');
+  } finally {
+    confirmDeletePaymentMethodBtn.disabled = false;
+    deletePaymentMethodBtnText.style.display = 'inline';
+    deletePaymentMethodBtnSpinner.style.display = 'none';
+  }
+}
+
+// Initialize payment methods when tab is clicked
+document.addEventListener('DOMContentLoaded', () => {
+  const paymentMethodsTab = document.querySelector('[data-tab="payment-methods"]');
+  if (paymentMethodsTab) {
+    paymentMethodsTab.addEventListener('click', async () => {
+      if (!paymentMethodsList) {
+        initPaymentMethodsDOM();
+        setupPaymentMethodsListeners();
+      }
+      await loadPaymentMethods();
+    });
+  }
+});
