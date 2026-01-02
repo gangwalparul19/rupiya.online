@@ -3,6 +3,7 @@ import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
 import categoriesService from '../services/categories-service.js';
 import toast from '../components/toast.js';
+import themeManager from '../utils/theme-manager.js';
 import { updateProfile, updatePassword, EmailAuthProvider, reauthenticateWithCredential, deleteUser } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
 import paymentMethodsService from '../services/payment-methods-service.js';
 // Helper function for toast
@@ -53,6 +54,16 @@ function initDOMElements() {
   dateFormatSelect = document.getElementById('dateFormat');
   languageSelect = document.getElementById('language');
   emailNotificationsCheckbox = document.getElementById('emailNotifications');
+  
+  // Initialize theme toggle
+  const themeToggle = document.getElementById('themeToggle');
+  if (themeToggle) {
+    themeToggle.checked = themeManager.getCurrentTheme() === 'dark';
+    themeToggle.addEventListener('change', () => {
+      themeManager.toggleTheme();
+      toast.success(`Switched to ${themeManager.getCurrentTheme()} mode`);
+    });
+  }
   
   exportDataBtn = document.getElementById('exportDataBtn');
   deleteAccountBtn = document.getElementById('deleteAccountBtn');

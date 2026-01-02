@@ -12,6 +12,7 @@
   <!-- Stylesheets -->
   <link rel="stylesheet" href="assets/css/common.css">
   <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/dark-mode.css">
   <link rel="stylesheet" href="assets/css/dashboard.css">
   <link rel="stylesheet" href="assets/css/profile.css">
 </head>
@@ -64,6 +65,18 @@
           <a href="recurring.html" class="nav-item">
             <span class="nav-icon">🔄</span>
             <span>Recurring</span>
+          </a>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-section-title">Intelligence</div>
+          <a href="ai-insights.html" class="nav-item">
+            <span class="nav-icon">🤖</span>
+            <span>AI Insights</span>
+          </a>
+          <a href="split-expense.html" class="nav-item">
+            <span class="nav-icon">🤝</span>
+            <span>Split Expense</span>
           </a>
         </div>
 
@@ -296,13 +309,26 @@
                 </div>
 
                 <div class="form-group">
-                  <label for="language">Language</label>
+                  <label>Language</label>
                   <select id="language">
                     <option value="en">English</option>
                     <option value="hi">Hindi</option>
                     <option value="es">Spanish</option>
                     <option value="fr">French</option>
                   </select>
+                </div>
+
+                <div class="form-group">
+                  <label>Theme</label>
+                  <div class="theme-toggle">
+                    <span class="theme-icon sun">☀️</span>
+                    <label class="toggle-switch">
+                      <input type="checkbox" id="themeToggle">
+                      <span class="toggle-slider"></span>
+                    </label>
+                    <span class="theme-icon moon">🌙</span>
+                  </div>
+                  <small class="form-help">Choose between light and dark theme</small>
                 </div>
 
                 <div class="form-group">

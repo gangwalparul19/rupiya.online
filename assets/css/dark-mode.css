@@ -1,0 +1,258 @@
+/* ============================================
+   DARK MODE STYLES
+   Dark theme colors and overrides
+   ============================================ */
+
+/* Dark Mode Variables */
+[data-theme="dark"] {
+  /* Primary Colors */
+  --primary-blue: #5BA3F5;
+  --primary-dark: #E8EAED;
+  --primary-light: #1E1E1E;
+  
+  /* Accent Colors */
+  --accent-green: #4CAF50;
+  --accent-red: #F44336;
+  --accent-orange: #FF9800;
+  --accent-purple: #AB47BC;
+  --accent-cyan: #00BCD4;
+  
+  /* Neutral Colors */
+  --white: #121212;
+  --light-gray: #1E1E1E;
+  --medium-gray: #424242;
+  --dark-gray: #B0B0B0;
+  --black: #E8EAED;
+  
+  /* Background */
+  --bg-primary: #121212;
+  --bg-secondary: #1E1E1E;
+  --bg-card: #2C2C2C;
+  --bg-hover: #3A3A3A;
+  
+  /* Text */
+  --text-primary: #E8EAED;
+  --text-secondary: #B0B0B0;
+  --text-light: #757575;
+  --text-white: #121212;
+  
+  /* Borders */
+  --border-color: #424242;
+  
+  /* Shadows */
+  --shadow-sm: 0 2px 4px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 8px rgba(0,0,0,0.4);
+  --shadow-lg: 0 8px 16px rgba(0,0,0,0.5);
+  --shadow-xl: 0 12px 24px rgba(0,0,0,0.6);
+}
+
+/* Dark Mode Specific Overrides */
+[data-theme="dark"] body {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .sidebar {
+  background: var(--bg-card);
+  border-right-color: var(--border-color);
+}
+
+[data-theme="dark"] .nav-item {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .nav-item:hover,
+[data-theme="dark"] .nav-item.active {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .nav-section-title {
+  color: var(--text-light);
+}
+
+[data-theme="dark"] .main-content {
+  background: var(--bg-secondary);
+}
+
+[data-theme="dark"] .kpi-card,
+[data-theme="dark"] .chart-card,
+[data-theme="dark"] .settings-card,
+[data-theme="dark"] .expense-card,
+[data-theme="dark"] .budget-card,
+[data-theme="dark"] .goal-card,
+[data-theme="dark"] .investment-card,
+[data-theme="dark"] .note-card,
+[data-theme="dark"] .document-card {
+  background: var(--bg-card);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .kpi-card:hover,
+[data-theme="dark"] .expense-card:hover,
+[data-theme="dark"] .budget-card:hover,
+[data-theme="dark"] .goal-card:hover {
+  border-color: var(--primary-blue);
+}
+
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea {
+  background: var(--bg-hover);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] input:focus,
+[data-theme="dark"] select:focus,
+[data-theme="dark"] textarea:focus {
+  border-color: var(--primary-blue);
+  background: var(--bg-card);
+}
+
+[data-theme="dark"] .btn-outline {
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .btn-outline:hover {
+  background: var(--bg-hover);
+  border-color: var(--primary-blue);
+}
+
+[data-theme="dark"] .modal-container {
+  background: var(--bg-card);
+}
+
+[data-theme="dark"] .modal-overlay {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+[data-theme="dark"] .filters-card,
+[data-theme="dark"] .add-expense-section,
+[data-theme="dark"] .add-budget-section,
+[data-theme="dark"] .add-goal-section {
+  background: var(--bg-card);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .empty-state {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .table-container table {
+  background: var(--bg-card);
+}
+
+[data-theme="dark"] .table-container th {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .table-container td {
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .table-container tr:hover {
+  background: var(--bg-hover);
+}
+
+/* Dark mode toggle switch */
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+}
+
+.theme-toggle-label {
+  font-size: 14px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 52px;
+  height: 28px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--medium-gray);
+  transition: 0.3s;
+  border-radius: 28px;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+}
+
+.toggle-switch input:checked + .toggle-slider {
+  background-color: var(--primary-blue);
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+  transform: translateX(24px);
+}
+
+.toggle-switch input:focus + .toggle-slider {
+  box-shadow: 0 0 1px var(--primary-blue);
+}
+
+/* Theme icons */
+.theme-icon {
+  font-size: 20px;
+  transition: opacity 0.3s;
+}
+
+.theme-icon.sun {
+  opacity: 1;
+}
+
+.theme-icon.moon {
+  opacity: 0.5;
+}
+
+[data-theme="dark"] .theme-icon.sun {
+  opacity: 0.5;
+}
+
+[data-theme="dark"] .theme-icon.moon {
+  opacity: 1;
+}
+
+/* Smooth transition for theme change */
+body,
+.sidebar,
+.main-content,
+.kpi-card,
+.chart-card,
+input,
+select,
+textarea,
+.btn-outline {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}

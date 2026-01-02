@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Rupiya Goals - Track your financial goals">
-  <title>Goals - Rupiya</title>
+  <meta name="description" content="Rupiya Split Expense - Split bills with friends">
+  <title>Split Expense - Rupiya</title>
   
   <!-- Favicon -->
   <link rel="icon" href="assets/images/logo.png" type="image/png">
@@ -12,13 +12,13 @@
   <!-- Stylesheets -->
   <link rel="stylesheet" href="assets/css/common.css">
   <link rel="stylesheet" href="assets/css/components.css">
-  <link rel="stylesheet" href="assets/css/dark-mode.css">
   <link rel="stylesheet" href="assets/css/dashboard.css">
-  <link rel="stylesheet" href="assets/css/goals.css">
+  <link rel="stylesheet" href="assets/css/dark-mode.css">
+  <link rel="stylesheet" href="assets/css/split-expense.css">
 </head>
 <body>
   <div class="dashboard-layout">
-    <!-- Sidebar -->
+    <!-- Sidebar (same as other pages) -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <div class="sidebar-logo">
@@ -58,7 +58,7 @@
             <span class="nav-icon">📈</span>
             <span>Investments</span>
           </a>
-          <a href="goals.html" class="nav-item active">
+          <a href="goals.html" class="nav-item">
             <span class="nav-icon">🎯</span>
             <span>Goals</span>
           </a>
@@ -74,7 +74,7 @@
             <span class="nav-icon">🤖</span>
             <span>AI Insights</span>
           </a>
-          <a href="split-expense.html" class="nav-item">
+          <a href="split-expense.html" class="nav-item active">
             <span class="nav-icon">🤝</span>
             <span>Split Expense</span>
           </a>
@@ -155,178 +155,205 @@
       <!-- Page Header -->
       <div class="page-header">
         <div>
-          <h1 class="page-title">Financial Goals</h1>
-          <p class="page-subtitle">Set and track your financial goals</p>
+          <h1 class="page-title">Split Expense</h1>
+          <p class="page-subtitle">Split bills with friends and track settlements</p>
         </div>
         <div class="page-actions">
-          <button class="btn btn-primary" id="addGoalBtn">
+          <button class="btn btn-primary" id="createSplitBtn">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
             </svg>
-            Add Goal
+            Create Split
           </button>
         </div>
       </div>
 
-      <!-- Goals Summary Cards -->
-      <div class="goals-summary" id="goalsSummary">
+      <!-- Summary Cards -->
+      <div class="split-summary">
         <div class="summary-card">
-          <div class="summary-icon">🎯</div>
+          <div class="summary-icon">💸</div>
           <div class="summary-content">
-            <div class="summary-label">Active Goals</div>
-            <div class="summary-value" id="activeGoals">0</div>
+            <div class="summary-label">You Owe</div>
+            <div class="summary-value text-danger" id="totalOwed">₹0</div>
           </div>
         </div>
         <div class="summary-card">
           <div class="summary-icon">💰</div>
           <div class="summary-content">
-            <div class="summary-label">Total Target</div>
-            <div class="summary-value" id="totalTarget">₹0</div>
+            <div class="summary-label">You're Owed</div>
+            <div class="summary-value text-success" id="totalOwedToYou">₹0</div>
           </div>
         </div>
         <div class="summary-card">
-          <div class="summary-icon">✅</div>
+          <div class="summary-icon">🤝</div>
           <div class="summary-content">
-            <div class="summary-label">Total Saved</div>
-            <div class="summary-value" id="totalSaved">₹0</div>
+            <div class="summary-label">Active Splits</div>
+            <div class="summary-value" id="activeSplits">0</div>
           </div>
         </div>
       </div>
 
-      <!-- Add Goal Form (Inline) -->
-      <div class="add-goal-section" id="addGoalSection">
-        <div class="add-goal-header">
-          <h2 class="add-goal-title" id="formTitle">Add Goal</h2>
-          <button class="modal-close" id="closeFormBtn">
+      <!-- Create Split Form -->
+      <div class="create-split-section" id="createSplitSection">
+        <div class="create-split-header">
+          <h2 class="create-split-title">Create Split Expense</h2>
+          <button class="modal-close" id="closeSplitFormBtn">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
             </svg>
           </button>
         </div>
 
-        <form id="goalForm">
+        <form id="splitForm">
           <div class="form-grid">
-            <div class="form-group">
-              <label for="name">Goal Name *</label>
-              <input type="text" id="name" required maxlength="100" placeholder="e.g., Emergency Fund">
-              <span class="error-message" id="nameError"></span>
-            </div>
-
-            <div class="form-group">
-              <label for="targetAmount">Target Amount *</label>
-              <input type="number" id="targetAmount" step="0.01" min="0" required placeholder="0.00">
-              <span class="error-message" id="targetAmountError"></span>
-            </div>
-
-            <div class="form-group">
-              <label for="currentAmount">Current Amount *</label>
-              <input type="number" id="currentAmount" step="0.01" min="0" value="0" required placeholder="0.00">
-              <span class="error-message" id="currentAmountError"></span>
-            </div>
-
-            <div class="form-group">
-              <label for="targetDate">Target Date *</label>
-              <input type="date" id="targetDate" required>
-              <span class="error-message" id="targetDateError"></span>
-            </div>
-
             <div class="form-group form-group-full">
-              <label for="description">Description</label>
-              <textarea id="description" rows="3" maxlength="500" placeholder="Describe your goal..."></textarea>
-              <span class="error-message" id="descriptionError"></span>
+              <label for="splitDescription">Description *</label>
+              <input type="text" id="splitDescription" required maxlength="200" placeholder="e.g., Dinner at Restaurant">
+              <span class="error-message" id="splitDescriptionError"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="splitAmount">Total Amount *</label>
+              <input type="number" id="splitAmount" step="0.01" min="0" required placeholder="0.00">
+              <span class="error-message" id="splitAmountError"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="splitDate">Date *</label>
+              <input type="date" id="splitDate" required>
+              <span class="error-message" id="splitDateError"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="splitCategory">Category</label>
+              <select id="splitCategory">
+                <option value="Dining">Dining</option>
+                <option value="Groceries">Groceries</option>
+                <option value="Transportation">Transportation</option>
+                <option value="Entertainment">Entertainment</option>
+                <option value="Travel">Travel</option>
+                <option value="Utilities">Utilities</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="paidBy">Paid By *</label>
+              <select id="paidBy" required>
+                <option value="me">Me</option>
+                <option value="other">Someone Else</option>
+              </select>
+            </div>
+
+            <div class="form-group" id="paidByNameGroup" style="display: none;">
+              <label for="paidByName">Paid By Name *</label>
+              <input type="text" id="paidByName" placeholder="Enter name">
+              <span class="error-message" id="paidByNameError"></span>
             </div>
           </div>
 
+          <!-- Split Type -->
+          <div class="form-group">
+            <label>Split Type *</label>
+            <div class="split-type-options">
+              <label class="radio-card">
+                <input type="radio" name="splitType" value="equal" checked>
+                <div class="radio-card-content">
+                  <div class="radio-card-icon">⚖️</div>
+                  <div class="radio-card-title">Equal Split</div>
+                  <div class="radio-card-desc">Split equally among all</div>
+                </div>
+              </label>
+              <label class="radio-card">
+                <input type="radio" name="splitType" value="custom">
+                <div class="radio-card-content">
+                  <div class="radio-card-icon">✏️</div>
+                  <div class="radio-card-title">Custom Split</div>
+                  <div class="radio-card-desc">Enter custom amounts</div>
+                </div>
+              </label>
+              <label class="radio-card">
+                <input type="radio" name="splitType" value="percentage">
+                <div class="radio-card-content">
+                  <div class="radio-card-icon">📊</div>
+                  <div class="radio-card-title">Percentage</div>
+                  <div class="radio-card-desc">Split by percentage</div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Participants -->
+          <div class="form-group form-group-full">
+            <label>Participants *</label>
+            <div id="participantsList">
+              <!-- Participants will be added here -->
+            </div>
+            <button type="button" class="btn btn-outline btn-sm" id="addParticipantBtn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+              </svg>
+              Add Participant
+            </button>
+            <span class="error-message" id="participantsError"></span>
+          </div>
+
+          <!-- Split Summary -->
+          <div class="split-summary-box" id="splitSummaryBox" style="display: none;">
+            <h4>Split Summary</h4>
+            <div id="splitSummaryContent"></div>
+          </div>
+
           <div class="form-actions">
-            <button type="button" class="btn btn-outline" id="cancelFormBtn">Cancel</button>
-            <button type="submit" class="btn btn-primary" id="saveFormBtn">
-              <span id="saveFormBtnText">Save Goal</span>
-              <span id="saveFormBtnSpinner" class="spinner" style="display: none;"></span>
+            <button type="button" class="btn btn-outline" id="cancelSplitBtn">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="saveSplitBtn">
+              <span id="saveSplitBtnText">Create Split</span>
+              <span id="saveSplitBtnSpinner" class="spinner" style="display: none;"></span>
             </button>
           </div>
         </form>
       </div>
 
-      <!-- Goals List -->
-      <div class="goals-container">
-        <div id="goalsList" class="goals-grid">
-          <!-- Goal cards will be loaded here -->
+      <!-- Splits List -->
+      <div class="splits-container">
+        <div class="splits-tabs">
+          <button class="tab-btn active" data-tab="active">Active</button>
+          <button class="tab-btn" data-tab="settled">Settled</button>
+          <button class="tab-btn" data-tab="all">All</button>
+        </div>
+
+        <div id="splitsList" class="splits-grid">
+          <!-- Splits will be loaded here -->
         </div>
 
         <!-- Empty State -->
         <div id="emptyState" class="empty-state" style="display: none;">
-          <div class="empty-state-icon">🎯</div>
-          <h3 class="empty-state-title">No goals yet</h3>
-          <p class="empty-state-text">Start achieving your dreams by setting your first financial goal.</p>
-          <button class="btn btn-primary" onclick="document.getElementById('addGoalBtn').click()">
+          <div class="empty-state-icon">🤝</div>
+          <h3 class="empty-state-title">No split expenses yet</h3>
+          <p class="empty-state-text">Create your first split to share expenses with friends.</p>
+          <button class="btn btn-primary" onclick="document.getElementById('createSplitBtn').click()">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
             </svg>
-            Set Your First Goal
+            Create Your First Split
           </button>
         </div>
 
         <!-- Loading State -->
         <div id="loadingState" class="loading-state">
           <div class="spinner-lg"></div>
-          <p>Loading goals...</p>
+          <p>Loading splits...</p>
         </div>
       </div>
     </main>
   </div>
 
-  <!-- Add Contribution Modal -->
-  <div class="modal-overlay" id="contributionModal">
+  <!-- Settle Modal -->
+  <div class="modal-overlay" id="settleModal">
     <div class="modal-container modal-sm">
       <div class="modal-header">
-        <h2 class="modal-title">Add Contribution</h2>
-        <button class="modal-close" id="closeContributionModalBtn">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-          </svg>
-        </button>
-      </div>
-
-      <form id="contributionForm" class="modal-body">
-        <div class="contribution-info">
-          <strong id="contributionGoalName"></strong>
-          <span id="contributionGoalProgress"></span>
-        </div>
-
-        <div class="form-group">
-          <label for="contributionAmount">Amount *</label>
-          <input type="number" id="contributionAmount" step="0.01" min="0" required placeholder="0.00">
-          <span class="error-message" id="contributionAmountError"></span>
-        </div>
-
-        <div class="form-group">
-          <label for="contributionDate">Date *</label>
-          <input type="date" id="contributionDate" required>
-          <span class="error-message" id="contributionDateError"></span>
-        </div>
-
-        <div class="form-group">
-          <label for="contributionNote">Note</label>
-          <input type="text" id="contributionNote" maxlength="200" placeholder="Optional note">
-        </div>
-      </form>
-
-      <div class="modal-footer">
-        <button type="button" class="btn btn-outline" id="cancelContributionBtn">Cancel</button>
-        <button type="submit" form="contributionForm" class="btn btn-primary" id="saveContributionBtn">
-          <span id="saveContributionBtnText">Add Contribution</span>
-          <span id="saveContributionBtnSpinner" class="spinner" style="display: none;"></span>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Delete Confirmation Modal -->
-  <div class="modal-overlay" id="deleteModal">
-    <div class="modal-container modal-sm">
-      <div class="modal-header">
-        <h2 class="modal-title">Delete Goal</h2>
-        <button class="modal-close" id="closeDeleteModalBtn">
+        <h2 class="modal-title">Settle Split</h2>
+        <button class="modal-close" id="closeSettleModalBtn">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
           </svg>
@@ -334,25 +361,32 @@
       </div>
 
       <div class="modal-body">
-        <p>Are you sure you want to delete this goal?</p>
-        <div class="delete-info">
-          <strong id="deleteGoalName"></strong>
-          <span id="deleteGoalTarget"></span>
+        <p>Mark this split as settled?</p>
+        <div class="settle-info">
+          <strong id="settleDescription"></strong>
+          <span id="settleAmount"></span>
         </div>
-        <p class="text-danger">This action cannot be undone.</p>
+        <div class="form-group">
+          <label for="settleDate">Settlement Date</label>
+          <input type="date" id="settleDate" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="settleNotes">Notes (Optional)</label>
+          <textarea id="settleNotes" rows="3" class="form-control" placeholder="Add settlement notes..."></textarea>
+        </div>
       </div>
 
       <div class="modal-footer">
-        <button type="button" class="btn btn-outline" id="cancelDeleteBtn">Cancel</button>
-        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
-          <span id="deleteBtnText">Delete</span>
-          <span id="deleteBtnSpinner" class="spinner" style="display: none;"></span>
+        <button type="button" class="btn btn-outline" id="cancelSettleBtn">Cancel</button>
+        <button type="button" class="btn btn-success" id="confirmSettleBtn">
+          <span id="settleBtnText">Mark as Settled</span>
+          <span id="settleBtnSpinner" class="spinner" style="display: none;"></span>
         </button>
       </div>
     </div>
   </div>
 
   <!-- Scripts -->
-  <script type="module" src="assets/js/pages/goals.js"></script>
+  <script type="module" src="assets/js/pages/split-expense.js"></script>
 </body>
 </html>

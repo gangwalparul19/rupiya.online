@@ -1,0 +1,330 @@
+/* Split Expense Styles */
+
+.split-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.create-split-section {
+  background: var(--bg-card);
+  border: 2px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  display: none;
+}
+
+.create-split-section.show {
+  display: block;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.create-split-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.create-split-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.split-type-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.radio-card {
+  position: relative;
+  cursor: pointer;
+}
+
+.radio-card input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+}
+
+.radio-card-content {
+  border: 2px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 1rem;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.radio-card input[type="radio"]:checked + .radio-card-content {
+  border-color: var(--primary-blue);
+  background: rgba(74, 144, 226, 0.1);
+}
+
+.radio-card-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.radio-card-title {
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.radio-card-desc {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+#participantsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.participant-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 0.75rem;
+  align-items: start;
+}
+
+.participant-row input {
+  width: 100%;
+}
+
+.btn-remove-participant {
+  padding: 0.5rem;
+  background: transparent;
+  border: 1px solid var(--accent-red);
+  color: var(--accent-red);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-remove-participant:hover {
+  background: var(--accent-red);
+  color: white;
+}
+
+.split-summary-box {
+  background: var(--bg-secondary);
+  border: 2px solid var(--primary-blue);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.split-summary-box h4 {
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+}
+
+.split-summary-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.split-summary-item:last-child {
+  border-bottom: none;
+}
+
+.splits-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.splits-tabs .tab-btn {
+  padding: 0.75rem 1.5rem;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: var(--text-secondary);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.splits-tabs .tab-btn:hover {
+  color: var(--text-primary);
+}
+
+.splits-tabs .tab-btn.active {
+  color: var(--primary-blue);
+  border-bottom-color: var(--primary-blue);
+}
+
+.splits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+.split-card {
+  background: var(--bg-card);
+  border: 2px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.split-card:hover {
+  border-color: var(--primary-blue);
+  box-shadow: var(--shadow-md);
+}
+
+.split-card.settled {
+  opacity: 0.7;
+}
+
+.split-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  margin-bottom: 1rem;
+}
+
+.split-card-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.split-card-amount {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-blue);
+}
+
+.split-card-status {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.split-card-status.active {
+  background: rgba(74, 144, 226, 0.1);
+  color: var(--primary-blue);
+}
+
+.split-card-status.settled {
+  background: rgba(39, 174, 96, 0.1);
+  color: var(--accent-green);
+}
+
+.split-card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.split-card-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.split-participants {
+  margin-bottom: 1rem;
+}
+
+.split-participants-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.split-participant-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  background: var(--bg-secondary);
+  border-radius: var(--border-radius);
+  margin-bottom: 0.5rem;
+}
+
+.split-participant-name {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.split-participant-amount {
+  font-weight: 600;
+  color: var(--primary-blue);
+}
+
+.split-participant-amount.owes {
+  color: var(--accent-red);
+}
+
+.split-participant-amount.owed {
+  color: var(--accent-green);
+}
+
+.split-card-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.split-card-actions .btn {
+  flex: 1;
+}
+
+.settle-info {
+  background: var(--bg-secondary);
+  padding: 1rem;
+  border-radius: var(--border-radius);
+  margin: 1rem 0;
+}
+
+.settle-info strong {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+.settle-info span {
+  color: var(--text-secondary);
+}
+
+@media (max-width: 768px) {
+  .split-type-options {
+    grid-template-columns: 1fr;
+  }
+  
+  .splits-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .participant-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .participant-row .btn-remove-participant {
+    width: 100%;
+  }
+}

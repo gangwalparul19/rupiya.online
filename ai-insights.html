@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Rupiya AI Insights - Smart financial recommendations">
+  <title>AI Insights - Rupiya</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" href="assets/images/logo.png" type="image/png">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="assets/css/common.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/dashboard.css">
+  <link rel="stylesheet" href="assets/css/dark-mode.css">
+  <link rel="stylesheet" href="assets/css/ai-insights.css">
+</head>
+<body>
+  <div class="dashboard-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <img src="assets/images/logo.png" alt="Rupiya">
+        </div>
+        <button class="sidebar-toggle" id="sidebarClose">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <div class="nav-section-title">Main</div>
+          <a href="dashboard.html" class="nav-item">
+            <span class="nav-icon">📊</span>
+            <span>Dashboard</span>
+          </a>
+          <a href="expenses.html" class="nav-item">
+            <span class="nav-icon">💸</span>
+            <span>Expenses</span>
+          </a>
+          <a href="income.html" class="nav-item">
+            <span class="nav-icon">💰</span>
+            <span>Income</span>
+          </a>
+          <a href="budgets.html" class="nav-item">
+            <span class="nav-icon">💳</span>
+            <span>Budgets</span>
+          </a>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-section-title">Tracking</div>
+          <a href="investments.html" class="nav-item">
+            <span class="nav-icon">📈</span>
+            <span>Investments</span>
+          </a>
+          <a href="goals.html" class="nav-item">
+            <span class="nav-icon">🎯</span>
+            <span>Goals</span>
+          </a>
+          <a href="recurring.html" class="nav-item">
+            <span class="nav-icon">🔄</span>
+            <span>Recurring</span>
+          </a>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-section-title">Intelligence</div>
+          <a href="ai-insights.html" class="nav-item active">
+            <span class="nav-icon">🤖</span>
+            <span>AI Insights</span>
+          </a>
+          <a href="split-expense.html" class="nav-item">
+            <span class="nav-icon">🤝</span>
+            <span>Split Expense</span>
+          </a>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-section-title">Assets</div>
+          <a href="houses.html" class="nav-item">
+            <span class="nav-icon">🏠</span>
+            <span>Houses</span>
+          </a>
+          <a href="vehicles.html" class="nav-item">
+            <span class="nav-icon">🚗</span>
+            <span>Vehicles</span>
+          </a>
+          <a href="house-help.html" class="nav-item">
+            <span class="nav-icon">🧹</span>
+            <span>House Help</span>
+          </a>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-section-title">More</div>
+          <a href="notes.html" class="nav-item">
+            <span class="nav-icon">📝</span>
+            <span>Notes</span>
+          </a>
+          <a href="documents.html" class="nav-item">
+            <span class="nav-icon">📄</span>
+            <span>Documents</span>
+          </a>
+          <a href="analytics.html" class="nav-item">
+            <span class="nav-icon">📉</span>
+            <span>Analytics</span>
+          </a>
+          <a href="profile.html" class="nav-item">
+            <span class="nav-icon">⚙️</span>
+            <span>Settings</span>
+          </a>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-profile" id="userProfile">
+          <div class="user-avatar" id="userAvatar">U</div>
+          <div class="user-info">
+            <div class="user-name" id="userName">Loading...</div>
+            <div class="user-email" id="userEmail">Loading...</div>
+          </div>
+        </div>
+        <button class="btn btn-sm btn-outline w-100 mt-3" id="logoutBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+          </svg>
+          Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- Sidebar Overlay (Mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Mobile Header -->
+      <div class="mobile-header">
+        <button class="sidebar-toggle" id="sidebarOpen">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+        <div class="sidebar-logo">
+          <img src="assets/images/logo.png" alt="Rupiya" style="height: 32px;">
+        </div>
+        <div style="width: 24px;"></div>
+      </div>
+
+      <!-- Page Header -->
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">AI Insights</h1>
+          <p class="page-subtitle">Smart recommendations powered by AI</p>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-outline" id="refreshInsightsBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+            </svg>
+            Refresh
+          </button>
+        </div>
+      </div>
+
+      <!-- Financial Health Score -->
+      <div class="health-score-card">
+        <div class="health-score-header">
+          <div>
+            <h2 class="health-score-title">Financial Health Score</h2>
+            <p class="health-score-subtitle">Based on your spending and saving patterns</p>
+          </div>
+          <div class="health-score-value" id="healthScore">
+            <div class="score-circle">
+              <svg class="score-ring" width="120" height="120">
+                <circle class="score-ring-bg" cx="60" cy="60" r="52" />
+                <circle class="score-ring-progress" cx="60" cy="60" r="52" id="scoreRing" />
+              </svg>
+              <div class="score-number" id="scoreNumber">0</div>
+            </div>
+          </div>
+        </div>
+        <div class="health-score-breakdown">
+          <div class="score-factor">
+            <div class="score-factor-label">Savings Rate</div>
+            <div class="score-factor-bar">
+              <div class="score-factor-fill" id="savingsRateFill" style="width: 0%"></div>
+            </div>
+            <div class="score-factor-value" id="savingsRateValue">0%</div>
+          </div>
+          <div class="score-factor">
+            <div class="score-factor-label">Budget Adherence</div>
+            <div class="score-factor-bar">
+              <div class="score-factor-fill" id="budgetAdherenceFill" style="width: 0%"></div>
+            </div>
+            <div class="score-factor-value" id="budgetAdherenceValue">0%</div>
+          </div>
+          <div class="score-factor">
+            <div class="score-factor-label">Spending Consistency</div>
+            <div class="score-factor-bar">
+              <div class="score-factor-fill" id="spendingConsistencyFill" style="width: 0%"></div>
+            </div>
+            <div class="score-factor-value" id="spendingConsistencyValue">0%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Insights Grid -->
+      <div class="insights-grid">
+        <!-- Spending Patterns -->
+        <div class="insight-card">
+          <div class="insight-header">
+            <div class="insight-icon spending">📊</div>
+            <div>
+              <h3 class="insight-title">Spending Patterns</h3>
+              <p class="insight-subtitle">This month vs last month</p>
+            </div>
+          </div>
+          <div class="insight-content" id="spendingPatternsContent">
+            <div class="loading-state">
+              <div class="spinner"></div>
+              <p>Analyzing...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Anomalies -->
+        <div class="insight-card">
+          <div class="insight-header">
+            <div class="insight-icon alert">⚠️</div>
+            <div>
+              <h3 class="insight-title">Unusual Activity</h3>
+              <p class="insight-subtitle">Detected anomalies</p>
+            </div>
+          </div>
+          <div class="insight-content" id="anomaliesContent">
+            <div class="loading-state">
+              <div class="spinner"></div>
+              <p>Analyzing...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Savings Opportunities -->
+        <div class="insight-card">
+          <div class="insight-header">
+            <div class="insight-icon savings">💡</div>
+            <div>
+              <h3 class="insight-title">Savings Opportunities</h3>
+              <p class="insight-subtitle">Ways to save more</p>
+            </div>
+          </div>
+          <div class="insight-content" id="savingsOpportunitiesContent">
+            <div class="loading-state">
+              <div class="spinner"></div>
+              <p>Analyzing...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Budget Recommendations -->
+        <div class="insight-card">
+          <div class="insight-header">
+            <div class="insight-icon budget">💳</div>
+            <div>
+              <h3 class="insight-title">Budget Recommendations</h3>
+              <p class="insight-subtitle">Suggested budget adjustments</p>
+            </div>
+          </div>
+          <div class="insight-content" id="budgetRecommendationsContent">
+            <div class="loading-state">
+              <div class="spinner"></div>
+              <p>Analyzing...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category Insights -->
+        <div class="insight-card">
+          <div class="insight-header">
+            <div class="insight-icon category">🏷️</div>
+            <div>
+              <h3 class="insight-title">Category Analysis</h3>
+              <p class="insight-subtitle">Top spending categories</p>
+            </div>
+          </div>
+          <div class="insight-content" id="categoryInsightsContent">
+            <div class="loading-state">
+              <div class="spinner"></div>
+              <p>Analyzing...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Predictions -->
+        <div class="insight-card">
+          <div class="insight-header">
+            <div class="insight-icon prediction">🔮</div>
+            <div>
+              <h3 class="insight-title">Predictions</h3>
+              <p class="insight-subtitle">Next month forecast</p>
+            </div>
+          </div>
+          <div class="insight-content" id="predictionsContent">
+            <div class="loading-state">
+              <div class="spinner"></div>
+              <p>Analyzing...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Monthly Report -->
+      <div class="monthly-report-card">
+        <div class="monthly-report-header">
+          <h2 class="monthly-report-title">AI-Generated Monthly Report</h2>
+          <p class="monthly-report-subtitle">Comprehensive analysis of your finances</p>
+        </div>
+        <div class="monthly-report-content" id="monthlyReportContent">
+          <div class="loading-state">
+            <div class="spinner-lg"></div>
+            <p>Generating report...</p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="assets/js/pages/ai-insights.js"></script>
+</body>
+</html>
