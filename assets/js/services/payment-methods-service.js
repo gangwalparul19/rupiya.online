@@ -139,8 +139,6 @@ class PaymentMethodsService {
           data.cardNumber = methodData.cardNumber || '';
           data.cardType = methodData.cardType || 'credit'; // credit, debit
           data.bankName = methodData.bankName || '';
-          data.expiryMonth = methodData.expiryMonth || '';
-          data.expiryYear = methodData.expiryYear || '';
           break;
           
         case this.types.UPI:

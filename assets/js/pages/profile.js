@@ -550,7 +550,7 @@ let deletePaymentMethodId = null;
 // Payment Methods DOM Elements
 let paymentTypeSelect, paymentMethodNameInput;
 let cardFields, upiFields, walletFields, bankFields;
-let cardNumberInput, cardTypeSelect, cardBankNameInput, expiryMonthSelect, expiryYearSelect;
+let cardNumberInput, cardTypeSelect, cardBankNameInput;
 let upiIdInput, upiProviderSelect;
 let walletProviderSelect, walletNumberInput;
 let bankAccountNumberInput, bankNameInput, ifscCodeInput, accountTypeSelect;
@@ -572,8 +572,6 @@ function initPaymentMethodsDOM() {
   cardNumberInput = document.getElementById('cardNumber');
   cardTypeSelect = document.getElementById('cardType');
   cardBankNameInput = document.getElementById('cardBankName');
-  expiryMonthSelect = document.getElementById('expiryMonth');
-  expiryYearSelect = document.getElementById('expiryYear');
   
   upiIdInput = document.getElementById('upiId');
   upiProviderSelect = document.getElementById('upiProvider');
@@ -600,9 +598,6 @@ function initPaymentMethodsDOM() {
   deletePaymentMethodName = document.getElementById('deletePaymentMethodName');
   deletePaymentMethodBtnText = document.getElementById('deletePaymentMethodBtnText');
   deletePaymentMethodBtnSpinner = document.getElementById('deletePaymentMethodBtnSpinner');
-  
-  // Populate expiry year dropdown
-  populateExpiryYears();
 }
 
 // Setup Payment Methods Event Listeners
@@ -625,20 +620,6 @@ function setupPaymentMethodsListeners() {
   
   if (confirmDeletePaymentMethodBtn) {
     confirmDeletePaymentMethodBtn.addEventListener('click', handleDeletePaymentMethod);
-  }
-}
-
-// Populate expiry years (current year + 20 years)
-function populateExpiryYears() {
-  if (!expiryYearSelect) return;
-  
-  const currentYear = new Date().getFullYear();
-  for (let i = 0; i <= 20; i++) {
-    const year = currentYear + i;
-    const option = document.createElement('option');
-    option.value = year;
-    option.textContent = year;
-    expiryYearSelect.appendChild(option);
   }
 }
 
@@ -762,8 +743,6 @@ async function handleAddPaymentMethod(e) {
         methodData.cardNumber = cardNumberInput.value.trim();
         methodData.cardType = cardTypeSelect.value;
         methodData.bankName = cardBankNameInput.value.trim();
-        methodData.expiryMonth = expiryMonthSelect.value;
-        methodData.expiryYear = expiryYearSelect.value;
         break;
       case 'upi':
         methodData.upiId = upiIdInput.value.trim();

@@ -137,7 +137,7 @@ function showEditForm(help) {
   document.getElementById('name').value = help.name;
   document.getElementById('role').value = help.role;
   document.getElementById('phone').value = help.phone || '';
-  document.getElementById('monthlySalary').value = help.monthlySalary;
+  document.getElementById('monthlySalary').value = parseFloat(help.monthlySalary) || 0;
   document.getElementById('joinDate').value = formatDateForInput(help.joinDate);
   document.getElementById('status').value = help.status;
   document.getElementById('notes').value = help.notes || '';
@@ -149,11 +149,20 @@ function showEditForm(help) {
 async function handleSubmit(e) {
   e.preventDefault();
 
+  const salaryValue = document.getElementById('monthlySalary').value;
+  const monthlySalary = parseFloat(salaryValue);
+  
+  // Validate salary
+  if (isNaN(monthlySalary) || monthlySalary < 0) {
+    showToast('Please enter a valid salary amount', 'error');
+    return;
+  }
+
   const formData = {
     name: document.getElementById('name').value.trim(),
     role: document.getElementById('role').value,
     phone: document.getElementById('phone').value.trim(),
-    monthlySalary: parseFloat(document.getElementById('monthlySalary').value),
+    monthlySalary: monthlySalary,
     joinDate: new Date(document.getElementById('joinDate').value),
     status: document.getElementById('status').value,
     notes: document.getElementById('notes').value.trim()
@@ -262,7 +271,7 @@ function renderStaff() {
         <div class="help-card-footer">
           <div class="help-salary">
             <div class="help-salary-label">Monthly Salary</div>
-            <div class="help-salary-value">${formatCurrency(help.monthlySalary)}</div>
+            <div class="help-salary-value">${formatCurrency(parseFloat(help.monthlySalary) || 0)}</div>
           </div>
         </div>
 
@@ -280,7 +289,10 @@ function updateSummary() {
   const totalStaff = staff.filter(h => h.status === 'Active').length;
   const monthlySalary = staff
     .filter(h => h.status === 'Active')
-    .reduce((sum, help) => sum + help.monthlySalary, 0);
+    .reduce((sum, help) => {
+      const salary = parseFloat(help.monthlySalary) || 0;
+      return sum + salary;
+    }, 0);
 
   totalStaffEl.textContent = totalStaff;
   monthlySalaryEl.textContent = formatCurrency(monthlySalary);
