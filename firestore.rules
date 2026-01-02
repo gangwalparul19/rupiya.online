@@ -1,0 +1,239 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Helper function to check if user owns the document
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Helper function to check if document belongs to current user
+    function belongsToUser() {
+      return isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+    
+    // Helper function to validate userId is set correctly on create
+    function hasValidUserId() {
+      return request.resource.data.userId == request.auth.uid;
+    }
+    
+    // Helper function to check if userId is not being changed
+    function userIdNotChanged() {
+      return request.resource.data.userId == resource.data.userId;
+    }
+    
+    // Helper function to validate timestamps
+    function hasValidTimestamps() {
+      return request.resource.data.createdAt is timestamp &&
+             request.resource.data.updatedAt is timestamp;
+    }
+    
+    // ============================================
+    // USER PROFILES
+    // ============================================
+    match /users/{userId} {
+      // Users can only read and write their own profile
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) && hasValidTimestamps();
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId);
+    }
+    
+    // ============================================
+    // EXPENSES
+    // ============================================
+    match /expenses/{expenseId} {
+      // Users can only access their own expenses
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && 
+                      hasValidUserId() && 
+                      hasValidTimestamps() &&
+                      request.resource.data.keys().hasAll(['amount', 'category', 'date', 'userId']);
+      allow update: if belongsToUser() && 
+                      userIdNotChanged() &&
+                      request.resource.data.keys().hasAll(['amount', 'category', 'date', 'userId']);
+      allow delete: if belongsToUser();
+    }
+    
+    // ============================================
+    // INCOME
+    // ============================================
+    match /income/{incomeId} {
+      // Users can only access their own income records
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && 
+                      hasValidUserId() && 
+                      hasValidTimestamps() &&
+                      request.resource.data.keys().hasAll(['amount', 'category', 'date', 'userId']);
+      allow update: if belongsToUser() && 
+                      userIdNotChanged() &&
+                      request.resource.data.keys().hasAll(['amount', 'category', 'date', 'userId']);
+      allow delete: if belongsToUser();
+    }
+    
+    // ============================================
+    // BUDGETS
+    // ============================================
+    match /budgets/{budgetId} {
+      // Users can only access their own budgets
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && 
+                      hasValidUserId() && 
+                      hasValidTimestamps() &&
+                      request.resource.data.keys().hasAll(['category', 'amount', 'userId']);
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
+    }
+    
+    // ============================================
+    // INVESTMENTS
+    // ============================================
+    match /investments/{investmentId} {
+      // Users can only access their own investments
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && 
+                      hasValidUserId() && 
+                      hasValidTimestamps() &&
+                      request.resource.data.keys().hasAll(['name', 'type', 'amount', 'userId']);
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
+    }
+    
+    // ============================================
+    // GOALS
+    // ============================================
+    match /goals/{goalId} {
+      // Users can only access their own goals
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && 
+                      hasValidUserId() && 
+                      hasValidTimestamps() &&
+                      request.resource.data.keys().hasAll(['name', 'targetAmount', 'userId']);
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
+    }
+    
+    // ============================================
+    // HOUSES
+    // ============================================
+    match /houses/{houseId} {
+      // Users can only access their own houses
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && 
+                      hasValidUserId() && 
+                      hasValidTimestamps() &&
+                      request.resource.data.keys().hasAll(['name', 'userId']);
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
+    }
+    
+    // ============================================
+    // VEHICLES
+    // ============================================
+    match /vehicles/{vehicleId} {
+      // Users can only access their own vehicles
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && 
+                      hasValidUserId() && 
+                      hasValidTimestamps() &&
+                      request.resource.data.keys().hasAll(['name', 'userId']);
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
+    }
+    
+    // ============================================
+    // HOUSE HELPS
+    // ============================================
+    match /houseHelps/{houseHelpId} {
+      // Users can only access their own house help records
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && 
+                      hasValidUserId() && 
+                      hasValidTimestamps();
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
+    }
+    
+    // ============================================
+    // NOTES
+    // ============================================
+    match /notes/{noteId} {
+      // Users can only access their own notes
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && 
+                      hasValidUserId() && 
+                      hasValidTimestamps() &&
+                      request.resource.data.keys().hasAll(['title', 'content', 'userId']);
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
+    }
+    
+    // ============================================
+    // DOCUMENTS
+    // ============================================
+    match /documents/{documentId} {
+      // Users can only access their own documents
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && 
+                      hasValidUserId() && 
+                      hasValidTimestamps() &&
+                      request.resource.data.keys().hasAll(['name', 'fileUrl', 'userId']);
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
+    }
+    
+    // ============================================
+    // CATEGORIES
+    // ============================================
+    match /categories/{userId} {
+      // Categories document ID is the userId itself
+      // Users can only access their own categories
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) && hasValidTimestamps();
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId);
+    }
+    
+    // ============================================
+    // WALLETS
+    // ============================================
+    match /wallets/{walletId} {
+      // Users can only access their own wallets
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && 
+                      hasValidUserId() && 
+                      hasValidTimestamps() &&
+                      request.resource.data.keys().hasAll(['name', 'balance', 'userId']);
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
+    }
+    
+    // ============================================
+    // RECURRING TRANSACTIONS
+    // ============================================
+    match /recurringTransactions/{recurringId} {
+      // Users can only access their own recurring transactions
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && 
+                      hasValidUserId() && 
+                      hasValidTimestamps() &&
+                      request.resource.data.keys().hasAll(['type', 'amount', 'frequency', 'userId']);
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
+    }
+    
+    // ============================================
+    // DENY ALL OTHER COLLECTIONS
+    // ============================================
+    // Explicitly deny access to any other collections
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

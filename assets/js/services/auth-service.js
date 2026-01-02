@@ -17,6 +17,7 @@ class AuthService {
     this.authStateListeners = [];
     this.authInitialized = false;
     this.authInitPromise = null;
+    this.userService = null; // Will be set after import to avoid circular dependency
   }
 
   // Initialize auth state listener
@@ -58,6 +59,12 @@ class AuthService {
   async signIn(email, password) {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      
+      // Create/update user profile in Firestore
+      if (this.userService) {
+        await this.userService.getOrCreateUserProfile(userCredential.user);
+      }
+      
       return { success: true, user: userCredential.user };
     } catch (error) {
       return { success: false, error: this.getErrorMessage(error.code) };
@@ -72,6 +79,15 @@ class AuthService {
       // Update profile with display name
       if (displayName) {
         await updateProfile(userCredential.user, { displayName });
+        // Refresh user to get updated displayName
+        await userCredential.user.reload();
+      }
+      
+      // Create user profile in Firestore
+      if (this.userService) {
+        await this.userService.getOrCreateUserProfile(
+          displayName ? auth.currentUser : userCredential.user
+        );
       }
       
       return { success: true, user: userCredential.user };
@@ -85,6 +101,12 @@ class AuthService {
     try {
       const provider = new GoogleAuthProvider();
       const userCredential = await signInWithPopup(auth, provider);
+      
+      // Create/update user profile in Firestore
+      if (this.userService) {
+        await this.userService.getOrCreateUserProfile(userCredential.user);
+      }
+      
       return { success: true, user: userCredential.user };
     } catch (error) {
       return { success: false, error: this.getErrorMessage(error.code) };
@@ -94,11 +116,21 @@ class AuthService {
   // Sign out
   async signOut() {
     try {
+      // Clear user service cache
+      if (this.userService) {
+        this.userService.clearCache();
+      }
+      
       await signOut(auth);
       return { success: true };
     } catch (error) {
       return { success: false, error: this.getErrorMessage(error.code) };
     }
+  }
+
+  // Set user service (called after import to avoid circular dependency)
+  setUserService(service) {
+    this.userService = service;
   }
 
   // Send password reset email

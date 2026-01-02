@@ -3,7 +3,6 @@ import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
 import toast from '../components/toast.js';
 import { formatCurrency, formatDate, getRelativeTime } from '../utils/helpers.js';
-import { generateAllSampleData } from '../utils/sample-data.js';
 
 // Check authentication
 async function checkAuth() {
@@ -550,35 +549,5 @@ categoryPeriod.addEventListener('change', async () => {
     createCategoryChart(expenses, categoryPeriod.value);
   } catch (error) {
     console.error('Error updating category chart:', error);
-  }
-});
-
-// Generate sample data button
-generateDataBtn.addEventListener('click', async () => {
-  generateDataBtn.disabled = true;
-  generateDataBtn.textContent = 'Generating...';
-  
-  const result = await generateAllSampleData();
-  
-  if (result.success) {
-    // Reload dashboard data
-    setTimeout(async () => {
-      await loadDashboardData();
-      generateDataBtn.disabled = false;
-      generateDataBtn.innerHTML = `
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-        </svg>
-        Generate Sample Data
-      `;
-    }, 2000);
-  } else {
-    generateDataBtn.disabled = false;
-    generateDataBtn.innerHTML = `
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-      </svg>
-      Generate Sample Data
-    `;
   }
 });

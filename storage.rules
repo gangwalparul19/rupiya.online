@@ -1,0 +1,142 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Helper function to check if user owns the file path
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Helper function to validate file size (max 10MB)
+    function isValidSize() {
+      return request.resource.size < 10 * 1024 * 1024;
+    }
+    
+    // Helper function to validate image file types
+    function isValidImageType() {
+      return request.resource.contentType.matches('image/.*');
+    }
+    
+    // Helper function to validate document file types
+    function isValidDocumentType() {
+      return request.resource.contentType.matches('image/.*') ||
+             request.resource.contentType.matches('application/pdf') ||
+             request.resource.contentType.matches('application/msword') ||
+             request.resource.contentType.matches('application/vnd.openxmlformats-officedocument.wordprocessingml.document') ||
+             request.resource.contentType.matches('application/vnd.ms-excel') ||
+             request.resource.contentType.matches('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') ||
+             request.resource.contentType.matches('text/plain') ||
+             request.resource.contentType.matches('text/csv');
+    }
+    
+    // ============================================
+    // USER PROFILE PICTURES
+    // ============================================
+    match /users/{userId}/profile/{fileName} {
+      // Users can only upload/read/delete their own profile pictures
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId) && 
+                     isValidImageType() && 
+                     isValidSize();
+      allow delete: if isOwner(userId);
+    }
+    
+    // ============================================
+    // DOCUMENT FILES
+    // ============================================
+    match /users/{userId}/documents/{fileName} {
+      // Users can only upload/read/delete their own documents
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId) && 
+                     isValidDocumentType() && 
+                     isValidSize();
+      allow delete: if isOwner(userId);
+    }
+    
+    // ============================================
+    // HOUSE IMAGES
+    // ============================================
+    match /users/{userId}/houses/{houseId}/{fileName} {
+      // Users can only upload/read/delete their own house images
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId) && 
+                     isValidImageType() && 
+                     isValidSize();
+      allow delete: if isOwner(userId);
+    }
+    
+    // ============================================
+    // VEHICLE IMAGES
+    // ============================================
+    match /users/{userId}/vehicles/{vehicleId}/{fileName} {
+      // Users can only upload/read/delete their own vehicle images
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId) && 
+                     isValidImageType() && 
+                     isValidSize();
+      allow delete: if isOwner(userId);
+    }
+    
+    // ============================================
+    // INVESTMENT DOCUMENTS
+    // ============================================
+    match /users/{userId}/investments/{investmentId}/{fileName} {
+      // Users can only upload/read/delete their own investment documents
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId) && 
+                     isValidDocumentType() && 
+                     isValidSize();
+      allow delete: if isOwner(userId);
+    }
+    
+    // ============================================
+    // EXPENSE RECEIPTS
+    // ============================================
+    match /users/{userId}/receipts/{expenseId}/{fileName} {
+      // Users can only upload/read/delete their own expense receipts
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId) && 
+                     isValidDocumentType() && 
+                     isValidSize();
+      allow delete: if isOwner(userId);
+    }
+    
+    // ============================================
+    // INCOME RECEIPTS
+    // ============================================
+    match /users/{userId}/income-receipts/{incomeId}/{fileName} {
+      // Users can only upload/read/delete their own income receipts
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId) && 
+                     isValidDocumentType() && 
+                     isValidSize();
+      allow delete: if isOwner(userId);
+    }
+    
+    // ============================================
+    // GENERAL USER FILES
+    // ============================================
+    match /users/{userId}/files/{allPaths=**} {
+      // Users can upload any files in their own directory
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId) && 
+                     isValidDocumentType() && 
+                     isValidSize();
+      allow delete: if isOwner(userId);
+    }
+    
+    // ============================================
+    // DENY ALL OTHER PATHS
+    // ============================================
+    // Explicitly deny access to any other storage paths
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

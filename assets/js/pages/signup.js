@@ -1,4 +1,5 @@
 // Signup Page Logic
+import '../services/services-init.js'; // Initialize services
 import authService from '../services/auth-service.js';
 import toast from '../components/toast.js';
 import { validateForm, setupRealtimeValidation } from '../utils/validation.js';

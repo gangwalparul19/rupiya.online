@@ -1,0 +1,16 @@
+{
+  "name": "rupiya",
+  "version": "1.0.0",
+  "description": "AI-powered personal finance and expense tracking platform",
+  "scripts": {
+    "build": "node build.js",
+    "vercel-build": "node build.js"
+  },
+  "keywords": [
+    "finance",
+    "expense-tracker",
+    "budgeting"
+  ],
+  "author": "",
+  "license": "MIT"
+}
