@@ -1,6 +1,6 @@
 // Split Service - Manage split expenses in Firestore
 import { db, auth } from '../config/firebase-config.js';
-import { collection, addDoc, updateDoc, deleteDoc, doc, getDocs, query, where, orderBy, Timestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { collection, addDoc, updateDoc, deleteDoc, doc, getDocs, query, where, orderBy, Timestamp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
 
 class SplitService {
   constructor() {
