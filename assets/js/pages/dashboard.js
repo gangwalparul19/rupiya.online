@@ -2,6 +2,7 @@
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
 import toast from '../components/toast.js';
+import themeManager from '../utils/theme-manager.js';
 import { formatCurrency, formatDate, getRelativeTime } from '../utils/helpers.js';
 
 // Check authentication
@@ -281,6 +282,15 @@ if (sidebarOverlay) {
   sidebarOverlay.addEventListener('click', () => {
     sidebar.classList.remove('open');
     sidebarOverlay.classList.remove('show');
+  });
+}
+
+// Theme toggle
+const themeToggleBtn = document.getElementById('themeToggleBtn');
+if (themeToggleBtn) {
+  themeToggleBtn.addEventListener('click', () => {
+    const newTheme = themeManager.toggleTheme();
+    toast.success(`Switched to ${newTheme} mode`);
   });
 }
 

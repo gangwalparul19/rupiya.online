@@ -5,6 +5,8 @@ import categoriesService from '../services/categories-service.js';
 import toast from '../components/toast.js';
 import themeManager from '../utils/theme-manager.js';
 import { updateProfile, updatePassword, EmailAuthProvider, reauthenticateWithCredential, deleteUser } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
+import { doc, setDoc, Timestamp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+import { db } from '../config/firebase-config.js';
 import paymentMethodsService from '../services/payment-methods-service.js';
 // Helper function for toast
 const showToast = (message, type) => toast.show(message, type);
@@ -157,7 +159,20 @@ function loadUserProfile(user) {
   // Fill profile form
   displayNameInput.value = user.displayName || '';
   emailInput.value = user.email || '';
-  phoneInput.value = user.phoneNumber || '';
+  
+  // Load phone number from Firestore
+  loadPhoneNumber();
+}
+
+async function loadPhoneNumber() {
+  try {
+    const result = await firestoreService.get('users', currentUser.uid);
+    if (result.success && result.data && result.data.phoneNumber) {
+      phoneInput.value = result.data.phoneNumber;
+    }
+  } catch (error) {
+    console.error('Error loading phone number:', error);
+  }
 }
 
 async function loadUserPreferences() {
@@ -201,9 +216,23 @@ async function handleProfileUpdate(e) {
 
   try {
     const displayName = displayNameInput.value.trim();
+    const phoneNumber = phoneInput.value.trim();
 
     // Update Firebase Auth profile
     await updateProfile(currentUser, { displayName });
+
+    // Save phone number to Firestore (Firebase Auth doesn't support phone in updateProfile)
+    const userProfileData = {
+      displayName: displayName,
+      email: currentUser.email,
+      phoneNumber: phoneNumber,
+      userId: currentUser.uid,
+      updatedAt: Timestamp.now()
+    };
+
+    // Use setDoc to create or update the document with the user's UID as the document ID
+    const userDocRef = doc(db, 'users', currentUser.uid);
+    await setDoc(userDocRef, userProfileData, { merge: true });
 
     // Update UI
     document.getElementById('userName').textContent = displayName || 'User';
