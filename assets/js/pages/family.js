@@ -7,38 +7,60 @@ let currentUser = null;
 let familyGroups = [];
 let pendingInvitations = [];
 
+console.log('[Family Page] Script loaded');
+
 // Initialize page
 async function init() {
+  console.log('[Family Page] Initializing...');
   try {
     const isAuthenticated = await checkAuth();
+    console.log('[Family Page] Auth check result:', isAuthenticated);
     if (isAuthenticated) {
+      console.log('[Family Page] User authenticated, initializing page');
       await initPage();
+    } else {
+      console.log('[Family Page] User not authenticated, should redirect');
     }
   } catch (error) {
-    console.error('Error initializing family page:', error);
-    toast.error('Failed to load page');
-    // Don't redirect, just show error
+    console.error('[Family Page] Error initializing:', error);
+    toast.error('Failed to load page: ' + error.message);
+    // Don't redirect on error, show error instead
   }
 }
 
 // Check authentication
 async function checkAuth() {
   try {
-    // Wait for auth to initialize
-    await authService.init();
+    console.log('[Family Page] Starting auth check...');
+    
+    // Wait for auth to initialize with timeout
+    const authPromise = authService.init();
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Auth timeout')), 10000)
+    );
+    
+    await Promise.race([authPromise, timeoutPromise]);
+    
     currentUser = authService.getCurrentUser();
     
-    console.log('Family page - Auth check:', currentUser ? 'Authenticated' : 'Not authenticated');
+    console.log('[Family Page] Auth initialized, current user:', currentUser ? currentUser.email : 'null');
     
     if (!currentUser) {
-      console.log('Family page - Redirecting to login');
-      window.location.href = 'login.html';
+      console.log('[Family Page] No user found, redirecting to login');
+      setTimeout(() => {
+        window.location.href = 'login.html';
+      }, 100);
       return false;
     }
+    
+    console.log('[Family Page] User authenticated:', currentUser.email);
     return true;
   } catch (error) {
-    console.error('Family page - Auth check error:', error);
-    window.location.href = 'login.html';
+    console.error('[Family Page] Auth check error:', error);
+    toast.error('Authentication error: ' + error.message);
+    setTimeout(() => {
+      window.location.href = 'login.html';
+    }, 2000);
     return false;
   }
 }

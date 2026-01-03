@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Family Page Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .log {
+      background: #f5f5f5;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      font-family: monospace;
+      font-size: 12px;
+    }
+    .error { background: #ffebee; color: #c62828; }
+    .success { background: #e8f5e9; color: #2e7d32; }
+    .info { background: #e3f2fd; color: #1565c0; }
+    button {
+      padding: 10px 20px;
+      margin: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Family Page Diagnostic Test</h1>
+  
+  <div id="status">
+    <h2>Status</h2>
+    <div id="statusLog"></div>
+  </div>
+  
+  <div id="actions">
+    <h2>Actions</h2>
+    <button onclick="testAuth()">Test Authentication</button>
+    <button onclick="testFamilyService()">Test Family Service</button>
+    <button onclick="clearCache()">Clear Cache & Reload</button>
+    <button onclick="goToFamily()">Go to Family Page</button>
+  </div>
+  
+  <div id="logs">
+    <h2>Console Logs</h2>
+    <div id="logContainer"></div>
+  </div>
+  
+  <script type="module">
+    import authService from './assets/js/services/auth-service.js';
+    import familyService from './assets/js/services/family-service.js';
+    
+    const logContainer = document.getElementById('logContainer');
+    const statusLog = document.getElementById('statusLog');
+    
+    function addLog(message, type = 'info') {
+      const div = document.createElement('div');
+      div.className = `log ${type}`;
+      div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      logContainer.insertBefore(div, logContainer.firstChild);
+      console.log(message);
+    }
+    
+    function updateStatus(message, type = 'info') {
+      const div = document.createElement('div');
+      div.className = `log ${type}`;
+      div.textContent = message;
+      statusLog.innerHTML = '';
+      statusLog.appendChild(div);
+    }
+    
+    // Test authentication
+    window.testAuth = async function() {
+      addLog('Testing authentication...', 'info');
+      try {
+        await authService.init();
+        const user = authService.getCurrentUser();
+        
+        if (user) {
+          addLog(`✅ User authenticated: ${user.email}`, 'success');
+          updateStatus(`Authenticated as: ${user.email}`, 'success');
+        } else {
+          addLog('❌ No user authenticated', 'error');
+          updateStatus('Not authenticated', 'error');
+        }
+      } catch (error) {
+        addLog(`❌ Auth error: ${error.message}`, 'error');
+        updateStatus(`Auth error: ${error.message}`, 'error');
+      }
+    };
+    
+    // Test family service
+    window.testFamilyService = async function() {
+      addLog('Testing family service...', 'info');
+      try {
+        const user = authService.getCurrentUser();
+        if (!user) {
+          addLog('❌ Must be authenticated first', 'error');
+          return;
+        }
+        
+        addLog('Fetching family groups...', 'info');
+        const groups = await familyService.getUserFamilyGroups();
+        addLog(`✅ Found ${groups.length} family groups`, 'success');
+        
+        if (groups.length > 0) {
+          groups.forEach((group, index) => {
+            addLog(`  Group ${index + 1}: ${group.name} (${group.members.length} members)`, 'info');
+          });
+        }
+        
+        updateStatus(`Family service working - ${groups.length} groups found`, 'success');
+      } catch (error) {
+        addLog(`❌ Family service error: ${error.message}`, 'error');
+        updateStatus(`Family service error: ${error.message}`, 'error');
+      }
+    };
+    
+    // Clear cache
+    window.clearCache = async function() {
+      addLog('Clearing cache...', 'info');
+      try {
+        if ('caches' in window) {
+          const cacheNames = await caches.keys();
+          for (const cacheName of cacheNames) {
+            await caches.delete(cacheName);
+            addLog(`Deleted cache: ${cacheName}`, 'info');
+          }
+          addLog('✅ Cache cleared', 'success');
+        }
+        
+        if ('serviceWorker' in navigator) {
+          const registrations = await navigator.serviceWorker.getRegistrations();
+          for (const registration of registrations) {
+            await registration.unregister();
+            addLog('Unregistered service worker', 'info');
+          }
+        }
+        
+        addLog('Reloading page...', 'info');
+        setTimeout(() => {
+          window.location.reload(true);
+        }, 1000);
+      } catch (error) {
+        addLog(`❌ Clear cache error: ${error.message}`, 'error');
+      }
+    };
+    
+    // Go to family page
+    window.goToFamily = function() {
+      addLog('Navigating to family page...', 'info');
+      window.location.href = 'family.html';
+    };
+    
+    // Auto-test on load
+    addLog('Page loaded', 'info');
+    setTimeout(() => {
+      testAuth();
+    }, 1000);
+  </script>
+</body>
+</html>

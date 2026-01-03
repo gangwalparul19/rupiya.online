@@ -364,8 +364,21 @@
   </div>
 
   <!-- Scripts -->
-  <script type="module" src="assets/js/pages/family.js"></script>
-  <script type="module" src="assets/js/pages/family-modals.js"></script>
-  <script src="assets/js/pwa-setup.js"></script>
+  <script type="module" src="assets/js/pages/family.js" onerror="console.error('[Family Page] Failed to load family.js')"></script>
+  <script type="module" src="assets/js/pages/family-modals.js" onerror="console.error('[Family Page] Failed to load family-modals.js')"></script>
+  <script src="assets/js/pwa-setup.js" onerror="console.error('[Family Page] Failed to load pwa-setup.js')"></script>
+  
+  <!-- Error Handler -->
+  <script>
+    window.addEventListener('error', function(e) {
+      console.error('[Family Page] Global error:', e.error || e.message);
+    });
+    
+    window.addEventListener('unhandledrejection', function(e) {
+      console.error('[Family Page] Unhandled promise rejection:', e.reason);
+    });
+    
+    console.log('[Family Page] HTML loaded, waiting for scripts...');
+  </script>
 </body>
 </html>
