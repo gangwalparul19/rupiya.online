@@ -231,3 +231,157 @@ function createFloatingShapes() {
 document.addEventListener('DOMContentLoaded', () => {
   createFloatingShapes();
 });
+
+
+// PWA Install functionality
+let deferredPrompt;
+const heroInstallSection = document.getElementById('heroInstallSection');
+const heroInstallBtn = document.getElementById('heroInstallAppBtn');
+const heroCta = document.getElementById('heroCta');
+const pwaInstallBanner = document.getElementById('pwaInstallBanner');
+const installAppBtn = document.getElementById('installAppBtn');
+const closePwaBanner = document.getElementById('closePwaBanner');
+
+// Check if already installed
+if (window.matchMedia('(display-mode: standalone)').matches) {
+  // Already installed, don't show install options
+  console.log('App is already installed');
+} else {
+  // Listen for beforeinstallprompt event
+  window.addEventListener('beforeinstallprompt', (e) => {
+    // Prevent the mini-infobar from appearing on mobile
+    e.preventDefault();
+    // Stash the event so it can be triggered later
+    deferredPrompt = e;
+    
+    // Show the hero install button (center)
+    if (heroInstallSection) {
+      heroInstallSection.style.display = 'block';
+    }
+    
+    // Hide the regular CTA buttons
+    if (heroCta) {
+      heroCta.style.display = 'none';
+    }
+    
+    // Also show the banner at top
+    if (pwaInstallBanner) {
+      pwaInstallBanner.style.display = 'block';
+    }
+    
+    console.log('PWA install prompt available');
+  });
+}
+
+// Handle install button click (hero button)
+if (heroInstallBtn) {
+  heroInstallBtn.addEventListener('click', async () => {
+    if (!deferredPrompt) {
+      console.log('No install prompt available');
+      return;
+    }
+    
+    // Show the install prompt
+    deferredPrompt.prompt();
+    
+    // Wait for the user to respond to the prompt
+    const { outcome } = await deferredPrompt.userChoice;
+    
+    console.log(`User response to the install prompt: ${outcome}`);
+    
+    if (outcome === 'accepted') {
+      console.log('User accepted the install prompt');
+    } else {
+      console.log('User dismissed the install prompt');
+    }
+    
+    // Clear the deferredPrompt
+    deferredPrompt = null;
+    
+    // Hide the install section
+    if (heroInstallSection) {
+      heroInstallSection.style.display = 'none';
+    }
+    
+    // Show the regular CTA buttons
+    if (heroCta) {
+      heroCta.style.display = 'flex';
+    }
+    
+    // Hide the banner
+    if (pwaInstallBanner) {
+      pwaInstallBanner.style.display = 'none';
+    }
+  });
+}
+
+// Handle install button click (banner button)
+if (installAppBtn) {
+  installAppBtn.addEventListener('click', async () => {
+    if (!deferredPrompt) {
+      console.log('No install prompt available');
+      return;
+    }
+    
+    // Show the install prompt
+    deferredPrompt.prompt();
+    
+    // Wait for the user to respond to the prompt
+    const { outcome } = await deferredPrompt.userChoice;
+    
+    console.log(`User response to the install prompt: ${outcome}`);
+    
+    if (outcome === 'accepted') {
+      console.log('User accepted the install prompt');
+    }
+    
+    // Clear the deferredPrompt
+    deferredPrompt = null;
+    
+    // Hide the banner
+    if (pwaInstallBanner) {
+      pwaInstallBanner.style.display = 'none';
+    }
+    
+    // Hide the install section
+    if (heroInstallSection) {
+      heroInstallSection.style.display = 'none';
+    }
+    
+    // Show the regular CTA buttons
+    if (heroCta) {
+      heroCta.style.display = 'flex';
+    }
+  });
+}
+
+// Handle close banner button
+if (closePwaBanner) {
+  closePwaBanner.addEventListener('click', () => {
+    if (pwaInstallBanner) {
+      pwaInstallBanner.style.display = 'none';
+    }
+  });
+}
+
+// Listen for app installed event
+window.addEventListener('appinstalled', () => {
+  console.log('PWA was installed');
+  
+  // Hide all install prompts
+  if (heroInstallSection) {
+    heroInstallSection.style.display = 'none';
+  }
+  
+  if (pwaInstallBanner) {
+    pwaInstallBanner.style.display = 'none';
+  }
+  
+  // Show the regular CTA buttons
+  if (heroCta) {
+    heroCta.style.display = 'flex';
+  }
+  
+  // Clear the deferredPrompt
+  deferredPrompt = null;
+});

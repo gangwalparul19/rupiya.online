@@ -32,10 +32,8 @@
             <img src="assets/images/logo.png" alt="Rupiya Logo">
           </div>
           <div class="landing-nav-links">
-            <a href="#features" class="nav-link">Features</a>
-            <a href="#how-it-works" class="nav-link">How It Works</a>
-            <a href="login.html" class="btn btn-sm btn-light">Login</a>
-            <a href="signup.html" class="btn btn-sm btn-primary">Get Started</a>
+            <a href="login.html" class="btn btn-sm btn-outline">Sign In</a>
+            <a href="signup.html" class="btn btn-sm btn-primary">Sign Up</a>
           </div>
           <button class="mobile-menu-toggle" id="mobileMenuToggle">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -49,10 +47,8 @@
     <!-- Mobile Menu -->
     <div class="mobile-menu" id="mobileMenu">
       <div class="mobile-menu-content">
-        <a href="#features" class="mobile-menu-link">Features</a>
-        <a href="#how-it-works" class="mobile-menu-link">How It Works</a>
-        <a href="login.html" class="btn btn-outline w-100">Login</a>
-        <a href="signup.html" class="btn btn-primary w-100">Get Started</a>
+        <a href="login.html" class="btn btn-outline w-100">Sign In</a>
+        <a href="signup.html" class="btn btn-primary w-100">Sign Up</a>
       </div>
     </div>
 
@@ -84,7 +80,19 @@
             Smart expense tracking, intelligent budgeting, and AI-powered insights. 
             Manage your money effortlessly with Rupiya.
           </p>
-          <div class="hero-cta">
+          
+          <!-- Install App Button (Center) -->
+          <div class="hero-install-section" id="heroInstallSection" style="display: none;">
+            <button class="btn btn-hero-install" id="heroInstallAppBtn">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+              </svg>
+              Install App - Works Offline!
+            </button>
+            <p class="install-help-text">Get the best experience with our mobile app</p>
+          </div>
+          
+          <div class="hero-cta" id="heroCta">
             <a href="signup.html" class="btn btn-hero-primary">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
