@@ -18,7 +18,7 @@ let editingVehicleId = null;
 let addVehicleBtn, addVehicleSection, closeFormBtn, cancelFormBtn;
 let vehicleForm, formTitle, saveFormBtn, saveFormBtnText, saveFormBtnSpinner;
 let vehiclesList, emptyState, loadingState;
-let totalVehiclesEl, totalFuelCostEl, avgMileageEl, totalDistanceEl;
+let totalVehiclesEl, avgMileageEl;
 let deleteModal, closeDeleteModalBtn, cancelDeleteBtn, confirmDeleteBtn;
 let deleteBtnText, deleteBtnSpinner, deleteVehicleName, deleteVehicleDetails;
 let deleteVehicleId = null;
@@ -67,9 +67,7 @@ function initDOMElements() {
   emptyState = document.getElementById('emptyState');
   loadingState = document.getElementById('loadingState');
   totalVehiclesEl = document.getElementById('totalVehicles');
-  totalFuelCostEl = document.getElementById('totalFuelCost');
   avgMileageEl = document.getElementById('avgMileage');
-  totalDistanceEl = document.getElementById('totalDistance');
   deleteModal = document.getElementById('deleteModal');
   closeDeleteModalBtn = document.getElementById('closeDeleteModalBtn');
   cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
@@ -383,11 +381,9 @@ function updateSummary() {
   // Calculate overall stats from fuel logs
   const overallStats = calculateOverallMileageStats();
   
-  totalFuelCostEl.textContent = formatCurrency(overallStats.totalFuelCost);
   avgMileageEl.textContent = overallStats.avgMileage > 0 ? overallStats.avgMileage.toFixed(2) + ' km/l' : '-- km/l';
-  totalDistanceEl.textContent = overallStats.totalDistance.toLocaleString() + ' km';
   
-  // Load expense and income data
+  // Load expense data
   loadVehicleKPIData();
 }
 
@@ -398,41 +394,15 @@ async function loadVehicleKPIData() {
     const allExpenses = await firestoreService.getExpenses();
     const vehicleExpenses = allExpenses.filter(e => e.linkedType === 'vehicle');
     
-    // Get all income linked to vehicles
-    const allIncome = await firestoreService.getIncome();
-    const vehicleIncome = allIncome.filter(i => i.linkedType === 'vehicle');
-    
     // Calculate totals
     const totalExpenses = vehicleExpenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
-    const totalIncome = vehicleIncome.reduce((sum, i) => sum + (Number(i.amount) || 0), 0);
-    
-    // Calculate fuel vs maintenance breakdown
-    const fuelExpenses = vehicleExpenses.filter(e => 
-      e.category === 'Vehicle Fuel' || e.description?.toLowerCase().includes('fuel')
-    );
-    const maintenanceExpenses = vehicleExpenses.filter(e => 
-      e.category === 'Vehicle Maintenance' || 
-      (!e.category?.includes('Fuel') && e.category !== 'Vehicle Fuel')
-    );
-    
-    const totalFuel = fuelExpenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
-    const totalMaintenance = maintenanceExpenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
-    
-    // Net profit/loss
-    const netProfitLoss = totalIncome - totalExpenses;
     
     // Update UI with compact format
-    document.getElementById('totalFuelCost').textContent = formatCurrencyCompact(totalFuel);
-    document.getElementById('totalMaintenanceCost').textContent = formatCurrencyCompact(totalMaintenance);
     document.getElementById('totalVehicleExpenses').textContent = formatCurrencyCompact(totalExpenses);
     
   } catch (error) {
     console.error('Error loading vehicle KPI data:', error);
   }
-}
-
-async function loadVehicleSummaryData() {
-  // This function is now replaced by fuel log based calculations
 }
 
 // Calculate mileage for a specific vehicle
@@ -794,7 +764,7 @@ async function handleSaveMaintenance() {
     if (result.success) {
       showToast('Maintenance expense added', 'success');
       hideMaintenanceModal();
-      await loadVehicleSummaryData();
+      await loadVehicleKPIData();
     } else {
       showToast(result.error || 'Failed to save maintenance', 'error');
     }
@@ -861,7 +831,7 @@ async function handleSaveVehicleIncome() {
     if (result.success) {
       showToast('Vehicle income added', 'success');
       hideVehicleIncomeModal();
-      await loadVehicleSummaryData();
+      await loadVehicleKPIData();
     } else {
       showToast(result.error || 'Failed to save income', 'error');
     }
@@ -872,24 +842,6 @@ async function handleSaveVehicleIncome() {
     saveBtn.disabled = false;
     saveBtnText.style.display = 'inline';
     saveBtnSpinner.style.display = 'none';
-  }
-}
-
-// Load vehicle expense and income summary
-async function loadVehicleSummaryData() {
-  try {
-    const [vehicleExpenses, vehicleIncome] = await Promise.all([
-      firestoreService.getTotalExpensesByLinkedType('vehicle'),
-      firestoreService.getTotalIncomeByLinkedType('vehicle')
-    ]);
-    
-    // Update the summary if elements exist
-    const totalExpensesEl = document.getElementById('totalVehicleExpenses');
-    const totalIncomeEl = document.getElementById('totalVehicleIncome');
-    if (totalExpensesEl) totalExpensesEl.textContent = formatCurrency(vehicleExpenses);
-    if (totalIncomeEl) totalIncomeEl.textContent = formatCurrency(vehicleIncome);
-  } catch (error) {
-    console.error('Error loading vehicle summary data:', error);
   }
 }
 

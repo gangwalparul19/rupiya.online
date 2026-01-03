@@ -115,13 +115,13 @@ function setupEventListeners() {
   });
 
   // Forms
-  profileForm.addEventListener('submit', handleProfileUpdate);
-  passwordForm.addEventListener('submit', handlePasswordChange);
-  preferencesForm.addEventListener('submit', handlePreferencesUpdate);
+  profileForm?.addEventListener('submit', handleProfileUpdate);
+  passwordForm?.addEventListener('submit', handlePasswordChange);
+  preferencesForm?.addEventListener('submit', handlePreferencesUpdate);
 
   // Data actions
-  exportDataBtn.addEventListener('click', handleExportData);
-  deleteAccountBtn.addEventListener('click', showDeleteAccountModal);
+  exportDataBtn?.addEventListener('click', handleExportData);
+  deleteAccountBtn?.addEventListener('click', showDeleteAccountModal);
 
   // Categories
   document.getElementById('addExpenseCategoryBtn')?.addEventListener('click', handleAddExpenseCategory);
@@ -144,10 +144,10 @@ function setupEventListeners() {
   });
 
   // Delete account modal
-  closeDeleteAccountModalBtn.addEventListener('click', hideDeleteAccountModal);
-  cancelDeleteAccountBtn.addEventListener('click', hideDeleteAccountModal);
-  confirmDeleteAccountBtn.addEventListener('click', handleDeleteAccount);
-  confirmDeleteText.addEventListener('input', (e) => {
+  closeDeleteAccountModalBtn?.addEventListener('click', hideDeleteAccountModal);
+  cancelDeleteAccountBtn?.addEventListener('click', hideDeleteAccountModal);
+  confirmDeleteAccountBtn?.addEventListener('click', handleDeleteAccount);
+  confirmDeleteText?.addEventListener('input', (e) => {
     confirmDeleteAccountBtn.disabled = e.target.value !== 'DELETE';
   });
 }
@@ -319,18 +319,23 @@ async function handlePreferencesUpdate(e) {
   const saveBtnText = document.getElementById('savePreferencesBtnText');
   const saveBtnSpinner = document.getElementById('savePreferencesBtnSpinner');
 
+  if (!saveBtn || !saveBtnText || !saveBtnSpinner) {
+    showToast('UI elements not found', 'error');
+    return;
+  }
+
   saveBtn.disabled = true;
   saveBtnText.style.display = 'none';
   saveBtnSpinner.style.display = 'inline-block';
 
   try {
     const preferences = {
-      currency: currencySelect.value,
-      dateFormat: dateFormatSelect.value,
-      language: languageSelect.value,
-      emailNotifications: emailNotificationsCheckbox.checked,
-      weeklyReportEnabled: weeklyReportEnabledCheckbox ? weeklyReportEnabledCheckbox.checked : false,
-      monthlyReportEnabled: monthlyReportEnabledCheckbox ? monthlyReportEnabledCheckbox.checked : false,
+      currency: currencySelect?.value || 'INR',
+      dateFormat: dateFormatSelect?.value || 'DD/MM/YYYY',
+      language: languageSelect?.value || 'en',
+      emailNotifications: emailNotificationsCheckbox?.checked || false,
+      weeklyReportEnabled: weeklyReportEnabledCheckbox?.checked || false,
+      monthlyReportEnabled: monthlyReportEnabledCheckbox?.checked || false,
       userId: currentUser.uid,
       updatedAt: Timestamp.now()
     };

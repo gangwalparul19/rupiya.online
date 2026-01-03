@@ -525,24 +525,26 @@
   flex: 1;
 }
 
+/* Settle Info */
 .settle-info {
   background: var(--bg-secondary);
   padding: 1rem;
   border-radius: var(--border-radius);
-  margin: 1rem 0;
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .settle-info strong {
-  display: block;
-  margin-bottom: 0.5rem;
   color: var(--text-primary);
+  font-size: 1.125rem;
 }
 
 .settle-info span {
   color: var(--text-secondary);
+  font-size: 0.875rem;
 }
-
-/* Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -578,23 +580,31 @@
 
 /* Responsive Styles */
 @media (max-width: 768px) {
+  /* 3 KPI cards per row on mobile */
   .split-summary {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
   }
   
   .summary-card {
-    padding: 1.25rem;
+    flex-direction: column;
+    text-align: center;
+    padding: 12px 8px;
+    gap: 8px;
   }
   
   .summary-icon {
-    font-size: 2rem;
-    width: 50px;
-    height: 50px;
+    font-size: 1.5rem;
+    width: 36px;
+    height: 36px;
+  }
+  
+  .summary-label {
+    font-size: 0.65rem;
   }
   
   .summary-value {
-    font-size: 1.5rem;
+    font-size: 0.875rem;
   }
   
   .create-split-section {
@@ -650,8 +660,26 @@
 }
 
 @media (max-width: 480px) {
-  .summary-value {
+  .split-summary {
+    gap: 6px;
+  }
+  
+  .summary-card {
+    padding: 10px 6px;
+  }
+  
+  .summary-icon {
     font-size: 1.25rem;
+    width: 32px;
+    height: 32px;
+  }
+  
+  .summary-label {
+    font-size: 0.6rem;
+  }
+  
+  .summary-value {
+    font-size: 0.75rem;
   }
   
   .create-split-title {
@@ -768,27 +796,6 @@
   border-top: 2px solid var(--border-color);
   background: var(--bg-secondary);
   border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg);
-}
-
-/* Settle Info */
-.settle-info {
-  background: var(--bg-secondary);
-  padding: 1rem;
-  border-radius: var(--border-radius);
-  margin-bottom: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.settle-info strong {
-  color: var(--text-primary);
-  font-size: 1.125rem;
-}
-
-.settle-info span {
-  color: var(--text-secondary);
-  font-size: 0.875rem;
 }
 
 /* Form Control (for modal forms) */

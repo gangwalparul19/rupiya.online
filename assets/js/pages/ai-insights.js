@@ -1,16 +1,13 @@
-// AI Insights Page Logic
+// AI Insights Page Logic - Redesigned
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
 import AIInsightsEngine from '../utils/ai-insights-engine.js';
 import familySwitcher from '../components/family-switcher.js';
 import toast from '../components/toast.js';
-import themeManager from '../utils/theme-manager.js';
-import { formatCurrency } from '../utils/helpers.js';
+import { formatCurrency, formatCurrencyCompact } from '../utils/helpers.js';
 
-// Initialize AI engine
 const aiEngine = new AIInsightsEngine();
 
-// Check authentication
 async function checkAuth() {
   await authService.waitForAuth();
   if (!authService.isAuthenticated()) {
@@ -20,18 +17,14 @@ async function checkAuth() {
   return true;
 }
 
-// Initialize page
 async function init() {
   const isAuthenticated = await checkAuth();
   if (!isAuthenticated) return;
-  
   await initPage();
 }
 
-// Start initialization
 init();
 
-// Get DOM elements
 const userAvatar = document.getElementById('userAvatar');
 const userName = document.getElementById('userName');
 const userEmail = document.getElementById('userEmail');
@@ -42,399 +35,460 @@ const sidebar = document.getElementById('sidebar');
 const sidebarOverlay = document.getElementById('sidebarOverlay');
 const refreshInsightsBtn = document.getElementById('refreshInsightsBtn');
 
-// Initialize page
 async function initPage() {
   const user = authService.getCurrentUser();
-  
   if (user) {
-    // Update user profile
     const initials = user.displayName 
       ? user.displayName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
       : user.email[0].toUpperCase();
-    
     userAvatar.textContent = initials;
     userName.textContent = user.displayName || 'User';
     userEmail.textContent = user.email;
-    
-    // Initialize family switcher
     await familySwitcher.init();
-    
-    // Update subtitle based on context
-    updatePageContext();
-    
-    // Setup event listeners
     setupEventListeners();
-    
-    // Load insights
+    setupTabs();
     await loadInsights();
   }
 }
 
-// Update page context based on family switcher
-function updatePageContext() {
-  const context = familySwitcher.getCurrentContext();
-  const subtitle = document.getElementById('aiInsightsSubtitle');
-  
-  if (subtitle && context.context === 'family' && context.group) {
-    subtitle.textContent = `AI insights for ${context.group.name}`;
-  } else if (subtitle) {
-    subtitle.textContent = 'Smart recommendations powered by AI';
-  }
+function setupTabs() {
+  document.querySelectorAll('.insight-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.insight-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById(`tab-${tab.dataset.tab}`).classList.add('active');
+    });
+  });
 }
 
-// Load insights
-async function loadInsights() {
+function setupEventListeners() {
+  // Sidebar toggle
+  sidebarOpen?.addEventListener('click', () => {
+    sidebar?.classList.add('open');
+    sidebarOverlay?.classList.add('active');
+  });
+
+  sidebarClose?.addEventListener('click', closeSidebar);
+  sidebarOverlay?.addEventListener('click', closeSidebar);
+
+  // Logout
+  logoutBtn?.addEventListener('click', async () => {
+    await authService.logout();
+    window.location.href = 'login.html';
+  });
+
+  // Refresh insights
+  refreshInsightsBtn?.addEventListener('click', () => {
+    loadInsights(true);
+  });
+}
+
+function closeSidebar() {
+  sidebar?.classList.remove('open');
+  sidebarOverlay?.classList.remove('active');
+}
+
+async function loadInsights(forceRefresh = false) {
+  showLoadingStates();
+  
   try {
-    // Show loading states
-    showLoadingStates();
-    
-    // Load all data
+    // Fetch all data
     const [expenses, income, budgets, goals] = await Promise.all([
       firestoreService.getExpenses(),
       firestoreService.getIncome(),
       firestoreService.getBudgets(),
       firestoreService.getGoals()
     ]);
-    
+
     // Check if we have enough data
-    if (expenses.length === 0 && income.length === 0) {
+    if (expenses.length < 3 && income.length < 1) {
       showInsufficientDataMessage();
       return;
     }
-    
+
     // Load data into AI engine
     aiEngine.loadData(expenses, income, budgets, goals);
-    
-    // Generate and render insights
+
+    // Update all sections
+    updateMonthlyStats(expenses, income);
     renderHealthScore();
-    renderSpendingPatterns();
+    renderTopPriority();
     renderAnomalies();
-    renderSavingsOpportunities();
-    renderBudgetRecommendations();
     renderCategoryInsights();
+    renderSpendingPatterns();
+    renderBudgetRecommendations();
+    renderSavingsOpportunities();
     renderPredictions();
     renderMonthlyReport();
-    
-    toast.success('Insights updated successfully');
-    
+
+    if (forceRefresh) {
+      toast.success('Insights refreshed!');
+    }
   } catch (error) {
     console.error('Error loading insights:', error);
     toast.error('Failed to load insights');
   }
 }
 
-// Show loading states
 function showLoadingStates() {
   const loadingHTML = `
-    <div class="loading-state">
+    <div class="insight-loading">
       <div class="spinner"></div>
-      <p>Analyzing...</p>
     </div>
   `;
   
-  document.getElementById('spendingPatternsContent').innerHTML = loadingHTML;
   document.getElementById('anomaliesContent').innerHTML = loadingHTML;
-  document.getElementById('savingsOpportunitiesContent').innerHTML = loadingHTML;
-  document.getElementById('budgetRecommendationsContent').innerHTML = loadingHTML;
   document.getElementById('categoryInsightsContent').innerHTML = loadingHTML;
+  document.getElementById('spendingPatternsContent').innerHTML = loadingHTML;
+  document.getElementById('budgetRecommendationsContent').innerHTML = loadingHTML;
+  document.getElementById('savingsOpportunitiesContent').innerHTML = loadingHTML;
   document.getElementById('predictionsContent').innerHTML = loadingHTML;
   document.getElementById('monthlyReportContent').innerHTML = `
-    <div class="loading-state">
+    <div class="insight-loading">
       <div class="spinner-lg"></div>
-      <p>Generating report...</p>
+      <p>Generating your personalized report...</p>
     </div>
   `;
 }
 
-// Show insufficient data message
 function showInsufficientDataMessage() {
-  const message = `
-    <div class="insight-item">
-      <div class="insight-item-header">
-        <div class="insight-item-title">Insufficient Data</div>
-        <div class="insight-item-value neutral">—</div>
-      </div>
-      <div class="insight-item-description">
-        Add expenses and income to get personalized insights.
-      </div>
-    </div>
-  `;
+  const emptyState = createEmptyState(
+    '📊',
+    'Not Enough Data',
+    'Add more transactions to unlock AI-powered insights. We need at least a few expenses and income entries to analyze your finances.'
+  );
+
+  document.getElementById('anomaliesContent').innerHTML = emptyState;
+  document.getElementById('categoryInsightsContent').innerHTML = emptyState;
+  document.getElementById('spendingPatternsContent').innerHTML = emptyState;
+  document.getElementById('budgetRecommendationsContent').innerHTML = emptyState;
+  document.getElementById('savingsOpportunitiesContent').innerHTML = emptyState;
+  document.getElementById('predictionsContent').innerHTML = emptyState;
+  document.getElementById('monthlyReportContent').innerHTML = emptyState;
   
-  document.getElementById('spendingPatternsContent').innerHTML = message;
-  document.getElementById('anomaliesContent').innerHTML = message;
-  document.getElementById('savingsOpportunitiesContent').innerHTML = message;
-  document.getElementById('budgetRecommendationsContent').innerHTML = message;
-  document.getElementById('categoryInsightsContent').innerHTML = message;
-  document.getElementById('predictionsContent').innerHTML = message;
-  
-  document.getElementById('monthlyReportContent').innerHTML = `
-    <div class="report-section">
-      <h3 class="report-section-title">
-        <span class="report-section-icon">📊</span>
-        Get Started
-      </h3>
-      <div class="report-section-content">
-        <p>Start tracking your expenses and income to receive personalized AI-powered insights and recommendations.</p>
-        <p>The more data you add, the better our AI can help you manage your finances.</p>
-      </div>
-    </div>
-  `;
+  // Reset health score
+  document.getElementById('scoreNumber').textContent = '—';
+  document.getElementById('healthMessage').textContent = 'Add more data to calculate your financial health score.';
 }
 
-// Render health score
+function updateMonthlyStats(expenses, income) {
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+
+  // Filter current month data
+  const monthlyExpenses = expenses.filter(e => {
+    const date = e.date?.toDate ? e.date.toDate() : new Date(e.date);
+    return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+  });
+
+  const monthlyIncome = income.filter(i => {
+    const date = i.date?.toDate ? i.date.toDate() : new Date(i.date);
+    return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+  });
+
+  const totalExpense = monthlyExpenses.reduce((sum, e) => sum + e.amount, 0);
+  const totalIncome = monthlyIncome.reduce((sum, i) => sum + i.amount, 0);
+  const netSavings = totalIncome - totalExpense;
+
+  // Animate numbers
+  animateNumber('monthlyIncome', totalIncome);
+  animateNumber('monthlyExpense', totalExpense);
+  animateNumber('monthlySavings', netSavings);
+
+  // Update subtitle
+  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
+                      'July', 'August', 'September', 'October', 'November', 'December'];
+  document.getElementById('aiInsightsSubtitle').textContent = 
+    `Analyzing your ${monthNames[currentMonth]} ${currentYear} finances`;
+  document.getElementById('reportDate').textContent = `${monthNames[currentMonth]} ${currentYear}`;
+}
+
 function renderHealthScore() {
-  const { score, factors } = aiEngine.calculateHealthScore();
-  
-  // Animate score ring
-  const scoreRing = document.getElementById('scoreRing');
-  const circumference = 2 * Math.PI * 52;
+  const healthData = aiEngine.calculateHealthScore();
+  const score = healthData.score;
+  const factors = healthData.factors;
+
+  // Animate score number
+  const scoreEl = document.getElementById('scoreNumber');
+  animateValue(scoreEl, 0, score, 1500);
+
+  // Animate ring
+  const ring = document.getElementById('scoreRing');
+  const circumference = 2 * Math.PI * 52; // r=52
   const offset = circumference - (score / 100) * circumference;
   
-  // Reset animation
-  scoreRing.style.transition = 'none';
-  scoreRing.style.strokeDashoffset = circumference;
-  
   setTimeout(() => {
-    scoreRing.style.transition = 'stroke-dashoffset 1s ease-out';
-    scoreRing.style.strokeDashoffset = offset;
+    ring.style.strokeDashoffset = offset;
+    ring.style.stroke = getScoreColor(score);
   }, 100);
+
+  // Update message
+  const messages = {
+    excellent: 'Excellent! Your finances are in great shape.',
+    good: 'Good job! You\'re managing your money well.',
+    fair: 'Fair. There\'s room for improvement.',
+    poor: 'Needs attention. Let\'s work on improving your finances.'
+  };
   
-  // Animate score number
-  animateNumber('scoreNumber', 0, score, 1000);
+  let messageKey = 'poor';
+  if (score >= 80) messageKey = 'excellent';
+  else if (score >= 60) messageKey = 'good';
+  else if (score >= 40) messageKey = 'fair';
   
-  // Update factors with animation
-  setTimeout(() => {
-    document.getElementById('savingsRateFill').style.width = `${factors.savingsRate}%`;
-    document.getElementById('savingsRateValue').textContent = `${factors.savingsRate}%`;
-    
-    document.getElementById('budgetAdherenceFill').style.width = `${factors.budgetAdherence}%`;
-    document.getElementById('budgetAdherenceValue').textContent = `${factors.budgetAdherence}%`;
-    
-    document.getElementById('spendingConsistencyFill').style.width = `${factors.spendingConsistency}%`;
-    document.getElementById('spendingConsistencyValue').textContent = `${factors.spendingConsistency}%`;
-  }, 200);
+  document.getElementById('healthMessage').textContent = messages[messageKey];
+
+  // Update tags
+  document.getElementById('savingsTag').textContent = `💰 Savings: ${factors.savingsRate}%`;
+  document.getElementById('budgetTag').textContent = `📊 Budget: ${factors.budgetAdherence}%`;
+  document.getElementById('consistencyTag').textContent = `📈 Consistency: ${factors.spendingConsistency}%`;
+
+  // Update factor bars
+  document.getElementById('savingsRateValue').textContent = `${factors.savingsRate}%`;
+  document.getElementById('savingsRateFill').style.width = `${factors.savingsRate}%`;
+  
+  document.getElementById('budgetAdherenceValue').textContent = `${factors.budgetAdherence}%`;
+  document.getElementById('budgetAdherenceFill').style.width = `${factors.budgetAdherence}%`;
+  
+  document.getElementById('spendingConsistencyValue').textContent = `${factors.spendingConsistency}%`;
+  document.getElementById('spendingConsistencyFill').style.width = `${factors.spendingConsistency}%`;
 }
 
-// Animate number
-function animateNumber(elementId, start, end, duration) {
-  const element = document.getElementById(elementId);
-  const range = end - start;
-  const increment = range / (duration / 16);
-  let current = start;
+function getScoreColor(score) {
+  if (score >= 80) return '#10b981';
+  if (score >= 60) return '#f59e0b';
+  if (score >= 40) return '#f97316';
+  return '#ef4444';
+}
+
+function renderTopPriority() {
+  const anomalies = aiEngine.detectAnomalies();
+  const savings = aiEngine.findSavingsOpportunities();
+  const budgetRecs = aiEngine.generateBudgetRecommendations();
+
+  // Find the most important insight
+  let topInsight = null;
   
-  const timer = setInterval(() => {
-    current += increment;
-    if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
-      current = end;
-      clearInterval(timer);
-    }
-    element.textContent = Math.round(current);
-  }, 16);
+  // Priority: anomalies > savings opportunities > budget recommendations
+  if (anomalies.length > 0 && anomalies[0].type === 'alert') {
+    topInsight = anomalies[0];
+  } else if (savings.length > 0 && savings[0].type === 'warning') {
+    topInsight = savings[0];
+  } else if (budgetRecs.length > 0 && budgetRecs[0].type === 'warning') {
+    topInsight = budgetRecs[0];
+  } else {
+    topInsight = {
+      title: 'You\'re Doing Great!',
+      description: 'No urgent financial issues detected. Keep up the good work!'
+    };
+  }
+
+  document.getElementById('topPriorityText').textContent = 
+    topInsight.description || 'Analyzing your financial priorities...';
 }
 
-// Render spending patterns
-function renderSpendingPatterns() {
-  const patterns = aiEngine.analyzeSpendingPatterns();
-  const container = document.getElementById('spendingPatternsContent');
-  container.innerHTML = patterns.map(p => createInsightItem(p)).join('');
-}
-
-// Render anomalies
 function renderAnomalies() {
   const anomalies = aiEngine.detectAnomalies();
   const container = document.getElementById('anomaliesContent');
-  container.innerHTML = anomalies.map(a => createInsightItem(a)).join('');
-}
-
-// Render savings opportunities
-function renderSavingsOpportunities() {
-  const opportunities = aiEngine.findSavingsOpportunities();
-  const container = document.getElementById('savingsOpportunitiesContent');
-  container.innerHTML = opportunities.map(o => createInsightItem(o)).join('');
-}
-
-// Render budget recommendations
-function renderBudgetRecommendations() {
-  const recommendations = aiEngine.generateBudgetRecommendations();
-  const container = document.getElementById('budgetRecommendationsContent');
-  container.innerHTML = recommendations.map(r => createInsightItem(r)).join('');
-}
-
-// Render category insights
-function renderCategoryInsights() {
-  const insights = aiEngine.analyzeCategoryInsights();
-  const container = document.getElementById('categoryInsightsContent');
   
-  if (insights.length === 0) {
-    container.innerHTML = `
-      <div class="insight-item">
-        <div class="insight-item-header">
-          <div class="insight-item-title">No Data</div>
-          <div class="insight-item-value neutral">—</div>
+  if (anomalies.length === 0) {
+    container.innerHTML = createEmptyState('✅', 'All Clear', 'No unusual activity detected.');
+    return;
+  }
+
+  container.innerHTML = anomalies.slice(0, 3).map(item => createInsightItem(item)).join('');
+}
+
+function renderCategoryInsights() {
+  const categories = aiEngine.getTopSpendingCategories(5);
+  const totalSpending = aiEngine.getTotalExpenses();
+  const container = document.getElementById('categoryInsightsContent');
+
+  if (categories.length === 0) {
+    container.innerHTML = createEmptyState('🏷️', 'No Categories', 'Add expenses to see category breakdown.');
+    return;
+  }
+
+  const colors = ['#4A90E2', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+  
+  container.innerHTML = categories.map((cat, index) => {
+    const percentage = totalSpending > 0 ? (cat.amount / totalSpending) * 100 : 0;
+    return `
+      <div class="category-bar-item">
+        <div class="category-bar-header">
+          <span class="category-bar-name">${cat.category}</span>
+          <span class="category-bar-value">${formatCurrency(cat.amount)}</span>
         </div>
-        <div class="insight-item-description">
-          Add expenses to see category breakdown.
+        <div class="category-bar-track">
+          <div class="category-bar-fill" style="width: ${percentage}%; background: ${colors[index % colors.length]}"></div>
         </div>
       </div>
     `;
-  } else {
-    container.innerHTML = insights.map(i => createInsightItem(i)).join('');
-  }
+  }).join('');
 }
 
-// Render predictions
+function renderSpendingPatterns() {
+  const patterns = aiEngine.analyzeSpendingPatterns();
+  const container = document.getElementById('spendingPatternsContent');
+
+  if (patterns.length === 0) {
+    container.innerHTML = createEmptyState('📊', 'No Patterns Yet', 'Add more transactions to see spending patterns.');
+    return;
+  }
+
+  container.innerHTML = patterns.map(item => createInsightItem(item)).join('');
+}
+
+function renderBudgetRecommendations() {
+  const recommendations = aiEngine.generateBudgetRecommendations();
+  const container = document.getElementById('budgetRecommendationsContent');
+
+  if (recommendations.length === 0) {
+    container.innerHTML = createEmptyState('💳', 'No Recommendations', 'Add budgets to get personalized recommendations.');
+    return;
+  }
+
+  container.innerHTML = recommendations.slice(0, 4).map(item => createInsightItem(item)).join('');
+}
+
+function renderSavingsOpportunities() {
+  const opportunities = aiEngine.findSavingsOpportunities();
+  const container = document.getElementById('savingsOpportunitiesContent');
+
+  if (opportunities.length === 0) {
+    container.innerHTML = createEmptyState('💡', 'Great Job!', 'No immediate savings opportunities found.');
+    return;
+  }
+
+  container.innerHTML = opportunities.map(item => createInsightItem(item)).join('');
+}
+
 function renderPredictions() {
   const predictions = aiEngine.generatePredictions();
   const container = document.getElementById('predictionsContent');
-  container.innerHTML = predictions.map(p => createInsightItem(p)).join('');
+
+  if (predictions.length === 0) {
+    container.innerHTML = createEmptyState('🔮', 'Need More Data', 'Add more transactions to enable predictions.');
+    return;
+  }
+
+  container.innerHTML = predictions.map(item => createInsightItem(item)).join('');
 }
 
-// Render monthly report
 function renderMonthlyReport() {
   const report = aiEngine.generateMonthlyReport();
   const container = document.getElementById('monthlyReportContent');
-  
-  const currentDate = new Date();
-  const monthName = currentDate.toLocaleString('default', { month: 'long', year: 'numeric' });
-  
+
+  const savingsStatus = report.summary.savings >= 0 ? 'positive' : 'negative';
+  const savingsIcon = report.summary.savings >= 0 ? '📈' : '📉';
+
   container.innerHTML = `
-    <div class="report-section">
-      <h3 class="report-section-title">
-        <span class="report-section-icon">📊</span>
-        Financial Summary - ${monthName}
-      </h3>
-      <div class="report-section-content">
-        <p>This month, you earned <strong>${formatCurrency(report.summary.income)}</strong> and spent <strong>${formatCurrency(report.summary.expenses)}</strong>, resulting in ${report.summary.savings >= 0 ? 'savings' : 'a deficit'} of <strong>${formatCurrency(Math.abs(report.summary.savings))}</strong> (${report.summary.savingsRate.toFixed(1)}% ${report.summary.savings >= 0 ? 'savings' : 'deficit'} rate).</p>
+    <div class="report-block">
+      <div class="report-block-title">📊 Financial Summary</div>
+      <div class="report-block-content">
+        <div class="report-highlight-box">
+          <p><strong>Total Income:</strong> ${formatCurrency(report.summary.income)}</p>
+          <p><strong>Total Expenses:</strong> ${formatCurrency(report.summary.expenses)}</p>
+          <p><strong>Net Savings:</strong> <span class="${savingsStatus}">${formatCurrency(report.summary.savings)}</span> (${report.summary.savingsRate.toFixed(1)}% savings rate)</p>
+        </div>
       </div>
     </div>
-    
-    ${report.topCategories.length > 0 ? `
-      <div class="report-section">
-        <h3 class="report-section-title">
-          <span class="report-section-icon">🏷️</span>
-          Top Spending Categories
-        </h3>
-        <div class="report-section-content">
-          <ul>
-            ${report.topCategories.map(cat => `<li><strong>${cat.category}</strong>: ${formatCurrency(cat.amount)}</li>`).join('')}
-          </ul>
-        </div>
-      </div>
-    ` : ''}
-    
-    <div class="report-highlight">
-      <div class="report-highlight-title">Financial Health Score: ${report.healthScore}/100</div>
-      <p>${getHealthScoreMessage(report.healthScore)}</p>
-    </div>
-    
-    ${report.insights.length > 0 ? `
-      <div class="report-section">
-        <h3 class="report-section-title">
-          <span class="report-section-icon">💡</span>
-          Key Insights
-        </h3>
-        <div class="report-section-content">
-          <ul>
-            ${report.insights.slice(0, 3).map(insight => `<li>${insight.description}</li>`).join('')}
-          </ul>
-        </div>
-      </div>
-    ` : ''}
-    
-    ${report.recommendations.length > 0 ? `
-      <div class="report-section">
-        <h3 class="report-section-title">
-          <span class="report-section-icon">🎯</span>
-          Recommendations
-        </h3>
-        <div class="report-section-content">
-          <ul>
-            ${report.recommendations.slice(0, 3).map(rec => `<li>${rec.description}</li>`).join('')}
-          </ul>
-        </div>
-      </div>
-    ` : ''}
-    
-    <div class="report-section">
-      <h3 class="report-section-title">
-        <span class="report-section-icon">📈</span>
-        Next Steps
-      </h3>
-      <div class="report-section-content">
-        <p>Based on your financial data, here are some actions you can take:</p>
+
+    <div class="report-block">
+      <div class="report-block-title">🏷️ Top Spending Categories</div>
+      <div class="report-block-content">
         <ul>
-          ${report.healthScore < 60 ? '<li>Review your budget and identify areas to cut spending</li>' : ''}
-          ${report.summary.savingsRate < 20 ? '<li>Aim to increase your savings rate to at least 20%</li>' : ''}
-          ${report.topCategories.length > 0 && report.topCategories[0].amount > report.summary.income * 0.3 ? '<li>Consider reducing spending in your top category</li>' : ''}
-          <li>Continue tracking all expenses and income regularly</li>
-          <li>Review your financial goals and adjust as needed</li>
-          ${report.healthScore >= 80 ? '<li>Great job! Keep up the good financial habits</li>' : ''}
+          ${report.topCategories.map(cat => `
+            <li><strong>${cat.category}:</strong> ${formatCurrency(cat.amount)}</li>
+          `).join('')}
+        </ul>
+      </div>
+    </div>
+
+    <div class="report-block">
+      <div class="report-block-title">${savingsIcon} Key Insights</div>
+      <div class="report-block-content">
+        <ul>
+          ${report.insights.slice(0, 3).map(insight => `
+            <li>${insight.description}</li>
+          `).join('')}
+        </ul>
+      </div>
+    </div>
+
+    <div class="report-block">
+      <div class="report-block-title">💡 Recommendations</div>
+      <div class="report-block-content">
+        <ul>
+          ${report.recommendations.slice(0, 3).map(rec => `
+            <li>${rec.description}</li>
+          `).join('')}
         </ul>
       </div>
     </div>
   `;
 }
 
-// Create insight item HTML
-function createInsightItem(insight) {
+function createInsightItem(item) {
+  const iconClass = item.type === 'positive' ? 'positive' : 
+                    item.type === 'warning' || item.type === 'alert' ? 'negative' : 'neutral';
+  const valueClass = item.type === 'positive' ? 'positive' : 
+                     item.type === 'warning' || item.type === 'alert' ? 'negative' : 'neutral';
+  
+  const icon = item.type === 'positive' ? '✅' : 
+               item.type === 'warning' ? '⚠️' : 
+               item.type === 'alert' ? '🚨' : 'ℹ️';
+
   return `
-    <div class="insight-item">
-      <div class="insight-item-header">
-        <div class="insight-item-title">${insight.title}</div>
-        <div class="insight-item-value ${insight.type}">${insight.value}</div>
+    <div class="insight-item-new">
+      <div class="insight-item-icon ${iconClass}">${icon}</div>
+      <div class="insight-item-content">
+        <div class="insight-item-title">${item.title}</div>
+        <div class="insight-item-desc">${item.description}</div>
       </div>
-      <div class="insight-item-description">${insight.description}</div>
-      ${insight.badge ? `<span class="insight-badge ${insight.badge}">${insight.badge}</span>` : ''}
+      ${item.value ? `<div class="insight-item-value ${valueClass}">${item.value}</div>` : ''}
     </div>
   `;
 }
 
-// Get health score message
-function getHealthScoreMessage(score) {
-  if (score >= 80) return 'Excellent! You\'re managing your finances very well. Keep up the great work!';
-  if (score >= 60) return 'Good job! You\'re on the right track. There\'s room for improvement in some areas.';
-  if (score >= 40) return 'Fair. Consider following the recommendations below to improve your financial health.';
-  return 'Needs attention. Focus on improving your savings rate and budget adherence. Small changes can make a big difference!';
+function createEmptyState(icon, title, description) {
+  return `
+    <div class="insight-empty-state">
+      <div class="empty-icon">${icon}</div>
+      <div class="empty-title">${title}</div>
+      <div class="empty-desc">${description}</div>
+    </div>
+  `;
 }
 
-// Setup event listeners
-function setupEventListeners() {
-  // Sidebar toggle
-  sidebarOpen.addEventListener('click', () => {
-    sidebar.classList.add('open');
-    sidebarOverlay.classList.add('show');
-  });
+function animateNumber(elementId, value) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
   
-  sidebarClose.addEventListener('click', () => {
-    sidebar.classList.remove('open');
-    sidebarOverlay.classList.remove('show');
-  });
+  const prefix = value < 0 ? '-₹' : '₹';
+  const absValue = Math.abs(value);
   
-  sidebarOverlay.addEventListener('click', () => {
-    sidebar.classList.remove('open');
-    sidebarOverlay.classList.remove('show');
-  });
+  animateValue(el, 0, absValue, 1000, (v) => `${prefix}${formatCurrencyCompact(v)}`);
+}
+
+function animateValue(element, start, end, duration, formatter = (v) => Math.round(v)) {
+  const startTime = performance.now();
   
-  // Logout
-  logoutBtn.addEventListener('click', async () => {
-    const confirmed = confirm('Are you sure you want to logout?');
-    if (!confirmed) return;
+  function update(currentTime) {
+    const elapsed = currentTime - startTime;
+    const progress = Math.min(elapsed / duration, 1);
     
-    const result = await authService.signOut();
-    if (result.success) {
-      toast.success('Logged out successfully');
-      setTimeout(() => {
-        window.location.href = 'index.html';
-      }, 1000);
-    } else {
-      toast.error('Failed to logout');
+    // Ease out cubic
+    const easeOut = 1 - Math.pow(1 - progress, 3);
+    const current = start + (end - start) * easeOut;
+    
+    element.textContent = formatter(current);
+    
+    if (progress < 1) {
+      requestAnimationFrame(update);
     }
-  });
+  }
   
-  // Refresh insights
-  refreshInsightsBtn.addEventListener('click', async () => {
-    refreshInsightsBtn.disabled = true;
-    await loadInsights();
-    refreshInsightsBtn.disabled = false;
-  });
+  requestAnimationFrame(update);
 }

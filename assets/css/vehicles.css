@@ -2,7 +2,7 @@
 
 .vehicles-summary {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
   margin-bottom: 2rem;
 }
@@ -404,13 +404,13 @@
 /* Mobile Responsive */
 @media (max-width: 1200px) {
   .vehicles-summary {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
 @media (max-width: 992px) {
   .vehicles-summary {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 0.75rem;
   }
   
@@ -434,12 +434,15 @@
 
 @media (max-width: 768px) {
   .vehicles-summary {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 0.5rem;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
   }
   
   .summary-card {
-    padding: 0.75rem 0.5rem;
+    padding: 12px 8px;
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
   }
   
   .summary-icon {
@@ -454,7 +457,7 @@
   }
   
   .summary-value {
-    font-size: 1rem;
+    font-size: 0.875rem;
   }
 
   .add-vehicle-section {
@@ -528,16 +531,16 @@
 
 @media (max-width: 480px) {
   .vehicles-summary {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.5rem;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
   }
   
   .summary-card {
-    padding: 0.6rem;
+    padding: 10px 6px;
   }
   
   .summary-icon {
-    font-size: 1.25rem;
+    font-size: 1.125rem;
     width: 32px;
     height: 32px;
   }
@@ -547,7 +550,7 @@
   }
   
   .summary-value {
-    font-size: 0.9rem;
+    font-size: 0.75rem;
   }
 
   .vehicle-card-body {

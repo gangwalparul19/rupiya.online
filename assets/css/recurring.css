@@ -555,22 +555,33 @@
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
+  /* 3 cards per row on mobile */
   .recurring-summary {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
   }
 
-  .recurring-summary .summary-card:nth-child(3) {
-    grid-column: 1 / -1;
+  .summary-card {
+    padding: 8px 4px;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 4px;
   }
 
   .summary-icon {
-    font-size: 2rem;
-    width: 50px;
-    height: 50px;
+    font-size: 1.25rem;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+  }
+
+  .summary-label {
+    font-size: 8px;
   }
 
   .summary-value {
-    font-size: 1.5rem;
+    font-size: 12px;
   }
 
   .add-recurring-section {
@@ -626,10 +637,10 @@
   }
 
   .recurring-container {
-    padding: 1.5rem;
+    padding: 1rem;
   }
 
-  /* 1 card per row on mobile for better space utilization */
+  /* 1 card per row on mobile for better readability */
   .recurring-grid {
     grid-template-columns: 1fr;
     gap: 10px;
@@ -684,56 +695,50 @@
   
   .recurring-footer {
     font-size: 11px;
-  }
-
-  .recurring-description {
-    font-size: 1rem;
-  }
-
-  .recurring-amount {
-    font-size: 1.25rem;
-  }
-
-  .recurring-details {
-    grid-template-columns: 1fr;
-    gap: 0.5rem;
-  }
-
-  .recurring-footer {
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.5rem;
+    gap: 4px;
+  }
+
+  .modal-container {
+    max-width: 100%;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+  
+  .modal-overlay {
+    padding: 0;
   }
 }
 
 @media (max-width: 480px) {
+  /* 3 cards per row on small mobile */
   .recurring-summary {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
   }
   
   .summary-card {
-    padding: 10px;
+    padding: 6px 4px;
   }
   
   .summary-icon {
-    font-size: 1.5rem;
-    width: 40px;
-    height: 40px;
+    font-size: 1rem;
+    width: 28px;
+    height: 28px;
   }
   
   .summary-label {
-    font-size: 10px;
+    font-size: 7px;
   }
   
   .summary-value {
-    font-size: 1.25rem;
+    font-size: 11px;
   }
 
-  /* 1 card per row for recurring transactions on small mobile */
   .recurring-grid {
     grid-template-columns: 1fr;
-    gap: 10px;
+    gap: 8px;
   }
 
   .recurring-card {
@@ -746,18 +751,5 @@
   
   .recurring-description {
     font-size: 13px;
-  }
-}
-  
-  .recurring-description {
-    font-size: 13px;
-  }
-
-  .recurring-description {
-    font-size: 0.875rem;
-  }
-
-  .recurring-amount {
-    font-size: 1.125rem;
   }
 }

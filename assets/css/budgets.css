@@ -639,29 +639,30 @@
     width: 100%;
   }
 
-  /* 2 cards per row on mobile */
+  /* 3 cards per row on mobile */
   .budget-summary {
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--spacing-sm);
-  }
-
-  .summary-card {
-    padding: var(--spacing-sm);
-    flex-direction: column;
-    align-items: flex-start;
+    grid-template-columns: repeat(3, 1fr);
     gap: var(--spacing-xs);
   }
 
+  .summary-card {
+    padding: var(--spacing-xs);
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 4px;
+  }
+
   .summary-icon {
-    font-size: 32px;
+    font-size: 24px;
   }
 
   .summary-label {
-    font-size: 10px;
+    font-size: 9px;
   }
 
   .summary-value {
-    font-size: var(--font-size-lg);
+    font-size: var(--font-size-sm);
   }
 
 

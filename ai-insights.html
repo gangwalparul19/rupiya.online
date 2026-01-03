@@ -3,11 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Rupiya AI Insights - Smart financial recommendations">
+  <meta name="description" content="Rupiya AI Insights - Smart financial recommendations powered by AI">
+  <meta name="theme-color" content="#4A90E2">
   <title>AI Insights - Rupiya</title>
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json">
   
   <!-- Favicon -->
   <link rel="icon" href="assets/images/logo.png" type="image/png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   
   <!-- Stylesheets -->
   <link rel="stylesheet" href="assets/css/common.css">
@@ -79,6 +84,10 @@
             <span class="nav-icon">🤝</span>
             <span>Split Expense</span>
           </a>
+          <a href="achievements.html" class="nav-item">
+            <span class="nav-icon">🏆</span>
+            <span>Achievements</span>
+          </a>
         </div>
 
         <div class="nav-section">
@@ -91,22 +100,10 @@
             <span class="nav-icon">🚗</span>
             <span>Vehicles</span>
           </a>
-          <a href="house-help.html" class="nav-item">
-            <span class="nav-icon">🧹</span>
-            <span>House Help</span>
-          </a>
         </div>
 
         <div class="nav-section">
           <div class="nav-section-title">More</div>
-          <a href="notes.html" class="nav-item">
-            <span class="nav-icon">📝</span>
-            <span>Notes</span>
-          </a>
-          <a href="documents.html" class="nav-item">
-            <span class="nav-icon">📄</span>
-            <span>Documents</span>
-          </a>
           <a href="analytics.html" class="nav-item">
             <span class="nav-icon">📉</span>
             <span>Analytics</span>
@@ -114,14 +111,6 @@
           <a href="profile.html" class="nav-item">
             <span class="nav-icon">⚙️</span>
             <span>Settings</span>
-          </a>
-        </div>
-
-        <div class="nav-section">
-          <div class="nav-section-title">Family</div>
-          <a href="family.html" class="nav-item">
-            <span class="nav-icon">👨‍👩‍👧‍👦</span>
-            <span>Family Groups</span>
           </a>
         </div>
       </nav>
@@ -134,16 +123,11 @@
             <div class="user-email" id="userEmail">Loading...</div>
           </div>
         </div>
-        <button class="btn btn-sm btn-outline w-100 mt-3" id="logoutBtn">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-          </svg>
-          Logout
-        </button>
+        <button class="btn btn-sm btn-outline w-100 mt-3" id="logoutBtn">Logout</button>
       </div>
     </aside>
 
-    <!-- Sidebar Overlay (Mobile) -->
+    <!-- Sidebar Overlay -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <!-- Main Content -->
@@ -161,197 +145,261 @@
         <div id="familySwitcherContainer"></div>
       </div>
 
-      <!-- Page Header -->
-      <div class="page-header">
-        <div>
-          <h1 class="page-title">AI Insights</h1>
-          <p class="page-subtitle" id="aiInsightsSubtitle">Smart recommendations powered by AI</p>
+      <!-- AI Hero Section -->
+      <div class="ai-hero">
+        <div class="ai-hero-content">
+          <div class="ai-hero-badge">
+            <span class="ai-pulse"></span>
+            <span>AI-Powered</span>
+          </div>
+          <h1 class="ai-hero-title">Financial Intelligence</h1>
+          <p class="ai-hero-subtitle" id="aiInsightsSubtitle">Smart insights to optimize your money</p>
         </div>
-        <div class="page-actions">
-          <button class="btn btn-outline" id="refreshInsightsBtn">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-            </svg>
-            Refresh
-          </button>
-        </div>
+        <button class="btn btn-ai-refresh" id="refreshInsightsBtn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+          </svg>
+          Refresh
+        </button>
       </div>
 
-      <!-- Financial Health Score -->
+      <!-- Health Score Card - Redesigned -->
       <div class="health-score-card">
-        <div class="health-score-header">
-          <div>
-            <h2 class="health-score-title">Financial Health Score</h2>
-            <p class="health-score-subtitle">Based on your spending and saving patterns</p>
-          </div>
-          <div class="health-score-value" id="healthScore">
-            <div class="score-circle">
-              <svg class="score-ring" width="120" height="120">
-                <circle class="score-ring-bg" cx="60" cy="60" r="52" />
-                <circle class="score-ring-progress" cx="60" cy="60" r="52" id="scoreRing" />
-              </svg>
+        <div class="health-score-main">
+          <div class="health-score-circle">
+            <svg class="score-ring" viewBox="0 0 120 120">
+              <defs>
+                <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" style="stop-color:#10b981"/>
+                  <stop offset="100%" style="stop-color:#34d399"/>
+                </linearGradient>
+              </defs>
+              <circle class="score-ring-bg" cx="60" cy="60" r="52"/>
+              <circle class="score-ring-progress" cx="60" cy="60" r="52" id="scoreRing"/>
+            </svg>
+            <div class="score-inner">
               <div class="score-number" id="scoreNumber">0</div>
+              <div class="score-label">Health Score</div>
+            </div>
+          </div>
+          <div class="health-score-info">
+            <h2>Financial Health</h2>
+            <p class="health-score-message" id="healthMessage">Analyzing your finances...</p>
+            <div class="health-score-tags">
+              <span class="health-tag" id="savingsTag">💰 Savings: --</span>
+              <span class="health-tag" id="budgetTag">📊 Budget: --</span>
+              <span class="health-tag" id="consistencyTag">📈 Consistency: --</span>
             </div>
           </div>
         </div>
-        <div class="health-score-breakdown">
-          <div class="score-factor">
-            <div class="score-factor-label">Savings Rate</div>
-            <div class="score-factor-bar">
-              <div class="score-factor-fill" id="savingsRateFill" style="width: 0%"></div>
+        <div class="health-score-factors">
+          <div class="factor-item">
+            <div class="factor-header">
+              <span class="factor-icon">💰</span>
+              <span class="factor-name">Savings Rate</span>
+              <span class="factor-value" id="savingsRateValue">0%</span>
             </div>
-            <div class="score-factor-value" id="savingsRateValue">0%</div>
-          </div>
-          <div class="score-factor">
-            <div class="score-factor-label">Budget Adherence</div>
-            <div class="score-factor-bar">
-              <div class="score-factor-fill" id="budgetAdherenceFill" style="width: 0%"></div>
-            </div>
-            <div class="score-factor-value" id="budgetAdherenceValue">0%</div>
-          </div>
-          <div class="score-factor">
-            <div class="score-factor-label">Spending Consistency</div>
-            <div class="score-factor-bar">
-              <div class="score-factor-fill" id="spendingConsistencyFill" style="width: 0%"></div>
-            </div>
-            <div class="score-factor-value" id="spendingConsistencyValue">0%</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Insights Grid -->
-      <div class="insights-grid">
-        <!-- Spending Patterns -->
-        <div class="insight-card">
-          <div class="insight-header">
-            <div class="insight-icon spending">📊</div>
-            <div>
-              <h3 class="insight-title">Spending Patterns</h3>
-              <p class="insight-subtitle">This month vs last month</p>
+            <div class="factor-bar">
+              <div class="factor-fill savings" id="savingsRateFill" style="width: 0%"></div>
             </div>
           </div>
-          <div class="insight-content" id="spendingPatternsContent">
-            <div class="loading-state">
-              <div class="spinner"></div>
-              <p>Analyzing...</p>
+          <div class="factor-item">
+            <div class="factor-header">
+              <span class="factor-icon">📊</span>
+              <span class="factor-name">Budget Adherence</span>
+              <span class="factor-value" id="budgetAdherenceValue">0%</span>
+            </div>
+            <div class="factor-bar">
+              <div class="factor-fill budget" id="budgetAdherenceFill" style="width: 0%"></div>
             </div>
           </div>
-        </div>
-
-        <!-- Anomalies -->
-        <div class="insight-card">
-          <div class="insight-header">
-            <div class="insight-icon alert">⚠️</div>
-            <div>
-              <h3 class="insight-title">Unusual Activity</h3>
-              <p class="insight-subtitle">Detected anomalies</p>
+          <div class="factor-item">
+            <div class="factor-header">
+              <span class="factor-icon">📈</span>
+              <span class="factor-name">Spending Consistency</span>
+              <span class="factor-value" id="spendingConsistencyValue">0%</span>
             </div>
-          </div>
-          <div class="insight-content" id="anomaliesContent">
-            <div class="loading-state">
-              <div class="spinner"></div>
-              <p>Analyzing...</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Savings Opportunities -->
-        <div class="insight-card">
-          <div class="insight-header">
-            <div class="insight-icon savings">💡</div>
-            <div>
-              <h3 class="insight-title">Savings Opportunities</h3>
-              <p class="insight-subtitle">Ways to save more</p>
-            </div>
-          </div>
-          <div class="insight-content" id="savingsOpportunitiesContent">
-            <div class="loading-state">
-              <div class="spinner"></div>
-              <p>Analyzing...</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Budget Recommendations -->
-        <div class="insight-card">
-          <div class="insight-header">
-            <div class="insight-icon budget">💳</div>
-            <div>
-              <h3 class="insight-title">Budget Recommendations</h3>
-              <p class="insight-subtitle">Suggested budget adjustments</p>
-            </div>
-          </div>
-          <div class="insight-content" id="budgetRecommendationsContent">
-            <div class="loading-state">
-              <div class="spinner"></div>
-              <p>Analyzing...</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Category Insights -->
-        <div class="insight-card">
-          <div class="insight-header">
-            <div class="insight-icon category">🏷️</div>
-            <div>
-              <h3 class="insight-title">Category Analysis</h3>
-              <p class="insight-subtitle">Top spending categories</p>
-            </div>
-          </div>
-          <div class="insight-content" id="categoryInsightsContent">
-            <div class="loading-state">
-              <div class="spinner"></div>
-              <p>Analyzing...</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Predictions -->
-        <div class="insight-card">
-          <div class="insight-header">
-            <div class="insight-icon prediction">🔮</div>
-            <div>
-              <h3 class="insight-title">Predictions</h3>
-              <p class="insight-subtitle">Next month forecast</p>
-            </div>
-          </div>
-          <div class="insight-content" id="predictionsContent">
-            <div class="loading-state">
-              <div class="spinner"></div>
-              <p>Analyzing...</p>
+            <div class="factor-bar">
+              <div class="factor-fill consistency" id="spendingConsistencyFill" style="width: 0%"></div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Monthly Report -->
-      <div class="monthly-report-card">
-        <div class="monthly-report-header">
-          <h2 class="monthly-report-title">AI-Generated Monthly Report</h2>
-          <p class="monthly-report-subtitle">Comprehensive analysis of your finances</p>
+      <!-- Quick Stats Row -->
+      <div class="ai-stats-row">
+        <div class="ai-stat-card">
+          <div class="ai-stat-icon income">📈</div>
+          <div class="ai-stat-content">
+            <div class="ai-stat-value" id="monthlyIncome">₹0</div>
+            <div class="ai-stat-label">This Month Income</div>
+          </div>
         </div>
-        <div class="monthly-report-content" id="monthlyReportContent">
-          <div class="loading-state">
+        <div class="ai-stat-card">
+          <div class="ai-stat-icon expense">📉</div>
+          <div class="ai-stat-content">
+            <div class="ai-stat-value" id="monthlyExpense">₹0</div>
+            <div class="ai-stat-label">This Month Expenses</div>
+          </div>
+        </div>
+        <div class="ai-stat-card">
+          <div class="ai-stat-icon savings">💎</div>
+          <div class="ai-stat-content">
+            <div class="ai-stat-value" id="monthlySavings">₹0</div>
+            <div class="ai-stat-label">Net Savings</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Insights Tabs -->
+      <div class="insights-tabs">
+        <button class="insight-tab active" data-tab="overview">
+          <span class="tab-icon">🎯</span>
+          <span>Overview</span>
+        </button>
+        <button class="insight-tab" data-tab="spending">
+          <span class="tab-icon">💸</span>
+          <span>Spending</span>
+        </button>
+        <button class="insight-tab" data-tab="savings">
+          <span class="tab-icon">💡</span>
+          <span>Savings</span>
+        </button>
+        <button class="insight-tab" data-tab="forecast">
+          <span class="tab-icon">🔮</span>
+          <span>Forecast</span>
+        </button>
+      </div>
+
+      <!-- Tab Content -->
+      <div class="insights-tab-content">
+        <!-- Overview Tab -->
+        <div class="tab-panel active" id="tab-overview">
+          <div class="insights-grid-new">
+            <!-- Top Insight Card -->
+            <div class="insight-card-featured">
+              <div class="featured-icon">🎯</div>
+              <div class="featured-content">
+                <h3>Top Priority</h3>
+                <p id="topPriorityText">Analyzing your financial data...</p>
+              </div>
+              <div class="featured-action">
+                <button class="btn btn-sm btn-primary" id="topPriorityAction">Take Action</button>
+              </div>
+            </div>
+
+            <!-- Anomalies Card -->
+            <div class="insight-card-new anomaly">
+              <div class="card-header-new">
+                <div class="card-icon">⚠️</div>
+                <h3>Unusual Activity</h3>
+              </div>
+              <div class="card-body-new" id="anomaliesContent">
+                <div class="insight-loading">
+                  <div class="spinner"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Category Breakdown -->
+            <div class="insight-card-new categories">
+              <div class="card-header-new">
+                <div class="card-icon">🏷️</div>
+                <h3>Top Categories</h3>
+              </div>
+              <div class="card-body-new" id="categoryInsightsContent">
+                <div class="insight-loading">
+                  <div class="spinner"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Spending Tab -->
+        <div class="tab-panel" id="tab-spending">
+          <div class="insights-grid-new">
+            <div class="insight-card-new full-width">
+              <div class="card-header-new">
+                <div class="card-icon">📊</div>
+                <h3>Spending Patterns</h3>
+              </div>
+              <div class="card-body-new" id="spendingPatternsContent">
+                <div class="insight-loading">
+                  <div class="spinner"></div>
+                </div>
+              </div>
+            </div>
+            <div class="insight-card-new">
+              <div class="card-header-new">
+                <div class="card-icon">💳</div>
+                <h3>Budget Recommendations</h3>
+              </div>
+              <div class="card-body-new" id="budgetRecommendationsContent">
+                <div class="insight-loading">
+                  <div class="spinner"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Savings Tab -->
+        <div class="tab-panel" id="tab-savings">
+          <div class="insights-grid-new">
+            <div class="insight-card-new savings-card full-width">
+              <div class="card-header-new">
+                <div class="card-icon">💡</div>
+                <h3>Savings Opportunities</h3>
+              </div>
+              <div class="card-body-new" id="savingsOpportunitiesContent">
+                <div class="insight-loading">
+                  <div class="spinner"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Forecast Tab -->
+        <div class="tab-panel" id="tab-forecast">
+          <div class="insights-grid-new">
+            <div class="insight-card-new forecast-card full-width">
+              <div class="card-header-new">
+                <div class="card-icon">🔮</div>
+                <h3>Next Month Predictions</h3>
+              </div>
+              <div class="card-body-new" id="predictionsContent">
+                <div class="insight-loading">
+                  <div class="spinner"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Report Section -->
+      <div class="ai-report-section">
+        <div class="ai-report-header">
+          <div class="ai-report-title">
+            <span class="report-icon">📋</span>
+            <h2>Monthly AI Report</h2>
+          </div>
+          <div class="ai-report-date" id="reportDate">January 2026</div>
+        </div>
+        <div class="ai-report-content" id="monthlyReportContent">
+          <div class="insight-loading">
             <div class="spinner-lg"></div>
-            <p>Generating report...</p>
+            <p>Generating your personalized report...</p>
           </div>
         </div>
       </div>
     </main>
   </div>
 
-  <!-- Family Modals -->
-  <script>
-    fetch('family-modals.html')
-      .then(response => response.text())
-      .then(html => {
-        const div = document.createElement('div');
-        div.innerHTML = html;
-        document.body.appendChild(div);
-      });
-  </script>
-
   <!-- Scripts -->
   <script type="module" src="assets/js/pages/ai-insights.js"></script>
+  <script src="assets/js/pwa-setup.js"></script>
 </body>
 </html>

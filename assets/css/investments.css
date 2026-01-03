@@ -411,27 +411,37 @@
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
+  /* 3 cards per row on mobile */
   .portfolio-summary {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-xs);
   }
 
   .summary-card {
-    padding: 1.25rem;
+    padding: var(--spacing-xs);
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 4px;
   }
 
   .summary-icon {
-    font-size: 2rem;
-    width: 50px;
-    height: 50px;
+    font-size: 1.5rem;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
   }
 
   .summary-value {
-    font-size: 1.5rem;
+    font-size: var(--font-size-sm);
   }
 
   .summary-label {
-    font-size: 0.8rem;
+    font-size: 9px;
+  }
+
+  .summary-change {
+    font-size: 10px;
   }
 
   .add-investment-section {
@@ -514,27 +524,32 @@
 }
 
 @media (max-width: 480px) {
+  /* 3 cards per row on small mobile */
   .portfolio-summary {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
   }
   
   .summary-card {
-    padding: 10px;
+    padding: 8px 4px;
   }
   
   .summary-icon {
-    font-size: 1.5rem;
-    width: 40px;
-    height: 40px;
+    font-size: 1.25rem;
+    width: 32px;
+    height: 32px;
   }
   
   .summary-label {
-    font-size: 10px;
+    font-size: 8px;
   }
   
   .summary-value {
-    font-size: 1.25rem;
+    font-size: 12px;
+  }
+
+  .summary-change {
+    font-size: 9px;
   }
 
   /* 1 card per row even on small mobile */
