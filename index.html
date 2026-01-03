@@ -3,11 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Rupiya - AI-powered personal finance and expense tracking platform">
-  <title>Rupiya - Smart Expense Tracker</title>
+  <meta name="description" content="Rupiya - AI-powered personal finance and expense tracking platform. Track expenses, manage budgets, and achieve your financial goals.">
+  <meta name="keywords" content="expense tracker, budget app, personal finance, money management, financial planning">
+  <title>Rupiya - Smart Personal Finance & Expense Tracker</title>
   
   <!-- Favicon -->
   <link rel="icon" href="assets/images/logo.png" type="image/png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
   
   <!-- Stylesheets -->
   <link rel="stylesheet" href="assets/css/common.css">
@@ -21,42 +23,105 @@
     <!-- Navigation -->
     <nav class="landing-nav" id="landingNav">
       <div class="container">
-        <div class="landing-logo">
-          <img src="assets/images/logo.png" alt="Rupiya">
-        </div>
-        <div class="landing-nav-links">
-          <a href="login.html" class="btn btn-sm btn-light">Login</a>
-          <a href="signup.html" class="btn btn-sm btn-primary">Sign Up</a>
+        <div class="nav-content">
+          <div class="landing-logo">
+            <img src="assets/images/logo.png" alt="Rupiya Logo">
+            <span class="logo-text">Rupiya</span>
+          </div>
+          <div class="landing-nav-links">
+            <a href="#features" class="nav-link">Features</a>
+            <a href="#how-it-works" class="nav-link">How It Works</a>
+            <a href="login.html" class="btn btn-sm btn-light">Login</a>
+            <a href="signup.html" class="btn btn-sm btn-primary">Get Started</a>
+          </div>
+          <button class="mobile-menu-toggle" id="mobileMenuToggle">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+          </button>
         </div>
       </div>
     </nav>
 
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+      <div class="mobile-menu-content">
+        <a href="#features" class="mobile-menu-link">Features</a>
+        <a href="#how-it-works" class="mobile-menu-link">How It Works</a>
+        <a href="login.html" class="btn btn-outline w-100">Login</a>
+        <a href="signup.html" class="btn btn-primary w-100">Get Started</a>
+      </div>
+    </div>
+
     <!-- Hero Section -->
     <section class="hero-section">
       <div class="container">
-        <h1 class="hero-title">Take Control of Your Finances</h1>
-        <p class="hero-subtitle">
-          AI-powered expense tracking, budgeting, and financial insights. 
-          Manage your money smarter with Rupiya.
-        </p>
-        <div class="hero-cta">
-          <a href="signup.html" class="btn btn-hero-primary">Get Started Free</a>
-          <a href="#features" class="btn btn-hero-secondary">Learn More</a>
+        <div class="hero-content">
+          <div class="hero-badge">🚀 AI-Powered Finance Management</div>
+          <h1 class="hero-title">Take Control of Your <span class="gradient-text">Financial Future</span></h1>
+          <p class="hero-subtitle">
+            Smart expense tracking, intelligent budgeting, and AI-powered insights. 
+            Manage your money effortlessly with Rupiya.
+          </p>
+          <div class="hero-cta">
+            <a href="signup.html" class="btn btn-hero-primary">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+              </svg>
+              Start Free Today
+            </a>
+            <a href="#features" class="btn btn-hero-secondary">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+              </svg>
+              Explore Features
+            </a>
+          </div>
+
+          <!-- Trust Indicators -->
+          <div class="trust-indicators">
+            <div class="trust-item">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <span>100% Free</span>
+            </div>
+            <div class="trust-item">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+              </svg>
+              <span>Bank-Level Security</span>
+            </div>
+            <div class="trust-item">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+              </svg>
+              <span>Works Offline</span>
+            </div>
+          </div>
         </div>
 
-        <!-- Stats -->
-        <div class="stats-section" style="display: grid !important; grid-template-columns: repeat(3, 1fr) !important; gap: 16px !important; max-width: 1000px !important; margin: 48px auto 0 !important; padding: 0 16px !important;">
-          <div class="stat-item" style="background: rgba(255, 255, 255, 0.95) !important; border: 2px solid #4A90E2 !important; border-radius: 12px !important; padding: 20px 12px !important; text-align: center !important; min-height: 120px !important; display: flex !important; flex-direction: column !important; justify-content: center !important; align-items: center !important; box-shadow: 0 4px 8px rgba(0,0,0,0.12) !important;">
-            <div class="stat-value" style="font-size: clamp(1.5rem, 5vw, 3rem) !important; font-weight: 800 !important; color: #4A90E2 !important; margin-bottom: 8px !important; line-height: 1.2 !important;">10K+</div>
-            <div class="stat-label" style="font-size: clamp(0.75rem, 2.5vw, 1rem) !important; color: #7F8C8D !important; font-weight: 600 !important; margin: 0 !important;">Active Users</div>
+        <!-- Stats Section -->
+        <div class="stats-section">
+          <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-value">10K+</div>
+            <div class="stat-label">Active Users</div>
           </div>
-          <div class="stat-item" style="background: rgba(255, 255, 255, 0.95) !important; border: 2px solid #4A90E2 !important; border-radius: 12px !important; padding: 20px 12px !important; text-align: center !important; min-height: 120px !important; display: flex !important; flex-direction: column !important; justify-content: center !important; align-items: center !important; box-shadow: 0 4px 8px rgba(0,0,0,0.12) !important;">
-            <div class="stat-value" style="font-size: clamp(1.5rem, 5vw, 3rem) !important; font-weight: 800 !important; color: #4A90E2 !important; margin-bottom: 8px !important; line-height: 1.2 !important;">₹50Cr+</div>
-            <div class="stat-label" style="font-size: clamp(0.75rem, 2.5vw, 1rem) !important; color: #7F8C8D !important; font-weight: 600 !important; margin: 0 !important;">Money Tracked</div>
+          <div class="stat-card">
+            <div class="stat-icon">💰</div>
+            <div class="stat-value">₹50Cr+</div>
+            <div class="stat-label">Money Tracked</div>
           </div>
-          <div class="stat-item" style="background: rgba(255, 255, 255, 0.95) !important; border: 2px solid #4A90E2 !important; border-radius: 12px !important; padding: 20px 12px !important; text-align: center !important; min-height: 120px !important; display: flex !important; flex-direction: column !important; justify-content: center !important; align-items: center !important; box-shadow: 0 4px 8px rgba(0,0,0,0.12) !important;">
-            <div class="stat-value" style="font-size: clamp(1.5rem, 5vw, 3rem) !important; font-weight: 800 !important; color: #4A90E2 !important; margin-bottom: 8px !important; line-height: 1.2 !important;">4.9★</div>
-            <div class="stat-label" style="font-size: clamp(0.75rem, 2.5vw, 1rem) !important; color: #7F8C8D !important; font-weight: 600 !important; margin: 0 !important;">User Rating</div>
+          <div class="stat-card">
+            <div class="stat-icon">⭐</div>
+            <div class="stat-value">4.9/5</div>
+            <div class="stat-label">User Rating</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">📊</div>
+            <div class="stat-value">1M+</div>
+            <div class="stat-label">Transactions</div>
           </div>
         </div>
       </div>
@@ -66,44 +131,90 @@
     <section class="features-section" id="features">
       <div class="container">
         <div class="section-header">
-          <span class="section-badge">Features</span>
-          <h2 class="section-title">Everything You Need</h2>
+          <span class="section-badge">✨ Features</span>
+          <h2 class="section-title">Everything You Need to Master Your Finances</h2>
           <p class="section-description">
-            Powerful features designed to give you complete control over your financial life
+            Powerful tools designed to give you complete control over your financial life
           </p>
         </div>
 
         <div class="features-grid">
           <div class="feature-card">
             <div class="feature-icon">📊</div>
-            <h3 class="feature-title">Expense Tracking</h3>
+            <h3 class="feature-title">Smart Expense Tracking</h3>
             <p class="feature-description">
-              Track every expense with detailed categories, payment methods, and real-time insights.
+              Track every rupee with detailed categories, payment methods, and real-time insights. Never lose track of where your money goes.
             </p>
+            <ul class="feature-list">
+              <li>Multiple categories & tags</li>
+              <li>Receipt attachments</li>
+              <li>Recurring expenses</li>
+            </ul>
           </div>
 
           <div class="feature-card">
             <div class="feature-icon">💳</div>
-            <h3 class="feature-title">Smart Budgets</h3>
+            <h3 class="feature-title">Intelligent Budgets</h3>
             <p class="feature-description">
-              Set intelligent budgets with AI-powered recommendations and instant alerts.
+              Set smart budgets with AI-powered recommendations. Get instant alerts when you're close to your limits.
             </p>
+            <ul class="feature-list">
+              <li>Category-wise budgets</li>
+              <li>Real-time alerts</li>
+              <li>Budget analytics</li>
+            </ul>
           </div>
 
           <div class="feature-card">
             <div class="feature-icon">📈</div>
-            <h3 class="feature-title">Investment Tracking</h3>
+            <h3 class="feature-title">Investment Portfolio</h3>
             <p class="feature-description">
-              Monitor your investments, stocks, and assets with real-time portfolio updates.
+              Monitor stocks, mutual funds, and assets with real-time updates. Track returns and make informed decisions.
             </p>
+            <ul class="feature-list">
+              <li>Multi-asset tracking</li>
+              <li>Performance analytics</li>
+              <li>Profit/loss reports</li>
+            </ul>
           </div>
 
           <div class="feature-card">
             <div class="feature-icon">🎯</div>
             <h3 class="feature-title">Financial Goals</h3>
             <p class="feature-description">
-              Set and track financial goals with visual progress indicators and milestones.
+              Set and achieve your financial goals with visual progress tracking and smart milestone reminders.
             </p>
+            <ul class="feature-list">
+              <li>Goal progress tracking</li>
+              <li>Milestone notifications</li>
+              <li>Achievement insights</li>
+            </ul>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">🤖</div>
+            <h3 class="feature-title">AI-Powered Insights</h3>
+            <p class="feature-description">
+              Get personalized financial advice and spending patterns analysis powered by artificial intelligence.
+            </p>
+            <ul class="feature-list">
+              <li>Spending pattern analysis</li>
+              <li>Personalized recommendations</li>
+              <li>Anomaly detection</li>
+            </ul>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">🤝</div>
+            <h3 class="feature-title">Split Expenses</h3>
+            <p class="feature-description">
+              Share expenses with friends and family. Track who owes what and settle up easily with built-in calculations.
+            </p>
+            <ul class="feature-list">
+              <li>Group expense splitting</li>
+              <li>Settlement tracking</li>
+              <li>Payment reminders</li>
+            </ul>
           </div>
         </div>
       </div>
@@ -113,28 +224,82 @@
     <section class="how-it-works-section" id="how-it-works">
       <div class="container">
         <div class="section-header">
-          <span class="section-badge">How It Works</span>
-          <h2 class="section-title">Get Started in 2 Simple Steps</h2>
+          <span class="section-badge">🎯 Simple Process</span>
+          <h2 class="section-title">Get Started in Minutes</h2>
           <p class="section-description">
-            Two simple steps to financial clarity
+            Three simple steps to financial clarity and control
           </p>
         </div>
 
-        <div class="steps-grid">
+        <div class="steps-container">
           <div class="step-card">
             <div class="step-number">1</div>
-            <h3 class="step-title">Create Account</h3>
-            <p class="step-description">
-              Sign up with email or Google in seconds. Your data is encrypted and secure.
-            </p>
+            <div class="step-content">
+              <h3 class="step-title">Create Your Account</h3>
+              <p class="step-description">
+                Sign up with email or Google in seconds. Your data is encrypted with bank-level security.
+              </p>
+            </div>
           </div>
+
+          <div class="step-connector"></div>
 
           <div class="step-card">
             <div class="step-number">2</div>
-            <h3 class="step-title">Track & Analyze</h3>
-            <p class="step-description">
-              Add transactions, set budgets, and get AI-powered insights to achieve your financial goals faster.
-            </p>
+            <div class="step-content">
+              <h3 class="step-title">Add Your Transactions</h3>
+              <p class="step-description">
+                Quickly log expenses and income. Set up budgets and financial goals that matter to you.
+              </p>
+            </div>
+          </div>
+
+          <div class="step-connector"></div>
+
+          <div class="step-card">
+            <div class="step-number">3</div>
+            <div class="step-content">
+              <h3 class="step-title">Get Smart Insights</h3>
+              <p class="step-description">
+                Receive AI-powered insights and recommendations to optimize your spending and achieve goals faster.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section class="benefits-section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-badge">💎 Why Choose Rupiya</span>
+          <h2 class="section-title">Built for Modern India</h2>
+        </div>
+
+        <div class="benefits-grid">
+          <div class="benefit-card">
+            <div class="benefit-icon">🇮🇳</div>
+            <h3 class="benefit-title">Made for India</h3>
+            <p class="benefit-description">Designed specifically for Indian users with INR support and local payment methods.</p>
+          </div>
+
+          <div class="benefit-card">
+            <div class="benefit-icon">📱</div>
+            <h3 class="benefit-title">Mobile First</h3>
+            <p class="benefit-description">Beautiful, responsive design that works perfectly on all your devices.</p>
+          </div>
+
+          <div class="benefit-card">
+            <div class="benefit-icon">🔒</div>
+            <h3 class="benefit-title">Privacy First</h3>
+            <p class="benefit-description">Your financial data is encrypted and never shared with third parties.</p>
+          </div>
+
+          <div class="benefit-card">
+            <div class="benefit-icon">⚡</div>
+            <h3 class="benefit-title">Lightning Fast</h3>
+            <p class="benefit-description">Optimized performance ensures smooth experience even on slower connections.</p>
           </div>
         </div>
       </div>
@@ -143,13 +308,23 @@
     <!-- CTA Section -->
     <section class="cta-section">
       <div class="container">
-        <h2 class="cta-title">Ready to Transform Your Finances?</h2>
-        <p class="cta-description">
-          Join thousands of users managing their money smarter
-        </p>
-        <div class="cta-buttons">
-          <a href="signup.html" class="btn btn-hero-primary">Sign Up Free</a>
-          <a href="login.html" class="btn btn-hero-secondary">Login</a>
+        <div class="cta-content">
+          <h2 class="cta-title">Ready to Transform Your Financial Life?</h2>
+          <p class="cta-description">
+            Join thousands of Indians managing their money smarter with Rupiya
+          </p>
+          <div class="cta-buttons">
+            <a href="signup.html" class="btn btn-hero-light">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+              </svg>
+              Create Free Account
+            </a>
+            <a href="login.html" class="btn btn-hero-outline">
+              Already have an account? Login
+            </a>
+          </div>
+          <p class="cta-note">✨ No credit card required • Free forever • Cancel anytime</p>
         </div>
       </div>
     </section>
@@ -157,9 +332,55 @@
     <!-- Footer -->
     <footer class="landing-footer">
       <div class="container">
-        <p class="footer-text">
-          © 2026 Rupiya. Built with ❤️ for modern professionals.
-        </p>
+        <div class="footer-content">
+          <div class="footer-brand">
+            <div class="footer-logo">
+              <img src="assets/images/logo.png" alt="Rupiya">
+              <span class="logo-text">Rupiya</span>
+            </div>
+            <p class="footer-tagline">Smart personal finance for modern India</p>
+          </div>
+          
+          <div class="footer-links">
+            <div class="footer-column">
+              <h4>Product</h4>
+              <a href="#features">Features</a>
+              <a href="#how-it-works">How It Works</a>
+              <a href="signup.html">Get Started</a>
+            </div>
+            
+            <div class="footer-column">
+              <h4>Company</h4>
+              <a href="#">About Us</a>
+              <a href="#">Privacy Policy</a>
+              <a href="#">Terms of Service</a>
+            </div>
+            
+            <div class="footer-column">
+              <h4>Support</h4>
+              <a href="#">Help Center</a>
+              <a href="#">Contact Us</a>
+              <a href="#">FAQs</a>
+            </div>
+          </div>
+        </div>
+        
+        <div class="footer-bottom">
+          <p class="footer-copyright">© 2026 Rupiya. Built with ❤️ for modern professionals.</p>
+          <div class="footer-social">
+            <a href="#" aria-label="Twitter">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"/>
+              </svg>
+            </a>
+            <a href="#" aria-label="LinkedIn">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/>
+                <circle cx="4" cy="4" r="2"/>
+              </svg>
+            </a>
+          </div>
+        </div>
       </div>
     </footer>
   </div>

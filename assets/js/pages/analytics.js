@@ -59,18 +59,18 @@ function setupEventListeners() {
   const sidebar = document.getElementById('sidebar');
 
   sidebarOpen?.addEventListener('click', () => {
-    sidebar.classList.add('active');
-    sidebarOverlay.classList.add('active');
+    sidebar.classList.add('open');
+    sidebarOverlay.classList.add('show');
   });
 
   sidebarClose?.addEventListener('click', () => {
-    sidebar.classList.remove('active');
-    sidebarOverlay.classList.remove('active');
+    sidebar.classList.remove('open');
+    sidebarOverlay.classList.remove('show');
   });
 
   sidebarOverlay?.addEventListener('click', () => {
-    sidebar.classList.remove('active');
-    sidebarOverlay.classList.remove('active');
+    sidebar.classList.remove('open');
+    sidebarOverlay.classList.remove('show');
   });
 
   // Logout
