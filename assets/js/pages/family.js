@@ -8,25 +8,40 @@ let currentUser = null;
 let familyGroups = [];
 let pendingInvitations = [];
 
-// Check authentication - EXACTLY like dashboard
+// Check authentication
 async function checkAuth() {
-  await authService.waitForAuth();
-  if (!authService.isAuthenticated()) {
+  console.log('[Family Page] Checking authentication...');
+  
+  try {
+    // Wait for auth to initialize - this waits for Firebase to restore session
+    const user = await authService.waitForAuth();
+    console.log('[Family Page] waitForAuth returned:', user ? user.email : 'null');
+    
+    if (!user) {
+      console.log('[Family Page] No user found, redirecting to login...');
+      window.location.href = 'login.html';
+      return false;
+    }
+    
+    console.log('[Family Page] User authenticated:', user.email);
+    return true;
+  } catch (error) {
+    console.error('[Family Page] Auth check error:', error);
     window.location.href = 'login.html';
     return false;
   }
-  return true;
 }
 
 // Initialize page only after auth check
 async function init() {
+  console.log('[Family Page] Initializing...');
   const isAuthenticated = await checkAuth();
   if (isAuthenticated) {
     await initPage();
   }
 }
 
-// Start initialization - same pattern as dashboard.js
+// Start initialization
 init();
 
 // Initialize page

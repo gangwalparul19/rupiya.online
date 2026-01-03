@@ -9,16 +9,31 @@ import { formatCurrency, formatDate, getRelativeTime } from '../utils/helpers.js
 
 // Check authentication
 async function checkAuth() {
-  await authService.waitForAuth();
-  if (!authService.isAuthenticated()) {
+  console.log('[Dashboard] Checking authentication...');
+  
+  try {
+    // Wait for auth to initialize - this waits for Firebase to restore session
+    const user = await authService.waitForAuth();
+    console.log('[Dashboard] waitForAuth returned:', user ? user.email : 'null');
+    
+    if (!user) {
+      console.log('[Dashboard] No user found, redirecting to login...');
+      window.location.href = 'login.html';
+      return false;
+    }
+    
+    console.log('[Dashboard] User authenticated:', user.email);
+    return true;
+  } catch (error) {
+    console.error('[Dashboard] Auth check error:', error);
     window.location.href = 'login.html';
     return false;
   }
-  return true;
 }
 
 // Initialize dashboard only after auth check
 async function init() {
+  console.log('[Dashboard] Initializing...');
   const isAuthenticated = await checkAuth();
   if (isAuthenticated) {
     await initDashboard();

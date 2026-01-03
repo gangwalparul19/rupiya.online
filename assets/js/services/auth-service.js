@@ -30,12 +30,19 @@ class AuthService {
     }
 
     this.authInitPromise = new Promise((resolve) => {
-      onAuthStateChanged(auth, (user) => {
-        console.log('[Auth Service] Auth state:', user ? user.email : 'Not logged in');
+      console.log('[Auth Service] Setting up auth state listener...');
+      
+      // The first onAuthStateChanged callback gives us the initial auth state
+      // This fires once Firebase has checked for a persisted session
+      const unsubscribe = onAuthStateChanged(auth, (user) => {
+        console.log('[Auth Service] Auth state changed:', user ? user.email : 'Not logged in');
+        
+        const wasInitialized = this.authInitialized;
         this.currentUser = user;
         
-        if (!this.authInitialized) {
+        if (!wasInitialized) {
           this.authInitialized = true;
+          console.log('[Auth Service] Auth initialized with user:', user ? user.email : 'null');
           resolve(user);
         }
         
@@ -47,18 +54,27 @@ class AuthService {
     return this.authInitPromise;
   }
 
-  // Wait for auth to be initialized
+  // Wait for auth to be initialized - this is the key method
   async waitForAuth() {
+    console.log('[Auth Service] waitForAuth called');
+    
+    // Ensure init has been called
     if (!this.authInitPromise) {
       this.init();
     }
-    await this.authInitPromise;
-    return this.currentUser;
+    
+    // Wait for Firebase to determine the auth state
+    // This promise resolves after onAuthStateChanged fires for the first time
+    const user = await this.authInitPromise;
+    
+    console.log('[Auth Service] waitForAuth complete, user:', user ? user.email : 'null');
+    return user;
   }
 
   // Subscribe to auth state changes
   onAuthStateChanged(callback) {
     this.authStateListeners.push(callback);
+    // If already initialized, call immediately with current state
     if (this.authInitialized) {
       callback(this.currentUser);
     }
@@ -153,7 +169,9 @@ class AuthService {
 
   // Check if user is authenticated
   isAuthenticated() {
-    return this.currentUser !== null;
+    const isAuth = this.currentUser !== null;
+    console.log('[Auth Service] isAuthenticated:', isAuth);
+    return isAuth;
   }
 
   // Get current user
