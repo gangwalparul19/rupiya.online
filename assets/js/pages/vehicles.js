@@ -1,9 +1,7 @@
 // Vehicles Page Logic
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
-import familySwitcher from '../components/family-switcher.js';
 import toast from '../components/toast.js';
-import themeManager from '../utils/theme-manager.js';
 import { formatCurrency, formatCurrencyCompact, formatDate } from '../utils/helpers.js';
 
 // Helper function for toast
@@ -122,13 +120,13 @@ function setupEventListeners() {
   });
 
   document.getElementById('logoutBtn')?.addEventListener('click', handleLogout);
-  addVehicleBtn.addEventListener('click', showAddForm);
-  closeFormBtn.addEventListener('click', hideForm);
-  cancelFormBtn.addEventListener('click', hideForm);
-  vehicleForm.addEventListener('submit', handleSubmit);
-  closeDeleteModalBtn.addEventListener('click', hideDeleteModal);
-  cancelDeleteBtn.addEventListener('click', hideDeleteModal);
-  confirmDeleteBtn.addEventListener('click', handleDelete);
+  addVehicleBtn?.addEventListener('click', showAddForm);
+  closeFormBtn?.addEventListener('click', hideForm);
+  cancelFormBtn?.addEventListener('click', hideForm);
+  vehicleForm?.addEventListener('submit', handleSubmit);
+  closeDeleteModalBtn?.addEventListener('click', hideDeleteModal);
+  cancelDeleteBtn?.addEventListener('click', hideDeleteModal);
+  confirmDeleteBtn?.addEventListener('click', handleDelete);
   
   // Fuel Log Modal Events
   closeFuelLogModalBtn?.addEventListener('click', hideFuelLogModal);

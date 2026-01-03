@@ -1,9 +1,7 @@
 // Houses Page Logic
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
-import familySwitcher from '../components/family-switcher.js';
 import toast from '../components/toast.js';
-import themeManager from '../utils/theme-manager.js';
 import { formatCurrency, formatDate } from '../utils/helpers.js';
 
 // Helper function for toast
@@ -104,15 +102,15 @@ function setupEventListeners() {
   document.getElementById('logoutBtn')?.addEventListener('click', handleLogout);
 
   // Add house
-  addHouseBtn.addEventListener('click', showAddForm);
-  closeFormBtn.addEventListener('click', hideForm);
-  cancelFormBtn.addEventListener('click', hideForm);
-  houseForm.addEventListener('submit', handleSubmit);
+  addHouseBtn?.addEventListener('click', showAddForm);
+  closeFormBtn?.addEventListener('click', hideForm);
+  cancelFormBtn?.addEventListener('click', hideForm);
+  houseForm?.addEventListener('submit', handleSubmit);
 
   // Delete modal
-  closeDeleteModalBtn.addEventListener('click', hideDeleteModal);
-  cancelDeleteBtn.addEventListener('click', hideDeleteModal);
-  confirmDeleteBtn.addEventListener('click', handleDelete);
+  closeDeleteModalBtn?.addEventListener('click', hideDeleteModal);
+  cancelDeleteBtn?.addEventListener('click', hideDeleteModal);
+  confirmDeleteBtn?.addEventListener('click', handleDelete);
 }
 
 // Load user profile

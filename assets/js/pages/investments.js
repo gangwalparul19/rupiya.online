@@ -299,35 +299,43 @@ function renderInvestments() {
         </div>
 
         <div class="investment-card-body">
-          <div class="investment-stat">
-            <div class="investment-stat-label">Quantity</div>
-            <div class="investment-stat-value">${investment.quantity}</div>
+          <div class="investment-stats-row">
+            <div class="investment-stat">
+              <div class="investment-stat-label">Quantity</div>
+              <div class="investment-stat-value">${investment.quantity}</div>
+            </div>
           </div>
-          <div class="investment-stat">
-            <div class="investment-stat-label">Purchase Price</div>
-            <div class="investment-stat-value">${formatCurrency(investment.purchasePrice)}</div>
+          <div class="investment-stats-row">
+            <div class="investment-stat">
+              <div class="investment-stat-label">Purchase Price</div>
+              <div class="investment-stat-value">${formatCurrency(investment.purchasePrice)}</div>
+            </div>
+            <div class="investment-stat">
+              <div class="investment-stat-label">Current Price</div>
+              <div class="investment-stat-value">${formatCurrency(investment.currentPrice)}</div>
+            </div>
           </div>
-          <div class="investment-stat">
-            <div class="investment-stat-label">Current Price</div>
-            <div class="investment-stat-value">${formatCurrency(investment.currentPrice)}</div>
+          <div class="investment-stats-row">
+            <div class="investment-stat">
+              <div class="investment-stat-label">Total Invested</div>
+              <div class="investment-stat-value">${formatCurrency(totalInvested)}</div>
+            </div>
+            <div class="investment-stat">
+              <div class="investment-stat-label">Current Value</div>
+              <div class="investment-stat-value">${formatCurrency(currentValue)}</div>
+            </div>
           </div>
-          <div class="investment-stat">
-            <div class="investment-stat-label">Total Invested</div>
-            <div class="investment-stat-value">${formatCurrency(totalInvested)}</div>
-          </div>
-          <div class="investment-stat">
-            <div class="investment-stat-label">Current Value</div>
-            <div class="investment-stat-value">${formatCurrency(currentValue)}</div>
+          <div class="investment-stats-row investment-returns-row">
+            <div class="investment-stat investment-stat-full">
+              <div class="investment-stat-label">Returns</div>
+              <div class="investment-stat-value ${returnsClass}">
+                ${returnsSign}${formatCurrency(Math.abs(returns))} (${returnsSign}${returnsPercentage}%)
+              </div>
+            </div>
           </div>
         </div>
 
         <div class="investment-card-footer">
-          <div class="investment-returns">
-            <div class="investment-returns-label">Returns</div>
-            <div class="investment-returns-value ${returnsClass}">
-              ${returnsSign}${formatCurrency(Math.abs(returns))} (${returnsSign}${returnsPercentage}%)
-            </div>
-          </div>
           <div class="investment-date">
             Purchased: ${formatDate(investment.purchaseDate)}
           </div>

@@ -303,15 +303,47 @@
 }
 
 .investment-card-body {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
   margin-bottom: 1rem;
+}
+
+.investment-stats-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.investment-stats-row:first-child {
+  grid-template-columns: 1fr;
+}
+
+.investment-returns-row {
+  padding-top: 0.75rem;
+  border-top: 1px dashed var(--border-color);
 }
 
 .investment-stat {
   display: flex;
   flex-direction: column;
+}
+
+.investment-stat-full {
+  text-align: center;
+}
+
+.investment-stat-full .investment-stat-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.investment-stat-full .investment-stat-value.positive {
+  color: var(--success-green);
+}
+
+.investment-stat-full .investment-stat-value.negative {
+  color: var(--danger-red);
 }
 
 .investment-stat-label {
@@ -332,32 +364,8 @@
   padding-top: 1rem;
   border-top: 2px solid var(--border-color);
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
-}
-
-.investment-returns {
-  display: flex;
-  flex-direction: column;
-}
-
-.investment-returns-label {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  margin-bottom: 0.25rem;
-}
-
-.investment-returns-value {
-  font-size: 1.25rem;
-  font-weight: 700;
-}
-
-.investment-returns-value.positive {
-  color: var(--success-green);
-}
-
-.investment-returns-value.negative {
-  color: var(--danger-red);
 }
 
 .investment-date {
@@ -510,16 +518,22 @@
     padding: 1rem;
   }
 
-  /* Show investment details in 1 column per row */
+  /* Show investment details in 2 columns per row on mobile too */
   .investment-card-body {
-    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .investment-stats-row {
+    grid-template-columns: repeat(2, 1fr);
     gap: 0.75rem;
   }
 
+  .investment-stats-row:first-child {
+    grid-template-columns: 1fr;
+  }
+
   .investment-card-footer {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
+    justify-content: flex-end;
   }
 }
 
@@ -566,14 +580,26 @@
     font-size: 1rem;
   }
 
-  /* Show investment details in 1 column per row */
+  /* Show investment details in 2 columns per row on small mobile */
   .investment-card-body {
-    grid-template-columns: 1fr;
     gap: 0.5rem;
+  }
+
+  .investment-stats-row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+
+  .investment-stats-row:first-child {
+    grid-template-columns: 1fr;
   }
 
   .investment-stat-value {
     font-size: 0.875rem;
+  }
+
+  .investment-stat-full .investment-stat-value {
+    font-size: 1rem;
   }
 }
 

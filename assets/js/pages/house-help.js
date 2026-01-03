@@ -1,9 +1,7 @@
 // House Help Page Logic
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
-import familySwitcher from '../components/family-switcher.js';
 import toast from '../components/toast.js';
-import themeManager from '../utils/theme-manager.js';
 import { formatCurrency, formatDate } from '../utils/helpers.js';
 
 // Helper function for toast
@@ -48,7 +46,7 @@ async function init() {
   await loadStaff();
   
   // Set default date if element exists
-  const joinDateInput = document.getElementById('joinDate');
+  const joinDateInput = document.querySelector('#helpForm #joinDate');
   if (joinDateInput) {
     joinDateInput.valueAsDate = new Date();
   }
@@ -68,7 +66,7 @@ function initDOMElements() {
   emptyState = document.getElementById('emptyState');
   loadingState = document.getElementById('loadingState');
   totalStaffEl = document.getElementById('totalStaff');
-  monthlySalaryEl = document.getElementById('monthlySalary');
+  monthlySalaryEl = document.getElementById('totalMonthlySalary');
   monthlyPaidEl = document.getElementById('monthlyPaid');
   deleteModal = document.getElementById('deleteModal');
   closeDeleteModalBtn = document.getElementById('closeDeleteModalBtn');
@@ -169,12 +167,12 @@ function showAddForm() {
   helpForm.reset();
   
   // Set default date if element exists
-  const joinDateInput = document.getElementById('joinDate');
+  const joinDateInput = document.querySelector('#helpForm #joinDate');
   if (joinDateInput) {
     joinDateInput.valueAsDate = new Date();
   }
   
-  document.getElementById('status').value = 'Active';
+  document.querySelector('#helpForm #status').value = 'Active';
   addHelpSection.classList.add('show');
   addHelpSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
@@ -190,13 +188,21 @@ function showEditForm(help) {
   formTitle.textContent = 'Edit Staff';
   saveFormBtnText.textContent = 'Update Staff';
 
-  document.getElementById('name').value = help.name;
-  document.getElementById('role').value = help.role;
-  document.getElementById('phone').value = help.phone || '';
-  document.getElementById('monthlySalary').value = parseFloat(help.monthlySalary) || 0;
-  document.getElementById('joinDate').value = formatDateForInput(help.joinDate);
-  document.getElementById('status').value = help.status;
-  document.getElementById('notes').value = help.notes || '';
+  const nameInput = document.querySelector('#helpForm #name');
+  const roleInput = document.querySelector('#helpForm #role');
+  const phoneInput = document.querySelector('#helpForm #phone');
+  const salaryInput = document.querySelector('#helpForm #monthlySalary');
+  const joinDateInput = document.querySelector('#helpForm #joinDate');
+  const statusInput = document.querySelector('#helpForm #status');
+  const notesInput = document.querySelector('#helpForm #notes');
+
+  if (nameInput) nameInput.value = help.name;
+  if (roleInput) roleInput.value = help.role;
+  if (phoneInput) phoneInput.value = help.phone || '';
+  if (salaryInput) salaryInput.value = parseFloat(help.monthlySalary) || 0;
+  if (joinDateInput) joinDateInput.value = formatDateForInput(help.joinDate);
+  if (statusInput) statusInput.value = help.status;
+  if (notesInput) notesInput.value = help.notes || '';
 
   addHelpSection.classList.add('show');
   addHelpSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -205,23 +211,37 @@ function showEditForm(help) {
 async function handleSubmit(e) {
   e.preventDefault();
 
-  const salaryValue = document.getElementById('monthlySalary').value;
+  const salaryInput = document.querySelector('#helpForm #monthlySalary');
+  const nameInput = document.querySelector('#helpForm #name');
+  const roleInput = document.querySelector('#helpForm #role');
+  const phoneInput = document.querySelector('#helpForm #phone');
+  const joinDateInput = document.querySelector('#helpForm #joinDate');
+  const statusInput = document.querySelector('#helpForm #status');
+  const notesInput = document.querySelector('#helpForm #notes');
+  
+  // Validate required elements exist
+  if (!salaryInput || !nameInput || !roleInput || !joinDateInput || !statusInput) {
+    showToast('Form error: Missing required fields', 'error');
+    return;
+  }
+  
+  const salaryValue = salaryInput.value;
   const monthlySalary = parseFloat(salaryValue);
   
   // Validate salary
-  if (isNaN(monthlySalary) || monthlySalary < 0) {
+  if (salaryValue === '' || isNaN(monthlySalary) || monthlySalary < 0) {
     showToast('Please enter a valid salary amount', 'error');
     return;
   }
 
   const formData = {
-    name: document.getElementById('name').value.trim(),
-    role: document.getElementById('role').value,
-    phone: document.getElementById('phone').value.trim(),
+    name: nameInput.value.trim(),
+    role: roleInput.value,
+    phone: phoneInput ? phoneInput.value.trim() : '',
     monthlySalary: monthlySalary,
-    joinDate: new Date(document.getElementById('joinDate').value),
-    status: document.getElementById('status').value,
-    notes: document.getElementById('notes').value.trim()
+    joinDate: new Date(joinDateInput.value),
+    status: statusInput.value,
+    notes: notesInput ? notesInput.value.trim() : ''
   };
 
   saveFormBtn.disabled = true;

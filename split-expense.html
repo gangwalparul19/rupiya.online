@@ -207,12 +207,14 @@
 
         <form id="splitForm">
           <div class="form-grid">
+            <!-- Row 1: Description (full width) -->
             <div class="form-group form-group-full">
               <label for="splitDescription">Description *</label>
               <input type="text" id="splitDescription" required maxlength="200" placeholder="e.g., Dinner at Restaurant">
               <span class="error-message" id="splitDescriptionError"></span>
             </div>
 
+            <!-- Row 2: Total Amount | Date -->
             <div class="form-group">
               <label for="splitAmount">Total Amount *</label>
               <input type="number" id="splitAmount" step="0.01" min="0" required placeholder="0.00">
@@ -225,6 +227,7 @@
               <span class="error-message" id="splitDateError"></span>
             </div>
 
+            <!-- Row 3: Category | Paid By -->
             <div class="form-group">
               <label for="splitCategory">Category</label>
               <select id="splitCategory">
@@ -246,17 +249,17 @@
               </select>
             </div>
 
-            <div class="form-group" id="paidByNameGroup" style="display: none;">
+            <div class="form-group form-group-full" id="paidByNameGroup" style="display: none;">
               <label for="paidByName">Paid By Name *</label>
               <input type="text" id="paidByName" placeholder="Enter name">
               <span class="error-message" id="paidByNameError"></span>
             </div>
           </div>
 
-          <!-- Split Type -->
+          <!-- Row 4: Split Type (all three in one row) -->
           <div class="form-group">
             <label>Split Type *</label>
-            <div class="split-type-options">
+            <div class="split-type-options split-type-row">
               <label class="radio-card">
                 <input type="radio" name="splitType" value="equal" checked>
                 <div class="radio-card-content">
@@ -305,7 +308,8 @@
             <div id="splitSummaryContent"></div>
           </div>
 
-          <div class="form-actions">
+          <!-- Row 5: Buttons (Create Split | Cancel) -->
+          <div class="form-actions form-actions-row">
             <button type="button" class="btn btn-outline" id="cancelSplitBtn">Cancel</button>
             <button type="submit" class="btn btn-primary" id="saveSplitBtn">
               <span id="saveSplitBtnText">Create Split</span>

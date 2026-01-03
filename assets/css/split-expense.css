@@ -198,6 +198,22 @@
   margin-top: 0.5rem;
 }
 
+/* Force 3 columns for split type on desktop */
+.split-type-row {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+/* Form actions in a row */
+.form-actions-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.form-actions-row .btn {
+  width: 100%;
+}
+
 .radio-card {
   position: relative;
   cursor: pointer;
@@ -617,13 +633,32 @@
     gap: 1rem;
   }
   
+  /* Keep 2-column layout on tablet */
   .form-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
   }
   
-  .split-type-options {
-    grid-template-columns: 1fr;
+  /* Split type stays in row on tablet */
+  .split-type-row {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .radio-card-content {
+    padding: 0.75rem;
+  }
+  
+  .radio-card-icon {
+    font-size: 1.5rem;
+  }
+  
+  .radio-card-title {
+    font-size: 0.8rem;
+  }
+  
+  .radio-card-desc {
+    font-size: 0.7rem;
+    display: none;
   }
   
   .splits-grid {
@@ -641,12 +676,9 @@
     padding: 0.75rem;
   }
   
-  .form-actions {
-    flex-direction: column-reverse;
-  }
-  
-  .form-actions .btn {
-    width: 100%;
+  /* Keep buttons in row */
+  .form-actions-row {
+    grid-template-columns: 1fr 1fr;
   }
   
   .splits-tabs {
@@ -656,6 +688,10 @@
   .splits-tabs .tab-btn {
     flex: 1;
     min-width: 100px;
+  }
+  
+  .empty-state {
+    padding-bottom: calc(5rem + env(safe-area-inset-bottom, 20px));
   }
 }
 
@@ -688,6 +724,33 @@
   
   .split-summary-box {
     padding: 1rem;
+  }
+  
+  /* Stack form fields on small mobile */
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  /* Stack split type on small mobile */
+  .split-type-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .radio-card-desc {
+    display: block;
+  }
+  
+  /* Stack buttons on small mobile */
+  .form-actions-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .form-actions-row .btn:first-child {
+    order: 2;
+  }
+  
+  .form-actions-row .btn:last-child {
+    order: 1;
   }
 }
 
@@ -843,7 +906,13 @@ textarea.form-control {
 .empty-state {
   text-align: center;
   padding: 3rem 1rem;
+  padding-bottom: calc(3rem + env(safe-area-inset-bottom, 20px));
   color: var(--text-secondary);
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .empty-state-icon {
@@ -863,6 +932,7 @@ textarea.form-control {
   font-size: 1rem;
   color: var(--text-secondary);
   margin-bottom: 1.5rem;
+  max-width: 300px;
 }
 
 /* Mobile Modal Adjustments */

@@ -2,9 +2,7 @@
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
 import storageService from '../services/storage-service.js';
-import familySwitcher from '../components/family-switcher.js';
 import toast from '../components/toast.js';
-import themeManager from '../utils/theme-manager.js';
 import { formatDate } from '../utils/helpers.js';
 
 // Helper function for toast
