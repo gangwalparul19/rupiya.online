@@ -1,4 +1,5 @@
 // Family Management Page Logic
+import '../services/services-init.js'; // Initialize services first
 import authService from '../services/auth-service.js';
 import familyService from '../services/family-service.js';
 import toast from '../components/toast.js';
@@ -25,12 +26,8 @@ async function init() {
   }
 }
 
-// Start initialization ONLY ONCE
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', init);
-} else {
-  init();
-}
+// Start initialization - same pattern as dashboard.js
+init();
 
 // Initialize page
 async function initPage() {
