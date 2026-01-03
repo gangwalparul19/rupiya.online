@@ -37,19 +37,14 @@ async function checkAuth() {
   try {
     console.log('[Family Page] Starting auth check...');
     
-    // Wait for auth to be ready with timeout
-    const timeoutPromise = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error('Auth timeout after 10 seconds')), 10000)
-    );
+    // Wait for auth using the same method as dashboard
+    await authService.waitForAuth();
     
-    const authPromise = authService.waitForAuth();
+    console.log('[Family Page] Auth initialized');
     
-    currentUser = await Promise.race([authPromise, timeoutPromise]);
-    
-    console.log('[Family Page] Auth result:', currentUser ? currentUser.email : 'null');
-    
-    if (!currentUser) {
-      console.log('[Family Page] No user found, redirecting to login in 1 second...');
+    // Check if authenticated using the service method
+    if (!authService.isAuthenticated()) {
+      console.log('[Family Page] Not authenticated, redirecting to login');
       toast.error('Please login to access Family Management');
       setTimeout(() => {
         window.location.href = 'login.html';
@@ -57,8 +52,11 @@ async function checkAuth() {
       return false;
     }
     
+    // Get current user
+    currentUser = authService.getCurrentUser();
     console.log('[Family Page] ✅ User authenticated:', currentUser.email);
     return true;
+    
   } catch (error) {
     console.error('[Family Page] Auth check error:', error);
     toast.error('Authentication error: ' + error.message);
