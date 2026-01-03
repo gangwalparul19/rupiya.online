@@ -54,7 +54,7 @@ service cloud.firestore {
         return isAuthenticated() && 
                resource.data.familyGroupId != null &&
                exists(/databases/$(database)/documents/familyGroups/$(resource.data.familyGroupId)) &&
-               request.auth.uid in get(/databases/$(database)/documents/familyGroups/$(resource.data.familyGroupId)).data.members[].userId;
+               request.auth.uid in get(/databases/$(database)/documents/familyGroups/$(resource.data.familyGroupId)).data.members;
       }
       
       // Users can read their own expenses OR family members' expenses
@@ -73,7 +73,7 @@ service cloud.firestore {
         return isAuthenticated() && 
                resource.data.familyGroupId != null &&
                exists(/databases/$(database)/documents/familyGroups/$(resource.data.familyGroupId)) &&
-               request.auth.uid in get(/databases/$(database)/documents/familyGroups/$(resource.data.familyGroupId)).data.members[].userId;
+               request.auth.uid in get(/databases/$(database)/documents/familyGroups/$(resource.data.familyGroupId)).data.members;
       }
       
       // Users can read their own income OR family members' income
@@ -269,7 +269,7 @@ service cloud.firestore {
       // Helper function to check if user is a member of the group
       function isMember() {
         return isAuthenticated() && 
-               request.auth.uid in resource.data.members[].userId;
+               request.auth.uid in resource.data.members;
       }
       
       // Helper function to check if user is admin of the group
