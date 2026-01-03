@@ -287,13 +287,21 @@
               <label for="paymentMethod">Payment Method *</label>
               <select id="paymentMethod" required>
                 <option value="">Select payment method</option>
-                <option value="Cash">Cash</option>
-                <option value="Card">Card</option>
-                <option value="UPI">UPI</option>
-                <option value="Bank Transfer">Bank Transfer</option>
-                <option value="Wallet">Wallet</option>
+                <option value="cash">💵 Cash</option>
+                <option value="card">💳 Card</option>
+                <option value="upi">📱 UPI</option>
+                <option value="wallet">👛 Wallet</option>
+                <option value="bank">🏦 Bank Account</option>
               </select>
               <span class="error-message" id="paymentMethodError"></span>
+            </div>
+
+            <div class="form-group" id="specificPaymentMethodGroup" style="display: none;">
+              <label for="specificPaymentMethod">Select from your saved methods</label>
+              <select id="specificPaymentMethod">
+                <option value="">Select...</option>
+              </select>
+              <span class="error-message" id="specificPaymentMethodError"></span>
             </div>
 
             <div class="form-group form-group-full">

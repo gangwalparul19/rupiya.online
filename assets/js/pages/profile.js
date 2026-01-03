@@ -315,22 +315,20 @@ async function handlePreferencesUpdate(e) {
       currency: currencySelect.value,
       dateFormat: dateFormatSelect.value,
       language: languageSelect.value,
-      emailNotifications: emailNotificationsCheckbox.checked
+      emailNotifications: emailNotificationsCheckbox.checked,
+      userId: currentUser.uid,
+      updatedAt: Timestamp.now()
     };
 
-    // Save to Firestore using document ID as user ID
-    const result = await firestoreService.update('userPreferences', currentUser.uid, preferences);
-    
-    if (!result.success) {
-      // If document doesn't exist, create it
-      await firestoreService.add('userPreferences', { ...preferences, userId: currentUser.uid });
-    }
+    // Use setDoc with merge to create or update the document
+    const docRef = doc(db, 'userPreferences', currentUser.uid);
+    await setDoc(docRef, preferences, { merge: true });
 
     userPreferences = preferences;
     showToast('Preferences saved successfully', 'success');
   } catch (error) {
     console.error('Error saving preferences:', error);
-    showToast('Failed to save preferences', 'error');
+    showToast('Failed to save preferences: ' + error.message, 'error');
   } finally {
     saveBtn.disabled = false;
     saveBtnText.style.display = 'inline';

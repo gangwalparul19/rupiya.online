@@ -95,6 +95,11 @@ const sourceInput = document.getElementById('source');
 const descriptionInput = document.getElementById('description');
 const dateInput = document.getElementById('date');
 const paymentMethodInput = document.getElementById('paymentMethod');
+const specificPaymentMethodGroup = document.getElementById('specificPaymentMethodGroup');
+const specificPaymentMethodInput = document.getElementById('specificPaymentMethod');
+
+// Store user's payment methods
+let userPaymentMethods = [];
 
 // Delete modal elements
 const deleteModal = document.getElementById('deleteModal');
@@ -127,6 +132,9 @@ async function initPage() {
     
     // Load categories into dropdowns
     await loadSourceDropdowns();
+    
+    // Load user's payment methods
+    await loadUserPaymentMethods();
     
     // Check for URL parameters (linked income from house/vehicle)
     checkURLParameters();
@@ -357,6 +365,107 @@ function attachCardEventListeners() {
   });
 }
 
+// Load user's payment methods
+async function loadUserPaymentMethods() {
+  try {
+    const paymentMethodsService = window.paymentMethodsService;
+    if (paymentMethodsService) {
+      userPaymentMethods = await paymentMethodsService.getPaymentMethods();
+    }
+  } catch (error) {
+    console.error('Error loading payment methods:', error);
+    userPaymentMethods = [];
+  }
+}
+
+// Handle payment method type change
+function handlePaymentMethodChange() {
+  const selectedType = paymentMethodInput.value;
+  
+  if (!selectedType || selectedType === 'cash') {
+    // Hide specific payment method dropdown for cash or no selection
+    specificPaymentMethodGroup.style.display = 'none';
+    specificPaymentMethodInput.value = '';
+    return;
+  }
+  
+  // Filter payment methods by selected type
+  const methodsOfType = userPaymentMethods.filter(method => method.type === selectedType);
+  
+  if (methodsOfType.length === 0) {
+    // No saved methods of this type
+    specificPaymentMethodGroup.style.display = 'none';
+    specificPaymentMethodInput.value = '';
+    toast.info(`No saved ${getPaymentTypeLabel(selectedType)} found. Add one in Profile > Payment Methods.`);
+    return;
+  }
+  
+  // Populate specific payment method dropdown
+  specificPaymentMethodInput.innerHTML = '<option value="">Select...</option>' +
+    methodsOfType.map(method => {
+      const displayName = getPaymentMethodDisplayName(method);
+      const icon = getPaymentMethodIcon(method.type);
+      return `<option value="${method.id}">${icon} ${displayName}</option>`;
+    }).join('');
+  
+  // Show the dropdown
+  specificPaymentMethodGroup.style.display = 'block';
+}
+
+// Get payment method display name
+function getPaymentMethodDisplayName(method) {
+  let details = method.name;
+  
+  switch (method.type) {
+    case 'card':
+      if (method.cardNumber) {
+        details += ` (****${method.cardNumber})`;
+      }
+      break;
+    case 'upi':
+      if (method.upiId) {
+        details += ` (${method.upiId})`;
+      }
+      break;
+    case 'wallet':
+      if (method.walletNumber) {
+        details += ` (${method.walletNumber})`;
+      }
+      break;
+    case 'bank':
+      if (method.bankAccountNumber) {
+        details += ` (****${method.bankAccountNumber})`;
+      }
+      break;
+  }
+  
+  return details;
+}
+
+// Get payment method icon
+function getPaymentMethodIcon(type) {
+  const icons = {
+    cash: '💵',
+    card: '💳',
+    upi: '📱',
+    wallet: '👛',
+    bank: '🏦'
+  };
+  return icons[type] || '💰';
+}
+
+// Get payment type label
+function getPaymentTypeLabel(type) {
+  const labels = {
+    cash: 'Cash',
+    card: 'Cards',
+    upi: 'UPI methods',
+    wallet: 'Wallets',
+    bank: 'Bank Accounts'
+  };
+  return labels[type] || type;
+}
+
 // Setup event listeners
 function setupEventListeners() {
   // Sidebar toggle
@@ -402,6 +511,9 @@ function setupEventListeners() {
   
   // Export button
   exportBtn.addEventListener('click', handleExport);
+  
+  // Payment method cascading selection
+  paymentMethodInput.addEventListener('change', handlePaymentMethodChange);
   
   // Filters
   sourceFilter.addEventListener('change', () => {
@@ -610,7 +722,10 @@ async function handleFormSubmit(e) {
       source: sourceInput.value,
       description: descriptionInput.value.trim(),
       date: new Date(dateInput.value),
-      paymentMethod: paymentMethodInput.value
+      paymentMethod: paymentMethodInput.value,
+      specificPaymentMethodId: specificPaymentMethodInput.value || null,
+      specificPaymentMethodName: specificPaymentMethodInput.value ? 
+        specificPaymentMethodInput.options[specificPaymentMethodInput.selectedIndex].text : null
     };
     
     // Add linked data if present
