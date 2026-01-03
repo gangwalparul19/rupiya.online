@@ -33,13 +33,14 @@ class AuthService {
       onAuthStateChanged(auth, (user) => {
         console.log('[Auth Service] Auth state:', user ? user.email : 'Not logged in');
         this.currentUser = user;
-        this.authInitialized = true;
+        
+        if (!this.authInitialized) {
+          this.authInitialized = true;
+          resolve(user);
+        }
         
         // Notify all listeners
         this.authStateListeners.forEach(callback => callback(user));
-        
-        // Resolve promise
-        resolve(user);
       });
     });
 

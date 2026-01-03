@@ -7,7 +7,7 @@ let currentUser = null;
 let familyGroups = [];
 let pendingInvitations = [];
 
-// Check authentication
+// Check authentication - EXACTLY like dashboard
 async function checkAuth() {
   await authService.waitForAuth();
   if (!authService.isAuthenticated()) {
@@ -25,8 +25,12 @@ async function init() {
   }
 }
 
-// Start initialization
-init();
+// Start initialization ONLY ONCE
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
 
 // Initialize page
 async function initPage() {
@@ -411,11 +415,4 @@ async function handleLogout() {
   } else {
     toast.error('Failed to logout');
   }
-}
-
-// Start initialization
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', init);
-} else {
-  init();
 }
