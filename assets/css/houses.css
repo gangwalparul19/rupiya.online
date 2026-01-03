@@ -393,10 +393,6 @@
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .houses-summary .summary-card:nth-child(3) {
-    grid-column: 1 / -1;
-  }
-
   .summary-icon {
     font-size: 2rem;
     width: 50px;
@@ -484,10 +480,6 @@
   .houses-summary {
     grid-template-columns: repeat(2, 1fr);
     gap: 8px;
-  }
-
-  .houses-summary .summary-card:nth-child(3) {
-    grid-column: 1 / -1;
   }
   
   .summary-card {

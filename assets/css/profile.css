@@ -376,7 +376,16 @@ ul li {
   }
 
   .categories-list {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+  
+  .category-item {
+    padding: 0.625rem 0.75rem;
+  }
+  
+  .category-name {
+    font-size: 0.8125rem;
   }
 }
 

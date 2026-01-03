@@ -385,10 +385,6 @@
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .help-summary .summary-card:nth-child(3) {
-    grid-column: 1 / -1;
-  }
-
   .summary-icon {
     font-size: 2rem;
     width: 50px;
@@ -474,10 +470,6 @@
   .help-summary {
     grid-template-columns: repeat(2, 1fr);
     gap: 8px;
-  }
-
-  .help-summary .summary-card:nth-child(3) {
-    grid-column: 1 / -1;
   }
   
   .summary-card {

@@ -305,6 +305,7 @@ function createIncomeCard(income) {
     <div class="income-card" data-id="${income.id}">
       <div class="income-header">
         <div class="income-amount">${formatCurrency(income.amount)}</div>
+        <div class="income-source">${income.source}</div>
         <div class="income-actions">
           <button class="btn-icon btn-edit" data-id="${income.id}" title="Edit">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -318,7 +319,6 @@ function createIncomeCard(income) {
           </button>
         </div>
       </div>
-      <div class="income-source">${income.source}</div>
       ${income.description ? `<div class="income-description">${income.description}</div>` : ''}
       <div class="income-meta">
         <div class="income-meta-item">

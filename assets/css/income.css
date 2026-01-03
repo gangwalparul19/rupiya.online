@@ -699,20 +699,25 @@
   
   .income-header {
     gap: 8px;
+    align-items: flex-start;
+  }
+  
+  /* Move source next to amount on mobile for space optimization */
+  .income-source {
+    font-size: 11px;
+    padding: 2px 8px;
+    margin-left: 8px;
+    flex-shrink: 0;
   }
   
   .income-actions {
     gap: 2px;
+    margin-left: auto;
   }
   
   .btn-icon {
     width: 28px;
     height: 28px;
-  }
-  
-  .income-source {
-    font-size: 11px;
-    padding: 2px 8px;
   }
   
   .income-description {

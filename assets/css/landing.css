@@ -828,6 +828,27 @@
     display: block;
   }
   
+  /* Center logo on mobile and hide text */
+  .nav-content {
+    justify-content: center;
+    position: relative;
+  }
+  
+  .landing-logo {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .logo-text {
+    display: none;
+  }
+  
+  .mobile-menu-toggle {
+    position: absolute;
+    right: 0;
+  }
+  
   .hero-section {
     padding: 120px 0 60px;
   }
@@ -879,8 +900,26 @@
     display: none;
   }
   
+  /* Benefits grid - 2 cards per row on mobile */
   .benefits-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+  
+  .benefit-card {
+    padding: 1.5rem 1rem;
+  }
+  
+  .benefit-icon {
+    font-size: 2.5rem;
+  }
+  
+  .benefit-title {
+    font-size: 1.125rem;
+  }
+  
+  .benefit-description {
+    font-size: 0.875rem;
   }
   
   .footer-content {
@@ -927,5 +966,29 @@
     width: 60px;
     height: 60px;
     font-size: 1.75rem;
+  }
+  
+  /* Benefits grid - keep 2 cards per row on small mobile */
+  .benefits-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+  
+  .benefit-card {
+    padding: 1.25rem 0.75rem;
+  }
+  
+  .benefit-icon {
+    font-size: 2rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .benefit-title {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .benefit-description {
+    font-size: 0.8125rem;
   }
 }

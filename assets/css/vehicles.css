@@ -368,10 +368,6 @@
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .vehicles-summary .summary-card:nth-child(3) {
-    grid-column: 1 / -1;
-  }
-
   .add-vehicle-section {
     padding: 1.5rem;
   }
@@ -449,10 +445,6 @@
   .vehicles-summary {
     grid-template-columns: repeat(2, 1fr);
     gap: 8px;
-  }
-
-  .vehicles-summary .summary-card:nth-child(3) {
-    grid-column: 1 / -1;
   }
   
   .summary-card {

@@ -305,6 +305,7 @@ function createExpenseCard(expense) {
     <div class="expense-card" data-id="${expense.id}">
       <div class="expense-header">
         <div class="expense-amount">${formatCurrency(expense.amount)}</div>
+        <div class="expense-category">${expense.category}</div>
         <div class="expense-actions">
           <button class="btn-icon btn-edit" data-id="${expense.id}" title="Edit">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -318,7 +319,6 @@ function createExpenseCard(expense) {
           </button>
         </div>
       </div>
-      <div class="expense-category">${expense.category}</div>
       ${expense.description ? `<div class="expense-description">${expense.description}</div>` : ''}
       <div class="expense-meta">
         <div class="expense-meta-item">

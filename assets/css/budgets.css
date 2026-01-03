@@ -664,10 +664,7 @@
     font-size: var(--font-size-lg);
   }
 
-  /* Third card spans full width */
-  .summary-card:nth-child(3) {
-    grid-column: 1 / -1;
-  }
+
 
   .budgets-grid {
     grid-template-columns: 1fr;

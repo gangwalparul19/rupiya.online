@@ -696,20 +696,25 @@
   
   .expense-header {
     gap: 8px;
+    align-items: flex-start;
+  }
+  
+  /* Move category next to amount on mobile for space optimization */
+  .expense-category {
+    font-size: 11px;
+    padding: 2px 8px;
+    margin-left: 8px;
+    flex-shrink: 0;
   }
   
   .expense-actions {
     gap: 2px;
+    margin-left: auto;
   }
   
   .btn-icon {
     width: 28px;
     height: 28px;
-  }
-  
-  .expense-category {
-    font-size: 11px;
-    padding: 2px 8px;
   }
   
   .expense-description {
