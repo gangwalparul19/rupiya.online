@@ -1,67 +1,40 @@
 // Feedback Page Logic
-import '../services/services-init.js'; // Initialize services first
 import authService from '../services/auth-service.js';
 import toast from '../components/toast.js';
 
+// Helper function for toast
+const showToast = (message, type) => toast.show(message, type);
+
 let currentUser = null;
 
-// Check authentication
-async function checkAuth() {
-  console.log('[Feedback Page] Checking authentication...');
+// Initialize
+async function init() {
+  console.log('[Feedback] Starting init...');
+  
   try {
     currentUser = await authService.waitForAuth();
-    console.log('[Feedback Page] Auth result:', currentUser ? currentUser.email : 'null');
+    console.log('[Feedback] Auth result:', currentUser ? currentUser.email : 'null');
     
     if (!currentUser) {
-      console.log('[Feedback Page] No user, redirecting to login...');
+      console.log('[Feedback] No user, redirecting...');
       window.location.href = 'login.html';
-      return false;
+      return;
     }
-    return true;
+    
+    // User is authenticated, initialize page
+    initPage();
+    
   } catch (error) {
-    console.error('[Feedback Page] Auth error:', error);
+    console.error('[Feedback] Init error:', error);
     window.location.href = 'login.html';
-    return false;
   }
 }
 
-// Initialize page
-async function init() {
-  console.log('[Feedback Page] Initializing...');
+// Initialize page after auth
+function initPage() {
+  console.log('[Feedback] Initializing page...');
   
-  // Show loading state
-  const loadingState = document.getElementById('pageLoadingState');
-  const mainContent = document.querySelector('.feedback-info-grid');
-  const formContainer = document.querySelector('.feedback-form-container');
-  const faqSection = document.querySelector('.feedback-faq');
-  
-  if (loadingState) loadingState.style.display = 'flex';
-  if (mainContent) mainContent.style.display = 'none';
-  if (formContainer) formContainer.style.display = 'none';
-  if (faqSection) faqSection.style.display = 'none';
-  
-  try {
-    const isAuthenticated = await checkAuth();
-    if (isAuthenticated) {
-      await initPage();
-      
-      // Show content
-      if (loadingState) loadingState.style.display = 'none';
-      if (mainContent) mainContent.style.display = 'grid';
-      if (formContainer) formContainer.style.display = 'block';
-      if (faqSection) faqSection.style.display = 'block';
-      
-      console.log('[Feedback Page] Page initialized successfully');
-    }
-  } catch (error) {
-    console.error('[Feedback Page] Init error:', error);
-    if (loadingState) loadingState.style.display = 'none';
-  }
-}
-
-// Initialize page
-async function initPage() {
-  // Update user profile
+  // Update user profile in sidebar
   updateUserProfile();
   
   // Setup event listeners
@@ -72,6 +45,8 @@ async function initPage() {
   if (emailInput && currentUser.email) {
     emailInput.value = currentUser.email;
   }
+  
+  console.log('[Feedback] Page initialized successfully');
 }
 
 // Update user profile
@@ -178,7 +153,7 @@ async function handleFeedbackSubmit(e) {
   
   // Validate
   if (!feedbackType || !feedbackSubject || !feedbackMessage) {
-    toast.error('Please fill in all required fields');
+    showToast('Please fill in all required fields', 'error');
     return;
   }
   
@@ -215,17 +190,17 @@ async function handleFeedbackSubmit(e) {
       // Show success message
       document.getElementById('feedbackForm').style.display = 'none';
       document.getElementById('feedbackSuccess').style.display = 'block';
-      toast.success('Feedback sent successfully!');
+      showToast('Feedback sent successfully!', 'success');
       
       // Scroll to success message
       document.getElementById('feedbackSuccess').scrollIntoView({ behavior: 'smooth' });
     } else {
-      toast.error(result.error || 'Failed to send feedback');
+      showToast(result.error || 'Failed to send feedback', 'error');
     }
     
   } catch (error) {
     console.error('Error sending feedback:', error);
-    toast.error('Failed to send feedback. Please try again.');
+    showToast('Failed to send feedback. Please try again.', 'error');
   } finally {
     submitBtn.disabled = false;
     submitBtnText.style.display = 'inline';
@@ -239,9 +214,13 @@ async function handleLogout() {
   if (result.success) {
     window.location.href = 'login.html';
   } else {
-    toast.error('Failed to logout');
+    showToast('Failed to logout', 'error');
   }
 }
 
-// Start initialization
-init();
+// Start initialization when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
