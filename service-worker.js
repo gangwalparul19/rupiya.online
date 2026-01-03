@@ -1,7 +1,7 @@
 // Service Worker for Rupiya PWA
 // Provides offline support and caching
 
-const CACHE_NAME = 'rupiya-v1.0.0';
+const CACHE_NAME = 'rupiya-v1.0.1';
 const RUNTIME_CACHE = 'rupiya-runtime';
 
 // Assets to cache on install

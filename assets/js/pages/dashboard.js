@@ -81,6 +81,9 @@ async function initDashboard() {
     // Update subtitle based on context
     updatePageContext();
     
+    // Initialize PWA install banner
+    initPWAInstallBanner();
+    
     // Load dashboard data
     await loadDashboardData();
   }
@@ -584,3 +587,116 @@ categoryPeriod.addEventListener('change', async () => {
   }
 });
 
+
+
+// PWA Install Banner
+function initPWAInstallBanner() {
+  const banner = document.getElementById('pwaInstallBannerDashboard');
+  const installBtn = document.getElementById('dashboardInstallAppBtn');
+  const closeBtn = document.getElementById('closePwaBannerDashboard');
+  const mobileInstallBtn = document.getElementById('dashboardInstallBtn');
+  
+  let deferredPrompt;
+  
+  // Check if already installed
+  if (window.matchMedia('(display-mode: standalone)').matches) {
+    // Already installed, don't show banner
+    return;
+  }
+  
+  // Check if user dismissed the banner before
+  const bannerDismissed = localStorage.getItem('pwaBannerDismissed');
+  if (bannerDismissed === 'true') {
+    return;
+  }
+  
+  // Listen for beforeinstallprompt event
+  window.addEventListener('beforeinstallprompt', (e) => {
+    // Prevent the mini-infobar from appearing on mobile
+    e.preventDefault();
+    // Stash the event so it can be triggered later
+    deferredPrompt = e;
+    
+    // Show the banner
+    if (banner) {
+      banner.style.display = 'block';
+    }
+    
+    // Show mobile install button
+    if (mobileInstallBtn) {
+      mobileInstallBtn.style.display = 'flex';
+    }
+  });
+  
+  // Install button click handler
+  const handleInstall = async () => {
+    if (!deferredPrompt) {
+      return;
+    }
+    
+    // Show the install prompt
+    deferredPrompt.prompt();
+    
+    // Wait for the user to respond to the prompt
+    const { outcome } = await deferredPrompt.userChoice;
+    
+    if (outcome === 'accepted') {
+      console.log('User accepted the install prompt');
+      toast.success('App installed successfully!');
+    } else {
+      console.log('User dismissed the install prompt');
+    }
+    
+    // Clear the deferredPrompt
+    deferredPrompt = null;
+    
+    // Hide the banner
+    if (banner) {
+      banner.style.display = 'none';
+    }
+    
+    // Hide mobile install button
+    if (mobileInstallBtn) {
+      mobileInstallBtn.style.display = 'none';
+    }
+  };
+  
+  // Attach click handlers
+  if (installBtn) {
+    installBtn.addEventListener('click', handleInstall);
+  }
+  
+  if (mobileInstallBtn) {
+    mobileInstallBtn.addEventListener('click', handleInstall);
+  }
+  
+  // Close button handler
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+      if (banner) {
+        banner.style.display = 'none';
+      }
+      // Remember that user dismissed the banner
+      localStorage.setItem('pwaBannerDismissed', 'true');
+    });
+  }
+  
+  // Listen for app installed event
+  window.addEventListener('appinstalled', () => {
+    console.log('PWA was installed');
+    toast.success('App installed! You can now use Rupiya offline.');
+    
+    // Hide the banner
+    if (banner) {
+      banner.style.display = 'none';
+    }
+    
+    // Hide mobile install button
+    if (mobileInstallBtn) {
+      mobileInstallBtn.style.display = 'none';
+    }
+    
+    // Clear the deferredPrompt
+    deferredPrompt = null;
+  });
+}

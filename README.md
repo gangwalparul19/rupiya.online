@@ -107,6 +107,15 @@ rupiya-vanilla/
 
 ## 🔧 Troubleshooting
 
+### Problem: "Missing or insufficient permissions" error in Family section
+**Solution:** Deploy updated Firestore rules!
+
+1. Go to: https://console.firebase.google.com/
+2. Select your project → Firestore Database → Rules
+3. Copy content from `firestore.rules` file
+4. Paste into Firebase Console and click "Publish"
+5. See `QUICK_FIX.md` or `DEPLOY_FIRESTORE_RULES.md` for details
+
 ### Problem: Changes not visible / Hamburger not working
 **Solution:** You're not using the local server correctly!
 

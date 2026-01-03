@@ -2,9 +2,9 @@
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
 import categoriesService from '../services/categories-service.js';
+import paymentMethodsService from '../services/payment-methods-service.js';
 import familySwitcher from '../components/family-switcher.js';
 import toast from '../components/toast.js';
-import themeManager from '../utils/theme-manager.js';
 import { Validator } from '../utils/validation.js';
 import { formatCurrency, formatDate, formatDateForInput, debounce, exportToCSV } from '../utils/helpers.js';
 
@@ -397,10 +397,8 @@ function attachCardEventListeners() {
 // Load user's payment methods
 async function loadUserPaymentMethods() {
   try {
-    const paymentMethodsService = window.paymentMethodsService;
-    if (paymentMethodsService) {
-      userPaymentMethods = await paymentMethodsService.getPaymentMethods();
-    }
+    userPaymentMethods = await paymentMethodsService.getPaymentMethods();
+    console.log('Loaded payment methods:', userPaymentMethods);
   } catch (error) {
     console.error('Error loading payment methods:', error);
     userPaymentMethods = [];

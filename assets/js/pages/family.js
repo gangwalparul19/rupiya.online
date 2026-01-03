@@ -2,7 +2,6 @@
 import authService from '../services/auth-service.js';
 import familyService from '../services/family-service.js';
 import toast from '../components/toast.js';
-import themeManager from '../utils/theme-manager.js';
 
 let currentUser = null;
 let familyGroups = [];
@@ -10,20 +9,32 @@ let pendingInvitations = [];
 
 // Initialize page
 async function init() {
-  const isAuthenticated = await checkAuth();
-  if (isAuthenticated) {
-    await initPage();
+  try {
+    const isAuthenticated = await checkAuth();
+    if (isAuthenticated) {
+      await initPage();
+    }
+  } catch (error) {
+    console.error('Error initializing family page:', error);
+    toast.error('Failed to load page');
+    // Don't redirect, just show error
   }
 }
 
 // Check authentication
 async function checkAuth() {
-  currentUser = await authService.waitForAuth();
-  if (!currentUser) {
+  try {
+    currentUser = await authService.waitForAuth();
+    if (!currentUser) {
+      window.location.href = 'login.html';
+      return false;
+    }
+    return true;
+  } catch (error) {
+    console.error('Auth check error:', error);
     window.location.href = 'login.html';
     return false;
   }
-  return true;
 }
 
 // Initialize page
@@ -409,4 +420,8 @@ async function handleLogout() {
 }
 
 // Start initialization
-init();
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}

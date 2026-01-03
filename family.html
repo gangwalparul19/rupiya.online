@@ -212,11 +212,160 @@
     </main>
   </div>
 
-  <!-- Include Family Modals -->
-  <script src="family-modals.html" type="text/html"></script>
+  <!-- Family Modals -->
+  <!-- Create Family Group Modal -->
+  <div class="modal-overlay" id="createFamilyModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h2 class="modal-title">Create Family Group</h2>
+        <button class="modal-close" id="closeCreateFamilyModal">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p class="mb-3">Create a family group to track finances together with your family members, roommates, or partner.</p>
+        
+        <form id="createFamilyForm">
+          <div class="form-group">
+            <label for="familyGroupName">Group Name *</label>
+            <input type="text" id="familyGroupName" 
+                   placeholder="e.g., Smith Family, Roommates, Our Home" 
+                   required maxlength="50">
+            <small class="form-help">Choose a name that represents your group</small>
+          </div>
+          
+          <div class="form-actions">
+            <button type="button" class="btn btn-outline" id="cancelCreateFamily">
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary" id="createFamilySubmit">
+              <span id="createFamilyBtnText">Create Group</span>
+              <span id="createFamilyBtnSpinner" class="spinner" style="display: none;"></span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Invite Member Modal -->
+  <div class="modal-overlay" id="inviteMemberModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h2 class="modal-title">Invite Family Member</h2>
+        <button class="modal-close" id="closeInviteMemberModal">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p class="mb-3">Invite a family member to join your group. They'll receive an invitation and can start tracking their finances.</p>
+        
+        <form id="inviteMemberForm">
+          <input type="hidden" id="inviteGroupId">
+          
+          <div class="form-group">
+            <label for="inviteEmail">Email Address *</label>
+            <input type="email" id="inviteEmail" 
+                   placeholder="member@example.com" 
+                   required>
+            <small class="form-help">They'll receive an invitation email</small>
+          </div>
+          
+          <div class="form-group">
+            <label for="inviteRole">Role *</label>
+            <select id="inviteRole" required>
+              <option value="member">Member - Can add/edit own data</option>
+              <option value="admin">Admin - Can manage group and members</option>
+            </select>
+            <small class="form-help">
+              <strong>Member:</strong> Can add their own expenses/income<br>
+              <strong>Admin:</strong> Can invite/remove members and manage settings
+            </small>
+          </div>
+          
+          <div class="form-actions">
+            <button type="button" class="btn btn-outline" id="cancelInviteMember">
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary" id="inviteMemberSubmit">
+              <span id="inviteMemberBtnText">Send Invitation</span>
+              <span id="inviteMemberBtnSpinner" class="spinner" style="display: none;"></span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm Remove Member Modal -->
+  <div class="modal-overlay" id="removeMemberModal">
+    <div class="modal-container modal-sm">
+      <div class="modal-header">
+        <h2 class="modal-title">Remove Member</h2>
+        <button class="modal-close" id="closeRemoveMemberModal">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p>Are you sure you want to remove <strong id="removeMemberName"></strong> from this group?</p>
+        <p class="text-muted">They will no longer have access to the group's data.</p>
+        
+        <input type="hidden" id="removeGroupId">
+        <input type="hidden" id="removeMemberId">
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" id="cancelRemoveMember">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirmRemoveMember">
+          <span id="removeMemberBtnText">Remove</span>
+          <span id="removeMemberBtnSpinner" class="spinner" style="display: none;"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm Delete Group Modal -->
+  <div class="modal-overlay" id="deleteGroupModal">
+    <div class="modal-container modal-sm">
+      <div class="modal-header">
+        <h2 class="modal-title">Delete Family Group</h2>
+        <button class="modal-close" id="closeDeleteGroupModal">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p class="text-danger mb-3">⚠️ Warning: This action cannot be undone!</p>
+        <p>Are you sure you want to delete <strong id="deleteGroupName"></strong>?</p>
+        <p class="text-muted">All members will be removed from the group. Individual transaction data will not be deleted.</p>
+        
+        <input type="hidden" id="deleteGroupId">
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" id="cancelDeleteGroup">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteGroup">
+          <span id="deleteGroupBtnText">Delete Group</span>
+          <span id="deleteGroupBtnSpinner" class="spinner" style="display: none;"></span>
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- Scripts -->
   <script type="module" src="assets/js/pages/family.js"></script>
+  <script type="module" src="assets/js/pages/family-modals.js"></script>
   <script src="assets/js/pwa-setup.js"></script>
 </body>
 </html>
