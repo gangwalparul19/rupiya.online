@@ -29,7 +29,9 @@ const htmlFiles = [
   'recurring.html',
   'ai-insights.html',
   'split-expense.html',
-  'family.html'
+  'family.html',
+  'feedback.html',
+  'achievements.html'
 ];
 
 // Environment variable injection script

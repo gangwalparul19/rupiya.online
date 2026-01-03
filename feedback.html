@@ -165,75 +165,72 @@
         <div style="width: 24px;"></div>
       </div>
 
-      <!-- Page Header -->
+      <!-- Compact Page Header -->
       <div class="feedback-page-header">
-        <div>
-          <h1 class="page-title">💬 Feedback & Suggestions</h1>
-          <p class="page-subtitle">Help us improve Rupiya by sharing your thoughts</p>
-        </div>
+        <h1 class="page-title">💬 Feedback</h1>
+        <p class="page-subtitle">Help us improve Rupiya</p>
       </div>
 
-      <!-- Feedback Info Cards -->
+      <!-- 3-Column Info Cards -->
       <div class="feedback-info-grid">
         <div class="feedback-info-card">
-          <div class="feedback-info-icon">🐛</div>
-          <h3>Report a Bug</h3>
-          <p>Found something not working? Let us know!</p>
+          <span class="feedback-info-icon">🐛</span>
+          <span class="feedback-info-text">Bug</span>
         </div>
         <div class="feedback-info-card">
-          <div class="feedback-info-icon">💡</div>
-          <h3>Request a Feature</h3>
-          <p>Have an idea? We'd love to hear it!</p>
+          <span class="feedback-info-icon">💡</span>
+          <span class="feedback-info-text">Feature</span>
         </div>
         <div class="feedback-info-card">
-          <div class="feedback-info-icon">⭐</div>
-          <h3>Share Feedback</h3>
-          <p>Tell us what you think about Rupiya</p>
+          <span class="feedback-info-icon">⭐</span>
+          <span class="feedback-info-text">Feedback</span>
         </div>
       </div>
 
-      <!-- Feedback Form -->
+      <!-- Compact Feedback Form -->
       <div class="feedback-form-container">
         <form id="feedbackForm" class="feedback-form">
-          <div class="form-group">
-            <label for="feedbackType">Feedback Type *</label>
-            <select id="feedbackType" required>
-              <option value="">Select type...</option>
-              <option value="bug">🐛 Bug Report</option>
-              <option value="feature">💡 Feature Request</option>
-              <option value="improvement">✨ Improvement Suggestion</option>
-              <option value="general">💬 General Feedback</option>
-              <option value="other">📝 Other</option>
-            </select>
+          <!-- Row 1: Type and Subject -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="feedbackType">Type *</label>
+              <select id="feedbackType" required>
+                <option value="">Select...</option>
+                <option value="bug">🐛 Bug</option>
+                <option value="feature">💡 Feature</option>
+                <option value="improvement">✨ Improvement</option>
+                <option value="general">💬 General</option>
+                <option value="other">📝 Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="feedbackSubject">Subject *</label>
+              <input type="text" id="feedbackSubject" placeholder="Brief summary" required maxlength="100">
+            </div>
           </div>
 
-          <div class="form-group">
-            <label for="feedbackSubject">Subject *</label>
-            <input type="text" id="feedbackSubject" placeholder="Brief summary of your feedback" required maxlength="100">
-          </div>
-
+          <!-- Row 2: Message -->
           <div class="form-group">
             <label for="feedbackMessage">Message *</label>
-            <textarea id="feedbackMessage" rows="8" placeholder="Please provide detailed information about your feedback..." required maxlength="2000"></textarea>
-            <small class="form-help"><span id="charCount">0</span>/2000 characters</small>
+            <textarea id="feedbackMessage" rows="4" placeholder="Describe your feedback..." required maxlength="2000"></textarea>
+            <small class="form-help"><span id="charCount">0</span>/2000</small>
           </div>
 
+          <!-- Row 3: Email -->
           <div class="form-group">
-            <label for="feedbackEmail">Your Email (optional)</label>
-            <input type="email" id="feedbackEmail" placeholder="your@email.com (if you want a response)">
-            <small class="form-help">We'll use your account email if not provided</small>
+            <label for="feedbackEmail">Email (optional)</label>
+            <input type="email" id="feedbackEmail" placeholder="For response">
           </div>
 
+          <!-- Row 4: Buttons -->
           <div class="form-actions">
-            <button type="button" class="btn btn-outline" id="cancelFeedbackBtn">
-              Cancel
-            </button>
+            <button type="button" class="btn btn-outline" id="cancelFeedbackBtn">Cancel</button>
             <button type="submit" class="btn btn-primary" id="submitFeedbackBtn">
               <span id="submitBtnText">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
                 </svg>
-                Send Feedback
+                Send
               </span>
               <span id="submitBtnSpinner" class="spinner" style="display: none;"></span>
             </button>
@@ -244,33 +241,25 @@
         <div id="feedbackSuccess" class="feedback-success" style="display: none;">
           <div class="success-icon">✅</div>
           <h3>Thank You!</h3>
-          <p>Your feedback has been sent successfully. We appreciate your input and will review it carefully.</p>
-          <button class="btn btn-primary" id="sendAnotherBtn">Send Another Feedback</button>
+          <p>Your feedback has been sent successfully.</p>
+          <button class="btn btn-primary" id="sendAnotherBtn">Send Another</button>
         </div>
       </div>
 
-      <!-- FAQ Section -->
-      <div class="feedback-faq">
-        <h2 class="section-title">Frequently Asked Questions</h2>
-        <div class="faq-grid">
-          <div class="faq-item">
-            <h4>How long does it take to get a response?</h4>
-            <p>We typically respond within 24-48 hours for bug reports and within a week for feature requests.</p>
+      <!-- Collapsible FAQ -->
+      <details class="feedback-faq-details">
+        <summary class="faq-summary">❓ FAQ</summary>
+        <div class="faq-content">
+          <div class="faq-item-compact">
+            <strong>Response time?</strong>
+            <span>24-48h for bugs, 1 week for features</span>
           </div>
-          <div class="faq-item">
-            <h4>Will my feature request be implemented?</h4>
-            <p>We carefully review all suggestions. Popular requests are prioritized in our development roadmap.</p>
-          </div>
-          <div class="faq-item">
-            <h4>Can I track my feedback status?</h4>
-            <p>Currently, we'll email you updates. A feedback tracking system is coming soon!</p>
-          </div>
-          <div class="faq-item">
-            <h4>Is my feedback anonymous?</h4>
-            <p>Your account email is included unless you specify otherwise. We keep all feedback confidential.</p>
+          <div class="faq-item-compact">
+            <strong>Will my request be added?</strong>
+            <span>Popular requests are prioritized</span>
           </div>
         </div>
-      </div>
+      </details>
     </main>
   </div>
 

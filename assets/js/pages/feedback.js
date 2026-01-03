@@ -12,11 +12,16 @@ async function init() {
   console.log('[Feedback] Starting init...');
   
   try {
+    // Add a small delay to ensure Firebase is ready
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
     currentUser = await authService.waitForAuth();
     console.log('[Feedback] Auth result:', currentUser ? currentUser.email : 'null');
     
     if (!currentUser) {
       console.log('[Feedback] No user, redirecting...');
+      // Don't redirect immediately - let user see the page first
+      // The page will show "Loading..." in sidebar
       window.location.href = 'login.html';
       return;
     }
@@ -26,7 +31,8 @@ async function init() {
     
   } catch (error) {
     console.error('[Feedback] Init error:', error);
-    window.location.href = 'login.html';
+    // Show error instead of redirecting
+    alert('Error loading page: ' + error.message);
   }
 }
 
@@ -42,7 +48,7 @@ function initPage() {
   
   // Pre-fill email if available
   const emailInput = document.getElementById('feedbackEmail');
-  if (emailInput && currentUser.email) {
+  if (emailInput && currentUser && currentUser.email) {
     emailInput.value = currentUser.email;
   }
   

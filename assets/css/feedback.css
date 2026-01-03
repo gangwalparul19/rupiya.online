@@ -1,223 +1,236 @@
-/* Feedback Page Styles */
+/* Feedback Page Styles - Mobile First */
 
+/* Page Header - Compact */
 .feedback-page-header {
-  margin-bottom: 2rem;
-}
-
-.feedback-info-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-}
-
-.feedback-info-card {
-  background: var(--card-bg);
-  border: 2px solid var(--border-color);
-  border-radius: var(--border-radius-lg);
-  padding: 1.5rem;
-  text-align: center;
-  transition: all 0.3s ease;
-}
-
-.feedback-info-card:hover {
-  border-color: var(--primary-blue);
-  transform: translateY(-4px);
-  box-shadow: 0 8px 16px rgba(74, 144, 226, 0.2);
-}
-
-.feedback-info-icon {
-  font-size: 3rem;
   margin-bottom: 1rem;
+  text-align: center;
 }
 
-.feedback-info-card h3 {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 0.5rem;
+.feedback-page-header .page-title {
+  font-size: 1.5rem;
+  margin-bottom: 0.25rem;
 }
 
-.feedback-info-card p {
-  font-size: 0.9rem;
+.feedback-page-header .page-subtitle {
+  font-size: 0.85rem;
   color: var(--text-secondary);
   margin: 0;
 }
 
+/* 3-Column Info Cards */
+.feedback-info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.feedback-info-card {
+  background: var(--card-bg, #fff);
+  border: 2px solid var(--border-color, #e0e0e0);
+  border-radius: 12px;
+  padding: 0.75rem 0.5rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  transition: all 0.2s ease;
+}
+
+.feedback-info-card:hover {
+  border-color: var(--primary-blue, #4A90E2);
+  transform: translateY(-2px);
+}
+
+.feedback-info-icon {
+  font-size: 1.5rem;
+}
+
+.feedback-info-text {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-secondary, #666);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Form Container - Compact */
 .feedback-form-container {
-  background: var(--card-bg);
-  border: 2px solid var(--border-color);
-  border-radius: var(--border-radius-lg);
-  padding: 2rem;
-  margin-bottom: 2rem;
-  max-width: 800px;
+  background: var(--card-bg, #fff);
+  border: 2px solid var(--border-color, #e0e0e0);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* Form Row - 2 columns */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
 }
 
 .feedback-form .form-group {
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.75rem;
 }
 
 .feedback-form label {
   display: block;
   font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 0.5rem;
-  font-size: 0.95rem;
+  color: var(--text-primary, #333);
+  margin-bottom: 0.35rem;
+  font-size: 0.8rem;
 }
 
 .feedback-form input,
 .feedback-form select,
 .feedback-form textarea {
   width: 100%;
-  padding: 0.75rem;
-  border: 2px solid var(--border-color);
-  border-radius: var(--border-radius);
-  font-size: 1rem;
+  padding: 0.6rem 0.75rem;
+  border: 2px solid var(--border-color, #e0e0e0);
+  border-radius: 8px;
+  font-size: 0.9rem;
   font-family: inherit;
-  background: var(--input-bg);
-  color: var(--text-primary);
-  transition: all 0.3s ease;
+  background: var(--input-bg, #fff);
+  color: var(--text-primary, #333);
+  transition: all 0.2s ease;
 }
 
 .feedback-form input:focus,
 .feedback-form select:focus,
 .feedback-form textarea:focus {
   outline: none;
-  border-color: var(--primary-blue);
+  border-color: var(--primary-blue, #4A90E2);
   box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
 }
 
 .feedback-form textarea {
   resize: vertical;
-  min-height: 150px;
+  min-height: 80px;
 }
 
 .feedback-form .form-help {
   display: block;
-  margin-top: 0.5rem;
-  font-size: 0.85rem;
-  color: var(--text-secondary);
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--text-secondary, #666);
 }
 
+/* Form Actions - Side by side */
 .feedback-form .form-actions {
-  display: flex;
-  gap: 1rem;
-  justify-content: flex-end;
-  margin-top: 2rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-color, #e0e0e0);
 }
 
+.feedback-form .form-actions .btn {
+  padding: 0.6rem 1rem;
+  font-size: 0.85rem;
+}
+
+/* Success Message - Compact */
 .feedback-success {
   text-align: center;
-  padding: 3rem 2rem;
+  padding: 2rem 1rem;
 }
 
 .feedback-success .success-icon {
-  font-size: 4rem;
-  margin-bottom: 1rem;
-  animation: scaleIn 0.5s ease-out;
+  font-size: 3rem;
+  margin-bottom: 0.75rem;
+  animation: scaleIn 0.4s ease-out;
 }
 
 @keyframes scaleIn {
-  from {
-    transform: scale(0);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
+  from { transform: scale(0); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
 }
 
 .feedback-success h3 {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 1rem;
+  color: var(--text-primary, #333);
+  margin-bottom: 0.5rem;
 }
 
 .feedback-success p {
-  font-size: 1rem;
-  color: var(--text-secondary);
-  margin-bottom: 2rem;
-  max-width: 500px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.feedback-faq {
-  margin-top: 3rem;
-}
-
-.feedback-faq .section-title {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 1.5rem;
-}
-
-.faq-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.5rem;
-}
-
-.faq-item {
-  background: var(--card-bg);
-  border: 2px solid var(--border-color);
-  border-radius: var(--border-radius-lg);
-  padding: 1.5rem;
-  transition: all 0.3s ease;
-}
-
-.faq-item:hover {
-  border-color: var(--primary-blue);
-  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.1);
-}
-
-.faq-item h4 {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 0.75rem;
-}
-
-.faq-item p {
   font-size: 0.9rem;
-  color: var(--text-secondary);
-  margin: 0;
-  line-height: 1.6;
+  color: var(--text-secondary, #666);
+  margin-bottom: 1rem;
 }
 
-/* Mobile Responsive */
-@media (max-width: 768px) {
-  .feedback-info-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .feedback-form-container {
-    padding: 1.5rem;
-  }
-
-  .feedback-form .form-actions {
-    flex-direction: column;
-  }
-
-  .feedback-form .form-actions button {
-    width: 100%;
-  }
-
-  .faq-grid {
-    grid-template-columns: 1fr;
-  }
+/* Collapsible FAQ */
+.feedback-faq-details {
+  background: var(--card-bg, #fff);
+  border: 2px solid var(--border-color, #e0e0e0);
+  border-radius: 12px;
+  margin-bottom: 1rem;
 }
 
-/* Character counter color */
+.faq-summary {
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-primary, #333);
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.faq-summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq-summary::after {
+  content: '▼';
+  font-size: 0.7rem;
+  transition: transform 0.2s ease;
+}
+
+.feedback-faq-details[open] .faq-summary::after {
+  transform: rotate(180deg);
+}
+
+.faq-content {
+  padding: 0 1rem 1rem;
+  border-top: 1px solid var(--border-color, #e0e0e0);
+}
+
+.faq-item-compact {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border-color, #e0e0e0);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.faq-item-compact:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.faq-item-compact strong {
+  font-size: 0.85rem;
+  color: var(--text-primary, #333);
+}
+
+.faq-item-compact span {
+  font-size: 0.8rem;
+  color: var(--text-secondary, #666);
+}
+
+/* Character counter */
 #charCount {
   font-weight: 600;
-  color: var(--primary-blue);
+  color: var(--primary-blue, #4A90E2);
 }
 
-/* Spinner animation */
+/* Spinner */
 .spinner {
   display: inline-block;
   width: 16px;
@@ -229,38 +242,120 @@
 }
 
 @keyframes spin {
-  to {
-    transform: rotate(360deg);
+  to { transform: rotate(360deg); }
+}
+
+/* Desktop Enhancements */
+@media (min-width: 768px) {
+  .feedback-page-header {
+    text-align: left;
+    margin-bottom: 1.5rem;
+  }
+  
+  .feedback-page-header .page-title {
+    font-size: 1.75rem;
+  }
+  
+  .feedback-info-grid {
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .feedback-info-card {
+    padding: 1rem;
+    flex-direction: row;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  
+  .feedback-info-icon {
+    font-size: 1.75rem;
+  }
+  
+  .feedback-info-text {
+    font-size: 0.8rem;
+  }
+  
+  .feedback-form-container {
+    padding: 1.5rem;
+    max-width: 700px;
+  }
+  
+  .form-row {
+    gap: 1rem;
+  }
+  
+  .feedback-form .form-group {
+    margin-bottom: 1rem;
+  }
+  
+  .feedback-form label {
+    font-size: 0.875rem;
+  }
+  
+  .feedback-form input,
+  .feedback-form select,
+  .feedback-form textarea {
+    padding: 0.75rem;
+    font-size: 1rem;
+  }
+  
+  .feedback-form textarea {
+    min-height: 120px;
+  }
+  
+  .feedback-form .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+  }
+  
+  .feedback-form .form-actions .btn {
+    width: auto;
+    min-width: 120px;
+  }
+  
+  .feedback-faq-details {
+    max-width: 700px;
+  }
+  
+  .faq-item-compact {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
   }
 }
 
-
-/* Loading State */
-.loading-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 4rem 2rem;
-  text-align: center;
+/* Small Mobile */
+@media (max-width: 360px) {
+  .feedback-info-grid {
+    gap: 0.35rem;
+  }
+  
+  .feedback-info-card {
+    padding: 0.5rem 0.25rem;
+  }
+  
+  .feedback-info-icon {
+    font-size: 1.25rem;
+  }
+  
+  .feedback-info-text {
+    font-size: 0.6rem;
+  }
+  
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .feedback-form-container {
+    padding: 0.75rem;
+  }
 }
 
-.loading-state p {
-  margin-top: 1rem;
-  color: var(--text-secondary);
-}
-
-.spinner-lg {
-  width: 48px;
-  height: 48px;
-  border: 4px solid var(--border-color);
-  border-top-color: var(--primary-blue);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
+/* Safe area for bottom */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .main-content {
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom));
   }
 }
