@@ -3,39 +3,27 @@ import '../services/services-init.js'; // Initialize services first
 import authService from '../services/auth-service.js';
 import familyService from '../services/family-service.js';
 import toast from '../components/toast.js';
-import { auth } from '../config/firebase-config.js';
 
 let currentUser = null;
 let familyGroups = [];
 let pendingInvitations = [];
 
-// Debug: Log current URL and origin
-console.log('[Family Page] Current URL:', window.location.href);
-console.log('[Family Page] Origin:', window.location.origin);
-console.log('[Family Page] Firebase auth.currentUser:', auth.currentUser);
-
 // Check authentication
 async function checkAuth() {
   console.log('[Family Page] Checking authentication...');
-  console.log('[Family Page] Direct auth.currentUser check:', auth.currentUser ? auth.currentUser.email : 'null');
   
   try {
-    // Wait for auth to initialize - this waits for Firebase to restore session
+    // Wait for auth to initialize
     const user = await authService.waitForAuth();
     console.log('[Family Page] waitForAuth returned:', user ? user.email : 'null');
     
-    // Double check with Firebase directly
-    console.log('[Family Page] After wait, auth.currentUser:', auth.currentUser ? auth.currentUser.email : 'null');
-    
-    if (!user && !auth.currentUser) {
+    if (!user) {
       console.log('[Family Page] No user found, redirecting to login...');
-      // Store the intended destination
-      sessionStorage.setItem('redirectAfterLogin', window.location.href);
       window.location.href = 'login.html';
       return false;
     }
     
-    console.log('[Family Page] User authenticated:', (user || auth.currentUser).email);
+    console.log('[Family Page] User authenticated:', user.email);
     return true;
   } catch (error) {
     console.error('[Family Page] Auth check error:', error);
