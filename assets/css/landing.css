@@ -1812,7 +1812,7 @@
 }
 
 /* ============================================
-   TESTIMONIALS SECTION - CAROUSEL
+   TESTIMONIALS SECTION - MARQUEE
    ============================================ */
 
 .testimonials-section {
@@ -1834,100 +1834,72 @@
   color: white;
 }
 
-.testimonials-carousel-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  max-width: 900px;
-  margin: 0 auto;
+.testimonials-marquee-wrapper {
   position: relative;
+  width: 100%;
+  overflow: hidden;
+  mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
 }
 
-.testimonials-carousel {
-  flex: 1;
+.testimonials-marquee {
   overflow: hidden;
-  border-radius: 1rem;
+  width: 100%;
 }
 
 .testimonials-track {
   display: flex;
-  transition: transform 0.5s ease-in-out;
+  gap: 1.5rem;
+  animation: marquee 40s linear infinite;
+  width: max-content;
+}
+
+.testimonials-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 .testimonial-card {
   background: rgba(255, 255, 255, 0.95);
   border-radius: 1rem;
-  padding: 2rem;
+  padding: 1.5rem;
   text-align: center;
-  min-width: 100%;
+  min-width: 320px;
+  max-width: 320px;
   flex-shrink: 0;
-  box-sizing: border-box;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.carousel-btn {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
-  border: 2px solid rgba(255, 255, 255, 0.4);
-  color: white;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-  flex-shrink: 0;
-}
-
-.carousel-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
-  border-color: white;
-  transform: scale(1.1);
-}
-
-.carousel-btn:active {
-  transform: scale(0.95);
-}
-
-.carousel-dots {
-  display: flex;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-top: 1.5rem;
-}
-
-.carousel-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.3);
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  padding: 0;
-}
-
-.carousel-dot:hover {
-  background: rgba(255, 255, 255, 0.5);
-}
-
-.carousel-dot.active {
-  background: white;
-  transform: scale(1.2);
+.testimonial-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
 }
 
 .testimonial-stars {
-  font-size: 1.25rem;
-  margin-bottom: 1rem;
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
 }
 
 .testimonial-card > p {
-  font-size: 1rem;
+  font-size: 0.9375rem;
   color: var(--text-secondary);
-  line-height: 1.7;
-  margin: 0 0 1.5rem 0;
+  line-height: 1.6;
+  margin: 0 0 1rem 0;
   font-style: italic;
-  min-height: 60px;
+  min-height: 72px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .testimonial-author {
@@ -1938,8 +1910,8 @@
 }
 
 .author-avatar {
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   background: linear-gradient(135deg, var(--primary-blue), #764ba2);
   color: white;
   border-radius: 50%;
@@ -1947,17 +1919,17 @@
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 1rem;
 }
 
 .testimonial-author strong {
   display: block;
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
   color: var(--text-primary);
 }
 
 .testimonial-author span {
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   color: var(--text-secondary);
 }
 
@@ -2066,37 +2038,21 @@
     font-size: 0.75rem;
   }
   
-  /* Testimonials - Carousel on mobile */
-  .testimonials-carousel-wrapper {
-    gap: 0.5rem;
-  }
-  
-  .carousel-btn {
-    width: 36px;
-    height: 36px;
-  }
-  
-  .carousel-btn svg {
-    width: 18px;
-    height: 18px;
-  }
-  
+  /* Testimonials - Marquee on mobile */
   .testimonial-card {
-    padding: 1.5rem 1rem;
+    min-width: 280px;
+    max-width: 280px;
+    padding: 1.25rem;
   }
   
   .testimonial-card > p {
-    font-size: 0.9375rem;
-    min-height: auto;
+    font-size: 0.875rem;
+    min-height: 64px;
   }
   
-  .carousel-dots {
-    margin-top: 1rem;
-  }
-  
-  .carousel-dot {
-    width: 8px;
-    height: 8px;
+  .testimonials-track {
+    gap: 1rem;
+    animation-duration: 30s;
   }
   
   /* Stats - already 2 per row, make more compact */

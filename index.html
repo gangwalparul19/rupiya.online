@@ -51,6 +51,8 @@
   <link rel="stylesheet" href="assets/css/components.css">
   <link rel="stylesheet" href="assets/css/dark-mode.css">
   <link rel="stylesheet" href="assets/css/landing.css">
+  <link rel="stylesheet" href="assets/css/animations.css">
+  <link rel="stylesheet" href="assets/css/mobile-enhancements.css">
   
   <!-- Structured Data - Organization -->
   <script type="application/ld+json">
@@ -517,15 +519,82 @@
           <h2 class="section-title">Loved by Users</h2>
         </div>
 
-        <div class="testimonials-carousel-wrapper">
-          <button class="carousel-btn carousel-prev" id="testimonialPrev" aria-label="Previous review">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-            </svg>
-          </button>
-          
-          <div class="testimonials-carousel" id="testimonialsCarousel">
-            <div class="testimonials-track" id="testimonialsTrack">
+        <div class="testimonials-marquee-wrapper">
+          <div class="testimonials-marquee">
+            <div class="testimonials-track">
+              <div class="testimonial-card">
+                <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+                <p>"Finally an app that understands Indian finances. The family sharing feature is amazing!"</p>
+                <div class="testimonial-author">
+                  <div class="author-avatar">R</div>
+                  <div>
+                    <strong>Rahul S.</strong>
+                    <span>Mumbai</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="testimonial-card">
+                <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+                <p>"Tracking my vehicle expenses has never been easier. Love the mileage calculator!"</p>
+                <div class="testimonial-author">
+                  <div class="author-avatar">P</div>
+                  <div>
+                    <strong>Priya M.</strong>
+                    <span>Bangalore</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="testimonial-card">
+                <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+                <p>"The weekly email reports help me stay on top of my spending. Highly recommend!"</p>
+                <div class="testimonial-author">
+                  <div class="author-avatar">A</div>
+                  <div>
+                    <strong>Amit K.</strong>
+                    <span>Delhi</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="testimonial-card">
+                <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+                <p>"Best expense tracker I've used. The AI insights actually helped me save ₹5000 last month!"</p>
+                <div class="testimonial-author">
+                  <div class="author-avatar">S</div>
+                  <div>
+                    <strong>Sneha R.</strong>
+                    <span>Pune</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="testimonial-card">
+                <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+                <p>"Managing house help payments is so easy now. The payment tracking feature is a lifesaver!"</p>
+                <div class="testimonial-author">
+                  <div class="author-avatar">V</div>
+                  <div>
+                    <strong>Vikram T.</strong>
+                    <span>Chennai</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="testimonial-card">
+                <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+                <p>"Love how it works offline. Perfect for when I'm traveling and need to log expenses quickly."</p>
+                <div class="testimonial-author">
+                  <div class="author-avatar">N</div>
+                  <div>
+                    <strong>Neha G.</strong>
+                    <span>Hyderabad</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Duplicate cards for seamless loop -->
               <div class="testimonial-card">
                 <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
                 <p>"Finally an app that understands Indian finances. The family sharing feature is amazing!"</p>
@@ -599,16 +668,6 @@
               </div>
             </div>
           </div>
-
-          <button class="carousel-btn carousel-next" id="testimonialNext" aria-label="Next review">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-            </svg>
-          </button>
-        </div>
-
-        <div class="carousel-dots" id="carouselDots">
-          <!-- Dots will be generated by JS -->
         </div>
       </div>
     </section>
@@ -629,7 +688,7 @@
               Create Free Account
             </a>
             <a href="login.html" class="btn btn-hero-outline">
-              Already have an account? Login
+              Log In
             </a>
           </div>
           <p class="cta-note">✨ No credit card required • Free forever • Cancel anytime</p>
