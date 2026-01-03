@@ -1,12 +1,19 @@
 // PWA Setup - Service Worker Registration and Install Prompt
 // This file should be included in all HTML pages
 
+const APP_VERSION = '1.0.4'; // Update this on every deployment
+
 // Register Service Worker
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/service-worker.js')
       .then(registration => {
         console.log('[PWA] Service Worker registered:', registration.scope);
+        
+        // Check for updates periodically
+        setInterval(() => {
+          registration.update();
+        }, 60000); // Check every minute
         
         // Check for updates
         registration.addEventListener('updatefound', () => {
@@ -15,13 +22,28 @@ if ('serviceWorker' in navigator) {
           
           newWorker.addEventListener('statechange', () => {
             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              console.log('[PWA] New content available, please refresh.');
-              // Optionally show a toast notification
+              console.log('[PWA] New content available, reloading...');
+              
+              // Show notification and auto-reload after 2 seconds
               if (typeof toast !== 'undefined') {
-                toast.info('New version available! Please refresh the page.');
+                toast.info('New version available! Updating...');
               }
+              
+              // Tell the new service worker to skip waiting
+              newWorker.postMessage({ type: 'SKIP_WAITING' });
+              
+              // Reload after a short delay
+              setTimeout(() => {
+                window.location.reload();
+              }, 2000);
             }
           });
+        });
+        
+        // Listen for controller change (new service worker activated)
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          console.log('[PWA] New Service Worker activated, reloading...');
+          window.location.reload();
         });
       })
       .catch(error => {
@@ -29,6 +51,25 @@ if ('serviceWorker' in navigator) {
       });
   });
 }
+
+// Clear old caches on app load
+async function clearOldCaches() {
+  if ('caches' in window) {
+    const cacheNames = await caches.keys();
+    const currentVersion = APP_VERSION;
+    
+    for (const cacheName of cacheNames) {
+      // Delete caches that don't match current version
+      if (!cacheName.includes(currentVersion)) {
+        console.log('[PWA] Deleting old cache:', cacheName);
+        await caches.delete(cacheName);
+      }
+    }
+  }
+}
+
+// Clear caches on load
+clearOldCaches();
 
 // Handle PWA install prompt
 let deferredPrompt = null;
@@ -169,4 +210,5 @@ function showManualInstructions() {
   }
 }
 
-console.log('[PWA] Setup loaded');
+console.log(`[PWA] Setup loaded - Version ${APP_VERSION}`);
+

@@ -24,14 +24,20 @@ async function init() {
 // Check authentication
 async function checkAuth() {
   try {
-    currentUser = await authService.waitForAuth();
+    // Wait for auth to initialize
+    await authService.init();
+    currentUser = authService.getCurrentUser();
+    
+    console.log('Family page - Auth check:', currentUser ? 'Authenticated' : 'Not authenticated');
+    
     if (!currentUser) {
+      console.log('Family page - Redirecting to login');
       window.location.href = 'login.html';
       return false;
     }
     return true;
   } catch (error) {
-    console.error('Auth check error:', error);
+    console.error('Family page - Auth check error:', error);
     window.location.href = 'login.html';
     return false;
   }

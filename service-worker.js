@@ -1,8 +1,9 @@
 // Service Worker for Rupiya PWA
 // Provides offline support and caching
 
-const CACHE_NAME = 'rupiya-v1.0.1';
-const RUNTIME_CACHE = 'rupiya-runtime';
+const CACHE_VERSION = '1.0.4'; // Increment this on every deployment
+const CACHE_NAME = `rupiya-v${CACHE_VERSION}`;
+const RUNTIME_CACHE = `rupiya-runtime-v${CACHE_VERSION}`;
 
 // Assets to cache on install
 const STATIC_ASSETS = [
@@ -15,6 +16,7 @@ const STATIC_ASSETS = [
   '/goals.html',
   '/investments.html',
   '/analytics.html',
+  '/family.html',
   '/houses.html',
   '/vehicles.html',
   '/house-help.html',
@@ -23,20 +25,27 @@ const STATIC_ASSETS = [
   '/profile.html',
   '/login.html',
   '/signup.html',
+  '/offline.html',
   '/assets/css/common.css',
   '/assets/css/components.css',
   '/assets/css/responsive.css',
   '/assets/css/loading.css',
   '/assets/css/accessibility.css',
+  '/assets/css/dashboard.css',
+  '/assets/css/family.css',
+  '/assets/css/landing.css',
   '/assets/js/config/firebase-config.js',
   '/assets/js/services/auth-service.js',
   '/assets/js/services/firestore-service.js',
   '/assets/js/services/storage-service.js',
+  '/assets/js/services/family-service.js',
   '/assets/js/utils/helpers.js',
   '/assets/js/utils/performance.js',
   '/assets/js/utils/error-handler.js',
   '/assets/js/components/loading.js',
   '/assets/js/components/toast.js',
+  '/assets/js/pages/family.js',
+  '/assets/js/pages/family-modals.js',
   '/logo.png',
   '/favicon.ico',
   '/android-chrome-192x192.png',
@@ -109,6 +118,51 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Network-first strategy for JavaScript files (cache busting)
+  if (url.pathname.endsWith('.js')) {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          if (response && response.status === 200) {
+            const responseToCache = response.clone();
+            caches.open(RUNTIME_CACHE).then((cache) => {
+              cache.put(request, responseToCache);
+            });
+          }
+          return response;
+        })
+        .catch(() => {
+          // Fallback to cache if network fails
+          return caches.match(request);
+        })
+    );
+    return;
+  }
+
+  // Network-first strategy for HTML files (cache busting)
+  if (url.pathname.endsWith('.html') || url.pathname === '/') {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          if (response && response.status === 200) {
+            const responseToCache = response.clone();
+            caches.open(RUNTIME_CACHE).then((cache) => {
+              cache.put(request, responseToCache);
+            });
+          }
+          return response;
+        })
+        .catch(() => {
+          // Fallback to cache if network fails
+          return caches.match(request).then((cachedResponse) => {
+            return cachedResponse || caches.match('/offline.html');
+          });
+        })
+    );
+    return;
+  }
+
+  // Cache-first strategy for other assets (CSS, images, etc.)
   event.respondWith(
     caches.match(request)
       .then((cachedResponse) => {
