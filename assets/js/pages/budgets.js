@@ -2,6 +2,7 @@
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
 import categoriesService from '../services/categories-service.js';
+import familySwitcher from '../components/family-switcher.js';
 import toast from '../components/toast.js';
 import themeManager from '../utils/theme-manager.js';
 import { Validator } from '../utils/validation.js';
@@ -99,6 +100,12 @@ async function initPage() {
     userName.textContent = user.displayName || 'User';
     userEmail.textContent = user.email;
     
+    // Initialize family switcher
+    await familySwitcher.init();
+    
+    // Update subtitle based on context
+    updatePageContext();
+    
     // Set default month to current month
     const now = new Date();
     const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
@@ -115,6 +122,18 @@ async function initPage() {
     
     // Setup event listeners
     setupEventListeners();
+  }
+}
+
+// Update page context based on family switcher
+function updatePageContext() {
+  const context = familySwitcher.getCurrentContext();
+  const subtitle = document.getElementById('budgetsSubtitle');
+  
+  if (context.context === 'family' && context.group) {
+    subtitle.textContent = `Managing budgets for ${context.group.name}`;
+  } else {
+    subtitle.textContent = 'Set spending limits and track your budget';
   }
 }
 

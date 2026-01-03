@@ -3,22 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Rupiya Analytics - Visualize your financial data">
-  <title>Analytics - Rupiya</title>
+  <meta name="description" content="Rupiya Family Management - Manage your family groups">
+  <meta name="theme-color" content="#4A90E2">
+  <title>Family Management - Rupiya</title>
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json">
   
   <!-- Favicon -->
   <link rel="icon" href="assets/images/logo.png" type="image/png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   
   <!-- Stylesheets -->
   <link rel="stylesheet" href="assets/css/common.css">
   <link rel="stylesheet" href="assets/css/components.css">
   <link rel="stylesheet" href="assets/css/dark-mode.css">
   <link rel="stylesheet" href="assets/css/dashboard.css">
-  <link rel="stylesheet" href="assets/css/analytics.css">
   <link rel="stylesheet" href="assets/css/family.css">
-  
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
 </head>
 <body>
   <div class="dashboard-layout">
@@ -110,21 +111,17 @@
             <span class="nav-icon">📄</span>
             <span>Documents</span>
           </a>
-          <a href="analytics.html" class="nav-item active">
+          <a href="analytics.html" class="nav-item">
             <span class="nav-icon">📉</span>
             <span>Analytics</span>
+          </a>
+          <a href="family.html" class="nav-item active">
+            <span class="nav-icon">👨‍👩‍👧‍👦</span>
+            <span>Family</span>
           </a>
           <a href="profile.html" class="nav-item">
             <span class="nav-icon">⚙️</span>
             <span>Settings</span>
-          </a>
-        </div>
-
-        <div class="nav-section">
-          <div class="nav-section-title">Family</div>
-          <a href="family.html" class="nav-item">
-            <span class="nav-icon">👨‍👩‍👧‍👦</span>
-            <span>Family Groups</span>
           </a>
         </div>
       </nav>
@@ -161,128 +158,65 @@
         <div class="sidebar-logo">
           <img src="assets/images/logo.png" alt="Rupiya" style="height: 32px;">
         </div>
-        <div id="familySwitcherContainer"></div>
+        <div style="width: 24px;"></div>
       </div>
 
       <!-- Page Header -->
-      <div class="page-header">
+      <div class="family-page-header">
         <div>
-          <h1 class="page-title">Analytics</h1>
-          <p class="page-subtitle" id="analyticsSubtitle">Visualize your financial data</p>
+          <h1 class="page-title">Family Management</h1>
+          <p class="page-subtitle">Manage your family groups and members</p>
         </div>
-        <div class="page-actions">
-          <select class="form-select" id="periodFilter">
-            <option value="month">This Month</option>
-            <option value="quarter">This Quarter</option>
-            <option value="year">This Year</option>
-            <option value="all">All Time</option>
-          </select>
+        <button class="btn btn-primary" id="createFamilyBtnTop">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          </svg>
+          Create Family Group
+        </button>
+      </div>
+
+      <!-- Pending Invitations -->
+      <div id="invitationsSection" style="display: none;">
+        <div class="invitations-section">
+          <h2 class="section-title">📨 Pending Invitations</h2>
+          <div id="invitationsList"></div>
         </div>
       </div>
 
-      <!-- Analytics Summary Cards -->
-      <div class="analytics-summary" id="analyticsSummary">
-        <div class="summary-card">
-          <div class="summary-icon">💰</div>
-          <div class="summary-content">
-            <div class="summary-label">Total Income</div>
-            <div class="summary-value" id="totalIncome">₹0</div>
-          </div>
-        </div>
-        <div class="summary-card">
-          <div class="summary-icon">💸</div>
-          <div class="summary-content">
-            <div class="summary-label">Total Expenses</div>
-            <div class="summary-value" id="totalExpenses">₹0</div>
-          </div>
-        </div>
-        <div class="summary-card">
-          <div class="summary-icon">💵</div>
-          <div class="summary-content">
-            <div class="summary-label">Net Savings</div>
-            <div class="summary-value" id="netSavings">₹0</div>
-            <div class="summary-change" id="savingsRate">0%</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Charts Grid -->
-      <div class="charts-grid">
-        <!-- Expense by Category Chart -->
-        <div class="chart-card">
-          <div class="chart-header">
-            <h3 class="chart-title">Expenses by Category</h3>
-          </div>
-          <div class="chart-container">
-            <canvas id="expenseByCategoryChart"></canvas>
-          </div>
+      <!-- Family Groups -->
+      <div class="family-groups-section">
+        <h2 class="section-title">👨‍👩‍👧‍👦 Your Family Groups</h2>
+        <div id="familyGroupsList" class="family-groups-grid">
+          <!-- Family groups will be loaded here -->
         </div>
 
-        <!-- Income vs Expenses Chart -->
-        <div class="chart-card">
-          <div class="chart-header">
-            <h3 class="chart-title">Income vs Expenses</h3>
-          </div>
-          <div class="chart-container">
-            <canvas id="incomeVsExpensesChart"></canvas>
-          </div>
+        <!-- Empty State -->
+        <div id="emptyState" class="empty-state" style="display: none;">
+          <div class="empty-state-icon">👨‍👩‍👧‍👦</div>
+          <h3 class="empty-state-title">No family groups yet</h3>
+          <p class="empty-state-text">Create a family group to track finances together with your family members, roommates, or partner.</p>
+          <button class="btn btn-primary" onclick="document.getElementById('createFamilyBtnTop').click()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Create Your First Group
+          </button>
         </div>
 
-        <!-- Monthly Trend Chart -->
-        <div class="chart-card chart-card-full">
-          <div class="chart-header">
-            <h3 class="chart-title">Monthly Trend</h3>
-          </div>
-          <div class="chart-container">
-            <canvas id="monthlyTrendChart"></canvas>
-          </div>
+        <!-- Loading State -->
+        <div id="loadingState" class="loading-state">
+          <div class="spinner-lg"></div>
+          <p>Loading family groups...</p>
         </div>
-
-        <!-- Top Categories Table -->
-        <div class="chart-card chart-card-full">
-          <div class="chart-header">
-            <h3 class="chart-title">Top Spending Categories</h3>
-          </div>
-          <div class="table-container">
-            <table class="analytics-table">
-              <thead>
-                <tr>
-                  <th>Category</th>
-                  <th>Amount</th>
-                  <th>Percentage</th>
-                  <th>Transactions</th>
-                </tr>
-              </thead>
-              <tbody id="topCategoriesTable">
-                <tr>
-                  <td colspan="4" class="text-center">Loading...</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- Loading State -->
-      <div id="loadingState" class="loading-state" style="display: none;">
-        <div class="spinner-lg"></div>
-        <p>Loading analytics...</p>
       </div>
     </main>
   </div>
 
-  <!-- Family Modals -->
-  <script>
-    fetch('family-modals.html')
-      .then(response => response.text())
-      .then(html => {
-        const div = document.createElement('div');
-        div.innerHTML = html;
-        document.body.appendChild(div);
-      });
-  </script>
+  <!-- Include Family Modals -->
+  <script src="family-modals.html" type="text/html"></script>
 
   <!-- Scripts -->
-  <script type="module" src="assets/js/pages/analytics.js"></script>
+  <script type="module" src="assets/js/pages/family.js"></script>
+  <script src="assets/js/pwa-setup.js"></script>
 </body>
 </html>

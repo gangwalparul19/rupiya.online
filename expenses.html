@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="assets/css/dark-mode.css">
   <link rel="stylesheet" href="assets/css/dashboard.css">
   <link rel="stylesheet" href="assets/css/expenses.css">
+  <link rel="stylesheet" href="assets/css/family.css">
 </head>
 <body>
   <div class="dashboard-layout">
@@ -115,6 +116,14 @@
             <span>Settings</span>
           </a>
         </div>
+
+        <div class="nav-section">
+          <div class="nav-section-title">Family</div>
+          <a href="family.html" class="nav-item">
+            <span class="nav-icon">👨‍👩‍👧‍👦</span>
+            <span>Family Groups</span>
+          </a>
+        </div>
       </nav>
 
       <div class="sidebar-footer">
@@ -149,14 +158,15 @@
         <div class="sidebar-logo">
           <img src="assets/images/logo.png" alt="Rupiya" style="height: 32px;">
         </div>
-        <div style="width: 24px;"></div>
+        <!-- Family Switcher -->
+        <div id="familySwitcherContainer"></div>
       </div>
 
       <!-- Page Header -->
       <div class="page-header">
         <div>
           <h1 class="page-title">Expenses</h1>
-          <p class="page-subtitle">Track and manage your spending</p>
+          <p class="page-subtitle" id="expensesSubtitle">Track and manage your spending</p>
         </div>
         <div class="page-actions">
           <button class="btn btn-outline" id="exportBtn">
@@ -309,6 +319,22 @@
               <input type="text" id="description" maxlength="200" placeholder="Enter description">
               <span class="error-message" id="descriptionError"></span>
             </div>
+
+            <!-- Family Context: Personal/Shared Option -->
+            <div class="form-group form-group-full" id="expenseTypeGroup" style="display: none;">
+              <label>Expense Type</label>
+              <div class="radio-group">
+                <label class="radio-option">
+                  <input type="radio" name="expenseType" value="personal" checked>
+                  <span>👤 Personal (Only you can see)</span>
+                </label>
+                <label class="radio-option">
+                  <input type="radio" name="expenseType" value="shared">
+                  <span>👨‍👩‍👧‍👦 Shared (Visible to family)</span>
+                </label>
+              </div>
+              <small class="form-help">Choose whether this expense is personal or shared with your family group</small>
+            </div>
           </div>
 
           <div class="form-actions">
@@ -398,6 +424,18 @@
       </div>
     </div>
   </div>
+
+  <!-- Family Modals -->
+  <script>
+    // Load family modals
+    fetch('family-modals.html')
+      .then(response => response.text())
+      .then(html => {
+        const div = document.createElement('div');
+        div.innerHTML = html;
+        document.body.appendChild(div);
+      });
+  </script>
 
   <!-- Scripts -->
   <script type="module" src="assets/js/pages/expenses.js"></script>

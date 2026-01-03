@@ -823,3 +823,60 @@
     max-width: 300px;
   }
 }
+
+/* Radio Group for Personal/Shared Selection */
+.radio-group {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--bg-card);
+  border: 2px solid var(--border-color);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex: 1;
+}
+
+.radio-option:hover {
+  border-color: var(--primary-blue);
+  background: var(--bg-hover);
+}
+
+.radio-option input[type="radio"] {
+  margin: 0;
+  cursor: pointer;
+}
+
+.radio-option input[type="radio"]:checked + span,
+.radio-option:has(input[type="radio"]:checked) {
+  font-weight: 600;
+  color: var(--primary-blue);
+}
+
+.radio-option:has(input[type="radio"]:checked) {
+  border-color: var(--primary-blue);
+  background: rgba(74, 144, 226, 0.1);
+}
+
+.radio-option span {
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+}
+
+@media (max-width: 480px) {
+  .radio-group {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .radio-option {
+    padding: 0.5rem 0.75rem;
+  }
+}

@@ -19,6 +19,7 @@
   <link rel="stylesheet" href="assets/css/components.css">
   <link rel="stylesheet" href="assets/css/dark-mode.css">
   <link rel="stylesheet" href="assets/css/dashboard.css">
+  <link rel="stylesheet" href="assets/css/family.css">
   
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
@@ -122,6 +123,14 @@
             <span>Settings</span>
           </a>
         </div>
+
+        <div class="nav-section">
+          <div class="nav-section-title">Family</div>
+          <a href="family.html" class="nav-item">
+            <span class="nav-icon">👨‍👩‍👧‍👦</span>
+            <span>Family Groups</span>
+          </a>
+        </div>
       </nav>
 
       <div class="sidebar-footer">
@@ -157,6 +166,8 @@
           <img src="assets/images/logo.png" alt="Rupiya" style="height: 32px;">
         </div>
         <div class="mobile-header-actions">
+          <!-- Family Switcher -->
+          <div id="familySwitcherContainer"></div>
           <button class="pwa-install-btn" id="dashboardInstallBtn" style="display: none;" title="Install App">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
@@ -185,8 +196,10 @@
       <div class="dashboard-header">
         <div>
           <h1 class="dashboard-title">Dashboard</h1>
-          <p class="dashboard-subtitle">Welcome back! Here's your financial overview.</p>
+          <p class="dashboard-subtitle" id="dashboardSubtitle">Welcome back! Here's your financial overview.</p>
         </div>
+        <!-- Desktop Family Switcher -->
+        <div id="familySwitcherContainerDesktop" style="display: none;"></div>
       </div>
 
       <!-- KPI Cards -->
@@ -305,6 +318,18 @@
       </div>
     </main>
   </div>
+
+  <!-- Family Modals -->
+  <script>
+    // Load family modals
+    fetch('family-modals.html')
+      .then(response => response.text())
+      .then(html => {
+        const div = document.createElement('div');
+        div.innerHTML = html;
+        document.body.appendChild(div);
+      });
+  </script>
 
   <!-- Scripts -->
   <script type="module" src="assets/js/pages/dashboard.js"></script>

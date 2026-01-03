@@ -1,6 +1,7 @@
 // Analytics Page Logic
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
+import familySwitcher from '../components/family-switcher.js';
 import toast from '../components/toast.js';
 import themeManager from '../utils/theme-manager.js';
 import { formatCurrency } from '../utils/helpers.js';
@@ -30,6 +31,12 @@ async function init() {
   // Initialize DOM elements
   initDOMElements();
 
+  // Initialize family switcher
+  await familySwitcher.init();
+  
+  // Update subtitle based on context
+  updatePageContext();
+
   // Set up event listeners
   setupEventListeners();
 
@@ -38,6 +45,18 @@ async function init() {
 
   // Load data and render charts
   await loadData();
+}
+
+// Update page context based on family switcher
+function updatePageContext() {
+  const context = familySwitcher.getCurrentContext();
+  const subtitle = document.getElementById('analyticsSubtitle');
+  
+  if (subtitle && context.context === 'family' && context.group) {
+    subtitle.textContent = `Analyzing data for ${context.group.name}`;
+  } else if (subtitle) {
+    subtitle.textContent = 'Visualize your financial data';
+  }
 }
 
 // Initialize DOM elements

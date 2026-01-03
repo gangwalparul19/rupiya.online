@@ -1,6 +1,7 @@
 // Investments Page Logic
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
+import familySwitcher from '../components/family-switcher.js';
 import toast from '../components/toast.js';
 import themeManager from '../utils/theme-manager.js';
 import { formatCurrency, formatDate } from '../utils/helpers.js';
@@ -33,6 +34,12 @@ async function init() {
   // Initialize DOM elements
   initDOMElements();
 
+  // Initialize family switcher
+  await familySwitcher.init();
+  
+  // Update subtitle based on context
+  updatePageContext();
+
   // Set up event listeners
   setupEventListeners();
 
@@ -46,6 +53,18 @@ async function init() {
   const purchaseDateInput = document.getElementById('purchaseDate');
   if (purchaseDateInput) {
     purchaseDateInput.valueAsDate = new Date();
+  }
+}
+
+// Update page context based on family switcher
+function updatePageContext() {
+  const context = familySwitcher.getCurrentContext();
+  const subtitle = document.getElementById('investmentsSubtitle');
+  
+  if (subtitle && context.context === 'family' && context.group) {
+    subtitle.textContent = `Tracking investments for ${context.group.name}`;
+  } else if (subtitle) {
+    subtitle.textContent = 'Track your investment portfolio';
   }
 }
 

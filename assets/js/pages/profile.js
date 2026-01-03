@@ -2,6 +2,7 @@
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
 import categoriesService from '../services/categories-service.js';
+import familySwitcher from '../components/family-switcher.js';
 import toast from '../components/toast.js';
 import themeManager from '../utils/theme-manager.js';
 import { updateProfile, updatePassword, EmailAuthProvider, reauthenticateWithCredential, deleteUser } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
@@ -33,6 +34,10 @@ async function init() {
   }
 
   initDOMElements();
+  
+  // Initialize family switcher
+  await familySwitcher.init();
+  
   setupEventListeners();
   loadUserProfile(currentUser);
   await loadUserPreferences();

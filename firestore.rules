@@ -49,8 +49,16 @@ service cloud.firestore {
     // EXPENSES
     // ============================================
     match /expenses/{expenseId} {
-      // Users can only access their own expenses
-      allow read: if belongsToUser();
+      // Helper function to check if user is in the same family group
+      function isFamilyMember() {
+        return isAuthenticated() && 
+               resource.data.familyGroupId != null &&
+               exists(/databases/$(database)/documents/familyGroups/$(resource.data.familyGroupId)) &&
+               request.auth.uid in get(/databases/$(database)/documents/familyGroups/$(resource.data.familyGroupId)).data.members[].userId;
+      }
+      
+      // Users can read their own expenses OR family members' expenses
+      allow read: if belongsToUser() || isFamilyMember();
       allow create: if isAuthenticated() && hasValidUserId();
       allow update: if belongsToUser() && userIdNotChanged();
       allow delete: if belongsToUser();
@@ -60,8 +68,16 @@ service cloud.firestore {
     // INCOME
     // ============================================
     match /income/{incomeId} {
-      // Users can only access their own income records
-      allow read: if belongsToUser();
+      // Helper function to check if user is in the same family group
+      function isFamilyMember() {
+        return isAuthenticated() && 
+               resource.data.familyGroupId != null &&
+               exists(/databases/$(database)/documents/familyGroups/$(resource.data.familyGroupId)) &&
+               request.auth.uid in get(/databases/$(database)/documents/familyGroups/$(resource.data.familyGroupId)).data.members[].userId;
+      }
+      
+      // Users can read their own income OR family members' income
+      allow read: if belongsToUser() || isFamilyMember();
       allow create: if isAuthenticated() && hasValidUserId();
       allow update: if belongsToUser() && userIdNotChanged();
       allow delete: if belongsToUser();
@@ -244,6 +260,71 @@ service cloud.firestore {
       allow create: if isAuthenticated() && hasValidUserId();
       allow update: if belongsToUser() && userIdNotChanged();
       allow delete: if belongsToUser();
+    }
+    
+    // ============================================
+    // FAMILY GROUPS
+    // ============================================
+    match /familyGroups/{groupId} {
+      // Helper function to check if user is a member of the group
+      function isMember() {
+        return isAuthenticated() && 
+               request.auth.uid in resource.data.members[].userId;
+      }
+      
+      // Helper function to check if user is admin of the group
+      function isAdmin() {
+        return isAuthenticated() && 
+               exists(/databases/$(database)/documents/familyGroups/$(groupId)) &&
+               get(/databases/$(database)/documents/familyGroups/$(groupId)).data.members
+                 .hasAny([{'userId': request.auth.uid, 'role': 'admin'}]);
+      }
+      
+      // Helper function to check if user is the creator
+      function isCreator() {
+        return isAuthenticated() && resource.data.createdBy == request.auth.uid;
+      }
+      
+      // Read: Only members can read
+      allow read: if isMember();
+      
+      // Create: Any authenticated user can create
+      allow create: if isAuthenticated() && 
+                       request.resource.data.createdBy == request.auth.uid;
+      
+      // Update: Only admins can update
+      allow update: if isAdmin();
+      
+      // Delete: Only creator can delete
+      allow delete: if isCreator();
+    }
+    
+    // ============================================
+    // FAMILY INVITATIONS
+    // ============================================
+    match /familyInvitations/{invitationId} {
+      // Helper function to check if user sent the invitation
+      function isSender() {
+        return isAuthenticated() && resource.data.invitedBy == request.auth.uid;
+      }
+      
+      // Helper function to check if invitation is for current user
+      function isRecipient() {
+        return isAuthenticated() && resource.data.invitedEmail == request.auth.token.email;
+      }
+      
+      // Read: Sender or recipient can read
+      allow read: if isSender() || isRecipient();
+      
+      // Create: Authenticated users can create invitations
+      allow create: if isAuthenticated() && 
+                       request.resource.data.invitedBy == request.auth.uid;
+      
+      // Update: Only recipient can update (to accept/decline)
+      allow update: if isRecipient();
+      
+      // Delete: Sender can delete
+      allow delete: if isSender();
     }
     
     // ============================================

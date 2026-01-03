@@ -2,6 +2,7 @@
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
 import categoriesService from '../services/categories-service.js';
+import familySwitcher from '../components/family-switcher.js';
 import toast from '../components/toast.js';
 import themeManager from '../utils/theme-manager.js';
 import { Validator } from '../utils/validation.js';
@@ -128,6 +129,12 @@ async function initPage() {
     userName.textContent = user.displayName || 'User';
     userEmail.textContent = user.email;
     
+    // Initialize family switcher
+    await familySwitcher.init();
+    
+    // Update subtitle based on context
+    updatePageContext();
+    
     // Initialize categories
     await categoriesService.initializeCategories();
     
@@ -145,6 +152,27 @@ async function initPage() {
     
     // Setup event listeners
     setupEventListeners();
+  }
+}
+
+// Update page context based on family switcher
+function updatePageContext() {
+  const context = familySwitcher.getCurrentContext();
+  const subtitle = document.getElementById('expensesSubtitle');
+  const expenseTypeGroup = document.getElementById('expenseTypeGroup');
+  
+  if (context.context === 'family' && context.group) {
+    subtitle.textContent = `Tracking expenses for ${context.group.name}`;
+    // Show personal/shared option in form
+    if (expenseTypeGroup) {
+      expenseTypeGroup.style.display = 'block';
+    }
+  } else {
+    subtitle.textContent = 'Track and manage your spending';
+    // Hide personal/shared option
+    if (expenseTypeGroup) {
+      expenseTypeGroup.style.display = 'none';
+    }
   }
 }
 
@@ -728,6 +756,22 @@ async function handleFormSubmit(e) {
       specificPaymentMethodName: specificPaymentMethodInput.value ? 
         specificPaymentMethodInput.options[specificPaymentMethodInput.selectedIndex].text : null
     };
+    
+    // Add family context if in family mode
+    const context = familySwitcher.getCurrentContext();
+    if (context.context === 'family' && context.groupId) {
+      expenseData.familyGroupId = context.groupId;
+      
+      // Check if expense is personal or shared
+      const expenseTypeRadio = document.querySelector('input[name="expenseType"]:checked');
+      if (expenseTypeRadio) {
+        expenseData.expenseType = expenseTypeRadio.value; // 'personal' or 'shared'
+        expenseData.isShared = expenseTypeRadio.value === 'shared';
+      } else {
+        expenseData.expenseType = 'personal';
+        expenseData.isShared = false;
+      }
+    }
     
     // Add linked data if present
     if (expenseForm.dataset.linkedType) {

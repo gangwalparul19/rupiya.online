@@ -2,6 +2,7 @@
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
 import AIInsightsEngine from '../utils/ai-insights-engine.js';
+import familySwitcher from '../components/family-switcher.js';
 import toast from '../components/toast.js';
 import themeManager from '../utils/theme-manager.js';
 import { formatCurrency } from '../utils/helpers.js';
@@ -55,11 +56,29 @@ async function initPage() {
     userName.textContent = user.displayName || 'User';
     userEmail.textContent = user.email;
     
+    // Initialize family switcher
+    await familySwitcher.init();
+    
+    // Update subtitle based on context
+    updatePageContext();
+    
     // Setup event listeners
     setupEventListeners();
     
     // Load insights
     await loadInsights();
+  }
+}
+
+// Update page context based on family switcher
+function updatePageContext() {
+  const context = familySwitcher.getCurrentContext();
+  const subtitle = document.getElementById('aiInsightsSubtitle');
+  
+  if (subtitle && context.context === 'family' && context.group) {
+    subtitle.textContent = `AI insights for ${context.group.name}`;
+  } else if (subtitle) {
+    subtitle.textContent = 'Smart recommendations powered by AI';
   }
 }
 

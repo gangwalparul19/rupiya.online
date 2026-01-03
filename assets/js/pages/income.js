@@ -2,6 +2,7 @@
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
 import categoriesService from '../services/categories-service.js';
+import familySwitcher from '../components/family-switcher.js';
 import toast from '../components/toast.js';
 import themeManager from '../utils/theme-manager.js';
 import { Validator } from '../utils/validation.js';
@@ -128,6 +129,12 @@ async function initPage() {
     userName.textContent = user.displayName || 'User';
     userEmail.textContent = user.email;
     
+    // Initialize family switcher
+    await familySwitcher.init();
+    
+    // Update subtitle based on context
+    updatePageContext();
+    
     // Initialize categories
     await categoriesService.initializeCategories();
     
@@ -145,6 +152,27 @@ async function initPage() {
     
     // Setup event listeners
     setupEventListeners();
+  }
+}
+
+// Update page context based on family switcher
+function updatePageContext() {
+  const context = familySwitcher.getCurrentContext();
+  const subtitle = document.getElementById('incomeSubtitle');
+  const incomeTypeGroup = document.getElementById('incomeTypeGroup');
+  
+  if (context.context === 'family' && context.group) {
+    subtitle.textContent = `Tracking income for ${context.group.name}`;
+    // Show personal/shared option in form
+    if (incomeTypeGroup) {
+      incomeTypeGroup.style.display = 'block';
+    }
+  } else {
+    subtitle.textContent = 'Track and manage your earnings';
+    // Hide personal/shared option
+    if (incomeTypeGroup) {
+      incomeTypeGroup.style.display = 'none';
+    }
   }
 }
 
@@ -728,6 +756,22 @@ async function handleFormSubmit(e) {
       specificPaymentMethodName: specificPaymentMethodInput.value ? 
         specificPaymentMethodInput.options[specificPaymentMethodInput.selectedIndex].text : null
     };
+    
+    // Add family context if in family mode
+    const context = familySwitcher.getCurrentContext();
+    if (context.context === 'family' && context.groupId) {
+      incomeData.familyGroupId = context.groupId;
+      
+      // Check if income is personal or shared
+      const incomeTypeRadio = document.querySelector('input[name="incomeType"]:checked');
+      if (incomeTypeRadio) {
+        incomeData.incomeType = incomeTypeRadio.value; // 'personal' or 'shared'
+        incomeData.isShared = incomeTypeRadio.value === 'shared';
+      } else {
+        incomeData.incomeType = 'personal';
+        incomeData.isShared = false;
+      }
+    }
     
     // Add linked data if present
     if (incomeForm.dataset.linkedType) {

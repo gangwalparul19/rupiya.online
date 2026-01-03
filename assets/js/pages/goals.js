@@ -1,6 +1,7 @@
 // Goals Page Logic
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
+import familySwitcher from '../components/family-switcher.js';
 import toast from '../components/toast.js';
 import themeManager from '../utils/theme-manager.js';
 import { Validator } from '../utils/validation.js';
@@ -112,6 +113,12 @@ async function initPage() {
     userName.textContent = user.displayName || 'User';
     userEmail.textContent = user.email;
     
+    // Initialize family switcher
+    await familySwitcher.init();
+    
+    // Update subtitle based on context
+    updatePageContext();
+    
     // Set default target date to 1 year from now
     const oneYearFromNow = new Date();
     oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
@@ -125,6 +132,18 @@ async function initPage() {
     
     // Setup event listeners
     setupEventListeners();
+  }
+}
+
+// Update page context based on family switcher
+function updatePageContext() {
+  const context = familySwitcher.getCurrentContext();
+  const subtitle = document.getElementById('goalsSubtitle');
+  
+  if (subtitle && context.context === 'family' && context.group) {
+    subtitle.textContent = `Tracking goals for ${context.group.name}`;
+  } else if (subtitle) {
+    subtitle.textContent = 'Set and track your financial goals';
   }
 }
 
