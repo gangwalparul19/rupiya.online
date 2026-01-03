@@ -216,10 +216,18 @@ async function loadSourceDropdowns() {
 // Check URL parameters for pre-filled data
 function checkURLParameters() {
   const urlParams = new URLSearchParams(window.location.search);
+  const action = urlParams.get('action');
   const linkedType = urlParams.get('linkedType');
   const linkedId = urlParams.get('linkedId');
   const linkedName = urlParams.get('linkedName');
   const source = urlParams.get('source');
+  
+  // Check if action=add to open form automatically
+  if (action === 'add') {
+    setTimeout(() => {
+      openAddForm();
+    }, 100);
+  }
   
   if (linkedType && linkedId && linkedName) {
     // Open add form with pre-filled data

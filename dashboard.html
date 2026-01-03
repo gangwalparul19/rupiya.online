@@ -209,8 +209,23 @@
           <h1 class="dashboard-title">Dashboard</h1>
           <p class="dashboard-subtitle" id="dashboardSubtitle">Welcome back! Here's your financial overview.</p>
         </div>
-        <!-- Desktop Family Switcher -->
-        <div id="familySwitcherContainerDesktop" style="display: none;"></div>
+        <div class="dashboard-header-actions">
+          <!-- Quick Add Buttons -->
+          <a href="expenses.html?action=add" class="quick-add-btn expense" title="Add Expense">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            <span>Expense</span>
+          </a>
+          <a href="income.html?action=add" class="quick-add-btn income" title="Add Income">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            <span>Income</span>
+          </a>
+          <!-- Desktop Family Switcher -->
+          <div id="familySwitcherContainerDesktop" style="display: none;"></div>
+        </div>
       </div>
 
       <!-- PWA Install Banner -->

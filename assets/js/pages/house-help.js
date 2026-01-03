@@ -10,6 +10,7 @@ import { formatCurrency, formatDate } from '../utils/helpers.js';
 const showToast = (message, type) => toast.show(message, type);
 
 let staff = [];
+let staffPayments = {}; // Store payments by staff ID
 let editingHelpId = null;
 
 let addHelpBtn, addHelpSection, closeFormBtn, cancelFormBtn;
@@ -19,6 +20,20 @@ let totalStaffEl, monthlySalaryEl, monthlyPaidEl;
 let deleteModal, closeDeleteModalBtn, cancelDeleteBtn, confirmDeleteBtn;
 let deleteBtnText, deleteBtnSpinner, deleteHelpName, deleteHelpRole;
 let deleteHelpId = null;
+
+// Payment modal elements
+let paymentModal, closePaymentModalBtn, cancelPaymentBtn, savePaymentBtn;
+let savePaymentBtnText, savePaymentBtnSpinner;
+let paymentStaffName, paymentStaffRole, paymentMonthlySalary;
+let paymentPaidThisMonth, paymentRemaining;
+let paymentForm, paymentAmount, paymentDate, paymentNote;
+let paymentHistoryList, noPaymentHistory;
+let currentPaymentStaffId = null;
+
+// Delete payment modal elements
+let deletePaymentModal, closeDeletePaymentModalBtn, cancelDeletePaymentBtn, confirmDeletePaymentBtn;
+let deletePaymentBtnText, deletePaymentBtnSpinner, deletePaymentAmount, deletePaymentDate;
+let deletePaymentId = null;
 
 async function init() {
   const user = await authService.waitForAuth();
@@ -63,6 +78,35 @@ function initDOMElements() {
   deleteBtnSpinner = document.getElementById('deleteBtnSpinner');
   deleteHelpName = document.getElementById('deleteHelpName');
   deleteHelpRole = document.getElementById('deleteHelpRole');
+
+  // Payment modal elements
+  paymentModal = document.getElementById('paymentModal');
+  closePaymentModalBtn = document.getElementById('closePaymentModalBtn');
+  cancelPaymentBtn = document.getElementById('cancelPaymentBtn');
+  savePaymentBtn = document.getElementById('savePaymentBtn');
+  savePaymentBtnText = document.getElementById('savePaymentBtnText');
+  savePaymentBtnSpinner = document.getElementById('savePaymentBtnSpinner');
+  paymentStaffName = document.getElementById('paymentStaffName');
+  paymentStaffRole = document.getElementById('paymentStaffRole');
+  paymentMonthlySalary = document.getElementById('paymentMonthlySalary');
+  paymentPaidThisMonth = document.getElementById('paymentPaidThisMonth');
+  paymentRemaining = document.getElementById('paymentRemaining');
+  paymentForm = document.getElementById('paymentForm');
+  paymentAmount = document.getElementById('paymentAmount');
+  paymentDate = document.getElementById('paymentDate');
+  paymentNote = document.getElementById('paymentNote');
+  paymentHistoryList = document.getElementById('paymentHistoryList');
+  noPaymentHistory = document.getElementById('noPaymentHistory');
+
+  // Delete payment modal elements
+  deletePaymentModal = document.getElementById('deletePaymentModal');
+  closeDeletePaymentModalBtn = document.getElementById('closeDeletePaymentModalBtn');
+  cancelDeletePaymentBtn = document.getElementById('cancelDeletePaymentBtn');
+  confirmDeletePaymentBtn = document.getElementById('confirmDeletePaymentBtn');
+  deletePaymentBtnText = document.getElementById('deletePaymentBtnText');
+  deletePaymentBtnSpinner = document.getElementById('deletePaymentBtnSpinner');
+  deletePaymentAmount = document.getElementById('deletePaymentAmount');
+  deletePaymentDate = document.getElementById('deletePaymentDate');
 }
 
 function setupEventListeners() {
@@ -94,6 +138,16 @@ function setupEventListeners() {
   closeDeleteModalBtn.addEventListener('click', hideDeleteModal);
   cancelDeleteBtn.addEventListener('click', hideDeleteModal);
   confirmDeleteBtn.addEventListener('click', handleDelete);
+
+  // Payment modal event listeners
+  closePaymentModalBtn?.addEventListener('click', hidePaymentModal);
+  cancelPaymentBtn?.addEventListener('click', hidePaymentModal);
+  savePaymentBtn?.addEventListener('click', handleSavePayment);
+
+  // Delete payment modal event listeners
+  closeDeletePaymentModalBtn?.addEventListener('click', hideDeletePaymentModal);
+  cancelDeletePaymentBtn?.addEventListener('click', hideDeletePaymentModal);
+  confirmDeletePaymentBtn?.addEventListener('click', handleDeletePayment);
 }
 
 function loadUserProfile(user) {
@@ -206,7 +260,13 @@ async function loadStaff() {
   emptyState.style.display = 'none';
 
   try {
-    staff = await firestoreService.getAll('houseHelps', 'createdAt', 'desc');
+    // Load staff and payments in parallel
+    const [staffData] = await Promise.all([
+      firestoreService.getAll('houseHelps', 'createdAt', 'desc'),
+      loadAllPayments()
+    ]);
+    
+    staff = staffData;
     
     if (staff.length === 0) {
       emptyState.style.display = 'block';
@@ -228,6 +288,10 @@ function renderStaff() {
   helpList.innerHTML = staff.map(help => {
     const statusClass = help.status === 'Active' ? 'active' : 'inactive';
     const joinDuration = calculateDuration(help.joinDate);
+    const payments = staffPayments[help.id] || [];
+    const paidThisMonth = calculatePaidThisMonth(payments);
+    const monthlySalary = parseFloat(help.monthlySalary) || 0;
+    const remaining = Math.max(0, monthlySalary - paidThisMonth);
 
     return `
       <div class="help-card">
@@ -246,6 +310,11 @@ function renderStaff() {
             ` : ''}
           </div>
           <div class="help-actions">
+            <button class="btn-icon btn-payment" onclick="window.showPaymentModal('${help.id}')" title="Record Payment">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </button>
             <button class="btn-icon" onclick="window.editHelp('${help.id}')" title="Edit">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
@@ -273,7 +342,19 @@ function renderStaff() {
         <div class="help-card-footer">
           <div class="help-salary">
             <div class="help-salary-label">Monthly Salary</div>
-            <div class="help-salary-value">${formatCurrency(parseFloat(help.monthlySalary) || 0)}</div>
+            <div class="help-salary-value">${formatCurrency(monthlySalary)}</div>
+          </div>
+        </div>
+
+        <div class="help-payment-status">
+          <div class="payment-progress-bar">
+            <div class="payment-progress-fill" style="width: ${monthlySalary > 0 ? Math.min(100, (paidThisMonth / monthlySalary) * 100) : 0}%"></div>
+          </div>
+          <div class="payment-status-info">
+            <span class="payment-paid">Paid: ${formatCurrency(paidThisMonth)}</span>
+            <span class="payment-remaining ${remaining > 0 ? 'has-remaining' : 'fully-paid'}">
+              ${remaining > 0 ? `Remaining: ${formatCurrency(remaining)}` : '✓ Fully Paid'}
+            </span>
           </div>
         </div>
 
@@ -296,9 +377,278 @@ function updateSummary() {
       return sum + salary;
     }, 0);
 
+  // Calculate total paid this month across all staff
+  let totalPaidThisMonth = 0;
+  staff.forEach(help => {
+    const payments = staffPayments[help.id] || [];
+    totalPaidThisMonth += calculatePaidThisMonth(payments);
+  });
+
   totalStaffEl.textContent = totalStaff;
   monthlySalaryEl.textContent = formatCurrency(monthlySalary);
-  monthlyPaidEl.textContent = '₹0'; // Placeholder for future payment tracking
+  monthlyPaidEl.textContent = formatCurrency(totalPaidThisMonth);
+}
+
+function calculatePaidThisMonth(payments) {
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+
+  return payments
+    .filter(payment => {
+      const paymentDate = payment.date?.toDate ? payment.date.toDate() : new Date(payment.date);
+      return paymentDate.getMonth() === currentMonth && paymentDate.getFullYear() === currentYear;
+    })
+    .reduce((sum, payment) => sum + (parseFloat(payment.amount) || 0), 0);
+}
+
+function getThisMonthPayments(payments) {
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+
+  return payments.filter(payment => {
+    const paymentDate = payment.date?.toDate ? payment.date.toDate() : new Date(payment.date);
+    return paymentDate.getMonth() === currentMonth && paymentDate.getFullYear() === currentYear;
+  });
+}
+
+async function loadPaymentsForStaff(staffId) {
+  try {
+    const payments = await firestoreService.getAll('houseHelpPayments', 'date', 'desc');
+    return payments.filter(p => p.staffId === staffId);
+  } catch (error) {
+    console.error('Error loading payments:', error);
+    return [];
+  }
+}
+
+async function loadAllPayments() {
+  try {
+    const payments = await firestoreService.getAll('houseHelpPayments', 'date', 'desc');
+    // Group payments by staff ID
+    staffPayments = {};
+    payments.forEach(payment => {
+      if (!staffPayments[payment.staffId]) {
+        staffPayments[payment.staffId] = [];
+      }
+      staffPayments[payment.staffId].push(payment);
+    });
+  } catch (error) {
+    console.error('Error loading all payments:', error);
+    staffPayments = {};
+  }
+}
+
+async function showPaymentModal(staffId) {
+  const help = staff.find(h => h.id === staffId);
+  if (!help) return;
+
+  currentPaymentStaffId = staffId;
+  
+  // Set staff info
+  paymentStaffName.textContent = help.name;
+  paymentStaffRole.textContent = help.role;
+  
+  const monthlySalary = parseFloat(help.monthlySalary) || 0;
+  paymentMonthlySalary.textContent = formatCurrency(monthlySalary);
+  
+  // Load payments for this staff
+  const payments = await loadPaymentsForStaff(staffId);
+  staffPayments[staffId] = payments;
+  
+  const paidThisMonth = calculatePaidThisMonth(payments);
+  const remaining = Math.max(0, monthlySalary - paidThisMonth);
+  
+  paymentPaidThisMonth.textContent = formatCurrency(paidThisMonth);
+  paymentRemaining.textContent = formatCurrency(remaining);
+  
+  // Set default values
+  paymentAmount.value = remaining > 0 ? remaining : '';
+  paymentDate.valueAsDate = new Date();
+  paymentNote.value = '';
+  
+  // Render payment history
+  renderPaymentHistory(payments);
+  
+  paymentModal.classList.add('show');
+}
+
+function hidePaymentModal() {
+  paymentModal.classList.remove('show');
+  currentPaymentStaffId = null;
+  paymentForm.reset();
+}
+
+function renderPaymentHistory(payments) {
+  const thisMonthPayments = getThisMonthPayments(payments);
+  
+  if (thisMonthPayments.length === 0) {
+    paymentHistoryList.innerHTML = '';
+    noPaymentHistory.style.display = 'block';
+    return;
+  }
+  
+  noPaymentHistory.style.display = 'none';
+  paymentHistoryList.innerHTML = thisMonthPayments.map(payment => {
+    const paymentDate = payment.date?.toDate ? payment.date.toDate() : new Date(payment.date);
+    return `
+      <div class="payment-history-item">
+        <div class="payment-history-info">
+          <span class="payment-history-amount">${formatCurrency(parseFloat(payment.amount) || 0)}</span>
+          <span class="payment-history-date">${formatDate(paymentDate)}</span>
+          ${payment.note ? `<span class="payment-history-note">${payment.note}</span>` : ''}
+        </div>
+        <button class="btn-icon btn-danger btn-sm" onclick="window.showDeletePaymentConfirmation('${payment.id}')" title="Delete">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+          </svg>
+        </button>
+      </div>
+    `;
+  }).join('');
+}
+
+async function handleSavePayment() {
+  if (!currentPaymentStaffId) return;
+  
+  const amount = parseFloat(paymentAmount.value);
+  if (isNaN(amount) || amount <= 0) {
+    showToast('Please enter a valid amount', 'error');
+    return;
+  }
+  
+  if (!paymentDate.value) {
+    showToast('Please select a date', 'error');
+    return;
+  }
+  
+  savePaymentBtn.disabled = true;
+  savePaymentBtnText.style.display = 'none';
+  savePaymentBtnSpinner.style.display = 'inline-block';
+  
+  try {
+    const paymentData = {
+      staffId: currentPaymentStaffId,
+      amount: amount,
+      date: new Date(paymentDate.value),
+      note: paymentNote.value.trim()
+    };
+    
+    const result = await firestoreService.add('houseHelpPayments', paymentData);
+    
+    if (result.success) {
+      showToast('Payment recorded successfully', 'success');
+      
+      // Reload payments and refresh UI
+      await loadAllPayments();
+      
+      // Update the modal with new data
+      const help = staff.find(h => h.id === currentPaymentStaffId);
+      if (help) {
+        const payments = staffPayments[currentPaymentStaffId] || [];
+        const monthlySalary = parseFloat(help.monthlySalary) || 0;
+        const paidThisMonth = calculatePaidThisMonth(payments);
+        const remaining = Math.max(0, monthlySalary - paidThisMonth);
+        
+        paymentPaidThisMonth.textContent = formatCurrency(paidThisMonth);
+        paymentRemaining.textContent = formatCurrency(remaining);
+        
+        renderPaymentHistory(payments);
+      }
+      
+      // Clear form
+      paymentAmount.value = '';
+      paymentNote.value = '';
+      
+      // Refresh staff list
+      renderStaff();
+      updateSummary();
+    } else {
+      showToast(result.error || 'Failed to record payment', 'error');
+    }
+  } catch (error) {
+    console.error('Error saving payment:', error);
+    showToast('Failed to record payment', 'error');
+  } finally {
+    savePaymentBtn.disabled = false;
+    savePaymentBtnText.style.display = 'inline';
+    savePaymentBtnSpinner.style.display = 'none';
+  }
+}
+
+function showDeletePaymentConfirmation(paymentId) {
+  // Find the payment
+  let payment = null;
+  for (const staffId in staffPayments) {
+    const found = staffPayments[staffId].find(p => p.id === paymentId);
+    if (found) {
+      payment = found;
+      break;
+    }
+  }
+  
+  if (!payment) return;
+  
+  deletePaymentId = paymentId;
+  deletePaymentAmount.textContent = formatCurrency(parseFloat(payment.amount) || 0);
+  const paymentDateVal = payment.date?.toDate ? payment.date.toDate() : new Date(payment.date);
+  deletePaymentDate.textContent = formatDate(paymentDateVal);
+  deletePaymentModal.classList.add('show');
+}
+
+function hideDeletePaymentModal() {
+  deletePaymentModal.classList.remove('show');
+  deletePaymentId = null;
+}
+
+async function handleDeletePayment() {
+  if (!deletePaymentId) return;
+  
+  confirmDeletePaymentBtn.disabled = true;
+  deletePaymentBtnText.style.display = 'none';
+  deletePaymentBtnSpinner.style.display = 'inline-block';
+  
+  try {
+    const result = await firestoreService.delete('houseHelpPayments', deletePaymentId);
+    
+    if (result.success) {
+      showToast('Payment deleted successfully', 'success');
+      hideDeletePaymentModal();
+      
+      // Reload payments and refresh UI
+      await loadAllPayments();
+      
+      // Update the payment modal if it's open
+      if (currentPaymentStaffId) {
+        const help = staff.find(h => h.id === currentPaymentStaffId);
+        if (help) {
+          const payments = staffPayments[currentPaymentStaffId] || [];
+          const monthlySalary = parseFloat(help.monthlySalary) || 0;
+          const paidThisMonth = calculatePaidThisMonth(payments);
+          const remaining = Math.max(0, monthlySalary - paidThisMonth);
+          
+          paymentPaidThisMonth.textContent = formatCurrency(paidThisMonth);
+          paymentRemaining.textContent = formatCurrency(remaining);
+          
+          renderPaymentHistory(payments);
+        }
+      }
+      
+      // Refresh staff list
+      renderStaff();
+      updateSummary();
+    } else {
+      showToast(result.error || 'Failed to delete payment', 'error');
+    }
+  } catch (error) {
+    console.error('Error deleting payment:', error);
+    showToast('Failed to delete payment', 'error');
+  } finally {
+    confirmDeletePaymentBtn.disabled = false;
+    deletePaymentBtnText.style.display = 'inline';
+    deletePaymentBtnSpinner.style.display = 'none';
+  }
 }
 
 function calculateDuration(joinDate) {
@@ -393,6 +743,8 @@ function formatDateForInput(date) {
 
 window.editHelp = editHelp;
 window.showDeleteConfirmation = showDeleteConfirmation;
+window.showPaymentModal = showPaymentModal;
+window.showDeletePaymentConfirmation = showDeletePaymentConfirmation;
 
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', init);

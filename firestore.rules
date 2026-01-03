@@ -150,6 +150,17 @@ service cloud.firestore {
     }
     
     // ============================================
+    // HOUSE HELP PAYMENTS
+    // ============================================
+    match /houseHelpPayments/{paymentId} {
+      // Users can only access their own house help payment records
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && hasValidUserId();
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
+    }
+    
+    // ============================================
     // NOTES
     // ============================================
     match /notes/{noteId} {

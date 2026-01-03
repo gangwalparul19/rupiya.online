@@ -4,10 +4,8 @@
 const demoBtn = document.getElementById('tryDemoBtn');
 if (demoBtn) {
   demoBtn.addEventListener('click', () => {
-    // Enable demo mode
-    localStorage.setItem('rupiya_demo_mode', 'true');
-    // Redirect to dashboard
-    window.location.href = 'dashboard.html?demo=true';
+    // Redirect to demo page
+    window.location.href = 'demo.html';
   });
 }
 
@@ -241,15 +239,123 @@ function createFloatingShapes() {
 // Initialize on load
 document.addEventListener('DOMContentLoaded', () => {
   createFloatingShapes();
+  initTestimonialsCarousel();
 });
+
+// Testimonials Carousel
+function initTestimonialsCarousel() {
+  const track = document.getElementById('testimonialsTrack');
+  const prevBtn = document.getElementById('testimonialPrev');
+  const nextBtn = document.getElementById('testimonialNext');
+  const dotsContainer = document.getElementById('carouselDots');
+  
+  if (!track || !prevBtn || !nextBtn || !dotsContainer) return;
+  
+  const cards = track.querySelectorAll('.testimonial-card');
+  const totalCards = cards.length;
+  let currentIndex = 0;
+  let autoPlayInterval;
+  
+  // Create dots
+  for (let i = 0; i < totalCards; i++) {
+    const dot = document.createElement('button');
+    dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+    dot.setAttribute('aria-label', `Go to review ${i + 1}`);
+    dot.addEventListener('click', () => goToSlide(i));
+    dotsContainer.appendChild(dot);
+  }
+  
+  const dots = dotsContainer.querySelectorAll('.carousel-dot');
+  
+  function updateCarousel() {
+    track.style.transform = `translateX(-${currentIndex * 100}%)`;
+    
+    // Update dots
+    dots.forEach((dot, index) => {
+      dot.classList.toggle('active', index === currentIndex);
+    });
+  }
+  
+  function goToSlide(index) {
+    currentIndex = index;
+    updateCarousel();
+    resetAutoPlay();
+  }
+  
+  function nextSlide() {
+    currentIndex = (currentIndex + 1) % totalCards;
+    updateCarousel();
+  }
+  
+  function prevSlide() {
+    currentIndex = (currentIndex - 1 + totalCards) % totalCards;
+    updateCarousel();
+  }
+  
+  function startAutoPlay() {
+    autoPlayInterval = setInterval(nextSlide, 5000);
+  }
+  
+  function resetAutoPlay() {
+    clearInterval(autoPlayInterval);
+    startAutoPlay();
+  }
+  
+  // Event listeners
+  prevBtn.addEventListener('click', () => {
+    prevSlide();
+    resetAutoPlay();
+  });
+  
+  nextBtn.addEventListener('click', () => {
+    nextSlide();
+    resetAutoPlay();
+  });
+  
+  // Touch/swipe support
+  let touchStartX = 0;
+  let touchEndX = 0;
+  
+  track.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+  }, { passive: true });
+  
+  track.addEventListener('touchend', (e) => {
+    touchEndX = e.changedTouches[0].screenX;
+    handleSwipe();
+  }, { passive: true });
+  
+  function handleSwipe() {
+    const swipeThreshold = 50;
+    const diff = touchStartX - touchEndX;
+    
+    if (Math.abs(diff) > swipeThreshold) {
+      if (diff > 0) {
+        nextSlide();
+      } else {
+        prevSlide();
+      }
+      resetAutoPlay();
+    }
+  }
+  
+  // Pause on hover
+  track.addEventListener('mouseenter', () => {
+    clearInterval(autoPlayInterval);
+  });
+  
+  track.addEventListener('mouseleave', () => {
+    startAutoPlay();
+  });
+  
+  // Start auto-play
+  startAutoPlay();
+}
 
 
 // PWA Install functionality
 let deferredPrompt;
 const heroInstallBtn = document.getElementById('heroInstallBtn');
-const pwaInstallBanner = document.getElementById('pwaInstallBanner');
-const installAppBtn = document.getElementById('installAppBtn');
-const closePwaBanner = document.getElementById('closePwaBanner');
 
 // Detect device and browser
 function isIOS() {
@@ -271,9 +377,6 @@ if (isInStandaloneMode()) {
   console.log('App is already installed');
   if (heroInstallBtn) {
     heroInstallBtn.style.display = 'none';
-  }
-  if (pwaInstallBanner) {
-    pwaInstallBanner.style.display = 'none';
   }
 } else {
   // Show install button for all devices
@@ -303,11 +406,6 @@ if (isInStandaloneMode()) {
         Install App
       `;
     }
-  }
-  
-  // Show banner
-  if (pwaInstallBanner) {
-    pwaInstallBanner.style.display = 'block';
   }
   
   // Listen for beforeinstallprompt event (Android Chrome, Edge, etc.)
@@ -404,10 +502,6 @@ if (heroInstallBtn) {
         if (heroInstallBtn) {
           heroInstallBtn.style.display = 'none';
         }
-        // Hide the banner
-        if (pwaInstallBanner) {
-          pwaInstallBanner.style.display = 'none';
-        }
       }
       
       // Clear the deferredPrompt
@@ -420,69 +514,6 @@ if (heroInstallBtn) {
         // Desktop - show generic instructions
         alert('To install this app:\n\n1. Click the install icon in your browser\'s address bar\n2. Or check your browser menu for "Install" or "Add to Home Screen" option');
       }
-    }
-  });
-}
-
-// Handle install button click (banner button)
-if (installAppBtn) {
-  installAppBtn.addEventListener('click', async () => {
-    // iOS - show instructions
-    if (isIOS()) {
-      showIOSInstructions();
-      return;
-    }
-    
-    // Android/Desktop with beforeinstallprompt support
-    if (deferredPrompt) {
-      // Show the install prompt
-      deferredPrompt.prompt();
-      
-      // Wait for the user to respond to the prompt
-      const { outcome } = await deferredPrompt.userChoice;
-      
-      console.log(`User response to the install prompt: ${outcome}`);
-      
-      if (outcome === 'accepted') {
-        console.log('User accepted the install prompt');
-        // Hide the banner
-        if (pwaInstallBanner) {
-          pwaInstallBanner.style.display = 'none';
-        }
-        // Hide the install button
-        if (heroInstallBtn) {
-          heroInstallBtn.style.display = 'none';
-        }
-      }
-      
-      // Clear the deferredPrompt
-      deferredPrompt = null;
-    } else {
-      // Android without beforeinstallprompt - show instructions
-      if (isAndroid()) {
-        showAndroidInstructions();
-      } else {
-        // Desktop - show generic instructions
-        alert('To install this app:\n\n1. Click the install icon in your browser\'s address bar\n2. Or check your browser menu for "Install" or "Add to Home Screen" option');
-      }
-    }
-  });
-}
-
-// Handle close banner button
-if (closePwaBanner) {
-  closePwaBanner.addEventListener('click', () => {
-    if (pwaInstallBanner) {
-      pwaInstallBanner.style.display = 'none';
-    }
-  });
-}
-
-// Handle close banner button
-if (closePwaBanner) {
-  closePwaBanner.addEventListener('click', () => {
-    if (pwaInstallBanner) {
-      pwaInstallBanner.style.display = 'none';
     }
   });
 }
@@ -491,13 +522,9 @@ if (closePwaBanner) {
 window.addEventListener('appinstalled', () => {
   console.log('PWA was installed');
   
-  // Hide all install prompts
+  // Hide install button
   if (heroInstallBtn) {
     heroInstallBtn.style.display = 'none';
-  }
-  
-  if (pwaInstallBanner) {
-    pwaInstallBanner.style.display = 'none';
   }
   
   // Clear the deferredPrompt

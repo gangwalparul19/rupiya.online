@@ -31,7 +31,8 @@ class FirestoreService {
       categories: 'categories',
       wallets: 'wallets',
       recurring: 'recurringTransactions',
-      houseHelps: 'houseHelps'
+      houseHelps: 'houseHelps',
+      houseHelpPayments: 'houseHelpPayments'
     };
   }
 

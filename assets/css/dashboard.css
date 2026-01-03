@@ -158,6 +158,49 @@
   gap: var(--spacing-md);
 }
 
+.dashboard-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.quick-add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.quick-add-btn svg {
+  flex-shrink: 0;
+}
+
+.quick-add-btn.expense {
+  background: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
+  color: white;
+}
+
+.quick-add-btn.expense:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
+.quick-add-btn.income {
+  background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+  color: white;
+}
+
+.quick-add-btn.income:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
 .dashboard-title {
   font-size: var(--font-size-3xl);
   font-weight: 700;
@@ -453,6 +496,26 @@
     display: flex;
     align-items: center;
     gap: 8px;
+  }
+
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .dashboard-header-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .quick-add-btn {
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+
+  .quick-add-btn span {
+    display: inline;
   }
   
   .pwa-install-btn {
