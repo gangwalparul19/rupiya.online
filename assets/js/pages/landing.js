@@ -1,5 +1,4 @@
 // Landing Page Logic
-import pwaInstallManager from '../utils/pwa-install.js';
 
 // Scroll effect for navigation
 const nav = document.getElementById('landingNav');
@@ -231,42 +230,4 @@ function createFloatingShapes() {
 // Initialize on load
 document.addEventListener('DOMContentLoaded', () => {
   createFloatingShapes();
-  setupPWAInstall();
 });
-
-// Setup PWA Install functionality
-function setupPWAInstall() {
-  const installBtn = document.getElementById('installAppBtn');
-  const closeBanner = document.getElementById('closePwaBanner');
-  const installBanner = document.getElementById('pwaInstallBanner');
-
-  if (installBtn) {
-    installBtn.addEventListener('click', async () => {
-      const installed = await pwaInstallManager.promptInstall();
-      if (installed) {
-        // Hide banner after successful install
-        if (installBanner) {
-          installBanner.style.display = 'none';
-        }
-      }
-    });
-  }
-
-  if (closeBanner) {
-    closeBanner.addEventListener('click', () => {
-      if (installBanner) {
-        installBanner.style.display = 'none';
-        localStorage.setItem('pwa-banner-dismissed', Date.now().toString());
-      }
-    });
-  }
-
-  // Check if banner should be shown
-  const status = pwaInstallManager.getInstallStatus();
-  if (status.isStandalone || status.isInstalled) {
-    // App is already installed, hide banner
-    if (installBanner) {
-      installBanner.style.display = 'none';
-    }
-  }
-}
