@@ -10,6 +10,90 @@
   position: relative;
 }
 
+/* Animated Background */
+.landing-page::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 20%, rgba(118, 75, 162, 0.3) 0%, transparent 50%);
+  animation: backgroundPulse 15s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes backgroundPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+/* Floating Shapes */
+.floating-shapes {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.shape {
+  position: absolute;
+  opacity: 0.1;
+  animation: float 20s infinite ease-in-out;
+}
+
+.shape-1 {
+  width: 300px;
+  height: 300px;
+  background: linear-gradient(135deg, #fff, transparent);
+  border-radius: 50%;
+  top: 10%;
+  left: 10%;
+  animation-delay: 0s;
+}
+
+.shape-2 {
+  width: 200px;
+  height: 200px;
+  background: linear-gradient(135deg, #fff, transparent);
+  border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+  top: 60%;
+  right: 10%;
+  animation-delay: 5s;
+}
+
+.shape-3 {
+  width: 150px;
+  height: 150px;
+  background: linear-gradient(135deg, #fff, transparent);
+  border-radius: 50%;
+  bottom: 20%;
+  left: 50%;
+  animation-delay: 10s;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-30px) rotate(5deg);
+  }
+  50% {
+    transform: translateY(-60px) rotate(-5deg);
+  }
+  75% {
+    transform: translateY(-30px) rotate(3deg);
+  }
+}
+
 /* ============================================
    NAVIGATION
    ============================================ */
@@ -164,11 +248,14 @@
   text-align: center;
   color: var(--white);
   position: relative;
+  z-index: 1;
 }
 
 .hero-content {
   max-width: 900px;
   margin: 0 auto;
+  position: relative;
+  z-index: 1;
 }
 
 .hero-badge {
@@ -183,7 +270,16 @@
   font-size: 0.875rem;
   font-weight: 600;
   margin-bottom: 2rem;
-  animation: fadeInUp 0.8s ease-out;
+  animation: fadeInUp 0.8s ease-out, pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
 }
 
 .hero-title {
@@ -200,6 +296,17 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  animation: gradientShift 3s ease-in-out infinite;
+  background-size: 200% 200%;
+}
+
+@keyframes gradientShift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
 }
 
 .hero-subtitle {
@@ -324,10 +431,27 @@
   text-align: center;
   transition: all 0.3s ease;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.stat-card:hover::before {
+  left: 100%;
 }
 
 .stat-card:hover {
-  transform: translateY(-8px);
+  transform: translateY(-8px) scale(1.05);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
   border-color: var(--primary-blue);
 }
@@ -335,6 +459,16 @@
 .stat-icon {
   font-size: 2.5rem;
   margin-bottom: 0.75rem;
+  animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 .stat-value {
@@ -346,6 +480,11 @@
   background-clip: text;
   margin-bottom: 0.5rem;
   line-height: 1;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover .stat-value {
+  transform: scale(1.1);
 }
 
 .stat-label {
@@ -410,7 +549,7 @@
   border: 2px solid var(--border-color);
   border-radius: 1.5rem;
   padding: 2.5rem;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   position: relative;
   overflow: hidden;
 }
@@ -424,16 +563,35 @@
   height: 4px;
   background: linear-gradient(90deg, var(--primary-blue), #764ba2);
   transform: scaleX(0);
-  transition: transform 0.3s ease;
+  transform-origin: left;
+  transition: transform 0.4s ease;
+}
+
+.feature-card::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(74, 144, 226, 0.1), transparent);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease;
 }
 
 .feature-card:hover::before {
   transform: scaleX(1);
 }
 
+.feature-card:hover::after {
+  width: 500px;
+  height: 500px;
+}
+
 .feature-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  transform: translateY(-12px) rotateX(5deg);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
   border-color: var(--primary-blue);
 }
 
@@ -448,6 +606,14 @@
   font-size: 2rem;
   margin-bottom: 1.5rem;
   box-shadow: 0 10px 30px rgba(74, 144, 226, 0.3);
+  transition: all 0.4s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.feature-card:hover .feature-icon {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 0 15px 40px rgba(74, 144, 226, 0.5);
 }
 
 .feature-title {
@@ -522,13 +688,30 @@
   border-radius: 1.5rem;
   padding: 2.5rem;
   text-align: center;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   position: relative;
+  overflow: hidden;
+}
+
+.step-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(74, 144, 226, 0.05), rgba(118, 75, 162, 0.05));
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.step-card:hover::before {
+  opacity: 1;
 }
 
 .step-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  transform: translateY(-12px) scale(1.03);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
   border-color: var(--primary-blue);
 }
 
@@ -545,6 +728,14 @@
   font-weight: 900;
   margin: 0 auto 1.5rem;
   box-shadow: 0 10px 30px rgba(74, 144, 226, 0.3);
+  transition: all 0.4s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.step-card:hover .step-number {
+  transform: scale(1.15) rotate(360deg);
+  box-shadow: 0 15px 40px rgba(74, 144, 226, 0.5);
 }
 
 .step-content {
@@ -802,6 +993,204 @@
 }
 
 /* ============================================
+   PWA INSTALL BANNER
+   ============================================ */
+
+.pwa-install-banner {
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(10px);
+  border: 2px solid var(--primary-blue);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 10px 40px rgba(74, 144, 226, 0.3);
+  animation: slideDown 0.5s ease-out, pulse 2s ease-in-out infinite;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.pwa-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+}
+
+.pwa-banner-icon {
+  font-size: 3rem;
+  flex-shrink: 0;
+  animation: bounce 2s ease-in-out infinite;
+}
+
+.pwa-banner-text {
+  flex: 1;
+  color: var(--text-primary);
+}
+
+.pwa-banner-text strong {
+  display: block;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--primary-blue);
+  margin-bottom: 0.25rem;
+}
+
+.pwa-banner-text p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.btn-install {
+  background: linear-gradient(135deg, var(--primary-blue), #764ba2);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(74, 144, 226, 0.4);
+  flex-shrink: 0;
+}
+
+.btn-install:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(74, 144, 226, 0.6);
+}
+
+.pwa-banner-close {
+  position: absolute;
+  top: -0.5rem;
+  right: -0.5rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--danger-red);
+  color: white;
+  border: 2px solid white;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.pwa-banner-close:hover {
+  transform: scale(1.1);
+  background: #d32f2f;
+}
+
+/* PWA Install Modal */
+.pwa-install-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 1rem;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.pwa-install-modal-content {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.install-instructions h3 {
+  color: var(--primary-blue);
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.install-instructions ol {
+  margin: 1rem 0 1.5rem 1.5rem;
+  color: var(--text-primary);
+}
+
+.install-instructions li {
+  margin-bottom: 0.75rem;
+  line-height: 1.6;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .pwa-install-banner {
+    padding: 1rem;
+  }
+
+  .pwa-banner-content {
+    flex-wrap: wrap;
+  }
+
+  .pwa-banner-icon {
+    font-size: 2.5rem;
+  }
+
+  .pwa-banner-text strong {
+    font-size: 1rem;
+  }
+
+  .pwa-banner-text p {
+    font-size: 0.8125rem;
+  }
+
+  .btn-install {
+    width: 100%;
+    justify-content: center;
+    margin-top: 0.5rem;
+  }
+
+  .pwa-banner-close {
+    top: 0.5rem;
+    right: 0.5rem;
+  }
+}
+
+/* ============================================
    RESPONSIVE DESIGN
    ============================================ */
 
@@ -941,19 +1330,25 @@
   }
   
   .stats-section {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
   }
   
   .stat-card {
-    padding: 1.25rem 1rem;
+    padding: 1rem 0.75rem;
+  }
+  
+  .stat-icon {
+    font-size: 1.75rem;
+    margin-bottom: 0.5rem;
   }
   
   .stat-value {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
   }
   
   .stat-label {
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
   }
   
   .feature-icon {

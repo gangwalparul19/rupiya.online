@@ -3,6 +3,7 @@ import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
 import toast from '../components/toast.js';
 import themeManager from '../utils/theme-manager.js';
+import pwaInstallManager from '../utils/pwa-install.js';
 import { formatCurrency, formatDate, getRelativeTime } from '../utils/helpers.js';
 
 // Check authentication
@@ -20,6 +21,7 @@ async function init() {
   const isAuthenticated = await checkAuth();
   if (isAuthenticated) {
     await initDashboard();
+    setupPWAInstall();
   }
 }
 
@@ -564,3 +566,29 @@ categoryPeriod.addEventListener('change', async () => {
     console.error('Error updating category chart:', error);
   }
 });
+
+
+// Setup PWA Install functionality
+function setupPWAInstall() {
+  const installBtn = document.getElementById('dashboardInstallBtn');
+
+  if (installBtn) {
+    installBtn.addEventListener('click', async () => {
+      const installed = await pwaInstallManager.promptInstall();
+      if (installed) {
+        // Hide button after successful install
+        installBtn.style.display = 'none';
+        toast.success('🎉 App installed! You can now use Rupiya like a native app.');
+      }
+    });
+  }
+
+  // Check if app is already installed
+  const status = pwaInstallManager.getInstallStatus();
+  if (status.isStandalone || status.isInstalled) {
+    // App is already installed, hide button
+    if (installBtn) {
+      installBtn.style.display = 'none';
+    }
+  }
+}

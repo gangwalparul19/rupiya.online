@@ -1,4 +1,5 @@
 // Landing Page Logic
+import pwaInstallManager from '../utils/pwa-install.js';
 
 // Scroll effect for navigation
 const nav = document.getElementById('landingNav');
@@ -95,3 +96,177 @@ document.querySelectorAll('.feature-card').forEach((card, index) => {
 document.querySelectorAll('.stat-card').forEach((card, index) => {
   card.style.transitionDelay = `${index * 0.1}s`;
 });
+
+// Counter animation for stats
+function animateCounter(element, target, duration = 2000) {
+  const start = 0;
+  const increment = target / (duration / 16);
+  let current = start;
+  
+  const timer = setInterval(() => {
+    current += increment;
+    if (current >= target) {
+      element.textContent = formatStatValue(target);
+      clearInterval(timer);
+    } else {
+      element.textContent = formatStatValue(Math.floor(current));
+    }
+  }, 16);
+}
+
+function formatStatValue(value) {
+  const originalText = value.toString();
+  if (originalText.includes('K')) return originalText;
+  if (originalText.includes('Cr')) return originalText;
+  if (originalText.includes('/')) return originalText;
+  if (originalText.includes('M')) return originalText;
+  return value.toLocaleString();
+}
+
+// Observe stat cards for counter animation
+const statObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting && !entry.target.dataset.animated) {
+      const valueElement = entry.target.querySelector('.stat-value');
+      const originalValue = valueElement.textContent;
+      entry.target.dataset.animated = 'true';
+      
+      // Extract number from text like "10K+", "₹50Cr+", "4.9/5", "1M+"
+      let targetValue = 0;
+      if (originalValue.includes('K+')) {
+        targetValue = parseInt(originalValue) * 1000;
+        setTimeout(() => {
+          let current = 0;
+          const interval = setInterval(() => {
+            current += 200;
+            if (current >= targetValue) {
+              valueElement.textContent = originalValue;
+              clearInterval(interval);
+            } else {
+              valueElement.textContent = Math.floor(current / 1000) + 'K+';
+            }
+          }, 20);
+        }, 300);
+      } else if (originalValue.includes('Cr+')) {
+        valueElement.textContent = '₹0Cr+';
+        setTimeout(() => {
+          let current = 0;
+          const target = parseInt(originalValue.replace('₹', '').replace('Cr+', ''));
+          const interval = setInterval(() => {
+            current += 1;
+            if (current >= target) {
+              valueElement.textContent = originalValue;
+              clearInterval(interval);
+            } else {
+              valueElement.textContent = '₹' + current + 'Cr+';
+            }
+          }, 40);
+        }, 300);
+      } else if (originalValue.includes('/')) {
+        valueElement.textContent = '0.0/5';
+        setTimeout(() => {
+          let current = 0;
+          const target = parseFloat(originalValue);
+          const interval = setInterval(() => {
+            current += 0.1;
+            if (current >= target) {
+              valueElement.textContent = originalValue;
+              clearInterval(interval);
+            } else {
+              valueElement.textContent = current.toFixed(1) + '/5';
+            }
+          }, 40);
+        }, 300);
+      } else if (originalValue.includes('M+')) {
+        valueElement.textContent = '0M+';
+        setTimeout(() => {
+          let current = 0;
+          const target = parseInt(originalValue.replace('M+', ''));
+          const interval = setInterval(() => {
+            current += 0.02;
+            if (current >= target) {
+              valueElement.textContent = originalValue;
+              clearInterval(interval);
+            } else {
+              valueElement.textContent = current.toFixed(1) + 'M+';
+            }
+          }, 20);
+        }, 300);
+      }
+    }
+  });
+}, { threshold: 0.5 });
+
+document.querySelectorAll('.stat-card').forEach(card => {
+  statObserver.observe(card);
+});
+
+// Parallax effect for hero section
+window.addEventListener('scroll', () => {
+  const scrolled = window.pageYOffset;
+  const heroContent = document.querySelector('.hero-content');
+  if (heroContent && scrolled < 800) {
+    heroContent.style.transform = `translateY(${scrolled * 0.3}px)`;
+    heroContent.style.opacity = 1 - (scrolled / 800);
+  }
+});
+
+// Add floating shapes to hero section
+function createFloatingShapes() {
+  const heroSection = document.querySelector('.hero-section');
+  if (!heroSection) return;
+  
+  const shapesContainer = document.createElement('div');
+  shapesContainer.className = 'floating-shapes';
+  
+  for (let i = 0; i < 3; i++) {
+    const shape = document.createElement('div');
+    shape.className = `shape shape-${i + 1}`;
+    shapesContainer.appendChild(shape);
+  }
+  
+  heroSection.insertBefore(shapesContainer, heroSection.firstChild);
+}
+
+// Initialize on load
+document.addEventListener('DOMContentLoaded', () => {
+  createFloatingShapes();
+  setupPWAInstall();
+});
+
+// Setup PWA Install functionality
+function setupPWAInstall() {
+  const installBtn = document.getElementById('installAppBtn');
+  const closeBanner = document.getElementById('closePwaBanner');
+  const installBanner = document.getElementById('pwaInstallBanner');
+
+  if (installBtn) {
+    installBtn.addEventListener('click', async () => {
+      const installed = await pwaInstallManager.promptInstall();
+      if (installed) {
+        // Hide banner after successful install
+        if (installBanner) {
+          installBanner.style.display = 'none';
+        }
+      }
+    });
+  }
+
+  if (closeBanner) {
+    closeBanner.addEventListener('click', () => {
+      if (installBanner) {
+        installBanner.style.display = 'none';
+        localStorage.setItem('pwa-banner-dismissed', Date.now().toString());
+      }
+    });
+  }
+
+  // Check if banner should be shown
+  const status = pwaInstallManager.getInstallStatus();
+  if (status.isStandalone || status.isInstalled) {
+    // App is already installed, hide banner
+    if (installBanner) {
+      installBanner.style.display = 'none';
+    }
+  }
+}
