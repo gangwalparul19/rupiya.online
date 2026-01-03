@@ -39,6 +39,7 @@
   
   <div id="actions">
     <h2>Actions</h2>
+    <button onclick="goToLogin()" style="background: #4A90E2; color: white; border: none;">Login First</button>
     <button onclick="testAuth()">Test Authentication</button>
     <button onclick="testFamilyService()">Test Family Service</button>
     <button onclick="clearCache()">Clear Cache & Reload</button>
@@ -154,6 +155,12 @@
     window.goToFamily = function() {
       addLog('Navigating to family page...', 'info');
       window.location.href = 'family.html';
+    };
+    
+    // Go to login page
+    window.goToLogin = function() {
+      addLog('Navigating to login page...', 'info');
+      window.location.href = 'login.html';
     };
     
     // Auto-test on load

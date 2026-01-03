@@ -27,11 +27,13 @@ class AuthService {
     }
 
     this.authInitPromise = new Promise((resolve) => {
-      onAuthStateChanged(auth, (user) => {
+      const unsubscribe = onAuthStateChanged(auth, (user) => {
+        console.log('[Auth Service] Auth state changed:', user ? user.email : 'null');
         this.currentUser = user;
         this.authInitialized = true;
         this.authStateListeners.forEach(callback => callback(user));
         resolve(user);
+        // Don't unsubscribe - keep listening for auth changes
       });
     });
 
@@ -42,6 +44,9 @@ class AuthService {
   async waitForAuth() {
     if (this.authInitialized) {
       return this.currentUser;
+    }
+    if (!this.authInitPromise) {
+      await this.init();
     }
     return await this.authInitPromise;
   }
