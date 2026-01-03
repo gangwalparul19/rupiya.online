@@ -1,5 +1,16 @@
 // Landing Page Logic
 
+// Demo Mode Handler
+const demoBtn = document.getElementById('tryDemoBtn');
+if (demoBtn) {
+  demoBtn.addEventListener('click', () => {
+    // Enable demo mode
+    localStorage.setItem('rupiya_demo_mode', 'true');
+    // Redirect to dashboard
+    window.location.href = 'dashboard.html?demo=true';
+  });
+}
+
 // Scroll effect for navigation
 const nav = document.getElementById('landingNav');
 const mobileMenuToggle = document.getElementById('mobileMenuToggle');

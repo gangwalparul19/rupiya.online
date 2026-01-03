@@ -1,7 +1,7 @@
 // Service Worker for Rupiya PWA
 // Provides offline support and caching
 
-const CACHE_VERSION = '1.0.23'; // Increment this on every deployment
+const CACHE_VERSION = '1.0.25'; // Increment this on every deployment
 const CACHE_NAME = `rupiya-v${CACHE_VERSION}`;
 const RUNTIME_CACHE = `rupiya-runtime-v${CACHE_VERSION}`;
 
@@ -26,6 +26,7 @@ const STATIC_ASSETS = [
   '/login.html',
   '/signup.html',
   '/offline.html',
+  '/achievements.html',
   '/assets/css/common.css',
   '/assets/css/components.css',
   '/assets/css/responsive.css',
@@ -34,18 +35,26 @@ const STATIC_ASSETS = [
   '/assets/css/dashboard.css',
   '/assets/css/family.css',
   '/assets/css/landing.css',
+  '/assets/css/gamification.css',
+  '/assets/css/onboarding.css',
   '/assets/js/config/firebase-config.js',
   '/assets/js/services/auth-service.js',
   '/assets/js/services/firestore-service.js',
   '/assets/js/services/storage-service.js',
   '/assets/js/services/family-service.js',
+  '/assets/js/services/gamification-service.js',
+  '/assets/js/services/onboarding-service.js',
   '/assets/js/utils/helpers.js',
   '/assets/js/utils/performance.js',
   '/assets/js/utils/error-handler.js',
+  '/assets/js/utils/daily-tips.js',
   '/assets/js/components/loading.js',
   '/assets/js/components/toast.js',
+  '/assets/js/components/gamification-ui.js',
+  '/assets/js/components/onboarding-ui.js',
   '/assets/js/pages/family.js',
   '/assets/js/pages/family-modals.js',
+  '/assets/js/pages/achievements.js',
   '/logo.png',
   '/favicon.ico',
   '/android-chrome-192x192.png',

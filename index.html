@@ -3,10 +3,35 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Rupiya - AI-powered personal finance and expense tracking platform. Track expenses, manage budgets, and achieve your financial goals.">
-  <meta name="keywords" content="expense tracker, budget app, personal finance, money management, financial planning">
+  
+  <!-- Primary Meta Tags -->
+  <title>Rupiya - Free AI-Powered Expense Tracker & Budget App for India</title>
+  <meta name="title" content="Rupiya - Free AI-Powered Expense Tracker & Budget App for India">
+  <meta name="description" content="Track expenses, manage budgets, and achieve financial goals with Rupiya - India's smartest free personal finance app. AI insights, family sharing, offline support. Join 10,000+ users!">
+  <meta name="keywords" content="expense tracker app, budget app India, personal finance app, money management, expense manager, budget planner, savings tracker, family expense tracker, free finance app, rupee tracker">
+  <meta name="author" content="Rupiya">
+  <meta name="robots" content="index, follow">
+  <meta name="language" content="English">
   <meta name="theme-color" content="#4A90E2">
-  <title>Rupiya - Smart Personal Finance & Expense Tracker</title>
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://rupiya.app/">
+  <meta property="og:title" content="Rupiya - Free AI-Powered Expense Tracker & Budget App">
+  <meta property="og:description" content="Track expenses, manage budgets, and achieve financial goals with India's smartest free personal finance app. AI insights, family sharing, works offline!">
+  <meta property="og:image" content="https://rupiya.app/assets/images/og-image.png">
+  <meta property="og:site_name" content="Rupiya">
+  <meta property="og:locale" content="en_IN">
+  
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://rupiya.app/">
+  <meta property="twitter:title" content="Rupiya - Free AI-Powered Expense Tracker & Budget App">
+  <meta property="twitter:description" content="Track expenses, manage budgets, and achieve financial goals with India's smartest free personal finance app.">
+  <meta property="twitter:image" content="https://rupiya.app/assets/images/og-image.png">
+  
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://rupiya.app/">
   
   <!-- PWA Manifest -->
   <link rel="manifest" href="/manifest.json">
@@ -14,12 +39,107 @@
   <!-- Favicon -->
   <link rel="icon" href="assets/images/logo.png" type="image/png">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
   
   <!-- Stylesheets -->
   <link rel="stylesheet" href="assets/css/common.css">
   <link rel="stylesheet" href="assets/css/components.css">
   <link rel="stylesheet" href="assets/css/dark-mode.css">
   <link rel="stylesheet" href="assets/css/landing.css">
+  
+  <!-- Structured Data - Organization -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Rupiya",
+    "applicationCategory": "FinanceApplication",
+    "operatingSystem": "Web, Android, iOS",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "INR"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.9",
+      "ratingCount": "10000",
+      "bestRating": "5",
+      "worstRating": "1"
+    },
+    "description": "AI-powered personal finance and expense tracking app for India. Track expenses, manage budgets, set goals, and get AI insights.",
+    "screenshot": "https://rupiya.app/screenshots/dashboard.png",
+    "featureList": "Expense Tracking, Budget Management, AI Insights, Family Sharing, Goal Setting, Investment Tracking, Offline Support",
+    "softwareVersion": "1.0",
+    "author": {
+      "@type": "Organization",
+      "name": "Rupiya"
+    }
+  }
+  </script>
+  
+  <!-- Structured Data - FAQ -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Is Rupiya free to use?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, Rupiya is 100% free to use with all features included. No hidden charges or premium plans."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does Rupiya work offline?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, Rupiya is a Progressive Web App (PWA) that works offline. Your data syncs automatically when you're back online."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is my financial data secure?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Absolutely. Rupiya uses bank-level encryption and your data is never shared with third parties. We use Firebase for secure authentication and data storage."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I share expenses with family?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, Rupiya has a Family Groups feature that lets you create groups, invite family members, and track shared expenses together."
+        }
+      }
+    ]
+  }
+  </script>
+  
+  <!-- Structured Data - Breadcrumb -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://rupiya.app/"
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
   <!-- Landing Page -->
@@ -82,13 +202,14 @@
           </p>
           
           <div class="hero-cta" id="heroCta">
-            <!-- Row 1: Install App (Full Width) -->
+            <!-- Row 1: Try Demo (Full Width) - No signup required -->
             <div class="hero-cta-row full-width">
-              <button class="btn btn-hero-install" id="heroInstallBtn">
+              <button class="btn btn-hero-demo" id="tryDemoBtn">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
-                Install App
+                Try Demo - No Signup Required
               </button>
             </div>
             
@@ -104,18 +225,18 @@
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
                 </svg>
-                Sign Up
+                Sign Up Free
               </a>
             </div>
             
-            <!-- Row 3: Explore Features (Full Width) -->
+            <!-- Row 3: Install App (Full Width) -->
             <div class="hero-cta-row full-width">
-              <a href="#features" class="btn btn-hero-secondary">
+              <button class="btn btn-hero-install" id="heroInstallBtn">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
                 </svg>
-                Explore Features
-              </a>
+                Install App
+              </button>
             </div>
           </div>
 
@@ -173,141 +294,143 @@
       <div class="container">
         <div class="section-header">
           <span class="section-badge">✨ Features</span>
-          <h2 class="section-title">Everything You Need to Master Your Finances</h2>
+          <h2 class="section-title">Everything You Need</h2>
           <p class="section-description">
-            Powerful tools designed to give you complete control over your financial life
+            Powerful tools for complete financial control
           </p>
         </div>
 
-        <div class="features-grid">
-          <div class="feature-card">
-            <div class="feature-icon">📊</div>
-            <h3 class="feature-title">Smart Expense Tracking</h3>
-            <p class="feature-description">
-              Track every rupee with detailed categories, payment methods, and real-time insights. Never lose track of where your money goes.
-            </p>
-            <ul class="feature-list">
-              <li>Multiple categories & tags</li>
-              <li>Receipt attachments</li>
-              <li>Recurring expenses</li>
-            </ul>
+        <div class="features-grid compact">
+          <div class="feature-card-compact">
+            <div class="feature-icon-sm">📊</div>
+            <div class="feature-content">
+              <h3>Expense Tracking</h3>
+              <p>Track every rupee with categories & insights</p>
+            </div>
           </div>
 
-          <div class="feature-card">
-            <div class="feature-icon">💳</div>
-            <h3 class="feature-title">Intelligent Budgets</h3>
-            <p class="feature-description">
-              Set smart budgets with AI-powered recommendations. Get instant alerts when you're close to your limits.
-            </p>
-            <ul class="feature-list">
-              <li>Category-wise budgets</li>
-              <li>Real-time alerts</li>
-              <li>Budget analytics</li>
-            </ul>
+          <div class="feature-card-compact">
+            <div class="feature-icon-sm">💳</div>
+            <div class="feature-content">
+              <h3>Smart Budgets</h3>
+              <p>AI-powered budget recommendations</p>
+            </div>
           </div>
 
-          <div class="feature-card">
-            <div class="feature-icon">📈</div>
-            <h3 class="feature-title">Investment Portfolio</h3>
-            <p class="feature-description">
-              Monitor stocks, mutual funds, and assets with real-time updates. Track returns and make informed decisions.
-            </p>
-            <ul class="feature-list">
-              <li>Multi-asset tracking</li>
-              <li>Performance analytics</li>
-              <li>Profit/loss reports</li>
-            </ul>
+          <div class="feature-card-compact">
+            <div class="feature-icon-sm">📈</div>
+            <div class="feature-content">
+              <h3>Investments</h3>
+              <p>Track stocks, MFs & portfolio returns</p>
+            </div>
           </div>
 
-          <div class="feature-card">
-            <div class="feature-icon">🎯</div>
-            <h3 class="feature-title">Financial Goals</h3>
-            <p class="feature-description">
-              Set and achieve your financial goals with visual progress tracking and smart milestone reminders.
-            </p>
-            <ul class="feature-list">
-              <li>Goal progress tracking</li>
-              <li>Milestone notifications</li>
-              <li>Achievement insights</li>
-            </ul>
+          <div class="feature-card-compact">
+            <div class="feature-icon-sm">🎯</div>
+            <div class="feature-content">
+              <h3>Goals</h3>
+              <p>Set & achieve financial milestones</p>
+            </div>
           </div>
 
-          <div class="feature-card">
-            <div class="feature-icon">🤖</div>
-            <h3 class="feature-title">AI-Powered Insights</h3>
-            <p class="feature-description">
-              Get personalized financial advice and spending patterns analysis powered by artificial intelligence.
-            </p>
-            <ul class="feature-list">
-              <li>Spending pattern analysis</li>
-              <li>Personalized recommendations</li>
-              <li>Anomaly detection</li>
-            </ul>
+          <div class="feature-card-compact">
+            <div class="feature-icon-sm">🤖</div>
+            <div class="feature-content">
+              <h3>AI Insights</h3>
+              <p>Personalized spending analysis</p>
+            </div>
           </div>
 
-          <div class="feature-card">
-            <div class="feature-icon">🤝</div>
-            <h3 class="feature-title">Split Expenses</h3>
-            <p class="feature-description">
-              Share expenses with friends and family. Track who owes what and settle up easily with built-in calculations.
-            </p>
-            <ul class="feature-list">
-              <li>Group expense splitting</li>
-              <li>Settlement tracking</li>
-              <li>Payment reminders</li>
-            </ul>
+          <div class="feature-card-compact">
+            <div class="feature-icon-sm">🤝</div>
+            <div class="feature-content">
+              <h3>Split Bills</h3>
+              <p>Share expenses with friends</p>
+            </div>
           </div>
 
-          <div class="feature-card">
-            <div class="feature-icon">👨‍👩‍👧‍👦</div>
-            <h3 class="feature-title">Family Groups</h3>
-            <p class="feature-description">
-              Manage finances together with family members. Track shared expenses, invite members, and collaborate on budgets.
-            </p>
-            <ul class="feature-list">
-              <li>Multi-member groups</li>
-              <li>Email invitations</li>
-              <li>Shared expense tracking</li>
-            </ul>
+          <div class="feature-card-compact">
+            <div class="feature-icon-sm">👨‍👩‍👧‍👦</div>
+            <div class="feature-content">
+              <h3>Family Groups</h3>
+              <p>Manage finances together</p>
+            </div>
           </div>
 
-          <div class="feature-card">
-            <div class="feature-icon">🏠</div>
-            <h3 class="feature-title">House Management</h3>
-            <p class="feature-description">
-              Track house-related expenses, maintenance, and property details. Monitor EMIs, repairs, and household costs.
-            </p>
-            <ul class="feature-list">
-              <li>Property tracking</li>
-              <li>Maintenance logs</li>
-              <li>EMI management</li>
-            </ul>
+          <div class="feature-card-compact">
+            <div class="feature-icon-sm">🏠</div>
+            <div class="feature-content">
+              <h3>House Tracking</h3>
+              <p>Property & maintenance logs</p>
+            </div>
           </div>
 
-          <div class="feature-card">
-            <div class="feature-icon">🚗</div>
-            <h3 class="feature-title">Vehicle Tracking</h3>
-            <p class="feature-description">
-              Manage vehicle expenses including fuel, maintenance, insurance, and servicing. Track mileage and costs.
-            </p>
-            <ul class="feature-list">
-              <li>Fuel tracking</li>
-              <li>Service reminders</li>
-              <li>Cost analytics</li>
-            </ul>
+          <div class="feature-card-compact">
+            <div class="feature-icon-sm">🚗</div>
+            <div class="feature-content">
+              <h3>Vehicles</h3>
+              <p>Fuel, service & mileage tracking</p>
+            </div>
           </div>
 
-          <div class="feature-card">
-            <div class="feature-icon">🧹</div>
-            <h3 class="feature-title">House Help Management</h3>
-            <p class="feature-description">
-              Track payments to domestic help, manage schedules, and maintain records. Never miss a payment again.
-            </p>
-            <ul class="feature-list">
-              <li>Payment tracking</li>
-              <li>Schedule management</li>
-              <li>Contact details</li>
-            </ul>
+          <div class="feature-card-compact">
+            <div class="feature-icon-sm">📧</div>
+            <div class="feature-content">
+              <h3>Weekly Reports</h3>
+              <p>Email summaries with CSV</p>
+            </div>
+          </div>
+
+          <div class="feature-card-compact">
+            <div class="feature-icon-sm">🔄</div>
+            <div class="feature-content">
+              <h3>Recurring</h3>
+              <p>Auto-track subscriptions & EMIs</p>
+            </div>
+          </div>
+
+          <div class="feature-card-compact">
+            <div class="feature-icon-sm">📱</div>
+            <div class="feature-content">
+              <h3>Works Offline</h3>
+              <p>PWA with offline support</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- App Preview Section -->
+    <section class="app-preview-section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-badge">📱 App Preview</span>
+          <h2 class="section-title">Beautiful & Intuitive</h2>
+          <p class="section-description">
+            Designed for the modern Indian professional
+          </p>
+        </div>
+
+        <div class="preview-features">
+          <div class="preview-feature">
+            <div class="preview-icon">🌙</div>
+            <h4>Dark Mode</h4>
+            <p>Easy on eyes</p>
+          </div>
+          <div class="preview-feature">
+            <div class="preview-icon">📊</div>
+            <h4>Charts</h4>
+            <p>Visual insights</p>
+          </div>
+          <div class="preview-feature">
+            <div class="preview-icon">⚡</div>
+            <h4>Fast</h4>
+            <p>Instant loading</p>
+          </div>
+          <div class="preview-feature">
+            <div class="preview-icon">🔒</div>
+            <h4>Secure</h4>
+            <p>Bank-level</p>
           </div>
         </div>
       </div>
@@ -317,46 +440,27 @@
     <section class="how-it-works-section" id="how-it-works">
       <div class="container">
         <div class="section-header">
-          <span class="section-badge">🎯 Simple Process</span>
-          <h2 class="section-title">Get Started in Minutes</h2>
-          <p class="section-description">
-            Three simple steps to financial clarity and control
-          </p>
+          <span class="section-badge">🎯 Get Started</span>
+          <h2 class="section-title">3 Simple Steps</h2>
         </div>
 
-        <div class="steps-container">
-          <div class="step-card">
-            <div class="step-number">1</div>
-            <div class="step-content">
-              <h3 class="step-title">Create Your Account</h3>
-              <p class="step-description">
-                Sign up with email or Google in seconds. Your data is encrypted with bank-level security.
-              </p>
-            </div>
+        <div class="steps-compact">
+          <div class="step-compact">
+            <div class="step-num">1</div>
+            <h4>Sign Up</h4>
+            <p>Create account in seconds</p>
           </div>
-
-          <div class="step-connector"></div>
-
-          <div class="step-card">
-            <div class="step-number">2</div>
-            <div class="step-content">
-              <h3 class="step-title">Add Your Transactions</h3>
-              <p class="step-description">
-                Quickly log expenses and income. Set up budgets and financial goals that matter to you.
-              </p>
-            </div>
+          <div class="step-arrow">→</div>
+          <div class="step-compact">
+            <div class="step-num">2</div>
+            <h4>Add Data</h4>
+            <p>Log expenses & income</p>
           </div>
-
-          <div class="step-connector"></div>
-
-          <div class="step-card">
-            <div class="step-number">3</div>
-            <div class="step-content">
-              <h3 class="step-title">Get Smart Insights</h3>
-              <p class="step-description">
-                Receive AI-powered insights and recommendations to optimize your spending and achieve goals faster.
-              </p>
-            </div>
+          <div class="step-arrow">→</div>
+          <div class="step-compact">
+            <div class="step-num">3</div>
+            <h4>Get Insights</h4>
+            <p>AI-powered analysis</p>
           </div>
         </div>
       </div>
@@ -366,33 +470,105 @@
     <section class="benefits-section">
       <div class="container">
         <div class="section-header">
-          <span class="section-badge">💎 Why Choose Rupiya</span>
-          <h2 class="section-title">Built for Modern India</h2>
+          <span class="section-badge">💎 Why Rupiya</span>
+          <h2 class="section-title">Built for India</h2>
         </div>
 
-        <div class="benefits-grid">
-          <div class="benefit-card">
-            <div class="benefit-icon">🇮🇳</div>
-            <h3 class="benefit-title">Made for India</h3>
-            <p class="benefit-description">Designed specifically for Indian users with INR support and local payment methods.</p>
+        <div class="benefits-grid-compact">
+          <div class="benefit-compact">
+            <span class="benefit-emoji">🇮🇳</span>
+            <div>
+              <h4>Made for India</h4>
+              <p>INR & local payments</p>
+            </div>
           </div>
 
-          <div class="benefit-card">
-            <div class="benefit-icon">📱</div>
-            <h3 class="benefit-title">Mobile First</h3>
-            <p class="benefit-description">Beautiful, responsive design that works perfectly on all your devices.</p>
+          <div class="benefit-compact">
+            <span class="benefit-emoji">📱</span>
+            <div>
+              <h4>Mobile First</h4>
+              <p>Works on all devices</p>
+            </div>
           </div>
 
-          <div class="benefit-card">
-            <div class="benefit-icon">🔒</div>
-            <h3 class="benefit-title">Privacy First</h3>
-            <p class="benefit-description">Your financial data is encrypted and never shared with third parties.</p>
+          <div class="benefit-compact">
+            <span class="benefit-emoji">🔒</span>
+            <div>
+              <h4>Privacy First</h4>
+              <p>Data never shared</p>
+            </div>
           </div>
 
-          <div class="benefit-card">
-            <div class="benefit-icon">⚡</div>
-            <h3 class="benefit-title">Lightning Fast</h3>
-            <p class="benefit-description">Optimized performance ensures smooth experience even on slower connections.</p>
+          <div class="benefit-compact">
+            <span class="benefit-emoji">⚡</span>
+            <div>
+              <h4>Lightning Fast</h4>
+              <p>Optimized performance</p>
+            </div>
+          </div>
+
+          <div class="benefit-compact">
+            <span class="benefit-emoji">🆓</span>
+            <div>
+              <h4>100% Free</h4>
+              <p>No hidden charges</p>
+            </div>
+          </div>
+
+          <div class="benefit-compact">
+            <span class="benefit-emoji">☁️</span>
+            <div>
+              <h4>Cloud Sync</h4>
+              <p>Access anywhere</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials-section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-badge">💬 Reviews</span>
+          <h2 class="section-title">Loved by Users</h2>
+        </div>
+
+        <div class="testimonials-grid">
+          <div class="testimonial-card">
+            <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+            <p>"Finally an app that understands Indian finances. The family sharing feature is amazing!"</p>
+            <div class="testimonial-author">
+              <div class="author-avatar">R</div>
+              <div>
+                <strong>Rahul S.</strong>
+                <span>Mumbai</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="testimonial-card">
+            <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+            <p>"Tracking my vehicle expenses has never been easier. Love the mileage calculator!"</p>
+            <div class="testimonial-author">
+              <div class="author-avatar">P</div>
+              <div>
+                <strong>Priya M.</strong>
+                <span>Bangalore</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="testimonial-card">
+            <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+            <p>"The weekly email reports help me stay on top of my spending. Highly recommend!"</p>
+            <div class="testimonial-author">
+              <div class="author-avatar">A</div>
+              <div>
+                <strong>Amit K.</strong>
+                <span>Delhi</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>

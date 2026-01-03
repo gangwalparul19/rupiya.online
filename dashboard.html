@@ -21,6 +21,8 @@
   <link rel="stylesheet" href="assets/css/dashboard.css">
   <link rel="stylesheet" href="assets/css/enhancements.css">
   <link rel="stylesheet" href="assets/css/family.css">
+  <link rel="stylesheet" href="assets/css/gamification.css">
+  <link rel="stylesheet" href="assets/css/onboarding.css">
   
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
@@ -86,6 +88,10 @@
           <a href="split-expense.html" class="nav-item">
             <span class="nav-icon">🤝</span>
             <span>Split Expense</span>
+          </a>
+          <a href="achievements.html" class="nav-item">
+            <span class="nav-icon">🏆</span>
+            <span>Achievements</span>
           </a>
         </div>
 
@@ -296,6 +302,32 @@
 
       <!-- Dashboard Widgets Row -->
       <div class="widgets-row">
+        <!-- Gamification Widget -->
+        <div class="gamification-widget" id="gamificationWidget" style="cursor: pointer;" onclick="window.location.href='achievements.html'">
+          <div class="gamification-header">
+            <div class="gamification-level">
+              <div class="gamification-level-icon" id="dashLevelIcon">🌱</div>
+              <div class="gamification-level-info">
+                <h4 id="dashLevelName">Finance Newbie</h4>
+                <p>Level <span id="dashLevelNumber">1</span></p>
+              </div>
+            </div>
+            <div class="gamification-points">
+              <div class="gamification-points-value" id="dashTotalPoints">0</div>
+              <div class="gamification-points-label">Points</div>
+            </div>
+          </div>
+          <div class="gamification-progress">
+            <div class="gamification-progress-text">
+              <span id="dashProgressText">Start earning points!</span>
+              <span id="dashStreakDisplay">🔥 0</span>
+            </div>
+            <div class="level-progress">
+              <div class="level-progress-fill" id="dashLevelProgress" style="width: 0%;"></div>
+            </div>
+          </div>
+        </div>
+
         <!-- Goal Progress Widget -->
         <div class="goal-progress-widget" id="goalProgressWidget" style="display: none;">
           <div class="goal-progress-header">

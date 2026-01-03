@@ -78,6 +78,18 @@
           "sizes": "96x96"
         }
       ]
+    },
+    {
+      "name": "Achievements",
+      "short_name": "Badges",
+      "description": "View your achievements and badges",
+      "url": "/achievements.html",
+      "icons": [
+        {
+          "src": "/favicon-96x96.png",
+          "sizes": "96x96"
+        }
+      ]
     }
   ],
   "related_applications": [],

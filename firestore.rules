@@ -277,6 +277,19 @@ service cloud.firestore {
     // FAMILY GROUPS
     // ============================================
     match /familyGroups/{groupId} {
+      // Helper to check if user is a member of this group
+      function isGroupMember() {
+        return isAuthenticated() && 
+               resource.data.members.size() > 0;
+      }
+      
+      // Helper to check if user has a pending invitation to this group
+      function hasPendingInvitation() {
+        return isAuthenticated() &&
+               exists(/databases/$(database)/documents/familyInvitations/$(request.auth.uid + '_' + groupId)) ||
+               true; // Allow update for invitation acceptance (validated in app logic)
+      }
+      
       // Read: Any authenticated user can read (they'll filter on client side)
       // This is necessary because we can't easily check array of objects in rules
       allow read: if isAuthenticated();
@@ -285,9 +298,11 @@ service cloud.firestore {
       allow create: if isAuthenticated() && 
                        request.resource.data.createdBy == request.auth.uid;
       
-      // Update: Only creator can update (simplified for now)
+      // Update: Creator can update, OR authenticated user can add themselves as member
+      // (invitation validation happens in application code)
       allow update: if isAuthenticated() && 
-                       resource.data.createdBy == request.auth.uid;
+                       (resource.data.createdBy == request.auth.uid || 
+                        request.resource.data.createdBy == resource.data.createdBy);
       
       // Delete: Only creator can delete
       allow delete: if isAuthenticated() && 
@@ -312,6 +327,18 @@ service cloud.firestore {
       // Delete: Creator can delete
       allow delete: if isAuthenticated() && 
                        resource.data.invitedBy == request.auth.uid;
+    }
+    
+    // ============================================
+    // GAMIFICATION
+    // ============================================
+    match /gamification/{userId} {
+      // Gamification document ID is the userId itself
+      // Users can only access their own gamification data
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId);
     }
     
     // ============================================

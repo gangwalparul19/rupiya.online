@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Your Rupiya Achievements - Track your financial milestones and badges">
+  <meta name="theme-color" content="#4A90E2">
+  <title>Achievements - Rupiya</title>
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="assets/images/logo.png" type="image/png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="assets/css/common.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/dark-mode.css">
+  <link rel="stylesheet" href="assets/css/dashboard.css">
+  <link rel="stylesheet" href="assets/css/gamification.css">
+</head>
+<body>
+  <div class="dashboard-layout">
+    <!-- Sidebar (same as dashboard) -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <img src="assets/images/logo.png" alt="Rupiya">
+        </div>
+        <button class="sidebar-toggle" id="sidebarClose">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <div class="nav-section-title">Main</div>
+          <a href="dashboard.html" class="nav-item">
+            <span class="nav-icon">📊</span>
+            <span>Dashboard</span>
+          </a>
+          <a href="expenses.html" class="nav-item">
+            <span class="nav-icon">💸</span>
+            <span>Expenses</span>
+          </a>
+          <a href="income.html" class="nav-item">
+            <span class="nav-icon">💰</span>
+            <span>Income</span>
+          </a>
+          <a href="budgets.html" class="nav-item">
+            <span class="nav-icon">💳</span>
+            <span>Budgets</span>
+          </a>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-section-title">Tracking</div>
+          <a href="investments.html" class="nav-item">
+            <span class="nav-icon">📈</span>
+            <span>Investments</span>
+          </a>
+          <a href="goals.html" class="nav-item">
+            <span class="nav-icon">🎯</span>
+            <span>Goals</span>
+          </a>
+          <a href="recurring.html" class="nav-item">
+            <span class="nav-icon">🔄</span>
+            <span>Recurring</span>
+          </a>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-section-title">Rewards</div>
+          <a href="achievements.html" class="nav-item active">
+            <span class="nav-icon">🏆</span>
+            <span>Achievements</span>
+          </a>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-section-title">More</div>
+          <a href="profile.html" class="nav-item">
+            <span class="nav-icon">⚙️</span>
+            <span>Settings</span>
+          </a>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-profile" id="userProfile">
+          <div class="user-avatar" id="userAvatar">U</div>
+          <div class="user-info">
+            <div class="user-name" id="userName">Loading...</div>
+            <div class="user-email" id="userEmail">Loading...</div>
+          </div>
+        </div>
+        <button class="btn btn-sm btn-outline w-100 mt-3" id="logoutBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+          </svg>
+          Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Mobile Header -->
+      <div class="mobile-header">
+        <button class="sidebar-toggle" id="sidebarOpen">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+        <div class="sidebar-logo">
+          <img src="assets/images/logo.png" alt="Rupiya" style="height: 32px;">
+        </div>
+        <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle theme">
+          <svg class="theme-icon-light" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <circle cx="12" cy="12" r="5"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Page Header -->
+      <div class="dashboard-header">
+        <div>
+          <h1 class="dashboard-title">🏆 Achievements</h1>
+          <p class="dashboard-subtitle">Track your progress and unlock rewards</p>
+        </div>
+      </div>
+
+      <!-- Gamification Summary -->
+      <div class="gamification-widget" id="gamificationSummary">
+        <div class="gamification-header">
+          <div class="gamification-level">
+            <div class="gamification-level-icon" id="levelIcon">🌱</div>
+            <div class="gamification-level-info">
+              <h4 id="levelName">Finance Newbie</h4>
+              <p>Level <span id="levelNumber">1</span></p>
+            </div>
+          </div>
+          <div class="gamification-points">
+            <div class="gamification-points-value" id="totalPoints">0</div>
+            <div class="gamification-points-label">Total Points</div>
+          </div>
+        </div>
+        <div class="gamification-progress">
+          <div class="gamification-progress-text">
+            <span id="progressText">0 / 50 points to next level</span>
+            <span id="nextLevelName">Budget Beginner</span>
+          </div>
+          <div class="level-progress">
+            <div class="level-progress-fill" id="levelProgressFill" style="width: 0%;"></div>
+          </div>
+        </div>
+        <div class="gamification-stats">
+          <div class="gamification-stat">
+            <div class="gamification-stat-value" id="streakValue">0</div>
+            <div class="gamification-stat-label">🔥 Day Streak</div>
+          </div>
+          <div class="gamification-stat">
+            <div class="gamification-stat-value" id="unlockedCount">0</div>
+            <div class="gamification-stat-label">🏅 Unlocked</div>
+          </div>
+          <div class="gamification-stat">
+            <div class="gamification-stat-value" id="totalAchievements">0</div>
+            <div class="gamification-stat-label">📋 Total</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Achievements List -->
+      <div id="achievementsList">
+        <!-- Will be populated by JS -->
+        <div class="empty-state">
+          <div class="empty-state-icon">🏆</div>
+          <h3 class="empty-state-title">Loading achievements...</h3>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="assets/js/pages/achievements.js"></script>
+  <script src="assets/js/pwa-setup.js"></script>
+</body>
+</html>

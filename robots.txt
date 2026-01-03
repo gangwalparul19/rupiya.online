@@ -1,38 +1,47 @@
-# Robots.txt for Rupiya - Personal Finance Tracker
+# Rupiya - Personal Finance App
+# https://rupiya.app
 
 User-agent: *
 Allow: /
-Disallow: /assets/
-Disallow: /components/
-Disallow: /*.js$
-Disallow: /*.css$
+
+# Allow indexing of main pages
+Allow: /index.html
+Allow: /login.html
+Allow: /signup.html
+
+# Disallow private/authenticated pages from indexing
+Disallow: /dashboard.html
+Disallow: /expenses.html
+Disallow: /income.html
+Disallow: /budgets.html
+Disallow: /goals.html
+Disallow: /investments.html
+Disallow: /family.html
+Disallow: /profile.html
+Disallow: /analytics.html
+Disallow: /achievements.html
+Disallow: /vehicles.html
+Disallow: /houses.html
+Disallow: /notes.html
+Disallow: /documents.html
+Disallow: /recurring.html
+Disallow: /split-expense.html
+Disallow: /ai-insights.html
+Disallow: /house-help.html
+
+# Disallow API and config files
+Disallow: /api/
+Disallow: /.env*
+Disallow: /firebase.json
+Disallow: /firestore.rules
+Disallow: /storage.rules
+
+# Disallow assets that shouldn't be indexed
+Disallow: /assets/js/
+Disallow: /node_modules/
 
 # Sitemap location
 Sitemap: https://rupiya.app/sitemap.xml
 
-# Crawl delay (optional)
+# Crawl delay (optional, be nice to servers)
 Crawl-delay: 1
-
-# Specific bot rules
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Slurp
-Allow: /
-
-# Block bad bots
-User-agent: AhrefsBot
-Disallow: /
-
-User-agent: SemrushBot
-Disallow: /
-
-User-agent: MJ12bot
-Disallow: /
-
-User-agent: DotBot
-Disallow: /
-
