@@ -1,8 +1,8 @@
 // Firebase Configuration
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
-import { getAuth, setPersistence, browserLocalPersistence, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
-import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
-import { getStorage } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-storage.js';
+import { getAuth, connectAuthEmulator } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
+import { getFirestore, connectFirestoreEmulator } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+import { getStorage, connectStorageEmulator } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-storage.js';
 import { loadEnvironment } from './env.js';
 
 // Load environment variables
@@ -26,25 +26,7 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
 
-// CRITICAL: Set auth persistence IMMEDIATELY before any auth operations
-// This must happen synchronously to ensure Firebase reads from localStorage
-(async () => {
-  try {
-    await setPersistence(auth, browserLocalPersistence);
-    console.log('[Firebase Config] ✅ Auth persistence set to LOCAL');
-    
-    // Force auth state check after setting persistence
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        console.log('[Firebase Config] ✅ User restored from localStorage:', user.email);
-      } else {
-        console.log('[Firebase Config] ⚠️ No user in auth state');
-      }
-    });
-  } catch (error) {
-    console.error('[Firebase Config] ❌ Error setting auth persistence:', error);
-  }
-})();
+console.log('[Firebase] Initialized successfully');
 
 // Export app for other uses
 export default app;

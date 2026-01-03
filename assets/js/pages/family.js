@@ -1,5 +1,4 @@
 // Family Management Page Logic
-import { auth } from '../config/firebase-config.js';
 import authService from '../services/auth-service.js';
 import familyService from '../services/family-service.js';
 import toast from '../components/toast.js';
@@ -8,62 +7,33 @@ let currentUser = null;
 let familyGroups = [];
 let pendingInvitations = [];
 
-console.log('[Family Page] Script loaded');
+console.log('[Family Page] Loading...');
 
 // Initialize page
 async function init() {
   console.log('[Family Page] Initializing...');
-  console.log('[Family Page] Firebase auth object:', typeof auth);
-  console.log('[Family Page] Auth service:', typeof authService);
   
   try {
-    const isAuthenticated = await checkAuth();
-    console.log('[Family Page] Auth check result:', isAuthenticated);
-    if (isAuthenticated) {
-      console.log('[Family Page] User authenticated, initializing page');
-      await initPage();
-    } else {
-      console.log('[Family Page] User not authenticated, should redirect');
-    }
-  } catch (error) {
-    console.error('[Family Page] Error initializing:', error);
-    toast.error('Failed to load page: ' + error.message);
-    // Don't redirect on error, show error instead
-  }
-}
-
-// Check authentication
-async function checkAuth() {
-  try {
-    console.log('[Family Page] Starting auth check...');
+    // Wait for auth
+    currentUser = await authService.waitForAuth();
     
-    // Wait for auth using the same method as dashboard
-    await authService.waitForAuth();
+    console.log('[Family Page] Auth result:', currentUser ? currentUser.email : 'Not logged in');
     
-    console.log('[Family Page] Auth initialized');
-    
-    // Check if authenticated using the service method
-    if (!authService.isAuthenticated()) {
-      console.log('[Family Page] Not authenticated, redirecting to login');
+    if (!currentUser) {
+      console.log('[Family Page] Not authenticated, redirecting...');
       toast.error('Please login to access Family Management');
       setTimeout(() => {
         window.location.href = 'login.html';
       }, 1000);
-      return false;
+      return;
     }
     
-    // Get current user
-    currentUser = authService.getCurrentUser();
-    console.log('[Family Page] ✅ User authenticated:', currentUser.email);
-    return true;
+    console.log('[Family Page] User authenticated, loading page...');
+    await initPage();
     
   } catch (error) {
-    console.error('[Family Page] Auth check error:', error);
-    toast.error('Authentication error: ' + error.message);
-    setTimeout(() => {
-      window.location.href = 'login.html';
-    }, 2000);
-    return false;
+    console.error('[Family Page] Error:', error);
+    toast.error('Failed to load page');
   }
 }
 

@@ -8,9 +8,7 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   sendPasswordResetEmail,
-  updateProfile,
-  setPersistence,
-  browserLocalPersistence
+  updateProfile
 } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
 
 class AuthService {
@@ -19,8 +17,10 @@ class AuthService {
     this.authStateListeners = [];
     this.authInitialized = false;
     this.authInitPromise = null;
-    this.resolved = false;
-    this.userService = null; // Will be set after import to avoid circular dependency
+    this.userService = null;
+    
+    // Start listening immediately
+    this.init();
   }
 
   // Initialize auth state listener
@@ -30,21 +30,17 @@ class AuthService {
     }
 
     this.authInitPromise = new Promise((resolve) => {
-      // Add a small delay to ensure persistence is set in firebase-config.js
-      setTimeout(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-          console.log('[Auth Service] Auth state changed:', user ? user.email : 'null');
-          this.currentUser = user;
-          this.authInitialized = true;
-          this.authStateListeners.forEach(callback => callback(user));
-          
-          // Only resolve once
-          if (!this.resolved) {
-            this.resolved = true;
-            resolve(user);
-          }
-        });
-      }, 100); // Small delay to let persistence be set
+      onAuthStateChanged(auth, (user) => {
+        console.log('[Auth Service] Auth state:', user ? user.email : 'Not logged in');
+        this.currentUser = user;
+        this.authInitialized = true;
+        
+        // Notify all listeners
+        this.authStateListeners.forEach(callback => callback(user));
+        
+        // Resolve promise
+        resolve(user);
+      });
     });
 
     return this.authInitPromise;
@@ -52,19 +48,16 @@ class AuthService {
 
   // Wait for auth to be initialized
   async waitForAuth() {
-    if (this.authInitialized) {
-      return this.currentUser;
-    }
     if (!this.authInitPromise) {
-      await this.init();
+      this.init();
     }
-    return await this.authInitPromise;
+    await this.authInitPromise;
+    return this.currentUser;
   }
 
   // Subscribe to auth state changes
   onAuthStateChanged(callback) {
     this.authStateListeners.push(callback);
-    // Call immediately with current state if initialized
     if (this.authInitialized) {
       callback(this.currentUser);
     }
@@ -73,22 +66,16 @@ class AuthService {
   // Sign in with email and password
   async signIn(email, password) {
     try {
-      // Ensure persistence is set to LOCAL
-      await setPersistence(auth, browserLocalPersistence);
-      console.log('[Auth Service] Persistence set for email sign-in');
-      
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      console.log('[Auth Service] Email sign-in successful');
       
-      console.log('[Auth Service] Email sign-in successful:', userCredential.user.email);
-      
-      // Create/update user profile in Firestore
       if (this.userService) {
         await this.userService.getOrCreateUserProfile(userCredential.user);
       }
       
       return { success: true, user: userCredential.user };
     } catch (error) {
-      console.error('[Auth Service] Email sign-in error:', error);
+      console.error('[Auth Service] Sign-in error:', error);
       return { success: false, error: this.getErrorMessage(error.code) };
     }
   }
@@ -98,14 +85,11 @@ class AuthService {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       
-      // Update profile with display name
       if (displayName) {
         await updateProfile(userCredential.user, { displayName });
-        // Refresh user to get updated displayName
         await userCredential.user.reload();
       }
       
-      // Create user profile in Firestore
       if (this.userService) {
         await this.userService.getOrCreateUserProfile(
           displayName ? auth.currentUser : userCredential.user
@@ -121,16 +105,11 @@ class AuthService {
   // Sign in with Google
   async signInWithGoogle() {
     try {
-      // Ensure persistence is set to LOCAL
-      await setPersistence(auth, browserLocalPersistence);
-      console.log('[Auth Service] Persistence set for Google sign-in');
-      
       const provider = new GoogleAuthProvider();
       const userCredential = await signInWithPopup(auth, provider);
       
-      console.log('[Auth Service] Google sign-in successful:', userCredential.user.email);
+      console.log('[Auth Service] Google sign-in successful');
       
-      // Create/update user profile in Firestore
       if (this.userService) {
         await this.userService.getOrCreateUserProfile(userCredential.user);
       }
@@ -145,7 +124,6 @@ class AuthService {
   // Sign out
   async signOut() {
     try {
-      // Clear user service cache
       if (this.userService) {
         this.userService.clearCache();
       }
@@ -157,7 +135,7 @@ class AuthService {
     }
   }
 
-  // Set user service (called after import to avoid circular dependency)
+  // Set user service
   setUserService(service) {
     this.userService = service;
   }
@@ -205,6 +183,5 @@ class AuthService {
 
 // Create and export singleton instance
 const authService = new AuthService();
-authService.init();
 
 export default authService;
