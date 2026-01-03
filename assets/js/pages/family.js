@@ -34,6 +34,9 @@ async function initPage() {
   // Setup event listeners
   setupEventListeners();
   
+  // Check for invitation link in URL
+  await checkInvitationLink();
+  
   // Load data
   await loadData();
   
@@ -364,6 +367,33 @@ function checkHashNavigation() {
     const invitationsSection = document.getElementById('invitationsSection');
     if (invitationsSection) {
       invitationsSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+}
+
+// Check for invitation link in URL
+async function checkInvitationLink() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const invitationId = urlParams.get('invitation');
+  
+  if (invitationId) {
+    // Show loading toast
+    toast.info('Processing invitation...');
+    
+    try {
+      // Try to accept the invitation
+      const result = await familyService.acceptInvitation(invitationId);
+      
+      if (result.success) {
+        toast.success('Invitation accepted! Welcome to the family group.');
+        // Remove invitation parameter from URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+      } else {
+        toast.error(result.error || 'Failed to accept invitation');
+      }
+    } catch (error) {
+      console.error('Error processing invitation:', error);
+      toast.error('Failed to process invitation');
     }
   }
 }

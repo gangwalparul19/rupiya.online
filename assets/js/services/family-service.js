@@ -161,8 +161,11 @@ class FamilyService {
 
       const docRef = await addDoc(collection(db, this.invitationsCollection), invitationData);
 
-      // TODO: Send email notification
-      // await this.sendInvitationEmail(invitationData);
+      // Send email notification
+      await this.sendInvitationEmail({
+        ...invitationData,
+        invitationId: docRef.id
+      });
 
       return { success: true, invitationId: docRef.id, data: invitationData };
     } catch (error) {
@@ -533,6 +536,37 @@ class FamilyService {
     } catch (error) {
       console.error('Error getting member expenses:', error);
       return [];
+    }
+  }
+
+  // Send invitation email
+  async sendInvitationEmail(invitationData) {
+    try {
+      const response = await fetch('/api/send-invitation', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          invitedEmail: invitationData.invitedEmail,
+          invitedByName: invitationData.invitedByName,
+          groupName: invitationData.groupName,
+          invitationId: invitationData.invitationId
+        })
+      });
+
+      const result = await response.json();
+      
+      if (!response.ok) {
+        console.error('Failed to send invitation email:', result.error);
+        return { success: false, error: result.error };
+      }
+
+      console.log('Invitation email sent successfully');
+      return { success: true };
+    } catch (error) {
+      console.error('Error sending invitation email:', error);
+      return { success: false, error: error.message };
     }
   }
 }

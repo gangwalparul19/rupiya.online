@@ -153,108 +153,109 @@
   </div>
 </div>
 
-<!-- Family Switcher Container (to be placed in navigation) -->
-<div id="familySwitcherContainer"></div>
-
 <script type="module">
   import familyService from './assets/js/services/family-service.js';
   import familySwitcher from './assets/js/components/family-switcher.js';
   import toast from './assets/js/components/toast.js';
 
-  // Initialize family switcher
-  document.addEventListener('DOMContentLoaded', async () => {
-    await familySwitcher.init();
-  });
-
-  // Create Family Form Handler
-  const createFamilyForm = document.getElementById('createFamilyForm');
-  const createFamilyModal = document.getElementById('createFamilyModal');
-  
-  if (createFamilyForm) {
-    createFamilyForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      const submitBtn = document.getElementById('createFamilySubmit');
-      const btnText = document.getElementById('createFamilyBtnText');
-      const btnSpinner = document.getElementById('createFamilyBtnSpinner');
-      const groupName = document.getElementById('familyGroupName').value.trim();
-      
-      if (!groupName) {
-        toast.error('Please enter a group name');
-        return;
-      }
-      
-      // Show loading
-      submitBtn.disabled = true;
-      btnText.style.display = 'none';
-      btnSpinner.style.display = 'inline-block';
-      
-      try {
-        const result = await familyService.createFamilyGroup(groupName);
-        
-        if (result.success) {
-          toast.success('Family group created successfully!');
-          createFamilyModal.classList.remove('show');
-          createFamilyForm.reset();
-          
-          // Refresh family switcher
-          await familySwitcher.refresh();
-          
-          // Switch to the new group
-          familySwitcher.switchToFamily(result.groupId);
-        } else {
-          toast.error(result.error || 'Failed to create family group');
-        }
-      } catch (error) {
-        console.error('Error creating family group:', error);
-        toast.error('Failed to create family group');
-      } finally {
-        submitBtn.disabled = false;
-        btnText.style.display = 'inline';
-        btnSpinner.style.display = 'none';
-      }
-    });
+  // Wait for DOM to be ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initModals);
+  } else {
+    initModals();
   }
 
-  // Close modal handlers
-  document.getElementById('closeCreateFamilyModal')?.addEventListener('click', () => {
-    createFamilyModal.classList.remove('show');
-  });
+  function initModals() {
+    // Create Family Form Handler
+    const createFamilyForm = document.getElementById('createFamilyForm');
+    const createFamilyModal = document.getElementById('createFamilyModal');
+    
+    if (createFamilyForm) {
+      createFamilyForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const submitBtn = document.getElementById('createFamilySubmit');
+        const btnText = document.getElementById('createFamilyBtnText');
+        const btnSpinner = document.getElementById('createFamilyBtnSpinner');
+        const groupName = document.getElementById('familyGroupName').value.trim();
+        
+        if (!groupName) {
+          toast.error('Please enter a group name');
+          return;
+        }
+        
+        // Show loading
+        submitBtn.disabled = true;
+        btnText.style.display = 'none';
+        btnSpinner.style.display = 'inline-block';
+        
+        try {
+          const result = await familyService.createFamilyGroup(groupName);
+          
+          if (result.success) {
+            toast.success('Family group created successfully!');
+            createFamilyModal.classList.remove('show');
+            createFamilyForm.reset();
+            
+            // Refresh family switcher
+            await familySwitcher.refresh();
+            
+            // Switch to the new group
+            familySwitcher.switchToFamily(result.groupId);
+          } else {
+            toast.error(result.error || 'Failed to create family group');
+          }
+        } catch (error) {
+          console.error('Error creating family group:', error);
+          toast.error('Failed to create family group');
+        } finally {
+          submitBtn.disabled = false;
+          btnText.style.display = 'inline';
+          btnSpinner.style.display = 'none';
+        }
+      });
+    }
 
-  document.getElementById('cancelCreateFamily')?.addEventListener('click', () => {
-    createFamilyModal.classList.remove('show');
-  });
-
-  document.getElementById('closeInviteMemberModal')?.addEventListener('click', () => {
-    document.getElementById('inviteMemberModal').classList.remove('show');
-  });
-
-  document.getElementById('cancelInviteMember')?.addEventListener('click', () => {
-    document.getElementById('inviteMemberModal').classList.remove('show');
-  });
-
-  document.getElementById('closeRemoveMemberModal')?.addEventListener('click', () => {
-    document.getElementById('removeMemberModal').classList.remove('show');
-  });
-
-  document.getElementById('cancelRemoveMember')?.addEventListener('click', () => {
-    document.getElementById('removeMemberModal').classList.remove('show');
-  });
-
-  document.getElementById('closeDeleteGroupModal')?.addEventListener('click', () => {
-    document.getElementById('deleteGroupModal').classList.remove('show');
-  });
-
-  document.getElementById('cancelDeleteGroup')?.addEventListener('click', () => {
-    document.getElementById('deleteGroupModal').classList.remove('show');
-  });
-
-  // Close modals when clicking outside
-  document.querySelectorAll('.modal-overlay').forEach(modal => {
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) {
-        modal.classList.remove('show');
-      }
+    // Close modal handlers
+    document.getElementById('closeCreateFamilyModal')?.addEventListener('click', () => {
+      createFamilyModal?.classList.remove('show');
     });
-  });
+
+    document.getElementById('cancelCreateFamily')?.addEventListener('click', () => {
+      createFamilyModal?.classList.remove('show');
+    });
+
+    document.getElementById('closeInviteMemberModal')?.addEventListener('click', () => {
+      document.getElementById('inviteMemberModal')?.classList.remove('show');
+    });
+
+    document.getElementById('cancelInviteMember')?.addEventListener('click', () => {
+      document.getElementById('inviteMemberModal')?.classList.remove('show');
+    });
+
+    document.getElementById('closeRemoveMemberModal')?.addEventListener('click', () => {
+      document.getElementById('removeMemberModal')?.classList.remove('show');
+    });
+
+    document.getElementById('cancelRemoveMember')?.addEventListener('click', () => {
+      document.getElementById('removeMemberModal')?.classList.remove('show');
+    });
+
+    document.getElementById('closeDeleteGroupModal')?.addEventListener('click', () => {
+      document.getElementById('deleteGroupModal')?.classList.remove('show');
+    });
+
+    document.getElementById('cancelDeleteGroup')?.addEventListener('click', () => {
+      document.getElementById('deleteGroupModal')?.classList.remove('show');
+    });
+
+    // Close modals when clicking outside
+    document.querySelectorAll('.modal-overlay').forEach(modal => {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.classList.remove('show');
+        }
+      });
+    });
+  }
 </script>

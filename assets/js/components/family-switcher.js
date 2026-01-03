@@ -185,46 +185,54 @@ class FamilySwitcher {
       });
     }
 
-    // Context switching
-    document.querySelectorAll('.switcher-option').forEach(option => {
-      option.addEventListener('click', () => {
-        const context = option.dataset.context;
-        const groupId = option.dataset.groupId;
+    // Use event delegation for dynamically created elements
+    const container = document.getElementById('familySwitcherContainer');
+    if (container) {
+      container.addEventListener('click', (e) => {
+        // Context switching
+        const switcherOption = e.target.closest('.switcher-option');
+        if (switcherOption) {
+          const context = switcherOption.dataset.context;
+          const groupId = switcherOption.dataset.groupId;
 
-        if (context === 'personal') {
-          this.switchToPersonal();
-        } else if (context === 'family' && groupId) {
-          this.switchToFamily(groupId);
+          if (context === 'personal') {
+            this.switchToPersonal();
+          } else if (context === 'family' && groupId) {
+            this.switchToFamily(groupId);
+          }
+
+          if (dropdown) {
+            dropdown.classList.remove('show');
+          }
+          if (btn) {
+            btn.classList.remove('open');
+          }
+          return;
         }
 
-        dropdown.classList.remove('show');
-        btn.classList.remove('open');
-      });
-    });
+        // Create family button
+        if (e.target.closest('#createFamilyBtn')) {
+          this.showCreateFamilyModal();
+          if (dropdown) {
+            dropdown.classList.remove('show');
+          }
+          if (btn) {
+            btn.classList.remove('open');
+          }
+          return;
+        }
 
-    // Create family button
-    const createBtn = document.getElementById('createFamilyBtn');
-    if (createBtn) {
-      createBtn.addEventListener('click', () => {
-        this.showCreateFamilyModal();
-        dropdown.classList.remove('show');
-        btn.classList.remove('open');
-      });
-    }
+        // Manage family button
+        if (e.target.closest('#manageFamilyBtn')) {
+          window.location.href = 'family.html';
+          return;
+        }
 
-    // Manage family button
-    const manageBtn = document.getElementById('manageFamilyBtn');
-    if (manageBtn) {
-      manageBtn.addEventListener('click', () => {
-        window.location.href = 'family.html';
-      });
-    }
-
-    // View invitations button
-    const invitationsBtn = document.getElementById('viewInvitationsBtn');
-    if (invitationsBtn) {
-      invitationsBtn.addEventListener('click', () => {
-        window.location.href = 'family.html#invitations';
+        // View invitations button
+        if (e.target.closest('#viewInvitationsBtn')) {
+          window.location.href = 'family.html#invitations';
+          return;
+        }
       });
     }
   }

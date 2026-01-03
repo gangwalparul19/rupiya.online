@@ -320,15 +320,45 @@
   </div>
 
   <!-- Family Modals -->
+  <!-- Family Modals -->
   <script>
     // Load family modals
-    fetch('family-modals.html')
-      .then(response => response.text())
-      .then(html => {
-        const div = document.createElement('div');
-        div.innerHTML = html;
-        document.body.appendChild(div);
-      });
+    (function() {
+      fetch('family-modals.html')
+        .then(response => response.text())
+        .then(html => {
+          // Remove comments and whitespace
+          const cleanHtml = html.replace(/<!--[\s\S]*?-->/g, '').trim();
+          
+          // Create a temporary container
+          const temp = document.createElement('div');
+          temp.innerHTML = cleanHtml;
+          
+          // Get all modal overlays and script tags
+          const modals = temp.querySelectorAll('.modal-overlay');
+          const scripts = temp.querySelectorAll('script');
+          
+          // Insert modals directly into body
+          modals.forEach(modal => {
+            document.body.appendChild(modal);
+          });
+          
+          // Execute scripts
+          scripts.forEach(oldScript => {
+            const newScript = document.createElement('script');
+            if (oldScript.type) newScript.type = oldScript.type;
+            if (oldScript.src) {
+              newScript.src = oldScript.src;
+            } else {
+              newScript.textContent = oldScript.textContent;
+            }
+            document.body.appendChild(newScript);
+          });
+          
+          console.log('Family modals loaded successfully');
+        })
+        .catch(error => console.error('Error loading family modals:', error));
+    })();
   </script>
 
   <!-- Scripts -->

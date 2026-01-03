@@ -81,7 +81,16 @@ rupiya-vanilla/
 - Blue theme with hover effects
 - No horizontal scrolling
 
-### Phase 3: Coming Next
+### Phase 3: Family Management ✅
+- Create and manage family groups
+- Invite members via email
+- **Email Invitations:** Beautiful HTML email templates with one-click acceptance
+- Accept/decline invitations
+- Member management (add/remove)
+- Role-based permissions (admin/member)
+- Family expense and income tracking
+
+### Phase 4: Coming Next
 - Expense management page
 - Income management page
 - Add/Edit/Delete functionality
@@ -152,12 +161,16 @@ Before proceeding to next phase:
 - `PHASE_2_SUMMARY.md` - Phase 2 implementation details
 - `MOBILE_HORIZONTAL_SCROLL_FIX.md` - Mobile optimization details
 - `MIGRATION_PLAN_NEXTJS_TO_VANILLA.md` - Full migration plan
+- **`EMAIL_SETUP_GUIDE.md`** - Complete email invitation setup guide
+- **`VERCEL_ENV_SETUP.md`** - Quick Vercel environment variables setup
+- **`FAMILY_INVITATION_FEATURE.md`** - Family invitation feature documentation
 
 ## 🚦 Current Status
 
 **Phase 1:** ✅ Complete
 **Phase 2:** ✅ Complete
-**Phase 3:** 🔄 Ready to start
+**Phase 3:** ✅ Complete (Family Management + Email Invitations)
+**Phase 4:** 🔄 Ready to start
 
 ## 🎯 Next Steps
 
