@@ -28,3 +28,9 @@ yarn-error.log*
 # Build outputs
 dist/
 build/
+www/
+
+# Capacitor
+android/
+ios/
+.capacitor/
