@@ -1,0 +1,241 @@
+/* Native App Specific Styles */
+/* Add this CSS file to all your HTML pages when running in Capacitor */
+
+/* Safe area insets for notched devices (iPhone X, etc.) */
+.native-app {
+  /* iOS safe areas */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/* Adjust main content for safe areas */
+.native-app .main-content {
+  padding-top: calc(var(--spacing-xl) + env(safe-area-inset-top));
+  padding-bottom: calc(var(--spacing-xl) + env(safe-area-inset-bottom));
+}
+
+/* Adjust mobile header for status bar */
+.native-app .mobile-header {
+  padding-top: calc(12px + env(safe-area-inset-top));
+}
+
+/* Hide PWA-specific elements in native app */
+.native-app .pwa-install-prompt,
+.native-app .pwa-install-button,
+.native-app .add-to-home-screen {
+  display: none !important;
+}
+
+/* Prevent text selection in native app (optional) */
+.native-app * {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Allow text selection in inputs and textareas */
+.native-app input,
+.native-app textarea,
+.native-app [contenteditable="true"] {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+
+/* Prevent zoom on double tap (iOS) */
+.native-app * {
+  touch-action: manipulation;
+}
+
+/* Smooth scrolling for native app */
+.native-app {
+  -webkit-overflow-scrolling: touch;
+  overflow-scrolling: touch;
+}
+
+/* Fix for iOS keyboard pushing content */
+.native-app.keyboard-open {
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Android status bar overlay fix */
+.native-app.android .mobile-header {
+  padding-top: 20px; /* Adjust based on your status bar height */
+}
+
+/* iOS status bar overlay fix */
+.native-app.ios .mobile-header {
+  padding-top: env(safe-area-inset-top, 20px);
+}
+
+/* Adjust sidebar for safe areas */
+.native-app .sidebar {
+  padding-top: env(safe-area-inset-top);
+}
+
+/* Adjust modals for safe areas */
+.native-app .modal-container {
+  margin-top: env(safe-area-inset-top);
+  margin-bottom: env(safe-area-inset-bottom);
+  max-height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+}
+
+/* Full screen modals on mobile */
+.native-app .modal-overlay {
+  padding: 0;
+}
+
+.native-app .modal-container {
+  border-radius: 0;
+  max-width: 100%;
+  max-height: 100vh;
+}
+
+/* Adjust bottom navigation for safe areas (if you add one) */
+.native-app .bottom-nav {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Fix for Android back button visual feedback */
+.native-app.android .btn:active,
+.native-app.android .nav-item:active {
+  opacity: 0.7;
+  transform: scale(0.98);
+}
+
+/* iOS-style bounce scroll */
+.native-app.ios {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Prevent overscroll on Android */
+.native-app.android {
+  overscroll-behavior: contain;
+}
+
+/* Native app splash screen background */
+.native-app-splash {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #4A90E2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.native-app-splash img {
+  width: 120px;
+  height: 120px;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+/* Hide splash when app is loaded */
+.native-app.loaded .native-app-splash {
+  display: none;
+}
+
+/* Adjust for notched devices (iPhone X, etc.) */
+@supports (padding: max(0px)) {
+  .native-app .mobile-header {
+    padding-top: max(12px, env(safe-area-inset-top));
+  }
+  
+  .native-app .main-content {
+    padding-bottom: max(var(--spacing-xl), env(safe-area-inset-bottom));
+  }
+}
+
+/* Dark mode adjustments for native app */
+.native-app[data-theme="dark"] .native-app-splash {
+  background: #1a1a1a;
+}
+
+/* Haptic feedback visual indicator (optional) */
+.native-app .btn:active::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: inherit;
+  transform: translate(-50%, -50%) scale(0);
+  animation: ripple 0.3s ease-out;
+}
+
+@keyframes ripple {
+  to {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0;
+  }
+}
+
+/* Network status indicator */
+.native-app .network-status {
+  position: fixed;
+  top: env(safe-area-inset-top, 0);
+  left: 0;
+  right: 0;
+  padding: 8px;
+  background: #E74C3C;
+  color: white;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  z-index: 10000;
+  transform: translateY(-100%);
+  transition: transform 0.3s ease;
+}
+
+.native-app .network-status.offline {
+  transform: translateY(0);
+}
+
+.native-app .network-status.online {
+  background: #27AE60;
+}
+
+/* Loading indicator for native app */
+.native-app .native-loading {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9998;
+}
+
+.native-app .native-loading .spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(74, 144, 226, 0.2);
+  border-top-color: #4A90E2;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

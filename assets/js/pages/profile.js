@@ -715,25 +715,65 @@ function renderPaymentMethods() {
     return;
   }
   
-  const html = paymentMethods.map(method => {
-    const icon = paymentMethodsService.getPaymentMethodIcon(method.type);
-    const displayName = paymentMethodsService.getPaymentMethodDisplayName(method);
-    const defaultBadge = method.isDefault ? '<span class="badge badge-primary">Default</span>' : '';
-    
-    return `
-      <div class="payment-method-card">
-        <div class="payment-method-icon">${icon}</div>
-        <div class="payment-method-info">
-          <div class="payment-method-name">${method.name} ${defaultBadge}</div>
-          <div class="payment-method-details">${getPaymentMethodDetails(method)}</div>
+  // Group payment methods by type
+  const grouped = {
+    cash: [],
+    card: [],
+    upi: [],
+    wallet: [],
+    bank: []
+  };
+  
+  paymentMethods.forEach(method => {
+    if (grouped[method.type]) {
+      grouped[method.type].push(method);
+    }
+  });
+  
+  // Category labels
+  const categoryLabels = {
+    cash: '💵 Cash',
+    card: '💳 Cards',
+    upi: '📱 UPI',
+    wallet: '👛 Digital Wallets',
+    bank: '🏦 Bank Accounts'
+  };
+  
+  let html = '';
+  
+  // Render each category
+  Object.keys(grouped).forEach(type => {
+    if (grouped[type].length > 0) {
+      html += `
+        <div class="payment-category">
+          <h3 class="payment-category-title">${categoryLabels[type]}</h3>
+          <div class="payment-methods-grid">
+            ${grouped[type].map(method => {
+              const icon = paymentMethodsService.getPaymentMethodIcon(method.type);
+              const displayName = paymentMethodsService.getPaymentMethodDisplayName(method);
+              const defaultBadge = method.isDefault ? '<span class="badge badge-primary">Default</span>' : '';
+              
+              return `
+                <div class="payment-method-card">
+                  <div class="payment-method-header">
+                    <div class="payment-method-icon">${icon}</div>
+                    <div class="payment-method-actions">
+                      ${!method.isDefault ? `<button class="btn-icon" onclick="setDefaultPaymentMethod('${method.id}')" title="Set as default">⭐</button>` : ''}
+                      <button class="btn-icon" onclick="showDeletePaymentMethodModal('${method.id}')" title="Delete">🗑️</button>
+                    </div>
+                  </div>
+                  <div class="payment-method-info">
+                    <div class="payment-method-name">${method.name} ${defaultBadge}</div>
+                    <div class="payment-method-details">${getPaymentMethodDetails(method)}</div>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
         </div>
-        <div class="payment-method-actions">
-          ${!method.isDefault ? `<button class="btn-icon" onclick="setDefaultPaymentMethod('${method.id}')" title="Set as default">⭐</button>` : ''}
-          <button class="btn-icon" onclick="showDeletePaymentMethodModal('${method.id}')" title="Delete">🗑️</button>
-        </div>
-      </div>
-    `;
-  }).join('');
+      `;
+    }
+  });
   
   paymentMethodsList.innerHTML = html;
 }

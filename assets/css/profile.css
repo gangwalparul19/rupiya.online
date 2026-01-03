@@ -390,12 +390,21 @@ ul li {
 }
 
 @media (max-width: 480px) {
-  .tab-btn span {
-    display: none;
+  .tab-btn {
+    padding: 0.625rem 0.5rem;
+    font-size: 0.6875rem;
+    flex-direction: column;
+    gap: 0.25rem;
   }
 
-  .tab-btn {
-    padding: 0.75rem 1rem;
+  .tab-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .tab-btn span {
+    display: block;
+    line-height: 1.2;
   }
 }
 
@@ -404,22 +413,56 @@ ul li {
    PAYMENT METHODS STYLES
    ============================================ */
 
-.payment-method-card {
+/* Payment Category Grouping */
+.payment-category {
+  margin-bottom: 2rem;
+}
+
+.payment-category:last-child {
+  margin-bottom: 0;
+}
+
+.payment-category-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #4A90E2;
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 0.5rem;
+}
+
+/* Payment Methods Grid - 2 per row */
+.payment-methods-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.payment-method-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   padding: 16px;
   background: #f8f9fa;
-  border: 1px solid #e9ecef;
-  border-radius: 8px;
-  margin-bottom: 12px;
+  border: 2px solid #4A90E2;
+  border-radius: 12px;
   transition: all 0.2s ease;
 }
 
 .payment-method-card:hover {
   background: #fff;
-  border-color: #4A90E2;
-  box-shadow: 0 2px 8px rgba(74, 144, 226, 0.1);
+  border-color: #00CED1;
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.15);
+  transform: translateY(-2px);
+}
+
+.payment-method-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .payment-method-icon {
@@ -436,7 +479,6 @@ ul li {
 
 .payment-method-info {
   flex: 1;
-  min-width: 0;
 }
 
 .payment-method-name {
@@ -446,16 +488,18 @@ ul li {
   display: flex;
   align-items: center;
   gap: 8px;
+  font-size: 0.9375rem;
 }
 
 .payment-method-details {
-  font-size: 14px;
+  font-size: 0.8125rem;
   color: #7f8c8d;
+  line-height: 1.4;
 }
 
 .payment-method-actions {
   display: flex;
-  gap: 8px;
+  gap: 4px;
 }
 
 .btn-icon {
@@ -463,9 +507,14 @@ ul li {
   border: none;
   font-size: 18px;
   cursor: pointer;
-  padding: 8px;
+  padding: 6px;
   border-radius: 4px;
   transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
 }
 
 .btn-icon:hover {
@@ -475,8 +524,8 @@ ul li {
 
 .badge {
   display: inline-block;
-  padding: 4px 8px;
-  font-size: 11px;
+  padding: 3px 8px;
+  font-size: 10px;
   font-weight: 600;
   text-transform: uppercase;
   border-radius: 4px;
@@ -534,27 +583,80 @@ ul li {
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
+  .payment-methods-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+  
   .payment-method-card {
-    flex-direction: column;
-    align-items: flex-start;
+    padding: 12px;
+    gap: 10px;
   }
   
   .payment-method-icon {
-    align-self: center;
+    font-size: 28px;
+    min-width: 40px;
+    height: 40px;
   }
   
-  .payment-method-info {
-    width: 100%;
-    text-align: center;
+  .payment-method-name {
+    font-size: 0.875rem;
   }
   
-  .payment-method-actions {
-    width: 100%;
-    justify-content: center;
+  .payment-method-details {
+    font-size: 0.75rem;
+  }
+  
+  .payment-category-title {
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .btn-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 16px;
+    padding: 4px;
+  }
+  
+  .badge {
+    font-size: 9px;
+    padding: 2px 6px;
   }
   
   .form-row {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .payment-methods-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+  
+  .payment-method-card {
+    padding: 10px;
+    gap: 8px;
+  }
+  
+  .payment-method-icon {
+    font-size: 24px;
+    min-width: 36px;
+    height: 36px;
+  }
+  
+  .payment-method-name {
+    font-size: 0.8125rem;
+  }
+  
+  .payment-method-details {
+    font-size: 0.6875rem;
+    line-height: 1.3;
+  }
+  
+  .payment-category-title {
+    font-size: 0.9375rem;
   }
 }
 
