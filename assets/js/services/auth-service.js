@@ -19,6 +19,7 @@ class AuthService {
     this.authStateListeners = [];
     this.authInitialized = false;
     this.authInitPromise = null;
+    this.resolved = false;
     this.userService = null; // Will be set after import to avoid circular dependency
   }
 
@@ -29,14 +30,21 @@ class AuthService {
     }
 
     this.authInitPromise = new Promise((resolve) => {
-      const unsubscribe = onAuthStateChanged(auth, (user) => {
-        console.log('[Auth Service] Auth state changed:', user ? user.email : 'null');
-        this.currentUser = user;
-        this.authInitialized = true;
-        this.authStateListeners.forEach(callback => callback(user));
-        resolve(user);
-        // Don't unsubscribe - keep listening for auth changes
-      });
+      // Add a small delay to ensure persistence is set in firebase-config.js
+      setTimeout(() => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+          console.log('[Auth Service] Auth state changed:', user ? user.email : 'null');
+          this.currentUser = user;
+          this.authInitialized = true;
+          this.authStateListeners.forEach(callback => callback(user));
+          
+          // Only resolve once
+          if (!this.resolved) {
+            this.resolved = true;
+            resolve(user);
+          }
+        });
+      }, 100); // Small delay to let persistence be set
     });
 
     return this.authInitPromise;
