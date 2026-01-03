@@ -479,32 +479,52 @@ function renderExpenseCategories() {
   const list = document.getElementById('expenseCategoriesList');
   if (!list) return;
   
-  list.innerHTML = expenseCategories.map(category => `
-    <div class="category-item">
-      <span class="category-name">${category}</span>
-      <button class="category-delete" onclick="window.deleteExpenseCategory('${category.replace(/'/g, "\\'")}')">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-        </svg>
-      </button>
-    </div>
-  `).join('');
+  const protectedCategories = categoriesService.getProtectedExpenseCategories();
+  
+  list.innerHTML = expenseCategories.map(category => {
+    const isProtected = protectedCategories.includes(category);
+    return `
+      <div class="category-item ${isProtected ? 'protected' : ''}">
+        <span class="category-name">
+          ${isProtected ? '🔒 ' : ''}${category}
+          ${isProtected ? '<span class="category-badge">System</span>' : ''}
+        </span>
+        ${!isProtected ? `
+          <button class="category-delete" onclick="window.deleteExpenseCategory('${category.replace(/'/g, "\\'")}')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        ` : ''}
+      </div>
+    `;
+  }).join('');
 }
 
 function renderIncomeCategories() {
   const list = document.getElementById('incomeCategoriesList');
   if (!list) return;
   
-  list.innerHTML = incomeCategories.map(category => `
-    <div class="category-item">
-      <span class="category-name">${category}</span>
-      <button class="category-delete" onclick="window.deleteIncomeCategory('${category.replace(/'/g, "\\'")}')">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-        </svg>
-      </button>
-    </div>
-  `).join('');
+  const protectedCategories = categoriesService.getProtectedIncomeCategories();
+  
+  list.innerHTML = incomeCategories.map(category => {
+    const isProtected = protectedCategories.includes(category);
+    return `
+      <div class="category-item ${isProtected ? 'protected' : ''}">
+        <span class="category-name">
+          ${isProtected ? '🔒 ' : ''}${category}
+          ${isProtected ? '<span class="category-badge">System</span>' : ''}
+        </span>
+        ${!isProtected ? `
+          <button class="category-delete" onclick="window.deleteIncomeCategory('${category.replace(/'/g, "\\'")}')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        ` : ''}
+      </div>
+    `;
+  }).join('');
 }
 
 async function handleAddExpenseCategory() {

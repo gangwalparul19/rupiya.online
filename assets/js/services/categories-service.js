@@ -14,6 +14,22 @@ class CategoriesService {
   constructor() {
     this.collectionName = 'userCategories';
     
+    // Protected expense categories - used by system features (cannot be deleted)
+    this.protectedExpenseCategories = [
+      'House Help',        // Used by house-help.js for maid payments
+      'Vehicle Fuel',      // Used by vehicles.js for fuel expenses
+      'Vehicle Maintenance', // Used by vehicles.js for maintenance expenses
+      'House Maintenance', // Used by houses.js for property maintenance
+      'Other'              // Fallback category
+    ];
+    
+    // Protected income categories - used by system features (cannot be deleted)
+    this.protectedIncomeCategories = [
+      'House Rent',        // Used by houses.js for rental income
+      'Vehicle Earnings',  // Used by vehicles.js for vehicle earnings
+      'Other'              // Fallback category
+    ];
+    
     // Default categories
     this.defaultExpenseCategories = [
       'Food & Dining',
@@ -26,6 +42,7 @@ class CategoriesService {
       'Travel',
       'Personal Care',
       'House Maintenance',
+      'House Help',
       'Vehicle Fuel',
       'Vehicle Maintenance',
       'Insurance',
@@ -56,6 +73,26 @@ class CategoriesService {
     const user = authService.getCurrentUser();
     if (!user) throw new Error('User not authenticated');
     return user.uid;
+  }
+  
+  // Check if expense category is protected
+  isProtectedExpenseCategory(category) {
+    return this.protectedExpenseCategories.includes(category);
+  }
+  
+  // Check if income category is protected
+  isProtectedIncomeCategory(category) {
+    return this.protectedIncomeCategories.includes(category);
+  }
+  
+  // Get list of protected expense categories
+  getProtectedExpenseCategories() {
+    return [...this.protectedExpenseCategories];
+  }
+  
+  // Get list of protected income categories
+  getProtectedIncomeCategories() {
+    return [...this.protectedIncomeCategories];
   }
 
   // Initialize categories for new user
@@ -202,6 +239,14 @@ class CategoriesService {
   // Delete expense category
   async deleteExpenseCategory(category) {
     try {
+      // Check if category is protected
+      if (this.isProtectedExpenseCategory(category)) {
+        return { 
+          success: false, 
+          error: `"${category}" is a system category used by the app and cannot be deleted.` 
+        };
+      }
+      
       const categories = await this.getExpenseCategories();
       const filtered = categories.filter(c => c !== category);
       
@@ -219,6 +264,14 @@ class CategoriesService {
   // Delete income category
   async deleteIncomeCategory(category) {
     try {
+      // Check if category is protected
+      if (this.isProtectedIncomeCategory(category)) {
+        return { 
+          success: false, 
+          error: `"${category}" is a system category used by the app and cannot be deleted.` 
+        };
+      }
+      
       const categories = await this.getIncomeCategories();
       const filtered = categories.filter(c => c !== category);
       

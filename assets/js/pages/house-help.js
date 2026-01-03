@@ -548,6 +548,11 @@ async function handleSavePayment() {
   savePaymentBtnSpinner.style.display = 'inline-block';
   
   try {
+    // Get staff details for expense description
+    const help = staff.find(h => h.id === currentPaymentStaffId);
+    const staffName = help ? help.name : 'House Help';
+    const staffRole = help ? help.role : 'Staff';
+    
     const paymentData = {
       staffId: currentPaymentStaffId,
       amount: amount,
@@ -555,16 +560,30 @@ async function handleSavePayment() {
       note: paymentNote.value.trim()
     };
     
+    // Save payment record
     const result = await firestoreService.add('houseHelpPayments', paymentData);
     
     if (result.success) {
+      // Also add as an expense so it shows on dashboard
+      const expenseData = {
+        amount: amount,
+        category: 'House Help',
+        description: `Payment to ${staffName} (${staffRole})${paymentNote.value.trim() ? ' - ' + paymentNote.value.trim() : ''}`,
+        date: new Date(paymentDate.value),
+        paymentMethod: 'Cash',
+        isHouseHelpPayment: true,
+        houseHelpPaymentId: result.id,
+        staffId: currentPaymentStaffId
+      };
+      
+      await firestoreService.addExpense(expenseData);
+      
       showToast('Payment recorded successfully', 'success');
       
       // Reload payments and refresh UI
       await loadAllPayments();
       
       // Update the modal with new data
-      const help = staff.find(h => h.id === currentPaymentStaffId);
       if (help) {
         const payments = staffPayments[currentPaymentStaffId] || [];
         const monthlySalary = parseFloat(help.monthlySalary) || 0;
@@ -630,6 +649,15 @@ async function handleDeletePayment() {
   deletePaymentBtnSpinner.style.display = 'inline-block';
   
   try {
+    // First, find and delete the corresponding expense
+    const expenses = await firestoreService.getExpenses();
+    const linkedExpense = expenses.find(e => e.houseHelpPaymentId === deletePaymentId);
+    
+    if (linkedExpense) {
+      await firestoreService.deleteExpense(linkedExpense.id);
+    }
+    
+    // Then delete the payment record
     const result = await firestoreService.delete('houseHelpPayments', deletePaymentId);
     
     if (result.success) {

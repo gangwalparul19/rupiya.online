@@ -7,19 +7,55 @@ let currentUser = null;
 
 // Check authentication
 async function checkAuth() {
-  currentUser = await authService.waitForAuth();
-  if (!currentUser) {
+  console.log('[Feedback Page] Checking authentication...');
+  try {
+    currentUser = await authService.waitForAuth();
+    console.log('[Feedback Page] Auth result:', currentUser ? currentUser.email : 'null');
+    
+    if (!currentUser) {
+      console.log('[Feedback Page] No user, redirecting to login...');
+      window.location.href = 'login.html';
+      return false;
+    }
+    return true;
+  } catch (error) {
+    console.error('[Feedback Page] Auth error:', error);
     window.location.href = 'login.html';
     return false;
   }
-  return true;
 }
 
 // Initialize page
 async function init() {
-  const isAuthenticated = await checkAuth();
-  if (isAuthenticated) {
-    await initPage();
+  console.log('[Feedback Page] Initializing...');
+  
+  // Show loading state
+  const loadingState = document.getElementById('pageLoadingState');
+  const mainContent = document.querySelector('.feedback-info-grid');
+  const formContainer = document.querySelector('.feedback-form-container');
+  const faqSection = document.querySelector('.feedback-faq');
+  
+  if (loadingState) loadingState.style.display = 'flex';
+  if (mainContent) mainContent.style.display = 'none';
+  if (formContainer) formContainer.style.display = 'none';
+  if (faqSection) faqSection.style.display = 'none';
+  
+  try {
+    const isAuthenticated = await checkAuth();
+    if (isAuthenticated) {
+      await initPage();
+      
+      // Show content
+      if (loadingState) loadingState.style.display = 'none';
+      if (mainContent) mainContent.style.display = 'grid';
+      if (formContainer) formContainer.style.display = 'block';
+      if (faqSection) faqSection.style.display = 'block';
+      
+      console.log('[Feedback Page] Page initialized successfully');
+    }
+  } catch (error) {
+    console.error('[Feedback Page] Init error:', error);
+    if (loadingState) loadingState.style.display = 'none';
   }
 }
 

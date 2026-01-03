@@ -45,6 +45,14 @@ const categoryIcons = {
   'Subscriptions': '📺',
   'Personal Care': '💅',
   'Gifts': '🎁',
+  'House Help': '🧹',
+  'Food & Dining': '🍽️',
+  'Bills & Utilities': '💡',
+  'House Maintenance': '🏠',
+  'Vehicle Fuel': '⛽',
+  'Vehicle Maintenance': '🔧',
+  'Taxes': '📋',
+  'Gifts & Donations': '🎁',
   'Other': '📦'
 };
 

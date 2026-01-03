@@ -267,6 +267,17 @@ ul li {
   box-shadow: 0 2px 8px rgba(74, 144, 226, 0.15);
 }
 
+.category-item.protected {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-color: #6c757d;
+  opacity: 0.85;
+}
+
+.category-item.protected:hover {
+  border-color: #6c757d;
+  box-shadow: none;
+}
+
 .category-name {
   font-size: 0.875rem;
   font-weight: 600;
@@ -275,6 +286,20 @@ ul li {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.category-badge {
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 0.15rem 0.4rem;
+  background: #6c757d;
+  color: white;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .category-delete {
