@@ -7,9 +7,45 @@ const showToast = (message, type) => toast.show(message, type);
 
 let currentUser = null;
 
+// Check if Firebase is properly configured
+function isFirebaseConfigured() {
+  const env = window.__ENV__;
+  if (!env) {
+    console.error('[Feedback] window.__ENV__ not found - build.js may not have run');
+    return false;
+  }
+  if (!env.VITE_FIREBASE_API_KEY || env.VITE_FIREBASE_API_KEY === '' || env.VITE_FIREBASE_API_KEY.includes('YOUR_')) {
+    console.error('[Feedback] Firebase API key not configured');
+    return false;
+  }
+  return true;
+}
+
+// Show configuration error
+function showConfigError() {
+  const mainContent = document.querySelector('.main-content');
+  if (mainContent) {
+    mainContent.innerHTML = `
+      <div style="padding: 2rem; text-align: center;">
+        <h2 style="color: #e74c3c; margin-bottom: 1rem;">⚠️ Configuration Error</h2>
+        <p style="margin-bottom: 1rem;">Firebase is not configured. This usually means the app needs to be redeployed.</p>
+        <p style="color: #666; font-size: 0.9rem;">If you're the developer, please redeploy to Vercel to inject environment variables.</p>
+        <button onclick="location.reload()" style="margin-top: 1rem; padding: 0.5rem 1rem; cursor: pointer;">Retry</button>
+      </div>
+    `;
+  }
+}
+
 // Initialize
 async function init() {
   console.log('[Feedback] Starting init...');
+  
+  // Check if Firebase is configured
+  if (!isFirebaseConfigured()) {
+    console.error('[Feedback] Firebase not configured, showing error');
+    showConfigError();
+    return;
+  }
   
   try {
     // Add a small delay to ensure Firebase is ready
@@ -20,8 +56,6 @@ async function init() {
     
     if (!currentUser) {
       console.log('[Feedback] No user, redirecting...');
-      // Don't redirect immediately - let user see the page first
-      // The page will show "Loading..." in sidebar
       window.location.href = 'login.html';
       return;
     }
@@ -32,7 +66,7 @@ async function init() {
   } catch (error) {
     console.error('[Feedback] Init error:', error);
     // Show error instead of redirecting
-    alert('Error loading page: ' + error.message);
+    showConfigError();
   }
 }
 
