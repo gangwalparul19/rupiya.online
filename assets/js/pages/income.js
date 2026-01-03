@@ -7,7 +7,7 @@ import familySwitcher from '../components/family-switcher.js';
 import toast from '../components/toast.js';
 import themeManager from '../utils/theme-manager.js';
 import { Validator } from '../utils/validation.js';
-import { formatCurrency, formatDate, formatDateForInput, debounce, exportToCSV } from '../utils/helpers.js';
+import { formatCurrency, formatCurrencyCompact, formatDate, formatDateForInput, debounce, exportToCSV } from '../utils/helpers.js';
 
 // State management
 const state = {
@@ -22,7 +22,26 @@ const state = {
     dateTo: '',
     search: ''
   },
-  editingIncomeId: null
+  editingIncomeId: null,
+  selectedIncome: new Set(),
+  bulkMode: false
+};
+
+// Source icons mapping
+const sourceIcons = {
+  'Salary': '💼',
+  'Freelance': '💻',
+  'Business': '🏢',
+  'Investments': '📈',
+  'Rental': '🏠',
+  'Interest': '🏦',
+  'Dividends': '💹',
+  'Bonus': '🎁',
+  'Commission': '💵',
+  'Pension': '👴',
+  'Gifts': '🎀',
+  'Refunds': '↩️',
+  'Other': '💰'
 };
 
 // Check authentication
@@ -234,6 +253,9 @@ async function loadIncome() {
     state.income = await firestoreService.getIncome();
     state.filteredIncome = [...state.income];
     
+    // Update KPI cards
+    updateIncomeKPIs();
+    
     applyFilters();
     
   } catch (error) {
@@ -241,6 +263,49 @@ async function loadIncome() {
     toast.error('Failed to load income');
     loadingState.style.display = 'none';
   }
+}
+
+// Update Income KPI Cards
+function updateIncomeKPIs() {
+  const now = new Date();
+  const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59);
+  
+  let thisMonthTotal = 0;
+  let lastMonthTotal = 0;
+  let totalAll = 0;
+  
+  state.income.forEach(income => {
+    const amount = Number(income.amount) || 0;
+    const incomeDate = income.date?.toDate ? income.date.toDate() : new Date(income.date);
+    
+    totalAll += amount;
+    
+    if (incomeDate >= thisMonthStart) {
+      thisMonthTotal += amount;
+    } else if (incomeDate >= lastMonthStart && incomeDate <= lastMonthEnd) {
+      lastMonthTotal += amount;
+    }
+  });
+  
+  // Update UI with compact format
+  const thisMonthEl = document.getElementById('thisMonthIncome');
+  const lastMonthEl = document.getElementById('lastMonthIncome');
+  const totalEl = document.getElementById('totalIncome');
+  
+  if (thisMonthEl) thisMonthEl.textContent = formatCurrencyCompact(thisMonthTotal);
+  if (lastMonthEl) lastMonthEl.textContent = formatCurrencyCompact(lastMonthTotal);
+  if (totalEl) totalEl.textContent = formatCurrencyCompact(totalAll);
+  
+  // Update tooltips with full amounts
+  const thisMonthKpi = document.getElementById('thisMonthKpi');
+  const lastMonthKpi = document.getElementById('lastMonthKpi');
+  const totalKpi = document.getElementById('totalKpi');
+  
+  if (thisMonthKpi) thisMonthKpi.setAttribute('data-tooltip', formatCurrency(thisMonthTotal));
+  if (lastMonthKpi) lastMonthKpi.setAttribute('data-tooltip', formatCurrency(lastMonthTotal));
+  if (totalKpi) totalKpi.setAttribute('data-tooltip', formatCurrency(totalAll));
 }
 
 // Apply filters
@@ -338,39 +403,58 @@ function renderIncome() {
 // Create income card HTML
 function createIncomeCard(income) {
   const date = income.date.toDate ? income.date.toDate() : new Date(income.date);
+  const sourceIcon = sourceIcons[income.source] || '💰';
+  const isRecurring = income.isRecurring || income.recurringId;
+  const isSelected = state.selectedIncome.has(income.id);
   
   return `
-    <div class="income-card" data-id="${income.id}">
-      <div class="income-header">
-        <div class="income-amount">${formatCurrency(income.amount)}</div>
-        <div class="income-source">${income.source}</div>
-        <div class="income-actions">
-          <button class="btn-icon btn-edit" data-id="${income.id}" title="Edit">
+    <div class="income-card swipeable-card ${isSelected ? 'selected' : ''}" data-id="${income.id}">
+      <div class="card-content">
+        <div class="income-header">
+          <input type="checkbox" class="income-checkbox" data-id="${income.id}" ${isSelected ? 'checked' : ''}>
+          <div class="income-amount">${formatCurrency(income.amount)}</div>
+          <div class="income-source-with-icon">
+            <span class="category-icon">${sourceIcon}</span>
+            <span>${income.source}</span>
+            ${isRecurring ? '<span class="recurring-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Recurring</span>' : ''}
+          </div>
+          <div class="income-actions">
+            <button class="btn-icon btn-duplicate" data-id="${income.id}" title="Duplicate">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+              </svg>
+            </button>
+            <button class="btn-icon btn-edit" data-id="${income.id}" title="Edit">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+              </svg>
+            </button>
+            <button class="btn-icon btn-delete" data-id="${income.id}" title="Delete">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        ${income.description ? `<div class="income-description">${income.description}</div>` : ''}
+        <div class="income-meta">
+          <div class="income-meta-item">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
             </svg>
-          </button>
-          <button class="btn-icon btn-delete" data-id="${income.id}" title="Delete">
+            ${formatDate(date)}
+          </div>
+          <div class="income-meta-item">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
             </svg>
-          </button>
+            ${income.paymentMethod}
+          </div>
         </div>
       </div>
-      ${income.description ? `<div class="income-description">${income.description}</div>` : ''}
-      <div class="income-meta">
-        <div class="income-meta-item">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-          </svg>
-          ${formatDate(date)}
-        </div>
-        <div class="income-meta-item">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
-          </svg>
-          ${income.paymentMethod}
-        </div>
+      <div class="swipe-actions">
+        <div class="swipe-action edit" data-id="${income.id}">✏️</div>
+        <div class="swipe-action delete" data-id="${income.id}">🗑️</div>
       </div>
     </div>
   `;
@@ -393,6 +477,125 @@ function attachCardEventListeners() {
       openDeleteModal(id);
     });
   });
+  
+  // Duplicate buttons
+  document.querySelectorAll('.btn-duplicate').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const id = e.currentTarget.getAttribute('data-id');
+      duplicateIncome(id);
+    });
+  });
+  
+  // Checkboxes for bulk selection
+  document.querySelectorAll('.income-checkbox').forEach(checkbox => {
+    checkbox.addEventListener('change', (e) => {
+      const id = e.target.getAttribute('data-id');
+      if (e.target.checked) {
+        state.selectedIncome.add(id);
+      } else {
+        state.selectedIncome.delete(id);
+      }
+      updateBulkActionsBar();
+    });
+  });
+  
+  // Swipe actions for mobile
+  initSwipeActions();
+}
+
+// Duplicate income
+async function duplicateIncome(id) {
+  const income = state.income.find(i => i.id === id);
+  if (!income) return;
+  
+  // Open add form with pre-filled data
+  openAddForm();
+  amountInput.value = income.amount;
+  sourceInput.value = income.source;
+  descriptionInput.value = income.description || '';
+  paymentMethodInput.value = income.paymentMethod;
+  
+  toast.info('Income duplicated - modify and save');
+}
+
+// Update bulk actions bar
+function updateBulkActionsBar() {
+  const bulkBar = document.getElementById('bulkActionsBar');
+  const countEl = document.getElementById('bulkSelectedCount');
+  
+  if (state.selectedIncome.size > 0) {
+    bulkBar.classList.add('visible');
+    countEl.textContent = `${state.selectedIncome.size} selected`;
+  } else {
+    bulkBar.classList.remove('visible');
+  }
+}
+
+// Bulk delete selected income
+async function bulkDeleteIncome() {
+  if (state.selectedIncome.size === 0) return;
+  
+  const confirmed = confirm(`Delete ${state.selectedIncome.size} selected income entries?`);
+  if (!confirmed) return;
+  
+  try {
+    const deletePromises = Array.from(state.selectedIncome).map(id => 
+      firestoreService.deleteIncome(id)
+    );
+    await Promise.all(deletePromises);
+    
+    toast.success(`${state.selectedIncome.size} income entries deleted`);
+    state.selectedIncome.clear();
+    updateBulkActionsBar();
+    await loadIncome();
+  } catch (error) {
+    console.error('Error bulk deleting:', error);
+    toast.error('Failed to delete some entries');
+  }
+}
+
+// Initialize swipe actions for mobile
+function initSwipeActions() {
+  if ('ontouchstart' in window) {
+    document.querySelectorAll('.swipeable-card').forEach(card => {
+      let startX = 0;
+      let currentX = 0;
+      
+      card.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+      });
+      
+      card.addEventListener('touchmove', (e) => {
+        currentX = e.touches[0].clientX;
+        const diff = startX - currentX;
+        
+        if (diff > 50) {
+          card.classList.add('swiped');
+        } else if (diff < -50) {
+          card.classList.remove('swiped');
+        }
+      });
+      
+      card.addEventListener('touchend', () => {
+        // Keep state based on final position
+      });
+    });
+    
+    // Swipe action buttons
+    document.querySelectorAll('.swipe-action.edit').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const id = e.target.getAttribute('data-id');
+        openEditForm(id);
+      });
+    });
+    
+    document.querySelectorAll('.swipe-action.delete').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const id = e.target.getAttribute('data-id');
+        openDeleteModal(id);
+      });
+    });
+  }
 }
 
 // Load user's payment methods
@@ -512,6 +715,15 @@ function setupEventListeners() {
     sidebarOverlay.classList.remove('show');
   });
   
+  // Theme toggle
+  const themeToggleBtn = document.getElementById('themeToggleBtn');
+  if (themeToggleBtn) {
+    themeToggleBtn.addEventListener('click', () => {
+      const newTheme = themeManager.toggleTheme();
+      toast.success(`Switched to ${newTheme} mode`);
+    });
+  }
+  
   // Filters toggle (mobile)
   filtersToggle.addEventListener('click', () => {
     filtersContent.classList.toggle('show');
@@ -607,6 +819,65 @@ function setupEventListeners() {
     if (e.target === deleteModal) {
       closeDeleteConfirmModal();
     }
+  });
+  
+  // FAB button
+  const fabBtn = document.getElementById('fabAddIncome');
+  if (fabBtn) {
+    fabBtn.addEventListener('click', openAddForm);
+  }
+  
+  // Bulk actions
+  const bulkCancelBtn = document.getElementById('bulkCancelBtn');
+  const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+  
+  if (bulkCancelBtn) {
+    bulkCancelBtn.addEventListener('click', () => {
+      state.selectedIncome.clear();
+      updateBulkActionsBar();
+      renderIncome();
+    });
+  }
+  
+  if (bulkDeleteBtn) {
+    bulkDeleteBtn.addEventListener('click', bulkDeleteIncome);
+  }
+  
+  // Pull to refresh
+  initPullToRefresh();
+}
+
+// Initialize pull to refresh
+function initPullToRefresh() {
+  let startY = 0;
+  let pulling = false;
+  const pullIndicator = document.getElementById('pullToRefresh');
+  
+  document.addEventListener('touchstart', (e) => {
+    if (window.scrollY === 0) {
+      startY = e.touches[0].clientY;
+      pulling = true;
+    }
+  });
+  
+  document.addEventListener('touchmove', (e) => {
+    if (!pulling) return;
+    
+    const currentY = e.touches[0].clientY;
+    const diff = currentY - startY;
+    
+    if (diff > 80 && window.scrollY === 0) {
+      pullIndicator.classList.add('visible');
+    }
+  });
+  
+  document.addEventListener('touchend', async () => {
+    if (pullIndicator && pullIndicator.classList.contains('visible')) {
+      await loadIncome();
+      pullIndicator.classList.remove('visible');
+      toast.success('Refreshed');
+    }
+    pulling = false;
   });
 }
 

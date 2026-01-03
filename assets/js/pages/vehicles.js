@@ -4,23 +4,34 @@ import firestoreService from '../services/firestore-service.js';
 import familySwitcher from '../components/family-switcher.js';
 import toast from '../components/toast.js';
 import themeManager from '../utils/theme-manager.js';
-import { formatCurrency, formatDate } from '../utils/helpers.js';
+import { formatCurrency, formatCurrencyCompact, formatDate } from '../utils/helpers.js';
 
 // Helper function for toast
 const showToast = (message, type) => toast.show(message, type);
 
 // State
 let vehicles = [];
+let fuelLogs = [];
 let editingVehicleId = null;
 
 // DOM Elements
 let addVehicleBtn, addVehicleSection, closeFormBtn, cancelFormBtn;
 let vehicleForm, formTitle, saveFormBtn, saveFormBtnText, saveFormBtnSpinner;
 let vehiclesList, emptyState, loadingState;
-let totalVehiclesEl, totalValueEl, monthlyFuelEl;
+let totalVehiclesEl, totalFuelCostEl, avgMileageEl, totalDistanceEl;
 let deleteModal, closeDeleteModalBtn, cancelDeleteBtn, confirmDeleteBtn;
 let deleteBtnText, deleteBtnSpinner, deleteVehicleName, deleteVehicleDetails;
 let deleteVehicleId = null;
+
+// Fuel Log Modal Elements
+let fuelLogModal, closeFuelLogModalBtn, cancelFuelLogBtn, saveFuelLogBtn;
+let fuelLogForm, fuelLogVehicleId, fuelLogVehicleName;
+let saveFuelLogBtnText, saveFuelLogBtnSpinner;
+
+// Mileage History Modal Elements
+let mileageHistoryModal, closeMileageHistoryBtn, closeMileageHistoryFooterBtn;
+let mileageVehicleName, fuelLogList;
+let vehicleAvgMileage, vehicleTotalDistance, vehicleTotalFuelCost, vehicleCostPerKm;
 
 // Initialize page
 async function init() {
@@ -56,8 +67,9 @@ function initDOMElements() {
   emptyState = document.getElementById('emptyState');
   loadingState = document.getElementById('loadingState');
   totalVehiclesEl = document.getElementById('totalVehicles');
-  totalValueEl = document.getElementById('totalFuelCost');
-  monthlyFuelEl = document.getElementById('totalMaintenanceCost');
+  totalFuelCostEl = document.getElementById('totalFuelCost');
+  avgMileageEl = document.getElementById('avgMileage');
+  totalDistanceEl = document.getElementById('totalDistance');
   deleteModal = document.getElementById('deleteModal');
   closeDeleteModalBtn = document.getElementById('closeDeleteModalBtn');
   cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
@@ -66,6 +78,28 @@ function initDOMElements() {
   deleteBtnSpinner = document.getElementById('deleteBtnSpinner');
   deleteVehicleName = document.getElementById('deleteVehicleName');
   deleteVehicleDetails = document.getElementById('deleteVehicleDetails');
+  
+  // Fuel Log Modal Elements
+  fuelLogModal = document.getElementById('fuelLogModal');
+  closeFuelLogModalBtn = document.getElementById('closeFuelLogModalBtn');
+  cancelFuelLogBtn = document.getElementById('cancelFuelLogBtn');
+  saveFuelLogBtn = document.getElementById('saveFuelLogBtn');
+  fuelLogForm = document.getElementById('fuelLogForm');
+  fuelLogVehicleId = document.getElementById('fuelLogVehicleId');
+  fuelLogVehicleName = document.getElementById('fuelLogVehicleName');
+  saveFuelLogBtnText = document.getElementById('saveFuelLogBtnText');
+  saveFuelLogBtnSpinner = document.getElementById('saveFuelLogBtnSpinner');
+  
+  // Mileage History Modal Elements
+  mileageHistoryModal = document.getElementById('mileageHistoryModal');
+  closeMileageHistoryBtn = document.getElementById('closeMileageHistoryBtn');
+  closeMileageHistoryFooterBtn = document.getElementById('closeMileageHistoryFooterBtn');
+  mileageVehicleName = document.getElementById('mileageVehicleName');
+  fuelLogList = document.getElementById('fuelLogList');
+  vehicleAvgMileage = document.getElementById('vehicleAvgMileage');
+  vehicleTotalDistance = document.getElementById('vehicleTotalDistance');
+  vehicleTotalFuelCost = document.getElementById('vehicleTotalFuelCost');
+  vehicleCostPerKm = document.getElementById('vehicleCostPerKm');
 }
 
 function setupEventListeners() {
@@ -97,6 +131,29 @@ function setupEventListeners() {
   closeDeleteModalBtn.addEventListener('click', hideDeleteModal);
   cancelDeleteBtn.addEventListener('click', hideDeleteModal);
   confirmDeleteBtn.addEventListener('click', handleDelete);
+  
+  // Fuel Log Modal Events
+  closeFuelLogModalBtn?.addEventListener('click', hideFuelLogModal);
+  cancelFuelLogBtn?.addEventListener('click', hideFuelLogModal);
+  saveFuelLogBtn?.addEventListener('click', handleSaveFuelLog);
+  
+  // Auto-calculate total cost
+  document.getElementById('fuelQuantity')?.addEventListener('input', calculateTotalCost);
+  document.getElementById('fuelPrice')?.addEventListener('input', calculateTotalCost);
+  
+  // Mileage History Modal Events
+  closeMileageHistoryBtn?.addEventListener('click', hideMileageHistoryModal);
+  closeMileageHistoryFooterBtn?.addEventListener('click', hideMileageHistoryModal);
+  
+  // Maintenance Modal Events
+  document.getElementById('closeMaintenanceModalBtn')?.addEventListener('click', hideMaintenanceModal);
+  document.getElementById('cancelMaintenanceBtn')?.addEventListener('click', hideMaintenanceModal);
+  document.getElementById('saveMaintenanceBtn')?.addEventListener('click', handleSaveMaintenance);
+  
+  // Vehicle Income Modal Events
+  document.getElementById('closeVehicleIncomeModalBtn')?.addEventListener('click', hideVehicleIncomeModal);
+  document.getElementById('cancelVehicleIncomeBtn')?.addEventListener('click', hideVehicleIncomeModal);
+  document.getElementById('saveVehicleIncomeBtn')?.addEventListener('click', handleSaveVehicleIncome);
 }
 
 function loadUserProfile(user) {
@@ -200,6 +257,8 @@ async function loadVehicles() {
   emptyState.style.display = 'none';
 
   try {
+    // Load both vehicles and fuel logs
+    await loadFuelLogs();
     vehicles = await firestoreService.getAll('vehicles', 'createdAt', 'desc');
     
     if (vehicles.length === 0) {
@@ -236,6 +295,10 @@ function renderVehicles() {
       }
     }
 
+    // Get vehicle mileage stats
+    const vehicleFuelLogs = fuelLogs.filter(log => log.vehicleId === vehicle.id);
+    const mileageStats = calculateVehicleMileage(vehicleFuelLogs);
+
     return `
       <div class="vehicle-card">
         <div class="vehicle-card-header">
@@ -269,12 +332,16 @@ function renderVehicles() {
 
         <div class="vehicle-card-body">
           <div class="vehicle-stat">
-            <div class="vehicle-stat-label">Current Mileage</div>
+            <div class="vehicle-stat-label">Odometer</div>
             <div class="vehicle-stat-value">${vehicle.currentMileage ? vehicle.currentMileage.toLocaleString() : '0'} km</div>
           </div>
           <div class="vehicle-stat">
             <div class="vehicle-stat-label">Fuel Type</div>
             <div class="vehicle-stat-value">${vehicle.fuelType || 'N/A'}</div>
+          </div>
+          <div class="vehicle-stat mileage-highlight">
+            <div class="vehicle-stat-label">Avg Mileage</div>
+            <div class="vehicle-stat-value ${mileageStats.avgMileage > 0 ? 'text-success' : ''}">${mileageStats.avgMileage > 0 ? mileageStats.avgMileage.toFixed(2) + ' km/l' : '-- km/l'}</div>
           </div>
           ${vehicle.insuranceExpiry ? `
             <div class="vehicle-stat">
@@ -285,17 +352,17 @@ function renderVehicles() {
         </div>
 
         <div class="vehicle-card-actions">
-          <button class="btn btn-sm btn-outline" onclick="window.addVehicleExpense('${vehicle.id}', '${vehicle.name.replace(/'/g, "\\'")}')">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-            </svg>
-            Add Expense
+          <button class="btn btn-sm btn-primary" onclick="window.showFuelLogModal('${vehicle.id}', '${vehicle.name.replace(/'/g, "\\'")}', ${vehicle.currentMileage || 0})">
+            ⛽ Add Fuel
           </button>
-          <button class="btn btn-sm btn-primary" onclick="window.addVehicleIncome('${vehicle.id}', '${vehicle.name.replace(/'/g, "\\'")}')">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-            </svg>
-            Add Income
+          <button class="btn btn-sm btn-outline" onclick="window.showMaintenanceModal('${vehicle.id}', '${vehicle.name.replace(/'/g, "\\'")}')">
+            🔧 Maintenance
+          </button>
+          <button class="btn btn-sm btn-success" onclick="window.showVehicleIncomeModal('${vehicle.id}', '${vehicle.name.replace(/'/g, "\\'")}')">
+            💰 Income
+          </button>
+          <button class="btn btn-sm btn-secondary" onclick="window.showMileageHistory('${vehicle.id}', '${vehicle.name.replace(/'/g, "\\'")}')">
+            📊 History
           </button>
         </div>
 
@@ -311,23 +378,516 @@ function renderVehicles() {
 
 function updateSummary() {
   const totalVehicles = vehicles.length;
-  
-  // Placeholders - will be updated with actual data
   totalVehiclesEl.textContent = totalVehicles;
-  totalValueEl.textContent = '₹0';
-  monthlyFuelEl.textContent = '₹0';
   
-  // Load actual expense/income data
-  loadVehicleSummaryData();
+  // Calculate overall stats from fuel logs
+  const overallStats = calculateOverallMileageStats();
+  
+  totalFuelCostEl.textContent = formatCurrency(overallStats.totalFuelCost);
+  avgMileageEl.textContent = overallStats.avgMileage > 0 ? overallStats.avgMileage.toFixed(2) + ' km/l' : '-- km/l';
+  totalDistanceEl.textContent = overallStats.totalDistance.toLocaleString() + ' km';
+  
+  // Load expense and income data
+  loadVehicleKPIData();
+}
+
+// Load all vehicle KPI data
+async function loadVehicleKPIData() {
+  try {
+    // Get all expenses linked to vehicles
+    const allExpenses = await firestoreService.getExpenses();
+    const vehicleExpenses = allExpenses.filter(e => e.linkedType === 'vehicle');
+    
+    // Get all income linked to vehicles
+    const allIncome = await firestoreService.getIncome();
+    const vehicleIncome = allIncome.filter(i => i.linkedType === 'vehicle');
+    
+    // Calculate totals
+    const totalExpenses = vehicleExpenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
+    const totalIncome = vehicleIncome.reduce((sum, i) => sum + (Number(i.amount) || 0), 0);
+    
+    // Calculate fuel vs maintenance breakdown
+    const fuelExpenses = vehicleExpenses.filter(e => 
+      e.category === 'Vehicle Fuel' || e.description?.toLowerCase().includes('fuel')
+    );
+    const maintenanceExpenses = vehicleExpenses.filter(e => 
+      e.category === 'Vehicle Maintenance' || 
+      (!e.category?.includes('Fuel') && e.category !== 'Vehicle Fuel')
+    );
+    
+    const totalFuel = fuelExpenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
+    const totalMaintenance = maintenanceExpenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
+    
+    // Net profit/loss
+    const netProfitLoss = totalIncome - totalExpenses;
+    
+    // Update UI with compact format
+    document.getElementById('totalFuelCost').textContent = formatCurrencyCompact(totalFuel);
+    document.getElementById('totalMaintenanceCost').textContent = formatCurrencyCompact(totalMaintenance);
+    document.getElementById('totalVehicleExpenses').textContent = formatCurrencyCompact(totalExpenses);
+    
+  } catch (error) {
+    console.error('Error loading vehicle KPI data:', error);
+  }
 }
 
 async function loadVehicleSummaryData() {
-  try {
-    const vehicleExpenses = await firestoreService.getTotalExpensesByLinkedType('vehicle');
-    const vehicleIncome = await firestoreService.getTotalIncomeByLinkedType('vehicle');
+  // This function is now replaced by fuel log based calculations
+}
+
+// Calculate mileage for a specific vehicle
+function calculateVehicleMileage(vehicleFuelLogs) {
+  if (!vehicleFuelLogs || vehicleFuelLogs.length < 2) {
+    return { avgMileage: 0, totalDistance: 0, totalFuelCost: 0, totalFuel: 0 };
+  }
+
+  // Sort by odometer reading
+  const sortedLogs = [...vehicleFuelLogs].sort((a, b) => a.odometerReading - b.odometerReading);
+  
+  let totalDistance = 0;
+  let totalFuel = 0;
+  let totalFuelCost = 0;
+
+  // Calculate mileage between consecutive full tank fills
+  for (let i = 1; i < sortedLogs.length; i++) {
+    const prevLog = sortedLogs[i - 1];
+    const currLog = sortedLogs[i];
     
-    totalValueEl.textContent = formatCurrency(vehicleExpenses);
-    monthlyFuelEl.textContent = formatCurrency(vehicleIncome);
+    const distance = currLog.odometerReading - prevLog.odometerReading;
+    totalDistance += distance;
+    totalFuel += currLog.fuelQuantity;
+    totalFuelCost += currLog.totalCost || (currLog.fuelQuantity * currLog.fuelPrice);
+  }
+
+  // Add first entry's fuel cost
+  if (sortedLogs.length > 0) {
+    totalFuelCost += sortedLogs[0].totalCost || (sortedLogs[0].fuelQuantity * sortedLogs[0].fuelPrice);
+  }
+
+  const avgMileage = totalFuel > 0 ? totalDistance / totalFuel : 0;
+
+  return {
+    avgMileage,
+    totalDistance,
+    totalFuelCost,
+    totalFuel
+  };
+}
+
+// Calculate overall mileage stats for all vehicles
+function calculateOverallMileageStats() {
+  let totalFuelCost = 0;
+  let totalDistance = 0;
+  let totalFuel = 0;
+
+  vehicles.forEach(vehicle => {
+    const vehicleLogs = fuelLogs.filter(log => log.vehicleId === vehicle.id);
+    const stats = calculateVehicleMileage(vehicleLogs);
+    totalFuelCost += stats.totalFuelCost;
+    totalDistance += stats.totalDistance;
+    totalFuel += stats.totalFuel;
+  });
+
+  const avgMileage = totalFuel > 0 ? totalDistance / totalFuel : 0;
+
+  return {
+    totalFuelCost,
+    totalDistance,
+    totalFuel,
+    avgMileage
+  };
+}
+
+// Load fuel logs from Firestore
+async function loadFuelLogs() {
+  try {
+    fuelLogs = await firestoreService.getAll('fuelLogs', 'date', 'desc');
+  } catch (error) {
+    console.error('Error loading fuel logs:', error);
+    fuelLogs = [];
+  }
+}
+
+// Calculate total cost when quantity or price changes
+function calculateTotalCost() {
+  const quantity = parseFloat(document.getElementById('fuelQuantity')?.value) || 0;
+  const price = parseFloat(document.getElementById('fuelPrice')?.value) || 0;
+  const totalCostInput = document.getElementById('totalCost');
+  if (totalCostInput) {
+    totalCostInput.value = (quantity * price).toFixed(2);
+  }
+}
+
+// Show Fuel Log Modal
+function showFuelLogModal(vehicleId, vehicleName, currentOdometer) {
+  fuelLogVehicleId.value = vehicleId;
+  fuelLogVehicleName.textContent = vehicleName;
+  
+  // Reset form
+  fuelLogForm.reset();
+  
+  // Set default date to today
+  document.getElementById('fuelDate').valueAsDate = new Date();
+  
+  // Set minimum odometer to current reading
+  const odometerInput = document.getElementById('odometerReading');
+  odometerInput.min = currentOdometer;
+  odometerInput.placeholder = `Min: ${currentOdometer} km`;
+  
+  fuelLogModal.classList.add('show');
+}
+
+// Hide Fuel Log Modal
+function hideFuelLogModal() {
+  fuelLogModal.classList.remove('show');
+  fuelLogForm.reset();
+}
+
+// Save Fuel Log
+async function handleSaveFuelLog() {
+  const vehicleId = fuelLogVehicleId.value;
+  const fuelDate = document.getElementById('fuelDate').value;
+  const odometerReading = parseFloat(document.getElementById('odometerReading').value);
+  const fuelQuantity = parseFloat(document.getElementById('fuelQuantity').value);
+  const fuelPrice = parseFloat(document.getElementById('fuelPrice').value);
+  const totalCost = parseFloat(document.getElementById('totalCost').value) || (fuelQuantity * fuelPrice);
+  const fuelStation = document.getElementById('fuelStation').value.trim();
+  const fullTank = document.getElementById('fullTank').checked;
+  const notes = document.getElementById('fuelNotes').value.trim();
+
+  // Validation
+  if (!fuelDate || !odometerReading || !fuelQuantity || !fuelPrice) {
+    showToast('Please fill all required fields', 'error');
+    return;
+  }
+
+  // Check odometer is greater than vehicle's current reading
+  const vehicle = vehicles.find(v => v.id === vehicleId);
+  if (vehicle && odometerReading < vehicle.currentMileage) {
+    showToast('Odometer reading must be greater than current reading', 'error');
+    return;
+  }
+
+  saveFuelLogBtn.disabled = true;
+  saveFuelLogBtnText.style.display = 'none';
+  saveFuelLogBtnSpinner.style.display = 'inline-block';
+
+  try {
+    const fuelLogData = {
+      vehicleId,
+      date: new Date(fuelDate),
+      odometerReading,
+      fuelQuantity,
+      fuelPrice,
+      totalCost,
+      fuelStation,
+      fullTank,
+      notes
+    };
+
+    // Save fuel log
+    const result = await firestoreService.add('fuelLogs', fuelLogData);
+
+    if (result.success) {
+      // Update vehicle's current mileage
+      await firestoreService.update('vehicles', vehicleId, {
+        currentMileage: odometerReading
+      });
+
+      // Also add as expense
+      await firestoreService.add('expenses', {
+        amount: totalCost,
+        category: 'Vehicle Fuel',
+        description: `Fuel: ${fuelQuantity}L @ ₹${fuelPrice}/L${fuelStation ? ' at ' + fuelStation : ''}`,
+        date: new Date(fuelDate),
+        linkedType: 'vehicle',
+        linkedId: vehicleId,
+        linkedName: vehicle?.name || 'Vehicle'
+      });
+
+      showToast('Fuel entry saved successfully', 'success');
+      hideFuelLogModal();
+      
+      // Reload data
+      await loadFuelLogs();
+      await loadVehicles();
+    } else {
+      showToast(result.error || 'Failed to save fuel entry', 'error');
+    }
+  } catch (error) {
+    console.error('Error saving fuel log:', error);
+    showToast('Failed to save fuel entry', 'error');
+  } finally {
+    saveFuelLogBtn.disabled = false;
+    saveFuelLogBtnText.style.display = 'inline';
+    saveFuelLogBtnSpinner.style.display = 'none';
+  }
+}
+
+// Show Mileage History Modal
+async function showMileageHistory(vehicleId, vehicleName) {
+  mileageVehicleName.textContent = vehicleName;
+  mileageHistoryModal.classList.add('show');
+  
+  // Show loading
+  fuelLogList.innerHTML = '<div class="loading-state"><div class="spinner"></div><p>Loading fuel logs...</p></div>';
+  
+  // Get fuel logs for this vehicle
+  const vehicleFuelLogs = fuelLogs.filter(log => log.vehicleId === vehicleId);
+  const stats = calculateVehicleMileage(vehicleFuelLogs);
+  
+  // Update stats
+  vehicleAvgMileage.textContent = stats.avgMileage > 0 ? stats.avgMileage.toFixed(2) + ' km/l' : '-- km/l';
+  vehicleTotalDistance.textContent = stats.totalDistance.toLocaleString() + ' km';
+  vehicleTotalFuelCost.textContent = formatCurrency(stats.totalFuelCost);
+  vehicleCostPerKm.textContent = stats.totalDistance > 0 ? '₹' + (stats.totalFuelCost / stats.totalDistance).toFixed(2) + '/km' : '₹0/km';
+  
+  // Render fuel logs
+  if (vehicleFuelLogs.length === 0) {
+    fuelLogList.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">⛽</div>
+        <h3>No fuel entries yet</h3>
+        <p>Add your first fuel entry to start tracking mileage.</p>
+      </div>
+    `;
+  } else {
+    // Sort by date descending
+    const sortedLogs = [...vehicleFuelLogs].sort((a, b) => {
+      const dateA = a.date?.toDate ? a.date.toDate() : new Date(a.date);
+      const dateB = b.date?.toDate ? b.date.toDate() : new Date(b.date);
+      return dateB - dateA;
+    });
+    
+    fuelLogList.innerHTML = `
+      <table class="fuel-log-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Odometer</th>
+            <th>Fuel (L)</th>
+            <th>Price/L</th>
+            <th>Total</th>
+            <th>Mileage</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          ${sortedLogs.map((log, index) => {
+            // Calculate mileage for this entry
+            let mileage = '--';
+            if (index < sortedLogs.length - 1) {
+              const prevLog = sortedLogs[index + 1];
+              const distance = log.odometerReading - prevLog.odometerReading;
+              if (distance > 0 && log.fuelQuantity > 0) {
+                mileage = (distance / log.fuelQuantity).toFixed(2) + ' km/l';
+              }
+            }
+            
+            return `
+              <tr>
+                <td>${formatDate(log.date)}</td>
+                <td>${log.odometerReading?.toLocaleString() || 0} km</td>
+                <td>${log.fuelQuantity?.toFixed(2) || 0} L</td>
+                <td>₹${log.fuelPrice?.toFixed(2) || 0}</td>
+                <td>₹${log.totalCost?.toFixed(2) || 0}</td>
+                <td class="${mileage !== '--' ? 'text-success' : ''}">${mileage}</td>
+                <td>
+                  <button class="btn-icon btn-danger btn-sm" onclick="window.deleteFuelLog('${log.id}')" title="Delete">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                  </button>
+                </td>
+              </tr>
+            `;
+          }).join('')}
+        </tbody>
+      </table>
+    `;
+  }
+}
+
+// Hide Mileage History Modal
+function hideMileageHistoryModal() {
+  mileageHistoryModal.classList.remove('show');
+}
+
+// Delete Fuel Log
+async function deleteFuelLog(logId) {
+  if (!confirm('Are you sure you want to delete this fuel entry?')) return;
+  
+  try {
+    const result = await firestoreService.delete('fuelLogs', logId);
+    if (result.success) {
+      showToast('Fuel entry deleted', 'success');
+      await loadFuelLogs();
+      await loadVehicles();
+      
+      // Refresh the modal if it's open
+      if (mileageHistoryModal.classList.contains('show')) {
+        const vehicleName = mileageVehicleName.textContent;
+        const vehicleId = fuelLogs.find(l => l.id === logId)?.vehicleId;
+        if (vehicleId) {
+          showMileageHistory(vehicleId, vehicleName);
+        }
+      }
+    } else {
+      showToast('Failed to delete fuel entry', 'error');
+    }
+  } catch (error) {
+    console.error('Error deleting fuel log:', error);
+    showToast('Failed to delete fuel entry', 'error');
+  }
+}
+
+// Show Maintenance Modal
+function showMaintenanceModal(vehicleId, vehicleName) {
+  document.getElementById('maintenanceVehicleId').value = vehicleId;
+  document.getElementById('maintenanceVehicleName').textContent = vehicleName;
+  document.getElementById('maintenanceForm').reset();
+  document.getElementById('maintenanceDate').valueAsDate = new Date();
+  document.getElementById('maintenanceModal').classList.add('show');
+}
+
+// Hide Maintenance Modal
+function hideMaintenanceModal() {
+  document.getElementById('maintenanceModal').classList.remove('show');
+}
+
+// Save Maintenance Expense
+async function handleSaveMaintenance() {
+  const vehicleId = document.getElementById('maintenanceVehicleId').value;
+  const maintenanceDate = document.getElementById('maintenanceDate').value;
+  const maintenanceType = document.getElementById('maintenanceType').value;
+  const maintenanceAmount = parseFloat(document.getElementById('maintenanceAmount').value);
+  const maintenanceDescription = document.getElementById('maintenanceDescription').value.trim();
+  const serviceCenter = document.getElementById('serviceCenter').value.trim();
+
+  if (!maintenanceDate || !maintenanceType || !maintenanceAmount) {
+    showToast('Please fill all required fields', 'error');
+    return;
+  }
+
+  const saveBtn = document.getElementById('saveMaintenanceBtn');
+  const saveBtnText = document.getElementById('saveMaintenanceBtnText');
+  const saveBtnSpinner = document.getElementById('saveMaintenanceBtnSpinner');
+
+  saveBtn.disabled = true;
+  saveBtnText.style.display = 'none';
+  saveBtnSpinner.style.display = 'inline-block';
+
+  try {
+    const vehicle = vehicles.find(v => v.id === vehicleId);
+    
+    // Add as expense
+    const result = await firestoreService.add('expenses', {
+      amount: maintenanceAmount,
+      category: 'Vehicle Maintenance',
+      description: `${maintenanceType}${maintenanceDescription ? ': ' + maintenanceDescription : ''}${serviceCenter ? ' at ' + serviceCenter : ''}`,
+      date: new Date(maintenanceDate),
+      linkedType: 'vehicle',
+      linkedId: vehicleId,
+      linkedName: vehicle?.name || 'Vehicle'
+    });
+
+    if (result.success) {
+      showToast('Maintenance expense added', 'success');
+      hideMaintenanceModal();
+      await loadVehicleSummaryData();
+    } else {
+      showToast(result.error || 'Failed to save maintenance', 'error');
+    }
+  } catch (error) {
+    console.error('Error saving maintenance:', error);
+    showToast('Failed to save maintenance', 'error');
+  } finally {
+    saveBtn.disabled = false;
+    saveBtnText.style.display = 'inline';
+    saveBtnSpinner.style.display = 'none';
+  }
+}
+
+// Show Vehicle Income Modal
+function showVehicleIncomeModal(vehicleId, vehicleName) {
+  document.getElementById('vehicleIncomeVehicleId').value = vehicleId;
+  document.getElementById('vehicleIncomeVehicleName').textContent = vehicleName;
+  document.getElementById('vehicleIncomeForm').reset();
+  document.getElementById('vehicleIncomeDate').valueAsDate = new Date();
+  document.getElementById('vehicleIncomeModal').classList.add('show');
+}
+
+// Hide Vehicle Income Modal
+function hideVehicleIncomeModal() {
+  document.getElementById('vehicleIncomeModal').classList.remove('show');
+}
+
+// Save Vehicle Income
+async function handleSaveVehicleIncome() {
+  const vehicleId = document.getElementById('vehicleIncomeVehicleId').value;
+  const incomeDate = document.getElementById('vehicleIncomeDate').value;
+  const incomeSource = document.getElementById('vehicleIncomeSource').value;
+  const incomeAmount = parseFloat(document.getElementById('vehicleIncomeAmount').value);
+  const incomeDescription = document.getElementById('vehicleIncomeDescription').value.trim();
+
+  if (!incomeDate || !incomeSource || !incomeAmount) {
+    showToast('Please fill all required fields', 'error');
+    return;
+  }
+
+  const saveBtn = document.getElementById('saveVehicleIncomeBtn');
+  const saveBtnText = document.getElementById('saveVehicleIncomeBtnText');
+  const saveBtnSpinner = document.getElementById('saveVehicleIncomeBtnSpinner');
+
+  saveBtn.disabled = true;
+  saveBtnText.style.display = 'none';
+  saveBtnSpinner.style.display = 'inline-block';
+
+  try {
+    const vehicle = vehicles.find(v => v.id === vehicleId);
+    
+    // Add as income
+    const result = await firestoreService.add('income', {
+      amount: incomeAmount,
+      category: 'Vehicle Income',
+      source: incomeSource,
+      description: incomeDescription || `${incomeSource} from ${vehicle?.name || 'Vehicle'}`,
+      date: new Date(incomeDate),
+      linkedType: 'vehicle',
+      linkedId: vehicleId,
+      linkedName: vehicle?.name || 'Vehicle'
+    });
+
+    if (result.success) {
+      showToast('Vehicle income added', 'success');
+      hideVehicleIncomeModal();
+      await loadVehicleSummaryData();
+    } else {
+      showToast(result.error || 'Failed to save income', 'error');
+    }
+  } catch (error) {
+    console.error('Error saving vehicle income:', error);
+    showToast('Failed to save income', 'error');
+  } finally {
+    saveBtn.disabled = false;
+    saveBtnText.style.display = 'inline';
+    saveBtnSpinner.style.display = 'none';
+  }
+}
+
+// Load vehicle expense and income summary
+async function loadVehicleSummaryData() {
+  try {
+    const [vehicleExpenses, vehicleIncome] = await Promise.all([
+      firestoreService.getTotalExpensesByLinkedType('vehicle'),
+      firestoreService.getTotalIncomeByLinkedType('vehicle')
+    ]);
+    
+    // Update the summary if elements exist
+    const totalExpensesEl = document.getElementById('totalVehicleExpenses');
+    const totalIncomeEl = document.getElementById('totalVehicleIncome');
+    if (totalExpensesEl) totalExpensesEl.textContent = formatCurrency(vehicleExpenses);
+    if (totalIncomeEl) totalIncomeEl.textContent = formatCurrency(vehicleIncome);
   } catch (error) {
     console.error('Error loading vehicle summary data:', error);
   }
@@ -414,32 +974,11 @@ function formatDateForInput(date) {
 
 window.editVehicle = editVehicle;
 window.showDeleteConfirmation = showDeleteConfirmation;
-window.addVehicleExpense = addVehicleExpense;
-window.addVehicleIncome = addVehicleIncome;
-
-// Add vehicle expense
-function addVehicleExpense(vehicleId, vehicleName) {
-  // Redirect to expenses page with pre-filled data
-  const params = new URLSearchParams({
-    linkedType: 'vehicle',
-    linkedId: vehicleId,
-    linkedName: vehicleName,
-    category: 'Vehicle Fuel'
-  });
-  window.location.href = `expenses.html?${params.toString()}`;
-}
-
-// Add vehicle income
-function addVehicleIncome(vehicleId, vehicleName) {
-  // Redirect to income page with pre-filled data
-  const params = new URLSearchParams({
-    linkedType: 'vehicle',
-    linkedId: vehicleId,
-    linkedName: vehicleName,
-    source: 'Vehicle Earnings'
-  });
-  window.location.href = `income.html?${params.toString()}`;
-}
+window.showFuelLogModal = showFuelLogModal;
+window.showMileageHistory = showMileageHistory;
+window.deleteFuelLog = deleteFuelLog;
+window.showMaintenanceModal = showMaintenanceModal;
+window.showVehicleIncomeModal = showVehicleIncomeModal;
 
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', init);

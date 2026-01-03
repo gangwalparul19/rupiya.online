@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="assets/css/dark-mode.css">
   <link rel="stylesheet" href="assets/css/dashboard.css">
   <link rel="stylesheet" href="assets/css/income.css">
+  <link rel="stylesheet" href="assets/css/enhancements.css">
   <link rel="stylesheet" href="assets/css/family.css">
 </head>
 <body>
@@ -158,8 +159,26 @@
         <div class="sidebar-logo">
           <img src="assets/images/logo.png" alt="Rupiya" style="height: 32px;">
         </div>
-        <!-- Family Switcher -->
-        <div id="familySwitcherContainer"></div>
+        <div class="mobile-header-actions">
+          <!-- Family Switcher -->
+          <div id="familySwitcherContainer"></div>
+          <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle theme">
+            <svg class="theme-icon-light" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <circle cx="12" cy="12" r="5"/>
+              <line x1="12" y1="1" x2="12" y2="3"/>
+              <line x1="12" y1="21" x2="12" y2="23"/>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+              <line x1="1" y1="12" x2="3" y2="12"/>
+              <line x1="21" y1="12" x2="23" y2="12"/>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+            </svg>
+            <svg class="theme-icon-dark" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="display: none;">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
+          </button>
+        </div>
       </div>
 
       <!-- Page Header -->
@@ -181,6 +200,31 @@
             </svg>
             Add Income
           </button>
+        </div>
+      </div>
+
+      <!-- KPI Summary Cards -->
+      <div class="kpi-summary">
+        <div class="kpi-card kpi-income" id="thisMonthKpi" data-tooltip="">
+          <div class="kpi-icon">💰</div>
+          <div class="kpi-content">
+            <div class="kpi-label">This Month</div>
+            <div class="kpi-value" id="thisMonthIncome">₹0</div>
+          </div>
+        </div>
+        <div class="kpi-card" id="lastMonthKpi" data-tooltip="">
+          <div class="kpi-icon">📅</div>
+          <div class="kpi-content">
+            <div class="kpi-label">Last Month</div>
+            <div class="kpi-value" id="lastMonthIncome">₹0</div>
+          </div>
+        </div>
+        <div class="kpi-card" id="totalKpi" data-tooltip="">
+          <div class="kpi-icon">📊</div>
+          <div class="kpi-content">
+            <div class="kpi-label">Total Income</div>
+            <div class="kpi-value" id="totalIncome">₹0</div>
+          </div>
         </div>
       </div>
 
@@ -423,6 +467,35 @@
         </button>
       </div>
     </div>
+  </div>
+
+  <!-- FAB Button for Quick Add -->
+  <div class="fab-container">
+    <button class="fab-btn" id="fabAddIncome" title="Quick Add Income">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Bulk Actions Bar -->
+  <div class="bulk-actions-bar" id="bulkActionsBar">
+    <span class="bulk-actions-count"><span id="bulkSelectedCount">0</span></span>
+    <div class="bulk-actions-buttons">
+      <button class="btn btn-outline btn-sm" id="bulkCancelBtn">Cancel</button>
+      <button class="btn btn-danger btn-sm" id="bulkDeleteBtn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+        </svg>
+        Delete Selected
+      </button>
+    </div>
+  </div>
+
+  <!-- Pull to Refresh Indicator -->
+  <div class="pull-to-refresh" id="pullToRefresh">
+    <div class="spinner"></div>
+    <span>Refreshing...</span>
   </div>
 
   <!-- Family Modals -->

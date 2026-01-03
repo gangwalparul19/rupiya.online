@@ -1,11 +1,39 @@
 // Utility Helper Functions
 
-// Format currency
+// Format currency (full format)
 export function formatCurrency(amount, currency = '₹') {
   if (typeof amount !== 'number') {
     amount = parseFloat(amount) || 0;
   }
   return `${currency}${amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
+// Format currency compact (K, L, Cr format for Indian numbering)
+// 1,000 = 1K, 1,00,000 = 1L, 1,00,00,000 = 1Cr
+export function formatCurrencyCompact(amount, currency = '₹') {
+  if (typeof amount !== 'number') {
+    amount = parseFloat(amount) || 0;
+  }
+  
+  const absAmount = Math.abs(amount);
+  const sign = amount < 0 ? '-' : '';
+  
+  if (absAmount >= 10000000) {
+    // Crores (1,00,00,000+)
+    const crores = absAmount / 10000000;
+    return `${sign}${currency}${crores.toFixed(1)}Cr`;
+  } else if (absAmount >= 100000) {
+    // Lakhs (1,00,000+)
+    const lakhs = absAmount / 100000;
+    return `${sign}${currency}${lakhs.toFixed(1)}L`;
+  } else if (absAmount >= 1000) {
+    // Thousands (1,000+)
+    const thousands = absAmount / 1000;
+    return `${sign}${currency}${thousands.toFixed(1)}K`;
+  } else {
+    // Less than 1000, show full amount
+    return `${sign}${currency}${absAmount.toFixed(0)}`;
+  }
 }
 
 // Format date

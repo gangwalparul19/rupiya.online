@@ -21,7 +21,7 @@ let incomeCategories = [];
 let profileForm, passwordForm, preferencesForm;
 let displayNameInput, emailInput, phoneInput;
 let currentPasswordInput, newPasswordInput, confirmPasswordInput;
-let currencySelect, dateFormatSelect, languageSelect, emailNotificationsCheckbox;
+let currencySelect, dateFormatSelect, languageSelect, emailNotificationsCheckbox, weeklyReportEnabledCheckbox, monthlyReportEnabledCheckbox;
 let exportDataBtn, deleteAccountBtn;
 let deleteAccountModal, closeDeleteAccountModalBtn, cancelDeleteAccountBtn, confirmDeleteAccountBtn;
 let confirmDeleteText;
@@ -61,6 +61,8 @@ function initDOMElements() {
   dateFormatSelect = document.getElementById('dateFormat');
   languageSelect = document.getElementById('language');
   emailNotificationsCheckbox = document.getElementById('emailNotifications');
+  weeklyReportEnabledCheckbox = document.getElementById('weeklyReportEnabled');
+  monthlyReportEnabledCheckbox = document.getElementById('monthlyReportEnabled');
   
   // Initialize theme toggle
   const themeToggle = document.getElementById('themeToggle');
@@ -190,6 +192,12 @@ async function loadUserPreferences() {
       dateFormatSelect.value = userPreferences.dateFormat || 'DD/MM/YYYY';
       languageSelect.value = userPreferences.language || 'en';
       emailNotificationsCheckbox.checked = userPreferences.emailNotifications !== false;
+      if (weeklyReportEnabledCheckbox) {
+        weeklyReportEnabledCheckbox.checked = userPreferences.weeklyReportEnabled === true;
+      }
+      if (monthlyReportEnabledCheckbox) {
+        monthlyReportEnabledCheckbox.checked = userPreferences.monthlyReportEnabled === true;
+      }
     }
   } catch (error) {
     console.error('Error loading preferences:', error);
@@ -321,6 +329,8 @@ async function handlePreferencesUpdate(e) {
       dateFormat: dateFormatSelect.value,
       language: languageSelect.value,
       emailNotifications: emailNotificationsCheckbox.checked,
+      weeklyReportEnabled: weeklyReportEnabledCheckbox ? weeklyReportEnabledCheckbox.checked : false,
+      monthlyReportEnabled: monthlyReportEnabledCheckbox ? monthlyReportEnabledCheckbox.checked : false,
       userId: currentUser.uid,
       updatedAt: Timestamp.now()
     };

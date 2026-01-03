@@ -19,6 +19,7 @@
   <link rel="stylesheet" href="assets/css/components.css">
   <link rel="stylesheet" href="assets/css/dark-mode.css">
   <link rel="stylesheet" href="assets/css/dashboard.css">
+  <link rel="stylesheet" href="assets/css/enhancements.css">
   <link rel="stylesheet" href="assets/css/family.css">
   
   <!-- Chart.js -->
@@ -226,7 +227,7 @@
 
       <!-- KPI Cards -->
       <div class="kpi-grid">
-        <div class="kpi-card">
+        <div class="kpi-card" id="incomeKpi" data-tooltip="">
           <div class="kpi-header">
             <div>
               <div class="kpi-title">Income</div>
@@ -240,7 +241,7 @@
           </div>
         </div>
 
-        <div class="kpi-card">
+        <div class="kpi-card" id="expenseKpi" data-tooltip="">
           <div class="kpi-header">
             <div>
               <div class="kpi-title">Expenses</div>
@@ -254,7 +255,7 @@
           </div>
         </div>
 
-        <div class="kpi-card">
+        <div class="kpi-card" id="cashflowKpi" data-tooltip="">
           <div class="kpi-header">
             <div>
               <div class="kpi-title">Cash Flow</div>
@@ -268,7 +269,7 @@
           </div>
         </div>
 
-        <div class="kpi-card">
+        <div class="kpi-card" id="savingsKpi" data-tooltip="">
           <div class="kpi-header">
             <div>
               <div class="kpi-title">Savings Rate</div>
@@ -279,6 +280,50 @@
           <div class="kpi-change positive" id="savingsChange">
             <span>↑</span>
             <span>Good progress</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Spending Alert (shown when spending exceeds budget/last month) -->
+      <div class="spending-alert" id="spendingAlert" style="display: none;">
+        <div class="spending-alert-icon">⚠️</div>
+        <div class="spending-alert-content">
+          <div class="spending-alert-title" id="alertTitle">Spending Alert</div>
+          <div class="spending-alert-text" id="alertText">Your spending is higher than usual.</div>
+        </div>
+        <button class="spending-alert-close" id="closeSpendingAlert">×</button>
+      </div>
+
+      <!-- Dashboard Widgets Row -->
+      <div class="widgets-row">
+        <!-- Goal Progress Widget -->
+        <div class="goal-progress-widget" id="goalProgressWidget" style="display: none;">
+          <div class="goal-progress-header">
+            <div class="goal-progress-title">🎯 <span id="goalName">Savings Goal</span></div>
+            <div class="goal-progress-percent" id="goalPercent">0%</div>
+          </div>
+          <div class="goal-progress-bar">
+            <div class="goal-progress-fill" id="goalProgressFill" style="width: 0%;"></div>
+          </div>
+          <div class="goal-progress-details">
+            <span id="goalCurrent">₹0</span>
+            <span id="goalTarget">of ₹0</span>
+          </div>
+        </div>
+
+        <!-- Top Spending Categories Widget -->
+        <div class="top-categories-widget" id="topCategoriesWidget">
+          <div class="top-categories-title">📊 Top Spending Categories</div>
+          <div id="topCategoriesList">
+            <!-- Categories will be loaded here -->
+          </div>
+        </div>
+
+        <!-- Upcoming Bills Widget -->
+        <div class="upcoming-bills-widget" id="upcomingBillsWidget">
+          <div class="upcoming-bills-title">📅 Upcoming Bills</div>
+          <div id="upcomingBillsList">
+            <!-- Bills will be loaded here -->
           </div>
         </div>
       </div>

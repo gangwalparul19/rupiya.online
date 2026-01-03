@@ -196,6 +196,18 @@
   accent-color: #4A90E2;
 }
 
+/* Preference Toggle */
+.preference-toggle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.preference-toggle .toggle-label {
+  font-size: 14px;
+  color: #4a4a4a;
+}
+
 .text-danger {
   color: #E74C3C;
 }

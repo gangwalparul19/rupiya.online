@@ -179,17 +179,52 @@
           </div>
         </div>
         <div class="summary-card">
-          <div class="summary-icon">💸</div>
+          <div class="summary-icon">⛽</div>
           <div class="summary-content">
-            <div class="summary-label">Total Expenses</div>
+            <div class="summary-label">Fuel Cost</div>
             <div class="summary-value" id="totalFuelCost">₹0</div>
           </div>
         </div>
         <div class="summary-card">
+          <div class="summary-icon">🔧</div>
+          <div class="summary-content">
+            <div class="summary-label">Maintenance</div>
+            <div class="summary-value" id="totalMaintenanceCost">₹0</div>
+          </div>
+        </div>
+        <div class="summary-card card-expense">
+          <div class="summary-icon">💸</div>
+          <div class="summary-content">
+            <div class="summary-label">Total Expenses</div>
+            <div class="summary-value" id="totalVehicleExpenses">₹0</div>
+          </div>
+        </div>
+        <div class="summary-card card-income">
           <div class="summary-icon">💰</div>
           <div class="summary-content">
             <div class="summary-label">Total Income</div>
-            <div class="summary-value" id="totalMaintenanceCost">₹0</div>
+            <div class="summary-value" id="totalVehicleIncome">₹0</div>
+          </div>
+        </div>
+        <div class="summary-card" id="netProfitCard">
+          <div class="summary-icon">📊</div>
+          <div class="summary-content">
+            <div class="summary-label">Net Profit/Loss</div>
+            <div class="summary-value" id="netProfitLoss">₹0</div>
+          </div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-icon">📈</div>
+          <div class="summary-content">
+            <div class="summary-label">Avg Mileage</div>
+            <div class="summary-value" id="avgMileage">-- km/l</div>
+          </div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-icon">🛣️</div>
+          <div class="summary-content">
+            <div class="summary-label">Total Distance</div>
+            <div class="summary-value" id="totalDistance">0 km</div>
           </div>
         </div>
       </div>
@@ -355,6 +390,265 @@
         <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
           <span id="deleteBtnText">Delete</span>
           <span id="deleteBtnSpinner" class="spinner" style="display: none;"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fuel Log Modal -->
+  <div class="modal-overlay" id="fuelLogModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h2 class="modal-title">⛽ Add Fuel Entry</h2>
+        <button class="modal-close" id="closeFuelLogModalBtn">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p class="fuel-log-vehicle-name" id="fuelLogVehicleName"></p>
+        <form id="fuelLogForm">
+          <input type="hidden" id="fuelLogVehicleId">
+          
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="fuelDate">Date *</label>
+              <input type="date" id="fuelDate" required>
+            </div>
+
+            <div class="form-group">
+              <label for="odometerReading">Odometer Reading (km) *</label>
+              <input type="number" id="odometerReading" step="0.1" min="0" required placeholder="Current odometer">
+              <small class="form-hint">Enter current odometer reading</small>
+            </div>
+
+            <div class="form-group">
+              <label for="fuelQuantity">Fuel Quantity (liters) *</label>
+              <input type="number" id="fuelQuantity" step="0.01" min="0" required placeholder="e.g., 25.5">
+            </div>
+
+            <div class="form-group">
+              <label for="fuelPrice">Price per Liter (₹) *</label>
+              <input type="number" id="fuelPrice" step="0.01" min="0" required placeholder="e.g., 102.50">
+            </div>
+
+            <div class="form-group">
+              <label for="totalCost">Total Cost (₹)</label>
+              <input type="number" id="totalCost" step="0.01" min="0" readonly placeholder="Auto-calculated">
+            </div>
+
+            <div class="form-group">
+              <label for="fuelStation">Fuel Station</label>
+              <input type="text" id="fuelStation" maxlength="100" placeholder="e.g., HP Petrol Pump">
+            </div>
+
+            <div class="form-group">
+              <label>
+                <input type="checkbox" id="fullTank"> Full Tank Fill
+              </label>
+              <small class="form-hint">Check if tank was filled completely (required for accurate mileage)</small>
+            </div>
+
+            <div class="form-group form-group-full">
+              <label for="fuelNotes">Notes</label>
+              <textarea id="fuelNotes" rows="2" maxlength="200" placeholder="Any additional notes..."></textarea>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" id="cancelFuelLogBtn">Cancel</button>
+        <button type="button" class="btn btn-primary" id="saveFuelLogBtn">
+          <span id="saveFuelLogBtnText">Save Entry</span>
+          <span id="saveFuelLogBtnSpinner" class="spinner" style="display: none;"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mileage History Modal -->
+  <div class="modal-overlay" id="mileageHistoryModal">
+    <div class="modal-container modal-lg">
+      <div class="modal-header">
+        <h2 class="modal-title">📊 Mileage History</h2>
+        <button class="modal-close" id="closeMileageHistoryBtn">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p class="mileage-vehicle-name" id="mileageVehicleName"></p>
+        
+        <div class="mileage-summary-cards">
+          <div class="mileage-stat-card">
+            <div class="mileage-stat-icon">⛽</div>
+            <div class="mileage-stat-value" id="vehicleAvgMileage">-- km/l</div>
+            <div class="mileage-stat-label">Avg Mileage</div>
+          </div>
+          <div class="mileage-stat-card">
+            <div class="mileage-stat-icon">🛣️</div>
+            <div class="mileage-stat-value" id="vehicleTotalDistance">0 km</div>
+            <div class="mileage-stat-label">Total Distance</div>
+          </div>
+          <div class="mileage-stat-card">
+            <div class="mileage-stat-icon">💰</div>
+            <div class="mileage-stat-value" id="vehicleTotalFuelCost">₹0</div>
+            <div class="mileage-stat-label">Total Fuel Cost</div>
+          </div>
+          <div class="mileage-stat-card">
+            <div class="mileage-stat-icon">📈</div>
+            <div class="mileage-stat-value" id="vehicleCostPerKm">₹0/km</div>
+            <div class="mileage-stat-label">Cost per km</div>
+          </div>
+        </div>
+
+        <div class="fuel-log-list" id="fuelLogList">
+          <div class="loading-state">
+            <div class="spinner"></div>
+            <p>Loading fuel logs...</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" id="closeMileageHistoryFooterBtn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Maintenance Modal -->
+  <div class="modal-overlay" id="maintenanceModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h2 class="modal-title">🔧 Add Maintenance Expense</h2>
+        <button class="modal-close" id="closeMaintenanceModalBtn">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p class="modal-vehicle-name" id="maintenanceVehicleName"></p>
+        <form id="maintenanceForm">
+          <input type="hidden" id="maintenanceVehicleId">
+          
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="maintenanceDate">Date *</label>
+              <input type="date" id="maintenanceDate" required>
+            </div>
+
+            <div class="form-group">
+              <label for="maintenanceType">Maintenance Type *</label>
+              <select id="maintenanceType" required>
+                <option value="">Select type</option>
+                <option value="Oil Change">Oil Change</option>
+                <option value="Tire Replacement">Tire Replacement</option>
+                <option value="Tire Rotation">Tire Rotation</option>
+                <option value="Brake Service">Brake Service</option>
+                <option value="Battery Replacement">Battery Replacement</option>
+                <option value="Air Filter">Air Filter</option>
+                <option value="AC Service">AC Service</option>
+                <option value="Engine Repair">Engine Repair</option>
+                <option value="Body Work">Body Work</option>
+                <option value="Washing/Cleaning">Washing/Cleaning</option>
+                <option value="Insurance">Insurance</option>
+                <option value="Registration/Tax">Registration/Tax</option>
+                <option value="Parking">Parking</option>
+                <option value="Toll">Toll</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="maintenanceAmount">Amount (₹) *</label>
+              <input type="number" id="maintenanceAmount" step="0.01" min="0" required placeholder="e.g., 2500">
+            </div>
+
+            <div class="form-group">
+              <label for="serviceCenter">Service Center</label>
+              <input type="text" id="serviceCenter" maxlength="100" placeholder="e.g., Authorized Service Center">
+            </div>
+
+            <div class="form-group form-group-full">
+              <label for="maintenanceDescription">Description</label>
+              <textarea id="maintenanceDescription" rows="2" maxlength="300" placeholder="Details about the maintenance..."></textarea>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" id="cancelMaintenanceBtn">Cancel</button>
+        <button type="button" class="btn btn-primary" id="saveMaintenanceBtn">
+          <span id="saveMaintenanceBtnText">Save Expense</span>
+          <span id="saveMaintenanceBtnSpinner" class="spinner" style="display: none;"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vehicle Income Modal -->
+  <div class="modal-overlay" id="vehicleIncomeModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h2 class="modal-title">💰 Add Vehicle Income</h2>
+        <button class="modal-close" id="closeVehicleIncomeModalBtn">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p class="modal-vehicle-name" id="vehicleIncomeVehicleName"></p>
+        <form id="vehicleIncomeForm">
+          <input type="hidden" id="vehicleIncomeVehicleId">
+          
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="vehicleIncomeDate">Date *</label>
+              <input type="date" id="vehicleIncomeDate" required>
+            </div>
+
+            <div class="form-group">
+              <label for="vehicleIncomeSource">Income Source *</label>
+              <select id="vehicleIncomeSource" required>
+                <option value="">Select source</option>
+                <option value="Rental Income">Rental Income</option>
+                <option value="Ride Sharing">Ride Sharing (Uber/Ola)</option>
+                <option value="Delivery Service">Delivery Service</option>
+                <option value="Commercial Use">Commercial Use</option>
+                <option value="Vehicle Sale">Vehicle Sale</option>
+                <option value="Insurance Claim">Insurance Claim</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="vehicleIncomeAmount">Amount (₹) *</label>
+              <input type="number" id="vehicleIncomeAmount" step="0.01" min="0" required placeholder="e.g., 5000">
+            </div>
+
+            <div class="form-group form-group-full">
+              <label for="vehicleIncomeDescription">Description</label>
+              <textarea id="vehicleIncomeDescription" rows="2" maxlength="300" placeholder="Details about the income..."></textarea>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" id="cancelVehicleIncomeBtn">Cancel</button>
+        <button type="button" class="btn btn-success" id="saveVehicleIncomeBtn">
+          <span id="saveVehicleIncomeBtnText">Save Income</span>
+          <span id="saveVehicleIncomeBtnSpinner" class="spinner" style="display: none;"></span>
         </button>
       </div>
     </div>

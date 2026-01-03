@@ -5,7 +5,7 @@ import firestoreService from '../services/firestore-service.js';
 import familySwitcher from '../components/family-switcher.js';
 import toast from '../components/toast.js';
 import themeManager from '../utils/theme-manager.js';
-import { formatCurrency, formatDate, getRelativeTime } from '../utils/helpers.js';
+import { formatCurrency, formatCurrencyCompact, formatDate, getRelativeTime } from '../utils/helpers.js';
 
 // Check authentication
 async function checkAuth() {
@@ -131,11 +131,13 @@ async function loadDashboardData() {
     const firstDayOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
     const lastDayOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
     
-    // Fetch expenses and income
+    // Fetch expenses, income, goals, and recurring
     console.log('Fetching expenses and income...');
-    const [expenses, income] = await Promise.all([
+    const [expenses, income, goals, recurring] = await Promise.all([
       firestoreService.getExpenses(),
-      firestoreService.getIncome()
+      firestoreService.getIncome(),
+      firestoreService.getGoals ? firestoreService.getGoals() : Promise.resolve([]),
+      firestoreService.getRecurring ? firestoreService.getRecurring() : Promise.resolve([])
     ]);
     
     console.log('Expenses:', expenses.length, 'Income:', income.length);
@@ -184,17 +186,36 @@ async function loadDashboardData() {
       ? ((currentMonthExpenses - lastMonthExpenses) / lastMonthExpenses) * 100 
       : 0;
     
-    // Update KPIs
-    incomeValue.textContent = formatCurrency(currentMonthIncome);
-    expenseValue.textContent = formatCurrency(currentMonthExpenses);
-    cashflowValue.textContent = formatCurrency(cashFlow);
+    // Update KPIs with compact format
+    incomeValue.textContent = formatCurrencyCompact(currentMonthIncome);
+    expenseValue.textContent = formatCurrencyCompact(currentMonthExpenses);
+    cashflowValue.textContent = formatCurrencyCompact(cashFlow);
     savingsValue.textContent = `${savingsRate.toFixed(1)}%`;
+    
+    // Update tooltips with full amounts
+    const incomeKpi = document.getElementById('incomeKpi');
+    const expenseKpi = document.getElementById('expenseKpi');
+    const cashflowKpi = document.getElementById('cashflowKpi');
+    const savingsKpi = document.getElementById('savingsKpi');
+    
+    if (incomeKpi) incomeKpi.setAttribute('data-tooltip', formatCurrency(currentMonthIncome));
+    if (expenseKpi) expenseKpi.setAttribute('data-tooltip', formatCurrency(currentMonthExpenses));
+    if (cashflowKpi) cashflowKpi.setAttribute('data-tooltip', formatCurrency(cashFlow));
+    if (savingsKpi) savingsKpi.setAttribute('data-tooltip', `${savingsRate.toFixed(2)}%`);
     
     // Update changes
     updateChange(incomeChange, incomeChangePercent, 'positive');
     updateChange(expenseChange, expenseChangePercent, 'negative');
     updateCashflowChange(cashFlow);
     updateSavingsChange(savingsRate);
+    
+    // Check for spending alerts
+    checkSpendingAlerts(currentMonthExpenses, lastMonthExpenses);
+    
+    // Load widgets
+    loadTopCategoriesWidget(expenses, firstDayOfMonth, lastDayOfMonth);
+    loadUpcomingBillsWidget(recurring);
+    loadGoalProgressWidget(goals);
     
     // Load recent transactions
     loadRecentTransactions(expenses, income);
@@ -210,6 +231,144 @@ async function loadDashboardData() {
     console.error('Error details:', error.message, error.code);
     toast.error('Failed to load dashboard data: ' + error.message);
   }
+}
+
+// Check for spending alerts
+function checkSpendingAlerts(currentExpenses, lastMonthExpenses) {
+  const alertEl = document.getElementById('spendingAlert');
+  const alertTitle = document.getElementById('alertTitle');
+  const alertText = document.getElementById('alertText');
+  const closeBtn = document.getElementById('closeSpendingAlert');
+  
+  if (!alertEl) return;
+  
+  // Check if spending exceeds last month by 20%
+  if (lastMonthExpenses > 0 && currentExpenses > lastMonthExpenses * 1.2) {
+    const percentOver = ((currentExpenses - lastMonthExpenses) / lastMonthExpenses * 100).toFixed(0);
+    alertTitle.textContent = '⚠️ High Spending Alert';
+    alertText.textContent = `You've spent ${percentOver}% more than last month. Consider reviewing your expenses.`;
+    alertEl.style.display = 'flex';
+    alertEl.classList.add('warning');
+  }
+  
+  // Close button handler
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+      alertEl.style.display = 'none';
+    });
+  }
+}
+
+// Load top spending categories widget
+function loadTopCategoriesWidget(expenses, startDate, endDate) {
+  const container = document.getElementById('topCategoriesList');
+  if (!container) return;
+  
+  // Filter current month expenses
+  const monthExpenses = expenses.filter(e => {
+    const date = e.date.toDate ? e.date.toDate() : new Date(e.date);
+    return date >= startDate && date <= endDate;
+  });
+  
+  // Group by category
+  const categoryTotals = {};
+  monthExpenses.forEach(e => {
+    const cat = e.category || 'Other';
+    categoryTotals[cat] = (categoryTotals[cat] || 0) + e.amount;
+  });
+  
+  // Sort and get top 5
+  const sorted = Object.entries(categoryTotals)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5);
+  
+  if (sorted.length === 0) {
+    container.innerHTML = '<p style="color: #7F8C8D; text-align: center; padding: 1rem;">No expenses this month</p>';
+    return;
+  }
+  
+  const maxAmount = sorted[0][1];
+  const colors = ['#4A90E2', '#27AE60', '#E74C3C', '#F39C12', '#9B59B6'];
+  
+  container.innerHTML = sorted.map(([cat, amount], i) => {
+    const percent = (amount / maxAmount * 100).toFixed(0);
+    return `
+      <div class="category-bar">
+        <div class="category-bar-header">
+          <span class="category-bar-name">${cat}</span>
+          <span class="category-bar-amount">${formatCurrencyCompact(amount)}</span>
+        </div>
+        <div class="category-bar-track">
+          <div class="category-bar-fill" style="width: ${percent}%; background: ${colors[i % colors.length]};"></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// Load upcoming bills widget
+function loadUpcomingBillsWidget(recurring) {
+  const container = document.getElementById('upcomingBillsList');
+  if (!container) return;
+  
+  // Filter upcoming bills (next 7 days)
+  const now = new Date();
+  const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+  
+  const upcomingBills = recurring
+    .filter(r => r.type === 'expense' && r.isActive !== false)
+    .map(r => {
+      // Calculate next due date based on frequency
+      let nextDue = r.nextDueDate?.toDate ? r.nextDueDate.toDate() : new Date(r.nextDueDate || r.startDate);
+      return { ...r, nextDue };
+    })
+    .filter(r => r.nextDue >= now && r.nextDue <= nextWeek)
+    .sort((a, b) => a.nextDue - b.nextDue)
+    .slice(0, 5);
+  
+  if (upcomingBills.length === 0) {
+    container.innerHTML = '<p style="color: #7F8C8D; text-align: center; padding: 1rem;">No upcoming bills this week</p>';
+    return;
+  }
+  
+  container.innerHTML = upcomingBills.map(bill => {
+    const daysUntil = Math.ceil((bill.nextDue - now) / (1000 * 60 * 60 * 24));
+    const dueClass = daysUntil === 0 ? 'today' : daysUntil < 0 ? 'overdue' : '';
+    const dueText = daysUntil === 0 ? 'Due today' : daysUntil < 0 ? 'Overdue' : `Due in ${daysUntil} days`;
+    
+    return `
+      <div class="bill-item">
+        <div class="bill-icon">📄</div>
+        <div class="bill-info">
+          <div class="bill-name">${bill.description || bill.category}</div>
+          <div class="bill-due ${dueClass}">${dueText}</div>
+        </div>
+        <div class="bill-amount">${formatCurrencyCompact(bill.amount)}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+// Load goal progress widget
+function loadGoalProgressWidget(goals) {
+  const widget = document.getElementById('goalProgressWidget');
+  if (!widget || !goals || goals.length === 0) return;
+  
+  // Get the first active goal
+  const activeGoal = goals.find(g => g.status !== 'completed') || goals[0];
+  if (!activeGoal) return;
+  
+  const current = activeGoal.currentAmount || 0;
+  const target = activeGoal.targetAmount || 1;
+  const percent = Math.min((current / target) * 100, 100);
+  
+  document.getElementById('goalName').textContent = activeGoal.name || 'Savings Goal';
+  document.getElementById('goalPercent').textContent = `${percent.toFixed(0)}%`;
+  document.getElementById('goalProgressFill').style.width = `${percent}%`;
+  document.getElementById('goalCurrent').textContent = formatCurrencyCompact(current);
+  document.getElementById('goalTarget').textContent = `of ${formatCurrencyCompact(target)}`;
+  
+  widget.style.display = 'block';
 }
 
 // Update change indicator

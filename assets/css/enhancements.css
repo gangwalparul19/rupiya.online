@@ -1,0 +1,749 @@
+/* ============================================
+   RUPIYA - UI ENHANCEMENTS
+   ============================================ */
+
+/* ============================================
+   1. TOOLTIPS ON KPI CARDS
+   ============================================ */
+.kpi-card[data-tooltip],
+.kpi-summary .kpi-card[data-tooltip],
+.summary-card[data-tooltip] {
+  position: relative;
+  cursor: pointer;
+}
+
+.kpi-card[data-tooltip]::after,
+.summary-card[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #2C3E50;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.kpi-card[data-tooltip]:hover::after,
+.summary-card[data-tooltip]:hover::after {
+  opacity: 1;
+  visibility: visible;
+  bottom: calc(100% + 8px);
+}
+
+/* ============================================
+   2. FLOATING ACTION BUTTON (FAB)
+   ============================================ */
+.fab-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1000;
+}
+
+.fab-btn {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4A90E2 0%, #00CED1 100%);
+  color: white;
+  border: none;
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.fab-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(74, 144, 226, 0.5);
+}
+
+.fab-btn:active {
+  transform: scale(0.95);
+}
+
+.fab-btn svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* ============================================
+   3. CATEGORY ICONS
+   ============================================ */
+.category-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  font-size: 14px;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.expense-category-with-icon {
+  display: flex;
+  align-items: center;
+}
+
+/* ============================================
+   4. RECURRING BADGE
+   ============================================ */
+.recurring-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  background: linear-gradient(135deg, #9B59B6 0%, #8E44AD 100%);
+  color: white;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.recurring-badge svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* ============================================
+   5. DUPLICATE BUTTON
+   ============================================ */
+.btn-duplicate {
+  color: #3498DB;
+  border-color: #3498DB;
+}
+
+.btn-duplicate:hover {
+  background: #3498DB;
+  color: white;
+}
+
+/* ============================================
+   6. SKELETON LOADING
+   ============================================ */
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+  border-radius: 4px;
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.skeleton-card {
+  background: white;
+  border: 2px solid #E0E0E0;
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.skeleton-line {
+  height: 16px;
+  margin-bottom: 8px;
+}
+
+.skeleton-line.short { width: 40%; }
+.skeleton-line.medium { width: 70%; }
+.skeleton-line.long { width: 100%; }
+
+.skeleton-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+/* ============================================
+   7. PULL TO REFRESH
+   ============================================ */
+.pull-to-refresh {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #4A90E2 0%, #00CED1 100%);
+  color: white;
+  transform: translateY(-100%);
+  transition: transform 0.3s ease;
+  z-index: 1001;
+}
+
+.pull-to-refresh.visible {
+  transform: translateY(0);
+}
+
+.pull-to-refresh .spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================
+   8. SWIPE ACTIONS (Mobile)
+   ============================================ */
+.swipeable-card {
+  position: relative;
+  overflow: hidden;
+  touch-action: pan-y;
+}
+
+.swipe-actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+}
+
+.swipe-action {
+  width: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.swipe-action.edit {
+  background: #3498DB;
+}
+
+.swipe-action.delete {
+  background: #E74C3C;
+}
+
+.swipe-action.duplicate {
+  background: #27AE60;
+}
+
+.swipeable-card.swiped .swipe-actions {
+  transform: translateX(0);
+}
+
+.swipeable-card .card-content {
+  background: white;
+  position: relative;
+  z-index: 1;
+  transition: transform 0.3s ease;
+}
+
+.swipeable-card.swiped .card-content {
+  transform: translateX(-140px);
+}
+
+/* ============================================
+   9. DARK MODE TOGGLE IN HEADER
+   ============================================ */
+.theme-toggle-header {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.theme-toggle-header:hover {
+  background: rgba(0,0,0,0.1);
+}
+
+.theme-toggle-header svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+}
+
+[data-theme="dark"] .theme-toggle-header .theme-icon-light,
+.theme-toggle-header .theme-icon-dark {
+  display: none;
+}
+
+[data-theme="dark"] .theme-toggle-header .theme-icon-dark,
+.theme-toggle-header .theme-icon-light {
+  display: block;
+}
+
+/* ============================================
+   10. SPENDING ALERT
+   ============================================ */
+.spending-alert {
+  background: linear-gradient(135deg, #fff5f5 0%, #ffe0e0 100%);
+  border: 2px solid #E74C3C;
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.spending-alert.warning {
+  background: linear-gradient(135deg, #fffbf0 0%, #fff3cd 100%);
+  border-color: #F39C12;
+}
+
+.spending-alert-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.spending-alert-content {
+  flex: 1;
+}
+
+.spending-alert-title {
+  font-weight: 600;
+  color: #2C3E50;
+  margin-bottom: 2px;
+}
+
+.spending-alert-text {
+  font-size: 0.875rem;
+  color: #7F8C8D;
+}
+
+.spending-alert-close {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+  color: #7F8C8D;
+  padding: 4px;
+}
+
+/* ============================================
+   11. TOP CATEGORIES WIDGET
+   ============================================ */
+.top-categories-widget {
+  background: white;
+  border: 2px solid #4A90E2;
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.top-categories-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2C3E50;
+  margin-bottom: 1rem;
+}
+
+.category-bar {
+  margin-bottom: 0.75rem;
+}
+
+.category-bar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.category-bar-name {
+  font-size: 0.875rem;
+  color: #2C3E50;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.category-bar-amount {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #2C3E50;
+}
+
+.category-bar-track {
+  height: 8px;
+  background: #E0E0E0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.category-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+/* ============================================
+   12. UPCOMING BILLS WIDGET
+   ============================================ */
+.upcoming-bills-widget {
+  background: white;
+  border: 2px solid #4A90E2;
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.upcoming-bills-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2C3E50;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bill-item {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #E0E0E0;
+}
+
+.bill-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.bill-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  margin-right: 12px;
+  background: linear-gradient(135deg, #4A90E2 0%, #00CED1 100%);
+}
+
+.bill-info {
+  flex: 1;
+}
+
+.bill-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #2C3E50;
+}
+
+.bill-due {
+  font-size: 0.75rem;
+  color: #7F8C8D;
+}
+
+.bill-due.overdue {
+  color: #E74C3C;
+}
+
+.bill-due.today {
+  color: #F39C12;
+}
+
+.bill-amount {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #2C3E50;
+}
+
+/* ============================================
+   13. GOAL PROGRESS WIDGET
+   ============================================ */
+.goal-progress-widget {
+  background: white;
+  border: 2px solid #27AE60;
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.goal-progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.goal-progress-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2C3E50;
+}
+
+.goal-progress-percent {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #27AE60;
+}
+
+.goal-progress-bar {
+  height: 12px;
+  background: #E0E0E0;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.goal-progress-fill {
+  height: 100%;
+  background: linear-gradient(135deg, #27AE60 0%, #2ECC71 100%);
+  border-radius: 6px;
+  transition: width 0.5s ease;
+}
+
+.goal-progress-details {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: #7F8C8D;
+}
+
+/* ============================================
+   14. BULK ACTIONS
+   ============================================ */
+.bulk-actions-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #2C3E50;
+  color: white;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+  z-index: 1000;
+}
+
+.bulk-actions-bar.visible {
+  transform: translateY(0);
+}
+
+.bulk-actions-count {
+  font-weight: 600;
+}
+
+.bulk-actions-buttons {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.bulk-actions-buttons .btn {
+  padding: 0.5rem 1rem;
+}
+
+/* Checkbox for selection */
+.expense-checkbox {
+  width: 20px;
+  height: 20px;
+  margin-right: 12px;
+  cursor: pointer;
+  accent-color: #4A90E2;
+}
+
+/* ============================================
+   MOBILE RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+  .fab-container {
+    bottom: 80px;
+    right: 16px;
+  }
+  
+  .fab-btn {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .bulk-actions-bar {
+    padding: 0.75rem;
+  }
+  
+  .spending-alert {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+  }
+}
+
+
+/* ============================================
+   15. WIDGETS ROW
+   ============================================ */
+.widgets-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+/* ============================================
+   16. INCOME SOURCE WITH ICON
+   ============================================ */
+.income-source-with-icon {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ============================================
+   17. SELECTED CARD STATE
+   ============================================ */
+.expense-card.selected,
+.income-card.selected {
+  border-color: #4A90E2;
+  background: linear-gradient(135deg, #f0f7ff 0%, #e6f2ff 100%);
+}
+
+/* ============================================
+   18. DARK MODE ENHANCEMENTS
+   ============================================ */
+[data-theme="dark"] .spending-alert {
+  background: linear-gradient(135deg, #3d2020 0%, #4a2525 100%);
+  border-color: #E74C3C;
+}
+
+[data-theme="dark"] .spending-alert.warning {
+  background: linear-gradient(135deg, #3d3520 0%, #4a4025 100%);
+  border-color: #F39C12;
+}
+
+[data-theme="dark"] .top-categories-widget,
+[data-theme="dark"] .upcoming-bills-widget,
+[data-theme="dark"] .goal-progress-widget {
+  background: #1e1e1e;
+  border-color: #3d3d3d;
+}
+
+[data-theme="dark"] .category-bar-track,
+[data-theme="dark"] .goal-progress-bar {
+  background: #3d3d3d;
+}
+
+[data-theme="dark"] .bill-item {
+  border-bottom-color: #3d3d3d;
+}
+
+[data-theme="dark"] .skeleton {
+  background: linear-gradient(90deg, #2d2d2d 25%, #3d3d3d 50%, #2d2d2d 75%);
+}
+
+[data-theme="dark"] .skeleton-card {
+  background: #1e1e1e;
+  border-color: #3d3d3d;
+}
+
+[data-theme="dark"] .bulk-actions-bar {
+  background: #1e1e1e;
+}
+
+[data-theme="dark"] .expense-card.selected,
+[data-theme="dark"] .income-card.selected {
+  background: linear-gradient(135deg, #1a2a3a 0%, #1e3040 100%);
+}
+
+[data-theme="dark"] .kpi-card[data-tooltip]::after,
+[data-theme="dark"] .summary-card[data-tooltip]::after {
+  background: #f0f0f0;
+  color: #1e1e1e;
+}
+
+/* ============================================
+   19. FAB BUTTON GREEN VARIANT FOR INCOME
+   ============================================ */
+.fab-btn.income-fab {
+  background: linear-gradient(135deg, #27AE60 0%, #2ECC71 100%);
+  box-shadow: 0 4px 12px rgba(39, 174, 96, 0.4);
+}
+
+.fab-btn.income-fab:hover {
+  box-shadow: 0 6px 20px rgba(39, 174, 96, 0.5);
+}
+
+/* ============================================
+   20. CHECKBOX STYLING
+   ============================================ */
+.expense-checkbox,
+.income-checkbox {
+  width: 18px;
+  height: 18px;
+  margin-right: 10px;
+  cursor: pointer;
+  accent-color: #4A90E2;
+  flex-shrink: 0;
+}
+
+/* ============================================
+   21. CARD HEADER WITH CHECKBOX
+   ============================================ */
+.expense-header,
+.income-header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.expense-header .expense-amount,
+.income-header .income-amount {
+  flex: 0 0 auto;
+}
+
+.expense-header .expense-category-with-icon,
+.income-header .income-source-with-icon {
+  flex: 1;
+  min-width: 0;
+}
+
+.expense-header .expense-actions,
+.income-header .income-actions {
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+
+/* ============================================
+   MOBILE RESPONSIVE ADDITIONS
+   ============================================ */
+@media (max-width: 768px) {
+  .widgets-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .expense-header,
+  .income-header {
+    flex-wrap: wrap;
+  }
+  
+  .expense-checkbox,
+  .income-checkbox {
+    order: -1;
+  }
+}

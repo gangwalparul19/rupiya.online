@@ -2,8 +2,8 @@
 
 .vehicles-summary {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
   margin-bottom: 2rem;
 }
 
@@ -11,7 +11,7 @@
   background: white;
   border: 2px solid #4A90E2;
   border-radius: 12px;
-  padding: 1.5rem;
+  padding: 1.25rem;
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -22,6 +22,45 @@
   border-color: #00CED1;
   box-shadow: 0 4px 12px rgba(74, 144, 226, 0.15);
   transform: translateY(-2px);
+}
+
+/* Card variants */
+.summary-card.card-expense {
+  border-color: #E74C3C;
+  background: linear-gradient(135deg, #fff5f5 0%, #fff 100%);
+}
+
+.summary-card.card-expense:hover {
+  border-color: #C0392B;
+  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.15);
+}
+
+.summary-card.card-income {
+  border-color: #27AE60;
+  background: linear-gradient(135deg, #f0fff4 0%, #fff 100%);
+}
+
+.summary-card.card-income:hover {
+  border-color: #1E8449;
+  box-shadow: 0 4px 12px rgba(39, 174, 96, 0.15);
+}
+
+.summary-card.card-profit {
+  border-color: #27AE60;
+  background: linear-gradient(135deg, #d4edda 0%, #fff 100%);
+}
+
+.summary-card.card-loss {
+  border-color: #E74C3C;
+  background: linear-gradient(135deg, #f8d7da 0%, #fff 100%);
+}
+
+.text-profit {
+  color: #27AE60 !important;
+}
+
+.text-loss {
+  color: #E74C3C !important;
 }
 
 .summary-icon {
@@ -363,9 +402,59 @@
 }
 
 /* Mobile Responsive */
+@media (max-width: 1200px) {
+  .vehicles-summary {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 992px) {
+  .vehicles-summary {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+  }
+  
+  .summary-card {
+    padding: 1rem;
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+  }
+  
+  .summary-icon {
+    width: 45px;
+    height: 45px;
+    font-size: 1.5rem;
+  }
+  
+  .summary-value {
+    font-size: 1.25rem;
+  }
+}
+
 @media (max-width: 768px) {
   .vehicles-summary {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+  }
+  
+  .summary-card {
+    padding: 0.75rem 0.5rem;
+  }
+  
+  .summary-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 1.25rem;
+    border-radius: 8px;
+  }
+  
+  .summary-label {
+    font-size: 0.65rem;
+  }
+  
+  .summary-value {
+    font-size: 1rem;
   }
 
   .add-vehicle-section {
@@ -433,40 +522,46 @@
   }
 
   .vehicle-card-actions {
-    flex-direction: column;
-  }
-
-  .vehicle-card-actions .btn {
-    width: 100%;
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 480px) {
   .vehicles-summary {
     grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
+    gap: 0.5rem;
   }
   
   .summary-card {
-    padding: 10px;
+    padding: 0.6rem;
   }
   
   .summary-icon {
-    font-size: 1.5rem;
-    width: 40px;
-    height: 40px;
+    font-size: 1.25rem;
+    width: 32px;
+    height: 32px;
   }
   
   .summary-label {
-    font-size: 10px;
+    font-size: 0.6rem;
   }
   
   .summary-value {
-    font-size: 1.25rem;
+    font-size: 0.9rem;
   }
 
   .vehicle-card-body {
     grid-template-columns: 1fr;
+  }
+  
+  .vehicle-card-actions {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.4rem;
+  }
+  
+  .vehicle-card-actions .btn {
+    font-size: 0.7rem;
+    padding: 0.4rem 0.2rem;
   }
 }
 
@@ -585,5 +680,258 @@
   
   .modal-overlay {
     padding: 0;
+  }
+}
+
+
+/* Mileage Tracking Styles */
+.mileage-highlight .vehicle-stat-value {
+  font-weight: 700;
+}
+
+.text-success {
+  color: #27AE60 !important;
+}
+
+.fuel-log-vehicle-name,
+.mileage-vehicle-name {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2C3E50;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #E0E0E0;
+}
+
+.form-hint {
+  font-size: 0.75rem;
+  color: #7F8C8D;
+  margin-top: 0.25rem;
+}
+
+.form-group input[type="checkbox"] {
+  width: auto;
+  margin-right: 0.5rem;
+}
+
+.form-group label:has(input[type="checkbox"]) {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-weight: normal;
+}
+
+/* Mileage Summary Cards */
+.mileage-summary-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.mileage-stat-card {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 10px;
+  padding: 1rem;
+  text-align: center;
+  border: 1px solid #E0E0E0;
+}
+
+.mileage-stat-icon {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.mileage-stat-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #2C3E50;
+  margin-bottom: 0.25rem;
+}
+
+.mileage-stat-label {
+  font-size: 0.75rem;
+  color: #7F8C8D;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Fuel Log Table */
+.fuel-log-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.fuel-log-table th,
+.fuel-log-table td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #E0E0E0;
+}
+
+.fuel-log-table th {
+  background: #f8f9fa;
+  font-weight: 600;
+  color: #2C3E50;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.fuel-log-table tbody tr:hover {
+  background: #f8f9fa;
+}
+
+.fuel-log-table .btn-icon {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  border: 1px solid #E74C3C;
+  background: white;
+  color: #E74C3C;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.fuel-log-table .btn-icon:hover {
+  background: #E74C3C;
+  color: white;
+}
+
+/* Modal Large */
+.modal-container.modal-lg {
+  max-width: 800px;
+}
+
+/* Empty state in modal */
+.fuel-log-list .empty-state {
+  padding: 2rem;
+  text-align: center;
+}
+
+.fuel-log-list .empty-state-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.fuel-log-list .empty-state h3 {
+  margin: 0 0 0.5rem;
+  color: #2C3E50;
+}
+
+.fuel-log-list .empty-state p {
+  margin: 0;
+  color: #7F8C8D;
+}
+
+/* Mobile Responsive for Mileage */
+@media (max-width: 768px) {
+  .mileage-summary-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .fuel-log-table {
+    font-size: 0.75rem;
+  }
+  
+  .fuel-log-table th,
+  .fuel-log-table td {
+    padding: 0.5rem;
+  }
+  
+  .modal-container.modal-lg {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .mileage-summary-cards {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+  
+  .mileage-stat-card {
+    padding: 0.75rem;
+  }
+  
+  .mileage-stat-value {
+    font-size: 1rem;
+  }
+  
+  .fuel-log-table {
+    display: block;
+    overflow-x: auto;
+  }
+}
+
+
+/* Vehicle Card Actions - 4 buttons layout */
+.vehicle-card-actions {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  padding-top: 1rem;
+  border-top: 2px solid #E0E0E0;
+  margin-top: 1rem;
+}
+
+.vehicle-card-actions .btn {
+  font-size: 0.75rem;
+  padding: 0.5rem 0.25rem;
+  white-space: nowrap;
+}
+
+/* Button variants */
+.btn-success {
+  background: linear-gradient(135deg, #27AE60 0%, #2ECC71 100%);
+  color: white;
+  border: none;
+}
+
+.btn-success:hover {
+  background: linear-gradient(135deg, #219A52 0%, #27AE60 100%);
+}
+
+.btn-secondary {
+  background: #7F8C8D;
+  color: white;
+  border: none;
+}
+
+.btn-secondary:hover {
+  background: #6C7A7B;
+}
+
+/* Modal vehicle name */
+.modal-vehicle-name {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2C3E50;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #E0E0E0;
+}
+
+/* Mobile responsive for 4 buttons */
+@media (max-width: 768px) {
+  .vehicle-card-actions {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 400px) {
+  .vehicle-card-actions {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.4rem;
+  }
+  
+  .vehicle-card-actions .btn {
+    font-size: 0.7rem;
+    padding: 0.4rem 0.2rem;
   }
 }

@@ -263,6 +263,17 @@ service cloud.firestore {
     }
     
     // ============================================
+    // FUEL LOGS (Vehicle Mileage Tracking)
+    // ============================================
+    match /fuelLogs/{logId} {
+      // Users can only access their own fuel logs
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && hasValidUserId();
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
+    }
+    
+    // ============================================
     // FAMILY GROUPS
     // ============================================
     match /familyGroups/{groupId} {

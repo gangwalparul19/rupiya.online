@@ -32,10 +32,8 @@ export default async function handler(req, res) {
       }
     });
 
-    // Generate invitation link
-    const baseUrl = process.env.VERCEL_URL 
-      ? `https://${process.env.VERCEL_URL}` 
-      : 'http://localhost:3000';
+    // Generate invitation link - Use custom domain or fallback
+    const baseUrl = process.env.APP_URL || 'https://www.rupiya.online';
     const invitationLink = `${baseUrl}/family.html?invitation=${invitationId}`;
 
     // Email HTML template

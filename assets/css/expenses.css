@@ -2,6 +2,143 @@
    RUPIYA - EXPENSES PAGE STYLES
    ============================================ */
 
+/* KPI Summary Cards */
+.kpi-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.kpi-card {
+  background: white;
+  border: 2px solid #4A90E2;
+  border-radius: 12px;
+  padding: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.3s ease;
+}
+
+.kpi-card:hover {
+  border-color: #00CED1;
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.15);
+  transform: translateY(-2px);
+}
+
+.kpi-card.kpi-expense {
+  border-color: #E74C3C;
+  background: linear-gradient(135deg, #fff5f5 0%, #fff 100%);
+}
+
+.kpi-card.kpi-expense:hover {
+  border-color: #C0392B;
+  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.15);
+}
+
+.kpi-card.kpi-income {
+  border-color: #27AE60;
+  background: linear-gradient(135deg, #f0fff4 0%, #fff 100%);
+}
+
+.kpi-card.kpi-income:hover {
+  border-color: #1E8449;
+  box-shadow: 0 4px 12px rgba(39, 174, 96, 0.15);
+}
+
+.kpi-icon {
+  font-size: 2rem;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #4A90E2 0%, #00CED1 100%);
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.kpi-card.kpi-expense .kpi-icon {
+  background: linear-gradient(135deg, #E74C3C 0%, #C0392B 100%);
+}
+
+.kpi-card.kpi-income .kpi-icon {
+  background: linear-gradient(135deg, #27AE60 0%, #2ECC71 100%);
+}
+
+.kpi-content {
+  flex: 1;
+}
+
+.kpi-label {
+  font-size: 0.8rem;
+  color: #7F8C8D;
+  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.kpi-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2C3E50;
+}
+
+@media (max-width: 768px) {
+  .kpi-summary {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+  }
+  
+  .kpi-card {
+    padding: 0.75rem;
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+  }
+  
+  .kpi-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1.5rem;
+  }
+  
+  .kpi-label {
+    font-size: 0.65rem;
+  }
+  
+  .kpi-value {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .kpi-summary {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.4rem;
+  }
+  
+  .kpi-card {
+    padding: 0.5rem;
+  }
+  
+  .kpi-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 1.25rem;
+    border-radius: 8px;
+  }
+  
+  .kpi-label {
+    font-size: 0.55rem;
+  }
+  
+  .kpi-value {
+    font-size: 0.85rem;
+  }
+}
+
 /* Page Header */
 .page-header {
   display: flex;

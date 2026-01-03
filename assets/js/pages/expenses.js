@@ -5,8 +5,9 @@ import categoriesService from '../services/categories-service.js';
 import paymentMethodsService from '../services/payment-methods-service.js';
 import familySwitcher from '../components/family-switcher.js';
 import toast from '../components/toast.js';
+import themeManager from '../utils/theme-manager.js';
 import { Validator } from '../utils/validation.js';
-import { formatCurrency, formatDate, formatDateForInput, debounce, exportToCSV } from '../utils/helpers.js';
+import { formatCurrency, formatCurrencyCompact, formatDate, formatDateForInput, debounce, exportToCSV } from '../utils/helpers.js';
 
 // State management
 const state = {
@@ -21,7 +22,30 @@ const state = {
     dateTo: '',
     search: ''
   },
-  editingExpenseId: null
+  editingExpenseId: null,
+  selectedExpenses: new Set(),
+  bulkMode: false
+};
+
+// Category icons mapping
+const categoryIcons = {
+  'Groceries': '🛒',
+  'Transportation': '🚗',
+  'Utilities': '💡',
+  'Entertainment': '🎬',
+  'Healthcare': '🏥',
+  'Shopping': '🛍️',
+  'Dining': '🍽️',
+  'Education': '📚',
+  'Rent': '🏠',
+  'Insurance': '🛡️',
+  'Fuel': '⛽',
+  'Maintenance': '🔧',
+  'Travel': '✈️',
+  'Subscriptions': '📺',
+  'Personal Care': '💅',
+  'Gifts': '🎁',
+  'Other': '📦'
 };
 
 // Check authentication
@@ -233,6 +257,9 @@ async function loadExpenses() {
     state.expenses = await firestoreService.getExpenses();
     state.filteredExpenses = [...state.expenses];
     
+    // Update KPI cards
+    updateExpenseKPIs();
+    
     applyFilters();
     
   } catch (error) {
@@ -240,6 +267,49 @@ async function loadExpenses() {
     toast.error('Failed to load expenses');
     loadingState.style.display = 'none';
   }
+}
+
+// Update Expense KPI Cards
+function updateExpenseKPIs() {
+  const now = new Date();
+  const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59);
+  
+  let thisMonthTotal = 0;
+  let lastMonthTotal = 0;
+  let totalAll = 0;
+  
+  state.expenses.forEach(expense => {
+    const amount = Number(expense.amount) || 0;
+    const expenseDate = expense.date?.toDate ? expense.date.toDate() : new Date(expense.date);
+    
+    totalAll += amount;
+    
+    if (expenseDate >= thisMonthStart) {
+      thisMonthTotal += amount;
+    } else if (expenseDate >= lastMonthStart && expenseDate <= lastMonthEnd) {
+      lastMonthTotal += amount;
+    }
+  });
+  
+  // Update UI with compact format
+  const thisMonthEl = document.getElementById('thisMonthExpenses');
+  const lastMonthEl = document.getElementById('lastMonthExpenses');
+  const totalEl = document.getElementById('totalExpenses');
+  
+  if (thisMonthEl) thisMonthEl.textContent = formatCurrencyCompact(thisMonthTotal);
+  if (lastMonthEl) lastMonthEl.textContent = formatCurrencyCompact(lastMonthTotal);
+  if (totalEl) totalEl.textContent = formatCurrencyCompact(totalAll);
+  
+  // Update tooltips with full amounts
+  const thisMonthKpi = document.getElementById('thisMonthKpi');
+  const lastMonthKpi = document.getElementById('lastMonthKpi');
+  const totalKpi = document.getElementById('totalKpi');
+  
+  if (thisMonthKpi) thisMonthKpi.setAttribute('data-tooltip', formatCurrency(thisMonthTotal));
+  if (lastMonthKpi) lastMonthKpi.setAttribute('data-tooltip', formatCurrency(lastMonthTotal));
+  if (totalKpi) totalKpi.setAttribute('data-tooltip', formatCurrency(totalAll));
 }
 
 // Apply filters
@@ -337,39 +407,58 @@ function renderExpenses() {
 // Create expense card HTML
 function createExpenseCard(expense) {
   const date = expense.date.toDate ? expense.date.toDate() : new Date(expense.date);
+  const categoryIcon = categoryIcons[expense.category] || '📦';
+  const isRecurring = expense.isRecurring || expense.recurringId;
+  const isSelected = state.selectedExpenses.has(expense.id);
   
   return `
-    <div class="expense-card" data-id="${expense.id}">
-      <div class="expense-header">
-        <div class="expense-amount">${formatCurrency(expense.amount)}</div>
-        <div class="expense-category">${expense.category}</div>
-        <div class="expense-actions">
-          <button class="btn-icon btn-edit" data-id="${expense.id}" title="Edit">
+    <div class="expense-card swipeable-card ${isSelected ? 'selected' : ''}" data-id="${expense.id}">
+      <div class="card-content">
+        <div class="expense-header">
+          <input type="checkbox" class="expense-checkbox" data-id="${expense.id}" ${isSelected ? 'checked' : ''}>
+          <div class="expense-amount">${formatCurrency(expense.amount)}</div>
+          <div class="expense-category-with-icon">
+            <span class="category-icon">${categoryIcon}</span>
+            <span>${expense.category}</span>
+            ${isRecurring ? '<span class="recurring-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Recurring</span>' : ''}
+          </div>
+          <div class="expense-actions">
+            <button class="btn-icon btn-duplicate" data-id="${expense.id}" title="Duplicate">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+              </svg>
+            </button>
+            <button class="btn-icon btn-edit" data-id="${expense.id}" title="Edit">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+              </svg>
+            </button>
+            <button class="btn-icon btn-delete" data-id="${expense.id}" title="Delete">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        ${expense.description ? `<div class="expense-description">${expense.description}</div>` : ''}
+        <div class="expense-meta">
+          <div class="expense-meta-item">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
             </svg>
-          </button>
-          <button class="btn-icon btn-delete" data-id="${expense.id}" title="Delete">
+            ${formatDate(date)}
+          </div>
+          <div class="expense-meta-item">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
             </svg>
-          </button>
+            ${expense.paymentMethod}
+          </div>
         </div>
       </div>
-      ${expense.description ? `<div class="expense-description">${expense.description}</div>` : ''}
-      <div class="expense-meta">
-        <div class="expense-meta-item">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-          </svg>
-          ${formatDate(date)}
-        </div>
-        <div class="expense-meta-item">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
-          </svg>
-          ${expense.paymentMethod}
-        </div>
+      <div class="swipe-actions">
+        <div class="swipe-action edit" data-id="${expense.id}">✏️</div>
+        <div class="swipe-action delete" data-id="${expense.id}">🗑️</div>
       </div>
     </div>
   `;
@@ -392,6 +481,125 @@ function attachCardEventListeners() {
       openDeleteModal(id);
     });
   });
+  
+  // Duplicate buttons
+  document.querySelectorAll('.btn-duplicate').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const id = e.currentTarget.getAttribute('data-id');
+      duplicateExpense(id);
+    });
+  });
+  
+  // Checkboxes for bulk selection
+  document.querySelectorAll('.expense-checkbox').forEach(checkbox => {
+    checkbox.addEventListener('change', (e) => {
+      const id = e.target.getAttribute('data-id');
+      if (e.target.checked) {
+        state.selectedExpenses.add(id);
+      } else {
+        state.selectedExpenses.delete(id);
+      }
+      updateBulkActionsBar();
+    });
+  });
+  
+  // Swipe actions for mobile
+  initSwipeActions();
+}
+
+// Duplicate expense
+async function duplicateExpense(id) {
+  const expense = state.expenses.find(e => e.id === id);
+  if (!expense) return;
+  
+  // Open add form with pre-filled data
+  openAddForm();
+  amountInput.value = expense.amount;
+  categoryInput.value = expense.category;
+  descriptionInput.value = expense.description || '';
+  paymentMethodInput.value = expense.paymentMethod;
+  
+  toast.info('Expense duplicated - modify and save');
+}
+
+// Update bulk actions bar
+function updateBulkActionsBar() {
+  const bulkBar = document.getElementById('bulkActionsBar');
+  const countEl = document.getElementById('bulkSelectedCount');
+  
+  if (state.selectedExpenses.size > 0) {
+    bulkBar.classList.add('visible');
+    countEl.textContent = `${state.selectedExpenses.size} selected`;
+  } else {
+    bulkBar.classList.remove('visible');
+  }
+}
+
+// Bulk delete selected expenses
+async function bulkDeleteExpenses() {
+  if (state.selectedExpenses.size === 0) return;
+  
+  const confirmed = confirm(`Delete ${state.selectedExpenses.size} selected expenses?`);
+  if (!confirmed) return;
+  
+  try {
+    const deletePromises = Array.from(state.selectedExpenses).map(id => 
+      firestoreService.deleteExpense(id)
+    );
+    await Promise.all(deletePromises);
+    
+    toast.success(`${state.selectedExpenses.size} expenses deleted`);
+    state.selectedExpenses.clear();
+    updateBulkActionsBar();
+    await loadExpenses();
+  } catch (error) {
+    console.error('Error bulk deleting:', error);
+    toast.error('Failed to delete some expenses');
+  }
+}
+
+// Initialize swipe actions for mobile
+function initSwipeActions() {
+  if ('ontouchstart' in window) {
+    document.querySelectorAll('.swipeable-card').forEach(card => {
+      let startX = 0;
+      let currentX = 0;
+      
+      card.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+      });
+      
+      card.addEventListener('touchmove', (e) => {
+        currentX = e.touches[0].clientX;
+        const diff = startX - currentX;
+        
+        if (diff > 50) {
+          card.classList.add('swiped');
+        } else if (diff < -50) {
+          card.classList.remove('swiped');
+        }
+      });
+      
+      card.addEventListener('touchend', () => {
+        // Keep state based on final position
+      });
+    });
+    
+    // Swipe action buttons
+    document.querySelectorAll('.swipe-action.edit').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const id = e.target.getAttribute('data-id');
+        openEditForm(id);
+      });
+    });
+    
+    document.querySelectorAll('.swipe-action.delete').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const id = e.target.getAttribute('data-id');
+        openDeleteModal(id);
+      });
+    });
+  }
 }
 
 // Load user's payment methods
@@ -511,6 +719,15 @@ function setupEventListeners() {
     sidebarOverlay.classList.remove('show');
   });
   
+  // Theme toggle
+  const themeToggleBtn = document.getElementById('themeToggleBtn');
+  if (themeToggleBtn) {
+    themeToggleBtn.addEventListener('click', () => {
+      const newTheme = themeManager.toggleTheme();
+      toast.success(`Switched to ${newTheme} mode`);
+    });
+  }
+  
   // Filters toggle (mobile)
   filtersToggle.addEventListener('click', () => {
     filtersContent.classList.toggle('show');
@@ -606,6 +823,65 @@ function setupEventListeners() {
     if (e.target === deleteModal) {
       closeDeleteConfirmModal();
     }
+  });
+  
+  // FAB button
+  const fabBtn = document.getElementById('fabAddExpense');
+  if (fabBtn) {
+    fabBtn.addEventListener('click', openAddForm);
+  }
+  
+  // Bulk actions
+  const bulkCancelBtn = document.getElementById('bulkCancelBtn');
+  const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+  
+  if (bulkCancelBtn) {
+    bulkCancelBtn.addEventListener('click', () => {
+      state.selectedExpenses.clear();
+      updateBulkActionsBar();
+      renderExpenses();
+    });
+  }
+  
+  if (bulkDeleteBtn) {
+    bulkDeleteBtn.addEventListener('click', bulkDeleteExpenses);
+  }
+  
+  // Pull to refresh
+  initPullToRefresh();
+}
+
+// Initialize pull to refresh
+function initPullToRefresh() {
+  let startY = 0;
+  let pulling = false;
+  const pullIndicator = document.getElementById('pullToRefresh');
+  
+  document.addEventListener('touchstart', (e) => {
+    if (window.scrollY === 0) {
+      startY = e.touches[0].clientY;
+      pulling = true;
+    }
+  });
+  
+  document.addEventListener('touchmove', (e) => {
+    if (!pulling) return;
+    
+    const currentY = e.touches[0].clientY;
+    const diff = currentY - startY;
+    
+    if (diff > 80 && window.scrollY === 0) {
+      pullIndicator.classList.add('visible');
+    }
+  });
+  
+  document.addEventListener('touchend', async () => {
+    if (pullIndicator.classList.contains('visible')) {
+      await loadExpenses();
+      pullIndicator.classList.remove('visible');
+      toast.success('Refreshed');
+    }
+    pulling = false;
   });
 }
 
