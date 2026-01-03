@@ -8,7 +8,9 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   sendPasswordResetEmail,
-  updateProfile
+  updateProfile,
+  setPersistence,
+  browserLocalPersistence
 } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
 
 class AuthService {
@@ -63,7 +65,13 @@ class AuthService {
   // Sign in with email and password
   async signIn(email, password) {
     try {
+      // Ensure persistence is set to LOCAL
+      await setPersistence(auth, browserLocalPersistence);
+      console.log('[Auth Service] Persistence set for email sign-in');
+      
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      
+      console.log('[Auth Service] Email sign-in successful:', userCredential.user.email);
       
       // Create/update user profile in Firestore
       if (this.userService) {
@@ -72,6 +80,7 @@ class AuthService {
       
       return { success: true, user: userCredential.user };
     } catch (error) {
+      console.error('[Auth Service] Email sign-in error:', error);
       return { success: false, error: this.getErrorMessage(error.code) };
     }
   }
@@ -104,8 +113,14 @@ class AuthService {
   // Sign in with Google
   async signInWithGoogle() {
     try {
+      // Ensure persistence is set to LOCAL
+      await setPersistence(auth, browserLocalPersistence);
+      console.log('[Auth Service] Persistence set for Google sign-in');
+      
       const provider = new GoogleAuthProvider();
       const userCredential = await signInWithPopup(auth, provider);
+      
+      console.log('[Auth Service] Google sign-in successful:', userCredential.user.email);
       
       // Create/update user profile in Firestore
       if (this.userService) {
@@ -114,6 +129,7 @@ class AuthService {
       
       return { success: true, user: userCredential.user };
     } catch (error) {
+      console.error('[Auth Service] Google sign-in error:', error);
       return { success: false, error: this.getErrorMessage(error.code) };
     }
   }

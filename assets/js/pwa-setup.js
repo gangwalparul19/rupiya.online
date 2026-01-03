@@ -1,7 +1,7 @@
 // PWA Setup - Service Worker Registration and Install Prompt
 // This file should be included in all HTML pages
 
-const APP_VERSION = '1.0.6'; // Update this on every deployment
+const APP_VERSION = '1.0.7'; // Update this on every deployment
 
 // Register Service Worker
 if ('serviceWorker' in navigator) {
