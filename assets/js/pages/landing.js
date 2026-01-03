@@ -254,14 +254,14 @@ if (window.matchMedia('(display-mode: standalone)').matches) {
     // Stash the event so it can be triggered later
     deferredPrompt = e;
     
-    // Show the hero install button (center)
+    // Show the hero install button (center) - it will be first
     if (heroInstallSection) {
       heroInstallSection.style.display = 'block';
     }
     
-    // Hide the regular CTA buttons
+    // Keep the regular CTA buttons visible (they will be below install button)
     if (heroCta) {
-      heroCta.style.display = 'none';
+      heroCta.style.display = 'flex';
     }
     
     // Also show the banner at top
@@ -303,11 +303,6 @@ if (heroInstallBtn) {
       heroInstallSection.style.display = 'none';
     }
     
-    // Show the regular CTA buttons
-    if (heroCta) {
-      heroCta.style.display = 'flex';
-    }
-    
     // Hide the banner
     if (pwaInstallBanner) {
       pwaInstallBanner.style.display = 'none';
@@ -347,11 +342,6 @@ if (installAppBtn) {
     if (heroInstallSection) {
       heroInstallSection.style.display = 'none';
     }
-    
-    // Show the regular CTA buttons
-    if (heroCta) {
-      heroCta.style.display = 'flex';
-    }
   });
 }
 
@@ -375,11 +365,6 @@ window.addEventListener('appinstalled', () => {
   
   if (pwaInstallBanner) {
     pwaInstallBanner.style.display = 'none';
-  }
-  
-  // Show the regular CTA buttons
-  if (heroCta) {
-    heroCta.style.display = 'flex';
   }
   
   // Clear the deferredPrompt

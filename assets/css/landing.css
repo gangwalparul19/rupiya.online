@@ -150,7 +150,33 @@
 .landing-nav-links {
   display: flex;
   align-items: center;
-  gap: 2rem;
+  gap: 1rem;
+}
+
+.btn-nav-signin {
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--primary-blue);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-nav-signin:hover {
+  background: var(--white);
+  border-color: var(--white);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.landing-nav.scrolled .btn-nav-signin {
+  background: var(--white);
+  color: var(--primary-blue);
+  border: 2px solid var(--primary-blue);
+}
+
+.landing-nav.scrolled .btn-nav-signin:hover {
+  background: var(--primary-blue);
+  color: var(--white);
 }
 
 .nav-link {
