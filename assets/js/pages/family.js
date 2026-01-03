@@ -7,38 +7,32 @@ let currentUser = null;
 let familyGroups = [];
 let pendingInvitations = [];
 
-console.log('[Family Page] Loading...');
+// Check authentication
+async function checkAuth() {
+  await authService.waitForAuth();
+  if (!authService.isAuthenticated()) {
+    window.location.href = 'login.html';
+    return false;
+  }
+  return true;
+}
 
-// Initialize page
+// Initialize page only after auth check
 async function init() {
-  console.log('[Family Page] Initializing...');
-  
-  try {
-    // Wait for auth
-    currentUser = await authService.waitForAuth();
-    
-    console.log('[Family Page] Auth result:', currentUser ? currentUser.email : 'Not logged in');
-    
-    if (!currentUser) {
-      console.log('[Family Page] Not authenticated, redirecting...');
-      toast.error('Please login to access Family Management');
-      setTimeout(() => {
-        window.location.href = 'login.html';
-      }, 1000);
-      return;
-    }
-    
-    console.log('[Family Page] User authenticated, loading page...');
+  const isAuthenticated = await checkAuth();
+  if (isAuthenticated) {
     await initPage();
-    
-  } catch (error) {
-    console.error('[Family Page] Error:', error);
-    toast.error('Failed to load page');
   }
 }
 
+// Start initialization
+init();
+
 // Initialize page
 async function initPage() {
+  // Get current user
+  currentUser = authService.getCurrentUser();
+  
   // Update user profile
   updateUserProfile();
   
