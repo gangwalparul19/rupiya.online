@@ -240,65 +240,175 @@ const pwaInstallBanner = document.getElementById('pwaInstallBanner');
 const installAppBtn = document.getElementById('installAppBtn');
 const closePwaBanner = document.getElementById('closePwaBanner');
 
+// Detect device and browser
+function isIOS() {
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+}
+
+function isAndroid() {
+  return /Android/.test(navigator.userAgent);
+}
+
+function isInStandaloneMode() {
+  return window.matchMedia('(display-mode: standalone)').matches || 
+         window.navigator.standalone === true;
+}
+
 // Check if already installed
-if (window.matchMedia('(display-mode: standalone)').matches) {
+if (isInStandaloneMode()) {
   // Already installed, don't show install options
   console.log('App is already installed');
+  if (heroInstallBtn) {
+    heroInstallBtn.style.display = 'none';
+  }
+  if (pwaInstallBanner) {
+    pwaInstallBanner.style.display = 'none';
+  }
 } else {
-  // Listen for beforeinstallprompt event
+  // Show install button for all devices
+  if (heroInstallBtn) {
+    heroInstallBtn.style.display = 'inline-flex';
+    
+    // Update button text based on device
+    if (isIOS()) {
+      heroInstallBtn.innerHTML = `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+        </svg>
+        Install App
+      `;
+    } else if (isAndroid()) {
+      heroInstallBtn.innerHTML = `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+        </svg>
+        Install App
+      `;
+    } else {
+      heroInstallBtn.innerHTML = `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+        </svg>
+        Install App
+      `;
+    }
+  }
+  
+  // Show banner
+  if (pwaInstallBanner) {
+    pwaInstallBanner.style.display = 'block';
+  }
+  
+  // Listen for beforeinstallprompt event (Android Chrome, Edge, etc.)
   window.addEventListener('beforeinstallprompt', (e) => {
     // Prevent the mini-infobar from appearing on mobile
     e.preventDefault();
     // Stash the event so it can be triggered later
     deferredPrompt = e;
     
-    // Show the hero install button
-    if (heroInstallBtn) {
-      heroInstallBtn.style.display = 'inline-flex';
+    console.log('PWA install prompt available (Android/Desktop)');
+  });
+}
+
+// Show iOS install instructions modal
+function showIOSInstructions() {
+  const modal = document.createElement('div');
+  modal.className = 'pwa-install-modal';
+  modal.innerHTML = `
+    <div class="pwa-install-modal-content">
+      <div class="install-instructions">
+        <h3>📱 Install Rupiya App</h3>
+        <p>To install this app on your iPhone:</p>
+        <ol>
+          <li>Tap the <strong>Share</strong> button <svg style="display: inline; width: 16px; height: 16px; vertical-align: middle;" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg> at the bottom of the screen</li>
+          <li>Scroll down and tap <strong>"Add to Home Screen"</strong></li>
+          <li>Tap <strong>"Add"</strong> in the top right corner</li>
+          <li>The app will appear on your home screen!</li>
+        </ol>
+        <button class="btn btn-primary w-100" onclick="this.closest('.pwa-install-modal').remove()">Got it!</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  
+  // Close on background click
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      modal.remove();
     }
-    
-    // Also show the banner at top
-    if (pwaInstallBanner) {
-      pwaInstallBanner.style.display = 'block';
+  });
+}
+
+// Show Android install instructions for browsers that don't support beforeinstallprompt
+function showAndroidInstructions() {
+  const modal = document.createElement('div');
+  modal.className = 'pwa-install-modal';
+  modal.innerHTML = `
+    <div class="pwa-install-modal-content">
+      <div class="install-instructions">
+        <h3>📱 Install Rupiya App</h3>
+        <p>To install this app on your Android device:</p>
+        <ol>
+          <li>Tap the <strong>menu</strong> button (⋮) in your browser</li>
+          <li>Look for <strong>"Add to Home screen"</strong> or <strong>"Install app"</strong></li>
+          <li>Tap it and confirm</li>
+          <li>The app will appear on your home screen!</li>
+        </ol>
+        <button class="btn btn-primary w-100" onclick="this.closest('.pwa-install-modal').remove()">Got it!</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  
+  // Close on background click
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      modal.remove();
     }
-    
-    console.log('PWA install prompt available');
   });
 }
 
 // Handle install button click (hero button)
 if (heroInstallBtn) {
   heroInstallBtn.addEventListener('click', async () => {
-    if (!deferredPrompt) {
-      console.log('No install prompt available');
+    // iOS - show instructions
+    if (isIOS()) {
+      showIOSInstructions();
       return;
     }
     
-    // Show the install prompt
-    deferredPrompt.prompt();
-    
-    // Wait for the user to respond to the prompt
-    const { outcome } = await deferredPrompt.userChoice;
-    
-    console.log(`User response to the install prompt: ${outcome}`);
-    
-    if (outcome === 'accepted') {
-      console.log('User accepted the install prompt');
+    // Android/Desktop with beforeinstallprompt support
+    if (deferredPrompt) {
+      // Show the install prompt
+      deferredPrompt.prompt();
+      
+      // Wait for the user to respond to the prompt
+      const { outcome } = await deferredPrompt.userChoice;
+      
+      console.log(`User response to the install prompt: ${outcome}`);
+      
+      if (outcome === 'accepted') {
+        console.log('User accepted the install prompt');
+        // Hide the install button
+        if (heroInstallBtn) {
+          heroInstallBtn.style.display = 'none';
+        }
+        // Hide the banner
+        if (pwaInstallBanner) {
+          pwaInstallBanner.style.display = 'none';
+        }
+      }
+      
+      // Clear the deferredPrompt
+      deferredPrompt = null;
     } else {
-      console.log('User dismissed the install prompt');
-    }
-    
-    // Clear the deferredPrompt
-    deferredPrompt = null;
-    
-    // Hide the install button
-    if (heroInstallBtn) {
-      heroInstallBtn.style.display = 'none';
-    }
-    
-    // Hide the banner
-    if (pwaInstallBanner) {
-      pwaInstallBanner.style.display = 'none';
+      // Android without beforeinstallprompt - show instructions
+      if (isAndroid()) {
+        showAndroidInstructions();
+      } else {
+        // Desktop - show generic instructions
+        alert('To install this app:\n\n1. Click the install icon in your browser\'s address bar\n2. Or check your browser menu for "Install" or "Add to Home Screen" option');
+      }
     }
   });
 }
@@ -306,34 +416,53 @@ if (heroInstallBtn) {
 // Handle install button click (banner button)
 if (installAppBtn) {
   installAppBtn.addEventListener('click', async () => {
-    if (!deferredPrompt) {
-      console.log('No install prompt available');
+    // iOS - show instructions
+    if (isIOS()) {
+      showIOSInstructions();
       return;
     }
     
-    // Show the install prompt
-    deferredPrompt.prompt();
-    
-    // Wait for the user to respond to the prompt
-    const { outcome } = await deferredPrompt.userChoice;
-    
-    console.log(`User response to the install prompt: ${outcome}`);
-    
-    if (outcome === 'accepted') {
-      console.log('User accepted the install prompt');
+    // Android/Desktop with beforeinstallprompt support
+    if (deferredPrompt) {
+      // Show the install prompt
+      deferredPrompt.prompt();
+      
+      // Wait for the user to respond to the prompt
+      const { outcome } = await deferredPrompt.userChoice;
+      
+      console.log(`User response to the install prompt: ${outcome}`);
+      
+      if (outcome === 'accepted') {
+        console.log('User accepted the install prompt');
+        // Hide the banner
+        if (pwaInstallBanner) {
+          pwaInstallBanner.style.display = 'none';
+        }
+        // Hide the install button
+        if (heroInstallBtn) {
+          heroInstallBtn.style.display = 'none';
+        }
+      }
+      
+      // Clear the deferredPrompt
+      deferredPrompt = null;
+    } else {
+      // Android without beforeinstallprompt - show instructions
+      if (isAndroid()) {
+        showAndroidInstructions();
+      } else {
+        // Desktop - show generic instructions
+        alert('To install this app:\n\n1. Click the install icon in your browser\'s address bar\n2. Or check your browser menu for "Install" or "Add to Home Screen" option');
+      }
     }
-    
-    // Clear the deferredPrompt
-    deferredPrompt = null;
-    
-    // Hide the banner
+  });
+}
+
+// Handle close banner button
+if (closePwaBanner) {
+  closePwaBanner.addEventListener('click', () => {
     if (pwaInstallBanner) {
       pwaInstallBanner.style.display = 'none';
-    }
-    
-    // Hide the install button
-    if (heroInstallBtn) {
-      heroInstallBtn.style.display = 'none';
     }
   });
 }

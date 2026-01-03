@@ -347,15 +347,32 @@
 
 .hero-cta {
   display: flex;
-  gap: 1rem;
+  gap: 0.75rem;
   justify-content: center;
-  align-items: center;
+  align-items: stretch;
   flex-wrap: wrap;
   margin-bottom: 3rem;
   animation: fadeInUp 0.8s ease-out 0.3s both;
   max-width: 600px;
   margin-left: auto;
   margin-right: auto;
+}
+
+.hero-cta-row {
+  display: flex;
+  gap: 0.75rem;
+  width: 100%;
+  justify-content: center;
+}
+
+.hero-cta-row.full-width {
+  width: 100%;
+}
+
+.hero-cta-row .btn,
+.hero-cta-row button {
+  flex: 1;
+  min-width: 0;
 }
 
 /* Hero Install Section - Removed, buttons now in hero-cta */
@@ -378,7 +395,13 @@
   border: 2px solid transparent;
   cursor: pointer;
   white-space: nowrap;
-  min-width: 160px;
+  flex: 1;
+  min-width: 0;
+}
+
+.btn-hero-install.full-width,
+.btn-hero-secondary.full-width {
+  width: 100%;
 }
 
 .btn-hero-primary {
@@ -1215,6 +1238,76 @@
   line-height: 1.6;
 }
 
+/* PWA Install Modal */
+.pwa-install-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 1rem;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.pwa-install-modal-content {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.install-instructions h3 {
+  color: var(--primary-blue);
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.install-instructions p {
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+.install-instructions ol {
+  margin: 1rem 0 1.5rem 1.5rem;
+  color: var(--text-primary);
+}
+
+.install-instructions li {
+  margin-bottom: 0.75rem;
+  line-height: 1.6;
+}
+
+.install-instructions strong {
+  color: var(--primary-blue);
+  font-weight: 700;
+}
+
 /* Mobile responsive */
 @media (max-width: 768px) {
   .pwa-install-banner {
@@ -1246,6 +1339,18 @@
   .pwa-banner-close {
     top: 0.5rem;
     right: 0.5rem;
+  }
+  
+  .pwa-install-modal-content {
+    padding: 1.5rem;
+  }
+  
+  .install-instructions h3 {
+    font-size: 1.25rem;
+  }
+  
+  .install-instructions ol {
+    margin-left: 1rem;
   }
 }
 
@@ -1305,13 +1410,25 @@
     flex-direction: column;
     width: 100%;
     gap: 0.75rem;
+    max-width: 100%;
+    padding: 0 1rem;
   }
   
-  .hero-cta .btn {
+  .hero-cta-row {
+    flex-direction: row;
+    gap: 0.75rem;
+  }
+  
+  .hero-cta-row.full-width .btn,
+  .hero-cta-row.full-width button {
     width: 100%;
-    max-width: 100%;
+  }
+  
+  .hero-cta .btn,
+  .hero-cta button {
     padding: 1rem 1.5rem;
-    font-size: 0.95rem;
+    font-size: 1rem;
+    justify-content: center;
   }
   
   .trust-indicators {
