@@ -7,6 +7,13 @@
   <meta name="theme-color" content="#4A90E2">
   <title>Family Management - Rupiya</title>
   
+  <!-- Redirect www to non-www to maintain auth session -->
+  <script>
+    if (window.location.hostname === 'www.rupiya.online') {
+      window.location.href = window.location.href.replace('www.rupiya.online', 'rupiya.online');
+    }
+  </script>
+  
   <!-- PWA Manifest -->
   <link rel="manifest" href="/manifest.json">
   
@@ -364,9 +371,9 @@
   </div>
 
   <!-- Scripts -->
-  <script type="module" src="assets/js/pages/family.js?v=1.0.14" onerror="console.error('[Family Page] Failed to load family.js')"></script>
-  <script type="module" src="assets/js/pages/family-modals.js?v=1.0.14" onerror="console.error('[Family Page] Failed to load family-modals.js')"></script>
-  <script src="assets/js/pwa-setup.js?v=1.0.14" onerror="console.error('[Family Page] Failed to load pwa-setup.js')"></script>
+  <script type="module" src="assets/js/pages/family.js?v=1.0.15" onerror="console.error('[Family Page] Failed to load family.js')"></script>
+  <script type="module" src="assets/js/pages/family-modals.js?v=1.0.15" onerror="console.error('[Family Page] Failed to load family-modals.js')"></script>
+  <script src="assets/js/pwa-setup.js?v=1.0.15" onerror="console.error('[Family Page] Failed to load pwa-setup.js')"></script>
   
   <!-- Error Handler -->
   <script>

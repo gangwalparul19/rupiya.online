@@ -1,8 +1,8 @@
 // Firebase Configuration
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
 import { getAuth, browserLocalPersistence, setPersistence } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
-import { getFirestore, connectFirestoreEmulator } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
-import { getStorage, connectStorageEmulator } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-storage.js';
+import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+import { getStorage } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-storage.js';
 import { loadEnvironment } from './env.js';
 
 // Load environment variables
@@ -26,15 +26,8 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
 
-// Set auth persistence to local (survives browser restart)
-setPersistence(auth, browserLocalPersistence)
-  .then(() => {
-    console.log('[Firebase] Auth persistence set to LOCAL');
-  })
-  .catch((error) => {
-    console.error('[Firebase] Error setting auth persistence:', error);
-  });
-
+// Auth persistence is LOCAL by default in Firebase v10+
+// No need to call setPersistence explicitly
 console.log('[Firebase] Initialized successfully');
 
 // Export app for other uses
