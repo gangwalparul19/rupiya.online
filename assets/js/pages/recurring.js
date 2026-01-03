@@ -3,6 +3,7 @@ import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
 import categoriesService from '../services/categories-service.js';
 import toast from '../components/toast.js';
+import themeManager from '../utils/theme-manager.js';
 import { formatCurrency, formatDate } from '../utils/helpers.js';
 
 // Helper function for toast

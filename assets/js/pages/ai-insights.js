@@ -3,6 +3,7 @@ import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
 import AIInsightsEngine from '../utils/ai-insights-engine.js';
 import toast from '../components/toast.js';
+import themeManager from '../utils/theme-manager.js';
 import { formatCurrency } from '../utils/helpers.js';
 
 // Initialize AI engine

@@ -2,6 +2,7 @@
 import authService from '../services/auth-service.js';
 import splitService from '../services/split-service.js';
 import toast from '../components/toast.js';
+import themeManager from '../utils/theme-manager.js';
 import { formatCurrency, formatDate, formatDateForInput } from '../utils/helpers.js';
 
 // State management
