@@ -235,9 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // PWA Install functionality
 let deferredPrompt;
-const heroInstallSection = document.getElementById('heroInstallSection');
-const heroInstallBtn = document.getElementById('heroInstallAppBtn');
-const heroCta = document.getElementById('heroCta');
+const heroInstallBtn = document.getElementById('heroInstallBtn');
 const pwaInstallBanner = document.getElementById('pwaInstallBanner');
 const installAppBtn = document.getElementById('installAppBtn');
 const closePwaBanner = document.getElementById('closePwaBanner');
@@ -254,14 +252,9 @@ if (window.matchMedia('(display-mode: standalone)').matches) {
     // Stash the event so it can be triggered later
     deferredPrompt = e;
     
-    // Show the hero install button (center) - it will be first
-    if (heroInstallSection) {
-      heroInstallSection.style.display = 'block';
-    }
-    
-    // Keep the regular CTA buttons visible (they will be below install button)
-    if (heroCta) {
-      heroCta.style.display = 'flex';
+    // Show the hero install button
+    if (heroInstallBtn) {
+      heroInstallBtn.style.display = 'inline-flex';
     }
     
     // Also show the banner at top
@@ -298,9 +291,9 @@ if (heroInstallBtn) {
     // Clear the deferredPrompt
     deferredPrompt = null;
     
-    // Hide the install section
-    if (heroInstallSection) {
-      heroInstallSection.style.display = 'none';
+    // Hide the install button
+    if (heroInstallBtn) {
+      heroInstallBtn.style.display = 'none';
     }
     
     // Hide the banner
@@ -338,9 +331,9 @@ if (installAppBtn) {
       pwaInstallBanner.style.display = 'none';
     }
     
-    // Hide the install section
-    if (heroInstallSection) {
-      heroInstallSection.style.display = 'none';
+    // Hide the install button
+    if (heroInstallBtn) {
+      heroInstallBtn.style.display = 'none';
     }
   });
 }
@@ -359,8 +352,8 @@ window.addEventListener('appinstalled', () => {
   console.log('PWA was installed');
   
   // Hide all install prompts
-  if (heroInstallSection) {
-    heroInstallSection.style.display = 'none';
+  if (heroInstallBtn) {
+    heroInstallBtn.style.display = 'none';
   }
   
   if (pwaInstallBanner) {
