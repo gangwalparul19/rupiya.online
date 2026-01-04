@@ -69,8 +69,15 @@ const pagesWithSidebar = [
   'admin.html'
 ];
 
-// Environment variable injection script
-const envScript = `
+// Environment variable injection script (only inject if values are present)
+const hasEnvVars = process.env.VITE_FIREBASE_API_KEY && process.env.VITE_FIREBASE_API_KEY.trim() !== '';
+
+console.log(`Firebase API Key present: ${hasEnvVars ? 'YES' : 'NO'}`);
+if (hasEnvVars) {
+  console.log(`Project ID: ${process.env.VITE_FIREBASE_PROJECT_ID}`);
+}
+
+const envScript = hasEnvVars ? `
 <script>
   // Firebase environment variables injected at build time
   window.__ENV__ = {
@@ -82,7 +89,7 @@ const envScript = `
     VITE_FIREBASE_APP_ID: '${process.env.VITE_FIREBASE_APP_ID || ''}'
   };
 </script>
-`;
+` : '';
 
 // Read the sidebar component template
 function getSidebarHTML() {
@@ -126,13 +133,15 @@ htmlFiles.forEach(file => {
     let content = fs.readFileSync(filePath, 'utf8');
     let modified = false;
     
-    // Inject environment variables if not already present
-    if (!content.includes('window.__ENV__')) {
+    // Inject environment variables if not already present and we have env vars
+    if (envScript && !content.includes('window.__ENV__')) {
       if (content.includes('<head>')) {
         content = content.replace('<head>', `<head>\n  ${envScript}`);
         modified = true;
         console.log(`✓ Injected environment variables into ${file}`);
       }
+    } else if (!envScript && !content.includes('window.__ENV__')) {
+      console.log(`⚠️  Skipping env injection for ${file} (no env vars available)`);
     }
 
     // Add sidebar CSS if this page has a sidebar and CSS not already included
