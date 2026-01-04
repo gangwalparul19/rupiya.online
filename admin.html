@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Rupiya Admin - Platform Analytics and Insights">
@@ -9,25 +8,14 @@
   <meta name="robots" content="noindex, nofollow">
   <title>Admin Dashboard - Rupiya</title>
   
-  <!-- PWA Manifest -->
-  <link rel="manifest" href="/manifest.json">
-  
   <!-- Favicon -->
   <link rel="icon" href="assets/images/logo.png" type="image/png">
-  <link rel="apple-touch-icon" href="/android-chrome-192x192.png">
   
   <!-- Stylesheets -->
   <link rel="stylesheet" href="assets/css/common.css">
   <link rel="stylesheet" href="assets/css/components.css">
   <link rel="stylesheet" href="assets/css/dark-mode.css">
-  <link rel="stylesheet" href="assets/css/dashboard.css">
-  <link rel="stylesheet" href="assets/css/analytics.css">
   <link rel="stylesheet" href="assets/css/admin.css">
-  <link rel="stylesheet" href="assets/css/enhancements.css">
-  <link rel="stylesheet" href="assets/css/animations.css">
-  <link rel="stylesheet" href="assets/css/mobile-enhancements.css">
-  <link rel="stylesheet" href="assets/css/ux-enhancements.css">
-  <link rel="stylesheet" href="assets/css/sidebar.css">
   
   <!-- Auth Guard -->
   <script src="assets/js/utils/auth-guard.js"></script>
@@ -35,267 +23,194 @@
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
 </head>
-<body>
-  <div class="dashboard-layout">
-    <!-- Sidebar -->
-    <aside class="sidebar" id="sidebar">
-      <div class="sidebar-header">
-        <div class="sidebar-logo">
-          <img src="assets/images/logo.png" alt="Rupiya">
-        </div>
-        <button class="sidebar-toggle" id="sidebarClose">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-          </svg>
-        </button>
-      </div>
-      <nav class="sidebar-nav"></nav>
-      <div class="sidebar-footer">
-        <div class="user-profile" id="userProfile">
-          <div class="user-avatar" id="userAvatar">U</div>
-          <div class="user-info">
-            <div class="user-name" id="userName">Loading...</div>
-            <div class="user-email" id="userEmail">Loading...</div>
-          </div>
-        </div>
-        <button class="btn btn-sm btn-outline w-100 mt-3" id="logoutBtn">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-          </svg>
-          Logout
-        </button>
-      </div>
-    </aside>
+<body class="admin-body">
+  <!-- Admin Header -->
+  <header class="admin-header">
+    <div class="admin-header-left">
+      <a href="dashboard.html" class="admin-logo">
+        <img src="assets/images/logo.png" alt="Rupiya">
+        <span>Rupiya</span>
+      </a>
+      <span class="admin-badge">Admin</span>
+    </div>
+    <div class="admin-header-right">
+      <span class="admin-user" id="adminUserEmail">Loading...</span>
+      <a href="dashboard.html" class="btn btn-sm btn-outline">← Back to App</a>
+      <button class="btn btn-sm btn-outline" id="logoutBtn">Logout</button>
+    </div>
+  </header>
 
-    <!-- Sidebar Overlay -->
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
-    <!-- Main Content -->
-    <main class="main-content">
-      <!-- Mobile Header -->
-      <div class="mobile-header">
-        <a href="dashboard.html" class="mobile-brand">
-          <img src="assets/images/logo.png" alt="Rupiya">
-        </a>
-        <div class="mobile-header-actions">
-          <button class="sidebar-toggle" id="sidebarOpen">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      <!-- Access Denied State -->
-      <div class="admin-access-denied" id="accessDenied" style="display: none;">
-        <div class="access-denied-icon">🔒</div>
-        <h2 class="access-denied-title">Access Denied</h2>
-        <p class="access-denied-message">You don't have permission to access the admin dashboard.</p>
-        <a href="dashboard.html" class="btn btn-primary">Go to Dashboard</a>
-      </div>
-
-      <!-- Loading State -->
-      <div class="admin-loading" id="loadingState">
-        <div class="spinner-lg"></div>
-        <p style="margin-top: 1rem; color: var(--text-secondary);">Loading admin dashboard...</p>
-      </div>
-
-      <!-- Admin Content -->
-      <div id="adminContent" style="display: none;">
-        <!-- Page Header -->
-        <div class="page-header">
-          <div class="admin-header">
-            <h1 class="page-title">Admin Dashboard</h1>
-            <span class="admin-badge">Admin</span>
-          </div>
-          <p class="page-subtitle">Platform-wide analytics and insights</p>
-        </div>
-        <div class="page-actions">
-          <button class="refresh-btn" id="refreshBtn">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-            </svg>
-            Refresh Data
-          </button>
-        </div>
-
-        <!-- Platform Stats -->
-        <div class="admin-stats-grid" id="platformStats">
-          <div class="admin-stat-card highlight">
-            <div class="stat-icon">👥</div>
-            <div class="stat-label">Total Users</div>
-            <div class="stat-value" id="totalUsers">-</div>
-          </div>
-          <div class="admin-stat-card">
-            <div class="stat-icon">💰</div>
-            <div class="stat-label">Total Income</div>
-            <div class="stat-value" id="totalIncome">-</div>
-          </div>
-          <div class="admin-stat-card">
-            <div class="stat-icon">💸</div>
-            <div class="stat-label">Total Expenses</div>
-            <div class="stat-value" id="totalExpenses">-</div>
-          </div>
-          <div class="admin-stat-card">
-            <div class="stat-icon">💵</div>
-            <div class="stat-label">Net Savings</div>
-            <div class="stat-value" id="netSavings">-</div>
-          </div>
-          <div class="admin-stat-card">
-            <div class="stat-icon">👨‍👩‍👧‍👦</div>
-            <div class="stat-label">Family Groups</div>
-            <div class="stat-value" id="totalFamilyGroups">-</div>
-          </div>
-          <div class="admin-stat-card">
-            <div class="stat-icon">✈️</div>
-            <div class="stat-label">Trip Groups</div>
-            <div class="stat-value" id="totalTripGroups">-</div>
-          </div>
-        </div>
-
-        <!-- User Activity -->
-        <h2 class="section-title" style="margin-bottom: 1rem;">User Activity</h2>
-        <div class="activity-grid" id="activityStats">
-          <div class="activity-card">
-            <div class="activity-icon">🟢</div>
-            <div class="activity-value" id="activeToday">-</div>
-            <div class="activity-label">Active Today</div>
-          </div>
-          <div class="activity-card">
-            <div class="activity-icon">📅</div>
-            <div class="activity-value" id="activeThisWeek">-</div>
-            <div class="activity-label">Active This Week</div>
-          </div>
-          <div class="activity-card">
-            <div class="activity-icon">📆</div>
-            <div class="activity-value" id="activeThisMonth">-</div>
-            <div class="activity-label">Active This Month</div>
-          </div>
-          <div class="activity-card">
-            <div class="activity-icon">😴</div>
-            <div class="activity-value" id="inactiveUsers">-</div>
-            <div class="activity-label">Inactive (30+ days)</div>
-          </div>
-        </div>
-
-        <!-- Location Stats -->
-        <h2 class="section-title" style="margin: 2rem 0 1rem;">Users by Location</h2>
-        <div class="location-grid">
-          <div class="location-card">
-            <div class="location-card-header">
-              <span>🌍</span>
-              <h3 class="location-card-title">By Country</h3>
-            </div>
-            <div class="location-list" id="countryList">
-              <p class="text-muted">Loading...</p>
-            </div>
-          </div>
-          <div class="location-card">
-            <div class="location-card-header">
-              <span>🏙️</span>
-              <h3 class="location-card-title">By City</h3>
-            </div>
-            <div class="location-list" id="cityList">
-              <p class="text-muted">Loading...</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Charts -->
-        <h2 class="section-title" style="margin: 2rem 0 1rem;">Financial Overview</h2>
-        <div class="admin-charts-grid">
-          <div class="admin-chart-card">
-            <div class="chart-header">
-              <h3 class="chart-title">Expenses by Category</h3>
-            </div>
-            <div class="chart-container">
-              <canvas id="expenseCategoryChart"></canvas>
-            </div>
-          </div>
-          <div class="admin-chart-card">
-            <div class="chart-header">
-              <h3 class="chart-title">Income by Source</h3>
-            </div>
-            <div class="chart-container">
-              <canvas id="incomeSourceChart"></canvas>
-            </div>
-          </div>
-          <div class="admin-chart-card full-width">
-            <div class="chart-header">
-              <h3 class="chart-title">Monthly Trends (Platform-wide)</h3>
-            </div>
-            <div class="chart-container">
-              <canvas id="monthlyTrendChart"></canvas>
-            </div>
-          </div>
-          <div class="admin-chart-card full-width">
-            <div class="chart-header">
-              <h3 class="chart-title">User Growth</h3>
-            </div>
-            <div class="chart-container">
-              <canvas id="userGrowthChart"></canvas>
-            </div>
-          </div>
-        </div>
-
-        <!-- Insights -->
-        <h2 class="section-title" style="margin: 2rem 0 1rem;">Platform Insights</h2>
-        <div class="insights-grid" id="insightsGrid">
-          <div class="insight-card">
-            <div class="insight-header">
-              <span class="insight-icon">📊</span>
-              <span class="insight-title">Avg. Expense per User</span>
-            </div>
-            <div class="insight-value" id="avgExpensePerUser">-</div>
-            <p class="insight-description">Average total expenses tracked per user</p>
-          </div>
-          <div class="insight-card">
-            <div class="insight-header">
-              <span class="insight-icon">💹</span>
-              <span class="insight-title">Avg. Income per User</span>
-            </div>
-            <div class="insight-value" id="avgIncomePerUser">-</div>
-            <p class="insight-description">Average total income tracked per user</p>
-          </div>
-          <div class="insight-card">
-            <div class="insight-header">
-              <span class="insight-icon">📝</span>
-              <span class="insight-title">Total Transactions</span>
-            </div>
-            <div class="insight-value" id="totalTransactions">-</div>
-            <p class="insight-description">Combined expense and income entries</p>
-          </div>
-        </div>
-
-        <!-- Recent Users Table -->
-        <div class="admin-table-card">
-          <div class="admin-table-header">
-            <h3 class="admin-table-title">Recent Users</h3>
-          </div>
-          <table class="admin-table">
-            <thead>
-              <tr>
-                <th>User</th>
-                <th>Location</th>
-                <th>Joined</th>
-                <th>Last Active</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody id="recentUsersTable">
-              <tr>
-                <td colspan="5" class="text-center">Loading...</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </main>
+  <!-- Access Denied State -->
+  <div class="admin-access-denied" id="accessDenied" style="display: none;">
+    <div class="access-denied-icon">🔒</div>
+    <h2 class="access-denied-title">Access Denied</h2>
+    <p class="access-denied-message">You don't have permission to access the admin dashboard.</p>
+    <a href="dashboard.html" class="btn btn-primary">Go to Dashboard</a>
   </div>
 
+  <!-- Loading State -->
+  <div class="admin-loading" id="loadingState">
+    <div class="spinner-lg"></div>
+    <p>Loading admin dashboard...</p>
+  </div>
+
+  <!-- Admin Content -->
+  <main class="admin-main" id="adminContent" style="display: none;">
+    <!-- Page Header -->
+    <div class="admin-page-header">
+      <div>
+        <h1 class="admin-title">Platform Analytics</h1>
+        <p class="admin-subtitle">Real-time insights across all users</p>
+      </div>
+      <button class="refresh-btn" id="refreshBtn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+        </svg>
+        Refresh
+      </button>
+    </div>
+
+    <!-- Platform Stats -->
+    <section class="admin-section">
+      <div class="admin-stats-grid">
+        <div class="admin-stat-card highlight">
+          <div class="stat-icon">👥</div>
+          <div class="stat-content">
+            <div class="stat-value" id="totalUsers">-</div>
+            <div class="stat-label">Total Users</div>
+          </div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="stat-icon">💰</div>
+          <div class="stat-content">
+            <div class="stat-value" id="totalIncome">-</div>
+            <div class="stat-label">Total Income</div>
+          </div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="stat-icon">💸</div>
+          <div class="stat-content">
+            <div class="stat-value" id="totalExpenses">-</div>
+            <div class="stat-label">Total Expenses</div>
+          </div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="stat-icon">💵</div>
+          <div class="stat-content">
+            <div class="stat-value" id="netSavings">-</div>
+            <div class="stat-label">Net Savings</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- User Activity -->
+    <section class="admin-section">
+      <h2 class="section-title">👤 User Activity</h2>
+      <div class="activity-grid">
+        <div class="activity-card">
+          <div class="activity-icon">🟢</div>
+          <div class="activity-value" id="activeToday">-</div>
+          <div class="activity-label">Active Today</div>
+        </div>
+        <div class="activity-card">
+          <div class="activity-icon">📅</div>
+          <div class="activity-value" id="activeThisWeek">-</div>
+          <div class="activity-label">This Week</div>
+        </div>
+        <div class="activity-card">
+          <div class="activity-icon">📆</div>
+          <div class="activity-value" id="activeThisMonth">-</div>
+          <div class="activity-label">This Month</div>
+        </div>
+        <div class="activity-card">
+          <div class="activity-icon">😴</div>
+          <div class="activity-value" id="inactiveUsers">-</div>
+          <div class="activity-label">Inactive</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Location Stats -->
+    <section class="admin-section">
+      <h2 class="section-title">🌍 Users by Location</h2>
+      <p class="text-muted location-info" id="unknownLocationCount" style="display:none; margin-bottom: 1rem; font-size: 0.875rem;"></p>
+      <div class="location-grid">
+        <div class="location-card">
+          <h3 class="location-card-title">By Country</h3>
+          <div class="location-list" id="countryList">
+            <p class="text-muted">Loading...</p>
+          </div>
+        </div>
+        <div class="location-card">
+          <h3 class="location-card-title">By City</h3>
+          <div class="location-list" id="cityList">
+            <p class="text-muted">Loading...</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Charts -->
+    <section class="admin-section">
+      <h2 class="section-title">📊 Financial Overview</h2>
+      <div class="admin-charts-grid">
+        <div class="admin-chart-card">
+          <h3 class="chart-title">Expenses by Category</h3>
+          <div class="chart-container">
+            <canvas id="expenseCategoryChart"></canvas>
+          </div>
+        </div>
+        <div class="admin-chart-card">
+          <h3 class="chart-title">Income by Source</h3>
+          <div class="chart-container">
+            <canvas id="incomeSourceChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Monthly Trends -->
+    <section class="admin-section">
+      <h2 class="section-title">📈 Monthly Trends</h2>
+      <div class="admin-chart-card full-width">
+        <div class="chart-container chart-container-lg">
+          <canvas id="monthlyTrendChart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- Users Table with Pagination -->
+    <section class="admin-section">
+      <div class="section-header">
+        <h2 class="section-title">👥 Recent Users</h2>
+        <div class="pagination-info" id="paginationInfo">Showing 0 users</div>
+      </div>
+      <div class="admin-table-wrapper">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Location</th>
+              <th>Joined</th>
+              <th>Last Active</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="usersTableBody">
+            <tr><td colspan="5" class="text-center">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination" id="pagination">
+        <button class="pagination-btn" id="prevPageBtn" disabled>← Previous</button>
+        <span class="pagination-current" id="currentPage">Page 1</span>
+        <button class="pagination-btn" id="nextPageBtn">Next →</button>
+      </div>
+    </section>
+  </main>
+
   <!-- Scripts -->
-  <script type="module" src="assets/js/utils/ux-enhancements.js"></script>
-  <script type="module" src="assets/js/components/sidebar.js"></script>
   <script type="module" src="assets/js/pages/admin.js"></script>
 </body>
 </html>

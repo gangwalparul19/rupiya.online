@@ -2,7 +2,7 @@
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
 import toast from '../components/toast.js';
-import { formatCurrency, formatDate } from '../utils/helpers.js';
+import { formatCurrency, formatDate, escapeHtml } from '../utils/helpers.js';
 
 // Helper function for toast
 const showToast = (message, type) => toast.show(message, type);
@@ -240,20 +240,27 @@ async function loadHouses() {
 // Render houses
 function renderHouses() {
   housesList.innerHTML = houses.map(house => {
+    const escapedName = escapeHtml(house.name);
+    const escapedAddress = escapeHtml(house.address);
+    const escapedOwnership = house.ownership ? escapeHtml(house.ownership) : '';
+    const escapedNotes = house.notes ? escapeHtml(house.notes) : '';
+    // Escape name for use in onclick handlers
+    const safeNameForJs = house.name.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"');
+    
     return `
       <div class="house-card">
         <div class="house-card-header">
           <div class="house-info">
-            <div class="house-name">${house.name}</div>
-            <span class="house-type">${house.type}</span>
+            <div class="house-name">${escapedName}</div>
+            <span class="house-type">${escapeHtml(house.type)}</span>
             <div class="house-address">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
               </svg>
-              ${house.address}
+              ${escapedAddress}
             </div>
-            ${house.ownership ? `<div class="house-ownership">Status: ${house.ownership}</div>` : ''}
+            ${house.ownership ? `<div class="house-ownership">Status: ${escapedOwnership}</div>` : ''}
           </div>
           <div class="house-actions">
             <button class="btn-icon" onclick="window.editHouse('${house.id}')" title="Edit">
@@ -279,13 +286,13 @@ function renderHouses() {
         </div>
 
         <div class="house-card-actions">
-          <button class="btn btn-sm btn-outline" onclick="window.addHouseExpense('${house.id}', '${house.name.replace(/'/g, "\\'")}')">
+          <button class="btn btn-sm btn-outline" onclick="window.addHouseExpense('${house.id}', '${safeNameForJs}')">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
             </svg>
             Add Expense
           </button>
-          <button class="btn btn-sm btn-primary" onclick="window.addHouseIncome('${house.id}', '${house.name.replace(/'/g, "\\'")}')">
+          <button class="btn btn-sm btn-primary" onclick="window.addHouseIncome('${house.id}', '${safeNameForJs}')">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
             </svg>
@@ -295,7 +302,7 @@ function renderHouses() {
 
         ${house.notes ? `
           <div class="house-notes">
-            <strong>Notes:</strong> ${house.notes}
+            <strong>Notes:</strong> ${escapedNotes}
           </div>
         ` : ''}
       </div>

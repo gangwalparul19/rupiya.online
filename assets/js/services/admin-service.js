@@ -1,14 +1,7 @@
-// Admin Service - Platform-wide analytics and user management
+// Admin Service - Optimized with pagination and reduced memory usage
 // 
 // HOW TO MAKE A USER AN ADMIN:
-// ============================
-// In Firebase Console > Firestore Database:
-// 1. Go to the 'users' collection
-// 2. Find the user document by their UID
-// 3. Add a field: isAdmin = true (boolean)
-// 
-// Or use Firebase Admin SDK:
-// await admin.firestore().collection('users').doc(userId).update({ isAdmin: true });
+// In Firebase Console > Firestore > users collection > find user > add isAdmin: true
 //
 import { db } from '../config/firebase-config.js';
 import {
@@ -28,9 +21,10 @@ import authService from './auth-service.js';
 
 class AdminService {
   constructor() {
-    this.adminEmails = []; // Will be loaded from config
     this.cache = new Map();
     this.cacheExpiry = 5 * 60 * 1000; // 5 minutes
+    this.usersLastDoc = null;
+    this.usersPageSize = 10;
   }
 
   // Check if current user is an admin
@@ -40,22 +34,17 @@ class AdminService {
 
     try {
       const userDoc = await getDoc(doc(db, 'users', user.uid));
-      if (userDoc.exists()) {
-        const userData = userDoc.data();
-        return userData.isAdmin === true;
-      }
-      return false;
+      return userDoc.exists() && userDoc.data().isAdmin === true;
     } catch (error) {
       console.error('Error checking admin status:', error);
       return false;
     }
   }
 
-  // Get cache or fetch fresh data
+  // Cache helpers
   getFromCache(key) {
     const cached = this.cache.get(key);
-    if (!cached) return null;
-    if (Date.now() - cached.timestamp > this.cacheExpiry) {
+    if (!cached || Date.now() - cached.timestamp > this.cacheExpiry) {
       this.cache.delete(key);
       return null;
     }
@@ -68,59 +57,51 @@ class AdminService {
 
   clearCache() {
     this.cache.clear();
+    this.usersLastDoc = null;
   }
 
-
-  // Get platform overview statistics
+  // Get platform stats using COUNT queries (memory efficient)
   async getPlatformStats() {
     const cacheKey = 'platformStats';
     const cached = this.getFromCache(cacheKey);
     if (cached) return cached;
 
     try {
-      // Get user count
-      const usersSnapshot = await getCountFromServer(collection(db, 'users'));
-      const totalUsers = usersSnapshot.data().count;
+      // Use count queries instead of fetching all documents
+      const [usersCount, expensesCount, incomeCount, familyCount, tripCount] = await Promise.all([
+        getCountFromServer(collection(db, 'users')),
+        getCountFromServer(collection(db, 'expenses')),
+        getCountFromServer(collection(db, 'income')),
+        getCountFromServer(collection(db, 'familyGroups')),
+        getCountFromServer(collection(db, 'tripGroups'))
+      ]);
 
-      // Get expenses count and sum
-      const expensesSnapshot = await getDocs(collection(db, 'expenses'));
+      // For totals, we need to fetch but limit the data
+      // Only fetch amounts, not full documents
+      const [expensesSnap, incomeSnap] = await Promise.all([
+        getDocs(query(collection(db, 'expenses'), limit(1000))),
+        getDocs(query(collection(db, 'income'), limit(1000)))
+      ]);
+
       let totalExpenses = 0;
-      let expenseCount = 0;
-      expensesSnapshot.forEach(doc => {
-        const data = doc.data();
-        totalExpenses += data.amount || 0;
-        expenseCount++;
+      expensesSnap.forEach(doc => {
+        totalExpenses += doc.data().amount || 0;
       });
 
-      // Get income count and sum
-      const incomeSnapshot = await getDocs(collection(db, 'income'));
       let totalIncome = 0;
-      let incomeCount = 0;
-      incomeSnapshot.forEach(doc => {
-        const data = doc.data();
-        totalIncome += data.amount || 0;
-        incomeCount++;
+      incomeSnap.forEach(doc => {
+        totalIncome += doc.data().amount || 0;
       });
-
-      // Get family groups count
-      const familyGroupsSnapshot = await getCountFromServer(collection(db, 'familyGroups'));
-      const totalFamilyGroups = familyGroupsSnapshot.data().count;
-
-      // Get trip groups count
-      const tripGroupsSnapshot = await getCountFromServer(collection(db, 'tripGroups'));
-      const totalTripGroups = tripGroupsSnapshot.data().count;
 
       const stats = {
-        totalUsers,
+        totalUsers: usersCount.data().count,
         totalExpenses,
         totalIncome,
-        expenseCount,
-        incomeCount,
-        totalFamilyGroups,
-        totalTripGroups,
-        netSavings: totalIncome - totalExpenses,
-        avgExpensePerUser: totalUsers > 0 ? totalExpenses / totalUsers : 0,
-        avgIncomePerUser: totalUsers > 0 ? totalIncome / totalUsers : 0
+        expenseCount: expensesCount.data().count,
+        incomeCount: incomeCount.data().count,
+        totalFamilyGroups: familyCount.data().count,
+        totalTripGroups: tripCount.data().count,
+        netSavings: totalIncome - totalExpenses
       };
 
       this.setCache(cacheKey, stats);
@@ -131,24 +112,64 @@ class AdminService {
     }
   }
 
-  // Get users by location (city/country)
+  // Get user activity stats (optimized)
+  async getUserActivityStats() {
+    const cacheKey = 'userActivityStats';
+    const cached = this.getFromCache(cacheKey);
+    if (cached) return cached;
+
+    try {
+      const now = new Date();
+      const dayAgo = Timestamp.fromDate(new Date(now - 24 * 60 * 60 * 1000));
+      const weekAgo = Timestamp.fromDate(new Date(now - 7 * 24 * 60 * 60 * 1000));
+      const monthAgo = Timestamp.fromDate(new Date(now - 30 * 24 * 60 * 60 * 1000));
+
+      // Use count queries for each time period
+      const [totalCount, todayCount, weekCount, monthCount] = await Promise.all([
+        getCountFromServer(collection(db, 'users')),
+        getCountFromServer(query(collection(db, 'users'), where('lastLoginAt', '>=', dayAgo))),
+        getCountFromServer(query(collection(db, 'users'), where('lastLoginAt', '>=', weekAgo))),
+        getCountFromServer(query(collection(db, 'users'), where('lastLoginAt', '>=', monthAgo)))
+      ]);
+
+      const stats = {
+        totalUsers: totalCount.data().count,
+        activeToday: todayCount.data().count,
+        activeThisWeek: weekCount.data().count,
+        activeThisMonth: monthCount.data().count,
+        inactiveUsers: totalCount.data().count - monthCount.data().count
+      };
+
+      this.setCache(cacheKey, stats);
+      return stats;
+    } catch (error) {
+      console.error('Error getting user activity stats:', error);
+      throw error;
+    }
+  }
+
+  // Get users by location (limited fetch)
   async getUsersByLocation() {
     const cacheKey = 'usersByLocation';
     const cached = this.getFromCache(cacheKey);
     if (cached) return cached;
 
     try {
-      const usersSnapshot = await getDocs(collection(db, 'users'));
-      const locationData = {
-        byCountry: {},
-        byCity: {},
-        unknown: 0
-      };
+      // Limit to 500 users for location analysis
+      const usersSnap = await getDocs(query(collection(db, 'users'), limit(500)));
+      
+      const locationData = { byCountry: {}, byCity: {}, byRegion: {}, unknown: 0, total: 0 };
 
-      usersSnapshot.forEach(doc => {
+      usersSnap.forEach(doc => {
         const data = doc.data();
+        locationData.total++;
+        
+        // Get country (check both direct field and nested location object)
         const country = data.country || data.location?.country;
+        // Get city
         const city = data.city || data.location?.city;
+        // Get region/state
+        const region = data.region || data.location?.region;
 
         if (country) {
           locationData.byCountry[country] = (locationData.byCountry[country] || 0) + 1;
@@ -156,19 +177,23 @@ class AdminService {
         if (city) {
           locationData.byCity[city] = (locationData.byCity[city] || 0) + 1;
         }
+        if (region) {
+          locationData.byRegion[region] = (locationData.byRegion[region] || 0) + 1;
+        }
         if (!country && !city) {
           locationData.unknown++;
         }
       });
 
-      // Sort by count
-      locationData.byCountry = Object.entries(locationData.byCountry)
+      // Sort and limit to top 10
+      const sortAndLimit = (obj) => Object.entries(obj)
         .sort((a, b) => b[1] - a[1])
-        .reduce((obj, [key, val]) => ({ ...obj, [key]: val }), {});
-      
-      locationData.byCity = Object.entries(locationData.byCity)
-        .sort((a, b) => b[1] - a[1])
-        .reduce((obj, [key, val]) => ({ ...obj, [key]: val }), {});
+        .slice(0, 10)
+        .reduce((acc, [k, v]) => ({ ...acc, [k]: v }), {});
+
+      locationData.byCountry = sortAndLimit(locationData.byCountry);
+      locationData.byCity = sortAndLimit(locationData.byCity);
+      locationData.byRegion = sortAndLimit(locationData.byRegion);
 
       this.setCache(cacheKey, locationData);
       return locationData;
@@ -178,30 +203,28 @@ class AdminService {
     }
   }
 
-
-  // Get expense breakdown by category (platform-wide)
+  // Get expenses by category (limited, aggregated)
   async getExpensesByCategory() {
     const cacheKey = 'expensesByCategory';
     const cached = this.getFromCache(cacheKey);
     if (cached) return cached;
 
     try {
-      const expensesSnapshot = await getDocs(collection(db, 'expenses'));
+      // Limit to recent 1000 expenses
+      const snap = await getDocs(query(collection(db, 'expenses'), limit(1000)));
       const categoryData = {};
 
-      expensesSnapshot.forEach(doc => {
+      snap.forEach(doc => {
         const data = doc.data();
-        const category = data.category || 'Uncategorized';
-        if (!categoryData[category]) {
-          categoryData[category] = { total: 0, count: 0 };
-        }
+        const category = data.category || 'Other';
+        if (!categoryData[category]) categoryData[category] = { total: 0, count: 0 };
         categoryData[category].total += data.amount || 0;
         categoryData[category].count++;
       });
 
-      // Sort by total amount
       const sorted = Object.entries(categoryData)
         .sort((a, b) => b[1].total - a[1].total)
+        .slice(0, 10)
         .map(([category, data]) => ({ category, ...data }));
 
       this.setCache(cacheKey, sorted);
@@ -212,29 +235,28 @@ class AdminService {
     }
   }
 
-  // Get income breakdown by source (platform-wide)
+  // Get income by source (limited, aggregated)
   async getIncomeBySource() {
     const cacheKey = 'incomeBySource';
     const cached = this.getFromCache(cacheKey);
     if (cached) return cached;
 
     try {
-      const incomeSnapshot = await getDocs(collection(db, 'income'));
+      const snap = await getDocs(query(collection(db, 'income'), limit(1000)));
       const sourceData = {};
 
-      incomeSnapshot.forEach(doc => {
+      snap.forEach(doc => {
         const data = doc.data();
-        const source = data.category || data.source || 'Other';
-        if (!sourceData[source]) {
-          sourceData[source] = { total: 0, count: 0 };
-        }
+        // Income uses 'source' field, not 'category'
+        const source = data.source || 'Other';
+        if (!sourceData[source]) sourceData[source] = { total: 0, count: 0 };
         sourceData[source].total += data.amount || 0;
         sourceData[source].count++;
       });
 
-      // Sort by total amount
       const sorted = Object.entries(sourceData)
         .sort((a, b) => b[1].total - a[1].total)
+        .slice(0, 10)
         .map(([source, data]) => ({ source, ...data }));
 
       this.setCache(cacheKey, sorted);
@@ -245,61 +267,38 @@ class AdminService {
     }
   }
 
-  // Get monthly trends (platform-wide)
-  async getMonthlyTrends(months = 12) {
-    const cacheKey = `monthlyTrends_${months}`;
+  // Get monthly trends (last 6 months only)
+  async getMonthlyTrends() {
+    const cacheKey = 'monthlyTrends';
     const cached = this.getFromCache(cacheKey);
     if (cached) return cached;
 
     try {
-      const startDate = new Date();
-      startDate.setMonth(startDate.getMonth() - months);
-      const startTimestamp = Timestamp.fromDate(startDate);
+      const sixMonthsAgo = new Date();
+      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+      const startTimestamp = Timestamp.fromDate(sixMonthsAgo);
 
-      // Get expenses
-      const expensesQuery = query(
-        collection(db, 'expenses'),
-        where('date', '>=', startTimestamp),
-        orderBy('date', 'asc')
-      );
-      const expensesSnapshot = await getDocs(expensesQuery);
+      const [expensesSnap, incomeSnap] = await Promise.all([
+        getDocs(query(collection(db, 'expenses'), where('date', '>=', startTimestamp), limit(500))),
+        getDocs(query(collection(db, 'income'), where('date', '>=', startTimestamp), limit(500)))
+      ]);
 
-      // Get income
-      const incomeQuery = query(
-        collection(db, 'income'),
-        where('date', '>=', startTimestamp),
-        orderBy('date', 'asc')
-      );
-      const incomeSnapshot = await getDocs(incomeQuery);
-
-      // Aggregate by month
       const monthlyData = {};
 
-      expensesSnapshot.forEach(doc => {
+      const processDoc = (doc, type) => {
         const data = doc.data();
         const date = data.date?.toDate ? data.date.toDate() : new Date(data.date);
         const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
         
         if (!monthlyData[monthKey]) {
-          monthlyData[monthKey] = { expenses: 0, income: 0, expenseCount: 0, incomeCount: 0 };
+          monthlyData[monthKey] = { expenses: 0, income: 0 };
         }
-        monthlyData[monthKey].expenses += data.amount || 0;
-        monthlyData[monthKey].expenseCount++;
-      });
+        monthlyData[monthKey][type] += data.amount || 0;
+      };
 
-      incomeSnapshot.forEach(doc => {
-        const data = doc.data();
-        const date = data.date?.toDate ? data.date.toDate() : new Date(data.date);
-        const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-        
-        if (!monthlyData[monthKey]) {
-          monthlyData[monthKey] = { expenses: 0, income: 0, expenseCount: 0, incomeCount: 0 };
-        }
-        monthlyData[monthKey].income += data.amount || 0;
-        monthlyData[monthKey].incomeCount++;
-      });
+      expensesSnap.forEach(doc => processDoc(doc, 'expenses'));
+      incomeSnap.forEach(doc => processDoc(doc, 'income'));
 
-      // Convert to sorted array
       const trends = Object.entries(monthlyData)
         .sort((a, b) => a[0].localeCompare(b[0]))
         .map(([month, data]) => ({
@@ -316,160 +315,68 @@ class AdminService {
     }
   }
 
+  // Get users with pagination
+  async getUsers(page = 1, reset = false) {
+    if (reset) {
+      this.usersLastDoc = null;
+    }
 
-  // Get recent users
-  async getRecentUsers(count = 10) {
     try {
-      const usersQuery = query(
-        collection(db, 'users'),
-        orderBy('createdAt', 'desc'),
-        limit(count)
-      );
-      const snapshot = await getDocs(usersQuery);
-      
+      let q;
+      if (page === 1 || !this.usersLastDoc) {
+        q = query(
+          collection(db, 'users'),
+          orderBy('createdAt', 'desc'),
+          limit(this.usersPageSize)
+        );
+      } else {
+        q = query(
+          collection(db, 'users'),
+          orderBy('createdAt', 'desc'),
+          startAfter(this.usersLastDoc),
+          limit(this.usersPageSize)
+        );
+      }
+
+      const snapshot = await getDocs(q);
       const users = [];
+
       snapshot.forEach(doc => {
         const data = doc.data();
         users.push({
           id: doc.id,
+          displayName: data.displayName || 'User',
           email: data.email,
-          displayName: data.displayName,
-          city: data.city || data.location?.city || '-',
-          country: data.country || data.location?.country || '-',
+          city: data.city || '-',
+          country: data.country || '-',
           createdAt: data.createdAt,
           lastLoginAt: data.lastLoginAt,
           isActive: data.isActive !== false
         });
+        this.usersLastDoc = doc;
       });
 
-      return users;
-    } catch (error) {
-      console.error('Error getting recent users:', error);
-      throw error;
-    }
-  }
-
-  // Get user activity stats
-  async getUserActivityStats() {
-    const cacheKey = 'userActivityStats';
-    const cached = this.getFromCache(cacheKey);
-    if (cached) return cached;
-
-    try {
-      const usersSnapshot = await getDocs(collection(db, 'users'));
-      
-      const now = new Date();
-      const dayAgo = new Date(now - 24 * 60 * 60 * 1000);
-      const weekAgo = new Date(now - 7 * 24 * 60 * 60 * 1000);
-      const monthAgo = new Date(now - 30 * 24 * 60 * 60 * 1000);
-
-      let activeToday = 0;
-      let activeThisWeek = 0;
-      let activeThisMonth = 0;
-      let totalUsers = 0;
-
-      usersSnapshot.forEach(doc => {
-        const data = doc.data();
-        totalUsers++;
-        
-        if (data.lastLoginAt) {
-          const lastLogin = data.lastLoginAt.toDate ? data.lastLoginAt.toDate() : new Date(data.lastLoginAt);
-          
-          if (lastLogin >= dayAgo) activeToday++;
-          if (lastLogin >= weekAgo) activeThisWeek++;
-          if (lastLogin >= monthAgo) activeThisMonth++;
-        }
-      });
-
-      const stats = {
-        totalUsers,
-        activeToday,
-        activeThisWeek,
-        activeThisMonth,
-        inactiveUsers: totalUsers - activeThisMonth
+      return {
+        users,
+        hasMore: users.length === this.usersPageSize
       };
-
-      this.setCache(cacheKey, stats);
-      return stats;
     } catch (error) {
-      console.error('Error getting user activity stats:', error);
+      console.error('Error getting users:', error);
       throw error;
     }
   }
 
-  // Get all users list with pagination
-  async getAllUsers(pageSize = 50, lastDoc = null) {
+  // Get total user count
+  async getTotalUserCount() {
     try {
-      let usersQuery;
-      
-      if (lastDoc) {
-        usersQuery = query(
-          collection(db, 'users'),
-          orderBy('createdAt', 'desc'),
-          startAfter(lastDoc),
-          limit(pageSize)
-        );
-      } else {
-        usersQuery = query(
-          collection(db, 'users'),
-          orderBy('createdAt', 'desc'),
-          limit(pageSize)
-        );
-      }
-
-      const snapshot = await getDocs(usersQuery);
-      const users = [];
-      let lastVisible = null;
-
-      snapshot.forEach(doc => {
-        users.push({ id: doc.id, ...doc.data() });
-        lastVisible = doc;
-      });
-
-      return { users, lastDoc: lastVisible, hasMore: users.length === pageSize };
+      const count = await getCountFromServer(collection(db, 'users'));
+      return count.data().count;
     } catch (error) {
-      console.error('Error getting all users:', error);
-      throw error;
-    }
-  }
-
-  // Get platform growth data
-  async getPlatformGrowth() {
-    const cacheKey = 'platformGrowth';
-    const cached = this.getFromCache(cacheKey);
-    if (cached) return cached;
-
-    try {
-      const usersSnapshot = await getDocs(collection(db, 'users'));
-      const monthlySignups = {};
-
-      usersSnapshot.forEach(doc => {
-        const data = doc.data();
-        if (data.createdAt) {
-          const date = data.createdAt.toDate ? data.createdAt.toDate() : new Date(data.createdAt);
-          const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-          monthlySignups[monthKey] = (monthlySignups[monthKey] || 0) + 1;
-        }
-      });
-
-      // Convert to sorted array with cumulative count
-      let cumulative = 0;
-      const growth = Object.entries(monthlySignups)
-        .sort((a, b) => a[0].localeCompare(b[0]))
-        .map(([month, count]) => {
-          cumulative += count;
-          return { month, newUsers: count, totalUsers: cumulative };
-        });
-
-      this.setCache(cacheKey, growth);
-      return growth;
-    } catch (error) {
-      console.error('Error getting platform growth:', error);
-      throw error;
+      console.error('Error getting user count:', error);
+      return 0;
     }
   }
 }
 
-// Create and export singleton instance
 const adminService = new AdminService();
 export default adminService;

@@ -1,10 +1,8 @@
 // Split Expense Page Logic
 import authService from '../services/auth-service.js';
 import splitService from '../services/split-service.js';
-import familySwitcher from '../components/family-switcher.js';
 import toast from '../components/toast.js';
-import themeManager from '../utils/theme-manager.js';
-import { formatCurrency, formatDate, formatDateForInput } from '../utils/helpers.js';
+import { formatCurrency, formatDate, formatDateForInput, escapeHtml } from '../utils/helpers.js';
 
 // State management
 const state = {
@@ -169,15 +167,18 @@ function renderSplits() {
 // Create split card HTML
 function createSplitCard(split) {
   const date = split.date.toDate ? split.date.toDate() : new Date(split.date);
+  const escapedDescription = escapeHtml(split.description);
+  const escapedPaidByName = escapeHtml(split.paidByName || '');
+  const escapedSettleNotes = split.settleNotes ? escapeHtml(split.settleNotes) : '';
   
   return `
     <div class="split-card ${split.status}">
       <div class="split-card-header">
         <div>
-          <div class="split-card-title">${split.description}</div>
+          <div class="split-card-title">${escapedDescription}</div>
           <div class="split-card-amount">${formatCurrency(split.totalAmount)}</div>
         </div>
-        <span class="split-card-status ${split.status}">${split.status}</span>
+        <span class="split-card-status ${split.status}">${escapeHtml(split.status)}</span>
       </div>
       <div class="split-card-meta">
         <div class="split-card-meta-item">
@@ -190,25 +191,25 @@ function createSplitCard(split) {
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
           </svg>
-          ${split.paidBy === 'me' ? 'You paid' : split.paidByName + ' paid'}
+          ${split.paidBy === 'me' ? 'You paid' : escapedPaidByName + ' paid'}
         </div>
       </div>
       <div class="split-participants">
         <div class="split-participants-title">Participants</div>
         ${split.participants.map(p => `
           <div class="split-participant-item">
-            <span class="split-participant-name">${p.name}</span>
+            <span class="split-participant-name">${escapeHtml(p.name)}</span>
             <span class="split-participant-amount ${p.name === 'Me' ? (split.paidBy === 'me' ? 'owed' : 'owes') : (split.paidBy === 'me' ? 'owes' : 'owed')}">${formatCurrency(p.amount)}</span>
           </div>
         `).join('')}
       </div>
-      ${split.status === 'settled' && split.settleNotes ? `
+      ${split.status === 'settled' && escapedSettleNotes ? `
         <div class="split-card-meta">
           <div class="split-card-meta-item">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
-            ${split.settleNotes}
+            ${escapedSettleNotes}
           </div>
         </div>
       ` : ''}
@@ -310,7 +311,7 @@ function updateSplitPreview() {
   
   splitSummaryContent.innerHTML = state.participants.map(p => `
     <div class="split-summary-item">
-      <span>${p.name || 'Unnamed'}</span>
+      <span>${escapeHtml(p.name) || 'Unnamed'}</span>
       <span>${formatCurrency(parseFloat(p.amount) || 0)}</span>
     </div>
   `).join('') + `

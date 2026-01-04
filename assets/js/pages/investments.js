@@ -4,7 +4,7 @@ import firestoreService from '../services/firestore-service.js';
 import familySwitcher from '../components/family-switcher.js';
 import toast from '../components/toast.js';
 import themeManager from '../utils/theme-manager.js';
-import { formatCurrency, formatDate } from '../utils/helpers.js';
+import { formatCurrency, formatDate, escapeHtml } from '../utils/helpers.js';
 
 // Helper function for toast
 const showToast = (message, type) => toast.show(message, type);
@@ -276,13 +276,16 @@ function renderInvestments() {
     const returnsPercentage = totalInvested > 0 ? ((returns / totalInvested) * 100).toFixed(2) : 0;
     const returnsClass = returns >= 0 ? 'positive' : 'negative';
     const returnsSign = returns >= 0 ? '+' : '';
+    const escapedName = escapeHtml(investment.name);
+    const escapedType = escapeHtml(investment.type);
+    const escapedNotes = investment.notes ? escapeHtml(investment.notes) : '';
 
     return `
       <div class="investment-card">
         <div class="investment-card-header">
           <div class="investment-info">
-            <div class="investment-name">${investment.name}</div>
-            <span class="investment-type">${investment.type}</span>
+            <div class="investment-name">${escapedName}</div>
+            <span class="investment-type">${escapedType}</span>
           </div>
           <div class="investment-actions">
             <button class="btn-icon" onclick="window.editInvestment('${investment.id}')" title="Edit">
@@ -343,7 +346,7 @@ function renderInvestments() {
 
         ${investment.notes ? `
           <div class="investment-notes">
-            ${investment.notes}
+            ${escapedNotes}
           </div>
         ` : ''}
       </div>

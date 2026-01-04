@@ -11,6 +11,11 @@ import {
   updateProfile
 } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
 
+// Production-safe logging (only logs in development)
+const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const log = isDev ? console.log.bind(console, '[Auth]') : () => {};
+const logError = console.error.bind(console, '[Auth]');
+
 class AuthService {
   constructor() {
     this.currentUser = null;
@@ -30,12 +35,12 @@ class AuthService {
     }
 
     this.authInitPromise = new Promise((resolve) => {
-      console.log('[Auth Service] Setting up auth state listener...');
+      log('Setting up auth state listener...');
       
       // The first onAuthStateChanged callback gives us the initial auth state
       // This fires once Firebase has checked for a persisted session
-      const unsubscribe = onAuthStateChanged(auth, (user) => {
-        console.log('[Auth Service] Auth state changed:', user ? user.email : 'Not logged in');
+      onAuthStateChanged(auth, (user) => {
+        log('Auth state changed:', user ? 'logged in' : 'not logged in');
         
         const wasInitialized = this.authInitialized;
         this.currentUser = user;
@@ -50,7 +55,7 @@ class AuthService {
         
         if (!wasInitialized) {
           this.authInitialized = true;
-          console.log('[Auth Service] Auth initialized with user:', user ? user.email : 'null');
+          log('Auth initialized');
           resolve(user);
         }
         
@@ -64,7 +69,7 @@ class AuthService {
 
   // Wait for auth to be initialized - this is the key method
   async waitForAuth() {
-    console.log('[Auth Service] waitForAuth called');
+    log('waitForAuth called');
     
     // Ensure init has been called
     if (!this.authInitPromise) {
@@ -75,7 +80,7 @@ class AuthService {
     // This promise resolves after onAuthStateChanged fires for the first time
     const user = await this.authInitPromise;
     
-    console.log('[Auth Service] waitForAuth complete, user:', user ? user.email : 'null');
+    log('waitForAuth complete');
     return user;
   }
 
@@ -92,7 +97,7 @@ class AuthService {
   async signIn(email, password) {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      console.log('[Auth Service] Email sign-in successful');
+      log('Email sign-in successful');
       
       // Set auth flag for quick check
       localStorage.setItem('rupiya_user_logged_in', 'true');
@@ -103,7 +108,7 @@ class AuthService {
       
       return { success: true, user: userCredential.user };
     } catch (error) {
-      console.error('[Auth Service] Sign-in error:', error);
+      logError('Sign-in error:', error.code);
       return { success: false, error: this.getErrorMessage(error.code) };
     }
   }
@@ -129,6 +134,7 @@ class AuthService {
       
       return { success: true, user: userCredential.user };
     } catch (error) {
+      logError('Sign-up error:', error.code);
       return { success: false, error: this.getErrorMessage(error.code) };
     }
   }
@@ -139,7 +145,7 @@ class AuthService {
       const provider = new GoogleAuthProvider();
       const userCredential = await signInWithPopup(auth, provider);
       
-      console.log('[Auth Service] Google sign-in successful');
+      log('Google sign-in successful');
       
       // Set auth flag for quick check
       localStorage.setItem('rupiya_user_logged_in', 'true');
@@ -150,7 +156,7 @@ class AuthService {
       
       return { success: true, user: userCredential.user };
     } catch (error) {
-      console.error('[Auth Service] Google sign-in error:', error);
+      logError('Google sign-in error:', error.code);
       return { success: false, error: this.getErrorMessage(error.code) };
     }
   }
@@ -168,6 +174,7 @@ class AuthService {
       await signOut(auth);
       return { success: true };
     } catch (error) {
+      logError('Sign-out error:', error.code);
       return { success: false, error: this.getErrorMessage(error.code) };
     }
   }
@@ -183,15 +190,14 @@ class AuthService {
       await sendPasswordResetEmail(auth, email);
       return { success: true };
     } catch (error) {
+      logError('Password reset error:', error.code);
       return { success: false, error: this.getErrorMessage(error.code) };
     }
   }
 
   // Check if user is authenticated
   isAuthenticated() {
-    const isAuth = this.currentUser !== null;
-    console.log('[Auth Service] isAuthenticated:', isAuth);
-    return isAuth;
+    return this.currentUser !== null;
   }
 
   // Get current user

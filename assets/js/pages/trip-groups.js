@@ -229,9 +229,9 @@ class TripGroupsPage {
     if (modalTitle) modalTitle.textContent = 'Create Trip Group';
     if (btnText) btnText.textContent = 'Create Group';
     
-    // Show modal
+    // Show modal (use 'show' class, not 'active')
     if (modal) {
-      modal.classList.add('active');
+      modal.classList.add('show');
       console.log('[Trip Groups] Modal should now be visible');
     } else {
       console.error('[Trip Groups] Modal element not found!');
@@ -239,7 +239,7 @@ class TripGroupsPage {
   }
 
   closeModal() {
-    document.getElementById('createGroupModal').classList.remove('active');
+    document.getElementById('createGroupModal')?.classList.remove('show');
     this.pendingMembers = [];
   }
 
@@ -356,11 +356,11 @@ class TripGroupsPage {
   openDeleteModal(groupId, groupName) {
     this.deletingGroupId = groupId;
     document.getElementById('deleteGroupName').textContent = groupName;
-    document.getElementById('deleteGroupModal').classList.add('active');
+    document.getElementById('deleteGroupModal')?.classList.add('show');
   }
 
   closeDeleteModal() {
-    document.getElementById('deleteGroupModal').classList.remove('active');
+    document.getElementById('deleteGroupModal')?.classList.remove('show');
     this.deletingGroupId = null;
   }
 

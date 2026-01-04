@@ -201,7 +201,7 @@ class FamilyService {
   async getUserInvitations() {
     try {
       const user = authService.getCurrentUser();
-      if (!user) return [];
+      if (!user || !user.email) return [];
 
       const q = query(
         collection(db, this.invitationsCollection),
@@ -215,7 +215,8 @@ class FamilyService {
       snapshot.forEach((doc) => {
         const data = doc.data();
         // Check if not expired (with null safety)
-        if (data.expiresAt && data.expiresAt.toDate && data.expiresAt.toDate() > new Date()) {
+        const expiresAt = data.expiresAt?.toDate ? data.expiresAt.toDate() : null;
+        if (!expiresAt || expiresAt > new Date()) {
           invitations.push({ id: doc.id, ...data });
         }
       });
@@ -233,6 +234,10 @@ class FamilyService {
       const userId = this.getUserId();
       const user = authService.getCurrentUser();
 
+      if (!user || !user.email) {
+        return { success: false, error: 'User not authenticated' };
+      }
+
       // Get invitation
       const inviteRef = doc(db, this.invitationsCollection, invitationId);
       const inviteSnap = await getDoc(inviteRef);
@@ -244,12 +249,13 @@ class FamilyService {
       const invitation = inviteSnap.data();
 
       // Check if invitation is for this user
-      if (invitation.invitedEmail.toLowerCase() !== user.email.toLowerCase()) {
+      if (!invitation.invitedEmail || invitation.invitedEmail.toLowerCase() !== user.email.toLowerCase()) {
         return { success: false, error: 'Invitation not for this user' };
       }
 
       // Check if expired (with null safety)
-      if (invitation.expiresAt && invitation.expiresAt.toDate && invitation.expiresAt.toDate() < new Date()) {
+      const expiresAt = invitation.expiresAt?.toDate ? invitation.expiresAt.toDate() : null;
+      if (expiresAt && expiresAt < new Date()) {
         await updateDoc(inviteRef, { status: 'expired' });
         return { success: false, error: 'Invitation expired' };
       }

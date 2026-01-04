@@ -9,6 +9,7 @@ import { updateProfile, updatePassword, EmailAuthProvider, reauthenticateWithCre
 import { doc, setDoc, Timestamp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
 import { db, auth } from '../config/firebase-config.js';
 import paymentMethodsService from '../services/payment-methods-service.js';
+import { escapeHtml } from '../utils/helpers.js';
 // Helper function for toast
 const showToast = (message, type) => toast.show(message, type);
 
@@ -420,6 +421,17 @@ async function handlePreferencesUpdate(e) {
   }
 }
 
+// Helper function to escape CSV field values
+function escapeCsvField(value) {
+  if (value === null || value === undefined) return '';
+  const str = String(value);
+  // If the field contains quotes, commas, or newlines, wrap in quotes and escape internal quotes
+  if (str.includes('"') || str.includes(',') || str.includes('\n') || str.includes('\r')) {
+    return '"' + str.replace(/"/g, '""') + '"';
+  }
+  return str;
+}
+
 async function handleExportData() {
   try {
     showToast('Preparing data export...', 'info');
@@ -435,13 +447,13 @@ async function handleExportData() {
     let csv = 'Type,Date,Category,Amount,Description\n';
 
     expenses.forEach(item => {
-      const date = item.date.toDate ? item.date.toDate().toISOString().split('T')[0] : '';
-      csv += `Expense,${date},${item.category},${item.amount},"${item.description || ''}"\n`;
+      const date = item.date?.toDate ? item.date.toDate().toISOString().split('T')[0] : '';
+      csv += `Expense,${escapeCsvField(date)},${escapeCsvField(item.category)},${escapeCsvField(item.amount)},${escapeCsvField(item.description)}\n`;
     });
 
     income.forEach(item => {
-      const date = item.date.toDate ? item.date.toDate().toISOString().split('T')[0] : '';
-      csv += `Income,${date},${item.category},${item.amount},"${item.description || ''}"\n`;
+      const date = item.date?.toDate ? item.date.toDate().toISOString().split('T')[0] : '';
+      csv += `Income,${escapeCsvField(date)},${escapeCsvField(item.category)},${escapeCsvField(item.amount)},${escapeCsvField(item.description)}\n`;
     });
 
     // Create and download file
@@ -547,14 +559,17 @@ function renderExpenseCategories() {
   
   list.innerHTML = expenseCategories.map(category => {
     const isProtected = protectedCategories.includes(category);
+    const escapedCategory = escapeHtml(category);
+    // Escape for use in onclick handlers
+    const safeCategoryForJs = category.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"');
     return `
       <div class="category-item ${isProtected ? 'protected' : ''}">
         <span class="category-name">
-          ${isProtected ? '🔒 ' : ''}${category}
+          ${isProtected ? '🔒 ' : ''}${escapedCategory}
           ${isProtected ? '<span class="category-badge">System</span>' : ''}
         </span>
         ${!isProtected ? `
-          <button class="category-delete" onclick="window.deleteExpenseCategory('${category.replace(/'/g, "\\'")}')">
+          <button class="category-delete" onclick="window.deleteExpenseCategory('${safeCategoryForJs}')">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
             </svg>
@@ -573,14 +588,17 @@ function renderIncomeCategories() {
   
   list.innerHTML = incomeCategories.map(category => {
     const isProtected = protectedCategories.includes(category);
+    const escapedCategory = escapeHtml(category);
+    // Escape for use in onclick handlers
+    const safeCategoryForJs = category.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"');
     return `
       <div class="category-item ${isProtected ? 'protected' : ''}">
         <span class="category-name">
-          ${isProtected ? '🔒 ' : ''}${category}
+          ${isProtected ? '🔒 ' : ''}${escapedCategory}
           ${isProtected ? '<span class="category-badge">System</span>' : ''}
         </span>
         ${!isProtected ? `
-          <button class="category-delete" onclick="window.deleteIncomeCategory('${category.replace(/'/g, "\\'")}')">
+          <button class="category-delete" onclick="window.deleteIncomeCategory('${safeCategoryForJs}')">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
             </svg>
@@ -854,6 +872,8 @@ function renderPaymentMethods() {
               const icon = paymentMethodsService.getPaymentMethodIcon(method.type);
               const displayName = paymentMethodsService.getPaymentMethodDisplayName(method);
               const defaultBadge = method.isDefault ? '<span class="badge badge-primary">Default</span>' : '';
+              const escapedName = escapeHtml(method.name);
+              const escapedDetails = escapeHtml(getPaymentMethodDetails(method));
               
               return `
                 <div class="payment-method-card">
@@ -865,8 +885,8 @@ function renderPaymentMethods() {
                     </div>
                   </div>
                   <div class="payment-method-info">
-                    <div class="payment-method-name">${method.name} ${defaultBadge}</div>
-                    <div class="payment-method-details">${getPaymentMethodDetails(method)}</div>
+                    <div class="payment-method-name">${escapedName} ${defaultBadge}</div>
+                    <div class="payment-method-details">${escapedDetails}</div>
                   </div>
                 </div>
               `;

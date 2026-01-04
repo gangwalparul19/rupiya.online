@@ -3,7 +3,7 @@ import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
 import storageService from '../services/storage-service.js';
 import toast from '../components/toast.js';
-import { formatDate } from '../utils/helpers.js';
+import { formatDate, escapeHtml } from '../utils/helpers.js';
 
 // Helper function for toast
 const showToast = (message, type) => toast.show(message, type);
@@ -338,17 +338,21 @@ function renderDocuments() {
   documentsList.innerHTML = filteredDocuments.map(doc => {
     const icon = doc.fileName ? storageService.getFileIcon(doc.fileName) : getDocumentIcon(doc.category);
     const fileSize = doc.fileSize ? ` (${storageService.formatFileSize(doc.fileSize)})` : '';
+    const escapedName = escapeHtml(doc.name);
+    const escapedCategory = escapeHtml(doc.category);
+    const escapedFileName = doc.fileName ? escapeHtml(doc.fileName) : '';
+    const escapedDescription = doc.description ? escapeHtml(doc.description) : '';
     
     return `
     <div class="document-card" onclick="window.viewDocument('${doc.id}')">
       <div class="document-icon">${icon}</div>
-      <div class="document-name">${doc.name}</div>
+      <div class="document-name">${escapedName}</div>
       <div class="document-meta">
-        <span class="document-category">${doc.category}</span>
+        <span class="document-category">${escapedCategory}</span>
         ${doc.documentDate ? `<span class="document-date">${formatDate(doc.documentDate)}</span>` : ''}
       </div>
-      ${doc.fileName ? `<div class="document-description">${doc.fileName}${fileSize}</div>` : ''}
-      ${doc.description ? `<div class="document-description">${doc.description}</div>` : ''}
+      ${doc.fileName ? `<div class="document-description">${escapedFileName}${fileSize}</div>` : ''}
+      ${doc.description ? `<div class="document-description">${escapedDescription}</div>` : ''}
       <div class="document-actions" onclick="event.stopPropagation()">
         <button class="btn-icon" onclick="window.openDocument('${doc.fileUrl}')" title="Open">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">

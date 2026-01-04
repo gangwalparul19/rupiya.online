@@ -1,5 +1,37 @@
 import nodemailer from 'nodemailer';
 
+// Simple in-memory rate limiting (resets on server restart)
+const rateLimitMap = new Map();
+const RATE_LIMIT_WINDOW = 60 * 60 * 1000; // 1 hour
+const MAX_REQUESTS_PER_WINDOW = 5; // Max 5 feedback submissions per hour per email
+
+function checkRateLimit(email) {
+  const now = Date.now();
+  const key = email.toLowerCase();
+  
+  if (!rateLimitMap.has(key)) {
+    rateLimitMap.set(key, { count: 1, windowStart: now });
+    return true;
+  }
+  
+  const record = rateLimitMap.get(key);
+  
+  // Reset window if expired
+  if (now - record.windowStart > RATE_LIMIT_WINDOW) {
+    rateLimitMap.set(key, { count: 1, windowStart: now });
+    return true;
+  }
+  
+  // Check if limit exceeded
+  if (record.count >= MAX_REQUESTS_PER_WINDOW) {
+    return false;
+  }
+  
+  // Increment count
+  record.count++;
+  return true;
+}
+
 // Helper function to escape HTML to prevent XSS in emails
 function escapeHtml(text) {
   if (!text) return '';
@@ -11,6 +43,12 @@ function escapeHtml(text) {
     "'": '&#039;'
   };
   return String(text).replace(/[&<>"']/g, m => map[m]);
+}
+
+// Helper function to validate email format
+function isValidEmail(email) {
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  return re.test(email);
 }
 
 export default async function handler(req, res) {
@@ -25,6 +63,29 @@ export default async function handler(req, res) {
     // Validate required fields
     if (!type || !subject || !message || !email) {
       return res.status(400).json({ error: 'Missing required fields' });
+    }
+    
+    // Validate email format
+    if (!isValidEmail(email)) {
+      return res.status(400).json({ error: 'Invalid email format' });
+    }
+    
+    // Validate userId is provided (ensures user is logged in)
+    if (!userId || userId.length < 10) {
+      return res.status(401).json({ error: 'User authentication required' });
+    }
+    
+    // Check rate limit
+    if (!checkRateLimit(email)) {
+      return res.status(429).json({ error: 'Too many feedback submissions. Please try again later.' });
+    }
+    
+    // Validate input lengths to prevent abuse
+    if (subject.length > 200) {
+      return res.status(400).json({ error: 'Subject too long (max 200 characters)' });
+    }
+    if (message.length > 5000) {
+      return res.status(400).json({ error: 'Message too long (max 5000 characters)' });
     }
 
     // Get Gmail credentials from environment variables

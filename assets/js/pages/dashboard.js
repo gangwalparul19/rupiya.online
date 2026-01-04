@@ -333,8 +333,9 @@ function loadTopCategoriesWidget(expenses, startDate, endDate) {
   const container = document.getElementById('topCategoriesList');
   if (!container) return;
   
-  // Filter current month expenses
+  // Filter current month expenses (with null check for date)
   const monthExpenses = expenses.filter(e => {
+    if (!e.date) return false;
     const date = e.date.toDate ? e.date.toDate() : new Date(e.date);
     return date >= startDate && date <= endDate;
   });
@@ -385,13 +386,19 @@ function loadUpcomingBillsWidget(recurring) {
   const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
   
   const upcomingBills = recurring
-    .filter(r => r.type === 'expense' && r.isActive !== false)
+    .filter(r => r.type === 'expense' && r.status === 'active')
     .map(r => {
       // Calculate next due date based on frequency
-      let nextDue = r.nextDueDate?.toDate ? r.nextDueDate.toDate() : new Date(r.nextDueDate || r.startDate);
+      let nextDue;
+      if (r.nextDueDate) {
+        nextDue = r.nextDueDate?.toDate ? r.nextDueDate.toDate() : new Date(r.nextDueDate);
+      } else {
+        // Calculate next due date from start date and frequency
+        nextDue = calculateNextDueDate(r);
+      }
       return { ...r, nextDue };
     })
-    .filter(r => r.nextDue >= now && r.nextDue <= nextWeek)
+    .filter(r => r.nextDue && r.nextDue >= now && r.nextDue <= nextWeek)
     .sort((a, b) => a.nextDue - b.nextDue)
     .slice(0, 5);
   
@@ -404,18 +411,51 @@ function loadUpcomingBillsWidget(recurring) {
     const daysUntil = Math.ceil((bill.nextDue - now) / (1000 * 60 * 60 * 24));
     const dueClass = daysUntil === 0 ? 'today' : daysUntil < 0 ? 'overdue' : '';
     const dueText = daysUntil === 0 ? 'Due today' : daysUntil < 0 ? 'Overdue' : `Due in ${daysUntil} days`;
+    const billName = escapeHtml(bill.description || bill.category || 'Unnamed');
     
     return `
       <div class="bill-item">
         <div class="bill-icon">📄</div>
         <div class="bill-info">
-          <div class="bill-name">${bill.description || bill.category}</div>
+          <div class="bill-name">${billName}</div>
           <div class="bill-due ${dueClass}">${dueText}</div>
         </div>
         <div class="bill-amount">${formatCurrencyCompact(bill.amount)}</div>
       </div>
     `;
   }).join('');
+}
+
+// Calculate next due date for recurring transaction
+function calculateNextDueDate(recurring) {
+  const startDate = recurring.startDate?.toDate ? recurring.startDate.toDate() : new Date(recurring.startDate);
+  const today = new Date();
+  let nextDate = new Date(startDate);
+  
+  // Calculate next occurrence based on frequency
+  while (nextDate < today) {
+    switch (recurring.frequency) {
+      case 'daily':
+        nextDate.setDate(nextDate.getDate() + 1);
+        break;
+      case 'weekly':
+        nextDate.setDate(nextDate.getDate() + 7);
+        break;
+      case 'monthly':
+        nextDate.setMonth(nextDate.getMonth() + 1);
+        break;
+      case 'quarterly':
+        nextDate.setMonth(nextDate.getMonth() + 3);
+        break;
+      case 'yearly':
+        nextDate.setFullYear(nextDate.getFullYear() + 1);
+        break;
+      default:
+        nextDate.setMonth(nextDate.getMonth() + 1);
+    }
+  }
+  
+  return nextDate;
 }
 
 // Load goal progress widget
@@ -532,11 +572,12 @@ function updateSavingsRateWidget(income, expenses, saved, rate) {
 
 // Load recent transactions
 function loadRecentTransactions(expenses, income) {
-  // Combine and sort by date
+  // Combine and sort by date (with null checks)
   const allTransactions = [
     ...expenses.map(e => ({ ...e, type: 'expense' })),
     ...income.map(i => ({ ...i, type: 'income' }))
-  ].sort((a, b) => {
+  ].filter(t => t.date) // Filter out items without dates
+  .sort((a, b) => {
     const dateA = a.date.toDate ? a.date.toDate() : new Date(a.date);
     const dateB = b.date.toDate ? b.date.toDate() : new Date(b.date);
     return dateB - dateA;

@@ -5,10 +5,10 @@ import {
   getDoc,
   setDoc,
   updateDoc,
-  Timestamp,
   serverTimestamp
 } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
 import authService from './auth-service.js';
+import locationService from './location-service.js';
 
 class UserService {
   constructor() {
@@ -79,15 +79,15 @@ class UserService {
         const userData = { id: userId, ...userDoc.data() };
         this.setCachedUser(userId, userData);
         
-        // Update last login time (fire and forget - don't wait)
-        this._updateLastLogin(userId).catch(err => 
+        // Update last login time and location if missing (fire and forget)
+        this._updateLastLoginAndLocation(userId, userData).catch(err => 
           console.warn('Failed to update last login:', err)
         );
         
         return { success: true, user: userData, isNewUser: false };
       } else {
-        // User doesn't exist, create new profile
-        const newUserData = this._createUserData(user);
+        // User doesn't exist, create new profile with location
+        const newUserData = await this._createUserData(user);
         await setDoc(userRef, newUserData);
         
         const userData = { id: userId, ...newUserData };
@@ -103,14 +103,32 @@ class UserService {
 
   /**
    * Create user data object from Firebase Auth user
+   * Includes automatic location detection
    */
-  _createUserData(user) {
+  async _createUserData(user) {
+    // Fetch location in parallel (don't block user creation)
+    let location = null;
+    try {
+      location = await locationService.getUserLocation();
+      console.log('[User Service] Location detected:', location);
+    } catch (error) {
+      console.warn('[User Service] Could not detect location:', error);
+    }
+
     return {
       email: user.email,
       displayName: user.displayName || this._extractNameFromEmail(user.email),
       photoURL: user.photoURL || null,
       emailVerified: user.emailVerified,
       phoneNumber: user.phoneNumber || null,
+      
+      // Location data (auto-detected from IP)
+      city: location?.city || null,
+      region: location?.region || null,
+      country: location?.country || null,
+      countryCode: location?.countryCode || null,
+      locationSource: location?.source || null,
+      locationDetectedAt: location ? serverTimestamp() : null,
       
       // Provider information
       providerId: user.providerData[0]?.providerId || 'password',
@@ -146,7 +164,44 @@ class UserService {
   }
 
   /**
+   * Update last login timestamp and location if missing (fire and forget)
+   */
+  async _updateLastLoginAndLocation(userId, existingData) {
+    try {
+      const userRef = doc(db, this.collectionName, userId);
+      const updateData = {
+        lastLoginAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      };
+
+      // If user doesn't have location data, try to fetch it
+      if (!existingData.city && !existingData.country) {
+        try {
+          const location = await locationService.getUserLocation();
+          if (location) {
+            updateData.city = location.city;
+            updateData.region = location.region;
+            updateData.country = location.country;
+            updateData.countryCode = location.countryCode;
+            updateData.locationSource = location.source;
+            updateData.locationDetectedAt = serverTimestamp();
+            console.log('[User Service] Location updated for existing user:', location);
+          }
+        } catch (locError) {
+          console.warn('[User Service] Could not fetch location for existing user:', locError);
+        }
+      }
+
+      await updateDoc(userRef, updateData);
+    } catch (error) {
+      // Silently fail - not critical
+      console.warn('Could not update last login:', error);
+    }
+  }
+
+  /**
    * Update last login timestamp (fire and forget)
+   * @deprecated Use _updateLastLoginAndLocation instead
    */
   async _updateLastLogin(userId) {
     try {

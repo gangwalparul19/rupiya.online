@@ -7,7 +7,7 @@ import familySwitcher from '../components/family-switcher.js';
 import toast from '../components/toast.js';
 import themeManager from '../utils/theme-manager.js';
 import recurringProcessor from '../services/recurring-processor.js';
-import { formatCurrency, formatDate } from '../utils/helpers.js';
+import { formatCurrency, formatDate, escapeHtml } from '../utils/helpers.js';
 
 // Helper function for toast
 const showToast = (message, type) => toast.show(message, type);
@@ -520,8 +520,8 @@ function createRecurringCard(recurring) {
   card.innerHTML = `
     <div class="recurring-header">
       <div>
-        <span class="recurring-type ${recurring.type}">${recurring.type}</span>
-        <div class="recurring-description">${recurring.description}</div>
+        <span class="recurring-type ${recurring.type}">${escapeHtml(recurring.type)}</span>
+        <div class="recurring-description">${escapeHtml(recurring.description)}</div>
         <div class="recurring-amount ${recurring.type}">${formatCurrency(recurring.amount)}</div>
       </div>
       <div class="recurring-actions">
@@ -541,7 +541,7 @@ function createRecurringCard(recurring) {
     <div class="recurring-details">
       <div class="recurring-detail">
         <span class="recurring-detail-label">Category</span>
-        <span class="recurring-detail-value">${recurring.category}</span>
+        <span class="recurring-detail-value">${escapeHtml(recurring.category)}</span>
       </div>
       <div class="recurring-detail">
         <span class="recurring-detail-label">Frequency</span>

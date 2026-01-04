@@ -6,6 +6,9 @@ import {
   getDoc,
   setDoc,
   updateDoc,
+  query,
+  where,
+  getDocs,
   Timestamp
 } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
 import authService from './auth-service.js';
@@ -247,6 +250,24 @@ class CategoriesService {
         };
       }
       
+      // Check if category is in use by any expenses
+      const usageCount = await this.getCategoryUsageCount('expenses', category);
+      if (usageCount > 0) {
+        return {
+          success: false,
+          error: `Cannot delete "${category}" - it is used by ${usageCount} expense${usageCount > 1 ? 's' : ''}. Please reassign or delete those expenses first.`
+        };
+      }
+      
+      // Check if category is used in any budgets
+      const budgetUsageCount = await this.getCategoryBudgetUsageCount(category);
+      if (budgetUsageCount > 0) {
+        return {
+          success: false,
+          error: `Cannot delete "${category}" - it is used by ${budgetUsageCount} budget${budgetUsageCount > 1 ? 's' : ''}. Please delete those budgets first.`
+        };
+      }
+      
       const categories = await this.getExpenseCategories();
       const filtered = categories.filter(c => c !== category);
       
@@ -272,6 +293,15 @@ class CategoriesService {
         };
       }
       
+      // Check if category is in use by any income entries
+      const usageCount = await this.getCategoryUsageCount('income', category);
+      if (usageCount > 0) {
+        return {
+          success: false,
+          error: `Cannot delete "${category}" - it is used by ${usageCount} income entr${usageCount > 1 ? 'ies' : 'y'}. Please reassign or delete those entries first.`
+        };
+      }
+      
       const categories = await this.getIncomeCategories();
       const filtered = categories.filter(c => c !== category);
       
@@ -283,6 +313,40 @@ class CategoriesService {
     } catch (error) {
       console.error('Error deleting income category:', error);
       return { success: false, error: error.message };
+    }
+  }
+  
+  // Check how many entries use a specific category
+  async getCategoryUsageCount(collectionName, category) {
+    try {
+      const userId = this.getUserId();
+      const q = query(
+        collection(db, collectionName),
+        where('userId', '==', userId),
+        where('category', '==', category)
+      );
+      const snapshot = await getDocs(q);
+      return snapshot.size;
+    } catch (error) {
+      console.error(`Error checking category usage in ${collectionName}:`, error);
+      return 0;
+    }
+  }
+  
+  // Check how many budgets use a specific category
+  async getCategoryBudgetUsageCount(category) {
+    try {
+      const userId = this.getUserId();
+      const q = query(
+        collection(db, 'budgets'),
+        where('userId', '==', userId),
+        where('category', '==', category)
+      );
+      const snapshot = await getDocs(q);
+      return snapshot.size;
+    } catch (error) {
+      console.error('Error checking category budget usage:', error);
+      return 0;
     }
   }
 

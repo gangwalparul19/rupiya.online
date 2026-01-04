@@ -134,9 +134,11 @@ class PaymentMethodsService {
       };
       
       // Add type-specific fields
+      // SECURITY: Only store last 4 digits of sensitive numbers
       switch (methodData.type) {
         case this.types.CARD:
-          data.cardNumber = methodData.cardNumber || '';
+          // Only store last 4 digits of card number for security
+          data.cardNumber = methodData.cardNumber ? methodData.cardNumber.slice(-4) : '';
           data.cardType = methodData.cardType || 'credit'; // credit, debit
           data.bankName = methodData.bankName || '';
           break;
@@ -148,12 +150,15 @@ class PaymentMethodsService {
           
         case this.types.WALLET:
           data.walletProvider = methodData.walletProvider || ''; // paytm, phonepe, amazon, etc.
-          data.walletNumber = methodData.walletNumber || '';
+          // Only store last 4 digits of wallet number
+          data.walletNumber = methodData.walletNumber ? methodData.walletNumber.slice(-4) : '';
           break;
           
         case this.types.BANK:
-          data.accountNumber = methodData.accountNumber || '';
+          // Only store last 4 digits of account number for security
+          data.bankAccountNumber = methodData.accountNumber ? methodData.accountNumber.slice(-4) : '';
           data.bankName = methodData.bankName || '';
+          // Don't store full IFSC, just for reference
           data.ifscCode = methodData.ifscCode || '';
           data.accountType = methodData.accountType || 'savings'; // savings, current
           break;
@@ -331,13 +336,13 @@ class PaymentMethodsService {
     
     switch (method.type) {
       case this.types.CARD:
-        return `${method.name} ${this.formatCardNumber(method.cardNumber)}`;
+        return `${method.name}${method.cardNumber ? ` (****${method.cardNumber})` : ''}`;
       case this.types.UPI:
-        return `${method.name} (${method.upiId})`;
+        return `${method.name}${method.upiId ? ` (${method.upiId})` : ''}`;
       case this.types.WALLET:
-        return `${method.name} - ${method.walletProvider}`;
+        return `${method.name}${method.walletProvider ? ` - ${method.walletProvider}` : ''}`;
       case this.types.BANK:
-        return `${method.name} ${this.formatAccountNumber(method.accountNumber)}`;
+        return `${method.name}${method.bankAccountNumber ? ` (****${method.bankAccountNumber})` : ''}`;
       default:
         return method.name;
     }

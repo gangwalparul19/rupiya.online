@@ -2,7 +2,7 @@
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
 import toast from '../components/toast.js';
-import { formatCurrency, formatCurrencyCompact, formatDate } from '../utils/helpers.js';
+import { formatCurrency, formatCurrencyCompact, formatDate, escapeHtml } from '../utils/helpers.js';
 
 // Helper function for toast
 const showToast = (message, type) => toast.show(message, type);
@@ -295,21 +295,32 @@ function renderVehicles() {
     const vehicleFuelLogs = fuelLogs.filter(log => log.vehicleId === vehicle.id);
     const mileageStats = calculateVehicleMileage(vehicleFuelLogs);
 
+    // Escape user-provided data
+    const escapedName = escapeHtml(vehicle.name);
+    const escapedType = escapeHtml(vehicle.type);
+    const escapedMake = vehicle.make ? escapeHtml(vehicle.make) : '';
+    const escapedModel = vehicle.model ? escapeHtml(vehicle.model) : '';
+    const escapedRegNumber = vehicle.registrationNumber ? escapeHtml(vehicle.registrationNumber) : '';
+    const escapedColor = vehicle.color ? escapeHtml(vehicle.color) : '';
+    const escapedNotes = vehicle.notes ? escapeHtml(vehicle.notes) : '';
+    // Escape name for use in onclick handlers
+    const safeNameForJs = vehicle.name.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"');
+
     return `
       <div class="vehicle-card">
         <div class="vehicle-card-header">
           <div class="vehicle-info">
-            <div class="vehicle-name">${vehicle.name}</div>
-            <span class="vehicle-type">${vehicle.type}</span>
+            <div class="vehicle-name">${escapedName}</div>
+            <span class="vehicle-type">${escapedType}</span>
             ${(() => {
               const detailsParts = [];
-              if (vehicle.make) detailsParts.push(vehicle.make);
-              if (vehicle.model) detailsParts.push(vehicle.model);
+              if (escapedMake) detailsParts.push(escapedMake);
+              if (escapedModel) detailsParts.push(escapedModel);
               if (vehicle.year) detailsParts.push(`(${vehicle.year})`);
               return detailsParts.length > 0 ? `<div class="vehicle-details">${detailsParts.join(' ')}</div>` : '';
             })()}
-            ${vehicle.registrationNumber ? `<div class="vehicle-details">Reg: ${vehicle.registrationNumber}</div>` : ''}
-            ${vehicle.color ? `<div class="vehicle-details">Color: ${vehicle.color}</div>` : ''}
+            ${escapedRegNumber ? `<div class="vehicle-details">Reg: ${escapedRegNumber}</div>` : ''}
+            ${escapedColor ? `<div class="vehicle-details">Color: ${escapedColor}</div>` : ''}
             ${insuranceStatus}
           </div>
           <div class="vehicle-actions">
@@ -333,7 +344,7 @@ function renderVehicles() {
           </div>
           <div class="vehicle-stat">
             <div class="vehicle-stat-label">Fuel Type</div>
-            <div class="vehicle-stat-value">${vehicle.fuelType || 'N/A'}</div>
+            <div class="vehicle-stat-value">${vehicle.fuelType ? escapeHtml(vehicle.fuelType) : 'N/A'}</div>
           </div>
           <div class="vehicle-stat mileage-highlight">
             <div class="vehicle-stat-label">Avg Mileage</div>
@@ -348,23 +359,23 @@ function renderVehicles() {
         </div>
 
         <div class="vehicle-card-actions">
-          <button class="btn btn-sm btn-primary" onclick="window.showFuelLogModal('${vehicle.id}', '${vehicle.name.replace(/'/g, "\\'")}', ${vehicle.currentMileage || 0})">
+          <button class="btn btn-sm btn-primary" onclick="window.showFuelLogModal('${vehicle.id}', '${safeNameForJs}', ${vehicle.currentMileage || 0})">
             ⛽ Add Fuel
           </button>
-          <button class="btn btn-sm btn-outline" onclick="window.showMaintenanceModal('${vehicle.id}', '${vehicle.name.replace(/'/g, "\\'")}')">
+          <button class="btn btn-sm btn-outline" onclick="window.showMaintenanceModal('${vehicle.id}', '${safeNameForJs}')">
             🔧 Maintenance
           </button>
-          <button class="btn btn-sm btn-success" onclick="window.showVehicleIncomeModal('${vehicle.id}', '${vehicle.name.replace(/'/g, "\\'")}')">
+          <button class="btn btn-sm btn-success" onclick="window.showVehicleIncomeModal('${vehicle.id}', '${safeNameForJs}')">
             💰 Income
           </button>
-          <button class="btn btn-sm btn-secondary" onclick="window.showMileageHistory('${vehicle.id}', '${vehicle.name.replace(/'/g, "\\'")}')">
+          <button class="btn btn-sm btn-secondary" onclick="window.showMileageHistory('${vehicle.id}', '${safeNameForJs}')">
             📊 History
           </button>
         </div>
 
-        ${vehicle.notes ? `
+        ${escapedNotes ? `
           <div class="vehicle-notes">
-            <strong>Notes:</strong> ${vehicle.notes}
+            <strong>Notes:</strong> ${escapedNotes}
           </div>
         ` : ''}
       </div>

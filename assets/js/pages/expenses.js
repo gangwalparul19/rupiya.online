@@ -259,10 +259,10 @@ function checkURLParameters() {
       expenseForm.dataset.linkedId = linkedId;
       expenseForm.dataset.linkedName = linkedName;
       
-      // Show info message
+      // Show info message (escape user input to prevent XSS)
       const infoDiv = document.createElement('div');
       infoDiv.className = 'linked-info';
-      infoDiv.innerHTML = `<strong>Linked to:</strong> ${linkedName} (${linkedType})`;
+      infoDiv.innerHTML = `<strong>Linked to:</strong> ${escapeHtml(linkedName)} (${escapeHtml(linkedType)})`;
       infoDiv.style.cssText = 'padding: 12px; background: #E3F2FD; border: 1px solid #4A90E2; border-radius: 8px; margin-bottom: 1rem; color: #2C3E50;';
       expenseForm.insertBefore(infoDiv, expenseForm.firstChild);
     }, 100);
