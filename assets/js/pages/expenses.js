@@ -6,15 +6,16 @@ import paymentMethodsService from '../services/payment-methods-service.js';
 import familySwitcher from '../components/family-switcher.js';
 import toast from '../components/toast.js';
 import themeManager from '../utils/theme-manager.js';
+import Pagination from '../components/pagination.js';
 import { Validator } from '../utils/validation.js';
-import { formatCurrency, formatCurrencyCompact, formatDate, formatDateForInput, debounce, exportToCSV } from '../utils/helpers.js';
+import { formatCurrency, formatCurrencyCompact, formatDate, formatDateForInput, debounce, exportToCSV, escapeHtml } from '../utils/helpers.js';
 
 // State management
 const state = {
   expenses: [],
   filteredExpenses: [],
   currentPage: 1,
-  itemsPerPage: 20,
+  itemsPerPage: 10,
   filters: {
     category: '',
     paymentMethod: '',
@@ -24,8 +25,12 @@ const state = {
   },
   editingExpenseId: null,
   selectedExpenses: new Set(),
-  bulkMode: false
+  bulkMode: false,
+  totalCount: 0
 };
+
+// Pagination instance
+let pagination = null;
 
 // Category icons mapping
 const categoryIcons = {
@@ -270,6 +275,21 @@ async function loadExpenses() {
     emptyState.style.display = 'none';
     expensesList.style.display = 'none';
     
+    // Get total count for pagination
+    state.totalCount = await firestoreService.getExpensesCount();
+    
+    // Initialize pagination if not already done
+    if (!pagination) {
+      pagination = new Pagination({
+        pageSize: state.itemsPerPage,
+        containerId: 'paginationContainer',
+        onPageChange: handlePageChange
+      });
+    }
+    
+    pagination.setTotal(state.totalCount);
+    
+    // Load all expenses for filtering and KPIs (cached by firestore service)
     state.expenses = await firestoreService.getExpenses();
     state.filteredExpenses = [...state.expenses];
     
@@ -283,6 +303,13 @@ async function loadExpenses() {
     toast.error('Failed to load expenses');
     loadingState.style.display = 'none';
   }
+}
+
+// Handle page change from pagination component
+function handlePageChange(page) {
+  state.currentPage = page;
+  renderExpenses();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // Update Expense KPI Cards
@@ -372,6 +399,12 @@ function applyFilters() {
   state.filteredExpenses = filtered;
   state.currentPage = 1;
   
+  // Update pagination with filtered count
+  if (pagination) {
+    pagination.setTotal(filtered.length);
+    pagination.currentPage = 1;
+  }
+  
   updateCounts();
   renderExpenses();
 }
@@ -389,7 +422,10 @@ function renderExpenses() {
   if (state.filteredExpenses.length === 0) {
     emptyState.style.display = 'flex';
     expensesList.style.display = 'none';
-    paginationContainer.style.display = 'none';
+    if (pagination) {
+      const container = document.getElementById('paginationContainer');
+      if (container) container.style.display = 'none';
+    }
     return;
   }
   
@@ -397,7 +433,6 @@ function renderExpenses() {
   expensesList.style.display = 'grid';
   
   // Calculate pagination
-  const totalPages = Math.ceil(state.filteredExpenses.length / state.itemsPerPage);
   const startIndex = (state.currentPage - 1) * state.itemsPerPage;
   const endIndex = startIndex + state.itemsPerPage;
   const pageExpenses = state.filteredExpenses.slice(startIndex, endIndex);
@@ -405,15 +440,9 @@ function renderExpenses() {
   // Render expense cards
   expensesList.innerHTML = pageExpenses.map(expense => createExpenseCard(expense)).join('');
   
-  // Update pagination
-  if (totalPages > 1) {
-    paginationContainer.style.display = 'flex';
-    currentPageSpan.textContent = state.currentPage;
-    totalPagesSpan.textContent = totalPages;
-    prevPageBtn.disabled = state.currentPage === 1;
-    nextPageBtn.disabled = state.currentPage === totalPages;
-  } else {
-    paginationContainer.style.display = 'none';
+  // Render pagination using the component
+  if (pagination) {
+    pagination.render();
   }
   
   // Attach event listeners to cards
@@ -456,7 +485,7 @@ function createExpenseCard(expense) {
             </button>
           </div>
         </div>
-        ${expense.description ? `<div class="expense-description">${expense.description}</div>` : ''}
+        ${expense.description ? `<div class="expense-description">${escapeHtml(expense.description)}</div>` : ''}
         <div class="expense-meta">
           <div class="expense-meta-item">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -804,23 +833,8 @@ function setupEventListeners() {
     applyFilters();
   }, 300));
   
-  // Pagination
-  prevPageBtn.addEventListener('click', () => {
-    if (state.currentPage > 1) {
-      state.currentPage--;
-      renderExpenses();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  });
-  
-  nextPageBtn.addEventListener('click', () => {
-    const totalPages = Math.ceil(state.filteredExpenses.length / state.itemsPerPage);
-    if (state.currentPage < totalPages) {
-      state.currentPage++;
-      renderExpenses();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  });
+  // Pagination is now handled by the Pagination component
+  // Old manual pagination listeners removed - using pagination.onPageChange callback
   
   // Form close buttons
   closeFormBtn.addEventListener('click', closeExpenseForm);

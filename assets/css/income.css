@@ -139,35 +139,6 @@
   }
 }
 
-/* Page Header */
-.page-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: var(--spacing-xl);
-  flex-wrap: wrap;
-  gap: var(--spacing-md);
-}
-
-.page-title {
-  font-size: var(--font-size-3xl);
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: var(--spacing-xs);
-}
-
-.page-subtitle {
-  font-size: var(--font-size-base);
-  color: var(--text-secondary);
-  margin: 0;
-}
-
-.page-actions {
-  display: flex;
-  gap: var(--spacing-md);
-  align-items: center;
-}
-
 /* Filters Card */
 .filters-card {
   background: var(--white);
@@ -758,29 +729,6 @@
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
-  .page-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--spacing-sm);
-  }
-
-  .page-actions {
-    width: 100%;
-    flex-direction: row;
-    gap: var(--spacing-sm);
-  }
-
-  .page-actions .btn {
-    flex: 1;
-    font-size: var(--font-size-sm);
-    padding: 10px 12px;
-  }
-
-  .page-actions .btn svg {
-    width: 14px;
-    height: 14px;
-  }
-
   /* Collapsible filters on mobile */
   .filters-toggle {
     display: flex;

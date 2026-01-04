@@ -1,7 +1,7 @@
 // Service Worker for Rupiya PWA
 // Provides offline support and caching
 
-const CACHE_VERSION = '1.0.29'; // Increment this on every deployment
+const CACHE_VERSION = '1.0.35'; // Increment this on every deployment
 const CACHE_NAME = `rupiya-v${CACHE_VERSION}`;
 const RUNTIME_CACHE = `rupiya-runtime-v${CACHE_VERSION}`;
 
@@ -56,6 +56,9 @@ const STATIC_ASSETS = [
   '/assets/js/components/toast.js',
   '/assets/js/components/gamification-ui.js',
   '/assets/js/components/onboarding-ui.js',
+  '/assets/js/components/pagination.js',
+  '/assets/js/utils/ux-enhancements.js',
+  '/assets/css/ux-enhancements.css',
   '/assets/js/pages/family.js',
   '/assets/js/pages/family-modals.js',
   '/assets/js/pages/achievements.js',

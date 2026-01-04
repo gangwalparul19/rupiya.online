@@ -6,15 +6,16 @@ import paymentMethodsService from '../services/payment-methods-service.js';
 import familySwitcher from '../components/family-switcher.js';
 import toast from '../components/toast.js';
 import themeManager from '../utils/theme-manager.js';
+import Pagination from '../components/pagination.js';
 import { Validator } from '../utils/validation.js';
-import { formatCurrency, formatCurrencyCompact, formatDate, formatDateForInput, debounce, exportToCSV } from '../utils/helpers.js';
+import { formatCurrency, formatCurrencyCompact, formatDate, formatDateForInput, debounce, exportToCSV, escapeHtml } from '../utils/helpers.js';
 
 // State management
 const state = {
   income: [],
   filteredIncome: [],
   currentPage: 1,
-  itemsPerPage: 20,
+  itemsPerPage: 10,
   filters: {
     source: '',
     paymentMethod: '',
@@ -24,8 +25,12 @@ const state = {
   },
   editingIncomeId: null,
   selectedIncome: new Set(),
-  bulkMode: false
+  bulkMode: false,
+  totalCount: 0
 };
+
+// Pagination instance
+let pagination = null;
 
 // Source icons mapping
 const sourceIcons = {
@@ -258,6 +263,21 @@ async function loadIncome() {
     emptyState.style.display = 'none';
     incomeList.style.display = 'none';
     
+    // Get total count for pagination
+    state.totalCount = await firestoreService.getIncomeCount();
+    
+    // Initialize pagination if not already done
+    if (!pagination) {
+      pagination = new Pagination({
+        pageSize: state.itemsPerPage,
+        containerId: 'paginationContainer',
+        onPageChange: handlePageChange
+      });
+    }
+    
+    pagination.setTotal(state.totalCount);
+    
+    // Load all income for filtering and KPIs (cached by firestore service)
     state.income = await firestoreService.getIncome();
     state.filteredIncome = [...state.income];
     
@@ -271,6 +291,13 @@ async function loadIncome() {
     toast.error('Failed to load income');
     loadingState.style.display = 'none';
   }
+}
+
+// Handle page change from pagination component
+function handlePageChange(page) {
+  state.currentPage = page;
+  renderIncome();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // Update Income KPI Cards
@@ -360,6 +387,12 @@ function applyFilters() {
   state.filteredIncome = filtered;
   state.currentPage = 1;
   
+  // Update pagination with filtered count
+  if (pagination) {
+    pagination.setTotal(filtered.length);
+    pagination.currentPage = 1;
+  }
+  
   updateCounts();
   renderIncome();
 }
@@ -377,7 +410,10 @@ function renderIncome() {
   if (state.filteredIncome.length === 0) {
     emptyState.style.display = 'flex';
     incomeList.style.display = 'none';
-    paginationContainer.style.display = 'none';
+    if (pagination) {
+      const container = document.getElementById('paginationContainer');
+      if (container) container.style.display = 'none';
+    }
     return;
   }
   
@@ -385,7 +421,6 @@ function renderIncome() {
   incomeList.style.display = 'grid';
   
   // Calculate pagination
-  const totalPages = Math.ceil(state.filteredIncome.length / state.itemsPerPage);
   const startIndex = (state.currentPage - 1) * state.itemsPerPage;
   const endIndex = startIndex + state.itemsPerPage;
   const pageIncome = state.filteredIncome.slice(startIndex, endIndex);
@@ -393,15 +428,9 @@ function renderIncome() {
   // Render income cards
   incomeList.innerHTML = pageIncome.map(income => createIncomeCard(income)).join('');
   
-  // Update pagination
-  if (totalPages > 1) {
-    paginationContainer.style.display = 'flex';
-    currentPageSpan.textContent = state.currentPage;
-    totalPagesSpan.textContent = totalPages;
-    prevPageBtn.disabled = state.currentPage === 1;
-    nextPageBtn.disabled = state.currentPage === totalPages;
-  } else {
-    paginationContainer.style.display = 'none';
+  // Render pagination using the component
+  if (pagination) {
+    pagination.render();
   }
   
   // Attach event listeners to cards
@@ -444,7 +473,7 @@ function createIncomeCard(income) {
             </button>
           </div>
         </div>
-        ${income.description ? `<div class="income-description">${income.description}</div>` : ''}
+        ${income.description ? `<div class="income-description">${escapeHtml(income.description)}</div>` : ''}
         <div class="income-meta">
           <div class="income-meta-item">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -792,23 +821,8 @@ function setupEventListeners() {
     applyFilters();
   }, 300));
   
-  // Pagination
-  prevPageBtn.addEventListener('click', () => {
-    if (state.currentPage > 1) {
-      state.currentPage--;
-      renderIncome();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  });
-  
-  nextPageBtn.addEventListener('click', () => {
-    const totalPages = Math.ceil(state.filteredIncome.length / state.itemsPerPage);
-    if (state.currentPage < totalPages) {
-      state.currentPage++;
-      renderIncome();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  });
+  // Pagination is now handled by the Pagination component
+  // Old manual pagination listeners removed - using pagination.onPageChange callback
   
   // Form close buttons
   closeFormBtn.addEventListener('click', closeIncomeForm);

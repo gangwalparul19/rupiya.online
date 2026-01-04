@@ -1,5 +1,13 @@
 // Utility Helper Functions
 
+// Escape HTML to prevent XSS attacks
+export function escapeHtml(text) {
+  if (!text) return '';
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
 // Format currency (full format)
 export function formatCurrency(amount, currency = '₹') {
   if (typeof amount !== 'number') {

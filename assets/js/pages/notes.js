@@ -2,7 +2,8 @@
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
 import toast from '../components/toast.js';
-import { formatDate } from '../utils/helpers.js';
+import Pagination from '../components/pagination.js';
+import { formatDate, escapeHtml } from '../utils/helpers.js';
 
 // Helper function for toast
 const showToast = (message, type) => toast.show(message, type);
@@ -10,6 +11,11 @@ const showToast = (message, type) => toast.show(message, type);
 let notes = [];
 let filteredNotes = [];
 let editingNoteId = null;
+
+// Pagination state
+let pagination = null;
+let currentLastDoc = null;
+let allLoadedNotes = []; // Cache for client-side filtering
 
 let addNoteBtn, addNoteSection, closeFormBtn, cancelFormBtn;
 let noteForm, formTitle, saveFormBtn, saveFormBtnText, saveFormBtnSpinner;
@@ -180,37 +186,101 @@ async function loadNotes() {
   emptyState.style.display = 'none';
 
   try {
-    notes = await firestoreService.getAll('notes', 'createdAt', 'desc');
+    // Get total count for pagination
+    const totalCount = await firestoreService.getCount('notes');
+    
+    // Initialize pagination if not already done
+    if (!pagination) {
+      pagination = new Pagination({
+        pageSize: 10,
+        containerId: 'paginationContainer',
+        onPageChange: handlePageChange
+      });
+    }
+    
+    pagination.setTotal(totalCount);
+    
+    // Load first page
+    await loadPage(1);
+    
+  } catch (error) {
+    console.error('Error loading notes:', error);
+    showToast('Failed to load notes', 'error');
+    loadingState.style.display = 'none';
+  }
+}
+
+async function loadPage(page) {
+  loadingState.style.display = 'flex';
+  
+  try {
+    // For page 1, start fresh; otherwise use cursor
+    const options = { pageSize: 10 };
+    
+    if (page === 1) {
+      currentLastDoc = null;
+      allLoadedNotes = [];
+    }
+    
+    // If we need to go to a specific page, we need to load all pages up to that point
+    // For simplicity, load all notes for filtering (notes are typically fewer than expenses)
+    if (allLoadedNotes.length === 0) {
+      allLoadedNotes = await firestoreService.getAll('notes', 'createdAt', 'desc');
+    }
+    
+    notes = allLoadedNotes;
     filteredNotes = [...notes];
+    
+    // Apply current filters
+    applyFiltersToNotes();
     
     if (notes.length === 0) {
       emptyState.style.display = 'block';
+      notesList.style.display = 'none';
     } else {
       renderNotes();
       notesList.style.display = 'grid';
     }
 
     updateSummary();
+    pagination.render();
+    
   } catch (error) {
-    console.error('Error loading notes:', error);
+    console.error('Error loading page:', error);
     showToast('Failed to load notes', 'error');
   } finally {
     loadingState.style.display = 'none';
   }
 }
 
-function handleSearch() {
-  const searchTerm = searchInput.value.toLowerCase();
-  const category = categoryFilter.value;
+function handlePageChange(page) {
+  loadPage(page);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function applyFiltersToNotes() {
+  const searchTerm = searchInput?.value?.toLowerCase() || '';
+  const category = categoryFilter?.value || '';
 
   filteredNotes = notes.filter(note => {
-    const matchesSearch = note.title.toLowerCase().includes(searchTerm) || 
+    const matchesSearch = !searchTerm || 
+                         note.title.toLowerCase().includes(searchTerm) || 
                          note.content.toLowerCase().includes(searchTerm);
     const matchesCategory = !category || note.category === category;
     return matchesSearch && matchesCategory;
   });
+  
+  // Update pagination total based on filtered results
+  if (pagination) {
+    pagination.setTotal(filteredNotes.length);
+    pagination.currentPage = 1;
+  }
+}
 
+function handleSearch() {
+  applyFiltersToNotes();
   renderNotes();
+  if (pagination) pagination.render();
 }
 
 function handleFilter() {
@@ -227,20 +297,31 @@ function renderNotes() {
 
   if (sortedNotes.length === 0) {
     notesList.innerHTML = '<div class="empty-state"><p>No notes found</p></div>';
+    if (pagination) {
+      const container = document.getElementById('paginationContainer');
+      if (container) container.style.display = 'none';
+    }
     return;
   }
 
-  notesList.innerHTML = sortedNotes.map(note => `
+  // Apply pagination
+  const pageSize = pagination ? pagination.pageSize : 10;
+  const currentPage = pagination ? pagination.currentPage : 1;
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+  const pageNotes = sortedNotes.slice(startIndex, endIndex);
+
+  notesList.innerHTML = pageNotes.map(note => `
     <div class="note-card ${note.isPinned ? 'pinned' : ''}" onclick="window.viewNote('${note.id}')">
       ${note.isPinned ? '<div class="pin-badge">📌</div>' : ''}
       <div class="note-card-header">
-        <div class="note-title">${note.title}</div>
+        <div class="note-title">${escapeHtml(note.title)}</div>
         <div class="note-meta">
-          <span class="note-category">${note.category}</span>
+          <span class="note-category">${escapeHtml(note.category)}</span>
           <span class="note-date">${formatDate(note.createdAt)}</span>
         </div>
       </div>
-      <div class="note-content">${note.content}</div>
+      <div class="note-content">${escapeHtml(note.content)}</div>
       <div class="note-actions" onclick="event.stopPropagation()">
         <button class="btn-icon" onclick="window.editNote('${note.id}')" title="Edit">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">

@@ -7,7 +7,7 @@ import toast from '../components/toast.js';
 import themeManager from '../utils/theme-manager.js';
 import gamificationService from '../services/gamification-service.js';
 import gamificationUI from '../components/gamification-ui.js';
-import { formatCurrency, formatCurrencyCompact, formatDate, getRelativeTime } from '../utils/helpers.js';
+import { formatCurrency, formatCurrencyCompact, formatDate, getRelativeTime, escapeHtml } from '../utils/helpers.js';
 
 // Check authentication
 async function checkAuth() {
@@ -170,55 +170,36 @@ async function loadDashboardData() {
     
     // Get current month data
     const now = new Date();
-    const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth();
     
-    // Get previous month data for comparison
-    const firstDayOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-    const lastDayOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
-    
-    // Fetch expenses, income, goals, and recurring
-    console.log('Fetching expenses and income...');
-    const [expenses, income, goals, recurring] = await Promise.all([
-      firestoreService.getExpenses(),
-      firestoreService.getIncome(),
+    // Use optimized monthly summary queries (cached)
+    console.log('Fetching monthly summaries...');
+    const [currentSummary, lastSummary, goals, recurring] = await Promise.all([
+      firestoreService.getMonthlySummary(currentYear, currentMonth),
+      firestoreService.getMonthlySummary(currentYear, currentMonth - 1),
       firestoreService.getGoals ? firestoreService.getGoals() : Promise.resolve([]),
       firestoreService.getRecurring ? firestoreService.getRecurring() : Promise.resolve([])
     ]);
     
-    console.log('Expenses:', expenses.length, 'Income:', income.length);
+    // Get limited expenses/income for charts (last 6 months only)
+    const sixMonthsAgo = new Date(currentYear, currentMonth - 5, 1);
+    const [expenses, income] = await Promise.all([
+      firestoreService.getExpenses(200), // Limit to 200 for charts
+      firestoreService.getIncome(200)
+    ]);
     
-    // Calculate current month totals
-    const currentMonthExpenses = expenses
-      .filter(e => {
-        const date = e.date.toDate ? e.date.toDate() : new Date(e.date);
-        return date >= firstDayOfMonth && date <= lastDayOfMonth;
-      })
-      .reduce((sum, e) => sum + e.amount, 0);
+    console.log('Current month summary:', currentSummary);
     
-    const currentMonthIncome = income
-      .filter(i => {
-        const date = i.date.toDate ? i.date.toDate() : new Date(i.date);
-        return date >= firstDayOfMonth && date <= lastDayOfMonth;
-      })
-      .reduce((sum, i) => sum + i.amount, 0);
+    // Define date range for current month (used by widgets)
+    const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
+    const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0, 23, 59, 59);
     
-    console.log('Current month - Expenses:', currentMonthExpenses, 'Income:', currentMonthIncome);
-    
-    // Calculate last month totals
-    const lastMonthExpenses = expenses
-      .filter(e => {
-        const date = e.date.toDate ? e.date.toDate() : new Date(e.date);
-        return date >= firstDayOfLastMonth && date <= lastDayOfLastMonth;
-      })
-      .reduce((sum, e) => sum + e.amount, 0);
-    
-    const lastMonthIncome = income
-      .filter(i => {
-        const date = i.date.toDate ? i.date.toDate() : new Date(i.date);
-        return date >= firstDayOfLastMonth && date <= lastDayOfLastMonth;
-      })
-      .reduce((sum, i) => sum + i.amount, 0);
+    // Use pre-calculated summaries
+    const currentMonthExpenses = currentSummary.totalExpenses;
+    const currentMonthIncome = currentSummary.totalIncome;
+    const lastMonthExpenses = lastSummary.totalExpenses;
+    const lastMonthIncome = lastSummary.totalIncome;
     
     // Calculate metrics
     const cashFlow = currentMonthIncome - currentMonthExpenses;
@@ -493,8 +474,8 @@ function loadRecentTransactions(expenses, income) {
           <div class="transaction-item">
             <div class="transaction-icon">${icon}</div>
             <div class="transaction-details">
-              <div class="transaction-title">${t.description || t.category || 'Transaction'}</div>
-              <div class="transaction-meta">${t.category || t.source || 'Uncategorized'} • ${getRelativeTime(date)}</div>
+              <div class="transaction-title">${escapeHtml(t.description || t.category || 'Transaction')}</div>
+              <div class="transaction-meta">${escapeHtml(t.category || t.source || 'Uncategorized')} • ${getRelativeTime(date)}</div>
             </div>
             <div class="transaction-amount ${amountClass}">${amountPrefix}${formatCurrency(t.amount)}</div>
           </div>

@@ -25,8 +25,9 @@ class FuelService {
 
       if (previousFillup && previousFillup.odometerReading < fillupData.odometerReading) {
         distanceTraveled = fillupData.odometerReading - previousFillup.odometerReading;
-        mileage = distanceTraveled / fillupData.fuelQuantity;
-        costPerKm = fillupData.totalAmount / distanceTraveled;
+        // Prevent division by zero
+        mileage = fillupData.fuelQuantity > 0 ? distanceTraveled / fillupData.fuelQuantity : 0;
+        costPerKm = distanceTraveled > 0 ? fillupData.totalAmount / distanceTraveled : 0;
       }
 
       const docRef = await addDoc(collection(db, this.collectionName), {

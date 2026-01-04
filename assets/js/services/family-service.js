@@ -214,8 +214,8 @@ class FamilyService {
 
       snapshot.forEach((doc) => {
         const data = doc.data();
-        // Check if not expired
-        if (data.expiresAt.toDate() > new Date()) {
+        // Check if not expired (with null safety)
+        if (data.expiresAt && data.expiresAt.toDate && data.expiresAt.toDate() > new Date()) {
           invitations.push({ id: doc.id, ...data });
         }
       });
@@ -248,8 +248,8 @@ class FamilyService {
         return { success: false, error: 'Invitation not for this user' };
       }
 
-      // Check if expired
-      if (invitation.expiresAt.toDate() < new Date()) {
+      // Check if expired (with null safety)
+      if (invitation.expiresAt && invitation.expiresAt.toDate && invitation.expiresAt.toDate() < new Date()) {
         await updateDoc(inviteRef, { status: 'expired' });
         return { success: false, error: 'Invitation expired' };
       }

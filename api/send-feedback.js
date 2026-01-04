@@ -1,5 +1,18 @@
 import nodemailer from 'nodemailer';
 
+// Helper function to escape HTML to prevent XSS in emails
+function escapeHtml(text) {
+  if (!text) return '';
+  const map = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  };
+  return String(text).replace(/[&<>"']/g, m => map[m]);
+}
+
 export default async function handler(req, res) {
   // Only allow POST requests
   if (req.method !== 'POST') {
@@ -43,7 +56,14 @@ export default async function handler(req, res) {
     };
     const typeLabel = typeLabels[type] || type;
 
-    // Email HTML template
+    // Email HTML template (escape user input to prevent XSS)
+    const safeSubject = escapeHtml(subject);
+    const safeMessage = escapeHtml(message);
+    const safeUserName = escapeHtml(userName);
+    const safeEmail = escapeHtml(email);
+    const safeUserId = escapeHtml(userId);
+    const safeUserAgent = escapeHtml(userAgent);
+    
     const htmlContent = `
 <!DOCTYPE html>
 <html lang="en">
@@ -68,10 +88,10 @@ export default async function handler(req, res) {
           <!-- Content -->
           <tr>
             <td style="padding: 40px;">
-              <h2 style="margin: 0 0 20px; color: #1a1a1a; font-size: 22px; font-weight: 600;">${subject}</h2>
+              <h2 style="margin: 0 0 20px; color: #1a1a1a; font-size: 22px; font-weight: 600;">${safeSubject}</h2>
               
               <div style="padding: 20px; background-color: #f8f9fa; border-radius: 6px; border-left: 4px solid #667eea; margin-bottom: 24px;">
-                <p style="margin: 0; color: #4a4a4a; font-size: 15px; line-height: 1.8; white-space: pre-wrap;">${message}</p>
+                <p style="margin: 0; color: #4a4a4a; font-size: 15px; line-height: 1.8; white-space: pre-wrap;">${safeMessage}</p>
               </div>
               
               <div style="border-top: 1px solid #e9ecef; padding-top: 20px; margin-top: 20px;">
@@ -79,15 +99,15 @@ export default async function handler(req, res) {
                 <table style="width: 100%; font-size: 14px; color: #4a4a4a;">
                   <tr>
                     <td style="padding: 6px 0;"><strong>Name:</strong></td>
-                    <td style="padding: 6px 0;">${userName}</td>
+                    <td style="padding: 6px 0;">${safeUserName}</td>
                   </tr>
                   <tr>
                     <td style="padding: 6px 0;"><strong>Email:</strong></td>
-                    <td style="padding: 6px 0;">${email}</td>
+                    <td style="padding: 6px 0;">${safeEmail}</td>
                   </tr>
                   <tr>
                     <td style="padding: 6px 0;"><strong>User ID:</strong></td>
-                    <td style="padding: 6px 0; font-family: monospace; font-size: 12px;">${userId}</td>
+                    <td style="padding: 6px 0; font-family: monospace; font-size: 12px;">${safeUserId}</td>
                   </tr>
                   <tr>
                     <td style="padding: 6px 0;"><strong>Timestamp:</strong></td>
@@ -95,7 +115,7 @@ export default async function handler(req, res) {
                   </tr>
                   <tr>
                     <td style="padding: 6px 0; vertical-align: top;"><strong>User Agent:</strong></td>
-                    <td style="padding: 6px 0; font-size: 12px; word-break: break-all;">${userAgent}</td>
+                    <td style="padding: 6px 0; font-size: 12px; word-break: break-all;">${safeUserAgent}</td>
                   </tr>
                 </table>
               </div>
@@ -184,17 +204,17 @@ This feedback was submitted through Rupiya Feedback System.
           <tr>
             <td style="padding: 40px;">
               <p style="margin: 0 0 16px; color: #4a4a4a; font-size: 16px; line-height: 1.6;">
-                Hi ${userName},
+                Hi ${safeUserName},
               </p>
               <p style="margin: 0 0 16px; color: #4a4a4a; font-size: 16px; line-height: 1.6;">
                 Thank you for taking the time to share your feedback with us. We've received your ${typeLabel.toLowerCase()} and our team will review it carefully.
               </p>
               <div style="padding: 20px; background-color: #f8f9fa; border-radius: 6px; margin: 24px 0;">
                 <p style="margin: 0 0 8px; color: #1a1a1a; font-weight: 600;">Your Feedback:</p>
-                <p style="margin: 0; color: #4a4a4a; font-size: 14px;"><strong>Subject:</strong> ${subject}</p>
+                <p style="margin: 0; color: #4a4a4a; font-size: 14px;"><strong>Subject:</strong> ${safeSubject}</p>
               </div>
               <p style="margin: 0 0 16px; color: #4a4a4a; font-size: 16px; line-height: 1.6;">
-                We typically respond within 24-48 hours for bug reports and within a week for feature requests. If your feedback requires a response, we'll get back to you at ${email}.
+                We typically respond within 24-48 hours for bug reports and within a week for feature requests. If your feedback requires a response, we'll get back to you at ${safeEmail}.
               </p>
               <p style="margin: 0; color: #4a4a4a; font-size: 16px; line-height: 1.6;">
                 Best regards,<br>
