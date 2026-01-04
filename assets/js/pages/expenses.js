@@ -456,6 +456,7 @@ function createExpenseCard(expense) {
   const categoryIcon = categoryIcons[expense.category] || '📦';
   const isRecurring = expense.isRecurring || expense.recurringId;
   const isSelected = state.selectedExpenses.has(expense.id);
+  const isTripExpense = expense.tripGroupId && expense.tripGroupExpenseId;
   
   return `
     <div class="expense-card swipeable-card ${isSelected ? 'selected' : ''}" data-id="${expense.id}">
@@ -467,6 +468,7 @@ function createExpenseCard(expense) {
             <span class="category-icon">${categoryIcon}</span>
             <span>${expense.category}</span>
             ${isRecurring ? '<span class="recurring-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Recurring</span>' : ''}
+            ${isTripExpense ? `<a href="trip-group-detail.html?id=${expense.tripGroupId}" class="trip-badge" title="View Trip Group">✈️ Trip</a>` : ''}
           </div>
           <div class="expense-actions">
             <button class="btn-icon btn-duplicate" data-id="${expense.id}" title="Duplicate">

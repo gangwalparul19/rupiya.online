@@ -1,0 +1,656 @@
+/* Trip Group Detail Page Styles */
+
+/* Page Header with Back Button */
+.page-header-back {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.back-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  color: var(--text-secondary, #6b7280);
+  transition: all 0.2s ease;
+}
+
+.back-link:hover {
+  background: var(--hover-bg, #f3f4f6);
+  color: var(--text-primary, #1f2937);
+}
+
+/* Budget Section */
+.budget-section {
+  margin-bottom: 1.5rem;
+}
+
+.budget-card {
+  background: var(--card-bg, #fff);
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-color, #e5e7eb);
+}
+
+.budget-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.budget-label {
+  font-weight: 500;
+  color: var(--text-secondary, #6b7280);
+}
+
+.budget-amount {
+  font-weight: 600;
+  color: var(--text-primary, #1f2937);
+}
+
+.budget-card .budget-progress-bar {
+  height: 8px;
+  background: var(--border-color, #e5e7eb);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 0.75rem;
+}
+
+.budget-card .budget-progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.budget-footer {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  color: var(--text-secondary, #6b7280);
+}
+
+/* Balances Section */
+.balances-section {
+  margin-bottom: 1.5rem;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.section-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary, #1f2937);
+  margin: 0;
+}
+
+.balances-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.balance-card {
+  background: var(--card-bg, #fff);
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-color, #e5e7eb);
+  text-align: center;
+}
+
+.balance-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--primary-color, #4A90E2);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1.25rem;
+  margin: 0 auto 0.75rem;
+}
+
+.balance-name {
+  font-weight: 500;
+  color: var(--text-primary, #1f2937);
+  margin-bottom: 0.25rem;
+}
+
+.balance-amount {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.balance-amount.positive {
+  color: #16a34a;
+}
+
+.balance-amount.negative {
+  color: #dc2626;
+}
+
+.balance-amount.settled {
+  color: var(--text-secondary, #6b7280);
+}
+
+.balance-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary, #6b7280);
+}
+
+/* Simplified Debts */
+.simplified-debts {
+  background: var(--card-bg, #fff);
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-color, #e5e7eb);
+}
+
+.debts-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary, #1f2937);
+  margin: 0 0 1rem 0;
+}
+
+.debts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.debt-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: var(--hover-bg, #f9fafb);
+  border-radius: 8px;
+}
+
+.debt-from, .debt-to {
+  font-weight: 500;
+  color: var(--text-primary, #1f2937);
+}
+
+.debt-arrow {
+  color: var(--text-secondary, #6b7280);
+}
+
+.debt-amount {
+  margin-left: auto;
+  font-weight: 600;
+  color: var(--primary-color, #4A90E2);
+}
+
+.debts-settled {
+  text-align: center;
+  padding: 1rem;
+  color: #16a34a;
+  font-weight: 500;
+}
+
+/* Detail Tabs */
+.detail-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color, #e5e7eb);
+  padding-bottom: 0.5rem;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* Expenses Filters */
+.expenses-filters {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.filter-select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 6px;
+  font-size: 0.875rem;
+  background: var(--card-bg, #fff);
+  color: var(--text-primary, #1f2937);
+  min-width: 150px;
+}
+
+/* Expenses List */
+.expenses-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.expense-item {
+  background: var(--card-bg, #fff);
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-color, #e5e7eb);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.expense-main {
+  flex: 1;
+}
+
+.expense-description {
+  font-weight: 500;
+  color: var(--text-primary, #1f2937);
+  margin-bottom: 0.25rem;
+}
+
+.expense-meta {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary, #6b7280);
+}
+
+.expense-category {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.125rem 0.5rem;
+  background: var(--primary-light, #e3f2fd);
+  color: var(--primary-color, #4A90E2);
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.expense-right {
+  text-align: right;
+}
+
+.expense-amount {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary, #1f2937);
+}
+
+.expense-paid-by {
+  font-size: 0.75rem;
+  color: var(--text-secondary, #6b7280);
+}
+
+
+/* Settlements List */
+.settlements-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.settlement-item {
+  background: var(--card-bg, #fff);
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-color, #e5e7eb);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.settlement-parties {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.settlement-from, .settlement-to {
+  font-weight: 500;
+  color: var(--text-primary, #1f2937);
+}
+
+.settlement-arrow {
+  color: #16a34a;
+}
+
+.settlement-amount {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #16a34a;
+}
+
+.settlement-date {
+  font-size: 0.75rem;
+  color: var(--text-secondary, #6b7280);
+}
+
+/* Members Grid */
+.members-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.member-card {
+  background: var(--card-bg, #fff);
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-color, #e5e7eb);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.member-card .member-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--primary-color, #4A90E2);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}
+
+.member-card .member-info {
+  flex: 1;
+}
+
+.member-card .member-name {
+  font-weight: 500;
+  color: var(--text-primary, #1f2937);
+}
+
+.member-card .member-role {
+  font-size: 0.75rem;
+  color: var(--text-secondary, #6b7280);
+}
+
+.member-card .member-balance {
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+/* Split Section in Modal */
+.split-section {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color, #e5e7eb);
+}
+
+.split-type-selector {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.split-type-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.split-type-option:has(input:checked) {
+  border-color: var(--primary-color, #4A90E2);
+  background: var(--primary-light, #e3f2fd);
+}
+
+.split-type-option input {
+  display: none;
+}
+
+.split-members {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.split-member-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  background: var(--hover-bg, #f9fafb);
+  border-radius: 6px;
+}
+
+.split-member-row input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+}
+
+.split-member-name {
+  flex: 1;
+  font-weight: 500;
+}
+
+.split-member-amount {
+  width: 100px;
+  padding: 0.375rem 0.5rem;
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 4px;
+  font-size: 0.875rem;
+  text-align: right;
+}
+
+.split-summary {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background: var(--hover-bg, #f9fafb);
+  border-radius: 6px;
+  text-align: right;
+  font-weight: 500;
+}
+
+/* Button Block */
+.btn-block {
+  width: 100%;
+  justify-content: center;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .page-header-back {
+    display: none;
+  }
+
+  .balances-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .members-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .expenses-filters {
+    flex-direction: column;
+  }
+
+  .filter-select {
+    width: 100%;
+  }
+
+  .expense-item {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .expense-right {
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .split-type-selector {
+    flex-direction: column;
+  }
+
+  .split-type-option {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .balances-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* Analytics Tab Styles */
+.analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.analytics-card {
+  background: var(--card-bg, #fff);
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-color, #e5e7eb);
+}
+
+.analytics-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary, #1f2937);
+  margin: 0 0 1rem 0;
+}
+
+/* Category Breakdown */
+.category-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.category-bar-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.category-bar-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+}
+
+.category-bar-name {
+  color: var(--text-primary, #1f2937);
+  font-weight: 500;
+}
+
+.category-bar-amount {
+  color: var(--text-secondary, #6b7280);
+}
+
+.category-bar-track {
+  height: 8px;
+  background: var(--border-color, #e5e7eb);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.category-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+/* Category colors */
+.category-bar-fill.accommodation { background: #3498db; }
+.category-bar-fill.transport { background: #e74c3c; }
+.category-bar-fill.food-dining { background: #f39c12; }
+.category-bar-fill.activities { background: #9b59b6; }
+.category-bar-fill.shopping { background: #1abc9c; }
+.category-bar-fill.tips { background: #34495e; }
+.category-bar-fill.other { background: #95a5a6; }
+
+/* Trip Stats */
+.trip-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary, #6b7280);
+}
+
+.stat-value {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary, #1f2937);
+}
+
+/* Archive Button */
+.archive-btn {
+  margin-top: 1rem;
+}
+
+.archived-notice {
+  background: #fef3c7;
+  border: 1px solid #f59e0b;
+  color: #92400e;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .analytics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .trip-stats {
+    grid-template-columns: 1fr;
+  }
+}

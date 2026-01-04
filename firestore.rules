@@ -364,6 +364,135 @@ service cloud.firestore {
     }
     
     // ============================================
+    // TRIP GROUPS
+    // ============================================
+    match /tripGroups/{groupId} {
+      // Helper to check if user is a member of this trip group
+      function isTripGroupMember() {
+        return isAuthenticated() && 
+               exists(/databases/$(database)/documents/tripGroupMembers/$(groupId + '_' + request.auth.uid));
+      }
+      
+      // Helper to check if user is admin of this trip group
+      function isTripGroupAdmin() {
+        return isAuthenticated() && 
+               exists(/databases/$(database)/documents/tripGroupMembers/$(groupId + '_' + request.auth.uid)) &&
+               get(/databases/$(database)/documents/tripGroupMembers/$(groupId + '_' + request.auth.uid)).data.isAdmin == true;
+      }
+      
+      // Read: Members can read their group
+      allow read: if isTripGroupMember() || 
+                     (isAuthenticated() && resource.data.createdBy == request.auth.uid);
+      
+      // Create: Any authenticated user can create a trip group
+      allow create: if isAuthenticated() && 
+                       request.resource.data.createdBy == request.auth.uid;
+      
+      // Update: Only admins can update group details
+      allow update: if isTripGroupAdmin();
+      
+      // Delete: Only the creator can delete the group
+      allow delete: if isAuthenticated() && 
+                       resource.data.createdBy == request.auth.uid;
+    }
+    
+    // ============================================
+    // TRIP GROUP MEMBERS
+    // ============================================
+    match /tripGroupMembers/{memberId} {
+      // Helper to check if user is a member of the same trip group
+      function isSameGroupMember() {
+        return isAuthenticated() && 
+               exists(/databases/$(database)/documents/tripGroupMembers/$(resource.data.groupId + '_' + request.auth.uid));
+      }
+      
+      // Helper to check if user is admin of the trip group
+      function isGroupAdmin() {
+        return isAuthenticated() && 
+               exists(/databases/$(database)/documents/tripGroupMembers/$(resource.data.groupId + '_' + request.auth.uid)) &&
+               get(/databases/$(database)/documents/tripGroupMembers/$(resource.data.groupId + '_' + request.auth.uid)).data.isAdmin == true;
+      }
+      
+      // Read: Group members can read all members in their group
+      allow read: if isSameGroupMember() || 
+                     (isAuthenticated() && resource.data.userId == request.auth.uid);
+      
+      // Create: Authenticated users can create (for adding themselves or others as admin)
+      allow create: if isAuthenticated();
+      
+      // Update: Admins can update member records
+      allow update: if isGroupAdmin() || 
+                       (isAuthenticated() && resource.data.userId == request.auth.uid);
+      
+      // Delete: Admins can remove members
+      allow delete: if isGroupAdmin();
+    }
+    
+    // ============================================
+    // TRIP GROUP EXPENSES
+    // ============================================
+    match /tripGroupExpenses/{expenseId} {
+      // Helper to check if user is a member of the expense's trip group
+      function isExpenseGroupMember() {
+        return isAuthenticated() && 
+               exists(/databases/$(database)/documents/tripGroupMembers/$(resource.data.groupId + '_' + request.auth.uid));
+      }
+      
+      // Helper for create - check membership using request data
+      function canCreateExpense() {
+        return isAuthenticated() && 
+               exists(/databases/$(database)/documents/tripGroupMembers/$(request.resource.data.groupId + '_' + request.auth.uid));
+      }
+      
+      // Read: Group members can read expenses
+      allow read: if isExpenseGroupMember();
+      
+      // Create: Group members can add expenses
+      allow create: if canCreateExpense() && 
+                       request.resource.data.addedBy == request.auth.uid;
+      
+      // Update: Only the person who added the expense can update it
+      allow update: if isExpenseGroupMember() && 
+                       resource.data.addedBy == request.auth.uid;
+      
+      // Delete: Only the person who added the expense can delete it
+      allow delete: if isExpenseGroupMember() && 
+                       resource.data.addedBy == request.auth.uid;
+    }
+    
+    // ============================================
+    // TRIP GROUP SETTLEMENTS
+    // ============================================
+    match /tripGroupSettlements/{settlementId} {
+      // Helper to check if user is a member of the settlement's trip group
+      function isSettlementGroupMember() {
+        return isAuthenticated() && 
+               exists(/databases/$(database)/documents/tripGroupMembers/$(resource.data.groupId + '_' + request.auth.uid));
+      }
+      
+      // Helper for create - check membership using request data
+      function canCreateSettlement() {
+        return isAuthenticated() && 
+               exists(/databases/$(database)/documents/tripGroupMembers/$(request.resource.data.groupId + '_' + request.auth.uid));
+      }
+      
+      // Read: Group members can read settlements
+      allow read: if isSettlementGroupMember();
+      
+      // Create: Group members can record settlements
+      allow create: if canCreateSettlement() && 
+                       request.resource.data.recordedBy == request.auth.uid;
+      
+      // Update: Only the person who recorded the settlement can update it
+      allow update: if isSettlementGroupMember() && 
+                       resource.data.recordedBy == request.auth.uid;
+      
+      // Delete: Only the person who recorded the settlement can delete it
+      allow delete: if isSettlementGroupMember() && 
+                       resource.data.recordedBy == request.auth.uid;
+    }
+    
+    // ============================================
     // DENY ALL OTHER COLLECTIONS
     // ============================================
     // Explicitly deny access to any other collections

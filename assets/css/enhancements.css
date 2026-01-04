@@ -120,6 +120,30 @@
 }
 
 /* ============================================
+   4.1 TRIP GROUP BADGE
+   ============================================ */
+.trip-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  background: linear-gradient(135deg, #3498DB 0%, #2980B9 100%);
+  color: white;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.trip-badge:hover {
+  background: linear-gradient(135deg, #2980B9 0%, #1a5276 100%);
+  transform: scale(1.05);
+}
+
+/* ============================================
    5. DUPLICATE BUTTON
    ============================================ */
 .btn-duplicate {

@@ -22,7 +22,7 @@ let isGoogleUser = false;
 let profileForm, passwordForm, preferencesForm;
 let displayNameInput, emailInput, phoneInput;
 let currentPasswordInput, newPasswordInput, confirmPasswordInput;
-let currencySelect, dateFormatSelect, weeklyReportEnabledCheckbox, monthlyReportEnabledCheckbox;
+let weeklyReportEnabledCheckbox, monthlyReportEnabledCheckbox;
 let exportDataBtn, deleteAccountBtn;
 let deleteAccountModal, closeDeleteAccountModalBtn, cancelDeleteAccountBtn, confirmDeleteAccountBtn;
 let confirmDeleteText;
@@ -63,8 +63,6 @@ function initDOMElements() {
   newPasswordInput = document.getElementById('newPassword');
   confirmPasswordInput = document.getElementById('confirmPassword');
   
-  currencySelect = document.getElementById('currency');
-  dateFormatSelect = document.getElementById('dateFormat');
   weeklyReportEnabledCheckbox = document.getElementById('weeklyReportEnabled');
   monthlyReportEnabledCheckbox = document.getElementById('monthlyReportEnabled');
   
@@ -248,12 +246,6 @@ async function loadUserPreferences() {
     if (prefs.success && prefs.data) {
       userPreferences = prefs.data;
       
-      if (currencySelect) {
-        currencySelect.value = userPreferences.currency || 'INR';
-      }
-      if (dateFormatSelect) {
-        dateFormatSelect.value = userPreferences.dateFormat || 'DD/MM/YYYY';
-      }
       if (weeklyReportEnabledCheckbox) {
         weeklyReportEnabledCheckbox.checked = userPreferences.weeklyReportEnabled === true;
       }
@@ -392,8 +384,6 @@ async function handlePreferencesUpdate(e) {
 
   try {
     const preferences = {
-      currency: currencySelect?.value || 'INR',
-      dateFormat: dateFormatSelect?.value || 'DD/MM/YYYY',
       weeklyReportEnabled: weeklyReportEnabledCheckbox?.checked || false,
       monthlyReportEnabled: monthlyReportEnabledCheckbox?.checked || false,
       userId: currentUser.uid,

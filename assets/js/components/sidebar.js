@@ -51,6 +51,7 @@ const navigationConfig = {
       items: [
         { href: 'ai-insights.html', icon: '🤖', label: 'AI Insights' },
         { href: 'split-expense.html', icon: '🤝', label: 'Split Expense' },
+        { href: 'trip-groups.html', icon: '✈️', label: 'Trip Groups' },
         { href: 'achievements.html', icon: '🏆', label: 'Achievements' }
       ]
     },
