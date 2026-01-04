@@ -13,16 +13,11 @@ class TripGroupsPage {
   }
 
   async init() {
-    console.log('[Trip Groups] init() called');
     const user = await this.waitForAuth();
-    console.log('[Trip Groups] waitForAuth returned:', user ? user.email : 'null');
-    if (!user) return; // Redirecting to login
+    if (!user) return;
     
-    console.log('[Trip Groups] Binding events...');
     this.bindEvents();
-    console.log('[Trip Groups] Loading groups...');
     await this.loadGroups();
-    console.log('[Trip Groups] Initialization complete');
   }
 
   async waitForAuth() {
@@ -39,23 +34,17 @@ class TripGroupsPage {
   }
 
   bindEvents() {
-    console.log('[Trip Groups] bindEvents() called');
-    
-    // Create group button
+    // Create group button - toggle inline form
     const createBtn = document.getElementById('createGroupBtn');
-    console.log('[Trip Groups] createGroupBtn element:', createBtn);
-    createBtn?.addEventListener('click', () => {
-      console.log('[Trip Groups] Create button clicked');
-      this.openCreateModal();
-    });
+    createBtn?.addEventListener('click', () => this.toggleCreateSection());
     
-    // Modal controls
-    document.getElementById('closeGroupModalBtn')?.addEventListener('click', () => this.closeModal());
-    document.getElementById('cancelGroupBtn')?.addEventListener('click', () => this.closeModal());
-    document.getElementById('groupForm')?.addEventListener('submit', (e) => this.handleSubmit(e));
+    // Inline form controls
+    document.getElementById('closeCreateSectionBtn')?.addEventListener('click', () => this.hideCreateSection());
+    document.getElementById('cancelCreateBtn')?.addEventListener('click', () => this.hideCreateSection());
+    document.getElementById('inlineGroupForm')?.addEventListener('submit', (e) => this.handleInlineSubmit(e));
     
-    // Add member button
-    document.getElementById('addMemberBtn')?.addEventListener('click', () => this.addPendingMember());
+    // Add member button (inline form)
+    document.getElementById('inlineAddMemberBtn')?.addEventListener('click', () => this.addPendingMember());
     
     // Tab buttons
     document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -67,15 +56,10 @@ class TripGroupsPage {
     document.getElementById('cancelDeleteBtn')?.addEventListener('click', () => this.closeDeleteModal());
     document.getElementById('confirmDeleteBtn')?.addEventListener('click', () => this.confirmDelete());
     
-    // Close modals on overlay click
-    document.getElementById('createGroupModal')?.addEventListener('click', (e) => {
-      if (e.target.id === 'createGroupModal') this.closeModal();
-    });
+    // Close delete modal on overlay click
     document.getElementById('deleteGroupModal')?.addEventListener('click', (e) => {
       if (e.target.id === 'deleteGroupModal') this.closeDeleteModal();
     });
-    
-    console.log('[Trip Groups] Events bound successfully');
   }
 
   async loadGroups() {
@@ -210,43 +194,48 @@ class TripGroupsPage {
     this.renderGroups();
   }
 
-  openCreateModal() {
-    console.log('[Trip Groups] openCreateModal() called');
+  toggleCreateSection() {
+    const section = document.getElementById('createGroupSection');
+    const isVisible = section.classList.contains('show');
+    
+    if (isVisible) {
+      this.hideCreateSection();
+    } else {
+      this.showCreateSection();
+    }
+  }
+
+  showCreateSection() {
     this.editingGroupId = null;
     this.pendingMembers = [];
     
     // Reset form
-    const form = document.getElementById('groupForm');
-    const membersList = document.getElementById('membersList');
-    const modalTitle = document.getElementById('groupModalTitle');
-    const btnText = document.getElementById('saveGroupBtnText');
-    const modal = document.getElementById('createGroupModal');
-    
-    console.log('[Trip Groups] Modal elements:', { form, membersList, modalTitle, btnText, modal });
+    const form = document.getElementById('inlineGroupForm');
+    const membersList = document.getElementById('inlineMembersList');
+    const title = document.getElementById('inlineGroupTitle');
+    const btnText = document.getElementById('inlineSaveGroupBtnText');
     
     form?.reset();
     if (membersList) membersList.innerHTML = '';
-    if (modalTitle) modalTitle.textContent = 'Create Trip Group';
+    if (title) title.textContent = 'Create Trip Group';
     if (btnText) btnText.textContent = 'Create Group';
     
-    // Show modal (use 'show' class, not 'active')
-    if (modal) {
-      modal.classList.add('show');
-      console.log('[Trip Groups] Modal should now be visible');
-    } else {
-      console.error('[Trip Groups] Modal element not found!');
-    }
+    // Show section
+    document.getElementById('createGroupSection')?.classList.add('show');
+    
+    // Scroll to form
+    document.getElementById('createGroupSection')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  closeModal() {
-    document.getElementById('createGroupModal')?.classList.remove('show');
+  hideCreateSection() {
+    document.getElementById('createGroupSection')?.classList.remove('show');
     this.pendingMembers = [];
   }
 
   addPendingMember() {
-    const nameInput = document.getElementById('memberName');
-    const emailInput = document.getElementById('memberEmail');
-    const phoneInput = document.getElementById('memberPhone');
+    const nameInput = document.getElementById('inlineMemberName');
+    const emailInput = document.getElementById('inlineMemberEmail');
+    const phoneInput = document.getElementById('inlineMemberPhone');
     
     const name = nameInput.value.trim();
     const email = emailInput.value.trim();
@@ -275,7 +264,7 @@ class TripGroupsPage {
   }
 
   renderPendingMembers() {
-    const container = document.getElementById('membersList');
+    const container = document.getElementById('inlineMembersList');
     
     container.innerHTML = this.pendingMembers.map((member, index) => `
       <div class="member-item">
@@ -304,29 +293,34 @@ class TripGroupsPage {
     });
   }
 
-  async handleSubmit(e) {
+  async handleInlineSubmit(e) {
     e.preventDefault();
     
-    const name = document.getElementById('groupName').value.trim();
-    const description = document.getElementById('groupDescription').value.trim();
-    const startDate = document.getElementById('startDate').value;
-    const endDate = document.getElementById('endDate').value;
-    const budget = parseFloat(document.getElementById('tripBudget').value) || 0;
+    const name = document.getElementById('inlineGroupName').value.trim();
+    const description = document.getElementById('inlineGroupDescription').value.trim();
+    const startDate = document.getElementById('inlineStartDate').value;
+    const endDate = document.getElementById('inlineEndDate').value;
+    const destination = document.getElementById('inlineDestination').value.trim();
+    const budget = parseFloat(document.getElementById('inlineTripBudget').value) || 0;
     
     if (!name) {
       this.showToast('Group name is required', 'error');
       return;
     }
     
-    this.setLoading(true);
+    this.setInlineLoading(true);
     
     try {
+      // Get current user info
+      const currentUser = await authService.waitForAuth();
+      
       // Create group
       const result = await tripGroupsService.createGroup({
         name,
         description,
         startDate,
         endDate,
+        destination,
         budget: { total: budget, categories: {} }
       });
       
@@ -339,8 +333,38 @@ class TripGroupsPage {
         await tripGroupsService.addMember(result.groupId, member);
       }
       
+      // Send invitation emails to members with valid emails
+      const membersWithEmail = this.pendingMembers.filter(m => m.email);
+      if (membersWithEmail.length > 0) {
+        try {
+          const emailResponse = await fetch('/api/send-trip-invitation', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              members: this.pendingMembers,
+              tripName: name,
+              destination: destination,
+              description: description,
+              startDate: startDate,
+              endDate: endDate,
+              creatorName: currentUser.displayName || currentUser.email,
+              creatorEmail: currentUser.email,
+              groupId: result.groupId
+            })
+          });
+          
+          const emailResult = await emailResponse.json();
+          if (emailResult.sent > 0) {
+            this.showToast(`Invitations sent to ${emailResult.sent} member(s)!`, 'success');
+          }
+        } catch (emailError) {
+          console.error('Error sending invitation emails:', emailError);
+          // Don't fail the whole operation if emails fail
+        }
+      }
+      
       this.showToast('Group created successfully!', 'success');
-      this.closeModal();
+      this.hideCreateSection();
       await this.loadGroups();
       
       // Navigate to the new group
@@ -349,8 +373,18 @@ class TripGroupsPage {
       console.error('Error creating group:', error);
       this.showToast(error.message || 'Failed to create group', 'error');
     } finally {
-      this.setLoading(false);
+      this.setInlineLoading(false);
     }
+  }
+
+  setInlineLoading(loading) {
+    const btn = document.getElementById('inlineSaveGroupBtn');
+    const text = document.getElementById('inlineSaveGroupBtnText');
+    const spinner = document.getElementById('inlineSaveGroupBtnSpinner');
+    
+    if (btn) btn.disabled = loading;
+    if (text) text.style.display = loading ? 'none' : 'inline';
+    if (spinner) spinner.style.display = loading ? 'inline-block' : 'none';
   }
 
   openDeleteModal(groupId, groupName) {
@@ -387,13 +421,13 @@ class TripGroupsPage {
   }
 
   setLoading(loading) {
-    const btn = document.getElementById('saveGroupBtn');
-    const text = document.getElementById('saveGroupBtnText');
-    const spinner = document.getElementById('saveGroupBtnSpinner');
+    const btn = document.getElementById('inlineSaveGroupBtn');
+    const text = document.getElementById('inlineSaveGroupBtnText');
+    const spinner = document.getElementById('inlineSaveGroupBtnSpinner');
     
-    btn.disabled = loading;
-    text.style.display = loading ? 'none' : 'inline';
-    spinner.style.display = loading ? 'inline-block' : 'none';
+    if (btn) btn.disabled = loading;
+    if (text) text.style.display = loading ? 'none' : 'inline';
+    if (spinner) spinner.style.display = loading ? 'inline-block' : 'none';
   }
 
   formatDate(date) {
@@ -434,6 +468,5 @@ class TripGroupsPage {
 
 // Initialize page
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('[Trip Groups] DOMContentLoaded - initializing page');
   new TripGroupsPage();
 });

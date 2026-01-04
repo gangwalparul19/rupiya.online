@@ -36,8 +36,8 @@
 }
 
 .admin-logo img {
-  width: 32px;
-  height: 32px;
+  width: 48px;
+  height: 48px;
 }
 
 .admin-badge {
@@ -563,12 +563,12 @@
 @media (max-width: 480px) {
   .admin-stats-grid,
   .activity-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
   }
   
   .admin-stat-card {
-    flex-direction: column;
-    text-align: center;
+    padding: 0.75rem;
   }
   
   .stat-icon {

@@ -70,6 +70,7 @@ class TripGroupsService {
       const tripGroup = {
         name: groupData.name.trim(),
         description: groupData.description || '',
+        destination: groupData.destination || '',
         startDate: groupData.startDate ? Timestamp.fromDate(new Date(groupData.startDate)) : null,
         endDate: groupData.endDate ? Timestamp.fromDate(new Date(groupData.endDate)) : null,
         createdBy: userId,

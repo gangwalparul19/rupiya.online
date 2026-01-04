@@ -133,6 +133,77 @@
         <button class="tab-btn" data-tab="all">All</button>
       </div>
 
+      <!-- Inline Create Group Form -->
+      <div class="create-group-section" id="createGroupSection">
+        <div class="create-group-header">
+          <h2 id="inlineGroupTitle">Create Trip Group</h2>
+          <button type="button" class="close-create-btn" id="closeCreateSectionBtn">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <form id="inlineGroupForm">
+          <div class="form-grid">
+            <div class="form-group form-group-full">
+              <label for="inlineGroupName">Group Name *</label>
+              <input type="text" id="inlineGroupName" required maxlength="100" placeholder="e.g., Goa Trip 2026">
+            </div>
+
+            <div class="form-group form-group-full">
+              <label for="inlineGroupDescription">Description</label>
+              <textarea id="inlineGroupDescription" rows="2" maxlength="500" placeholder="Describe your trip..."></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="inlineStartDate">Start Date</label>
+              <input type="date" id="inlineStartDate">
+            </div>
+
+            <div class="form-group">
+              <label for="inlineEndDate">End Date</label>
+              <input type="date" id="inlineEndDate">
+            </div>
+
+            <div class="form-group form-group-full">
+              <label for="inlineDestination">Destination (for travel tips)</label>
+              <input type="text" id="inlineDestination" maxlength="100" placeholder="e.g., Goa, Manali, Paris">
+            </div>
+
+            <div class="form-group">
+              <label for="inlineTripBudget">Budget (Optional)</label>
+              <input type="number" id="inlineTripBudget" step="0.01" min="0" placeholder="0.00">
+            </div>
+          </div>
+
+          <!-- Members Section -->
+          <div class="members-section">
+            <h3 class="section-title">Add Members</h3>
+            <p class="section-subtitle">You'll be added as admin automatically</p>
+            
+            <div class="add-member-form">
+              <div class="form-row">
+                <input type="text" id="inlineMemberName" placeholder="Name *" class="member-input">
+                <input type="email" id="inlineMemberEmail" placeholder="Email (optional)" class="member-input">
+                <input type="tel" id="inlineMemberPhone" placeholder="Phone (optional)" class="member-input">
+                <button type="button" class="btn btn-outline btn-sm" id="inlineAddMemberBtn">Add</button>
+              </div>
+            </div>
+
+            <div id="inlineMembersList" class="members-list"></div>
+          </div>
+
+          <div class="create-group-footer">
+            <button type="button" class="btn btn-outline" id="cancelCreateBtn">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="inlineSaveGroupBtn">
+              <span id="inlineSaveGroupBtnText">Create Group</span>
+              <span id="inlineSaveGroupBtnSpinner" class="spinner" style="display: none;"></span>
+            </button>
+          </div>
+        </form>
+      </div>
+
       <!-- Groups List -->
       <div class="trip-groups-container">
         <div id="groupsList" class="groups-grid">
@@ -159,77 +230,6 @@
         </div>
       </div>
     </main>
-  </div>
-
-  <!-- Create Group Modal -->
-  <div class="modal-overlay" id="createGroupModal">
-    <div class="modal-container">
-      <div class="modal-header">
-        <h2 class="modal-title" id="groupModalTitle">Create Trip Group</h2>
-        <button class="modal-close" id="closeGroupModalBtn">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-          </svg>
-        </button>
-      </div>
-
-      <form id="groupForm" class="modal-body">
-        <div class="form-grid">
-          <div class="form-group form-group-full">
-            <label for="groupName">Group Name *</label>
-            <input type="text" id="groupName" required maxlength="100" placeholder="e.g., Goa Trip 2026">
-            <span class="error-message" id="groupNameError"></span>
-          </div>
-
-          <div class="form-group form-group-full">
-            <label for="groupDescription">Description</label>
-            <textarea id="groupDescription" rows="2" maxlength="500" placeholder="Describe your trip..."></textarea>
-          </div>
-
-          <div class="form-group">
-            <label for="startDate">Start Date</label>
-            <input type="date" id="startDate">
-          </div>
-
-          <div class="form-group">
-            <label for="endDate">End Date</label>
-            <input type="date" id="endDate">
-          </div>
-
-          <div class="form-group">
-            <label for="tripBudget">Budget (Optional)</label>
-            <input type="number" id="tripBudget" step="0.01" min="0" placeholder="0.00">
-          </div>
-        </div>
-
-        <!-- Members Section -->
-        <div class="members-section">
-          <h3 class="section-title">Add Members</h3>
-          <p class="section-subtitle">You'll be added as admin automatically</p>
-          
-          <div class="add-member-form">
-            <div class="form-row">
-              <input type="text" id="memberName" placeholder="Name *" class="member-input">
-              <input type="email" id="memberEmail" placeholder="Email (optional)" class="member-input">
-              <input type="tel" id="memberPhone" placeholder="Phone (optional)" class="member-input">
-              <button type="button" class="btn btn-outline btn-sm" id="addMemberBtn">Add</button>
-            </div>
-          </div>
-
-          <div id="membersList" class="members-list">
-            <!-- Members will be added here -->
-          </div>
-        </div>
-      </form>
-
-      <div class="modal-footer">
-        <button type="button" class="btn btn-outline" id="cancelGroupBtn">Cancel</button>
-        <button type="submit" form="groupForm" class="btn btn-primary" id="saveGroupBtn">
-          <span id="saveGroupBtnText">Create Group</span>
-          <span id="saveGroupBtnSpinner" class="spinner" style="display: none;"></span>
-        </button>
-      </div>
-    </div>
   </div>
 
   <!-- Delete Confirmation Modal -->
