@@ -70,8 +70,8 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Invalid email format' });
     }
     
-    // Validate invitationId format (should be alphanumeric, 10-50 chars)
-    if (!/^[a-zA-Z0-9]{10,50}$/.test(invitationId)) {
+    // Validate invitationId format (Firebase document IDs are alphanumeric, 20 chars)
+    if (!invitationId || typeof invitationId !== 'string' || invitationId.length < 10 || invitationId.length > 50) {
       return res.status(400).json({ error: 'Invalid invitation ID format' });
     }
     

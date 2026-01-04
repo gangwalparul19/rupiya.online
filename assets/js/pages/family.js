@@ -120,16 +120,23 @@ async function loadData() {
   const emptyState = document.getElementById('emptyState');
   const familyGroupsList = document.getElementById('familyGroupsList');
 
+  console.log('[Family Page] loadData() called');
+
   try {
     loadingState.style.display = 'block';
     emptyState.style.display = 'none';
     familyGroupsList.innerHTML = '';
 
+    console.log('[Family Page] Loading family groups and invitations...');
+    
     // Load family groups and invitations
     [familyGroups, pendingInvitations] = await Promise.all([
       familyService.getUserFamilyGroups(),
       familyService.getUserInvitations()
     ]);
+
+    console.log('[Family Page] Loaded family groups:', familyGroups.length);
+    console.log('[Family Page] Loaded invitations:', pendingInvitations.length);
 
     loadingState.style.display = 'none';
 
@@ -143,7 +150,7 @@ async function loadData() {
       renderFamilyGroups();
     }
   } catch (error) {
-    console.error('Error loading data:', error);
+    console.error('[Family Page] Error loading data:', error);
     loadingState.style.display = 'none';
     toast.error('Failed to load family groups');
   }

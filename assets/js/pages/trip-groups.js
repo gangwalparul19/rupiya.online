@@ -46,6 +46,17 @@ class TripGroupsPage {
     // Add member button (inline form)
     document.getElementById('inlineAddMemberBtn')?.addEventListener('click', () => this.addPendingMember());
     
+    // Allow Enter key to add members (prevent form submission)
+    const memberInputs = ['inlineMemberName', 'inlineMemberEmail', 'inlineMemberPhone'];
+    memberInputs.forEach(inputId => {
+      document.getElementById(inputId)?.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          this.addPendingMember();
+        }
+      });
+    });
+    
     // Tab buttons
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', (e) => this.switchTab(e.target.dataset.tab));
@@ -241,6 +252,8 @@ class TripGroupsPage {
     const email = emailInput.value.trim();
     const phone = phoneInput.value.trim();
     
+    console.log('Adding pending member:', { name, email, phone });
+    
     if (!name) {
       this.showToast('Member name is required', 'error');
       nameInput.focus();
@@ -253,8 +266,12 @@ class TripGroupsPage {
       return;
     }
     
-    this.pendingMembers.push({ name, email, phone });
+    const newMember = { name, email, phone };
+    this.pendingMembers.push(newMember);
+    console.log('Pending members array:', this.pendingMembers);
+    
     this.renderPendingMembers();
+    this.showToast(`${name} added to the group`, 'success');
     
     // Clear inputs
     nameInput.value = '';
@@ -328,34 +345,57 @@ class TripGroupsPage {
         throw new Error(result.error);
       }
       
+      console.log('Group created:', result.groupId);
+      console.log('Pending members to add:', this.pendingMembers);
+      
       // Add pending members
+      const addedMembers = [];
       for (const member of this.pendingMembers) {
-        await tripGroupsService.addMember(result.groupId, member);
+        console.log('Adding member:', member);
+        const addResult = await tripGroupsService.addMember(result.groupId, member);
+        console.log('Add member result:', addResult);
+        if (addResult.success) {
+          addedMembers.push(member);
+        } else {
+          console.error('Failed to add member:', member.name, addResult.error);
+        }
       }
       
+      console.log('Successfully added members:', addedMembers.length);
+      
       // Send invitation emails to members with valid emails
-      const membersWithEmail = this.pendingMembers.filter(m => m.email);
+      const membersWithEmail = addedMembers.filter(m => m.email && m.email.trim() !== '');
+      console.log('Members with email:', membersWithEmail);
+      
       if (membersWithEmail.length > 0) {
         try {
+          console.log('Sending invitation emails...');
+          const emailPayload = {
+            members: addedMembers,
+            tripName: name,
+            destination: destination,
+            description: description,
+            startDate: startDate,
+            endDate: endDate,
+            creatorName: currentUser.displayName || currentUser.email,
+            creatorEmail: currentUser.email,
+            groupId: result.groupId
+          };
+          console.log('Email payload:', emailPayload);
+          
           const emailResponse = await fetch('/api/send-trip-invitation', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              members: this.pendingMembers,
-              tripName: name,
-              destination: destination,
-              description: description,
-              startDate: startDate,
-              endDate: endDate,
-              creatorName: currentUser.displayName || currentUser.email,
-              creatorEmail: currentUser.email,
-              groupId: result.groupId
-            })
+            body: JSON.stringify(emailPayload)
           });
           
           const emailResult = await emailResponse.json();
-          if (emailResult.sent > 0) {
+          console.log('Email API response:', emailResult);
+          
+          if (emailResult.success && emailResult.sent > 0) {
             this.showToast(`Invitations sent to ${emailResult.sent} member(s)!`, 'success');
+          } else if (emailResult.error) {
+            console.error('Email API error:', emailResult.error);
           }
         } catch (emailError) {
           console.error('Error sending invitation emails:', emailError);
