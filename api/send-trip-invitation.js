@@ -45,6 +45,7 @@ function getDestinationImage(destination) {
 // Generate travel tips based on destination
 function getTravelTips(destination) {
   const tips = {
+    // India - Popular Destinations
     'goa': [
       '🏖️ Best beaches: Palolem, Anjuna, Baga',
       '🍽️ Try local Goan fish curry and bebinca',
@@ -69,11 +70,187 @@ function getTravelTips(destination) {
       '🍛 Savor Dal Baati Churma',
       '🛍️ Shop for handicrafts and textiles'
     ],
-    'paris': [
-      '🗼 Book Eiffel Tower tickets in advance',
-      '🥐 Start mornings with fresh croissants',
-      '🎨 Spend a day at the Louvre',
-      '🚶 Walk along the Seine at sunset'
+    'jaipur': [
+      '🏰 Visit Amber Fort and Hawa Mahal',
+      '📸 Pink City is best explored on foot',
+      '🛍️ Shop at Johari Bazaar for jewelry',
+      '🍛 Try authentic Rajasthani thali'
+    ],
+    'udaipur': [
+      '🏰 Lake Palace and City Palace are must-visits',
+      '🚤 Take a boat ride on Lake Pichola',
+      '🌅 Watch sunset from Sajjangarh Palace',
+      '🎨 Explore local miniature paintings'
+    ],
+    'shimla': [
+      '🚂 Toy train ride is a must experience',
+      '🏔️ Visit Kufri for snow activities',
+      '🛍️ Mall Road for shopping and food',
+      '⛪ Christ Church is iconic'
+    ],
+    'ladakh': [
+      '🏔️ Acclimatize for 1-2 days before activities',
+      '🛵 Bike trip to Khardung La pass',
+      '🏞️ Pangong Lake is breathtaking',
+      '🙏 Visit ancient monasteries'
+    ],
+    'leh': [
+      '🏔️ Take it slow - altitude is high',
+      '🏍️ Rent a Royal Enfield for road trips',
+      '🏞️ Nubra Valley sand dunes are unique',
+      '☕ Try butter tea with locals'
+    ],
+    'rishikesh': [
+      '🧘 Join a yoga or meditation session',
+      '🚣 River rafting in the Ganges',
+      '🌉 Walk across Laxman Jhula',
+      '🍃 It\'s a vegetarian and alcohol-free zone'
+    ],
+    'varanasi': [
+      '🛕 Witness Ganga Aarti at Dashashwamedh Ghat',
+      '🚣 Sunrise boat ride on the Ganges',
+      '🍛 Try local street food at Kachori Gali',
+      '🎭 Explore the narrow ancient lanes'
+    ],
+    'agra': [
+      '🕌 Visit Taj Mahal at sunrise',
+      '🏰 Agra Fort is equally impressive',
+      '🍽️ Try Mughlai cuisine and petha sweets',
+      '📸 Mehtab Bagh for sunset Taj views'
+    ],
+    'mumbai': [
+      '🌊 Marine Drive evening walk is iconic',
+      '🍽️ Street food at Chowpatty Beach',
+      '🎬 Bollywood studio tour',
+      '🚂 Experience local train during off-peak'
+    ],
+    'delhi': [
+      '🏛️ Red Fort and Qutub Minar are must-visits',
+      '🍛 Chandni Chowk for street food paradise',
+      '🛍️ Dilli Haat for handicrafts',
+      '🚇 Metro is the best way to get around'
+    ],
+    'bangalore': [
+      '🌳 Cubbon Park for morning walks',
+      '🍺 Craft beer scene is amazing',
+      '🛍️ MG Road and Brigade Road for shopping',
+      '🍛 Try Bisi Bele Bath and filter coffee'
+    ],
+    'hyderabad': [
+      '🍗 Biryani is a must - try Paradise or Bawarchi',
+      '🏰 Charminar and Golconda Fort',
+      '🛍️ Laad Bazaar for bangles',
+      '🎢 Ramoji Film City for a day out'
+    ],
+    'chennai': [
+      '🏖️ Marina Beach evening stroll',
+      '🛕 Kapaleeshwarar Temple visit',
+      '🍛 Filter coffee and dosa breakfast',
+      '🎭 Catch a Bharatanatyam performance'
+    ],
+    'kolkata': [
+      '🏛️ Victoria Memorial is stunning',
+      '🍛 Try Kathi rolls and mishti doi',
+      '🚃 Ride the iconic yellow trams',
+      '📚 College Street for book lovers'
+    ],
+    'darjeeling': [
+      '🚂 Toy train ride through tea gardens',
+      '🌄 Tiger Hill sunrise view of Kanchenjunga',
+      '☕ Visit tea estates and taste fresh brew',
+      '🏔️ Pleasant weather year-round'
+    ],
+    'sikkim': [
+      '🏔️ Gangtok has stunning Himalayan views',
+      '🙏 Visit Rumtek Monastery',
+      '🌸 Best visited during spring flowers',
+      '📜 Permits needed for some areas'
+    ],
+    'andaman': [
+      '🏝️ Radhanagar Beach is Asia\'s best',
+      '🤿 Scuba diving at Havelock Island',
+      '🏛️ Cellular Jail light and sound show',
+      '🚤 Island hopping is a must'
+    ],
+    'ooty': [
+      '🚂 Nilgiri Mountain Railway experience',
+      '🌹 Botanical Gardens are beautiful',
+      '☕ Fresh tea from local estates',
+      '🏞️ Boat ride at Ooty Lake'
+    ],
+    'coorg': [
+      '☕ Coffee plantation tours',
+      '🌊 Abbey Falls is picturesque',
+      '🍛 Try Kodava cuisine - pandi curry',
+      '🌿 Perfect for nature walks'
+    ],
+    'pondicherry': [
+      '🏛️ French Quarter has colonial charm',
+      '🏖️ Paradise and Serenity beaches',
+      '🧘 Auroville for spiritual experience',
+      '🍷 Try French cafes and bakeries'
+    ],
+    'hampi': [
+      '🏛️ UNESCO World Heritage ruins',
+      '🚲 Rent a bicycle to explore',
+      '🌅 Sunset from Hemakuta Hill',
+      '🛕 Virupaksha Temple is still active'
+    ],
+    'mysore': [
+      '🏰 Mysore Palace lit up at night',
+      '🛍️ Silk sarees and sandalwood',
+      '🍛 Mysore Pak and Masala Dosa',
+      '🏔️ Day trip to Chamundi Hills'
+    ],
+    'amritsar': [
+      '🛕 Golden Temple is breathtaking',
+      '🍛 Langar (free community meal) experience',
+      '🏛️ Jallianwala Bagh memorial',
+      '🍽️ Eat at Kesar Da Dhaba'
+    ],
+    'mcleodganj': [
+      '🙏 Visit the Dalai Lama Temple',
+      '🏔️ Trek to Triund for views',
+      '🍜 Tibetan food - momos and thukpa',
+      '🧘 Meditation and yoga retreats'
+    ],
+    'kasol': [
+      '🏔️ Backpacker paradise in Parvati Valley',
+      '🥾 Trek to Kheerganga hot springs',
+      '🍕 Israeli cafes with great food',
+      '🌿 Peaceful riverside camping'
+    ],
+    'spiti': [
+      '🏔️ High altitude desert valley',
+      '🙏 Key Monastery is iconic',
+      '🚗 Road trip from Manali is epic',
+      '⭐ Best stargazing in India'
+    ],
+    'rann of kutch': [
+      '🌕 White desert during full moon',
+      '🎪 Rann Utsav festival (Nov-Feb)',
+      '🐪 Camel safari experience',
+      '🎨 Local handicrafts and embroidery'
+    ],
+    'meghalaya': [
+      '🌉 Living root bridges trek',
+      '🌧️ Cherrapunji - wettest place on earth',
+      '🏞️ Dawki river crystal clear waters',
+      '🍖 Try Jadoh and smoked meats'
+    ],
+    'arunachal': [
+      '🏔️ Tawang Monastery is stunning',
+      '📜 Inner Line Permit required',
+      '🌸 Best during spring and autumn',
+      '🎭 Rich tribal culture'
+    ],
+    
+    // International - Asia
+    'thailand': [
+      '🛕 Visit Grand Palace in Bangkok',
+      '🏝️ Island hop in Phi Phi or Krabi',
+      '🍜 Street food is a must-try',
+      '🐘 Ethical elephant sanctuaries in Chiang Mai'
     ],
     'bali': [
       '🛕 Visit Tanah Lot and Uluwatu temples',
@@ -81,11 +258,373 @@ function getTravelTips(destination) {
       '🏄 Try surfing at Kuta Beach',
       '🍜 Enjoy local Nasi Goreng'
     ],
-    'thailand': [
-      '🛕 Visit Grand Palace in Bangkok',
-      '🏝️ Island hop in Phi Phi or Krabi',
-      '🍜 Street food is a must-try',
-      '🐘 Ethical elephant sanctuaries in Chiang Mai'
+    'singapore': [
+      '🌳 Gardens by the Bay light show',
+      '🍜 Hawker centers for cheap eats',
+      '🎰 Marina Bay Sands views',
+      '🚇 MRT is efficient and cheap'
+    ],
+    'malaysia': [
+      '🏙️ Petronas Towers in KL',
+      '🍜 Penang street food is legendary',
+      '🏝️ Langkawi for beaches',
+      '🌿 Cameron Highlands for tea'
+    ],
+    'vietnam': [
+      '🏍️ Motorbike is the way to travel',
+      '🍜 Pho and Banh Mi everywhere',
+      '🏞️ Ha Long Bay cruise',
+      '🏮 Hoi An ancient town charm'
+    ],
+    'cambodia': [
+      '🛕 Angkor Wat sunrise is magical',
+      '🎫 Get a 3-day temple pass',
+      '🍜 Try Fish Amok and Lok Lak',
+      '🏛️ Learn about Khmer history'
+    ],
+    'japan': [
+      '🚄 JR Pass for bullet trains',
+      '🌸 Cherry blossoms in spring',
+      '🍣 Sushi and ramen paradise',
+      '🏯 Kyoto temples are serene'
+    ],
+    'tokyo': [
+      '🗼 Shibuya crossing is iconic',
+      '🍣 Tsukiji outer market for sushi',
+      '🎮 Akihabara for anime and gaming',
+      '🚇 Get a Suica card for transport'
+    ],
+    'korea': [
+      '🍖 Korean BBQ is a must',
+      '🏛️ Gyeongbokgung Palace in Seoul',
+      '💄 Myeongdong for K-beauty shopping',
+      '🎤 Try a noraebang (karaoke)'
+    ],
+    'seoul': [
+      '🏛️ Bukchon Hanok Village charm',
+      '🍜 Street food at Gwangjang Market',
+      '🛍️ Hongdae for nightlife',
+      '🚇 T-money card for transport'
+    ],
+    'china': [
+      '🏯 Great Wall is a must-visit',
+      '🍜 Regional cuisines vary greatly',
+      '📱 Download offline maps (no Google)',
+      '💳 WeChat Pay is everywhere'
+    ],
+    'hong kong': [
+      '🌃 Victoria Peak night views',
+      '🍜 Dim sum breakfast tradition',
+      '⛴️ Star Ferry across the harbor',
+      '🛍️ Temple Street night market'
+    ],
+    'maldives': [
+      '🏝️ Overwater villas are dreamy',
+      '🤿 Snorkeling with manta rays',
+      '🌅 Sunset dolphin cruises',
+      '💰 Budget tip: stay on local islands'
+    ],
+    'sri lanka': [
+      '🚂 Scenic train to Ella',
+      '🐘 Elephant safari at Minneriya',
+      '🏖️ Beaches in the south',
+      '☕ Ceylon tea country is beautiful'
+    ],
+    'nepal': [
+      '🏔️ Everest Base Camp trek',
+      '🛕 Pashupatinath Temple in Kathmandu',
+      '🙏 Boudhanath Stupa peace',
+      '🍛 Try Dal Bhat - unlimited refills!'
+    ],
+    'bhutan': [
+      '🏔️ Tiger\'s Nest Monastery trek',
+      '🎫 Daily tourist fee applies',
+      '🙏 Gross National Happiness country',
+      '🏛️ Dzongs are architectural marvels'
+    ],
+    'dubai': [
+      '🏙️ Burj Khalifa views',
+      '🛍️ Dubai Mall is massive',
+      '🏜️ Desert safari with BBQ dinner',
+      '🌴 Palm Jumeirah beach clubs'
+    ],
+    'abu dhabi': [
+      '🕌 Sheikh Zayed Mosque is stunning',
+      '🏎️ Ferrari World for thrill seekers',
+      '🏝️ Yas Island beaches',
+      '🎨 Louvre Abu Dhabi museum'
+    ],
+    
+    // International - Europe
+    'paris': [
+      '🗼 Book Eiffel Tower tickets in advance',
+      '🥐 Start mornings with fresh croissants',
+      '🎨 Spend a day at the Louvre',
+      '🚶 Walk along the Seine at sunset'
+    ],
+    'london': [
+      '🎡 London Eye for city views',
+      '🏛️ British Museum is free',
+      '🚇 Get an Oyster card',
+      '☕ Afternoon tea experience'
+    ],
+    'rome': [
+      '🏛️ Colosseum and Vatican are must-sees',
+      '🍝 Pasta in Trastevere neighborhood',
+      '⛲ Throw a coin in Trevi Fountain',
+      '🚶 Best explored on foot'
+    ],
+    'italy': [
+      '🍕 Pizza in Naples is the original',
+      '🚂 Trains connect major cities well',
+      '🍷 Wine tasting in Tuscany',
+      '🛥️ Venice gondola ride'
+    ],
+    'spain': [
+      '🏛️ Sagrada Familia in Barcelona',
+      '💃 Flamenco show in Seville',
+      '🍷 Tapas hopping is a must',
+      '🌅 Late dinners are normal'
+    ],
+    'barcelona': [
+      '🏛️ Gaudí architecture everywhere',
+      '🏖️ Barceloneta Beach',
+      '🍷 La Boqueria market',
+      '⚽ Camp Nou stadium tour'
+    ],
+    'amsterdam': [
+      '🚲 Rent a bike like locals',
+      '🎨 Van Gogh Museum',
+      '🏠 Canal house architecture',
+      '🌷 Tulips in spring'
+    ],
+    'switzerland': [
+      '🏔️ Swiss Alps are breathtaking',
+      '🚂 Scenic train journeys',
+      '🧀 Fondue and chocolate',
+      '💰 It\'s expensive - budget well'
+    ],
+    'greece': [
+      '🏛️ Acropolis in Athens',
+      '🏝️ Island hop in the Cyclades',
+      '🍽️ Greek salad and souvlaki',
+      '🌅 Santorini sunsets'
+    ],
+    'santorini': [
+      '🌅 Oia sunset is world-famous',
+      '🏊 Red and black sand beaches',
+      '🍷 Local wine tasting',
+      '🚤 Boat trip to volcano'
+    ],
+    'germany': [
+      '🍺 Beer gardens in Munich',
+      '🏰 Neuschwanstein Castle',
+      '🚂 Efficient train network',
+      '🎄 Christmas markets in winter'
+    ],
+    'prague': [
+      '🏰 Prague Castle views',
+      '🍺 Cheapest beer in Europe',
+      '🌉 Charles Bridge at sunrise',
+      '⏰ Astronomical Clock show'
+    ],
+    'vienna': [
+      '🎵 Classical music concerts',
+      '🏛️ Schönbrunn Palace',
+      '☕ Coffee house culture',
+      '🍰 Sachertorte chocolate cake'
+    ],
+    'portugal': [
+      '🏖️ Algarve beaches',
+      '🚃 Lisbon tram rides',
+      '🍷 Port wine in Porto',
+      '🥧 Pastéis de nata everywhere'
+    ],
+    'iceland': [
+      '🌌 Northern Lights (winter)',
+      '♨️ Blue Lagoon geothermal spa',
+      '🚗 Ring Road road trip',
+      '🌋 Volcanic landscapes'
+    ],
+    'norway': [
+      '🏔️ Fjord cruises are stunning',
+      '🌌 Northern Lights in Tromsø',
+      '💰 Very expensive - budget well',
+      '🚂 Flåm Railway scenic route'
+    ],
+    'scotland': [
+      '🏰 Edinburgh Castle',
+      '🥃 Whisky distillery tours',
+      '🏔️ Highlands road trip',
+      '🎒 Isle of Skye is magical'
+    ],
+    'ireland': [
+      '🍀 Dublin pubs and live music',
+      '🏰 Cliffs of Moher',
+      '🥃 Whiskey vs Whisky tour',
+      '🚗 Wild Atlantic Way drive'
+    ],
+    'croatia': [
+      '🏰 Dubrovnik old town (Game of Thrones)',
+      '🏝️ Plitvice Lakes National Park',
+      '🏖️ Island hopping along coast',
+      '🍷 Local wines are great'
+    ],
+    'turkey': [
+      '🎈 Hot air balloon in Cappadocia',
+      '🕌 Hagia Sophia in Istanbul',
+      '🛁 Turkish bath experience',
+      '🍢 Kebabs and baklava'
+    ],
+    'istanbul': [
+      '🕌 Blue Mosque and Hagia Sophia',
+      '🛍️ Grand Bazaar shopping',
+      '🚢 Bosphorus cruise',
+      '☕ Turkish coffee and tea'
+    ],
+    
+    // International - Americas
+    'usa': [
+      '🗽 NYC, LA, and national parks',
+      '🚗 Road trips are the best way',
+      '💳 Tip 15-20% at restaurants',
+      '📱 Get a local SIM card'
+    ],
+    'new york': [
+      '🗽 Statue of Liberty ferry',
+      '🌳 Central Park walks',
+      '🎭 Broadway show',
+      '🍕 Dollar pizza slices'
+    ],
+    'las vegas': [
+      '🎰 Casinos on the Strip',
+      '🏜️ Grand Canyon day trip',
+      '🎪 Free shows on Fremont Street',
+      '🍽️ Buffets are legendary'
+    ],
+    'california': [
+      '🌉 Golden Gate Bridge in SF',
+      '🎬 Hollywood in LA',
+      '🏖️ San Diego beaches',
+      '🍷 Napa Valley wine country'
+    ],
+    'hawaii': [
+      '🏖️ Waikiki Beach in Oahu',
+      '🌋 Volcanoes National Park',
+      '🤙 Learn to surf',
+      '🌺 Luau dinner show'
+    ],
+    'canada': [
+      '🍁 Niagara Falls',
+      '🏔️ Banff National Park',
+      '🏙️ Toronto and Vancouver',
+      '🦫 Wildlife spotting'
+    ],
+    'mexico': [
+      '🏖️ Cancun and Riviera Maya',
+      '🏛️ Mayan ruins at Chichen Itza',
+      '🌮 Tacos and tequila',
+      '🎨 Mexico City culture'
+    ],
+    'brazil': [
+      '🗿 Christ the Redeemer in Rio',
+      '🏖️ Copacabana Beach',
+      '🌴 Amazon rainforest',
+      '💃 Samba and Carnival'
+    ],
+    'peru': [
+      '🏔️ Machu Picchu trek',
+      '🍽️ Ceviche in Lima',
+      '🦙 Llamas everywhere',
+      '🏞️ Sacred Valley'
+    ],
+    'argentina': [
+      '💃 Tango in Buenos Aires',
+      '🥩 Best steaks in the world',
+      '🏔️ Patagonia glaciers',
+      '🍷 Mendoza wine region'
+    ],
+    
+    // International - Africa & Oceania
+    'australia': [
+      '🏖️ Bondi Beach in Sydney',
+      '🐨 Wildlife is unique',
+      '🏜️ Uluru in the outback',
+      '🤿 Great Barrier Reef snorkeling'
+    ],
+    'sydney': [
+      '🏛️ Opera House and Harbour Bridge',
+      '🏖️ Bondi to Coogee walk',
+      '🐨 Taronga Zoo',
+      '🚢 Ferry rides are scenic'
+    ],
+    'new zealand': [
+      '🏔️ Lord of the Rings landscapes',
+      '🚗 Road trip both islands',
+      '🪂 Adventure sports capital',
+      '🥝 Kiwi bird spotting'
+    ],
+    'south africa': [
+      '🦁 Safari in Kruger National Park',
+      '🏔️ Table Mountain in Cape Town',
+      '🍷 Stellenbosch wine region',
+      '🐧 Penguins at Boulders Beach'
+    ],
+    'egypt': [
+      '🏛️ Pyramids of Giza',
+      '🚢 Nile River cruise',
+      '🏛️ Luxor temples',
+      '🐪 Camel ride in the desert'
+    ],
+    'morocco': [
+      '🏜️ Sahara desert camping',
+      '🛍️ Marrakech souks',
+      '🍵 Mint tea everywhere',
+      '🏛️ Blue city of Chefchaouen'
+    ],
+    'kenya': [
+      '🦁 Masai Mara safari',
+      '🐘 Big Five wildlife',
+      '🏖️ Mombasa beaches',
+      '👥 Maasai village visit'
+    ],
+    'tanzania': [
+      '🏔️ Mount Kilimanjaro',
+      '🦁 Serengeti migration',
+      '🏝️ Zanzibar beaches',
+      '🐘 Ngorongoro Crater'
+    ],
+    'mauritius': [
+      '🏖️ Beautiful beaches everywhere',
+      '🌊 Water sports paradise',
+      '🌈 Seven Colored Earths',
+      '🍛 Creole cuisine'
+    ],
+    'seychelles': [
+      '🏝️ Pristine beaches',
+      '🐢 Giant tortoises',
+      '🤿 Snorkeling paradise',
+      '💰 Luxury but worth it'
+    ],
+    
+    // Generic categories
+    'beach': [
+      '🏖️ Pack reef-safe sunscreen',
+      '🤿 Snorkeling gear often rentable',
+      '🌅 Sunrise and sunset are magical',
+      '💧 Stay hydrated in the sun'
+    ],
+    'mountain': [
+      '🏔️ Acclimatize before high altitude',
+      '🧥 Layer your clothing',
+      '🥾 Good hiking boots essential',
+      '📸 Golden hour photos are best'
+    ],
+    'city': [
+      '🚇 Public transport saves money',
+      '🚶 Walking tours are great intros',
+      '🍽️ Eat where locals eat',
+      '📱 Download offline maps'
     ],
     'default': [
       '📱 Download offline maps before you go',
