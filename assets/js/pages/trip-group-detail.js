@@ -26,23 +26,25 @@ class TripGroupDetailPage {
       return;
     }
     
-    await this.waitForAuth();
+    const user = await this.waitForAuth();
+    if (!user) return; // Redirecting to login
+    
     this.currentUserId = authService.getCurrentUser()?.uid;
     this.bindEvents();
     await this.loadGroupData();
   }
 
   async waitForAuth() {
-    return new Promise((resolve) => {
-      const checkAuth = () => {
-        if (authService.getCurrentUser()) {
-          resolve();
-        } else {
-          setTimeout(checkAuth, 100);
-        }
-      };
-      checkAuth();
-    });
+    // Wait for auth service to initialize
+    const user = await authService.waitForAuth();
+    
+    if (!user) {
+      // Not logged in, redirect to login
+      window.location.href = 'login.html';
+      return null;
+    }
+    
+    return user;
   }
 
   bindEvents() {

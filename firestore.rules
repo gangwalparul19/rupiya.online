@@ -34,12 +34,20 @@ service cloud.firestore {
              request.resource.data.updatedAt is timestamp;
     }
     
+    // Helper function to check if user is an admin
+    function isAdmin() {
+      return isAuthenticated() && 
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+    }
+    
     // ============================================
     // USER PROFILES
     // ============================================
     match /users/{userId} {
-      // Users can only read and write their own profile
-      allow read: if isOwner(userId);
+      // Users can read and write their own profile
+      // Admins can read all user profiles for analytics
+      allow read: if isOwner(userId) || isAdmin();
       allow create: if isOwner(userId);
       allow update: if isOwner(userId);
       allow delete: if isOwner(userId);
@@ -58,7 +66,8 @@ service cloud.firestore {
       }
       
       // Users can read their own expenses OR family members' expenses
-      allow read: if belongsToUser() || isFamilyMember();
+      // Admins can read all expenses for analytics
+      allow read: if belongsToUser() || isFamilyMember() || isAdmin();
       allow create: if isAuthenticated() && hasValidUserId();
       allow update: if belongsToUser() && userIdNotChanged();
       allow delete: if belongsToUser();
@@ -77,7 +86,8 @@ service cloud.firestore {
       }
       
       // Users can read their own income OR family members' income
-      allow read: if belongsToUser() || isFamilyMember();
+      // Admins can read all income for analytics
+      allow read: if belongsToUser() || isFamilyMember() || isAdmin();
       allow create: if isAuthenticated() && hasValidUserId();
       allow update: if belongsToUser() && userIdNotChanged();
       allow delete: if belongsToUser();

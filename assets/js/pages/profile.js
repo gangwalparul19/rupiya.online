@@ -20,7 +20,7 @@ let isGoogleUser = false;
 
 // DOM Elements
 let profileForm, passwordForm, preferencesForm;
-let displayNameInput, emailInput, phoneInput;
+let displayNameInput, emailInput, phoneInput, cityInput, countryInput;
 let currentPasswordInput, newPasswordInput, confirmPasswordInput;
 let weeklyReportEnabledCheckbox, monthlyReportEnabledCheckbox;
 let exportDataBtn, deleteAccountBtn;
@@ -58,6 +58,8 @@ function initDOMElements() {
   displayNameInput = document.getElementById('displayName');
   emailInput = document.getElementById('email');
   phoneInput = document.getElementById('phone');
+  cityInput = document.getElementById('city');
+  countryInput = document.getElementById('country');
   
   currentPasswordInput = document.getElementById('currentPassword');
   newPasswordInput = document.getElementById('newPassword');
@@ -232,11 +234,19 @@ function loadUserProfile(user) {
 async function loadPhoneNumber() {
   try {
     const result = await firestoreService.get('users', currentUser.uid);
-    if (result.success && result.data && result.data.phoneNumber) {
-      phoneInput.value = result.data.phoneNumber;
+    if (result.success && result.data) {
+      if (result.data.phoneNumber) {
+        phoneInput.value = result.data.phoneNumber;
+      }
+      if (result.data.city && cityInput) {
+        cityInput.value = result.data.city;
+      }
+      if (result.data.country && countryInput) {
+        countryInput.value = result.data.country;
+      }
     }
   } catch (error) {
-    console.error('Error loading phone number:', error);
+    console.error('Error loading user data:', error);
   }
 }
 
@@ -284,15 +294,19 @@ async function handleProfileUpdate(e) {
   try {
     const displayName = displayNameInput.value.trim();
     const phoneNumber = phoneInput.value.trim();
+    const city = cityInput?.value.trim() || '';
+    const country = countryInput?.value.trim() || '';
 
     // Update Firebase Auth profile
     await updateProfile(currentUser, { displayName });
 
-    // Save phone number to Firestore (Firebase Auth doesn't support phone in updateProfile)
+    // Save profile data to Firestore
     const userProfileData = {
       displayName: displayName,
       email: currentUser.email,
       phoneNumber: phoneNumber,
+      city: city,
+      country: country,
       userId: currentUser.uid,
       updatedAt: Timestamp.now()
     };

@@ -14,7 +14,29 @@
  * - Quick search with Cmd/Ctrl+K shortcut
  * - Auto-expands section containing current page
  * - Mobile responsive with hamburger menu
+ * - Admin-only sections (hidden for non-admin users)
  */
+
+import { db } from '../config/firebase-config.js';
+import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+import authService from '../services/auth-service.js';
+
+// Check if current user is admin
+async function checkIsAdmin() {
+  try {
+    const user = authService.getCurrentUser();
+    if (!user) return false;
+    
+    const userDoc = await getDoc(doc(db, 'users', user.uid));
+    if (userDoc.exists()) {
+      return userDoc.data().isAdmin === true;
+    }
+    return false;
+  } catch (error) {
+    console.error('Error checking admin status:', error);
+    return false;
+  }
+}
 
 // Navigation configuration - edit this to update nav across all pages
 const navigationConfig = {
@@ -88,6 +110,16 @@ const navigationConfig = {
       items: [
         { href: 'family.html', icon: '👨‍👩‍👧‍👦', label: 'Family Groups' }
       ]
+    },
+    {
+      id: 'admin',
+      title: 'Admin',
+      icon: '🔐',
+      expanded: false,
+      adminOnly: true,
+      items: [
+        { href: 'admin.html', icon: '📊', label: 'Admin Dashboard' }
+      ]
     }
   ]
 };
@@ -119,7 +151,7 @@ function saveSectionState(sectionId, expanded) {
 }
 
 // Generate sidebar HTML
-function generateSidebarHTML() {
+function generateSidebarHTML(isAdmin = false) {
   const currentPage = getCurrentPage();
   const sectionState = getSectionState();
   
@@ -134,6 +166,11 @@ function generateSidebarHTML() {
   let navHTML = '';
   
   navigationConfig.sections.forEach(section => {
+    // Skip admin-only sections for non-admin users
+    if (section.adminOnly && !isAdmin) {
+      return;
+    }
+    
     // Determine if section should be expanded
     const isCurrentSection = section.id === currentSection;
     const savedState = sectionState[section.id];
@@ -189,7 +226,7 @@ function generateQuickSearchHTML() {
 }
 
 // Initialize sidebar
-export function initSidebar() {
+export async function initSidebar() {
   const sidebar = document.getElementById('sidebar');
   if (!sidebar) return;
 
@@ -197,14 +234,17 @@ export function initSidebar() {
   const sidebarNav = sidebar.querySelector('.sidebar-nav');
   if (!sidebarNav) return;
 
+  // Check if user is admin
+  const isAdmin = await checkIsAdmin();
+
   // Generate and inject navigation
-  sidebarNav.innerHTML = generateQuickSearchHTML() + generateSidebarHTML();
+  sidebarNav.innerHTML = generateQuickSearchHTML() + generateSidebarHTML(isAdmin);
 
   // Setup section toggle handlers
   setupSectionToggles();
   
   // Setup quick search
-  setupQuickSearch();
+  setupQuickSearch(isAdmin);
   
   // Setup sidebar toggle for mobile
   setupMobileSidebar();
@@ -229,15 +269,17 @@ function setupSectionToggles() {
 }
 
 // Setup quick search functionality
-function setupQuickSearch() {
+function setupQuickSearch(isAdmin = false) {
   const searchInput = document.getElementById('navQuickSearch');
   const resultsContainer = document.getElementById('quickSearchResults');
   
   if (!searchInput || !resultsContainer) return;
 
-  // Flatten all nav items for search
+  // Flatten all nav items for search (excluding admin-only for non-admins)
   const allItems = [];
   navigationConfig.sections.forEach(section => {
+    if (section.adminOnly && !isAdmin) return;
+    
     section.items.forEach(item => {
       allItems.push({
         ...item,
