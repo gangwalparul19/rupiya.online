@@ -52,9 +52,26 @@
       transition: all 0.3s ease;
     }
     
+    .demo-banner .btn.btn-secondary {
+      background: rgba(255,255,255,0.2);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.4);
+    }
+    
     .demo-banner .btn:hover {
       transform: scale(1.05);
       box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    
+    .demo-banner .btn.btn-secondary:hover {
+      background: rgba(255,255,255,0.3);
+    }
+    
+    .demo-banner-buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
     }
 
     .demo-content {
@@ -369,6 +386,13 @@
       .demo-header h1 {
         font-size: 1.5rem;
       }
+      
+      /* EMI Summary - 2 per row on mobile */
+      .demo-emi-summary {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
     }
 
     @media (max-width: 480px) {
@@ -402,15 +426,38 @@
         gap: 12px;
         padding: 12px 16px;
       }
+      
+      .demo-banner-buttons {
+        gap: 8px;
+      }
+      
+      .demo-banner .btn {
+        padding: 6px 14px;
+        font-size: 11px;
+      }
 
       .demo-features-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 12px;
       }
 
+      /* EMI Summary - 2 per row on mobile */
       .demo-emi-summary {
-        flex-direction: column;
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
         gap: 8px;
+      }
+      
+      .demo-emi-stat {
+        padding: 10px 8px;
+      }
+      
+      .demo-emi-label {
+        font-size: 0.65rem;
+      }
+      
+      .demo-emi-value {
+        font-size: 0.9rem;
       }
     }
   </style>
@@ -419,7 +466,11 @@
   <!-- Demo Banner -->
   <div class="demo-banner">
     <span class="demo-banner-text">🎯 <strong>Demo Mode</strong> - This is sample data. Sign up to track your own finances!</span>
-    <a href="signup.html" class="btn">Sign Up Free</a>
+    <div class="demo-banner-buttons">
+      <a href="signup.html" class="btn">Sign Up Free</a>
+      <a href="user-guide.html" class="btn btn-secondary">📖 User Guide</a>
+      <a href="index.html" class="btn btn-secondary">🏠 Home</a>
+    </div>
   </div>
 
   <!-- Demo Content -->
@@ -892,8 +943,6 @@
       </div>
       <div class="demo-cta-buttons">
         <a href="signup.html" class="btn-primary">Create Free Account</a>
-        <a href="user-guide.html" class="btn-outline">📖 User Guide</a>
-        <a href="index.html" class="btn-outline">Back to Home</a>
       </div>
     </div>
   </div>

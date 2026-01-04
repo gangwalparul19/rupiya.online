@@ -1403,6 +1403,11 @@
     grid-template-columns: repeat(2, 1fr);
   }
   
+  /* Features compact - 3 per row on tablet */
+  .features-grid.compact {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
   .footer-content {
     grid-template-columns: 1fr 1fr;
   }
@@ -1610,7 +1615,7 @@
 
 .features-grid.compact {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
   max-width: 1200px;
   margin: 0 auto;
@@ -1713,24 +1718,27 @@
    ============================================ */
 
 .steps-compact {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-  max-width: 800px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  max-width: 900px;
   margin: 0 auto;
 }
 
 .step-compact {
   text-align: center;
-  padding: 1.5rem;
+  padding: 2rem 1.5rem;
   background: var(--white);
   border-radius: 1rem;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-  flex: 1;
-  min-width: 150px;
-  max-width: 200px;
+  transition: all 0.3s ease;
+  border: 2px solid var(--border-color);
+}
+
+.step-compact:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  border-color: var(--primary-blue);
 }
 
 .step-num {
@@ -1988,34 +1996,38 @@
     font-size: 0.75rem;
   }
   
-  /* Steps - stack on mobile */
+  /* Steps - 3 cards in a row on tablet, stack on mobile */
   .steps-compact {
-    flex-direction: column;
+    grid-template-columns: repeat(3, 1fr);
     gap: 0.75rem;
   }
   
   .step-compact {
-    width: 100%;
-    max-width: 100%;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    text-align: left;
-    padding: 1rem;
+    padding: 1.25rem 1rem;
   }
   
   .step-num {
-    margin: 0;
-    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .step-compact h4 {
+    font-size: 0.875rem;
+  }
+  
+  .step-compact p {
+    font-size: 0.75rem;
   }
   
   .step-arrow {
     display: none;
   }
   
-  /* Benefits - 2 per row */
+  /* Benefits - 3 per row on tablet */
   .benefits-grid-compact {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 0.75rem;
   }
   
@@ -2099,12 +2111,50 @@
     line-height: 1.3;
   }
   
+  /* Steps - 3 per row even on small mobile */
+  .steps-compact {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+  }
+  
+  .step-compact {
+    padding: 1rem 0.5rem;
+  }
+  
+  .step-num {
+    width: 32px;
+    height: 32px;
+    font-size: 0.875rem;
+  }
+  
+  .step-compact h4 {
+    font-size: 0.75rem;
+  }
+  
+  .step-compact p {
+    font-size: 0.65rem;
+  }
+  
+  /* Benefits - 3 per row on small mobile */
   .benefits-grid-compact {
+    grid-template-columns: repeat(3, 1fr);
     gap: 0.5rem;
   }
   
   .benefit-compact {
     padding: 0.75rem 0.5rem;
+  }
+  
+  .benefit-emoji {
+    font-size: 1.25rem;
+  }
+  
+  .benefit-compact h4 {
+    font-size: 0.7rem;
+  }
+  
+  .benefit-compact p {
+    font-size: 0.6rem;
   }
   
   .preview-features {

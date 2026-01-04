@@ -13,37 +13,43 @@ const SETUP_STEPS = [
     id: 'welcome',
     title: 'Welcome to Rupiya! 🎉',
     subtitle: 'Let\'s set up your account in just a few minutes',
-    icon: '👋'
+    icon: '👋',
+    shortTitle: 'Welcome'
   },
   {
     id: 'payment-methods',
     title: 'Add Payment Methods',
     subtitle: 'Add your cards, UPI, and bank accounts',
-    icon: '💳'
+    icon: '💳',
+    shortTitle: 'Payments'
   },
   {
     id: 'categories',
     title: 'Customize Categories',
     subtitle: 'Set up expense and income categories',
-    icon: '🏷️'
+    icon: '🏷️',
+    shortTitle: 'Categories'
   },
   {
     id: 'budget-template',
     title: 'Choose Budget Style',
     subtitle: 'Select a template that matches your lifestyle',
-    icon: '📊'
+    icon: '📊',
+    shortTitle: 'Budget'
   },
   {
     id: 'assets',
     title: 'Add Your Assets',
     subtitle: 'Properties, vehicles, and house help (optional)',
-    icon: '🏠'
+    icon: '🏠',
+    shortTitle: 'Assets'
   },
   {
     id: 'complete',
     title: 'You\'re All Set! 🚀',
     subtitle: 'Start tracking your finances',
-    icon: '✅'
+    icon: '✅',
+    shortTitle: 'Done'
   }
 ];
 
@@ -101,20 +107,58 @@ class SetupWizard {
     this.wizardEl.className = 'setup-wizard-overlay';
     this.wizardEl.innerHTML = `
       <div class="setup-wizard-container">
+        <!-- Mobile Header with Navigation -->
+        <div class="setup-wizard-header">
+          <button class="setup-header-btn setup-prev-btn" id="setupHeaderPrev" disabled>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M15 18l-6-6 6-6"/>
+            </svg>
+          </button>
+          <div class="setup-header-title">
+            <span class="setup-header-step">Step <span id="currentStepNum">1</span> of ${SETUP_STEPS.length}</span>
+            <h3 id="setupHeaderText">${SETUP_STEPS[0].shortTitle}</h3>
+          </div>
+          <button class="setup-header-btn setup-next-btn" id="setupHeaderNext">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 18l6-6-6-6"/>
+            </svg>
+          </button>
+        </div>
+        
+        <!-- Progress Tabs - Clickable -->
         <div class="setup-wizard-progress">
           ${SETUP_STEPS.map((step, i) => `
-            <div class="setup-progress-step ${i === 0 ? 'active' : ''}" data-step="${i}">
+            <div class="setup-progress-step ${i === 0 ? 'active' : ''} ${i === 0 ? 'clickable' : ''}" data-step="${i}" role="button" tabindex="0">
               <div class="setup-progress-dot">${step.icon}</div>
-              <span class="setup-progress-label">${step.title.split(' ')[0]}</span>
+              <span class="setup-progress-label">${step.shortTitle}</span>
             </div>
           `).join('')}
         </div>
+        
+        <!-- Content Area -->
         <div class="setup-wizard-content" id="setupWizardContent"></div>
+        
+        <!-- Footer -->
         <div class="setup-wizard-footer">
-          <button class="btn btn-outline" id="setupSkipBtn">Skip Setup</button>
+          <button class="btn btn-outline setup-skip-btn" id="setupSkipBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 6L6 18M6 6l12 12"/>
+            </svg>
+            Skip Setup
+          </button>
           <div class="setup-wizard-nav">
-            <button class="btn btn-outline" id="setupPrevBtn" style="display: none;">Back</button>
-            <button class="btn btn-primary" id="setupNextBtn">Next</button>
+            <button class="btn btn-outline" id="setupPrevBtn" style="display: none;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M15 18l-6-6 6-6"/>
+              </svg>
+              Back
+            </button>
+            <button class="btn btn-primary" id="setupNextBtn">
+              Next
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 18l6-6-6-6"/>
+              </svg>
+            </button>
           </div>
         </div>
       </div>
@@ -125,9 +169,33 @@ class SetupWizard {
   }
 
   bindEvents() {
+    // Footer navigation
     document.getElementById('setupNextBtn')?.addEventListener('click', () => this.nextStep());
     document.getElementById('setupPrevBtn')?.addEventListener('click', () => this.prevStep());
     document.getElementById('setupSkipBtn')?.addEventListener('click', () => this.skipSetup());
+    
+    // Header navigation (mobile)
+    document.getElementById('setupHeaderNext')?.addEventListener('click', () => this.nextStep());
+    document.getElementById('setupHeaderPrev')?.addEventListener('click', () => this.prevStep());
+    
+    // Clickable progress tabs
+    document.querySelectorAll('.setup-progress-step').forEach(el => {
+      el.addEventListener('click', () => this.goToStep(parseInt(el.dataset.step)));
+      el.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          this.goToStep(parseInt(el.dataset.step));
+        }
+      });
+    });
+  }
+
+  goToStep(stepIndex) {
+    // Only allow going to completed steps or the next available step
+    if (stepIndex <= this.currentStep || stepIndex === this.currentStep + 1) {
+      this.currentStep = stepIndex;
+      this.renderStep();
+    }
   }
 
   renderStep() {
@@ -136,21 +204,52 @@ class SetupWizard {
     const prevBtn = document.getElementById('setupPrevBtn');
     const nextBtn = document.getElementById('setupNextBtn');
     const skipBtn = document.getElementById('setupSkipBtn');
+    const headerPrev = document.getElementById('setupHeaderPrev');
+    const headerNext = document.getElementById('setupHeaderNext');
+    const headerText = document.getElementById('setupHeaderText');
+    const currentStepNum = document.getElementById('currentStepNum');
 
-    // Update progress
+    // Update header
+    if (headerText) headerText.textContent = step.shortTitle;
+    if (currentStepNum) currentStepNum.textContent = this.currentStep + 1;
+    
+    // Update header navigation
+    if (headerPrev) {
+      headerPrev.disabled = this.currentStep === 0;
+    }
+    if (headerNext) {
+      headerNext.disabled = this.currentStep === SETUP_STEPS.length - 1;
+      if (this.currentStep === SETUP_STEPS.length - 1) {
+        headerNext.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>`;
+      } else {
+        headerNext.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>`;
+      }
+    }
+
+    // Update progress tabs
     document.querySelectorAll('.setup-progress-step').forEach((el, i) => {
       el.classList.toggle('active', i === this.currentStep);
       el.classList.toggle('completed', i < this.currentStep);
+      el.classList.toggle('clickable', i <= this.currentStep);
     });
 
-    // Update buttons
-    prevBtn.style.display = this.currentStep > 0 ? 'block' : 'none';
-    nextBtn.textContent = this.currentStep === SETUP_STEPS.length - 1 ? 'Get Started' : 'Next';
-    skipBtn.style.display = this.currentStep === SETUP_STEPS.length - 1 ? 'none' : 'block';
+    // Update footer buttons
+    prevBtn.style.display = this.currentStep > 0 ? 'flex' : 'none';
+    
+    if (this.currentStep === SETUP_STEPS.length - 1) {
+      nextBtn.innerHTML = `Get Started <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>`;
+      skipBtn.style.display = 'none';
+    } else {
+      nextBtn.innerHTML = `Next <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>`;
+      skipBtn.style.display = 'flex';
+    }
 
     // Render step content
     content.innerHTML = this.getStepContent(step.id);
     this.bindStepEvents(step.id);
+    
+    // Scroll content to top
+    content.scrollTop = 0;
   }
 
   getStepContent(stepId) {
