@@ -27,6 +27,9 @@
   <link rel="stylesheet" href="assets/css/ux-enhancements.css">
   <link rel="stylesheet" href="assets/css/sidebar.css">
   <link rel="stylesheet" href="assets/css/setup-wizard.css">
+  
+  <!-- Auth Guard - Must be loaded early to prevent flash of protected content -->
+  <script src="assets/js/utils/auth-guard.js"></script>
 </head>
 <body>
   <div class="dashboard-layout">
@@ -71,15 +74,18 @@
     <main class="main-content">
       <!-- Mobile Header -->
       <div class="mobile-header">
-        <button class="sidebar-toggle" id="sidebarOpen">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-          </svg>
-        </button>
-        <div class="sidebar-logo">
-          <img src="assets/images/logo.png" alt="Rupiya" style="height: 32px;">
+        <a href="dashboard.html" class="mobile-brand">
+          <img src="assets/images/logo.png" alt="Rupiya">
+          <span class="brand-name">Rupiya</span>
+        </a>
+        <div class="mobile-header-actions">
+          <div id="familySwitcherContainer"></div>
+          <button class="sidebar-toggle" id="sidebarOpen">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+          </button>
         </div>
-        <div id="familySwitcherContainer"></div>
       </div>
 
       <!-- Page Header -->
@@ -89,6 +95,14 @@
           <p class="page-subtitle" id="recurringSubtitle">Manage your recurring expenses and income</p>
         </div>
         <div class="page-actions">
+          <!-- Desktop Family Switcher -->
+          <div id="familySwitcherContainerDesktop"></div>
+          <button class="btn btn-outline" id="processNowBtn" title="Process due recurring transactions now">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+            </svg>
+            Process Now
+          </button>
           <button class="btn btn-primary" id="addRecurringBtn">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -206,6 +220,18 @@
                 <option value="paused">Paused</option>
               </select>
               <span class="error-message" id="statusError"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="paymentMethod">Payment Method</label>
+              <select id="paymentMethod">
+                <option value="cash">Cash</option>
+                <option value="card">Card</option>
+                <option value="upi">UPI</option>
+                <option value="bank">Bank Transfer</option>
+                <option value="wallet">Digital Wallet</option>
+              </select>
+              <span class="error-message" id="paymentMethodError"></span>
             </div>
 
             <div class="form-group form-group-full">

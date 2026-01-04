@@ -5,6 +5,7 @@ import categoriesService from '../services/categories-service.js';
 import familySwitcher from '../components/family-switcher.js';
 import toast from '../components/toast.js';
 import themeManager from '../utils/theme-manager.js';
+import recurringProcessor from '../services/recurring-processor.js';
 import { formatCurrency, formatDate } from '../utils/helpers.js';
 
 // Helper function for toast
@@ -18,6 +19,7 @@ let editingRecurringId = null;
 let addRecurringBtn, addRecurringSection, closeFormBtn, cancelFormBtn;
 let recurringForm, formTitle, saveFormBtn, saveFormBtnText, saveFormBtnSpinner;
 let recurringList, emptyState, loadingState;
+let processNowBtn;
 let monthlyExpensesEl, monthlyIncomeEl, activeCountEl;
 let deleteModal, closeDeleteModalBtn, cancelDeleteBtn, confirmDeleteBtn;
 let deleteBtnText, deleteBtnSpinner, deleteRecurringDescription, deleteRecurringAmount;
@@ -96,6 +98,7 @@ async function loadCategoryDropdown() {
 // Initialize DOM elements
 function initDOMElements() {
   addRecurringBtn = document.getElementById('addRecurringBtn');
+  processNowBtn = document.getElementById('processNowBtn');
   addRecurringSection = document.getElementById('addRecurringSection');
   closeFormBtn = document.getElementById('closeFormBtn');
   cancelFormBtn = document.getElementById('cancelFormBtn');
@@ -152,10 +155,51 @@ function setupEventListeners() {
   cancelFormBtn.addEventListener('click', hideForm);
   recurringForm.addEventListener('submit', handleSubmit);
 
+  // Process now button
+  processNowBtn?.addEventListener('click', handleProcessNow);
+
   // Delete modal
   closeDeleteModalBtn.addEventListener('click', hideDeleteModal);
   cancelDeleteBtn.addEventListener('click', hideDeleteModal);
   confirmDeleteBtn.addEventListener('click', handleDelete);
+}
+
+// Handle process now button click
+async function handleProcessNow() {
+  processNowBtn.disabled = true;
+  processNowBtn.innerHTML = `
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="spin">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+    </svg>
+    Processing...
+  `;
+
+  try {
+    // Force process regardless of daily check
+    recurringProcessor.resetProcessingFlag();
+    const result = await recurringProcessor.processRecurring(true);
+
+    if (result.processed > 0) {
+      showToast(`✅ Created ${result.processed} transaction(s) from recurring entries`, 'success');
+      // Reload the list to show updated lastProcessedDate
+      await loadRecurringTransactions();
+    } else if (result.error) {
+      showToast(`Error: ${result.error}`, 'error');
+    } else {
+      showToast('No transactions due for processing', 'info');
+    }
+  } catch (error) {
+    console.error('Error processing recurring:', error);
+    showToast('Failed to process recurring transactions', 'error');
+  } finally {
+    processNowBtn.disabled = false;
+    processNowBtn.innerHTML = `
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+      </svg>
+      Process Now
+    `;
+  }
 }
 
 // Load user profile
@@ -210,6 +254,7 @@ function showEditForm(recurring) {
   document.getElementById('startDate').value = formatDateForInput(recurring.startDate);
   document.getElementById('endDate').value = recurring.endDate ? formatDateForInput(recurring.endDate) : '';
   document.getElementById('status').value = recurring.status;
+  document.getElementById('paymentMethod').value = recurring.paymentMethod || 'cash';
   document.getElementById('notes').value = recurring.notes || '';
 
   addRecurringSection.classList.add('show');
@@ -230,6 +275,7 @@ async function handleSubmit(e) {
     startDate: new Date(document.getElementById('startDate').value),
     endDate: document.getElementById('endDate').value ? new Date(document.getElementById('endDate').value) : null,
     status: document.getElementById('status').value,
+    paymentMethod: document.getElementById('paymentMethod')?.value || 'cash',
     notes: document.getElementById('notes').value
   };
 
@@ -314,6 +360,14 @@ function createRecurringCard(recurring) {
 
   const nextDate = calculateNextDate(recurring);
   const monthlyAmount = calculateMonthlyAmount(recurring);
+  const paymentMethodIcons = {
+    cash: '💵',
+    card: '💳',
+    upi: '📱',
+    bank: '🏦',
+    wallet: '👛'
+  };
+  const paymentIcon = paymentMethodIcons[recurring.paymentMethod] || '💰';
 
   card.innerHTML = `
     <div class="recurring-header">
@@ -346,8 +400,8 @@ function createRecurringCard(recurring) {
         <span class="recurring-detail-value">${capitalizeFirst(recurring.frequency)}</span>
       </div>
       <div class="recurring-detail">
-        <span class="recurring-detail-label">Monthly Amount</span>
-        <span class="recurring-detail-value">${formatCurrency(monthlyAmount)}</span>
+        <span class="recurring-detail-label">Payment</span>
+        <span class="recurring-detail-value">${paymentIcon} ${capitalizeFirst(recurring.paymentMethod || 'cash')}</span>
       </div>
       <div class="recurring-detail">
         <span class="recurring-detail-label">Status</span>

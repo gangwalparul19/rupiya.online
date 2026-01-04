@@ -20,6 +20,36 @@ const validationRules = {
   password: ['required', 'password:6']
 };
 
+// Get redirect URL after login (checks for pending invitations)
+function getRedirectUrl() {
+  try {
+    // Check for pending invitation first
+    const pendingInvitation = localStorage.getItem('rupiya_pending_invitation');
+    if (pendingInvitation) {
+      localStorage.removeItem('rupiya_pending_invitation');
+      localStorage.removeItem('rupiya_redirect_url');
+      return `family.html?invitation=${pendingInvitation}`;
+    }
+    
+    // Check for stored redirect URL
+    const redirectUrl = localStorage.getItem('rupiya_redirect_url');
+    if (redirectUrl) {
+      localStorage.removeItem('rupiya_redirect_url');
+      // Extract just the path and query from the full URL
+      try {
+        const url = new URL(redirectUrl);
+        return url.pathname.replace(/^\//, '') + url.search;
+      } catch (e) {
+        return 'dashboard.html';
+      }
+    }
+    
+    return 'dashboard.html';
+  } catch (e) {
+    return 'dashboard.html';
+  }
+}
+
 // Setup real-time validation
 setupRealtimeValidation(loginForm, validationRules);
 
@@ -63,8 +93,9 @@ loginForm.addEventListener('submit', async (e) => {
     
     if (result.success) {
       toast.success('Login successful! Redirecting...');
+      const redirectUrl = getRedirectUrl();
       setTimeout(() => {
-        window.location.href = 'dashboard.html';
+        window.location.href = redirectUrl;
       }, 1000);
     } else {
       toast.error(result.error);
@@ -90,8 +121,9 @@ googleSignInBtn.addEventListener('click', async () => {
     
     if (result.success) {
       toast.success('Login successful! Redirecting...');
+      const redirectUrl = getRedirectUrl();
       setTimeout(() => {
-        window.location.href = 'dashboard.html';
+        window.location.href = redirectUrl;
       }, 1000);
     } else {
       toast.error(result.error);

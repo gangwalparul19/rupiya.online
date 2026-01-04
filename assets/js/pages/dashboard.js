@@ -8,6 +8,7 @@ import themeManager from '../utils/theme-manager.js';
 import gamificationService from '../services/gamification-service.js';
 import gamificationUI from '../components/gamification-ui.js';
 import setupWizard from '../components/setup-wizard.js';
+import recurringProcessor from '../services/recurring-processor.js';
 import { formatCurrency, formatCurrencyCompact, formatDate, getRelativeTime, escapeHtml } from '../utils/helpers.js';
 
 // Check authentication
@@ -118,6 +119,9 @@ async function initDashboard() {
     // Initialize PWA install banner
     initPWAInstallBanner();
     
+    // Process recurring transactions (runs once per day)
+    await processRecurringTransactions();
+    
     // Load gamification data
     await loadGamificationWidget();
     
@@ -126,6 +130,24 @@ async function initDashboard() {
     
     // Load dashboard data
     await loadDashboardData();
+  }
+}
+
+// Process recurring transactions
+async function processRecurringTransactions() {
+  try {
+    const result = await recurringProcessor.processRecurring();
+    
+    if (result.processed > 0) {
+      console.log(`[Dashboard] Processed ${result.processed} recurring transactions`);
+      toast.success(`${result.processed} recurring transaction(s) added automatically`);
+    } else if (result.skipped) {
+      console.log('[Dashboard] Recurring transactions already processed today');
+    } else if (result.error) {
+      console.error('[Dashboard] Error processing recurring:', result.error);
+    }
+  } catch (error) {
+    console.error('[Dashboard] Error in recurring processor:', error);
   }
 }
 

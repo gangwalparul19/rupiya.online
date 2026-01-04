@@ -86,6 +86,9 @@ class AuthService {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       console.log('[Auth Service] Email sign-in successful');
       
+      // Set auth flag for quick check
+      localStorage.setItem('rupiya_user_logged_in', 'true');
+      
       if (this.userService) {
         await this.userService.getOrCreateUserProfile(userCredential.user);
       }
@@ -107,6 +110,9 @@ class AuthService {
         await userCredential.user.reload();
       }
       
+      // Set auth flag for quick check
+      localStorage.setItem('rupiya_user_logged_in', 'true');
+      
       if (this.userService) {
         await this.userService.getOrCreateUserProfile(
           displayName ? auth.currentUser : userCredential.user
@@ -127,6 +133,9 @@ class AuthService {
       
       console.log('[Auth Service] Google sign-in successful');
       
+      // Set auth flag for quick check
+      localStorage.setItem('rupiya_user_logged_in', 'true');
+      
       if (this.userService) {
         await this.userService.getOrCreateUserProfile(userCredential.user);
       }
@@ -144,6 +153,9 @@ class AuthService {
       if (this.userService) {
         this.userService.clearCache();
       }
+      
+      // Clear auth flag
+      localStorage.removeItem('rupiya_user_logged_in');
       
       await signOut(auth);
       return { success: true };

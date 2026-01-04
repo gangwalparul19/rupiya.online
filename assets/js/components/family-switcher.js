@@ -73,13 +73,13 @@ class FamilySwitcher {
 
   render() {
     const container = document.getElementById('familySwitcherContainer');
-    if (!container) return;
-
+    const desktopContainer = document.getElementById('familySwitcherContainerDesktop');
+    
     const currentGroup = this.getCurrentGroup();
     const currentName = currentGroup ? currentGroup.name : 'Personal';
     const currentIcon = currentGroup ? '👨‍👩‍👧‍👦' : '👤';
 
-    container.innerHTML = `
+    const switcherHTML = `
       <div class="family-switcher">
         ${this.pendingInvitations.length > 0 ? `
           <span class="invitations-badge">${this.pendingInvitations.length}</span>
@@ -98,6 +98,35 @@ class FamilySwitcher {
         </div>
       </div>
     `;
+
+    // Render to mobile container
+    if (container) {
+      container.innerHTML = switcherHTML;
+    }
+    
+    // Render to desktop container (with different IDs to avoid conflicts)
+    if (desktopContainer) {
+      desktopContainer.style.display = 'block';
+      desktopContainer.innerHTML = `
+        <div class="family-switcher family-switcher-desktop">
+          ${this.pendingInvitations.length > 0 ? `
+            <span class="invitations-badge">${this.pendingInvitations.length}</span>
+          ` : ''}
+          
+          <button class="family-switcher-btn" id="familySwitcherBtnDesktop">
+            <span class="current-context-icon">${currentIcon}</span>
+            <span class="current-context-name">${currentName}</span>
+            <svg class="dropdown-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+          
+          <div class="family-switcher-dropdown" id="familySwitcherDropdownDesktop">
+            ${this.renderDropdownContent()}
+          </div>
+        </div>
+      `;
+    }
   }
 
   renderDropdownContent() {
@@ -165,9 +194,15 @@ class FamilySwitcher {
   }
 
   setupEventListeners() {
-    // Toggle dropdown
-    const btn = document.getElementById('familySwitcherBtn');
-    const dropdown = document.getElementById('familySwitcherDropdown');
+    // Setup for both mobile and desktop switchers
+    this.setupSwitcherEvents('familySwitcherBtn', 'familySwitcherDropdown', 'familySwitcherContainer');
+    this.setupSwitcherEvents('familySwitcherBtnDesktop', 'familySwitcherDropdownDesktop', 'familySwitcherContainerDesktop');
+  }
+
+  setupSwitcherEvents(btnId, dropdownId, containerId) {
+    const btn = document.getElementById(btnId);
+    const dropdown = document.getElementById(dropdownId);
+    const container = document.getElementById(containerId);
 
     if (btn && dropdown) {
       btn.addEventListener('click', (e) => {
@@ -186,7 +221,6 @@ class FamilySwitcher {
     }
 
     // Use event delegation for dynamically created elements
-    const container = document.getElementById('familySwitcherContainer');
     if (container) {
       container.addEventListener('click', (e) => {
         // Context switching
@@ -211,7 +245,7 @@ class FamilySwitcher {
         }
 
         // Create family button
-        if (e.target.closest('#createFamilyBtn')) {
+        if (e.target.closest('#createFamilyBtn') || e.target.closest('.create-family-btn')) {
           this.showCreateFamilyModal();
           if (dropdown) {
             dropdown.classList.remove('show');
@@ -223,13 +257,13 @@ class FamilySwitcher {
         }
 
         // Manage family button
-        if (e.target.closest('#manageFamilyBtn')) {
+        if (e.target.closest('#manageFamilyBtn') || e.target.closest('.manage-family-btn')) {
           window.location.href = 'family.html';
           return;
         }
 
         // View invitations button
-        if (e.target.closest('#viewInvitationsBtn')) {
+        if (e.target.closest('#viewInvitationsBtn') || e.target.closest('.view-invitations-btn')) {
           window.location.href = 'family.html#invitations';
           return;
         }

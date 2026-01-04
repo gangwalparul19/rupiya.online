@@ -2,410 +2,859 @@
 
 > Your complete personal finance companion built for Indian households 🇮🇳
 
+**🔗 Key Links:**
+- **Demo (No Signup):** [rupiya.app/demo.html](https://rupiya.app/demo.html)
+- **User Guide:** [rupiya.app/user-guide.html](https://rupiya.app/user-guide.html)
+- **Main App:** [rupiya.app](https://rupiya.app)
+
 ---
 
 ## 📱 LinkedIn Posts
 
 ### Post 1: Launch Announcement
 ```
-🚀 Excited to introduce Rupiya - A complete personal finance app built specifically for Indian households!
+🚀 Introducing Rupiya 1.0 - The most complete personal finance app built for Indian households!
 
-Managing money shouldn't be complicated. That's why I built Rupiya with features that actually matter:
+Managing money shouldn't require an MBA. That's why Rupiya comes packed with features that actually matter:
 
+💰 CORE FEATURES:
 ✅ Track expenses & income effortlessly
-✅ Set budgets and financial goals
-✅ Monitor investments (Stocks, MF, FD, Gold)
-✅ Split expenses with friends & family
+✅ Set budgets with smart alerts
+✅ Achieve financial goals faster
 ✅ AI-powered spending insights
-✅ Manage house help payments
-✅ Track vehicle & property expenses
+
+🏠 HOUSEHOLD MANAGEMENT:
+✅ Track house help payments (maid, cook, driver)
+✅ Manage property expenses & maintenance
+✅ Vehicle tracking with mileage calculator
+✅ EMI & Loan tracker with due date reminders
+
+💳 PAYMENT TRACKING:
+✅ Credit/Debit cards
+✅ UPI IDs (GPay, PhonePe, Paytm)
+✅ Bank accounts & digital wallets
+
+👨‍👩‍👧‍👦 FAMILY & SOCIAL:
 ✅ Family account sharing
+✅ Split expenses with friends
+✅ Investment portfolio tracking
 
-The best part? It works offline and installs like a native app on your phone!
+🎁 BONUS:
+✅ Works offline (PWA)
+✅ Interactive demo - no signup needed!
+✅ Step-by-step user guide
+✅ Weekly email reports with CSV
 
-Built with security-first approach using Firebase Authentication and Firestore.
+👉 Try the demo instantly: rupiya.app/demo.html
+📖 Read the guide: rupiya.app/user-guide.html
 
-Try it free: [Your App URL]
-
-#PersonalFinance #FinTech #MadeInIndia #MoneyManagement #FinancialFreedom
+#PersonalFinance #FinTech #MadeInIndia #MoneyManagement #FinancialFreedom #EMITracker #HouseholdFinance
 ```
 
-### Post 2: Problem-Solution Focused
+### Post 2: Demo Page Promotion
 ```
-💸 "Where did all my money go this month?"
+🎮 Want to try a finance app WITHOUT creating an account?
 
-Sound familiar? You're not alone.
+Introducing Rupiya's Interactive Demo!
 
-Most Indians struggle with:
-→ Tracking daily expenses
-→ Managing household budgets
-→ Splitting bills with roommates
-→ Paying house help on time
-→ Monitoring multiple investments
+Most apps make you sign up before you can even see what they offer. Not us.
 
-I built Rupiya to solve exactly these problems.
+Our demo page lets you:
+→ Explore ALL features with sample data
+→ See real expense tracking in action
+→ Check out budget management
+→ View investment tracking
+→ Experience the UI/UX firsthand
 
-One app. All your finances. Zero complexity.
+No email. No password. No commitment.
 
-🎯 Smart categorization
-📊 Visual analytics
-🤖 AI insights that actually help
-👨‍👩‍👧‍👦 Family sharing built-in
-📱 Works offline
+Just pure exploration. 🔍
 
-No more Excel sheets. No more forgotten payments.
+If you like what you see, signing up takes 30 seconds.
 
-Start your financial clarity journey today → [Your App URL]
+👉 Try it now: rupiya.app/demo.html
 
-#FinancialPlanning #BudgetingTips #IndianStartup #PersonalFinanceIndia
-```
+Why did we build this?
+Because we believe you should KNOW what you're getting before you commit.
 
-### Post 3: Feature Highlight - Family Sharing
-```
-👨‍👩‍👧‍👦 Managing family finances just got easier!
+Transparency > Tricks
 
-Introducing Family Accounts in Rupiya:
-
-→ Create family groups
-→ Share expenses transparently
-→ Track who paid what
-→ Split household costs fairly
-→ Invite members via email
-
-Whether you're:
-• Newlyweds combining finances
-• Roommates splitting rent
-• Parents tracking family expenses
-• Joint family managing household
-
-Rupiya keeps everyone on the same page.
-
-No more awkward money conversations. Just clarity.
-
-Try the Family feature free → [Your App URL]
-
-#FamilyFinance #SharedExpenses #MoneyManagement #FinTechIndia
+#ProductDemo #FinTechIndia #UserExperience #TransparentBusiness #TryBeforeYouBuy
 ```
 
-### Post 4: Security & Privacy Focus
+### Post 3: User Guide & Onboarding
 ```
-🔐 Your financial data deserves bank-level security.
+📖 "I downloaded a finance app but don't know where to start..."
 
-When building Rupiya, security wasn't an afterthought - it was the foundation.
+We've all been there. New app, overwhelming features, no guidance.
 
-Here's how we protect your data:
+That's why Rupiya includes:
 
-✅ Firebase Authentication (Google-grade security)
-✅ Firestore security rules (row-level access control)
-✅ No data selling. Ever.
-✅ Your data stays yours
-✅ Encrypted data transmission
-✅ Secure cloud storage
+1️⃣ INTERACTIVE SETUP WIZARD
+   - Appears on first login
+   - 6 simple steps
+   - Takes only 3-5 minutes
+   - Sets up your account perfectly
 
-In a world of data breaches, we chose to build different.
+2️⃣ COMPREHENSIVE USER GUIDE
+   - 14 detailed sections
+   - Step-by-step instructions
+   - Visual guides
+   - Available anytime (even for guests!)
 
-Your trust > Our growth
+3️⃣ SMART NAVIGATION
+   - Collapsible sidebar
+   - Quick search (Cmd+K)
+   - Organized feature sections
 
-Experience secure finance management → [Your App URL]
+We don't just give you tools. We teach you how to use them.
 
-#DataPrivacy #CyberSecurity #FinTechSecurity #TrustInTech
+📖 Read the guide: rupiya.app/user-guide.html
+🎮 Try the demo: rupiya.app/demo.html
+
+#UserOnboarding #ProductDesign #FinancialLiteracy #AppDesign #UXDesign
 ```
 
-### Post 5: Developer Journey / Behind the Scenes
+### Post 4: EMI & Loan Tracker Feature
 ```
-🛠️ From idea to launch: Building Rupiya
+🏦 Juggling multiple EMIs? Never miss a payment again!
 
-6 months ago, I was frustrated with existing finance apps:
-- Too complex
-- Not India-focused
-- Missing household features
-- Poor offline support
+Introducing Rupiya's EMI & Loan Tracker:
 
-So I built what I needed.
+Track ALL your loans in one place:
+🏠 Home Loan
+🚗 Car/Bike Loan
+💳 Personal Loan
+📱 Product EMIs (Phone, Laptop, Appliances)
 
-Tech stack:
-→ Vanilla JS (no framework bloat)
-→ Firebase (Auth + Firestore)
-→ PWA (works offline, installs on phone)
-→ Responsive design (mobile-first)
+For each loan, monitor:
+→ EMI amount & due date
+→ Outstanding balance
+→ Interest rate & tenure
+→ Payment history
+→ Total interest paid
 
-Key learnings:
-1. Simplicity wins over features
-2. Offline-first is crucial for India
-3. Security can't be compromised
-4. User feedback shapes everything
+SMART FEATURES:
+⏰ Due date reminders
+📊 Visual progress tracking
+📈 Prepayment calculator
+📧 Monthly summary reports
 
-The journey continues. New features dropping soon!
+The average Indian has 2-3 active EMIs.
+Are you tracking yours properly?
 
-What finance feature do YOU wish existed? 👇
+Start tracking: rupiya.app
+See it in action: rupiya.app/demo.html
 
-#BuildInPublic #IndieHacker #WebDevelopment #StartupJourney #FinTech
+#EMITracker #LoanManagement #DebtFree #FinancialPlanning #HomeLoan #CarLoan #PersonalLoan
 ```
+
+### Post 5: House Help Management
+```
+🧹 Managing house help payments just got professional!
+
+If you have domestic staff, you know the struggle:
+- Remembering payment dates
+- Tracking attendance
+- Managing multiple helpers
+- Calculating monthly dues
+
+Rupiya's House Help feature handles it all:
+
+👩 STAFF MANAGEMENT:
+- Add maid, cook, driver, gardener, etc.
+- Set monthly salary
+- Define work schedule
+- Track attendance
+
+💰 PAYMENT TRACKING:
+- Payment reminders
+- Complete payment history
+- Monthly/weekly schedules
+- Advance payments
+
+📊 INSIGHTS:
+- Total monthly staff cost
+- Payment trends
+- Attendance reports
+
+Treat your household like a well-run business.
+
+Try it: rupiya.app/demo.html (see House Help section)
+
+#HouseholdManagement #DomesticHelp #HomeManagement #IndianHousehold #StaffManagement
+```
+
+### Post 6: Vehicle Expense Tracking
+```
+🚗 Do you know how much your car ACTUALLY costs you?
+
+Most people track fuel. That's it.
+
+But real vehicle costs include:
+⛽ Fuel
+🔧 Service & maintenance
+📋 Insurance
+🛣️ Road tax
+🅿️ Parking & tolls
+🔩 Repairs & parts
+
+Rupiya's Vehicle Tracker captures EVERYTHING:
+
+✅ Multiple vehicles (car, bike, scooter)
+✅ Fuel log with mileage calculator
+✅ Service reminders
+✅ Insurance renewal alerts
+✅ Cost per kilometer analysis
+✅ Expense trends over time
+
+Finally know your true cost of ownership.
+
+See it in action: rupiya.app/demo.html
+
+#VehicleExpenses #CarMaintenance #BikeLovers #CostOfOwnership #AutoExpenses #MileageTracker
+```
+
+### Post 7: Payment Methods Feature
+```
+�  One expense. Multiple payment options. Zero confusion.
+
+In India, we pay through:
+- Credit cards (rewards!)
+- Debit cards
+- UPI (GPay, PhonePe, Paytm)
+- Bank transfers
+- Digital wallets
+- Good old cash
+
+Rupiya lets you track them ALL:
+
+ADD YOUR PAYMENT METHODS:
+💳 Cards (just last 4 digits - secure!)
+📱 UPI IDs
+🏦 Bank accounts
+👛 Digital wallets
+
+THEN FOR EVERY EXPENSE:
+→ Select which payment method you used
+→ See card-wise spending
+→ Track UPI transactions
+→ Monitor wallet balances
+
+Know exactly WHERE your money is going FROM.
+
+Set up in 2 minutes: rupiya.app
+
+#PaymentTracking #UPIPayments #CreditCardRewards #DigitalPayments #MoneyManagement
+```
+
+### Post 8: Investment Tracking
+```
+📈 Your investment portfolio, simplified.
+
+Tracking investments across platforms is a nightmare:
+- Zerodha for stocks
+- Groww for MFs
+- Bank for FDs
+- Separate apps for gold, PPF, NPS...
+
+Rupiya brings them together:
+
+TRACK ALL INVESTMENTS:
+📊 Stocks & Equities
+📈 Mutual Funds (SIP + Lumpsum)
+🏦 Fixed Deposits
+🥇 Gold (Physical + Digital)
+💼 PPF, NPS, EPF
+🏠 Real Estate
+
+FOR EACH INVESTMENT:
+→ Current value
+→ Returns (absolute + %)
+→ Investment date
+→ Maturity tracking
+
+ONE DASHBOARD. COMPLETE VISIBILITY.
+
+See sample portfolio: rupiya.app/demo.html
+
+#InvestmentTracking #MutualFunds #StockMarket #PortfolioManagement #WealthManagement #FinancialPlanning
+```
+
 
 ---
 
 ## 💬 WhatsApp Messages
 
-### Message 1: Personal Introduction
+### Message 1: Demo Introduction
 ```
 Hey! 👋
 
-I built something that might help you manage money better.
+Remember I told you about that finance app I built?
 
-*Rupiya* - A free personal finance app for Indian households
+Good news - you can now TRY IT without signing up! 🎉
 
-✨ What it does:
-• Track expenses & income
-• Set budgets & goals
-• Split bills with friends
-• AI spending insights
-• Works offline!
+*Rupiya Demo* - See all features with sample data:
+→ Expense tracking
+→ Budget management
+→ EMI tracker
+→ Investment portfolio
+→ House help payments
+→ Vehicle expenses
 
-No ads. No hidden charges.
+Just open this link: rupiya.app/demo.html
 
-Try it here: [Your App URL]
+No account needed. Explore everything!
 
-Let me know what you think! 🙏
+If you like it, signup takes 30 seconds 😊
 ```
 
-### Message 2: Problem-Focused
+### Message 2: User Guide Share
 ```
-Bro/Sis, quick question 🤔
+Bro/Sis 📱
 
-Do you also forget where your salary went by month-end?
+If you're confused about managing money, I got you!
 
-I had the same problem, so I built *Rupiya* 💰
+*Rupiya User Guide* - Complete step-by-step tutorial:
 
-→ Add expenses in 2 taps
-→ See where money goes
-→ Set monthly budgets
-→ Get AI insights
+📖 What's covered:
+• Setting up payment methods
+• Creating budgets
+• Tracking EMIs & loans
+• Managing investments
+• Vehicle expense tracking
+• House help payments
+• Family sharing
+• AI insights
 
-It's free and works on any phone!
+It's like a free personal finance course!
 
-Check it out: [Your App URL]
+Read here: rupiya.app/user-guide.html
 
-Trust me, it's a game changer 🚀
-```
-
-### Message 3: Feature Highlight
-```
-Hey! Got something cool to share 📱
-
-You know how splitting bills with friends is always awkward?
-
-*Rupiya* has a Split Expense feature:
-✅ Add expense
-✅ Select friends
-✅ Auto-calculate shares
-✅ Track who paid
-
-No more "tu kitna dega" confusion 😅
-
-Free app: [Your App URL]
-
-Forward to your trip group! 🏖️
+Forward to anyone who needs this 🙏
 ```
 
-### Message 4: Family Group Message
+### Message 3: EMI Tracker Highlight
 ```
-*For the family group* 👨‍👩‍👧‍👦
+Quick question 🤔
 
-Found an app that can help us track household expenses together!
+How many EMIs are you paying right now?
 
-*Rupiya* lets us:
-📝 Add shared expenses
-💰 Track house help payments
-🏠 Monitor property costs
-📊 See monthly spending
+Home loan? Car loan? Phone EMI? Credit card?
 
-Everyone can see where money goes. Full transparency!
+I built an *EMI Tracker* in Rupiya that:
+✅ Shows all EMIs in one place
+✅ Reminds you before due dates
+✅ Tracks outstanding amounts
+✅ Calculates total monthly burden
 
-It's free: [Your App URL]
+No more missed payments. No more late fees.
 
-Should we try it this month?
+Check it out: rupiya.app/demo.html
+(Scroll to EMI & Loan section)
+
+Game changer for anyone with loans! 💪
 ```
 
-### Message 5: Casual Recommendation
+### Message 4: House Help Feature
 ```
-Yaar, you HAVE to try this app 🔥
+*For everyone with domestic help* 🏠
 
-*Rupiya* - best finance app I've used
+Tired of:
+- Forgetting maid's payment date?
+- Calculating cook's salary with leaves?
+- Tracking driver's advances?
 
-What I love:
-• Super simple UI
-• Works without internet
-• Tracks investments too
-• Has dark mode 🌙
-• Made for India 🇮🇳
+Rupiya has a *House Help* feature:
+📝 Add all your staff
+💰 Set salaries & schedules
+📅 Get payment reminders
+📊 Track payment history
 
-Been using it for [X] weeks. Finally know where my money goes!
+Finally, professional management for household staff!
 
-Link: [Your App URL]
+See how it works: rupiya.app/demo.html
 
-Thank me later 😎
+Share with family 👨‍👩‍👧‍👦
+```
+
+### Message 5: Complete Feature List
+```
+*Rupiya - Everything it does* 💰
+
+TRACKING:
+📝 Expenses & Income
+💳 Payment methods (Cards, UPI, Wallets)
+🔄 Recurring transactions
+
+PLANNING:
+📊 Budgets with alerts
+🎯 Savings goals
+📈 Investment portfolio
+
+HOUSEHOLD:
+🏠 Property management
+🚗 Vehicle expenses
+🧹 House help payments
+🏦 EMI & Loan tracker
+
+SOCIAL:
+👨‍👩‍👧‍👦 Family sharing
+🤝 Split expenses
+
+SMART:
+🤖 AI insights
+📧 Weekly reports
+📱 Works offline
+
+*TRY WITHOUT SIGNUP:* rupiya.app/demo.html
+*LEARN EVERYTHING:* rupiya.app/user-guide.html
+
+Best part? It's FREE! 🆓
+```
+
+### Message 6: Trip Planning
+```
+Planning a trip with friends? 🏖️
+
+Use *Rupiya* to:
+
+BEFORE TRIP:
+→ Set a trip budget
+→ Create savings goal
+→ Track who's contributing
+
+DURING TRIP:
+→ Log all expenses
+→ Split bills instantly
+→ Track who paid what
+
+AFTER TRIP:
+→ See total spent
+→ Calculate who owes whom
+→ Settle up easily
+
+No more "hisaab baad mein kar lenge" 😅
+
+Download before your next trip: rupiya.app
+
+Demo: rupiya.app/demo.html
 ```
 
 ---
 
 ## 📸 Instagram Posts/Reels Captions
 
-### Post 1: Carousel - App Features
+### Post 1: Demo Page Promotion
 ```
-Stop losing track of your money 💸
+POV: You found a finance app that lets you TRY before you SIGN UP 🤯
 
-Swipe to see how Rupiya helps you take control →
+No email required.
+No password needed.
+No commitment asked.
 
-Slide 1: Track every rupee 📝
-Slide 2: Beautiful analytics 📊
-Slide 3: Set & crush goals 🎯
-Slide 4: Split bills easily 🤝
-Slide 5: AI insights 🤖
-Slide 6: Works offline 📱
+Just pure exploration with real sample data ✨
 
-Link in bio to try free! 
+See EXACTLY what you're getting:
+→ Expense tracking
+→ Budget management
+→ EMI tracker
+→ Investment portfolio
+→ House help payments
+→ Vehicle expenses
+→ And 10+ more features!
 
-#PersonalFinance #MoneyTips #FinanceApp #BudgetingTips #IndianApp #MoneyManagement #FinancialFreedom #SavingMoney #ExpenseTracker #FinTech
-```
+Link in bio → Try Demo 🔗
 
-### Post 2: Reel Script - "POV: You finally track expenses"
-```
-POV: You finally started tracking your expenses 📱💰
-
-*Before Rupiya:*
-"Where did 50k go?" 😭
-"I'll remember this expense" 🤡
-"Excel sheet se kar lunga" 📊❌
-
-*After Rupiya:*
-✅ Every expense logged
-✅ Know exactly where money goes
-✅ Actually saving money now
-✅ Investments tracked
-✅ Bills split with friends
-
-The glow up is real ✨
-
-Free app - Link in bio!
-
-#MoneyGlowUp #FinanceReels #PersonalFinanceTips #IndianFinance #MoneyTok #BudgetingReels #FinancialLiteracy
+#FinanceApp #TryBeforeYouBuy #NoSignupNeeded #AppDemo #PersonalFinance #TransparentBusiness #IndianApp
 ```
 
-### Post 3: Static Post - Pain Point
+### Post 2: Carousel - Complete Feature Tour
 ```
-Raise your hand if you've said this 🙋‍♂️
+The ONLY finance app you'll ever need 💰
 
-"Salary aate hi gayab ho jati hai"
+Swipe to see ALL features →
 
-You're not bad with money.
-You just don't have visibility.
+Slide 1: 💳 Payment Methods
+Track cards, UPI, wallets, bank accounts
 
-Rupiya gives you that visibility:
-→ See daily/weekly/monthly spending
-→ Category-wise breakdown
-→ Smart AI insights
-→ Budget alerts
+Slide 2: 📊 Smart Budgets
+Set limits, get alerts, stay on track
 
-Knowledge is power. Financial knowledge is freedom.
+Slide 3: 🏦 EMI & Loan Tracker
+Never miss a payment again
 
-Start tracking → Link in bio
+Slide 4: 🚗 Vehicle Expenses
+Fuel, service, insurance - everything
 
-#SalaryGone #MoneyProblems #FinanceTips #IndianMillennials #PersonalFinanceIndia #MoneyMatters
-```
+Slide 5: 🧹 House Help
+Manage domestic staff payments
 
-### Post 4: Reel Script - Feature Demo
-```
-This app feature is *chef's kiss* 🤌
+Slide 6: 📈 Investments
+Stocks, MFs, FDs in one place
 
-Splitting dinner bill with friends?
+Slide 7: 👨‍👩‍👧‍👦 Family Sharing
+Transparent household finances
 
-Old way:
-→ Calculator nikalo
-→ "Tera kitna hua"
-→ "Baad mein de dunga"
-→ *Never pays* 💀
+Slide 8: 🤖 AI Insights
+Smart spending analysis
 
-Rupiya way:
-→ Add expense
-→ Select friends
-→ Auto split ✅
-→ Track payments
-→ Send reminder
+Slide 9: 📖 User Guide
+Step-by-step tutorials included!
 
-No more awkward conversations!
+Slide 10: 🎮 Free Demo
+Try without signing up!
 
-Try free - Link in bio 🔗
+Link in bio 🔗
 
-#SplitBill #FriendsTrip #MoneyWithFriends #AppRecommendation #LifeHack #IndianApps
+#FinanceApp #AllInOne #MoneyManagement #IndianFintech #PersonalFinance #BudgetingApp #EMITracker #InvestmentTracker
 ```
 
-### Post 5: Carousel - Why Rupiya
+### Post 3: Reel - "Finance app red flags vs green flags"
 ```
-Why 10,000+ Indians are switching to Rupiya 🇮🇳
+Finance app red flags 🚩 vs green flags 🟢
 
-Slide 1: Made for Indian households 🏠
+RED FLAGS:
+❌ Must signup to see features
+❌ Hidden premium paywalls
+❌ Sells your data
+❌ No offline mode
+❌ Complex UI
+❌ No India-specific features
+
+GREEN FLAGS:
+✅ Free demo without signup
+✅ All features free
+✅ Privacy-first approach
+✅ Works offline
+✅ Simple & clean UI
+✅ Made for Indian households
+
+Rupiya has ALL the green flags 🟢
+
+Try the demo - Link in bio!
+
+#FinanceApp #RedFlags #GreenFlags #AppReview #PersonalFinance #IndianApp #FinTech
+```
+
+### Post 4: Reel - EMI Tracker Demo
+```
+POV: You finally have all your EMIs in one place 🏦
+
+*Opens Rupiya*
+
+Home Loan - ₹35,000 - Due 5th
+Car Loan - ₹12,500 - Due 10th
+Phone EMI - ₹5,999 - Due 15th
+
+Total Monthly: ₹53,499
+Outstanding: ₹31.94L
+
+*Gets reminder before due date*
+*Never misses a payment*
+*Actually becomes debt-free faster*
+
+The organization is *chef's kiss* 🤌
+
+Try it: Link in bio
+
+#EMITracker #LoanManagement #DebtFree #FinanceReels #MoneyManagement #HomeLoan #CarLoan
+```
+
+### Post 5: Static - User Guide Promotion
+```
+"I don't know how to manage money" 
+
+Neither did I. Then I learned.
+
+Rupiya's FREE User Guide teaches you:
+
+📖 Setting up payment methods
+📖 Creating effective budgets
+📖 Tracking EMIs & loans
+📖 Managing investments
+📖 Vehicle expense tracking
+📖 House help payments
+📖 Family finance sharing
+📖 Using AI insights
+
+14 detailed sections.
+Step-by-step instructions.
+Available to EVERYONE (even without signup!)
+
+Financial literacy shouldn't cost money.
+
+Read free → Link in bio
+
+#FinancialLiteracy #UserGuide #LearnFinance #MoneyEducation #FreeResources #PersonalFinance
+```
+
+### Post 6: Carousel - Why Indians Love Rupiya
+```
+Why 10,000+ Indians switched to Rupiya 🇮🇳
+
+Slide 1: 🏠 HOUSEHOLD FEATURES
 - House help payment tracking
-- UPI/Cash/Card support
-- INR focused
+- Property expense management
+- Vehicle maintenance logs
+- EMI & loan tracker
 
-Slide 2: Privacy first 🔐
-- No data selling
-- Bank-level security
-- Your data = yours
+Slide 2: 💳 INDIAN PAYMENTS
+- UPI support (GPay, PhonePe)
+- All major cards
+- Digital wallets
+- Cash tracking
 
-Slide 3: Works offline 📴
-- No internet? No problem
-- Syncs when online
+Slide 3: 👨‍👩‍👧‍👦 FAMILY FIRST
+- Joint expense tracking
+- Family groups
+- Transparent sharing
+- Split bills easily
+
+Slide 4: 📱 WORKS EVERYWHERE
+- Offline mode
+- Installs like app
+- Syncs across devices
 - Fast & reliable
 
-Slide 4: Actually free 🆓
-- No premium paywalls
-- No annoying ads
-- Full features free
+Slide 5: 🎓 EASY TO LEARN
+- Interactive setup wizard
+- Comprehensive user guide
+- Demo with sample data
+- Simple UI
 
-Slide 5: Simple & beautiful ✨
-- Clean UI
-- Dark mode
-- Easy to use
+Slide 6: 🆓 ACTUALLY FREE
+- No premium tier
+- No ads
+- No data selling
+- Full features
 
 Join the community → Link in bio
 
-#IndianApp #MadeInIndia #FinanceApp #FreeApp #PrivacyFirst #PersonalFinance #MoneyApp
+#MadeInIndia #IndianApp #FinanceApp #IndianHousehold #FamilyFinance #FinTechIndia
+```
+
+
+---
+
+## 🐦 Twitter/X Threads
+
+### Thread 1: Complete Feature Breakdown
+```
+🧵 THREAD: Everything Rupiya can do for your finances (you'll want to bookmark this)
+
+1/ Rupiya is a FREE personal finance app built specifically for Indian households.
+
+But "finance app" doesn't do it justice. Let me break down EVERY feature 👇
+```
+```
+2/ 💳 PAYMENT METHOD TRACKING
+
+Add all your payment sources:
+- Credit/Debit cards
+- UPI IDs (GPay, PhonePe, Paytm)
+- Bank accounts
+- Digital wallets
+
+Then track which payment method you use for each expense.
+
+Finally know where money goes FROM.
+```
+```
+3/ 📊 SMART BUDGETING
+
+- Set monthly budgets by category
+- Get alerts at 80% usage
+- Visual progress bars
+- Auto-reset each month
+
+No more "where did my salary go?" moments.
+```
+```
+4/ 🏦 EMI & LOAN TRACKER
+
+Track ALL your loans:
+- Home loan
+- Car loan
+- Personal loan
+- Product EMIs
+
+See due dates, outstanding amounts, and total monthly burden in one view.
+```
+```
+5/ 🚗 VEHICLE EXPENSE TRACKING
+
+For each vehicle:
+- Fuel logs with mileage calculator
+- Service records
+- Insurance tracking
+- Cost per km analysis
+
+Know your TRUE cost of ownership.
+```
+```
+6/ 🧹 HOUSE HELP MANAGEMENT
+
+Track domestic staff:
+- Maid, cook, driver, gardener
+- Monthly salaries
+- Payment schedules
+- Attendance tracking
+
+Professional household management.
+```
+```
+7/ 📈 INVESTMENT TRACKING
+
+Monitor your portfolio:
+- Stocks
+- Mutual Funds
+- Fixed Deposits
+- Gold, PPF, NPS
+
+One dashboard for all investments.
+```
+```
+8/ 👨‍👩‍👧‍👦 FAMILY SHARING
+
+- Create family groups
+- Share expenses transparently
+- Track who paid what
+- Split household costs
+
+Perfect for joint families & couples.
+```
+```
+9/ 🤖 AI INSIGHTS
+
+- Spending pattern analysis
+- Personalized saving tips
+- Anomaly detection
+- Goal recommendations
+
+Your personal finance advisor.
+```
+```
+10/ 🎁 BONUS FEATURES
+
+- Works offline (PWA)
+- Weekly email reports
+- Dark mode
+- Quick search (Cmd+K)
+- Interactive demo (no signup!)
+- Comprehensive user guide
+
+All FREE. No premium tier.
+```
+```
+11/ Want to try before signing up?
+
+🎮 Demo: rupiya.app/demo.html
+📖 Guide: rupiya.app/user-guide.html
+🚀 App: rupiya.app
+
+Bookmark this thread for later!
+
+#PersonalFinance #FinTech #MadeInIndia
 ```
 
 ---
 
-## 🎯 Hashtag Banks
+## 🎯 Call-to-Action Templates
+
+### For Demo Page
+```
+🎮 Try Rupiya without signing up!
+→ rupiya.app/demo.html
+
+Explore all features with sample data. No email required.
+```
+
+### For User Guide
+```
+📖 Learn personal finance management for FREE
+→ rupiya.app/user-guide.html
+
+14 detailed sections. Step-by-step guides. Available to everyone.
+```
+
+### For Main App
+```
+🚀 Start your financial clarity journey
+→ rupiya.app
+
+Free forever. No ads. No data selling.
+```
+
+### Combined CTA
+```
+🎮 Try Demo: rupiya.app/demo.html
+📖 Read Guide: rupiya.app/user-guide.html
+🚀 Sign Up Free: rupiya.app
+```
+
+---
+
+## 🎯 Hashtag Banks (Updated)
 
 ### LinkedIn
 ```
-#PersonalFinance #FinTech #MadeInIndia #MoneyManagement #FinancialFreedom #IndianStartup #BuildInPublic #WebDevelopment #PWA #Firebase #FinancialPlanning #BudgetingTips #IndieHacker #StartupLife #TechForGood
+#PersonalFinance #FinTech #MadeInIndia #MoneyManagement #FinancialFreedom #IndianStartup #BuildInPublic #EMITracker #LoanManagement #HouseholdFinance #InvestmentTracking #FamilyFinance #FinancialPlanning #BudgetingTips #IndieHacker #StartupLife #TechForGood #ProductDemo #UserOnboarding
 ```
 
 ### Instagram
 ```
-#PersonalFinance #MoneyTips #FinanceApp #BudgetingTips #IndianApp #MoneyManagement #FinancialFreedom #SavingMoney #ExpenseTracker #FinTech #MoneyGlowUp #FinanceReels #IndianFinance #MoneyTok #FinancialLiteracy #MadeInIndia #IndianStartup #AppRecommendation
+#PersonalFinance #MoneyTips #FinanceApp #BudgetingTips #IndianApp #MoneyManagement #FinancialFreedom #SavingMoney #ExpenseTracker #FinTech #MoneyGlowUp #FinanceReels #IndianFinance #MoneyTok #FinancialLiteracy #MadeInIndia #IndianStartup #AppRecommendation #EMITracker #InvestmentTracker #HouseholdManagement
+```
+
+### Twitter/X
+```
+#PersonalFinance #FinTech #MadeInIndia #IndianStartup #BuildInPublic #MoneyManagement #FinancialFreedom #EMITracker #BudgetingApp #InvestmentTracking
 ```
 
 ---
 
-## 📝 Key Messaging Points
+## 📝 Key Messaging Points (Updated)
 
 ### Unique Selling Points (USPs)
-1. **India-focused** - House help tracking, UPI support, INR
-2. **Family sharing** - Transparent household finance management
-3. **Offline-first** - Works without internet (PWA)
-4. **AI insights** - Smart spending analysis
-5. **All-in-one** - Expenses, income, investments, goals, splits
-6. **Privacy-first** - No data selling, secure authentication
-7. **Free** - Full features without paywalls
+1. **India-focused** - House help tracking, UPI support, EMI tracker, INR
+2. **Try before signup** - Interactive demo with sample data
+3. **Comprehensive guide** - 14-section user manual for everyone
+4. **Family sharing** - Transparent household finance management
+5. **Offline-first** - Works without internet (PWA)
+6. **AI insights** - Smart spending analysis
+7. **All-in-one** - Expenses, income, investments, EMIs, vehicles, house help
+8. **Privacy-first** - No data selling, secure authentication
+9. **Free forever** - Full features without paywalls or ads
+
+### Complete Feature List
+| Category | Features |
+|----------|----------|
+| **Core** | Expense tracking, Income tracking, Categories, Recurring transactions |
+| **Planning** | Budgets, Savings goals, Financial reports |
+| **Payments** | Cards, UPI, Bank accounts, Wallets, Cash |
+| **Loans** | EMI tracker, Loan management, Due date reminders |
+| **Assets** | Properties, Vehicles, Investments |
+| **Household** | House help payments, Staff management |
+| **Social** | Family groups, Split expenses |
+| **Intelligence** | AI insights, Spending analysis, Recommendations |
+| **Reports** | Weekly emails, CSV exports, Analytics |
+| **Experience** | Offline mode, Dark mode, Quick search, Setup wizard |
 
 ### Target Audience
-- Young professionals (22-35)
-- Newlyweds managing joint finances
+- Young professionals (22-35) managing first salary
+- Newlyweds combining finances
 - Families tracking household expenses
+- Homeowners with EMIs and staff
+- Vehicle owners tracking expenses
+- Investors monitoring portfolio
 - Roommates splitting bills
 - Anyone wanting financial clarity
+
+### Key Pages to Promote
+1. **Demo Page** (`/demo.html`) - No signup exploration
+2. **User Guide** (`/user-guide.html`) - Learning resource
+3. **Main App** (`/`) - Sign up and start
 
 ### Tone of Voice
 - Friendly & relatable
@@ -413,7 +862,33 @@ Join the community → Link in bio
 - Solution-focused
 - Trustworthy
 - Indian context
+- Educational
+
+---
+
+## 📅 Content Calendar Suggestions
+
+### Week 1: Awareness
+- Mon: Launch/Feature overview post
+- Wed: Demo page promotion
+- Fri: User guide highlight
+
+### Week 2: Features Deep Dive
+- Mon: EMI & Loan tracker
+- Wed: House help management
+- Fri: Vehicle tracking
+
+### Week 3: Use Cases
+- Mon: Family finance management
+- Wed: Trip expense splitting
+- Fri: Investment tracking
+
+### Week 4: Social Proof & Education
+- Mon: User testimonials
+- Wed: Financial tips from AI insights
+- Fri: Behind-the-scenes / roadmap
 
 ---
 
 *Last updated: January 2026*
+*Version: 2.0 - Added demo page, user guide, EMI tracker, house help, vehicle tracking, payment methods content*

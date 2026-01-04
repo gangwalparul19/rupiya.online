@@ -24,6 +24,35 @@ const validationRules = {
   terms: ['required']
 };
 
+// Get redirect URL after signup (checks for pending invitations)
+function getRedirectUrl() {
+  try {
+    // Check for pending invitation first
+    const pendingInvitation = localStorage.getItem('rupiya_pending_invitation');
+    if (pendingInvitation) {
+      localStorage.removeItem('rupiya_pending_invitation');
+      localStorage.removeItem('rupiya_redirect_url');
+      return `family.html?invitation=${pendingInvitation}`;
+    }
+    
+    // Check for stored redirect URL
+    const redirectUrl = localStorage.getItem('rupiya_redirect_url');
+    if (redirectUrl) {
+      localStorage.removeItem('rupiya_redirect_url');
+      try {
+        const url = new URL(redirectUrl);
+        return url.pathname.replace(/^\//, '') + url.search;
+      } catch (e) {
+        return 'dashboard.html';
+      }
+    }
+    
+    return 'dashboard.html';
+  } catch (e) {
+    return 'dashboard.html';
+  }
+}
+
 // Setup real-time validation
 setupRealtimeValidation(signupForm, validationRules);
 
@@ -81,8 +110,9 @@ signupForm.addEventListener('submit', async (e) => {
     
     if (result.success) {
       toast.success('Account created successfully! Redirecting...');
+      const redirectUrl = getRedirectUrl();
       setTimeout(() => {
-        window.location.href = 'dashboard.html';
+        window.location.href = redirectUrl;
       }, 1000);
     } else {
       toast.error(result.error);
@@ -108,8 +138,9 @@ googleSignUpBtn.addEventListener('click', async () => {
     
     if (result.success) {
       toast.success('Account created successfully! Redirecting...');
+      const redirectUrl = getRedirectUrl();
       setTimeout(() => {
-        window.location.href = 'dashboard.html';
+        window.location.href = redirectUrl;
       }, 1000);
     } else {
       toast.error(result.error);
@@ -126,6 +157,7 @@ googleSignUpBtn.addEventListener('click', async () => {
 (async () => {
   await authService.waitForAuth();
   if (authService.isAuthenticated()) {
-    window.location.href = 'dashboard.html';
+    const redirectUrl = getRedirectUrl();
+    window.location.href = redirectUrl;
   }
 })();

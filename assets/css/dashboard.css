@@ -485,17 +485,40 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px;
+    padding: 12px 16px;
     background: var(--white);
     border-bottom: 2px solid var(--primary-blue);
     margin: -12px;
     margin-bottom: 16px;
   }
   
+  .mobile-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
+  
+  .mobile-brand img {
+    height: 36px;
+    width: auto;
+  }
+  
+  .mobile-brand .brand-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary-blue);
+    letter-spacing: -0.5px;
+  }
+  
   .mobile-header-actions {
     display: flex;
     align-items: center;
     gap: 8px;
+  }
+  
+  .mobile-header .sidebar-toggle {
+    order: 10; /* Push hamburger to the end */
   }
 
   .dashboard-header {

@@ -784,3 +784,40 @@
     justify-content: center;
   }
 }
+
+
+/* Desktop Family Switcher - Show only on desktop */
+#familySwitcherContainerDesktop {
+  display: none;
+}
+
+@media (min-width: 769px) {
+  #familySwitcherContainerDesktop {
+    display: block !important;
+  }
+  
+  /* Hide mobile family switcher on desktop */
+  #familySwitcherContainer {
+    display: none;
+  }
+  
+  .family-switcher-desktop {
+    margin-left: 12px;
+  }
+  
+  .family-switcher-desktop .family-switcher-dropdown {
+    right: 0;
+    left: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Show mobile family switcher, hide desktop */
+  #familySwitcherContainer {
+    display: block;
+  }
+  
+  #familySwitcherContainerDesktop {
+    display: none !important;
+  }
+}

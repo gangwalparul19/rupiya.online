@@ -28,6 +28,9 @@
   <link rel="stylesheet" href="assets/css/sidebar.css">
   <link rel="stylesheet" href="assets/css/setup-wizard.css">
   
+  <!-- Auth Guard - Must be loaded early to prevent flash of protected content -->
+  <script src="assets/js/utils/auth-guard.js"></script>
+  
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
 </head>
@@ -74,15 +77,18 @@
     <main class="main-content">
       <!-- Mobile Header -->
       <div class="mobile-header">
-        <button class="sidebar-toggle" id="sidebarOpen">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-          </svg>
-        </button>
-        <div class="sidebar-logo">
-          <img src="assets/images/logo.png" alt="Rupiya" style="height: 32px;">
+        <a href="dashboard.html" class="mobile-brand">
+          <img src="assets/images/logo.png" alt="Rupiya">
+          <span class="brand-name">Rupiya</span>
+        </a>
+        <div class="mobile-header-actions">
+          <div id="familySwitcherContainer"></div>
+          <button class="sidebar-toggle" id="sidebarOpen">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+          </button>
         </div>
-        <div id="familySwitcherContainer"></div>
       </div>
 
       <!-- Page Header -->
@@ -92,6 +98,8 @@
           <p class="page-subtitle" id="analyticsSubtitle">Visualize your financial data</p>
         </div>
         <div class="page-actions">
+          <!-- Desktop Family Switcher -->
+          <div id="familySwitcherContainerDesktop"></div>
           <select class="form-select" id="periodFilter">
             <option value="month">This Month</option>
             <option value="quarter">This Quarter</option>
