@@ -155,9 +155,15 @@ googleSignUpBtn.addEventListener('click', async () => {
 
 // Check if already logged in (on page load only)
 (async () => {
-  await authService.waitForAuth();
-  if (authService.isAuthenticated()) {
-    const redirectUrl = getRedirectUrl();
-    window.location.href = redirectUrl;
+  try {
+    await authService.waitForAuth();
+    if (authService.isAuthenticated()) {
+      // User is already logged in, redirect
+      const redirectUrl = getRedirectUrl();
+      window.location.replace(redirectUrl);
+    }
+  } catch (error) {
+    console.error('[Signup] Error checking auth state:', error);
+    // Don't redirect on error, let user try to signup
   }
 })();

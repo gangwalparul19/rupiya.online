@@ -117,6 +117,17 @@ service cloud.firestore {
     }
     
     // ============================================
+    // LOANS & EMI
+    // ============================================
+    match /loans/{loanId} {
+      // Users can only access their own loans
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && hasValidUserId();
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
+    }
+    
+    // ============================================
     // HOUSES
     // ============================================
     match /houses/{houseId} {

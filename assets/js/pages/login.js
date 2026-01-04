@@ -167,8 +167,15 @@ forgotPasswordLink.addEventListener('click', async (e) => {
 
 // Check if already logged in (on page load only)
 (async () => {
-  await authService.waitForAuth();
-  if (authService.isAuthenticated()) {
-    window.location.href = 'dashboard.html';
+  try {
+    await authService.waitForAuth();
+    if (authService.isAuthenticated()) {
+      // User is already logged in, redirect to dashboard
+      const redirectUrl = getRedirectUrl();
+      window.location.replace(redirectUrl);
+    }
+  } catch (error) {
+    console.error('[Login] Error checking auth state:', error);
+    // Don't redirect on error, let user try to login
   }
 })();

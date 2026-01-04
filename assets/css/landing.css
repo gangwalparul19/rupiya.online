@@ -109,7 +109,6 @@
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   transition: all 0.3s ease;
-  display: none; /* Hide navigation on landing page */
 }
 
 .landing-nav.scrolled {
@@ -283,7 +282,7 @@
    ============================================ */
 
 .hero-section {
-  padding: 80px 0 80px;
+  padding: 120px 0 80px;
   text-align: center;
   color: var(--white);
   position: relative;
@@ -1456,7 +1455,7 @@
   }
   
   .hero-section {
-    padding: 60px 0 60px;
+    padding: 100px 0 60px;
   }
   
   .hero-cta {

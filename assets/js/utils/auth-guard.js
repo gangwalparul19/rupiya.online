@@ -16,6 +16,11 @@
   // Check for Firebase auth data in storage (quick check before Firebase SDK loads)
   const hasAuthData = () => {
     try {
+      // Check the rupiya auth flag first (most reliable)
+      if (localStorage.getItem('rupiya_user_logged_in') === 'true') {
+        return true;
+      }
+      
       // Check all localStorage keys for Firebase auth data
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
@@ -23,10 +28,10 @@
           return true;
         }
       }
-      // Also check IndexedDB indicator
-      if (localStorage.getItem('rupiya_user_logged_in') === 'true') {
-        return true;
-      }
+      
+      // Check for Firebase IndexedDB data indicator
+      // Firebase 10.x uses IndexedDB by default, so we can't check it synchronously
+      // If no localStorage flag, assume not logged in for quick redirect
       return false;
     } catch (e) {
       // If storage access fails, let the page load and handle auth normally
@@ -55,7 +60,14 @@
     }
   };
   
-  if (!hasAuthData()) {
+  // Check if we're already on the login page to prevent redirect loop
+  const isLoginPage = window.location.pathname.endsWith('login.html') || 
+                      window.location.pathname.endsWith('signup.html') ||
+                      window.location.pathname.endsWith('index.html') ||
+                      window.location.pathname === '/' ||
+                      window.location.pathname === '';
+  
+  if (!hasAuthData() && !isLoginPage) {
     // Store redirect info before redirecting
     storeRedirectUrl();
     // No auth data found, redirect immediately

@@ -35,7 +35,8 @@ const htmlFiles = [
   'feedback.html',
   'achievements.html',
   'user-guide.html',
-  'demo.html'
+  'demo.html',
+  'offline.html'
 ];
 
 // Pages that have the dashboard layout with sidebar

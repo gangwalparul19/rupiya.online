@@ -40,6 +40,14 @@ class AuthService {
         const wasInitialized = this.authInitialized;
         this.currentUser = user;
         
+        // Keep the localStorage flag in sync with Firebase auth state
+        // This ensures auth-guard.js works correctly on page refresh
+        if (user) {
+          localStorage.setItem('rupiya_user_logged_in', 'true');
+        } else {
+          localStorage.removeItem('rupiya_user_logged_in');
+        }
+        
         if (!wasInitialized) {
           this.authInitialized = true;
           console.log('[Auth Service] Auth initialized with user:', user ? user.email : 'null');
