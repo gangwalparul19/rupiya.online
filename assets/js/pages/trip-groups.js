@@ -358,6 +358,7 @@ class TripGroupsPage {
           addedMembers.push(member);
         } else {
           console.error('Failed to add member:', member.name, addResult.error);
+          this.showToast(`Failed to add ${member.name}: ${addResult.error}`, 'warning');
         }
       }
       
@@ -371,7 +372,7 @@ class TripGroupsPage {
         try {
           console.log('Sending invitation emails...');
           const emailPayload = {
-            members: addedMembers,
+            members: membersWithEmail,
             tripName: name,
             destination: destination,
             description: description,
@@ -389,26 +390,39 @@ class TripGroupsPage {
             body: JSON.stringify(emailPayload)
           });
           
+          if (!emailResponse.ok) {
+            throw new Error(`HTTP error! status: ${emailResponse.status}`);
+          }
+          
           const emailResult = await emailResponse.json();
           console.log('Email API response:', emailResult);
           
-          if (emailResult.success && emailResult.sent > 0) {
-            this.showToast(`Invitations sent to ${emailResult.sent} member(s)!`, 'success');
-          } else if (emailResult.error) {
+          if (emailResult.success) {
+            if (emailResult.sent > 0) {
+              this.showToast(`✅ Invitations sent to ${emailResult.sent} member(s)!`, 'success');
+            } else if (emailResult.sent === 0) {
+              this.showToast('⚠️ No valid emails to send invitations', 'info');
+            }
+          } else {
             console.error('Email API error:', emailResult.error);
+            this.showToast(`⚠️ Failed to send emails: ${emailResult.error}`, 'warning');
           }
         } catch (emailError) {
           console.error('Error sending invitation emails:', emailError);
-          // Don't fail the whole operation if emails fail
+          this.showToast(`⚠️ Email sending failed: ${emailError.message}`, 'warning');
         }
+      } else {
+        console.log('No members with email addresses to send invitations');
       }
       
-      this.showToast('Group created successfully!', 'success');
+      this.showToast('✅ Group created successfully!', 'success');
       this.hideCreateSection();
       await this.loadGroups();
       
       // Navigate to the new group
-      window.location.href = `trip-group-detail.html?id=${result.groupId}`;
+      setTimeout(() => {
+        window.location.href = `trip-group-detail.html?id=${result.groupId}`;
+      }, 1000);
     } catch (error) {
       console.error('Error creating group:', error);
       this.showToast(error.message || 'Failed to create group', 'error');

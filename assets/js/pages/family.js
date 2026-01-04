@@ -8,6 +8,43 @@ let currentUser = null;
 let familyGroups = [];
 let pendingInvitations = [];
 
+// Modal functions - defined early so they can be used by early event handlers
+function showCreateFamilyModal() {
+  console.log('[Family Page] showCreateFamilyModal called');
+  const modal = document.getElementById('createFamilyModal');
+  console.log('[Family Page] createFamilyModal element:', modal);
+  
+  if (modal) {
+    modal.classList.add('show');
+    console.log('[Family Page] Modal show class added');
+  } else {
+    console.error('[Family Page] createFamilyModal not found!');
+  }
+}
+
+// Expose to global scope for inline onclick handlers
+window.showCreateFamilyModal = showCreateFamilyModal;
+
+// Setup create family button early (doesn't need auth)
+function setupCreateFamilyButton() {
+  const createFamilyBtnTop = document.getElementById('createFamilyBtnTop');
+  console.log('[Family Page] Early setup - createFamilyBtnTop element:', createFamilyBtnTop);
+  
+  if (createFamilyBtnTop) {
+    createFamilyBtnTop.addEventListener('click', () => {
+      console.log('[Family Page] Create Family button clicked (early handler)');
+      showCreateFamilyModal();
+    });
+  }
+}
+
+// Run early setup when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', setupCreateFamilyButton);
+} else {
+  setupCreateFamilyButton();
+}
+
 // Check authentication
 async function checkAuth() {
   console.log('[Family Page] Checking authentication...');
@@ -107,11 +144,6 @@ function setupEventListeners() {
 
   // Logout
   document.getElementById('logoutBtn')?.addEventListener('click', handleLogout);
-
-  // Create family button
-  document.getElementById('createFamilyBtnTop')?.addEventListener('click', () => {
-    showCreateFamilyModal();
-  });
 }
 
 // Load data
@@ -277,13 +309,7 @@ function formatDate(timestamp) {
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
-// Modal functions
-function showCreateFamilyModal() {
-  const modal = document.getElementById('createFamilyModal');
-  if (modal) {
-    modal.classList.add('show');
-  }
-}
+// Additional Modal functions
 
 function showInviteMemberModal(groupId) {
   const modal = document.getElementById('inviteMemberModal');
