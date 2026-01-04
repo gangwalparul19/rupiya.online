@@ -323,8 +323,8 @@ service cloud.firestore {
       }
       
       // Read: Any authenticated user can read (they'll filter on client side)
-      // This is necessary because we can't easily check array of objects in rules
-      allow read: if isAuthenticated();
+      // Admins can read all for analytics
+      allow read: if isAuthenticated() || isAdmin();
       
       // Create: Any authenticated user can create
       allow create: if isAuthenticated() && 
@@ -390,9 +390,10 @@ service cloud.firestore {
                get(/databases/$(database)/documents/tripGroupMembers/$(groupId + '_' + request.auth.uid)).data.isAdmin == true;
       }
       
-      // Read: Members can read their group
+      // Read: Members can read their group, Admins can read all for analytics
       allow read: if isTripGroupMember() || 
-                     (isAuthenticated() && resource.data.createdBy == request.auth.uid);
+                     (isAuthenticated() && resource.data.createdBy == request.auth.uid) ||
+                     isAdmin();
       
       // Create: Any authenticated user can create a trip group
       allow create: if isAuthenticated() && 

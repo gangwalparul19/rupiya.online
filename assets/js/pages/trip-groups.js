@@ -13,11 +13,16 @@ class TripGroupsPage {
   }
 
   async init() {
+    console.log('[Trip Groups] init() called');
     const user = await this.waitForAuth();
+    console.log('[Trip Groups] waitForAuth returned:', user ? user.email : 'null');
     if (!user) return; // Redirecting to login
     
+    console.log('[Trip Groups] Binding events...');
     this.bindEvents();
+    console.log('[Trip Groups] Loading groups...');
     await this.loadGroups();
+    console.log('[Trip Groups] Initialization complete');
   }
 
   async waitForAuth() {
@@ -34,8 +39,15 @@ class TripGroupsPage {
   }
 
   bindEvents() {
+    console.log('[Trip Groups] bindEvents() called');
+    
     // Create group button
-    document.getElementById('createGroupBtn')?.addEventListener('click', () => this.openCreateModal());
+    const createBtn = document.getElementById('createGroupBtn');
+    console.log('[Trip Groups] createGroupBtn element:', createBtn);
+    createBtn?.addEventListener('click', () => {
+      console.log('[Trip Groups] Create button clicked');
+      this.openCreateModal();
+    });
     
     // Modal controls
     document.getElementById('closeGroupModalBtn')?.addEventListener('click', () => this.closeModal());
@@ -62,6 +74,8 @@ class TripGroupsPage {
     document.getElementById('deleteGroupModal')?.addEventListener('click', (e) => {
       if (e.target.id === 'deleteGroupModal') this.closeDeleteModal();
     });
+    
+    console.log('[Trip Groups] Events bound successfully');
   }
 
   async loadGroups() {
@@ -197,17 +211,31 @@ class TripGroupsPage {
   }
 
   openCreateModal() {
+    console.log('[Trip Groups] openCreateModal() called');
     this.editingGroupId = null;
     this.pendingMembers = [];
     
     // Reset form
-    document.getElementById('groupForm').reset();
-    document.getElementById('membersList').innerHTML = '';
-    document.getElementById('groupModalTitle').textContent = 'Create Trip Group';
-    document.getElementById('saveGroupBtnText').textContent = 'Create Group';
+    const form = document.getElementById('groupForm');
+    const membersList = document.getElementById('membersList');
+    const modalTitle = document.getElementById('groupModalTitle');
+    const btnText = document.getElementById('saveGroupBtnText');
+    const modal = document.getElementById('createGroupModal');
+    
+    console.log('[Trip Groups] Modal elements:', { form, membersList, modalTitle, btnText, modal });
+    
+    form?.reset();
+    if (membersList) membersList.innerHTML = '';
+    if (modalTitle) modalTitle.textContent = 'Create Trip Group';
+    if (btnText) btnText.textContent = 'Create Group';
     
     // Show modal
-    document.getElementById('createGroupModal').classList.add('active');
+    if (modal) {
+      modal.classList.add('active');
+      console.log('[Trip Groups] Modal should now be visible');
+    } else {
+      console.error('[Trip Groups] Modal element not found!');
+    }
   }
 
   closeModal() {
@@ -406,5 +434,6 @@ class TripGroupsPage {
 
 // Initialize page
 document.addEventListener('DOMContentLoaded', () => {
+  console.log('[Trip Groups] DOMContentLoaded - initializing page');
   new TripGroupsPage();
 });
