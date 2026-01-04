@@ -36,7 +36,10 @@ const htmlFiles = [
   'achievements.html',
   'user-guide.html',
   'demo.html',
-  'offline.html'
+  'offline.html',
+  'trip-groups.html',
+  'trip-group-detail.html',
+  'admin.html'
 ];
 
 // Pages that have the dashboard layout with sidebar
@@ -60,7 +63,10 @@ const pagesWithSidebar = [
   'split-expense.html',
   'family.html',
   'feedback.html',
-  'achievements.html'
+  'achievements.html',
+  'trip-groups.html',
+  'trip-group-detail.html',
+  'admin.html'
 ];
 
 // Environment variable injection script

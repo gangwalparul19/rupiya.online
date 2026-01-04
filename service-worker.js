@@ -1,7 +1,7 @@
 // Service Worker for Rupiya PWA
 // Provides offline support and caching
 
-const CACHE_VERSION = '1.0.37'; // Increment this on every deployment
+const CACHE_VERSION = '1.0.38'; // Increment this on every deployment
 const CACHE_NAME = `rupiya-v${CACHE_VERSION}`;
 const RUNTIME_CACHE = `rupiya-runtime-v${CACHE_VERSION}`;
 
@@ -32,6 +32,9 @@ const STATIC_ASSETS = [
   '/recurring.html',
   '/ai-insights.html',
   '/split-expense.html',
+  '/trip-groups.html',
+  '/trip-group-detail.html',
+  '/admin.html',
   '/assets/css/common.css',
   '/assets/css/components.css',
   '/assets/css/responsive.css',
@@ -42,6 +45,9 @@ const STATIC_ASSETS = [
   '/assets/css/landing.css',
   '/assets/css/gamification.css',
   '/assets/css/onboarding.css',
+  '/assets/css/trip-groups.css',
+  '/assets/css/trip-group-detail.css',
+  '/assets/css/admin.css',
   '/assets/js/config/firebase-config.js',
   '/assets/js/services/auth-service.js',
   '/assets/js/services/firestore-service.js',
@@ -49,6 +55,8 @@ const STATIC_ASSETS = [
   '/assets/js/services/family-service.js',
   '/assets/js/services/gamification-service.js',
   '/assets/js/services/onboarding-service.js',
+  '/assets/js/services/trip-groups-service.js',
+  '/assets/js/services/admin-service.js',
   '/assets/js/utils/helpers.js',
   '/assets/js/utils/performance.js',
   '/assets/js/utils/error-handler.js',
@@ -66,6 +74,9 @@ const STATIC_ASSETS = [
   '/assets/js/pages/family-modals.js',
   '/assets/js/pages/achievements.js',
   '/assets/js/pages/feedback.js',
+  '/assets/js/pages/trip-groups.js',
+  '/assets/js/pages/trip-group-detail.js',
+  '/assets/js/pages/admin.js',
   '/assets/js/services/services-init.js',
   '/assets/css/feedback.css',
   '/logo.png',

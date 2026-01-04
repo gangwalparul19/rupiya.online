@@ -21,10 +21,20 @@ import { db } from '../config/firebase-config.js';
 import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
 import authService from '../services/auth-service.js';
 
-// Check if current user is admin
+// Check if current user is admin (non-blocking)
 async function checkIsAdmin() {
   try {
-    const user = authService.getCurrentUser();
+    // First check if user is already available (fast path)
+    let user = authService.getCurrentUser();
+    
+    // If not, wait briefly for auth to initialize
+    if (!user) {
+      // Use a timeout to avoid blocking on public pages
+      const timeoutPromise = new Promise(resolve => setTimeout(() => resolve(null), 500));
+      const authPromise = authService.waitForAuth();
+      user = await Promise.race([authPromise, timeoutPromise]);
+    }
+    
     if (!user) return false;
     
     const userDoc = await getDoc(doc(db, 'users', user.uid));
