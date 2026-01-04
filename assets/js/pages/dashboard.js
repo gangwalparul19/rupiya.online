@@ -10,6 +10,7 @@ import gamificationUI from '../components/gamification-ui.js';
 import setupWizard from '../components/setup-wizard.js';
 import recurringProcessor from '../services/recurring-processor.js';
 import { formatCurrency, formatCurrencyCompact, formatDate, getRelativeTime, escapeHtml } from '../utils/helpers.js';
+import timezoneService from '../utils/timezone.js';
 
 // Check authentication
 async function checkAuth() {
@@ -636,13 +637,13 @@ function createTrendChart(expenses, income, months = 6) {
   
   for (let i = months - 1; i >= 0; i--) {
     const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const monthName = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+    const monthName = timezoneService.formatShortMonthYear(date);
     labels.push(monthName);
     
     // Calculate expenses for this month
     const monthExpenses = expenses
       .filter(e => {
-        const expenseDate = e.date.toDate ? e.date.toDate() : new Date(e.date);
+        const expenseDate = timezoneService.toLocalDate(e.date);
         return expenseDate.getMonth() === date.getMonth() && 
                expenseDate.getFullYear() === date.getFullYear();
       })
@@ -651,7 +652,7 @@ function createTrendChart(expenses, income, months = 6) {
     // Calculate income for this month
     const monthIncome = income
       .filter(i => {
-        const incomeDate = i.date.toDate ? i.date.toDate() : new Date(i.date);
+        const incomeDate = timezoneService.toLocalDate(i.date);
         return incomeDate.getMonth() === date.getMonth() && 
                incomeDate.getFullYear() === date.getFullYear();
       })

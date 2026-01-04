@@ -327,7 +327,7 @@
 }
 
 /* Small Mobile */
-@media (max-width: 360px) {
+@media (max-width: 480px) {
   .feedback-info-grid {
     gap: 0.35rem;
   }
@@ -344,12 +344,64 @@
     font-size: 0.6rem;
   }
   
+  /* Single column for all form fields on mobile */
   .form-row {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
   }
   
   .feedback-form-container {
     padding: 0.75rem;
+  }
+  
+  .feedback-form .form-group {
+    margin-bottom: 0.75rem !important;
+  }
+  
+  .feedback-form label {
+    margin-bottom: 4px !important;
+    font-size: 13px !important;
+  }
+  
+  .feedback-form input,
+  .feedback-form select,
+  .feedback-form textarea {
+    padding: 10px 12px !important;
+    font-size: 14px !important;
+  }
+  
+  /* Keep buttons side by side */
+  .feedback-form .form-actions {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px !important;
+  }
+  
+  .feedback-form .form-actions .btn {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .feedback-info-grid {
+    gap: 0.25rem;
+  }
+  
+  .feedback-info-card {
+    padding: 0.4rem 0.2rem;
+  }
+  
+  .feedback-info-icon {
+    font-size: 1.125rem;
+  }
+  
+  .feedback-info-text {
+    font-size: 0.55rem;
+  }
+  
+  .feedback-form-container {
+    padding: 0.6rem;
   }
 }
 

@@ -76,7 +76,7 @@
       <div class="mobile-header">
         <a href="dashboard.html" class="mobile-brand">
           <img src="assets/images/logo.png" alt="Rupiya">
-          <span class="brand-name">Rupiya</span>
+          
         </a>
         <div class="mobile-header-actions">
           <div id="familySwitcherContainer"></div>
@@ -150,6 +150,7 @@
 
         <form id="recurringForm">
           <div class="form-grid">
+            <!-- Row 1: Type and Amount -->
             <div class="form-group">
               <label for="type">Type *</label>
               <select id="type" required>
@@ -161,17 +162,19 @@
             </div>
 
             <div class="form-group">
-              <label for="description">Description *</label>
-              <input type="text" id="description" required maxlength="200" placeholder="e.g., Netflix Subscription">
-              <span class="error-message" id="descriptionError"></span>
-            </div>
-
-            <div class="form-group">
               <label for="amount">Amount *</label>
               <input type="number" id="amount" step="0.01" min="0" required placeholder="0.00">
               <span class="error-message" id="amountError"></span>
             </div>
 
+            <!-- Row 2: Description (full width) -->
+            <div class="form-group form-group-full">
+              <label for="description">Description *</label>
+              <input type="text" id="description" required maxlength="200" placeholder="e.g., Netflix Subscription">
+              <span class="error-message" id="descriptionError"></span>
+            </div>
+
+            <!-- Row 3: Category and Frequency -->
             <div class="form-group">
               <label for="category">Category *</label>
               <select id="category" required>
@@ -201,6 +204,7 @@
               <span class="error-message" id="frequencyError"></span>
             </div>
 
+            <!-- Row 4: Start Date and End Date -->
             <div class="form-group">
               <label for="startDate">Start Date *</label>
               <input type="date" id="startDate" required>
@@ -213,6 +217,7 @@
               <span class="error-message" id="endDateError"></span>
             </div>
 
+            <!-- Row 5: Status and Payment Method -->
             <div class="form-group">
               <label for="status">Status *</label>
               <select id="status" required>
@@ -225,15 +230,25 @@
             <div class="form-group">
               <label for="paymentMethod">Payment Method</label>
               <select id="paymentMethod">
-                <option value="cash">Cash</option>
-                <option value="card">Card</option>
-                <option value="upi">UPI</option>
-                <option value="bank">Bank Transfer</option>
-                <option value="wallet">Digital Wallet</option>
+                <option value="cash">💵 Cash</option>
+                <option value="card">💳 Card</option>
+                <option value="upi">📱 UPI</option>
+                <option value="bank">🏦 Bank Transfer</option>
+                <option value="wallet">👛 Digital Wallet</option>
               </select>
               <span class="error-message" id="paymentMethodError"></span>
             </div>
 
+            <!-- Row 6: Specific Payment Method (conditional, full width) -->
+            <div class="form-group form-group-full" id="specificPaymentMethodGroup" style="display: none;">
+              <label for="specificPaymentMethod">Select Account</label>
+              <select id="specificPaymentMethod">
+                <option value="">Select...</option>
+              </select>
+              <span class="helper-text">Choose from your saved payment methods</span>
+            </div>
+
+            <!-- Row 7: Notes (full width) -->
             <div class="form-group form-group-full">
               <label for="notes">Notes</label>
               <textarea id="notes" rows="3" maxlength="500" placeholder="Add notes..."></textarea>
@@ -250,6 +265,7 @@
           </div>
         </form>
       </div>
+
 
       <!-- Recurring List -->
       <div class="recurring-container">

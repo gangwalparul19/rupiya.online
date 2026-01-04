@@ -76,7 +76,7 @@
       <div class="mobile-header">
         <a href="dashboard.html" class="mobile-brand">
           <img src="assets/images/logo.png" alt="Rupiya">
-          <span class="brand-name">Rupiya</span>
+          
         </a>
         <div class="mobile-header-actions">
           <div id="familySwitcherContainer"></div>
@@ -144,6 +144,7 @@
 
         <form id="budgetForm">
           <div class="form-grid">
+            <!-- Row 1: Category and Amount -->
             <div class="form-group">
               <label for="category">Category *</label>
               <select id="category" required>
@@ -166,6 +167,7 @@
               <span class="error-message" id="amountError"></span>
             </div>
 
+            <!-- Row 2: Month and Alert Threshold -->
             <div class="form-group">
               <label for="month">Month *</label>
               <input type="month" id="month" required>
@@ -178,6 +180,7 @@
               <span class="error-message" id="alertThresholdError"></span>
             </div>
 
+            <!-- Row 3: Notes (full width) -->
             <div class="form-group form-group-full">
               <label for="notes">Notes</label>
               <textarea id="notes" rows="3" maxlength="500" placeholder="Add notes about this budget..."></textarea>

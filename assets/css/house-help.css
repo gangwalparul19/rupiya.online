@@ -408,42 +408,43 @@
   }
 
   .add-help-section {
-    padding: 1.5rem;
+    padding: 1rem;
   }
 
-  /* Form grid mobile */
+  /* Form grid mobile - keep 2 columns with !important to override mobile-enhancements.css */
   .form-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
   }
   
   .form-group {
-    margin-bottom: 0;
+    margin-bottom: 0 !important;
   }
   
   .form-group-full {
-    grid-column: 1 / -1;
+    grid-column: 1 / -1 !important;
   }
   
   .form-group label {
-    margin-bottom: 4px;
-    font-size: 13px;
+    margin-bottom: 4px !important;
+    font-size: 13px !important;
   }
   
   .form-group input,
   .form-group select,
   .form-group textarea {
-    padding: 10px 12px;
-    font-size: 14px;
+    padding: 10px 12px !important;
+    font-size: 14px !important;
   }
 
   .form-actions {
-    flex-direction: column-reverse;
-    gap: 10px;
+    flex-direction: row !important;
+    gap: 10px !important;
   }
 
   .form-actions .btn {
-    width: 100%;
+    flex: 1 !important;
+    min-width: 0 !important;
   }
   
   .modal-body {
@@ -456,11 +457,16 @@
   
   .modal-footer {
     padding: 12px;
+    flex-direction: row;
     gap: 10px;
+  }
+  
+  .modal-footer .btn {
+    flex: 1;
   }
 
   .help-container {
-    padding: 1.5rem;
+    padding: 1rem;
   }
 
   .help-card {
@@ -472,8 +478,8 @@
   }
 
   .help-card-footer {
-    flex-direction: column;
-    align-items: flex-start;
+    flex-direction: row;
+    align-items: center;
     gap: 0.5rem;
   }
 }
@@ -502,8 +508,34 @@
     font-size: 0.75rem;
   }
 
+  /* Keep 2-column form grid on small mobile */
+  .form-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+  
+  .form-group-full {
+    grid-column: 1 / -1 !important;
+  }
+  
+  .form-group label {
+    font-size: 12px !important;
+  }
+  
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: 8px 10px !important;
+    font-size: 13px !important;
+  }
+
   .help-card-body {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .help-card-footer {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
 

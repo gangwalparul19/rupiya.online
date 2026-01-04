@@ -5,9 +5,9 @@ import categoriesService from '../services/categories-service.js';
 import familySwitcher from '../components/family-switcher.js';
 import toast from '../components/toast.js';
 import themeManager from '../utils/theme-manager.js';
-import { updateProfile, updatePassword, EmailAuthProvider, reauthenticateWithCredential, deleteUser } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
+import { updateProfile, updatePassword, EmailAuthProvider, reauthenticateWithCredential, deleteUser, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
 import { doc, setDoc, Timestamp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
-import { db } from '../config/firebase-config.js';
+import { db, auth } from '../config/firebase-config.js';
 import paymentMethodsService from '../services/payment-methods-service.js';
 // Helper function for toast
 const showToast = (message, type) => toast.show(message, type);
@@ -16,15 +16,17 @@ let currentUser = null;
 let userPreferences = {};
 let expenseCategories = [];
 let incomeCategories = [];
+let isGoogleUser = false;
 
 // DOM Elements
 let profileForm, passwordForm, preferencesForm;
 let displayNameInput, emailInput, phoneInput;
 let currentPasswordInput, newPasswordInput, confirmPasswordInput;
-let currencySelect, dateFormatSelect, languageSelect, emailNotificationsCheckbox, weeklyReportEnabledCheckbox, monthlyReportEnabledCheckbox;
+let currencySelect, dateFormatSelect, weeklyReportEnabledCheckbox, monthlyReportEnabledCheckbox;
 let exportDataBtn, deleteAccountBtn;
 let deleteAccountModal, closeDeleteAccountModalBtn, cancelDeleteAccountBtn, confirmDeleteAccountBtn;
 let confirmDeleteText;
+let googleAuthNotice, emailAuthSection, sendResetEmailBtn;
 
 async function init() {
   currentUser = await authService.waitForAuth();
@@ -33,6 +35,9 @@ async function init() {
     return;
   }
 
+  // Detect if user signed in with Google
+  isGoogleUser = currentUser.providerData.some(provider => provider.providerId === 'google.com');
+
   initDOMElements();
   
   // Initialize family switcher
@@ -40,6 +45,7 @@ async function init() {
   
   setupEventListeners();
   loadUserProfile(currentUser);
+  setupSecuritySection();
   await loadUserPreferences();
   await loadCategories();
 }
@@ -59,8 +65,6 @@ function initDOMElements() {
   
   currencySelect = document.getElementById('currency');
   dateFormatSelect = document.getElementById('dateFormat');
-  languageSelect = document.getElementById('language');
-  emailNotificationsCheckbox = document.getElementById('emailNotifications');
   weeklyReportEnabledCheckbox = document.getElementById('weeklyReportEnabled');
   monthlyReportEnabledCheckbox = document.getElementById('monthlyReportEnabled');
   
@@ -82,6 +86,11 @@ function initDOMElements() {
   cancelDeleteAccountBtn = document.getElementById('cancelDeleteAccountBtn');
   confirmDeleteAccountBtn = document.getElementById('confirmDeleteAccountBtn');
   confirmDeleteText = document.getElementById('confirmDeleteText');
+
+  // Security section elements
+  googleAuthNotice = document.getElementById('googleAuthNotice');
+  emailAuthSection = document.getElementById('emailAuthSection');
+  sendResetEmailBtn = document.getElementById('sendResetEmailBtn');
 }
 
 function setupEventListeners() {
@@ -150,6 +159,57 @@ function setupEventListeners() {
   confirmDeleteText?.addEventListener('input', (e) => {
     confirmDeleteAccountBtn.disabled = e.target.value !== 'DELETE';
   });
+
+  // Password reset email
+  sendResetEmailBtn?.addEventListener('click', handleSendResetEmail);
+}
+
+// Setup security section based on auth provider
+function setupSecuritySection() {
+  if (isGoogleUser) {
+    // Show Google notice, hide email/password form
+    if (googleAuthNotice) googleAuthNotice.style.display = 'block';
+    if (emailAuthSection) emailAuthSection.style.display = 'none';
+  } else {
+    // Show email/password form, hide Google notice
+    if (googleAuthNotice) googleAuthNotice.style.display = 'none';
+    if (emailAuthSection) emailAuthSection.style.display = 'block';
+  }
+}
+
+// Handle sending password reset email
+async function handleSendResetEmail() {
+  const btn = sendResetEmailBtn;
+  const btnText = document.getElementById('sendResetEmailBtnText');
+  const btnSpinner = document.getElementById('sendResetEmailBtnSpinner');
+
+  if (!btn || !btnText || !btnSpinner) return;
+
+  btn.disabled = true;
+  btnText.style.display = 'none';
+  btnSpinner.style.display = 'inline-block';
+
+  try {
+    // Configure action code settings for password reset
+    const actionCodeSettings = {
+      url: `${window.location.origin}/login.html?passwordReset=success`,
+      handleCodeInApp: false
+    };
+
+    await sendPasswordResetEmail(auth, currentUser.email, actionCodeSettings);
+    showToast(`Password reset email sent to ${currentUser.email}. Please check your inbox.`, 'success');
+  } catch (error) {
+    console.error('Error sending password reset email:', error);
+    if (error.code === 'auth/too-many-requests') {
+      showToast('Too many requests. Please try again later.', 'error');
+    } else {
+      showToast('Failed to send password reset email. Please try again.', 'error');
+    }
+  } finally {
+    btn.disabled = false;
+    btnText.style.display = 'inline';
+    btnSpinner.style.display = 'none';
+  }
 }
 
 function loadUserProfile(user) {
@@ -188,10 +248,12 @@ async function loadUserPreferences() {
     if (prefs.success && prefs.data) {
       userPreferences = prefs.data;
       
-      currencySelect.value = userPreferences.currency || 'INR';
-      dateFormatSelect.value = userPreferences.dateFormat || 'DD/MM/YYYY';
-      languageSelect.value = userPreferences.language || 'en';
-      emailNotificationsCheckbox.checked = userPreferences.emailNotifications !== false;
+      if (currencySelect) {
+        currencySelect.value = userPreferences.currency || 'INR';
+      }
+      if (dateFormatSelect) {
+        dateFormatSelect.value = userPreferences.dateFormat || 'DD/MM/YYYY';
+      }
       if (weeklyReportEnabledCheckbox) {
         weeklyReportEnabledCheckbox.checked = userPreferences.weeklyReportEnabled === true;
       }
@@ -332,8 +394,6 @@ async function handlePreferencesUpdate(e) {
     const preferences = {
       currency: currencySelect?.value || 'INR',
       dateFormat: dateFormatSelect?.value || 'DD/MM/YYYY',
-      language: languageSelect?.value || 'en',
-      emailNotifications: emailNotificationsCheckbox?.checked || false,
       weeklyReportEnabled: weeklyReportEnabledCheckbox?.checked || false,
       monthlyReportEnabled: monthlyReportEnabledCheckbox?.checked || false,
       userId: currentUser.uid,

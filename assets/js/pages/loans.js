@@ -111,14 +111,14 @@ function setupEventListeners() {
     }
   });
   
-  // Add loan buttons
-  document.getElementById('addLoanBtn')?.addEventListener('click', () => openLoanModal());
-  document.getElementById('addFirstLoanBtn')?.addEventListener('click', () => openLoanModal());
+  // Add loan buttons - now opens inline form
+  document.getElementById('addLoanBtn')?.addEventListener('click', () => showAddForm());
+  document.getElementById('addFirstLoanBtn')?.addEventListener('click', () => showAddForm());
   
-  // Modal controls
-  document.getElementById('closeLoanModal')?.addEventListener('click', closeLoanModal);
-  document.getElementById('cancelLoanBtn')?.addEventListener('click', closeLoanModal);
-  document.getElementById('saveLoanBtn')?.addEventListener('click', saveLoan);
+  // Inline form controls
+  document.getElementById('closeFormBtn')?.addEventListener('click', hideForm);
+  document.getElementById('cancelFormBtn')?.addEventListener('click', hideForm);
+  document.getElementById('loanForm')?.addEventListener('submit', saveLoan);
   
   // Payment modal
   document.getElementById('closePaymentModal')?.addEventListener('click', closePaymentModal);
@@ -417,10 +417,10 @@ function calculateEndDate(loan) {
   return formatDate(end);
 }
 
-// Open loan modal
-function openLoanModal(loanId = null) {
-  const modal = document.getElementById('loanModal');
-  const title = document.getElementById('modalTitle');
+// Show add form (inline)
+function showAddForm(loanId = null) {
+  const addLoanSection = document.getElementById('addLoanSection');
+  const title = document.getElementById('formTitle');
   const form = document.getElementById('loanForm');
   
   editingLoanId = loanId;
@@ -438,12 +438,15 @@ function openLoanModal(loanId = null) {
     document.getElementById('emiPreview').style.display = 'none';
   }
   
-  modal.classList.add('show');
+  addLoanSection.classList.add('show');
+  addLoanSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-// Close loan modal
-function closeLoanModal() {
-  document.getElementById('loanModal').classList.remove('show');
+// Hide form (inline)
+function hideForm() {
+  const addLoanSection = document.getElementById('addLoanSection');
+  addLoanSection.classList.remove('show');
+  document.getElementById('loanForm').reset();
   editingLoanId = null;
 }
 
@@ -473,6 +476,15 @@ function populateLoanForm(loan) {
 // Save loan
 async function saveLoan(e) {
   e.preventDefault();
+  
+  const saveFormBtn = document.getElementById('saveFormBtn');
+  const saveFormBtnText = document.getElementById('saveFormBtnText');
+  const saveFormBtnSpinner = document.getElementById('saveFormBtnSpinner');
+  
+  // Show loading state
+  saveFormBtn.disabled = true;
+  saveFormBtnText.style.display = 'none';
+  saveFormBtnSpinner.style.display = 'inline-block';
   
   const loanData = {
     loanName: document.getElementById('loanName').value.trim(),
@@ -512,12 +524,17 @@ async function saveLoan(e) {
       toast.success('Loan added successfully');
     }
     
-    closeLoanModal();
+    hideForm();
     await loadLoans();
     renderCalendar();
   } catch (error) {
     console.error('Error saving loan:', error);
     toast.error('Failed to save loan');
+  } finally {
+    // Reset loading state
+    saveFormBtn.disabled = false;
+    saveFormBtnText.style.display = 'inline';
+    saveFormBtnSpinner.style.display = 'none';
   }
 }
 
@@ -607,7 +624,7 @@ async function savePayment(e) {
 
 // Edit loan
 function editLoan(loanId) {
-  openLoanModal(loanId);
+  showAddForm(loanId);
 }
 
 // Delete loan

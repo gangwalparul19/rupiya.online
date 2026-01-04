@@ -2,6 +2,7 @@
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
 import categoriesService from '../services/categories-service.js';
+import paymentMethodsService from '../services/payment-methods-service.js';
 import familySwitcher from '../components/family-switcher.js';
 import toast from '../components/toast.js';
 import themeManager from '../utils/theme-manager.js';
@@ -14,6 +15,7 @@ const showToast = (message, type) => toast.show(message, type);
 // State
 let recurringTransactions = [];
 let editingRecurringId = null;
+let userPaymentMethods = [];
 
 // DOM Elements
 let addRecurringBtn, addRecurringSection, closeFormBtn, cancelFormBtn;
@@ -24,6 +26,7 @@ let monthlyExpensesEl, monthlyIncomeEl, activeCountEl;
 let deleteModal, closeDeleteModalBtn, cancelDeleteBtn, confirmDeleteBtn;
 let deleteBtnText, deleteBtnSpinner, deleteRecurringDescription, deleteRecurringAmount;
 let deleteRecurringId = null;
+let paymentMethodInput, specificPaymentMethodGroup, specificPaymentMethodInput;
 
 // Initialize page
 async function init() {
@@ -54,6 +57,9 @@ async function init() {
   
   // Load categories into dropdown
   await loadCategoryDropdown();
+
+  // Load user payment methods
+  await loadUserPaymentMethods();
 
   // Load recurring transactions
   await loadRecurringTransactions();
@@ -95,6 +101,105 @@ async function loadCategoryDropdown() {
   }
 }
 
+// Load user's payment methods
+async function loadUserPaymentMethods() {
+  try {
+    userPaymentMethods = await paymentMethodsService.getPaymentMethods();
+    console.log('Loaded payment methods:', userPaymentMethods);
+  } catch (error) {
+    console.error('Error loading payment methods:', error);
+    userPaymentMethods = [];
+  }
+}
+
+// Handle payment method type change
+function handlePaymentMethodChange() {
+  const selectedType = paymentMethodInput.value;
+  
+  if (!selectedType || selectedType === 'cash') {
+    // Hide specific payment method dropdown for cash or no selection
+    specificPaymentMethodGroup.style.display = 'none';
+    specificPaymentMethodInput.value = '';
+    return;
+  }
+  
+  // Filter payment methods by selected type
+  const methodsOfType = userPaymentMethods.filter(method => method.type === selectedType);
+  
+  if (methodsOfType.length === 0) {
+    // No saved methods of this type
+    specificPaymentMethodGroup.style.display = 'none';
+    specificPaymentMethodInput.value = '';
+    showToast(`No saved ${getPaymentTypeLabel(selectedType)} found. Add one in Profile > Payment Methods.`, 'info');
+    return;
+  }
+  
+  // Populate specific payment method dropdown
+  specificPaymentMethodInput.innerHTML = '<option value="">Select...</option>' +
+    methodsOfType.map(method => {
+      const displayName = getPaymentMethodDisplayName(method);
+      const icon = getPaymentMethodIcon(method.type);
+      return `<option value="${method.id}">${icon} ${displayName}</option>`;
+    }).join('');
+  
+  // Show the dropdown
+  specificPaymentMethodGroup.style.display = 'block';
+}
+
+// Get payment method display name
+function getPaymentMethodDisplayName(method) {
+  let details = method.name;
+  
+  switch (method.type) {
+    case 'card':
+      if (method.cardNumber) {
+        details += ` (****${method.cardNumber})`;
+      }
+      break;
+    case 'upi':
+      if (method.upiId) {
+        details += ` (${method.upiId})`;
+      }
+      break;
+    case 'wallet':
+      if (method.walletNumber) {
+        details += ` (${method.walletNumber})`;
+      }
+      break;
+    case 'bank':
+      if (method.bankAccountNumber) {
+        details += ` (****${method.bankAccountNumber})`;
+      }
+      break;
+  }
+  
+  return details;
+}
+
+// Get payment method icon
+function getPaymentMethodIcon(type) {
+  const icons = {
+    'cash': '💵',
+    'card': '💳',
+    'upi': '📱',
+    'bank': '🏦',
+    'wallet': '👛'
+  };
+  return icons[type] || '💰';
+}
+
+// Get payment type label
+function getPaymentTypeLabel(type) {
+  const labels = {
+    'cash': 'Cash',
+    'card': 'Cards',
+    'upi': 'UPI accounts',
+    'bank': 'Bank accounts',
+    'wallet': 'Digital wallets'
+  };
+  return labels[type] || type;
+}
+
 // Initialize DOM elements
 function initDOMElements() {
   addRecurringBtn = document.getElementById('addRecurringBtn');
@@ -121,6 +226,11 @@ function initDOMElements() {
   deleteBtnSpinner = document.getElementById('deleteBtnSpinner');
   deleteRecurringDescription = document.getElementById('deleteRecurringDescription');
   deleteRecurringAmount = document.getElementById('deleteRecurringAmount');
+  
+  // Payment method elements
+  paymentMethodInput = document.getElementById('paymentMethod');
+  specificPaymentMethodGroup = document.getElementById('specificPaymentMethodGroup');
+  specificPaymentMethodInput = document.getElementById('specificPaymentMethod');
 }
 
 // Setup event listeners
@@ -157,6 +267,9 @@ function setupEventListeners() {
 
   // Process now button
   processNowBtn?.addEventListener('click', handleProcessNow);
+
+  // Payment method change handler
+  paymentMethodInput?.addEventListener('change', handlePaymentMethodChange);
 
   // Delete modal
   closeDeleteModalBtn.addEventListener('click', hideDeleteModal);
@@ -228,6 +341,14 @@ function showAddForm() {
     startDateInput.valueAsDate = new Date();
   }
   
+  // Reset specific payment method dropdown
+  if (specificPaymentMethodGroup) {
+    specificPaymentMethodGroup.style.display = 'none';
+  }
+  if (specificPaymentMethodInput) {
+    specificPaymentMethodInput.value = '';
+  }
+  
   addRecurringSection.classList.add('show');
   addRecurringSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
@@ -237,6 +358,11 @@ function hideForm() {
   addRecurringSection.classList.remove('show');
   recurringForm.reset();
   editingRecurringId = null;
+  
+  // Reset specific payment method dropdown
+  if (specificPaymentMethodGroup) {
+    specificPaymentMethodGroup.style.display = 'none';
+  }
 }
 
 // Show edit form
@@ -257,6 +383,12 @@ function showEditForm(recurring) {
   document.getElementById('paymentMethod').value = recurring.paymentMethod || 'cash';
   document.getElementById('notes').value = recurring.notes || '';
 
+  // Handle specific payment method
+  handlePaymentMethodChange();
+  if (recurring.paymentMethodId && specificPaymentMethodInput) {
+    specificPaymentMethodInput.value = recurring.paymentMethodId;
+  }
+
   addRecurringSection.classList.add('show');
   addRecurringSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
@@ -264,6 +396,10 @@ function showEditForm(recurring) {
 // Handle form submit
 async function handleSubmit(e) {
   e.preventDefault();
+
+  // Get specific payment method if selected
+  const specificMethodId = specificPaymentMethodInput?.value;
+  const specificMethod = specificMethodId ? userPaymentMethods.find(m => m.id === specificMethodId) : null;
 
   // Get form data
   const formData = {
@@ -276,6 +412,8 @@ async function handleSubmit(e) {
     endDate: document.getElementById('endDate').value ? new Date(document.getElementById('endDate').value) : null,
     status: document.getElementById('status').value,
     paymentMethod: document.getElementById('paymentMethod')?.value || 'cash',
+    paymentMethodId: specificMethodId || null,
+    paymentMethodName: specificMethod ? getPaymentMethodDisplayName(specificMethod) : null,
     notes: document.getElementById('notes').value
   };
 
@@ -303,6 +441,16 @@ async function handleSubmit(e) {
     if (result.success) {
       hideForm();
       await loadRecurringTransactions();
+      
+      // Auto-process if this is a new recurring transaction with a past start date
+      if (!editingRecurringId && formData.startDate <= new Date()) {
+        showToast('Processing past due entries...', 'info');
+        recurringProcessor.resetProcessingFlag();
+        const processResult = await recurringProcessor.processRecurring(true);
+        if (processResult.processed > 0) {
+          showToast(`✅ Created ${processResult.processed} transaction(s) automatically`, 'success');
+        }
+      }
     } else {
       showToast(result.error || 'Failed to save recurring transaction', 'error');
     }

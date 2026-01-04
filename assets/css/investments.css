@@ -456,9 +456,9 @@
     padding: 1.5rem;
   }
 
-  /* Form grid mobile */
+  /* Form grid mobile - keep 2 columns */
   .form-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 1fr) !important;
     gap: 12px;
   }
   
@@ -467,7 +467,7 @@
   }
   
   .form-group-full {
-    grid-column: 1 / -1;
+    grid-column: 1 / -1 !important;
   }
   
   .form-group label {
@@ -483,12 +483,12 @@
   }
 
   .form-actions {
-    flex-direction: column-reverse;
+    flex-direction: row;
     gap: 10px;
   }
 
   .form-actions .btn {
-    width: 100%;
+    flex: 1;
   }
   
   .modal-body {
@@ -564,6 +564,27 @@
 
   .summary-change {
     font-size: 9px;
+  }
+
+  /* Keep 2-column form grid on small mobile */
+  .form-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px;
+  }
+  
+  .form-group-full {
+    grid-column: 1 / -1 !important;
+  }
+  
+  .form-group label {
+    font-size: 12px;
+  }
+  
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: 8px 10px;
+    font-size: 13px;
   }
 
   /* 1 card per row even on small mobile */

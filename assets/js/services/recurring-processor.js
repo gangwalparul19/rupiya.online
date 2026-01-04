@@ -76,10 +76,20 @@ class RecurringProcessor {
     today.setHours(23, 59, 59, 999);
     
     let currentDate = new Date(startDate);
+    // Normalize to start of day to avoid timezone issues
+    currentDate.setHours(0, 0, 0, 0);
+    
+    console.log('[RecurringProcessor] getDueDates called:', {
+      startDate: currentDate.toISOString(),
+      frequency,
+      lastProcessedDate: lastProcessedDate ? new Date(lastProcessedDate).toISOString() : null,
+      today: today.toISOString()
+    });
     
     // If we have a last processed date, start from the next occurrence after that
     if (lastProcessedDate) {
       const lastProcessed = new Date(lastProcessedDate);
+      lastProcessed.setHours(0, 0, 0, 0);
       while (currentDate <= lastProcessed) {
         currentDate = this.calculateNextDate(currentDate, frequency);
       }
@@ -90,12 +100,15 @@ class RecurringProcessor {
       // Check if end date has passed
       if (endDate) {
         const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
         if (currentDate > end) break;
       }
       
       dueDates.push(new Date(currentDate));
       currentDate = this.calculateNextDate(currentDate, frequency);
     }
+    
+    console.log('[RecurringProcessor] Due dates found:', dueDates.length, dueDates.map(d => d.toISOString()));
     
     return dueDates;
   }
@@ -122,18 +135,28 @@ class RecurringProcessor {
       // Get all recurring transactions
       const recurringTransactions = await firestoreService.getAll('recurringTransactions', 'startDate', 'asc');
       
+      console.log(`[RecurringProcessor] Found ${recurringTransactions.length} recurring transactions`);
+      
       let processedCount = 0;
       let createdTransactions = [];
 
       for (const recurring of recurringTransactions) {
         // Skip paused or inactive recurring transactions
         if (recurring.status === 'paused' || recurring.status === 'inactive') {
+          console.log(`[RecurringProcessor] Skipping ${recurring.description} - status: ${recurring.status}`);
           continue;
         }
 
         const startDate = recurring.startDate?.toDate ? recurring.startDate.toDate() : new Date(recurring.startDate);
         const endDate = recurring.endDate?.toDate ? recurring.endDate.toDate() : null;
         const lastProcessed = recurring.lastProcessedDate?.toDate ? recurring.lastProcessedDate.toDate() : null;
+        
+        console.log(`[RecurringProcessor] Checking ${recurring.description}:`, {
+          status: recurring.status,
+          frequency: recurring.frequency,
+          startDate: startDate.toISOString(),
+          lastProcessed: lastProcessed ? lastProcessed.toISOString() : null
+        });
         
         // Get all due dates that need processing
         const dueDates = this.getDueDates(startDate, recurring.frequency, lastProcessed, endDate);
@@ -152,6 +175,8 @@ class RecurringProcessor {
             description: recurring.description,
             date: dueDate,
             paymentMethod: recurring.paymentMethod || 'cash',
+            paymentMethodId: recurring.paymentMethodId || null,
+            paymentMethodName: recurring.paymentMethodName || null,
             isRecurring: true,
             recurringId: recurring.id,
             notes: recurring.notes || `Auto-generated from recurring: ${recurring.description}`
@@ -159,10 +184,16 @@ class RecurringProcessor {
 
           let result;
           if (recurring.type === 'expense') {
+            console.log(`[RecurringProcessor] Creating expense for ${recurring.description} on ${dueDate.toISOString()}`);
             result = await firestoreService.addExpense(transactionData);
           } else if (recurring.type === 'income') {
+            console.log(`[RecurringProcessor] Creating income for ${recurring.description} on ${dueDate.toISOString()}`);
             result = await firestoreService.addIncome(transactionData);
+          } else {
+            console.log(`[RecurringProcessor] Unknown type: ${recurring.type} for ${recurring.description}`);
           }
+
+          console.log(`[RecurringProcessor] Result:`, result);
 
           if (result?.success) {
             processedCount++;

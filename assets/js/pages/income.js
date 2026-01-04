@@ -9,6 +9,7 @@ import themeManager from '../utils/theme-manager.js';
 import Pagination from '../components/pagination.js';
 import { Validator } from '../utils/validation.js';
 import { formatCurrency, formatCurrencyCompact, formatDate, formatDateForInput, debounce, exportToCSV, escapeHtml } from '../utils/helpers.js';
+import timezoneService from '../utils/timezone.js';
 
 // State management
 const state = {
@@ -303,9 +304,9 @@ function handlePageChange(page) {
 // Update Income KPI Cards
 function updateIncomeKPIs() {
   const now = new Date();
-  const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-  const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-  const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59);
+  const thisMonthStart = timezoneService.startOfMonth(now);
+  const lastMonthStart = timezoneService.startOfMonth(new Date(now.getFullYear(), now.getMonth() - 1, 1));
+  const lastMonthEnd = timezoneService.endOfMonth(new Date(now.getFullYear(), now.getMonth() - 1, 1));
   
   let thisMonthTotal = 0;
   let lastMonthTotal = 0;
@@ -313,7 +314,7 @@ function updateIncomeKPIs() {
   
   state.income.forEach(income => {
     const amount = Number(income.amount) || 0;
-    const incomeDate = income.date?.toDate ? income.date.toDate() : new Date(income.date);
+    const incomeDate = timezoneService.toLocalDate(income.date);
     
     totalAll += amount;
     
@@ -359,20 +360,20 @@ function applyFilters() {
   
   // Date range filter
   if (state.filters.dateFrom) {
-    const fromDate = new Date(state.filters.dateFrom);
-    fromDate.setHours(0, 0, 0, 0);
+    const fromDate = timezoneService.parseInputDate(state.filters.dateFrom);
+    const fromStart = timezoneService.startOfDay(fromDate);
     filtered = filtered.filter(i => {
-      const incomeDate = i.date.toDate ? i.date.toDate() : new Date(i.date);
-      return incomeDate >= fromDate;
+      const incomeDate = timezoneService.toLocalDate(i.date);
+      return incomeDate >= fromStart;
     });
   }
   
   if (state.filters.dateTo) {
-    const toDate = new Date(state.filters.dateTo);
-    toDate.setHours(23, 59, 59, 999);
+    const toDate = timezoneService.parseInputDate(state.filters.dateTo);
+    const toEnd = timezoneService.endOfDay(toDate);
     filtered = filtered.filter(i => {
-      const incomeDate = i.date.toDate ? i.date.toDate() : new Date(i.date);
-      return incomeDate <= toDate;
+      const incomeDate = timezoneService.toLocalDate(i.date);
+      return incomeDate <= toEnd;
     });
   }
   
@@ -439,7 +440,7 @@ function renderIncome() {
 
 // Create income card HTML
 function createIncomeCard(income) {
-  const date = income.date.toDate ? income.date.toDate() : new Date(income.date);
+  const date = timezoneService.toLocalDate(income.date);
   const sourceIcon = sourceIcons[income.source] || '💰';
   const isRecurring = income.isRecurring || income.recurringId;
   const isSelected = state.selectedIncome.has(income.id);
@@ -930,7 +931,7 @@ function openAddForm() {
   
   // Reset form
   incomeForm.reset();
-  dateInput.value = formatDateForInput(new Date());
+  dateInput.value = timezoneService.formatDateForInput(new Date());
   
   // Clear errors
   clearFormErrors();
@@ -953,8 +954,8 @@ function openEditForm(id) {
   amountInput.value = income.amount;
   sourceInput.value = income.source;
   descriptionInput.value = income.description || '';
-  const date = income.date.toDate ? income.date.toDate() : new Date(income.date);
-  dateInput.value = formatDateForInput(date);
+  const date = timezoneService.toLocalDate(income.date);
+  dateInput.value = timezoneService.formatDateForInput(date);
   paymentMethodInput.value = income.paymentMethod;
   
   // Clear errors
@@ -1005,9 +1006,8 @@ function validateIncomeForm() {
     document.getElementById('dateError').textContent = 'Please select a date';
     isValid = false;
   } else {
-    const selectedDate = new Date(dateInput.value);
-    const today = new Date();
-    today.setHours(23, 59, 59, 999);
+    const selectedDate = timezoneService.parseInputDate(dateInput.value);
+    const today = timezoneService.endOfDay(new Date());
     
     if (selectedDate > today) {
       document.getElementById('dateError').textContent = 'Date cannot be in the future';
@@ -1042,7 +1042,7 @@ async function handleFormSubmit(e) {
       amount: parseFloat(amountInput.value),
       source: sourceInput.value,
       description: descriptionInput.value.trim(),
-      date: new Date(dateInput.value),
+      date: timezoneService.parseInputDate(dateInput.value),
       paymentMethod: paymentMethodInput.value,
       specificPaymentMethodId: specificPaymentMethodInput.value || null,
       specificPaymentMethodName: specificPaymentMethodInput.value ? 
@@ -1173,7 +1173,7 @@ function handleExport() {
   
   // Prepare data for export
   const exportData = state.filteredIncome.map(income => {
-    const date = income.date.toDate ? income.date.toDate() : new Date(income.date);
+    const date = timezoneService.toLocalDate(income.date);
     return {
       Date: formatDate(date),
       Amount: income.amount,
@@ -1185,7 +1185,7 @@ function handleExport() {
   
   // Generate filename with current date
   const today = new Date();
-  const filename = `income_${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}.csv`;
+  const filename = `income_${timezoneService.formatDateForInput(today)}.csv`;
   
   exportToCSV(exportData, filename);
   toast.success('Income exported successfully');

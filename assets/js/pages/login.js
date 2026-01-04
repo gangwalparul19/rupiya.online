@@ -168,6 +168,14 @@ forgotPasswordLink.addEventListener('click', async (e) => {
 // Check if already logged in (on page load only)
 (async () => {
   try {
+    // Check for password reset success message
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('passwordReset') === 'success') {
+      toast.success('Password reset successful! Please sign in with your new password.');
+      // Clean up the URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
     await authService.waitForAuth();
     if (authService.isAuthenticated()) {
       // User is already logged in, redirect to dashboard

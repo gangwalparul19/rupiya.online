@@ -76,7 +76,7 @@
       <div class="mobile-header">
         <a href="dashboard.html" class="mobile-brand">
           <img src="assets/images/logo.png" alt="Rupiya">
-          <span class="brand-name">Rupiya</span>
+          
         </a>
         <div class="mobile-header-actions">
           <div id="familySwitcherContainer"></div>
@@ -160,6 +160,130 @@
           <div class="alert-text" id="upcomingEmiText">You have EMI payments due soon.</div>
         </div>
         <button class="alert-close" id="closeEmiAlert">×</button>
+      </div>
+
+      <!-- Add/Edit Loan Form (Inline) -->
+      <div class="add-loan-section" id="addLoanSection">
+        <div class="add-loan-header">
+          <h2 class="add-loan-title" id="formTitle">Add New Loan</h2>
+          <button class="modal-close" id="closeFormBtn">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <form id="loanForm">
+          <div class="form-grid">
+            <!-- Row 1: Loan Name and Loan Type -->
+            <div class="form-group">
+              <label for="loanName">Loan Name *</label>
+              <input type="text" id="loanName" required placeholder="e.g., Home Loan - SBI">
+            </div>
+            <div class="form-group">
+              <label for="loanType">Loan Type *</label>
+              <select id="loanType" required>
+                <option value="">Select type</option>
+                <option value="home">🏠 Home Loan</option>
+                <option value="car">🚗 Car Loan</option>
+                <option value="personal">💳 Personal Loan</option>
+                <option value="education">🎓 Education Loan</option>
+                <option value="gold">🥇 Gold Loan</option>
+                <option value="business">💼 Business Loan</option>
+                <option value="two-wheeler">🏍️ Two Wheeler Loan</option>
+                <option value="credit-card">💳 Credit Card Loan</option>
+                <option value="other">📋 Other</option>
+              </select>
+            </div>
+
+            <!-- Row 2: Lender and Account Number -->
+            <div class="form-group">
+              <label for="lender">Lender/Bank *</label>
+              <input type="text" id="lender" required placeholder="e.g., State Bank of India">
+            </div>
+            <div class="form-group">
+              <label for="accountNumber">Loan Account Number</label>
+              <input type="text" id="accountNumber" placeholder="e.g., LOAN123456789">
+            </div>
+
+            <!-- Row 3: Principal Amount and Interest Rate -->
+            <div class="form-group">
+              <label for="principalAmount">Principal Amount (₹) *</label>
+              <input type="number" id="principalAmount" required placeholder="e.g., 5000000">
+            </div>
+            <div class="form-group">
+              <label for="interestRate">Interest Rate (% p.a.) *</label>
+              <input type="number" id="interestRate" step="0.01" required placeholder="e.g., 8.5">
+            </div>
+
+            <!-- Row 4: Tenure and EMI Amount -->
+            <div class="form-group">
+              <label for="tenure">Tenure (Months) *</label>
+              <input type="number" id="tenure" required placeholder="e.g., 240">
+            </div>
+            <div class="form-group">
+              <label for="emiAmount">EMI Amount (₹) *</label>
+              <input type="number" id="emiAmount" required placeholder="Auto-calculated">
+            </div>
+
+            <!-- Row 5: Start Date and EMI Due Date -->
+            <div class="form-group">
+              <label for="startDate">Start Date *</label>
+              <input type="date" id="startDate" required>
+            </div>
+            <div class="form-group">
+              <label for="emiDate">EMI Due Date (Day) *</label>
+              <input type="number" id="emiDate" min="1" max="28" required placeholder="e.g., 5">
+            </div>
+
+            <!-- Row 6: EMIs Paid and Outstanding -->
+            <div class="form-group">
+              <label for="emisPaid">EMIs Already Paid</label>
+              <input type="number" id="emisPaid" value="0" min="0" placeholder="e.g., 24">
+            </div>
+            <div class="form-group">
+              <label for="outstandingAmount">Current Outstanding (₹)</label>
+              <input type="number" id="outstandingAmount" placeholder="Auto-calculated">
+            </div>
+
+            <!-- Row 7: Notes (full width) -->
+            <div class="form-group form-group-full">
+              <label for="notes">Notes</label>
+              <textarea id="notes" rows="3" placeholder="Any additional notes..."></textarea>
+            </div>
+          </div>
+
+          <!-- EMI Preview -->
+          <div class="emi-preview" id="emiPreview" style="display: none;">
+            <div class="preview-title">Loan Summary</div>
+            <div class="preview-grid">
+              <div class="preview-item">
+                <span class="preview-label">Calculated EMI</span>
+                <span class="preview-value" id="previewEmi">₹0</span>
+              </div>
+              <div class="preview-item">
+                <span class="preview-label">Total Interest</span>
+                <span class="preview-value" id="previewInterest">₹0</span>
+              </div>
+              <div class="preview-item">
+                <span class="preview-label">Total Payment</span>
+                <span class="preview-value" id="previewTotal">₹0</span>
+              </div>
+              <div class="preview-item">
+                <span class="preview-label">End Date</span>
+                <span class="preview-value" id="previewEndDate">-</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-outline" id="cancelFormBtn">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="saveFormBtn">
+              <span id="saveFormBtnText">Save Loan</span>
+              <span id="saveFormBtnSpinner" class="spinner" style="display: none;"></span>
+            </button>
+          </div>
+        </form>
       </div>
 
       <!-- EMI Calendar -->
@@ -246,120 +370,6 @@
         </div>
       </div>
     </main>
-  </div>
-
-  <!-- Add/Edit Loan Modal -->
-  <div class="modal-overlay" id="loanModal">
-    <div class="modal">
-      <div class="modal-header">
-        <h3 class="modal-title" id="modalTitle">Add New Loan</h3>
-        <button class="modal-close" id="closeLoanModal">×</button>
-      </div>
-      <div class="modal-body">
-        <form id="loanForm">
-          <div class="form-row">
-            <div class="form-group">
-              <label for="loanName">Loan Name *</label>
-              <input type="text" id="loanName" class="form-control" placeholder="e.g., Home Loan - SBI" required>
-            </div>
-            <div class="form-group">
-              <label for="loanType">Loan Type *</label>
-              <select id="loanType" class="form-control" required>
-                <option value="">Select type</option>
-                <option value="home">🏠 Home Loan</option>
-                <option value="car">🚗 Car Loan</option>
-                <option value="personal">💳 Personal Loan</option>
-                <option value="education">🎓 Education Loan</option>
-                <option value="gold">🥇 Gold Loan</option>
-                <option value="business">💼 Business Loan</option>
-                <option value="two-wheeler">🏍️ Two Wheeler Loan</option>
-                <option value="credit-card">💳 Credit Card Loan</option>
-                <option value="other">📋 Other</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="lender">Lender/Bank *</label>
-              <input type="text" id="lender" class="form-control" placeholder="e.g., State Bank of India" required>
-            </div>
-            <div class="form-group">
-              <label for="accountNumber">Loan Account Number</label>
-              <input type="text" id="accountNumber" class="form-control" placeholder="e.g., LOAN123456789">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="principalAmount">Principal Amount (₹) *</label>
-              <input type="number" id="principalAmount" class="form-control" placeholder="e.g., 5000000" required>
-            </div>
-            <div class="form-group">
-              <label for="interestRate">Interest Rate (% p.a.) *</label>
-              <input type="number" id="interestRate" class="form-control" step="0.01" placeholder="e.g., 8.5" required>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="tenure">Tenure (Months) *</label>
-              <input type="number" id="tenure" class="form-control" placeholder="e.g., 240" required>
-            </div>
-            <div class="form-group">
-              <label for="emiAmount">EMI Amount (₹) *</label>
-              <input type="number" id="emiAmount" class="form-control" placeholder="Auto-calculated or enter manually" required>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="startDate">Start Date *</label>
-              <input type="date" id="startDate" class="form-control" required>
-            </div>
-            <div class="form-group">
-              <label for="emiDate">EMI Due Date (Day of Month) *</label>
-              <input type="number" id="emiDate" class="form-control" min="1" max="28" placeholder="e.g., 5" required>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="emisPaid">EMIs Already Paid</label>
-              <input type="number" id="emisPaid" class="form-control" value="0" min="0" placeholder="e.g., 24">
-            </div>
-            <div class="form-group">
-              <label for="outstandingAmount">Current Outstanding (₹)</label>
-              <input type="number" id="outstandingAmount" class="form-control" placeholder="Auto-calculated or enter">
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="notes">Notes</label>
-            <textarea id="notes" class="form-control" rows="2" placeholder="Any additional notes..."></textarea>
-          </div>
-          <div class="emi-preview" id="emiPreview" style="display: none;">
-            <div class="preview-title">Loan Summary</div>
-            <div class="preview-grid">
-              <div class="preview-item">
-                <span class="preview-label">Calculated EMI</span>
-                <span class="preview-value" id="previewEmi">₹0</span>
-              </div>
-              <div class="preview-item">
-                <span class="preview-label">Total Interest</span>
-                <span class="preview-value" id="previewInterest">₹0</span>
-              </div>
-              <div class="preview-item">
-                <span class="preview-label">Total Payment</span>
-                <span class="preview-value" id="previewTotal">₹0</span>
-              </div>
-              <div class="preview-item">
-                <span class="preview-label">End Date</span>
-                <span class="preview-value" id="previewEndDate">-</span>
-              </div>
-            </div>
-          </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-outline" id="cancelLoanBtn">Cancel</button>
-        <button type="submit" class="btn btn-primary" id="saveLoanBtn">Save Loan</button>
-      </div>
-    </div>
   </div>
 
   <!-- Record Payment Modal -->

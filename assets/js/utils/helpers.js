@@ -1,4 +1,5 @@
 // Utility Helper Functions
+import timezoneService from './timezone.js';
 
 // Escape HTML to prevent XSS attacks
 export function escapeHtml(text) {
@@ -44,13 +45,9 @@ export function formatCurrencyCompact(amount, currency = '₹') {
   }
 }
 
-// Format date
+// Format date using timezone service
 export function formatDate(date, format = 'short') {
   if (!date) return '';
-  
-  const d = date instanceof Date ? date : new Date(date);
-  
-  if (isNaN(d.getTime())) return '';
   
   const options = {
     short: { year: 'numeric', month: 'short', day: 'numeric' },
@@ -58,42 +55,17 @@ export function formatDate(date, format = 'short') {
     full: { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
   };
   
-  return d.toLocaleDateString('en-IN', options[format] || options.short);
+  return timezoneService.formatDate(date, options[format] || options.short);
 }
 
-// Format date for input fields (YYYY-MM-DD)
+// Format date for input fields (YYYY-MM-DD) using timezone service
 export function formatDateForInput(date) {
-  if (!date) return '';
-  const d = date instanceof Date ? date : new Date(date);
-  if (isNaN(d.getTime())) return '';
-  
-  const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  
-  return `${year}-${month}-${day}`;
+  return timezoneService.formatDateForInput(date);
 }
 
-// Get relative time (e.g., "2 hours ago")
+// Get relative time using timezone service
 export function getRelativeTime(date) {
-  if (!date) return '';
-  
-  const d = date instanceof Date ? date : new Date(date);
-  if (isNaN(d.getTime())) return '';
-  
-  const now = new Date();
-  const diffMs = now - d;
-  const diffSec = Math.floor(diffMs / 1000);
-  const diffMin = Math.floor(diffSec / 60);
-  const diffHour = Math.floor(diffMin / 60);
-  const diffDay = Math.floor(diffHour / 24);
-  
-  if (diffSec < 60) return 'Just now';
-  if (diffMin < 60) return `${diffMin} minute${diffMin > 1 ? 's' : ''} ago`;
-  if (diffHour < 24) return `${diffHour} hour${diffHour > 1 ? 's' : ''} ago`;
-  if (diffDay < 7) return `${diffDay} day${diffDay > 1 ? 's' : ''} ago`;
-  
-  return formatDate(d);
+  return timezoneService.getRelativeTime(date);
 }
 
 // Truncate text
@@ -359,3 +331,7 @@ export const storage = {
     }
   }
 };
+
+
+// Re-export timezone service for convenience
+export { default as timezoneService } from './timezone.js';
