@@ -459,6 +459,63 @@
   border-top: 1px solid var(--border-color, #e5e7eb);
 }
 
+/* Form Grid for Create Group */
+.create-group-section .form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.create-group-section .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.create-group-section .form-group-full {
+  grid-column: 1 / -1;
+}
+
+.create-group-section .form-group label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary, #1f2937);
+}
+
+.create-group-section .form-group input,
+.create-group-section .form-group textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  color: var(--text-primary, #1f2937);
+  background: var(--input-bg, #fff);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.create-group-section .form-group input:focus,
+.create-group-section .form-group textarea:focus {
+  outline: none;
+  border-color: var(--primary-color, #4A90E2);
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+.create-group-section .form-group input::placeholder,
+.create-group-section .form-group textarea::placeholder {
+  color: var(--text-secondary, #9ca3af);
+}
+
+.create-group-section .form-group textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+/* Date inputs row */
+.create-group-section .form-group input[type="date"] {
+  cursor: pointer;
+}
+
 /* Mobile Responsive */
 @media (max-width: 768px) {
   .trip-summary {
@@ -517,12 +574,34 @@
     padding: 1rem;
   }
 
+  .create-group-section .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .create-group-section .form-group-full {
+    grid-column: 1;
+  }
+
+  /* Keep dates in one row on mobile */
+  .create-group-section .form-grid .form-group:has(input[type="date"]) {
+    grid-column: auto;
+  }
+
   .create-group-footer {
     flex-direction: column;
   }
 
   .create-group-footer .btn {
     width: 100%;
+  }
+}
+
+/* Small mobile - dates stack */
+@media (max-width: 480px) {
+  .create-group-section .form-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
   }
 }
 
@@ -567,4 +646,32 @@
 .dark-mode .group-balance.negative {
   background: rgba(239, 68, 68, 0.2);
   color: #f87171;
+}
+
+/* Dark mode form styles */
+[data-theme="dark"] .create-group-section,
+.dark-mode .create-group-section {
+  background: var(--card-bg, #1e1e1e);
+  border-color: var(--border-color, #333);
+}
+
+[data-theme="dark"] .create-group-section .form-group input,
+[data-theme="dark"] .create-group-section .form-group textarea,
+.dark-mode .create-group-section .form-group input,
+.dark-mode .create-group-section .form-group textarea {
+  background: var(--input-bg, #2d2d2d);
+  border-color: var(--border-color, #444);
+  color: var(--text-primary, #e5e5e5);
+}
+
+[data-theme="dark"] .create-group-section .form-group label,
+.dark-mode .create-group-section .form-group label {
+  color: var(--text-primary, #e5e5e5);
+}
+
+[data-theme="dark"] .member-input,
+.dark-mode .member-input {
+  background: var(--input-bg, #2d2d2d);
+  border-color: var(--border-color, #444);
+  color: var(--text-primary, #e5e5e5);
 }
