@@ -27,6 +27,7 @@ class FirestoreService {
       budgets: 'budgets',
       investments: 'investments',
       goals: 'goals',
+      loans: 'loans',
       houses: 'houses',
       vehicles: 'vehicles',
       notes: 'notes',
@@ -414,6 +415,27 @@ class FirestoreService {
   }
 
   async deleteGoal(id) { return this.delete(this.collections.goals, id); }
+
+  // ============================================
+  // LOANS & EMI
+  // ============================================
+
+  async addLoan(loan) {
+    return this.add(this.collections.loans, {
+      ...loan,
+      startDate: loan.startDate instanceof Date ? Timestamp.fromDate(loan.startDate) : Timestamp.now()
+    });
+  }
+
+  async getLoans() { return this.getAll(this.collections.loans, 'createdAt', 'desc'); }
+
+  async updateLoan(id, loan) {
+    const updateData = { ...loan };
+    if (loan.startDate instanceof Date) updateData.startDate = Timestamp.fromDate(loan.startDate);
+    return this.update(this.collections.loans, id, updateData);
+  }
+
+  async deleteLoan(id) { return this.delete(this.collections.loans, id); }
 
   // ============================================
   // RECURRING TRANSACTIONS

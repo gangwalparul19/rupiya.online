@@ -126,7 +126,7 @@
 
     .demo-sections {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap: 24px;
       margin-bottom: 32px;
     }
@@ -213,6 +213,38 @@
     .demo-item-amount.expense { color: #ef4444; }
     .demo-item-amount.income { color: #10b981; }
 
+    .demo-emi-summary {
+      display: flex;
+      gap: 16px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 2px solid var(--border-color);
+    }
+
+    .demo-emi-stat {
+      flex: 1;
+      background: var(--bg-secondary);
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+    }
+
+    .demo-emi-label {
+      display: block;
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .demo-emi-value {
+      display: block;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
     .demo-chart-placeholder {
       background: linear-gradient(135deg, rgba(74, 144, 226, 0.1) 0%, rgba(0, 206, 209, 0.1) 100%);
       border-radius: 12px;
@@ -248,12 +280,21 @@
     .demo-features-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 20px;
+      gap: 16px;
       margin-bottom: 24px;
     }
 
     .demo-feature {
       text-align: center;
+      padding: 12px 8px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      transition: all 0.3s ease;
+    }
+
+    .demo-feature:hover {
+      background: rgba(255,255,255,0.2);
+      transform: translateY(-2px);
     }
 
     .demo-feature-icon {
@@ -293,6 +334,12 @@
     }
 
     /* Mobile Responsive */
+    @media (max-width: 1024px) {
+      .demo-sections {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
     @media (max-width: 768px) {
       .demo-stats {
         grid-template-columns: repeat(2, 1fr);
@@ -316,7 +363,7 @@
       }
 
       .demo-features-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(3, 1fr);
       }
 
       .demo-header h1 {
@@ -357,8 +404,13 @@
       }
 
       .demo-features-grid {
-        grid-template-columns: 1fr 1fr;
-        gap: 16px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+
+      .demo-emi-summary {
+        flex-direction: column;
+        gap: 8px;
       }
     }
   </style>
@@ -593,6 +645,196 @@
           </li>
         </ul>
       </div>
+
+      <!-- Payment Methods -->
+      <div class="demo-section">
+        <div class="demo-section-header">
+          <span class="demo-section-icon">💳</span>
+          <h3 class="demo-section-title">Payment Methods</h3>
+        </div>
+        <ul class="demo-list">
+          <li class="demo-list-item">
+            <div class="demo-item-info">
+              <div class="demo-item-icon" style="background: linear-gradient(135deg, #667eea, #764ba2);">💳</div>
+              <div class="demo-item-details">
+                <h4>HDFC Credit Card</h4>
+                <span>**** 4521 • Credit Card</span>
+              </div>
+            </div>
+            <span class="demo-item-amount" style="color: #667eea;">Primary</span>
+          </li>
+          <li class="demo-list-item">
+            <div class="demo-item-info">
+              <div class="demo-item-icon" style="background: linear-gradient(135deg, #10b981, #059669);">📱</div>
+              <div class="demo-item-details">
+                <h4>Google Pay</h4>
+                <span>user@okaxis • UPI</span>
+              </div>
+            </div>
+            <span class="demo-item-amount" style="color: #10b981;">Active</span>
+          </li>
+          <li class="demo-list-item">
+            <div class="demo-item-info">
+              <div class="demo-item-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">🏦</div>
+              <div class="demo-item-details">
+                <h4>SBI Savings Account</h4>
+                <span>**** 7890 • Bank Account</span>
+              </div>
+            </div>
+            <span class="demo-item-amount" style="color: #f59e0b;">Active</span>
+          </li>
+          <li class="demo-list-item">
+            <div class="demo-item-info">
+              <div class="demo-item-icon" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">👛</div>
+              <div class="demo-item-details">
+                <h4>Paytm Wallet</h4>
+                <span>Balance: ₹2,450</span>
+              </div>
+            </div>
+            <span class="demo-item-amount" style="color: #3b82f6;">Active</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- EMI & Loans -->
+      <div class="demo-section">
+        <div class="demo-section-header">
+          <span class="demo-section-icon">🏦</span>
+          <h3 class="demo-section-title">EMI & Loan Tracker</h3>
+        </div>
+        <ul class="demo-list">
+          <li class="demo-list-item">
+            <div class="demo-item-info">
+              <div class="demo-item-icon" style="background: linear-gradient(135deg, #ef4444, #dc2626);">🏠</div>
+              <div class="demo-item-details">
+                <h4>Home Loan - HDFC</h4>
+                <span>EMI: ₹35,000 • Due: 5th Jan</span>
+              </div>
+            </div>
+            <span class="demo-item-amount" style="color: #ef4444;">₹28.5L left</span>
+          </li>
+          <li class="demo-list-item">
+            <div class="demo-item-info">
+              <div class="demo-item-icon" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">🚗</div>
+              <div class="demo-item-details">
+                <h4>Car Loan - ICICI</h4>
+                <span>EMI: ₹12,500 • Due: 10th Jan</span>
+              </div>
+            </div>
+            <span class="demo-item-amount" style="color: #8b5cf6;">₹3.2L left</span>
+          </li>
+          <li class="demo-list-item">
+            <div class="demo-item-info">
+              <div class="demo-item-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">📱</div>
+              <div class="demo-item-details">
+                <h4>iPhone EMI - Bajaj</h4>
+                <span>EMI: ₹5,999 • Due: 15th Jan</span>
+              </div>
+            </div>
+            <span class="demo-item-amount" style="color: #f59e0b;">₹24K left</span>
+          </li>
+        </ul>
+        <div class="demo-emi-summary">
+          <div class="demo-emi-stat">
+            <span class="demo-emi-label">Total Monthly EMI</span>
+            <span class="demo-emi-value">₹53,499</span>
+          </div>
+          <div class="demo-emi-stat">
+            <span class="demo-emi-label">Total Outstanding</span>
+            <span class="demo-emi-value">₹31.94L</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Properties & Assets -->
+      <div class="demo-section">
+        <div class="demo-section-header">
+          <span class="demo-section-icon">🏠</span>
+          <h3 class="demo-section-title">Properties & Assets</h3>
+        </div>
+        <ul class="demo-list">
+          <li class="demo-list-item">
+            <div class="demo-item-info">
+              <div class="demo-item-icon" style="background: linear-gradient(135deg, #10b981, #059669);">🏠</div>
+              <div class="demo-item-details">
+                <h4>2BHK Apartment - Whitefield</h4>
+                <span>Purchased: 2022 • 1,200 sq.ft</span>
+              </div>
+            </div>
+            <span class="demo-item-amount" style="color: #10b981;">₹85L</span>
+          </li>
+          <li class="demo-list-item">
+            <div class="demo-item-info">
+              <div class="demo-item-icon" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">🚗</div>
+              <div class="demo-item-details">
+                <h4>Honda City 2023</h4>
+                <span>KA-01-XX-1234 • 15,000 km</span>
+              </div>
+            </div>
+            <span class="demo-item-amount" style="color: #3b82f6;">₹12.5L</span>
+          </li>
+          <li class="demo-list-item">
+            <div class="demo-item-info">
+              <div class="demo-item-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">🛵</div>
+              <div class="demo-item-details">
+                <h4>Honda Activa 6G</h4>
+                <span>KA-01-YY-5678 • 8,500 km</span>
+              </div>
+            </div>
+            <span class="demo-item-amount" style="color: #f59e0b;">₹85K</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- House Help -->
+      <div class="demo-section">
+        <div class="demo-section-header">
+          <span class="demo-section-icon">🧹</span>
+          <h3 class="demo-section-title">House Help Management</h3>
+        </div>
+        <ul class="demo-list">
+          <li class="demo-list-item">
+            <div class="demo-item-info">
+              <div class="demo-item-icon" style="background: linear-gradient(135deg, #ec4899, #db2777);">👩</div>
+              <div class="demo-item-details">
+                <h4>Lakshmi - Maid</h4>
+                <span>Daily • Morning 8-10 AM</span>
+              </div>
+            </div>
+            <span class="demo-item-amount" style="color: #ec4899;">₹4,000/mo</span>
+          </li>
+          <li class="demo-list-item">
+            <div class="demo-item-info">
+              <div class="demo-item-icon" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">👨</div>
+              <div class="demo-item-details">
+                <h4>Raju - Cook</h4>
+                <span>Daily • Evening 6-8 PM</span>
+              </div>
+            </div>
+            <span class="demo-item-amount" style="color: #8b5cf6;">₹8,000/mo</span>
+          </li>
+          <li class="demo-list-item">
+            <div class="demo-item-info">
+              <div class="demo-item-icon" style="background: linear-gradient(135deg, #06b6d4, #0891b2);">👨</div>
+              <div class="demo-item-details">
+                <h4>Suresh - Driver</h4>
+                <span>Mon-Sat • 8 AM - 6 PM</span>
+              </div>
+            </div>
+            <span class="demo-item-amount" style="color: #06b6d4;">₹15,000/mo</span>
+          </li>
+        </ul>
+        <div class="demo-emi-summary">
+          <div class="demo-emi-stat">
+            <span class="demo-emi-label">Total Monthly</span>
+            <span class="demo-emi-value">₹27,000</span>
+          </div>
+          <div class="demo-emi-stat">
+            <span class="demo-emi-label">Next Payment</span>
+            <span class="demo-emi-value">1st Feb</span>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Features CTA -->
@@ -605,19 +847,15 @@
         </div>
         <div class="demo-feature">
           <div class="demo-feature-icon">💳</div>
-          <div class="demo-feature-text">Set & Monitor Budgets</div>
+          <div class="demo-feature-text">Manage Payment Methods</div>
         </div>
         <div class="demo-feature">
           <div class="demo-feature-icon">🎯</div>
           <div class="demo-feature-text">Achieve Savings Goals</div>
         </div>
         <div class="demo-feature">
-          <div class="demo-feature-icon">🤖</div>
-          <div class="demo-feature-text">AI-Powered Insights</div>
-        </div>
-        <div class="demo-feature">
-          <div class="demo-feature-icon">📈</div>
-          <div class="demo-feature-text">Track Investments</div>
+          <div class="demo-feature-icon">🏦</div>
+          <div class="demo-feature-text">EMI & Loan Tracker</div>
         </div>
         <div class="demo-feature">
           <div class="demo-feature-icon">🏠</div>
@@ -628,12 +866,33 @@
           <div class="demo-feature-text">Vehicle Expenses</div>
         </div>
         <div class="demo-feature">
+          <div class="demo-feature-icon">🧹</div>
+          <div class="demo-feature-text">House Help Payments</div>
+        </div>
+        <div class="demo-feature">
+          <div class="demo-feature-icon">🤖</div>
+          <div class="demo-feature-text">AI-Powered Insights</div>
+        </div>
+        <div class="demo-feature">
+          <div class="demo-feature-icon">📈</div>
+          <div class="demo-feature-text">Track Investments</div>
+        </div>
+        <div class="demo-feature">
+          <div class="demo-feature-icon">🤝</div>
+          <div class="demo-feature-text">Split Bills</div>
+        </div>
+        <div class="demo-feature">
           <div class="demo-feature-icon">👨‍👩‍👧‍👦</div>
           <div class="demo-feature-text">Family Sharing</div>
+        </div>
+        <div class="demo-feature">
+          <div class="demo-feature-icon">📱</div>
+          <div class="demo-feature-text">Works Offline</div>
         </div>
       </div>
       <div class="demo-cta-buttons">
         <a href="signup.html" class="btn-primary">Create Free Account</a>
+        <a href="user-guide.html" class="btn-outline">📖 User Guide</a>
         <a href="index.html" class="btn-outline">Back to Home</a>
       </div>
     </div>

@@ -1,7 +1,7 @@
 // Service Worker for Rupiya PWA
 // Provides offline support and caching
 
-const CACHE_VERSION = '1.0.35'; // Increment this on every deployment
+const CACHE_VERSION = '1.0.37'; // Increment this on every deployment
 const CACHE_NAME = `rupiya-v${CACHE_VERSION}`;
 const RUNTIME_CACHE = `rupiya-runtime-v${CACHE_VERSION}`;
 
@@ -15,6 +15,7 @@ const STATIC_ASSETS = [
   '/budgets.html',
   '/goals.html',
   '/investments.html',
+  '/loans.html',
   '/analytics.html',
   '/family.html',
   '/houses.html',
@@ -59,6 +60,8 @@ const STATIC_ASSETS = [
   '/assets/js/components/pagination.js',
   '/assets/js/utils/ux-enhancements.js',
   '/assets/css/ux-enhancements.css',
+  '/assets/css/loans.css',
+  '/assets/js/pages/loans.js',
   '/assets/js/pages/family.js',
   '/assets/js/pages/family-modals.js',
   '/assets/js/pages/achievements.js',
@@ -69,7 +72,7 @@ const STATIC_ASSETS = [
   '/favicon.ico',
   '/android-chrome-192x192.png',
   '/android-chrome-512x512.png',
-  '/apple-touch-icon.png'
+  '/android-chrome-192x192.png'
 ];
 
 // Install event - cache static assets

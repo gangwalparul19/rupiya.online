@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Rupiya User Guide - Learn how to use all features">
+  <meta name="theme-color" content="#4A90E2">
+  <title>User Guide - Rupiya</title>
+  
+  <link rel="icon" href="assets/images/logo.png" type="image/png">
+  <link rel="stylesheet" href="assets/css/common.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/dark-mode.css">
+  
+  <style>
+    .guide-page { min-height: 100vh; background: var(--bg-primary); }
+    .guide-header { background: linear-gradient(135deg, #4A90E2 0%, #00CED1 100%); color: white; padding: 24px; position: sticky; top: 0; z-index: 100; }
+    .guide-header-content { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
+    .guide-header h1 { margin: 0; font-size: 1.5rem; display: flex; align-items: center; gap: 12px; }
+    .guide-nav { display: flex; gap: 12px; }
+    .guide-nav a { color: white; text-decoration: none; padding: 8px 16px; border-radius: 8px; background: rgba(255,255,255,0.2); font-size: 14px; }
+    .guide-nav a:hover { background: rgba(255,255,255,0.3); }
+    .guide-container { max-width: 1200px; margin: 0 auto; padding: 24px; display: grid; grid-template-columns: 280px 1fr; gap: 32px; }
+    .guide-sidebar { position: sticky; top: 100px; height: fit-content; }
+    .guide-toc { background: var(--bg-card); border-radius: 16px; padding: 20px; border: 1px solid var(--border-color); }
+    .guide-toc h3 { margin: 0 0 16px 0; font-size: 14px; text-transform: uppercase; color: var(--text-muted); }
+    .guide-toc-list { list-style: none; padding: 0; margin: 0; }
+    .guide-toc-item { margin-bottom: 4px; }
+    .guide-toc-link { display: flex; align-items: center; gap: 10px; padding: 10px 12px; color: var(--text-secondary); text-decoration: none; border-radius: 8px; font-size: 14px; transition: all 0.2s; }
+    .guide-toc-link:hover, .guide-toc-link.active { background: var(--bg-secondary); color: var(--primary-color); }
+    .guide-toc-icon { font-size: 18px; }
+  </style>
+</head>
+<body>
+  <div class="guide-page">
+    <header class="guide-header">
+      <div class="guide-header-content">
+        <h1>📖 Rupiya User Guide</h1>
+        <nav class="guide-nav">
+          <a href="index.html">Home</a>
+          <a href="dashboard.html">Dashboard</a>
+          <a href="demo.html">Try Demo</a>
+        </nav>
+      </div>
+    </header>
+
+    <div class="guide-container">
+      <aside class="guide-sidebar">
+        <div class="guide-toc">
+          <h3>Quick Navigation</h3>
+          <ul class="guide-toc-list">
+            <li class="guide-toc-item"><a href="#getting-started" class="guide-toc-link"><span class="guide-toc-icon">🚀</span>Getting Started</a></li>
+            <li class="guide-toc-item"><a href="#payment-methods" class="guide-toc-link"><span class="guide-toc-icon">💳</span>Payment Methods</a></li>
+            <li class="guide-toc-item"><a href="#categories" class="guide-toc-link"><span class="guide-toc-icon">🏷️</span>Categories</a></li>
+            <li class="guide-toc-item"><a href="#expenses-income" class="guide-toc-link"><span class="guide-toc-icon">💰</span>Expenses & Income</a></li>
+            <li class="guide-toc-item"><a href="#budgets" class="guide-toc-link"><span class="guide-toc-icon">📊</span>Budgets</a></li>
+            <li class="guide-toc-item"><a href="#goals" class="guide-toc-link"><span class="guide-toc-icon">🎯</span>Savings Goals</a></li>
+            <li class="guide-toc-item"><a href="#loans-emi" class="guide-toc-link"><span class="guide-toc-icon">🏦</span>Loans & EMI</a></li>
+            <li class="guide-toc-item"><a href="#investments" class="guide-toc-link"><span class="guide-toc-icon">📈</span>Investments</a></li>
+            <li class="guide-toc-item"><a href="#properties" class="guide-toc-link"><span class="guide-toc-icon">🏠</span>Properties</a></li>
+            <li class="guide-toc-item"><a href="#vehicles" class="guide-toc-link"><span class="guide-toc-icon">🚗</span>Vehicles</a></li>
+            <li class="guide-toc-item"><a href="#house-help" class="guide-toc-link"><span class="guide-toc-icon">🧹</span>House Help</a></li>
+            <li class="guide-toc-item"><a href="#family" class="guide-toc-link"><span class="guide-toc-icon">👨‍👩‍👧‍👦</span>Family Groups</a></li>
+            <li class="guide-toc-item"><a href="#ai-insights" class="guide-toc-link"><span class="guide-toc-icon">🤖</span>AI Insights</a></li>
+            <li class="guide-toc-item"><a href="#reports" class="guide-toc-link"><span class="guide-toc-icon">📧</span>Reports</a></li>
+          </ul>
+        </div>
+      </aside>
+      
+      <main class="guide-content" id="guideContent">
+        <!-- Content will be loaded here -->
+      </main>
+    </div>
+  </div>
+  
+  <script type="module" src="assets/js/pages/user-guide.js"></script>
+</body>
+</html>

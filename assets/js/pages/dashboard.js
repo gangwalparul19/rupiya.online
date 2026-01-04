@@ -7,6 +7,7 @@ import toast from '../components/toast.js';
 import themeManager from '../utils/theme-manager.js';
 import gamificationService from '../services/gamification-service.js';
 import gamificationUI from '../components/gamification-ui.js';
+import setupWizard from '../components/setup-wizard.js';
 import { formatCurrency, formatCurrencyCompact, formatDate, getRelativeTime, escapeHtml } from '../utils/helpers.js';
 
 // Check authentication
@@ -33,12 +34,27 @@ async function checkAuth() {
   }
 }
 
+// Check if first-time user needs setup
+async function checkFirstTimeSetup() {
+  try {
+    const needsSetup = await setupWizard.needsSetup();
+    if (needsSetup) {
+      console.log('[Dashboard] First-time user detected, showing setup wizard');
+      setupWizard.show();
+    }
+  } catch (error) {
+    console.error('[Dashboard] Error checking setup status:', error);
+  }
+}
+
 // Initialize dashboard only after auth check
 async function init() {
   console.log('[Dashboard] Initializing...');
   const isAuthenticated = await checkAuth();
   if (isAuthenticated) {
     await initDashboard();
+    // Check for first-time setup after dashboard loads
+    await checkFirstTimeSetup();
   }
 }
 
@@ -235,6 +251,9 @@ async function loadDashboardData() {
     updateChange(expenseChange, expenseChangePercent, 'negative');
     updateCashflowChange(cashFlow);
     updateSavingsChange(savingsRate);
+    
+    // Update Savings Rate Widget
+    updateSavingsRateWidget(currentMonthIncome, currentMonthExpenses, cashFlow, savingsRate);
     
     // Check for spending alerts
     checkSpendingAlerts(currentMonthExpenses, lastMonthExpenses);
@@ -441,6 +460,50 @@ function updateSavingsChange(savingsRate) {
   } else {
     savingsChange.classList.add('negative');
     savingsChange.innerHTML = '<span>↓</span><span>Need to save more</span>';
+  }
+}
+
+// Update Savings Rate Widget
+function updateSavingsRateWidget(income, expenses, saved, rate) {
+  const valueEl = document.getElementById('savingsRateValue');
+  const fillEl = document.getElementById('savingsRateFill');
+  const incomeEl = document.getElementById('srIncome');
+  const expensesEl = document.getElementById('srExpenses');
+  const savedEl = document.getElementById('srSaved');
+  const tipEl = document.getElementById('savingsRateTip');
+  
+  if (!valueEl) return;
+  
+  // Update values
+  valueEl.textContent = `${rate.toFixed(1)}%`;
+  incomeEl.textContent = formatCurrencyCompact(income);
+  expensesEl.textContent = formatCurrencyCompact(expenses);
+  savedEl.textContent = formatCurrencyCompact(saved);
+  
+  // Update saved value color
+  if (saved >= 0) {
+    savedEl.classList.add('positive');
+    savedEl.classList.remove('negative');
+  } else {
+    savedEl.classList.add('negative');
+    savedEl.classList.remove('positive');
+  }
+  
+  // Update progress bar (cap at 50% for visual)
+  const fillWidth = Math.min(Math.max(rate, 0), 50) * 2;
+  fillEl.style.width = `${fillWidth}%`;
+  
+  // Update tip based on rate
+  if (rate >= 30) {
+    tipEl.textContent = '🌟 Outstanding! You\'re saving like a pro!';
+  } else if (rate >= 20) {
+    tipEl.textContent = '✨ Excellent! You\'re on track for financial freedom';
+  } else if (rate >= 10) {
+    tipEl.textContent = '👍 Good start! Try to reach 20% for better security';
+  } else if (rate > 0) {
+    tipEl.textContent = '💪 Keep going! Small savings add up over time';
+  } else {
+    tipEl.textContent = '⚠️ Try to reduce expenses to start saving';
   }
 }
 

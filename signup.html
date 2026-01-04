@@ -17,23 +17,27 @@
 </head>
 <body>
   <div class="auth-page">
+    <!-- Floating Decorations -->
+    <div class="auth-decoration auth-decoration-1"></div>
+    <div class="auth-decoration auth-decoration-2"></div>
+
     <!-- Navigation Header -->
-    <nav class="landing-nav" style="position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); box-shadow: 0 4px 8px rgba(0,0,0,0.12);">
-      <div class="container" style="display: flex; align-items: center; justify-content: space-between; padding-top: 24px; padding-bottom: 24px;">
+    <nav class="landing-nav">
+      <div class="container">
         <div class="landing-logo">
           <a href="index.html">
-            <img src="assets/images/logo.png" alt="Rupiya" style="height: 40px; width: auto;">
+            <img src="assets/images/logo.png" alt="Rupiya">
           </a>
         </div>
-        <div class="landing-nav-links" style="display: flex; align-items: center; gap: 24px;">
-          <a href="index.html#features" style="color: #2C3E50; font-weight: 600; text-decoration: none;">Features</a>
-          <a href="index.html#how-it-works" style="color: #2C3E50; font-weight: 600; text-decoration: none;">How It Works</a>
-          <a href="login.html" class="btn btn-sm btn-light" style="background-color: white; color: #4A90E2; padding: 8px 16px; border-radius: 8px; text-decoration: none; border: 2px solid #4A90E2;">Login</a>
+        <div class="landing-nav-links">
+          <a href="index.html#features">Features</a>
+          <a href="index.html#how-it-works">How It Works</a>
+          <a href="login.html" class="btn btn-sm btn-light">Login</a>
         </div>
       </div>
     </nav>
 
-    <div class="auth-container" style="margin-top: 100px;">
+    <div class="auth-container">
       <div class="auth-card">
         <!-- Logo -->
         <div class="auth-logo">
@@ -83,7 +87,7 @@
                 placeholder="Create a password (min 6 characters)"
                 required
               >
-              <button type="button" class="password-toggle-btn" id="togglePassword">
+              <button type="button" class="password-toggle-btn" id="togglePassword" aria-label="Toggle password visibility">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
                   <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
                   <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
@@ -104,7 +108,7 @@
                 placeholder="Confirm your password"
                 required
               >
-              <button type="button" class="password-toggle-btn" id="toggleConfirmPassword">
+              <button type="button" class="password-toggle-btn" id="toggleConfirmPassword" aria-label="Toggle password visibility">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
                   <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
                   <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>

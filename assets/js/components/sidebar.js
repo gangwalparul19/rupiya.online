@@ -1,0 +1,332 @@
+/**
+ * Centralized Sidebar Navigation Component
+ * Provides a single source of truth for navigation across all pages
+ * 
+ * HOW TO MODIFY NAVIGATION:
+ * ========================
+ * 1. Edit the `navigationConfig` object below to add/remove/modify nav items
+ * 2. Each section has: id, title, icon, expanded (default state), and items array
+ * 3. Each item has: href (page URL), icon (emoji), label (display text)
+ * 4. Changes here automatically apply to ALL pages
+ * 
+ * FEATURES:
+ * - Collapsible sections (state saved in localStorage)
+ * - Quick search with Cmd/Ctrl+K shortcut
+ * - Auto-expands section containing current page
+ * - Mobile responsive with hamburger menu
+ */
+
+// Navigation configuration - edit this to update nav across all pages
+const navigationConfig = {
+  sections: [
+    {
+      id: 'main',
+      title: 'Main',
+      icon: '📊',
+      expanded: true,
+      items: [
+        { href: 'dashboard.html', icon: '📊', label: 'Dashboard' },
+        { href: 'expenses.html', icon: '💸', label: 'Expenses' },
+        { href: 'income.html', icon: '💰', label: 'Income' },
+        { href: 'budgets.html', icon: '💳', label: 'Budgets' }
+      ]
+    },
+    {
+      id: 'tracking',
+      title: 'Tracking',
+      icon: '📈',
+      expanded: false,
+      items: [
+        { href: 'investments.html', icon: '📈', label: 'Investments' },
+        { href: 'loans.html', icon: '🏦', label: 'Loans & EMI' },
+        { href: 'goals.html', icon: '🎯', label: 'Goals' },
+        { href: 'recurring.html', icon: '🔄', label: 'Recurring' }
+      ]
+    },
+    {
+      id: 'intelligence',
+      title: 'Intelligence',
+      icon: '🤖',
+      expanded: false,
+      items: [
+        { href: 'ai-insights.html', icon: '🤖', label: 'AI Insights' },
+        { href: 'split-expense.html', icon: '🤝', label: 'Split Expense' },
+        { href: 'achievements.html', icon: '🏆', label: 'Achievements' }
+      ]
+    },
+    {
+      id: 'assets',
+      title: 'Assets',
+      icon: '🏠',
+      expanded: false,
+      items: [
+        { href: 'houses.html', icon: '🏠', label: 'Houses' },
+        { href: 'vehicles.html', icon: '🚗', label: 'Vehicles' },
+        { href: 'house-help.html', icon: '🧹', label: 'House Help' }
+      ]
+    },
+    {
+      id: 'more',
+      title: 'More',
+      icon: '📝',
+      expanded: false,
+      items: [
+        { href: 'notes.html', icon: '📝', label: 'Notes' },
+        { href: 'documents.html', icon: '📄', label: 'Documents' },
+        { href: 'analytics.html', icon: '📉', label: 'Analytics' },
+        { href: 'feedback.html', icon: '💬', label: 'Feedback' },
+        { href: 'profile.html', icon: '⚙️', label: 'Settings' },
+        { href: 'user-guide.html', icon: '📖', label: 'User Guide' }
+      ]
+    },
+    {
+      id: 'family',
+      title: 'Family',
+      icon: '👨‍👩‍👧‍👦',
+      expanded: false,
+      items: [
+        { href: 'family.html', icon: '👨‍👩‍👧‍👦', label: 'Family Groups' }
+      ]
+    }
+  ]
+};
+
+// Get current page filename
+function getCurrentPage() {
+  const path = window.location.pathname;
+  return path.substring(path.lastIndexOf('/') + 1) || 'dashboard.html';
+}
+
+// Save/load expanded sections state
+function getSectionState() {
+  try {
+    const saved = localStorage.getItem('rupiya_nav_sections');
+    return saved ? JSON.parse(saved) : {};
+  } catch {
+    return {};
+  }
+}
+
+function saveSectionState(sectionId, expanded) {
+  try {
+    const state = getSectionState();
+    state[sectionId] = expanded;
+    localStorage.setItem('rupiya_nav_sections', JSON.stringify(state));
+  } catch {
+    // Ignore storage errors
+  }
+}
+
+// Generate sidebar HTML
+function generateSidebarHTML() {
+  const currentPage = getCurrentPage();
+  const sectionState = getSectionState();
+  
+  // Find which section contains the current page and expand it
+  let currentSection = null;
+  navigationConfig.sections.forEach(section => {
+    if (section.items.some(item => item.href === currentPage)) {
+      currentSection = section.id;
+    }
+  });
+
+  let navHTML = '';
+  
+  navigationConfig.sections.forEach(section => {
+    // Determine if section should be expanded
+    const isCurrentSection = section.id === currentSection;
+    const savedState = sectionState[section.id];
+    const isExpanded = savedState !== undefined ? savedState : (section.expanded || isCurrentSection);
+    
+    navHTML += `
+      <div class="nav-section ${isExpanded ? 'expanded' : 'collapsed'}" data-section="${section.id}">
+        <div class="nav-section-header" data-section-toggle="${section.id}">
+          <div class="nav-section-title">
+            <span class="nav-section-icon">${section.icon}</span>
+            <span>${section.title}</span>
+          </div>
+          <svg class="nav-section-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </div>
+        <div class="nav-section-items">
+    `;
+    
+    section.items.forEach(item => {
+      const isActive = item.href === currentPage;
+      navHTML += `
+          <a href="${item.href}" class="nav-item ${isActive ? 'active' : ''}">
+            <span class="nav-icon">${item.icon}</span>
+            <span>${item.label}</span>
+          </a>
+      `;
+    });
+    
+    navHTML += `
+        </div>
+      </div>
+    `;
+  });
+
+  return navHTML;
+}
+
+// Generate quick search HTML
+function generateQuickSearchHTML() {
+  return `
+    <div class="nav-quick-search">
+      <div class="quick-search-input-wrapper">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <input type="text" class="quick-search-input" placeholder="Quick search..." id="navQuickSearch">
+        <kbd class="quick-search-kbd">⌘K</kbd>
+      </div>
+      <div class="quick-search-results" id="quickSearchResults"></div>
+    </div>
+  `;
+}
+
+// Initialize sidebar
+export function initSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  if (!sidebar) return;
+
+  // Find the sidebar-nav element
+  const sidebarNav = sidebar.querySelector('.sidebar-nav');
+  if (!sidebarNav) return;
+
+  // Generate and inject navigation
+  sidebarNav.innerHTML = generateQuickSearchHTML() + generateSidebarHTML();
+
+  // Setup section toggle handlers
+  setupSectionToggles();
+  
+  // Setup quick search
+  setupQuickSearch();
+  
+  // Setup sidebar toggle for mobile
+  setupMobileSidebar();
+}
+
+// Setup collapsible section toggles
+function setupSectionToggles() {
+  document.querySelectorAll('[data-section-toggle]').forEach(header => {
+    header.addEventListener('click', (e) => {
+      e.preventDefault();
+      const sectionId = header.dataset.sectionToggle;
+      const section = document.querySelector(`[data-section="${sectionId}"]`);
+      
+      if (section) {
+        const isExpanded = section.classList.contains('expanded');
+        section.classList.toggle('expanded', !isExpanded);
+        section.classList.toggle('collapsed', isExpanded);
+        saveSectionState(sectionId, !isExpanded);
+      }
+    });
+  });
+}
+
+// Setup quick search functionality
+function setupQuickSearch() {
+  const searchInput = document.getElementById('navQuickSearch');
+  const resultsContainer = document.getElementById('quickSearchResults');
+  
+  if (!searchInput || !resultsContainer) return;
+
+  // Flatten all nav items for search
+  const allItems = [];
+  navigationConfig.sections.forEach(section => {
+    section.items.forEach(item => {
+      allItems.push({
+        ...item,
+        section: section.title,
+        searchText: `${item.label} ${section.title}`.toLowerCase()
+      });
+    });
+  });
+
+  searchInput.addEventListener('input', (e) => {
+    const query = e.target.value.toLowerCase().trim();
+    
+    if (!query) {
+      resultsContainer.innerHTML = '';
+      resultsContainer.classList.remove('visible');
+      return;
+    }
+
+    const matches = allItems.filter(item => 
+      item.searchText.includes(query)
+    ).slice(0, 5);
+
+    if (matches.length > 0) {
+      resultsContainer.innerHTML = matches.map(item => `
+        <a href="${item.href}" class="quick-search-result">
+          <span class="quick-search-result-icon">${item.icon}</span>
+          <span class="quick-search-result-label">${item.label}</span>
+          <span class="quick-search-result-section">${item.section}</span>
+        </a>
+      `).join('');
+      resultsContainer.classList.add('visible');
+    } else {
+      resultsContainer.innerHTML = '<div class="quick-search-no-results">No results found</div>';
+      resultsContainer.classList.add('visible');
+    }
+  });
+
+  // Keyboard shortcut (Cmd/Ctrl + K)
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      e.preventDefault();
+      searchInput.focus();
+    }
+    
+    // Escape to close search
+    if (e.key === 'Escape' && document.activeElement === searchInput) {
+      searchInput.blur();
+      searchInput.value = '';
+      resultsContainer.innerHTML = '';
+      resultsContainer.classList.remove('visible');
+    }
+  });
+
+  // Close results when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.nav-quick-search')) {
+      resultsContainer.classList.remove('visible');
+    }
+  });
+}
+
+// Setup mobile sidebar toggle
+function setupMobileSidebar() {
+  const sidebarOpen = document.getElementById('sidebarOpen');
+  const sidebarClose = document.getElementById('sidebarClose');
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+
+  function openSidebar() {
+    sidebar?.classList.add('open');
+    overlay?.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeSidebar() {
+    sidebar?.classList.remove('open');
+    overlay?.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  sidebarOpen?.addEventListener('click', openSidebar);
+  sidebarClose?.addEventListener('click', closeSidebar);
+  overlay?.addEventListener('click', closeSidebar);
+}
+
+// Auto-initialize when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initSidebar);
+} else {
+  initSidebar();
+}
+
+export { navigationConfig };

@@ -442,3 +442,148 @@
 [data-theme="dark"] .gamification-widget {
   background: var(--bg-card);
 }
+
+
+/* ============================================
+   SAVINGS RATE WIDGET (Dashboard)
+   ============================================ */
+
+.savings-rate-widget {
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  border-radius: var(--border-radius-lg);
+  padding: 20px;
+  border: 2px solid var(--accent-green);
+  transition: all var(--transition-base);
+}
+
+.savings-rate-widget:hover {
+  box-shadow: 0 4px 12px rgba(39, 174, 96, 0.2);
+  transform: translateY(-2px);
+}
+
+.savings-rate-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.savings-rate-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.savings-rate-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--accent-green);
+}
+
+.savings-rate-bar {
+  position: relative;
+  height: 12px;
+  background: rgba(39, 174, 96, 0.2);
+  border-radius: 6px;
+  margin-bottom: 8px;
+  overflow: visible;
+}
+
+.savings-rate-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #27AE60 0%, #2ECC71 100%);
+  border-radius: 6px;
+  transition: width 0.5s ease;
+  max-width: 100%;
+}
+
+.savings-rate-markers {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 4px;
+}
+
+.savings-rate-markers .marker {
+  position: absolute;
+  font-size: 10px;
+  color: var(--text-secondary);
+  transform: translateX(-50%);
+}
+
+.savings-rate-details {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(39, 174, 96, 0.2);
+}
+
+.savings-detail {
+  text-align: center;
+}
+
+.savings-detail .detail-label {
+  display: block;
+  font-size: 11px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.savings-detail .detail-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.savings-detail .detail-value.positive {
+  color: var(--accent-green);
+}
+
+.savings-detail .detail-value.negative {
+  color: var(--accent-red);
+}
+
+.savings-rate-tip {
+  margin-top: 12px;
+  padding: 8px 12px;
+  background: rgba(39, 174, 96, 0.1);
+  border-radius: 8px;
+  font-size: 12px;
+  color: #065f46;
+  text-align: center;
+}
+
+/* Dark Mode */
+[data-theme="dark"] .savings-rate-widget {
+  background: linear-gradient(135deg, #052e16 0%, #14532d 100%);
+}
+
+[data-theme="dark"] .savings-rate-tip {
+  background: rgba(39, 174, 96, 0.2);
+  color: #86efac;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .savings-rate-widget {
+    padding: 16px;
+  }
+  
+  .savings-rate-value {
+    font-size: 24px;
+  }
+  
+  .savings-rate-details {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  
+  .savings-detail {
+    flex: 1;
+    min-width: 80px;
+  }
+}
