@@ -1,5 +1,6 @@
 // Family Switcher Component
 import familyService from '../services/family-service.js';
+import userService from '../services/user-service.js';
 import toast from './toast.js';
 
 class FamilySwitcher {
@@ -9,6 +10,7 @@ class FamilySwitcher {
     this.familyGroups = [];
     this.pendingInvitations = [];
     this.initialized = false;
+    this.preferencesUnsubscribe = null; // Real-time listener
   }
 
   async init() {
@@ -21,8 +23,11 @@ class FamilySwitcher {
         this.loadPendingInvitations()
       ]);
 
-      // Restore saved context
-      this.restoreContext();
+      // Restore saved context from Firestore (with localStorage fallback)
+      await this.restoreContext();
+
+      // Setup real-time listener for multi-tab sync
+      this.setupPreferencesListener();
 
       // Render the switcher
       this.render();
@@ -54,7 +59,32 @@ class FamilySwitcher {
     }
   }
 
-  restoreContext() {
+  async restoreContext() {
+    try {
+      // Try to load from Firestore first
+      const prefs = await userService.getUserPreferences();
+      if (prefs.success && prefs.data) {
+        const context = prefs.data.currentContext || 'personal';
+        const groupId = prefs.data.currentGroupId || null;
+
+        if (context === 'family' && groupId) {
+          // Verify the group still exists
+          const group = this.familyGroups.find(g => g.id === groupId);
+          if (group) {
+            this.currentContext = 'family';
+            this.currentGroupId = groupId;
+            // Update localStorage for offline access
+            localStorage.setItem('currentContext', 'family');
+            localStorage.setItem('currentGroupId', groupId);
+            return;
+          }
+        }
+      }
+    } catch (error) {
+      console.warn('Could not load preferences from Firestore, falling back to localStorage:', error);
+    }
+
+    // Fallback to localStorage if Firestore fails
     const savedContext = localStorage.getItem('currentContext');
     const savedGroupId = localStorage.getItem('currentGroupId');
 
@@ -66,8 +96,34 @@ class FamilySwitcher {
         this.currentGroupId = savedGroupId;
       } else {
         // Group no longer exists, reset to personal
-        this.switchToPersonal();
+        await this.switchToPersonal();
       }
+    }
+  }
+
+  setupPreferencesListener() {
+    try {
+      // Setup real-time listener for multi-tab sync
+      this.preferencesUnsubscribe = userService.setupPreferencesListener((prefs) => {
+        const newContext = prefs.currentContext || 'personal';
+        const newGroupId = prefs.currentGroupId || null;
+
+        // Check if context changed
+        if (newContext !== this.currentContext || newGroupId !== this.currentGroupId) {
+          console.log('[Family Switcher] Context changed from another tab:', { newContext, newGroupId });
+          this.currentContext = newContext;
+          this.currentGroupId = newGroupId;
+          
+          // Re-render the switcher
+          this.render();
+          this.setupEventListeners();
+          
+          // Dispatch event
+          this.dispatchContextChange();
+        }
+      });
+    } catch (error) {
+      console.warn('Could not setup preferences listener:', error);
     }
   }
 
@@ -275,7 +331,13 @@ class FamilySwitcher {
     this.currentContext = 'personal';
     this.currentGroupId = null;
 
-    // Save to localStorage
+    // Save to Firestore
+    userService.setCurrentContext('personal').catch(error => {
+      console.error('Failed to save context to Firestore:', error);
+      toast.error('Failed to save preference');
+    });
+
+    // Also update localStorage for offline access
     localStorage.setItem('currentContext', 'personal');
     localStorage.removeItem('currentGroupId');
 
@@ -296,7 +358,13 @@ class FamilySwitcher {
     this.currentContext = 'family';
     this.currentGroupId = groupId;
 
-    // Save to localStorage
+    // Save to Firestore
+    userService.setCurrentContext('family', groupId).catch(error => {
+      console.error('Failed to save context to Firestore:', error);
+      toast.error('Failed to save preference');
+    });
+
+    // Also update localStorage for offline access
     localStorage.setItem('currentContext', 'family');
     localStorage.setItem('currentGroupId', groupId);
 
@@ -344,6 +412,16 @@ class FamilySwitcher {
     await this.loadPendingInvitations();
     this.render();
     this.setupEventListeners();
+  }
+
+  /**
+   * Cleanup method to unsubscribe from listeners
+   */
+  destroy() {
+    if (this.preferencesUnsubscribe) {
+      this.preferencesUnsubscribe();
+      this.preferencesUnsubscribe = null;
+    }
   }
 }
 

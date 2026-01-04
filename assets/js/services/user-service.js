@@ -376,6 +376,195 @@ class UserService {
       return false;
     }
   }
+
+  // ============================================
+  // USER PREFERENCES MANAGEMENT (Firestore)
+  // ============================================
+
+  /**
+   * Get user preferences from Firestore
+   * Includes: currentContext, currentGroupId, isDemoMode, pendingInvitationId
+   */
+  async getUserPreferences(userId = null) {
+    const uid = userId || authService.getCurrentUser()?.uid;
+    if (!uid) {
+      throw new Error('User not authenticated');
+    }
+
+    try {
+      const prefsRef = doc(db, 'userPreferences', uid);
+      const prefsDoc = await getDoc(prefsRef);
+
+      if (prefsDoc.exists()) {
+        return { success: true, data: { id: uid, ...prefsDoc.data() } };
+      } else {
+        // Return default preferences if document doesn't exist
+        return { 
+          success: true, 
+          data: {
+            id: uid,
+            currentContext: 'personal',
+            currentGroupId: null,
+            isDemoMode: false,
+            pendingInvitationId: null
+          }
+        };
+      }
+    } catch (error) {
+      console.error('Error getting user preferences:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Update user preferences in Firestore
+   * Supports partial updates
+   */
+  async updateUserPreferences(updates) {
+    const userId = authService.getCurrentUser()?.uid;
+    if (!userId) {
+      throw new Error('User not authenticated');
+    }
+
+    try {
+      const prefsRef = doc(db, 'userPreferences', userId);
+      
+      // Add updatedAt timestamp
+      const updateData = {
+        ...updates,
+        updatedAt: serverTimestamp()
+      };
+
+      // Use setDoc with merge to create if doesn't exist
+      await setDoc(prefsRef, updateData, { merge: true });
+
+      return { success: true };
+    } catch (error) {
+      console.error('Error updating user preferences:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Set current context (personal or family)
+   */
+  async setCurrentContext(context, groupId = null) {
+    if (!['personal', 'family'].includes(context)) {
+      return { success: false, error: 'Invalid context' };
+    }
+
+    const updates = {
+      currentContext: context,
+      currentGroupId: context === 'family' ? groupId : null
+    };
+
+    return await this.updateUserPreferences(updates);
+  }
+
+  /**
+   * Get current context
+   */
+  async getCurrentContext() {
+    const result = await this.getUserPreferences();
+    if (result.success) {
+      return {
+        context: result.data.currentContext || 'personal',
+        groupId: result.data.currentGroupId || null
+      };
+    }
+    return { context: 'personal', groupId: null };
+  }
+
+  /**
+   * Set demo mode
+   */
+  async setDemoMode(enabled) {
+    return await this.updateUserPreferences({
+      isDemoMode: enabled,
+      demoModeEnabledAt: enabled ? serverTimestamp() : null
+    });
+  }
+
+  /**
+   * Check if demo mode is enabled
+   */
+  async isDemoMode() {
+    const result = await this.getUserPreferences();
+    if (result.success) {
+      return result.data.isDemoMode || false;
+    }
+    return false;
+  }
+
+  /**
+   * Set pending invitation
+   */
+  async setPendingInvitation(invitationId) {
+    return await this.updateUserPreferences({
+      pendingInvitationId: invitationId
+    });
+  }
+
+  /**
+   * Get pending invitation
+   */
+  async getPendingInvitation() {
+    const result = await this.getUserPreferences();
+    if (result.success) {
+      return result.data.pendingInvitationId || null;
+    }
+    return null;
+  }
+
+  /**
+   * Clear pending invitation
+   */
+  async clearPendingInvitation() {
+    return await this.updateUserPreferences({
+      pendingInvitationId: null,
+      pendingInvitationAcceptedAt: serverTimestamp()
+    });
+  }
+
+  /**
+   * Setup real-time listener for user preferences
+   * Useful for multi-tab sync
+   */
+  setupPreferencesListener(callback) {
+    const userId = authService.getCurrentUser()?.uid;
+    if (!userId) {
+      console.error('User not authenticated');
+      return null;
+    }
+
+    try {
+      const { onSnapshot } = require('https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js');
+      const prefsRef = doc(db, 'userPreferences', userId);
+      
+      const unsubscribe = onSnapshot(prefsRef, (docSnap) => {
+        if (docSnap.exists()) {
+          const prefs = { id: userId, ...docSnap.data() };
+          
+          // Update localStorage for offline access
+          try {
+            localStorage.setItem('userPreferences', JSON.stringify(prefs));
+          } catch (e) {
+            console.warn('Could not update localStorage:', e);
+          }
+          
+          // Call callback with updated preferences
+          callback(prefs);
+        }
+      }, (error) => {
+        console.error('Error listening to preferences:', error);
+      });
+
+      return unsubscribe;
+    } catch (error) {
+      console.error('Error setting up preferences listener:', error);
+      return null;
+    }
+  }
 }
 
 // Create and export singleton instance
