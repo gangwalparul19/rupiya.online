@@ -26,9 +26,8 @@ class LivePriceService {
         return cached.rate;
       }
 
-      // Fetch from API
-      // const response = await fetch('/api/get-live-price?symbol=USDINR=X');
-      const response = { ok: false, status: 'Mock' }; // Skip fetch to avoid 404
+      // Fetch from Open Source API (Frankfurter)
+      const response = await fetch('https://api.frankfurter.app/latest?from=USD&to=INR');
 
       if (!response.ok) {
         throw new Error(`API error: ${response.status}`);
@@ -36,11 +35,11 @@ class LivePriceService {
 
       const result = await response.json();
 
-      if (!result.success || !result.data) {
-        throw new Error('Failed to fetch exchange rate');
+      if (!result.rates || !result.rates.INR) {
+        throw new Error('Failed to fetch exchange rate data');
       }
 
-      const rate = result.data.price;
+      const rate = result.rates.INR;
 
       // Cache the rate
       this.exchangeRateCache.set('USD_INR', {
@@ -138,9 +137,13 @@ class LivePriceService {
     const change = price - basePrice;
     const changePercent = (variation * 100);
 
+    // Detect currency based on symbol suffix
+    const isIndianStock = symbol.includes('.NS') || symbol.includes('.BO') || symbol === 'USDINR=X';
+    const currency = isIndianStock ? 'INR' : 'USD';
+
     return {
       price: parseFloat(price.toFixed(2)),
-      currency: 'USD',
+      currency: currency,
       symbol: symbol,
       change: parseFloat(change.toFixed(2)),
       changePercent: parseFloat(changePercent.toFixed(2)),

@@ -1,20 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Rupiya Investments - Track your investment portfolio">
   <meta name="theme-color" content="#4A90E2">
   <title>Investments - Rupiya</title>
-  
+
   <!-- PWA Manifest -->
   <link rel="manifest" href="/manifest.json">
-  
+
   <!-- Favicon -->
   <link rel="icon" href="assets/images/logo.png" type="image/png">
   <link rel="apple-touch-icon" href="/android-chrome-192x192.png">
-  
+
   <!-- Stylesheets -->
   <link rel="stylesheet" href="assets/css/common.css">
   <link rel="stylesheet" href="assets/css/components.css">
@@ -30,13 +31,14 @@
   <link rel="stylesheet" href="assets/css/ux-enhancements.css">
   <link rel="stylesheet" href="assets/css/sidebar.css">
   <link rel="stylesheet" href="assets/css/setup-wizard.css">
-  
+
   <!-- Auth Guard - Must be loaded early to prevent flash of protected content -->
   <script src="assets/js/utils/auth-guard.js"></script>
 </head>
+
 <body>
   <div class="dashboard-layout">
-        <!-- Sidebar -->
+    <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <div class="sidebar-logo">
@@ -44,7 +46,7 @@
         </div>
         <button class="sidebar-toggle" id="sidebarClose">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
       </div>
@@ -63,7 +65,8 @@
         </div>
         <button class="btn btn-sm btn-outline w-100 mt-3" id="logoutBtn">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
           </svg>
           Logout
         </button>
@@ -79,13 +82,13 @@
       <div class="mobile-header">
         <a href="dashboard.html" class="mobile-brand">
           <img src="assets/images/logo.png" alt="Rupiya">
-          
+
         </a>
         <div class="mobile-header-actions">
           <div id="familySwitcherContainer"></div>
           <button class="sidebar-toggle" id="sidebarOpen">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
         </div>
@@ -100,7 +103,7 @@
         <div class="page-actions">
           <button class="btn btn-primary" id="addInvestmentBtn">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
             </svg>
             Add Investment
           </button>
@@ -139,7 +142,7 @@
           <h2 class="add-investment-title" id="formTitle">Add Investment</h2>
           <button class="modal-close" id="closeFormBtn">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
@@ -169,11 +172,21 @@
               <span class="error-message" id="typeError"></span>
             </div>
 
+            <!-- Currency Selector -->
+            <div class="form-group">
+              <label for="currency">Currency *</label>
+              <select id="currency" required>
+                <option value="INR">INR (₹)</option>
+                <option value="USD">USD ($)</option>
+              </select>
+            </div>
+
             <!-- Row 2: Symbol (with autocomplete) -->
             <div class="form-group form-group-full">
               <label for="symbol">Symbol (Yahoo Finance) *</label>
               <div class="symbol-input-wrapper">
-                <input type="text" id="symbol" class="symbol-input" required maxlength="20" placeholder="e.g., AAPL, BTC-USD, RELIANCE.NS">
+                <input type="text" id="symbol" class="symbol-input" required maxlength="20"
+                  placeholder="e.g., AAPL, BTC-USD, RELIANCE.NS">
                 <div id="symbolDropdown" class="symbol-dropdown"></div>
               </div>
               <small style="color: #666; font-size: 12px; margin-top: 4px; display: block;">
@@ -242,7 +255,7 @@
           <p class="empty-state-text">Start building your portfolio by adding your first investment.</p>
           <button class="btn btn-primary" onclick="document.getElementById('addInvestmentBtn').click()">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
             </svg>
             Add Your First Investment
           </button>
@@ -264,7 +277,7 @@
         <h2 class="modal-title">Delete Investment</h2>
         <button class="modal-close" id="closeDeleteModalBtn">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
       </div>
@@ -305,4 +318,5 @@
   <script type="module" src="assets/js/pages/investments.js"></script>
   <script src="assets/js/pwa-setup.js"></script>
 </body>
+
 </html>

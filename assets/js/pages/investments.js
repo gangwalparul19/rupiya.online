@@ -219,6 +219,7 @@ function showEditForm(investment) {
   document.getElementById('currentPrice').value = investment.currentPrice;
   document.getElementById('purchaseDate').value = formatDateForInput(investment.purchaseDate);
   document.getElementById('notes').value = investment.notes || '';
+  document.getElementById('currency').value = investment.currency || 'INR';
 
   addInvestmentSection.classList.add('show');
   addInvestmentSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -237,7 +238,8 @@ async function handleSubmit(e) {
     purchasePrice: parseFloat(document.getElementById('purchasePrice').value),
     currentPrice: parseFloat(document.getElementById('currentPrice').value),
     purchaseDate: timezoneService.parseInputDate(document.getElementById('purchaseDate').value),
-    notes: document.getElementById('notes').value.trim()
+    notes: document.getElementById('notes').value.trim(),
+    currency: document.getElementById('currency').value
   };
 
   // Validate symbol
@@ -325,7 +327,7 @@ async function loadInvestments() {
       investmentsList.style.display = 'grid';
     }
 
-    updateSummary();
+    await updateSummary();
   } catch (error) {
     console.error('Error loading investments:', error);
     showToast('Failed to load investments', 'error');
@@ -450,11 +452,11 @@ function renderInvestments() {
           <div class="investment-stats-row">
             <div class="investment-stat">
               <div class="investment-stat-label">Purchase Price</div>
-              <div class="investment-stat-value">${formatCurrency(investment.purchasePrice)}</div>
+              <div class="investment-stat-value">${formatCurrency(investment.purchasePrice, investment.currency === 'USD' ? '$' : '₹')}</div>
             </div>
             <div class="investment-stat">
               <div class="investment-stat-label">Current Price ${liveIndicator}</div>
-              <div class="investment-stat-value">${formatCurrency(currentPrice)} ${currencyDisplay}</div>
+              <div class="investment-stat-value">${formatCurrency(currentPrice, investment.currency === 'USD' ? '$' : '₹')} ${currencyDisplay}</div>
               ${inrDisplay}
               ${priceChangeDisplay}
             </div>
@@ -462,18 +464,18 @@ function renderInvestments() {
           <div class="investment-stats-row">
             <div class="investment-stat">
               <div class="investment-stat-label">Total Invested</div>
-              <div class="investment-stat-value">${formatCurrency(totalInvested)}</div>
+              <div class="investment-stat-value">${formatCurrency(totalInvested, investment.currency === 'USD' ? '$' : '₹')}</div>
             </div>
             <div class="investment-stat">
               <div class="investment-stat-label">Current Value</div>
-              <div class="investment-stat-value">${formatCurrency(currentValue)}</div>
+              <div class="investment-stat-value">${formatCurrency(currentValue, investment.currency === 'USD' ? '$' : '₹')}</div>
             </div>
           </div>
           <div class="investment-stats-row investment-returns-row">
             <div class="investment-stat investment-stat-full">
               <div class="investment-stat-label">Returns</div>
               <div class="investment-stat-value ${returnsClass}">
-                ${returnsSign}${formatCurrency(Math.abs(returns))} (${returnsSign}${returnsPercentage}%)
+               ${returnsSign}${formatCurrency(Math.abs(returns), investment.currency === 'USD' ? '$' : '₹')} (${returnsSign}${returnsPercentage}%)
               </div>
             </div>
           </div>
@@ -497,13 +499,31 @@ function renderInvestments() {
 }
 
 // Update summary
-function updateSummary() {
+// Update summary
+async function updateSummary() {
   let totalInvested = 0;
   let currentValue = 0;
 
+  // Get exchange rate for Summary calculations
+  let usdToInrRate = 89.50; // Fallback
+  try {
+    usdToInrRate = await livePriceService.getUSDToINRRate();
+  } catch (e) {
+    console.warn('Using fallback rate for summary:', e);
+  }
+
   investments.forEach(investment => {
-    totalInvested += investment.quantity * investment.purchasePrice;
-    currentValue += investment.quantity * investment.currentPrice;
+    let investPurchasePrice = investment.purchasePrice;
+    let investCurrentPrice = investment.currentPrice;
+
+    // Convert USD to INR for summary totals
+    if (investment.currency === 'USD') {
+      investPurchasePrice = investment.purchasePrice * usdToInrRate;
+      investCurrentPrice = (investment.inrPrice || (investment.currentPrice * usdToInrRate));
+    }
+
+    totalInvested += investment.quantity * investPurchasePrice;
+    currentValue += investment.quantity * investCurrentPrice;
   });
 
   const totalReturns = currentValue - totalInvested;
@@ -511,9 +531,9 @@ function updateSummary() {
   const returnsClass = totalReturns >= 0 ? 'positive' : 'negative';
   const returnsSign = totalReturns >= 0 ? '+' : '';
 
-  totalInvestedEl.textContent = formatCurrency(totalInvested);
-  currentValueEl.textContent = formatCurrency(currentValue);
-  totalReturnsEl.textContent = `${returnsSign}${formatCurrency(Math.abs(totalReturns))}`;
+  totalInvestedEl.textContent = formatCurrency(totalInvested, '₹');
+  currentValueEl.textContent = formatCurrency(currentValue, '₹');
+  totalReturnsEl.textContent = `${returnsSign}${formatCurrency(Math.abs(totalReturns), '₹')}`;
   returnsPercentageEl.textContent = `${returnsSign}${returnsPercentage}%`;
   returnsPercentageEl.className = `summary-change ${returnsClass}`;
 }
@@ -765,6 +785,13 @@ async function selectSymbol(symbol, type) {
       const priceData = await livePriceService.getLivePrice(symbol);
       if (priceData && priceData.price) {
         currentPriceInput.value = priceData.price;
+
+        // Auto-select currency
+        const currencyInput = document.getElementById('currency');
+        if (priceData.currency && currencyInput) {
+          currencyInput.value = priceData.currency;
+        }
+
         // Also populate purchase price if empty, as a starting point
         const purchasePriceInput = document.getElementById('purchasePrice');
         if (purchasePriceInput && !purchasePriceInput.value) {

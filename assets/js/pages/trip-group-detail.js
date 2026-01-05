@@ -1020,8 +1020,21 @@ class TripGroupDetailPage {
 document.addEventListener('DOMContentLoaded', () => {
   try {
     window.tripGroupDetailPage = new TripGroupDetailPage();
+
+    // Safety check: specific fix for blank page issue
+    // Ensure document is visible even if auth-guard failed to reveal it
+    setTimeout(() => {
+      if (document.documentElement.style.visibility === 'hidden') {
+        console.warn('Recovering from blank page state (Auth Guard timeout)');
+        document.documentElement.style.visibility = 'visible';
+        document.documentElement.style.opacity = '1';
+      }
+    }, 1000);
   } catch (error) {
     console.error('Critical initialization error:', error);
+    // ... error handling code ...
+    document.documentElement.style.visibility = 'visible';
+    document.documentElement.style.opacity = '1';
     document.body.innerHTML = `
       <div style="padding: 20px; color: red; background: #fff; text-align: center; margin-top: 50px;">
         <h1>Something went wrong</h1>
