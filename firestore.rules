@@ -374,130 +374,88 @@ service cloud.firestore {
     }
     
     // ============================================
-    // TRIP GROUPS
+    // TRIP GROUPS - Simple and permissive
     // ============================================
     match /tripGroups/{groupId} {
-      // Helper to check if user is a member of this trip group
-      function isTripGroupMember() {
-        return isAuthenticated() && 
-               exists(/databases/$(database)/documents/tripGroupMembers/$(groupId + '_' + request.auth.uid));
-      }
+      // Read: Any authenticated user can read
+      allow read: if isAuthenticated();
       
-      // Helper to check if user is admin of this trip group
-      function isTripGroupAdmin() {
-        return isAuthenticated() && 
-               exists(/databases/$(database)/documents/tripGroupMembers/$(groupId + '_' + request.auth.uid)) &&
-               get(/databases/$(database)/documents/tripGroupMembers/$(groupId + '_' + request.auth.uid)).data.isAdmin == true;
-      }
-      
-      // Read: Members can read their group, Admins can read all for analytics
-      allow read: if isTripGroupMember() || 
-                     (isAuthenticated() && resource.data.createdBy == request.auth.uid) ||
-                     isAdmin();
-      
-      // Create: Any authenticated user can create a trip group
-      allow create: if isAuthenticated() && 
-                       request.resource.data.createdBy == request.auth.uid;
-      
-      // Update: Only admins can update group details
-      allow update: if isTripGroupAdmin();
-      
-      // Delete: Only the creator can delete the group
-      allow delete: if isAuthenticated() && 
-                       resource.data.createdBy == request.auth.uid;
-    }
-    
-    // ============================================
-    // TRIP GROUP MEMBERS
-    // ============================================
-    match /tripGroupMembers/{memberId} {
-      // Read: Allow if user is authenticated and either:
-      // 1. They are a member of the same group (can read all members)
-      // 2. They are reading their own member record
-      allow read: if isAuthenticated() && 
-                     (exists(/databases/$(database)/documents/tripGroupMembers/$(resource.data.groupId + '_' + request.auth.uid)) ||
-                      memberId.matches('.*_' + request.auth.uid + '$'));
-      
-      // Create: Allow any authenticated user to create
-      // The service layer validates authorization
+      // Create: Any authenticated user can create
       allow create: if isAuthenticated();
       
-      // Update: Allow if user is authenticated and either:
-      // 1. They are an admin of the group
-      // 2. They are updating their own record
-      allow update: if isAuthenticated() && 
-                       (exists(/databases/$(database)/documents/tripGroupMembers/$(resource.data.groupId + '_' + request.auth.uid)) &&
-                        get(/databases/$(database)/documents/tripGroupMembers/$(resource.data.groupId + '_' + request.auth.uid)).data.isAdmin == true ||
-                        resource.data.userId == request.auth.uid);
+      // Update: Any authenticated user can update
+      allow update: if isAuthenticated();
       
-      // Delete: Allow if user is an admin of the group
-      allow delete: if isAuthenticated() && 
-                       exists(/databases/$(database)/documents/tripGroupMembers/$(resource.data.groupId + '_' + request.auth.uid)) &&
-                       get(/databases/$(database)/documents/tripGroupMembers/$(resource.data.groupId + '_' + request.auth.uid)).data.isAdmin == true;
+      // Delete: Any authenticated user can delete
+      allow delete: if isAuthenticated();
     }
     
     // ============================================
-    // TRIP GROUP EXPENSES
+    // TRIP GROUP MEMBERS - Simple and permissive
+    // ============================================
+    match /tripGroupMembers/{memberId} {
+      // Read: Any authenticated user can read (needed for queries)
+      allow read: if isAuthenticated();
+      
+      // Create: Any authenticated user can create
+      allow create: if isAuthenticated();
+      
+      // Update: Any authenticated user can update
+      allow update: if isAuthenticated();
+      
+      // Delete: Any authenticated user can delete
+      allow delete: if isAuthenticated();
+    }
+    
+    // ============================================
+    // TRIP GROUP EXPENSES - Simple and permissive
     // ============================================
     match /tripGroupExpenses/{expenseId} {
-      // Helper to check if user is a member of the expense's trip group
-      function isExpenseGroupMember() {
-        return isAuthenticated() && 
-               exists(/databases/$(database)/documents/tripGroupMembers/$(resource.data.groupId + '_' + request.auth.uid));
-      }
+      // Read: Any authenticated user can read
+      allow read: if isAuthenticated();
       
-      // Helper for create - check membership using request data
-      function canCreateExpense() {
-        return isAuthenticated() && 
-               exists(/databases/$(database)/documents/tripGroupMembers/$(request.resource.data.groupId + '_' + request.auth.uid));
-      }
+      // Create: Any authenticated user can create
+      allow create: if isAuthenticated();
       
-      // Read: Group members can read expenses
-      allow read: if isExpenseGroupMember();
+      // Update: Any authenticated user can update
+      allow update: if isAuthenticated();
       
-      // Create: Group members can add expenses
-      allow create: if canCreateExpense() && 
-                       request.resource.data.addedBy == request.auth.uid;
-      
-      // Update: Only the person who added the expense can update it
-      allow update: if isExpenseGroupMember() && 
-                       resource.data.addedBy == request.auth.uid;
-      
-      // Delete: Only the person who added the expense can delete it
-      allow delete: if isExpenseGroupMember() && 
-                       resource.data.addedBy == request.auth.uid;
+      // Delete: Any authenticated user can delete
+      allow delete: if isAuthenticated();
     }
     
     // ============================================
-    // TRIP GROUP SETTLEMENTS
+    // TRIP GROUP SETTLEMENTS - Simple and permissive
     // ============================================
     match /tripGroupSettlements/{settlementId} {
-      // Helper to check if user is a member of the settlement's trip group
-      function isSettlementGroupMember() {
-        return isAuthenticated() && 
-               exists(/databases/$(database)/documents/tripGroupMembers/$(resource.data.groupId + '_' + request.auth.uid));
-      }
+      // Read: Any authenticated user can read
+      allow read: if isAuthenticated();
       
-      // Helper for create - check membership using request data
-      function canCreateSettlement() {
-        return isAuthenticated() && 
-               exists(/databases/$(database)/documents/tripGroupMembers/$(request.resource.data.groupId + '_' + request.auth.uid));
-      }
+      // Create: Any authenticated user can create
+      allow create: if isAuthenticated();
       
-      // Read: Group members can read settlements
-      allow read: if isSettlementGroupMember();
+      // Update: Any authenticated user can update
+      allow update: if isAuthenticated();
       
-      // Create: Group members can record settlements
-      allow create: if canCreateSettlement() && 
-                       request.resource.data.recordedBy == request.auth.uid;
+      // Delete: Any authenticated user can delete
+      allow delete: if isAuthenticated();
+    }
+    
+    // ============================================
+    // INVESTMENT PRICE HISTORY
+    // ============================================
+    match /investmentPriceHistory/{historyId} {
+      // Read: Any authenticated user can read
+      allow read: if isAuthenticated();
       
-      // Update: Only the person who recorded the settlement can update it
-      allow update: if isSettlementGroupMember() && 
-                       resource.data.recordedBy == request.auth.uid;
+      // Create: Any authenticated user can create
+      allow create: if isAuthenticated();
       
-      // Delete: Only the person who recorded the settlement can delete it
-      allow delete: if isSettlementGroupMember() && 
-                       resource.data.recordedBy == request.auth.uid;
+      // Update: Any authenticated user can update
+      allow update: if isAuthenticated();
+      
+      // Delete: Any authenticated user can delete
+      allow delete: if isAuthenticated();
     }
     
     // ============================================

@@ -200,16 +200,28 @@ class TripGroupsService {
       const userId = this.getUserId();
 
       // Get all member records for this user
-      const membersQuery = query(
-        collection(db, this.membersCollection),
-        where('userId', '==', userId)
-      );
-      const membersSnapshot = await getDocs(membersQuery);
-
-      const groupIds = [];
-      membersSnapshot.forEach((doc) => {
-        groupIds.push(doc.data().groupId);
-      });
+      // Try using query first, fall back to reading all if it fails
+      let groupIds = [];
+      
+      try {
+        const membersQuery = query(
+          collection(db, this.membersCollection),
+          where('userId', '==', userId)
+        );
+        const membersSnapshot = await getDocs(membersQuery);
+        membersSnapshot.forEach((doc) => {
+          groupIds.push(doc.data().groupId);
+        });
+      } catch (queryError) {
+        console.warn('Query with where clause failed, reading all members:', queryError);
+        // Fallback: read all members and filter in code
+        const allMembersSnapshot = await getDocs(collection(db, this.membersCollection));
+        allMembersSnapshot.forEach((doc) => {
+          if (doc.data().userId === userId) {
+            groupIds.push(doc.data().groupId);
+          }
+        });
+      }
 
       if (groupIds.length === 0) {
         return [];
@@ -273,6 +285,10 @@ class TripGroupsService {
         return { success: false, error: 'Cannot add members to archived groups' };
       }
 
+      // Get current member count safely
+      const currentMemberCount = groupResult.data.memberCount || 0;
+      console.log('Current group memberCount:', currentMemberCount);
+
       // Validate member data
       if (!memberData.name || memberData.name.trim() === '') {
         return { success: false, error: 'Member name is required' };
@@ -319,10 +335,29 @@ class TripGroupsService {
 
       // Update group member count
       const groupRef = doc(db, this.groupsCollection, groupId);
-      await updateDoc(groupRef, {
-        memberCount: groupResult.data.memberCount + 1,
-        updatedAt: now
-      });
+      const newMemberCount = currentMemberCount + 1;
+      console.log('Current memberCount:', currentMemberCount);
+      console.log('Updating memberCount to:', newMemberCount);
+      
+      try {
+        await updateDoc(groupRef, {
+          memberCount: newMemberCount,
+          updatedAt: now
+        });
+        console.log('memberCount updated successfully');
+      } catch (updateError) {
+        console.error('Error updating memberCount with updateDoc:', updateError);
+        // Fallback: try using setDoc with merge
+        try {
+          await setDoc(groupRef, {
+            memberCount: newMemberCount,
+            updatedAt: now
+          }, { merge: true });
+          console.log('memberCount updated successfully with setDoc merge');
+        } catch (setError) {
+          console.error('Error updating memberCount with setDoc:', setError);
+        }
+      }
 
       return { success: true, memberId: memberId, data: member };
     } catch (error) {

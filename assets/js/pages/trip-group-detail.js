@@ -2,6 +2,48 @@
 import tripGroupsService from '../services/trip-groups-service.js';
 import authService from '../services/auth-service.js';
 
+// Debug panel setup
+const debugLogs = [];
+const originalLog = console.log;
+const originalError = console.error;
+const originalWarn = console.warn;
+
+console.log = function(...args) {
+  originalLog.apply(console, args);
+  debugLogs.push({ type: 'log', message: args.join(' '), time: new Date().toLocaleTimeString() });
+  updateDebugPanel();
+};
+
+console.error = function(...args) {
+  originalError.apply(console, args);
+  debugLogs.push({ type: 'error', message: args.join(' '), time: new Date().toLocaleTimeString() });
+  updateDebugPanel();
+};
+
+console.warn = function(...args) {
+  originalWarn.apply(console, args);
+  debugLogs.push({ type: 'warn', message: args.join(' '), time: new Date().toLocaleTimeString() });
+  updateDebugPanel();
+};
+
+function updateDebugPanel() {
+  const panel = document.getElementById('debugPanel');
+  if (!panel) return;
+  
+  const logsList = panel.querySelector('.debug-logs');
+  if (!logsList) return;
+  
+  logsList.innerHTML = debugLogs.slice(-20).map(log => `
+    <div class="debug-log ${log.type}">
+      <span class="debug-time">${log.time}</span>
+      <span class="debug-type">${log.type.toUpperCase()}</span>
+      <span class="debug-message">${log.message}</span>
+    </div>
+  `).join('');
+  
+  logsList.scrollTop = logsList.scrollHeight;
+}
+
 class TripGroupDetailPage {
   constructor() {
     this.groupId = null;
@@ -17,11 +59,19 @@ class TripGroupDetailPage {
   }
 
   async init() {
+    // Create debug panel
+    this.createDebugPanel();
+    
+    console.log('Initializing Trip Group Detail Page');
+    
     // Get group ID from URL
     const params = new URLSearchParams(window.location.search);
     this.groupId = params.get('id');
     
+    console.log('Group ID from URL:', this.groupId);
+    
     if (!this.groupId) {
+      console.error('No group ID provided');
       window.location.href = 'trip-groups.html';
       return;
     }
@@ -30,8 +80,47 @@ class TripGroupDetailPage {
     if (!user) return; // Redirecting to login
     
     this.currentUserId = authService.getCurrentUser()?.uid;
+    console.log('Current user ID:', this.currentUserId);
+    
     this.bindEvents();
     await this.loadGroupData();
+  }
+
+  createDebugPanel() {
+    const panel = document.createElement('div');
+    panel.id = 'debugPanel';
+    panel.style.cssText = `
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 400px;
+      max-height: 300px;
+      background: #1a1a1a;
+      border: 2px solid #4A90E2;
+      border-radius: 8px;
+      padding: 10px;
+      font-family: monospace;
+      font-size: 11px;
+      color: #fff;
+      z-index: 10000;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    `;
+    
+    panel.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid #4A90E2; padding-bottom: 5px;">
+        <strong>Debug Logs</strong>
+        <button onclick="this.parentElement.parentElement.style.display='none'" style="background: none; border: none; color: #fff; cursor: pointer; font-size: 16px;">×</button>
+      </div>
+      <div class="debug-logs" style="
+        max-height: 250px;
+        overflow-y: auto;
+        background: #0a0a0a;
+        border-radius: 4px;
+        padding: 8px;
+      "></div>
+    `;
+    
+    document.body.appendChild(panel);
   }
 
   async waitForAuth() {
@@ -107,24 +196,38 @@ class TripGroupDetailPage {
     this.showLoading(true);
     
     try {
+      console.log('Loading group data for group:', this.groupId);
+      
       // Load group details
+      console.log('Fetching group details...');
       const groupResult = await tripGroupsService.getGroup(this.groupId);
+      console.log('Group result:', groupResult);
+      
       if (!groupResult.success) {
         throw new Error(groupResult.error);
       }
       this.group = groupResult.data;
+      console.log('Group loaded:', this.group.name);
       
       // Load members, expenses, settlements in parallel
+      console.log('Loading members, expenses, and settlements...');
       [this.members, this.expenses, this.settlements] = await Promise.all([
         tripGroupsService.getGroupMembers(this.groupId),
         tripGroupsService.getGroupExpenses(this.groupId),
         tripGroupsService.getSettlements(this.groupId)
       ]);
       
+      console.log('Members loaded:', this.members.length);
+      console.log('Expenses loaded:', this.expenses.length);
+      console.log('Settlements loaded:', this.settlements.length);
+      
       // Calculate balances
+      console.log('Calculating balances...');
       this.balances = await tripGroupsService.calculateBalances(this.groupId);
+      console.log('Balances calculated:', this.balances);
       
       // Render everything
+      console.log('Rendering UI...');
       this.renderHeader();
       this.renderBudget();
       this.renderBalances();
@@ -134,6 +237,8 @@ class TripGroupDetailPage {
       this.renderAnalytics();
       this.populateFilters();
       this.populateModalSelects();
+      
+      console.log('UI rendered successfully');
     } catch (error) {
       console.error('Error loading group data:', error);
       this.showToast('Failed to load group data', 'error');
