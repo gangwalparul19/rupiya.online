@@ -928,10 +928,12 @@ async function handleAddPaymentMethod(e) {
     return;
   }
   
-  // Show loading
+  // Show loading with text
   addPaymentMethodBtn.disabled = true;
-  addPaymentMethodBtnText.style.display = 'none';
-  addPaymentMethodBtnSpinner.style.display = 'inline-block';
+  addPaymentMethodBtn.innerHTML = `
+    <span class="spinner"></span>
+    <span style="margin-left: 8px;">Adding...</span>
+  `;
   
   try {
     const methodData = {
@@ -976,9 +978,9 @@ async function handleAddPaymentMethod(e) {
     console.error('Error adding payment method:', error);
     showToast('Failed to add payment method', 'error');
   } finally {
+    // Reset button
     addPaymentMethodBtn.disabled = false;
-    addPaymentMethodBtnText.style.display = 'inline';
-    addPaymentMethodBtnSpinner.style.display = 'none';
+    addPaymentMethodBtn.innerHTML = 'Add Payment Method';
   }
 }
 
@@ -1018,10 +1020,12 @@ function hideDeletePaymentMethodModal() {
 async function handleDeletePaymentMethod() {
   if (!deletePaymentMethodId) return;
   
-  // Show loading
+  // Show loading with text
   confirmDeletePaymentMethodBtn.disabled = true;
-  deletePaymentMethodBtnText.style.display = 'none';
-  deletePaymentMethodBtnSpinner.style.display = 'inline-block';
+  confirmDeletePaymentMethodBtn.innerHTML = `
+    <span class="spinner"></span>
+    <span style="margin-left: 8px;">Deleting...</span>
+  `;
   
   try {
     const result = await paymentMethodsService.deletePaymentMethod(deletePaymentMethodId);
@@ -1037,9 +1041,9 @@ async function handleDeletePaymentMethod() {
     console.error('Error deleting payment method:', error);
     showToast('Failed to delete payment method', 'error');
   } finally {
+    // Reset button
     confirmDeletePaymentMethodBtn.disabled = false;
-    deletePaymentMethodBtnText.style.display = 'inline';
-    deletePaymentMethodBtnSpinner.style.display = 'none';
+    confirmDeletePaymentMethodBtn.innerHTML = 'Delete';
   }
 }
 
