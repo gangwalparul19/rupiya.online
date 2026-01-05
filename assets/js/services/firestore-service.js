@@ -484,6 +484,47 @@ class FirestoreService {
   async getSplitsPaginated(options = {}) { return this.getPaginated(this.collections.splits, { orderByField: 'createdAt', orderDirection: 'desc', ...options }); }
 
   // ============================================
+  // CUSTOM QUERY METHOD
+  // ============================================
+
+  async query(collectionName, filters = [], orderByField = null, orderDirection = 'asc', limitCount = null) {
+    try {
+      const userId = this.getUserId();
+      let constraints = [where('userId', '==', userId)];
+      
+      // Add filters
+      if (Array.isArray(filters)) {
+        filters.forEach(filter => {
+          constraints.push(where(filter.field, filter.operator, filter.value));
+        });
+      }
+      
+      // Add ordering
+      if (orderByField) {
+        constraints.push(orderBy(orderByField, orderDirection));
+      }
+      
+      // Add limit
+      if (limitCount) {
+        constraints.push(limit(limitCount));
+      }
+      
+      const q = query(collection(db, collectionName), ...constraints);
+      const querySnapshot = await getDocs(q);
+      
+      const data = [];
+      querySnapshot.forEach((doc) => {
+        data.push({ id: doc.id, ...doc.data() });
+      });
+      
+      return data;
+    } catch (error) {
+      console.error(`Error querying ${collectionName}:`, error);
+      return [];
+    }
+  }
+
+  // ============================================
   // OPTIMIZED QUERY HELPERS
   // ============================================
 
