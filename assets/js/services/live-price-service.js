@@ -27,7 +27,8 @@ class LivePriceService {
       }
 
       // Fetch from API
-      const response = await fetch('/api/get-live-price?symbol=USDINR=X');
+      // const response = await fetch('/api/get-live-price?symbol=USDINR=X');
+      const response = { ok: false, status: 'Mock' }; // Skip fetch to avoid 404
 
       if (!response.ok) {
         throw new Error(`API error: ${response.status}`);

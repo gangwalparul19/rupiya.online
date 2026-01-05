@@ -1018,5 +1018,18 @@ class TripGroupDetailPage {
 
 // Initialize page
 document.addEventListener('DOMContentLoaded', () => {
-  new TripGroupDetailPage();
+  try {
+    window.tripGroupDetailPage = new TripGroupDetailPage();
+  } catch (error) {
+    console.error('Critical initialization error:', error);
+    document.body.innerHTML = `
+      <div style="padding: 20px; color: red; background: #fff; text-align: center; margin-top: 50px;">
+        <h1>Something went wrong</h1>
+        <p>Failed to initialize page: ${error.message}</p>
+        <pre style="text-align: left; background: #f0f0f0; padding: 10px; overflow: auto; max-width: 800px; margin: 20px auto;">${error.stack}</pre>
+        <button onclick="window.location.reload()" style="padding: 10px 20px; cursor: pointer;">Reload Page</button>
+        <a href="trip-groups.html" style="display: block; margin-top: 10px;">Back to Trips</a>
+      </div>
+    `;
+  }
 });

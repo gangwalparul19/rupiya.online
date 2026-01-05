@@ -713,9 +713,11 @@ function renderSymbolDropdown(results) {
 
 // Select symbol from dropdown
 // Select symbol from dropdown
-function selectSymbol(symbol, type) {
+// Select symbol from dropdown
+window.selectSymbol = async function (symbol, type) {
   const symbolInput = document.getElementById('symbol');
   const typeInput = document.getElementById('type');
+  const currentPriceInput = document.getElementById('currentPrice');
 
   symbolInput.value = symbol;
 
@@ -742,13 +744,11 @@ function selectSymbol(symbol, type) {
     }
   }
 
-  // If normalized type exists, select it. Otherwise fallback to 'Other' or keep as is?
-  // Let's fallback to 'Other' if we can't match, or just don't change it if user already selected valid one
+  // If normalized type exists, select it
   if (typeExists) {
     typeInput.value = normalizedType;
   } else if (upperType && !typeInput.value) {
-    // If we have a type from search but it doesn't match our options, and no type is selected, select 'Other'
-    // But verify 'Other' exists
+    // Fallback to 'Other' if possible
     const otherOption = Array.from(typeInput.options).find(o => o.value === 'Other');
     if (otherOption) {
       typeInput.value = 'Other';
@@ -758,7 +758,25 @@ function selectSymbol(symbol, type) {
   const dropdown = document.getElementById('symbolDropdown');
   if (dropdown) dropdown.style.display = 'none';
 
-  // Don't trigger change event - it causes issues with type clearing
+  // Auto-populate current price
+  if (currentPriceInput) {
+    try {
+      currentPriceInput.placeholder = 'Fetching...';
+      const priceData = await livePriceService.getLivePrice(symbol);
+      if (priceData && priceData.price) {
+        currentPriceInput.value = priceData.price;
+        // Also populate purchase price if empty, as a starting point
+        const purchasePriceInput = document.getElementById('purchasePrice');
+        if (purchasePriceInput && !purchasePriceInput.value) {
+          purchasePriceInput.value = priceData.price;
+        }
+        showToast(`Price fetched for ${symbol}: ${formatCurrency(priceData.price)}`, 'success');
+      }
+    } catch (error) {
+      console.warn('Could not auto-populate price:', error);
+      currentPriceInput.placeholder = '0.00';
+    }
+  }
 }
 
 // Refresh live price for an investment

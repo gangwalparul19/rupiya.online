@@ -1,7 +1,7 @@
 // Service Worker for Rupiya PWA
 // Provides offline support and caching
 
-const CACHE_VERSION = '1.1.2'; // Increment this on every deployment
+const CACHE_VERSION = '1.1.3'; // Increment this on every deployment
 const CACHE_NAME = `rupiya-v${CACHE_VERSION}`;
 const RUNTIME_CACHE = `rupiya-runtime-v${CACHE_VERSION}`;
 
@@ -89,7 +89,7 @@ const STATIC_ASSETS = [
 // Install event - cache static assets
 self.addEventListener('install', (event) => {
   console.log('[Service Worker] Installing...');
-  
+
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
@@ -109,7 +109,7 @@ self.addEventListener('install', (event) => {
 // Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
   console.log('[Service Worker] Activating...');
-  
+
   event.waitUntil(
     caches.keys()
       .then((cacheNames) => {
@@ -226,7 +226,7 @@ self.addEventListener('fetch', (event) => {
           })
           .catch((error) => {
             console.error('[Service Worker] Fetch failed:', error);
-            
+
             // Return offline page for navigation requests
             if (request.mode === 'navigate') {
               return caches.match('/offline.html');
@@ -264,7 +264,7 @@ function updateCache(request) {
 // Background sync for offline actions
 self.addEventListener('sync', (event) => {
   console.log('[Service Worker] Background sync:', event.tag);
-  
+
   if (event.tag === 'sync-data') {
     event.waitUntil(syncData());
   }
@@ -276,7 +276,7 @@ async function syncData() {
     // Get pending actions from IndexedDB or localStorage
     // Sync with Firebase
     console.log('[Service Worker] Syncing data...');
-    
+
     // Notify clients that sync is complete
     const clients = await self.clients.matchAll();
     clients.forEach((client) => {
@@ -293,7 +293,7 @@ async function syncData() {
 // Push notifications (future feature)
 self.addEventListener('push', (event) => {
   console.log('[Service Worker] Push notification received');
-  
+
   const options = {
     body: event.data ? event.data.text() : 'New notification from Rupiya',
     icon: '/android-chrome-192x192.png',
@@ -325,7 +325,7 @@ self.addEventListener('push', (event) => {
 // Notification click handler
 self.addEventListener('notificationclick', (event) => {
   console.log('[Service Worker] Notification clicked:', event.action);
-  
+
   event.notification.close();
 
   if (event.action === 'view') {
@@ -338,7 +338,7 @@ self.addEventListener('notificationclick', (event) => {
 // Message handler for communication with clients
 self.addEventListener('message', (event) => {
   console.log('[Service Worker] Message received:', event.data);
-  
+
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
   }
