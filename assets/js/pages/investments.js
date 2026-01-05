@@ -345,6 +345,18 @@ async function updateLivePrices() {
         investment.priceChange = priceData.change;
         investment.priceChangePercent = priceData.changePercent;
         investment.lastPriceUpdate = priceData.lastUpdate;
+        investment.currency = priceData.currency;
+        
+        // Add INR conversion for US stocks
+        if (priceData.currency === 'USD') {
+          try {
+            investment.inrPrice = await livePriceService.convertUSDToINR(priceData.price);
+            investment.inrChange = await livePriceService.convertUSDToINR(priceData.change);
+            investment.hasInrConversion = true;
+          } catch (error) {
+            console.warn(`Could not convert ${investment.symbol} to INR:`, error);
+          }
+        }
       } catch (error) {
         console.warn(`Could not fetch live price for ${investment.symbol}:`, error);
         // Keep using the stored current price if live price fails
@@ -379,6 +391,14 @@ function renderInvestments() {
     // Live price indicator
     const liveIndicator = investment.livePrice 
       ? '<span class="live-indicator">🔴 LIVE</span>'
+      : '';
+    
+    // Currency display
+    const currencyDisplay = investment.currency ? `(${investment.currency})` : '';
+    
+    // INR conversion display for US stocks
+    const inrDisplay = investment.hasInrConversion && investment.inrPrice
+      ? `<div class="investment-stat-inr">₹${investment.inrPrice.toFixed(2)} INR</div>`
       : '';
 
     return `
@@ -427,7 +447,8 @@ function renderInvestments() {
             </div>
             <div class="investment-stat">
               <div class="investment-stat-label">Current Price ${liveIndicator}</div>
-              <div class="investment-stat-value">${formatCurrency(currentPrice)}</div>
+              <div class="investment-stat-value">${formatCurrency(currentPrice)} ${currencyDisplay}</div>
+              ${inrDisplay}
               ${priceChangeDisplay}
             </div>
           </div>
@@ -558,6 +579,7 @@ window.editInvestment = editInvestment;
 window.showDeleteConfirmation = showDeleteConfirmation;
 window.viewPriceHistory = viewPriceHistory;
 window.refreshInvestmentPrice = refreshInvestmentPrice;
+window.selectSymbol = selectSymbol;
 
 // Handle symbol search input
 async function handleSymbolSearch(e) {
@@ -713,6 +735,18 @@ async function refreshInvestmentPrice(investmentId) {
     investment.priceChange = priceData.change;
     investment.priceChangePercent = priceData.changePercent;
     investment.lastPriceUpdate = priceData.lastUpdate;
+    investment.currency = priceData.currency;
+    
+    // Add INR conversion for US stocks
+    if (priceData.currency === 'USD') {
+      try {
+        investment.inrPrice = await livePriceService.convertUSDToINR(priceData.price);
+        investment.inrChange = await livePriceService.convertUSDToINR(priceData.change);
+        investment.hasInrConversion = true;
+      } catch (error) {
+        console.warn('Could not convert to INR:', error);
+      }
+    }
 
     // Update in Firestore
     await firestoreService.updateInvestment(investmentId, {

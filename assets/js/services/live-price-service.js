@@ -11,6 +11,56 @@ class LivePriceService {
     this.refreshIntervals = new Map(); // Store interval IDs for cleanup
     this.CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
     this.API_ENDPOINT = '/api/get-live-price';
+    this.exchangeRateCache = new Map();
+    this.EXCHANGE_RATE_CACHE_DURATION = 60 * 60 * 1000; // 1 hour
+  }
+
+  /**
+   * Get USD to INR exchange rate
+   */
+  async getUSDToINRRate() {
+    try {
+      // Check cache first
+      const cached = this.exchangeRateCache.get('USD_INR');
+      if (cached && Date.now() - cached.timestamp < this.EXCHANGE_RATE_CACHE_DURATION) {
+        return cached.rate;
+      }
+
+      // Fetch from API
+      const response = await fetch('/api/get-live-price?symbol=USDINR=X');
+      
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      if (!result.success || !result.data) {
+        throw new Error('Failed to fetch exchange rate');
+      }
+
+      const rate = result.data.price;
+      
+      // Cache the rate
+      this.exchangeRateCache.set('USD_INR', {
+        rate,
+        timestamp: Date.now()
+      });
+
+      return rate;
+    } catch (error) {
+      console.error('Error fetching USD to INR rate:', error);
+      // Return a fallback rate if API fails
+      return 83; // Approximate rate as fallback
+    }
+  }
+
+  /**
+   * Convert USD price to INR
+   */
+  async convertUSDToINR(usdPrice) {
+    const rate = await this.getUSDToINRRate();
+    return usdPrice * rate;
   }
 
   /**
