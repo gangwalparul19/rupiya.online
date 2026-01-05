@@ -1,19 +1,21 @@
 /**
  * Symbol Search Service
  * Provides autocomplete and search functionality for investment symbols
+ * Now uses Google Sheets data directly
  */
+
+import googleSheetsPriceService from './google-sheets-price-service.js';
 
 class SymbolSearchService {
   constructor() {
-    this.API_ENDPOINT = '/api/search-symbols';
     this.cache = new Map();
     this.CACHE_DURATION = 60 * 60 * 1000; // 1 hour
   }
 
   /**
-   * Search for symbols
+   * Search for symbols in Google Sheets data
    */
-  async searchSymbols(query, type = 'all', limit = 10) {
+  async searchSymbols(query, type = 'all', limit = 15) {
     if (!query || query.length < 1) {
       return [];
     }
@@ -26,25 +28,33 @@ class SymbolSearchService {
     }
 
     try {
-      const url = `${this.API_ENDPOINT}?query=${encodeURIComponent(query)}&type=${encodeURIComponent(type)}&limit=${limit}&action=search`;
-      console.log('Fetching symbols from:', url);
+      console.log('Searching Google Sheets for:', query, 'type:', type);
       
-      const response = await fetch(url);
-
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
+      // Use Google Sheets service to search
+      const results = await googleSheetsPriceService.searchSymbols(query, limit);
+      
+      // Filter by type if specified
+      let filteredResults = results;
+      if (type && type !== 'all') {
+        filteredResults = results.filter(r => {
+          const resultType = this.normalizeType(r.type);
+          const searchType = this.normalizeType(type);
+          return resultType === searchType;
+        });
       }
 
-      const data = await response.json();
-      console.log('API Response:', data);
+      // Enhance results with additional info
+      const enhancedResults = filteredResults.map(r => ({
+        symbol: r.symbol,
+        name: r.name,
+        type: this.normalizeType(r.type),
+        exchange: r.exchange || '',
+        displayName: this.formatSymbolDisplay(r)
+      }));
 
-      if (!data.success) {
-        throw new Error(data.error || 'Search failed');
-      }
-
-      this.setCache(cacheKey, data.results);
-      console.log('Found results:', data.results);
-      return data.results;
+      this.setCache(cacheKey, enhancedResults);
+      console.log('Found results:', enhancedResults.length);
+      return enhancedResults;
     } catch (error) {
       console.error('Error searching symbols:', error);
       return [];
@@ -52,7 +62,30 @@ class SymbolSearchService {
   }
 
   /**
-   * Verify if symbol is supported
+   * Normalize type names
+   */
+  normalizeType(type) {
+    if (!type) return 'other';
+    
+    const typeUpper = type.toUpperCase();
+    
+    if (typeUpper.includes('STOCK') || typeUpper.includes('EQUITY') || typeUpper.includes('ETF')) {
+      return 'Stocks';
+    } else if (typeUpper.includes('CRYPTO') || typeUpper.includes('CURRENCY')) {
+      return 'Cryptocurrency';
+    } else if (typeUpper.includes('MUTUAL') || typeUpper.includes('FUND') || typeUpper.includes('MF')) {
+      return 'Mutual Funds';
+    } else if (typeUpper.includes('GOLD') || typeUpper.includes('SILVER') || typeUpper.includes('COMMODITY')) {
+      return 'Gold';
+    } else if (typeUpper.includes('FOREX') || typeUpper.includes('FX')) {
+      return 'Forex';
+    }
+    
+    return 'Other';
+  }
+
+  /**
+   * Verify if symbol exists in sheets
    */
   async verifySymbol(symbol, type = 'all') {
     if (!symbol) {
@@ -66,24 +99,15 @@ class SymbolSearchService {
     }
 
     try {
-      const response = await fetch(
-        `${this.API_ENDPOINT}?query=${encodeURIComponent(symbol)}&type=${type}&action=verify`
-      );
-
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      if (!data.success) {
-        return false;
-      }
-
-      this.setCache(cacheKey, data.supported);
-      return data.supported;
+      // Try to get price data for the symbol
+      const priceData = await googleSheetsPriceService.getLivePrice(symbol);
+      const exists = !!priceData;
+      
+      this.setCache(cacheKey, exists);
+      return exists;
     } catch (error) {
-      console.error('Error verifying symbol:', error);
+      console.warn('Symbol not found:', symbol);
+      this.setCache(cacheKey, false);
       return false;
     }
   }
@@ -99,22 +123,33 @@ class SymbolSearchService {
     }
 
     try {
-      const response = await fetch(
-        `${this.API_ENDPOINT}?type=${type}&action=all`
-      );
-
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
+      // Get all data from sheets
+      const allData = await googleSheetsPriceService.getAllData();
+      
+      let symbols = [];
+      
+      // Add stocks
+      if (type === 'all' || type === 'Stocks') {
+        symbols = symbols.concat(allData.stocks.map(row => ({
+          symbol: row.Symbol || row.symbol,
+          name: row.Name || row.name,
+          type: 'Stocks',
+          exchange: row.Exchange || row.exchange
+        })));
+      }
+      
+      // Add mutual funds
+      if (type === 'all' || type === 'Mutual Funds') {
+        symbols = symbols.concat(allData.mutualFunds.map(row => ({
+          symbol: row.Symbol || row.symbol || row['Scheme Code'],
+          name: row.Name || row.name || row['Scheme Name'],
+          type: 'Mutual Funds',
+          exchange: 'India'
+        })));
       }
 
-      const data = await response.json();
-
-      if (!data.success) {
-        throw new Error(data.error || 'Failed to get symbols');
-      }
-
-      this.setCache(cacheKey, data.symbols);
-      return data.symbols;
+      this.setCache(cacheKey, symbols);
+      return symbols;
     } catch (error) {
       console.error('Error getting all symbols:', error);
       return [];
@@ -154,21 +189,25 @@ class SymbolSearchService {
    * Format symbol for display
    */
   formatSymbolDisplay(result) {
-    if (result.type === 'stock') {
-      return `${result.symbol} - ${result.name} (${result.exchange})`;
-    } else if (result.type === 'crypto') {
-      return `${result.symbol} - ${result.name}`;
-    } else if (result.type === 'mf') {
-      return `${result.symbol} - ${result.name} (${result.fund_house})`;
+    const symbol = result.symbol || result.Symbol;
+    const name = result.name || result.Name;
+    const exchange = result.exchange || result.Exchange;
+    const type = result.type || result.Type;
+    
+    if (type && type.toLowerCase().includes('mutual')) {
+      return `${symbol} - ${name}`;
+    } else if (exchange) {
+      return `${symbol} - ${name} (${exchange})`;
+    } else {
+      return `${symbol} - ${name}`;
     }
-    return result.symbol;
   }
 
   /**
    * Get symbol from result
    */
   getSymbolFromResult(result) {
-    return result.symbol;
+    return result.symbol || result.Symbol;
   }
 }
 

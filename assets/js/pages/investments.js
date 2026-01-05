@@ -732,76 +732,118 @@ function renderSymbolDropdown(results) {
 }
 
 // Select symbol from dropdown
-// Select symbol from dropdown
-// Select symbol from dropdown
 async function selectSymbol(symbol, type) {
   const symbolInput = document.getElementById('symbol');
   const typeInput = document.getElementById('type');
+  const nameInput = document.getElementById('name');
   const currentPriceInput = document.getElementById('currentPrice');
+  const purchasePriceInput = document.getElementById('purchasePrice');
+  const currencyInput = document.getElementById('currency');
 
   symbolInput.value = symbol;
 
-  // Normalize type to match select options
-  let normalizedType = type;
-  const upperType = type ? type.toUpperCase() : '';
-
-  if (upperType === 'EQUITY' || upperType === 'ETF' || upperType === 'INDEX') {
-    normalizedType = 'Stocks';
-  } else if (upperType.includes('FUND')) {
-    normalizedType = 'Mutual Funds';
-  } else if (upperType === 'CRYPTOCURRENCY' || upperType === 'CRYPTO') {
-    normalizedType = 'Cryptocurrency';
-  } else if (upperType.includes('GOLD') || upperType.includes('Currencies')) {
-    normalizedType = 'Gold';
-  }
-
-  // Check if normalized type exists in the select options
-  let typeExists = false;
-  for (let i = 0; i < typeInput.options.length; i++) {
-    if (typeInput.options[i].value === normalizedType) {
-      typeExists = true;
-      break;
-    }
-  }
-
-  // If normalized type exists, select it
-  if (typeExists) {
-    typeInput.value = normalizedType;
-  } else if (upperType && !typeInput.value) {
-    // Fallback to 'Other' if possible
-    const otherOption = Array.from(typeInput.options).find(o => o.value === 'Other');
-    if (otherOption) {
-      typeInput.value = 'Other';
+  // Set type based on the symbol's type
+  const normalizedType = type || 'Other';
+  if (typeInput) {
+    // Check if type exists in select options
+    const typeExists = Array.from(typeInput.options).some(o => o.value === normalizedType);
+    if (typeExists) {
+      typeInput.value = normalizedType;
     }
   }
 
   const dropdown = document.getElementById('symbolDropdown');
   if (dropdown) dropdown.style.display = 'none';
 
-  // Auto-populate current price
+  // Auto-populate price and other details
   if (currentPriceInput) {
     try {
-      currentPriceInput.placeholder = 'Fetching...';
+      currentPriceInput.placeholder = 'Fetching price...';
+      currentPriceInput.disabled = true;
+      
+      // Get price data from Google Sheets
       const priceData = await googleSheetsPriceService.getLivePrice(symbol);
+      
       if (priceData && priceData.price) {
-        currentPriceInput.value = priceData.price;
-
-        // Auto-select currency
-        const currencyInput = document.getElementById('currency');
-        if (priceData.currency && currencyInput) {
-          currencyInput.value = priceData.currency;
+        // Set name if available
+        if (nameInput && priceData.name && !nameInput.value) {
+          nameInput.value = priceData.name;
         }
-
-        // Also populate purchase price if empty, as a starting point
-        const purchasePriceInput = document.getElementById('purchasePrice');
-        if (purchasePriceInput && !purchasePriceInput.value) {
-          purchasePriceInput.value = priceData.price;
+        
+        // Determine currency and handle conversion
+        let displayPrice = priceData.price;
+        let displayCurrency = priceData.currency || 'INR';
+        
+        // For USD stocks/crypto, show both USD and INR
+        if (displayCurrency === 'USD') {
+          try {
+            const inrPrice = await googleSheetsPriceService.convertUSDToINR(priceData.price);
+            
+            // Show USD price in current price
+            currentPriceInput.value = priceData.price.toFixed(2);
+            if (purchasePriceInput && !purchasePriceInput.value) {
+              purchasePriceInput.value = priceData.price.toFixed(2);
+            }
+            
+            // Set currency to USD
+            if (currencyInput) {
+              currencyInput.value = 'USD';
+            }
+            
+            // Show INR equivalent in a toast
+            showToast(
+              `Price: $${priceData.price.toFixed(2)} USD (₹${inrPrice.toFixed(2)} INR)\n` +
+              `${priceData.name || symbol}`,
+              'success'
+            );
+          } catch (conversionError) {
+            console.warn('Could not convert to INR:', conversionError);
+            currentPriceInput.value = priceData.price.toFixed(2);
+            if (purchasePriceInput && !purchasePriceInput.value) {
+              purchasePriceInput.value = priceData.price.toFixed(2);
+            }
+            if (currencyInput) {
+              currencyInput.value = 'USD';
+            }
+            showToast(`Price fetched: $${priceData.price.toFixed(2)} USD`, 'success');
+          }
+        } else {
+          // INR or other currency
+          currentPriceInput.value = priceData.price.toFixed(2);
+          if (purchasePriceInput && !purchasePriceInput.value) {
+            purchasePriceInput.value = priceData.price.toFixed(2);
+          }
+          if (currencyInput) {
+            currencyInput.value = displayCurrency;
+          }
+          
+          const currencySymbol = displayCurrency === 'INR' ? '₹' : displayCurrency;
+          showToast(
+            `Price: ${currencySymbol}${priceData.price.toFixed(2)}\n` +
+            `${priceData.name || symbol}`,
+            'success'
+          );
         }
-        showToast(`Price fetched for ${symbol}: ${formatCurrency(priceData.price)}`, 'success');
+        
+        // Show additional info if available
+        if (priceData.change !== undefined) {
+          const changeSign = priceData.change >= 0 ? '+' : '';
+          const changeClass = priceData.change >= 0 ? 'positive' : 'negative';
+          console.log(
+            `%cChange: ${changeSign}${priceData.change.toFixed(2)} (${changeSign}${priceData.changePercent?.toFixed(2)}%)`,
+            `color: ${priceData.change >= 0 ? 'green' : 'red'}`
+          );
+        }
       }
+      
+      currentPriceInput.disabled = false;
+      currentPriceInput.placeholder = '0.00';
+      
     } catch (error) {
       console.warn('Could not auto-populate price:', error);
       currentPriceInput.placeholder = '0.00';
+      currentPriceInput.disabled = false;
+      showToast(`Symbol selected: ${symbol}. Please enter price manually.`, 'info');
     }
   }
 }
