@@ -182,7 +182,8 @@
   border-radius: 8px;
 }
 
-.debt-from, .debt-to {
+.debt-from,
+.debt-to {
   font-weight: 500;
   color: var(--text-primary, #1f2937);
 }
@@ -326,7 +327,8 @@
   flex: 1;
 }
 
-.settlement-from, .settlement-to {
+.settlement-from,
+.settlement-to {
   font-weight: 500;
   color: var(--text-primary, #1f2937);
 }
@@ -595,13 +597,33 @@
 }
 
 /* Category colors */
-.category-bar-fill.accommodation { background: #3498db; }
-.category-bar-fill.transport { background: #e74c3c; }
-.category-bar-fill.food-dining { background: #f39c12; }
-.category-bar-fill.activities { background: #9b59b6; }
-.category-bar-fill.shopping { background: #1abc9c; }
-.category-bar-fill.tips { background: #34495e; }
-.category-bar-fill.other { background: #95a5a6; }
+.category-bar-fill.accommodation {
+  background: #3498db;
+}
+
+.category-bar-fill.transport {
+  background: #e74c3c;
+}
+
+.category-bar-fill.food-dining {
+  background: #f39c12;
+}
+
+.category-bar-fill.activities {
+  background: #9b59b6;
+}
+
+.category-bar-fill.shopping {
+  background: #1abc9c;
+}
+
+.category-bar-fill.tips {
+  background: #34495e;
+}
+
+.category-bar-fill.other {
+  background: #95a5a6;
+}
 
 /* Trip Stats */
 .trip-stats {
@@ -633,9 +655,9 @@
 }
 
 .archived-notice {
-  background: #fef3c7;
-  border: 1px solid #f59e0b;
-  color: #92400e;
+  background: var(--bg-warning-light, #fef3c7);
+  border: 1px solid var(--border-warning, #f59e0b);
+  color: var(--text-warning-dark, #92400e);
   padding: 0.75rem 1rem;
   border-radius: 8px;
   margin-bottom: 1rem;
@@ -710,4 +732,113 @@
   flex: 1;
   word-break: break-word;
   white-space: pre-wrap;
+}
+
+/* Modal Styles (Added for Add Expense Modal) */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 2000;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.modal-overlay.show {
+  display: flex;
+}
+
+.modal-container {
+  background: var(--card-bg, #fff);
+  border-radius: 12px;
+  box-shadow: var(--shadow-xl, 0 10px 40px rgba(0, 0, 0, 0.2));
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: modalSlideIn 0.3s ease-out;
+  border: 1px solid var(--border-color, #e5e7eb);
+}
+
+.modal-container.modal-sm {
+  max-width: 400px;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border-color, #e5e7eb);
+}
+
+.modal-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary, #1f2937);
+  margin: 0;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--text-secondary, #6b7280);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+  font-size: 1.5rem;
+}
+
+.modal-close:hover {
+  color: var(--text-primary, #1f2937);
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-top: 1px solid var(--border-color, #e5e7eb);
+}
+
+/* Fix for form groups inside modal */
+.modal-body .form-group {
+  margin-bottom: 1rem;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .modal-container {
+    max-width: 100%;
+    margin: 1rem;
+    max-height: calc(100vh - 2rem);
+  }
 }

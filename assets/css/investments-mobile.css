@@ -5,6 +5,7 @@
    ============================================ */
 
 @media (max-width: 480px) {
+
   /* Page Header */
   .page-header {
     flex-direction: column;
@@ -121,7 +122,8 @@
   .form-group input,
   .form-group select,
   .form-group textarea {
-    font-size: 16px; /* Prevents zoom on iOS */
+    font-size: 16px;
+    /* Prevents zoom on iOS */
     padding: 12px;
     border-radius: 6px;
     border: 1px solid #ddd;
@@ -386,6 +388,7 @@
    ============================================ */
 
 @media (min-width: 481px) and (max-width: 768px) {
+
   /* Page Header */
   .page-header {
     flex-direction: row;
@@ -547,6 +550,7 @@
    ============================================ */
 
 @media (hover: none) and (pointer: coarse) {
+
   /* Increase touch targets */
   .btn-icon {
     min-width: 44px;
@@ -557,7 +561,8 @@
   .form-group select,
   .form-group textarea {
     padding: 14px;
-    font-size: 16px; /* Prevents zoom on iOS */
+    font-size: 16px;
+    /* Prevents zoom on iOS */
   }
 
   .symbol-item {
@@ -613,42 +618,42 @@
 /* Dark mode adjustments for mobile */
 @media (prefers-color-scheme: dark) {
   .portfolio-summary {
-    background: #1a1a1a;
+    background: var(--bg-secondary);
   }
 
   .summary-card {
-    background: #2a2a2a;
-    border: 1px solid #333;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
   }
 
   .investment-card {
-    background: #2a2a2a;
-    border: 1px solid #333;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
   }
 
   .investment-returns-row {
-    border-top-color: #333;
+    border-top-color: var(--border-color);
   }
 
   .investment-card-footer {
-    border-top-color: #333;
+    border-top-color: var(--border-color);
   }
 
   .investment-notes {
-    background: #1a1a1a;
-    border-top-color: #333;
+    background: var(--bg-secondary);
+    border-top-color: var(--border-color);
   }
 
   .form-group input,
   .form-group select,
   .form-group textarea {
-    background: #2a2a2a;
-    color: #fff;
-    border-color: #444;
+    background: var(--bg-hover);
+    color: var(--text-primary);
+    border-color: var(--border-color);
   }
 
   .delete-info {
-    background: #1a1a1a;
-    border: 1px solid #333;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
   }
 }

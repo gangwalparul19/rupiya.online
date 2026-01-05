@@ -8,14 +8,14 @@ class TripGroupsPage {
     this.currentTab = 'active';
     this.pendingMembers = [];
     this.editingGroupId = null;
-    
+
     this.init();
   }
 
   async init() {
     const user = await this.waitForAuth();
     if (!user) return;
-    
+
     this.bindEvents();
     await this.loadGroups();
   }
@@ -23,13 +23,13 @@ class TripGroupsPage {
   async waitForAuth() {
     // Wait for auth service to initialize
     const user = await authService.waitForAuth();
-    
+
     if (!user) {
       // Not logged in, redirect to login
       window.location.href = 'login.html';
       return;
     }
-    
+
     return user;
   }
 
@@ -37,15 +37,15 @@ class TripGroupsPage {
     // Create group button - toggle inline form
     const createBtn = document.getElementById('createGroupBtn');
     createBtn?.addEventListener('click', () => this.toggleCreateSection());
-    
+
     // Inline form controls
     document.getElementById('closeCreateSectionBtn')?.addEventListener('click', () => this.hideCreateSection());
     document.getElementById('cancelCreateBtn')?.addEventListener('click', () => this.hideCreateSection());
     document.getElementById('inlineGroupForm')?.addEventListener('submit', (e) => this.handleInlineSubmit(e));
-    
+
     // Add member button (inline form)
     document.getElementById('inlineAddMemberBtn')?.addEventListener('click', () => this.addPendingMember());
-    
+
     // Allow Enter key to add members (prevent form submission)
     const memberInputs = ['inlineMemberName', 'inlineMemberEmail', 'inlineMemberPhone'];
     memberInputs.forEach(inputId => {
@@ -56,17 +56,17 @@ class TripGroupsPage {
         }
       });
     });
-    
+
     // Tab buttons
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', (e) => this.switchTab(e.target.dataset.tab));
     });
-    
+
     // Delete modal controls
     document.getElementById('closeDeleteModalBtn')?.addEventListener('click', () => this.closeDeleteModal());
     document.getElementById('cancelDeleteBtn')?.addEventListener('click', () => this.closeDeleteModal());
     document.getElementById('confirmDeleteBtn')?.addEventListener('click', () => this.confirmDelete());
-    
+
     // Close delete modal on overlay click
     document.getElementById('deleteGroupModal')?.addEventListener('click', (e) => {
       if (e.target.id === 'deleteGroupModal') this.closeDeleteModal();
@@ -75,7 +75,7 @@ class TripGroupsPage {
 
   async loadGroups() {
     this.showLoading(true);
-    
+
     try {
       this.groups = await tripGroupsService.getUserGroups();
       this.updateSummary();
@@ -91,10 +91,10 @@ class TripGroupsPage {
   updateSummary() {
     const activeGroups = this.groups.filter(g => g.status === 'active');
     const totalExpenses = this.groups.reduce((sum, g) => sum + (g.totalExpenses || 0), 0);
-    
+
     document.getElementById('activeTrips').textContent = activeGroups.length;
     document.getElementById('totalTripExpenses').textContent = `₹${totalExpenses.toLocaleString('en-IN')}`;
-    
+
     // Calculate user's total balance across all groups
     // This would need async calculation, so we'll show a placeholder for now
     document.getElementById('yourBalance').textContent = '₹0';
@@ -103,7 +103,7 @@ class TripGroupsPage {
   renderGroups() {
     const container = document.getElementById('groupsList');
     const emptyState = document.getElementById('emptyState');
-    
+
     // Filter groups by current tab
     let filteredGroups = this.groups;
     if (this.currentTab === 'active') {
@@ -111,16 +111,16 @@ class TripGroupsPage {
     } else if (this.currentTab === 'archived') {
       filteredGroups = this.groups.filter(g => g.status === 'archived' || g.status === 'completed');
     }
-    
+
     if (filteredGroups.length === 0) {
       container.innerHTML = '';
       emptyState.style.display = 'block';
       return;
     }
-    
+
     emptyState.style.display = 'none';
     container.innerHTML = filteredGroups.map(group => this.renderGroupCard(group)).join('');
-    
+
     // Bind card click events
     container.querySelectorAll('.group-card').forEach(card => {
       card.addEventListener('click', (e) => {
@@ -135,23 +135,23 @@ class TripGroupsPage {
   renderGroupCard(group) {
     const startDate = group.startDate?.toDate ? group.startDate.toDate() : null;
     const endDate = group.endDate?.toDate ? group.endDate.toDate() : null;
-    
-    const dateRange = startDate && endDate 
+
+    const dateRange = startDate && endDate
       ? `${this.formatDate(startDate)} - ${this.formatDate(endDate)}`
-      : startDate 
+      : startDate
         ? `From ${this.formatDate(startDate)}`
         : 'No dates set';
-    
+
     const statusClass = group.status || 'active';
-    const statusLabel = group.status === 'completed' ? 'Completed' : 
-                        group.status === 'archived' ? 'Archived' : 'Active';
-    
+    const statusLabel = group.status === 'completed' ? 'Completed' :
+      group.status === 'archived' ? 'Archived' : 'Active';
+
     // Budget progress
     let budgetHtml = '';
     if (group.budget?.total > 0) {
       const progress = Math.min(100, (group.totalExpenses / group.budget.total) * 100);
       const progressClass = progress >= 100 ? 'danger' : progress >= 80 ? 'warning' : 'safe';
-      
+
       budgetHtml = `
         <div class="budget-progress">
           <div class="budget-progress-header">
@@ -164,7 +164,7 @@ class TripGroupsPage {
         </div>
       `;
     }
-    
+
     return `
       <div class="group-card ${statusClass}" data-group-id="${group.id}">
         <div class="group-card-header">
@@ -196,19 +196,19 @@ class TripGroupsPage {
 
   switchTab(tab) {
     this.currentTab = tab;
-    
+
     // Update tab buttons
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.tab === tab);
     });
-    
+
     this.renderGroups();
   }
 
   toggleCreateSection() {
     const section = document.getElementById('createGroupSection');
     const isVisible = section.classList.contains('show');
-    
+
     if (isVisible) {
       this.hideCreateSection();
     } else {
@@ -219,17 +219,17 @@ class TripGroupsPage {
   showCreateSection() {
     this.editingGroupId = null;
     this.pendingMembers = [];
-    
+
     // Reset form
     const form = document.getElementById('inlineGroupForm');
     const membersList = document.getElementById('inlineMembersList');
     const title = document.getElementById('inlineGroupTitle');
     const btnText = document.getElementById('inlineSaveGroupBtnText');
-    
+
     form?.reset();
     if (title) title.textContent = 'Create Trip Group';
     if (btnText) btnText.textContent = 'Create Group';
-    
+
     // Show creator in members list
     const user = authService.getCurrentUser();
     if (user && membersList) {
@@ -248,10 +248,10 @@ class TripGroupsPage {
         </div>
       `;
     }
-    
+
     // Show section
     document.getElementById('createGroupSection')?.classList.add('show');
-    
+
     // Scroll to form
     document.getElementById('createGroupSection')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
@@ -265,32 +265,32 @@ class TripGroupsPage {
     const nameInput = document.getElementById('inlineMemberName');
     const emailInput = document.getElementById('inlineMemberEmail');
     const phoneInput = document.getElementById('inlineMemberPhone');
-    
+
     const name = nameInput.value.trim();
     const email = emailInput.value.trim();
     const phone = phoneInput.value.trim();
-    
+
     console.log('Adding pending member:', { name, email, phone });
-    
+
     if (!name) {
       this.showToast('Member name is required', 'error');
       nameInput.focus();
       return;
     }
-    
+
     // Check for duplicates
     if (this.pendingMembers.some(m => m.name.toLowerCase() === name.toLowerCase())) {
       this.showToast('Member already added', 'error');
       return;
     }
-    
+
     const newMember = { name, email, phone };
     this.pendingMembers.push(newMember);
     console.log('Pending members array:', this.pendingMembers);
-    
+
     this.renderPendingMembers();
     this.showToast(`${name} added to the group`, 'success');
-    
+
     // Clear inputs
     nameInput.value = '';
     emailInput.value = '';
@@ -301,7 +301,7 @@ class TripGroupsPage {
   renderPendingMembers() {
     const container = document.getElementById('inlineMembersList');
     const user = authService.getCurrentUser();
-    
+
     // Start with creator
     let html = `
       <div class="members-list-header">
@@ -317,7 +317,7 @@ class TripGroupsPage {
         </div>
       </div>
     `;
-    
+
     // Add pending members
     if (this.pendingMembers.length > 0) {
       html += this.pendingMembers.map((member, index) => `
@@ -337,9 +337,9 @@ class TripGroupsPage {
         </div>
       `).join('');
     }
-    
+
     container.innerHTML = html;
-    
+
     // Bind remove buttons
     container.querySelectorAll('.remove-member-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -352,25 +352,25 @@ class TripGroupsPage {
 
   async handleInlineSubmit(e) {
     e.preventDefault();
-    
+
     const name = document.getElementById('inlineGroupName').value.trim();
     const description = document.getElementById('inlineGroupDescription').value.trim();
     const startDate = document.getElementById('inlineStartDate').value;
     const endDate = document.getElementById('inlineEndDate').value;
     const destination = document.getElementById('inlineDestination').value.trim();
     const budget = parseFloat(document.getElementById('inlineTripBudget').value) || 0;
-    
+
     if (!name) {
       this.showToast('Group name is required', 'error');
       return;
     }
-    
+
     this.setInlineLoading(true);
-    
+
     try {
       // Get current user info
       const currentUser = await authService.waitForAuth();
-      
+
       // Create group
       const result = await tripGroupsService.createGroup({
         name,
@@ -380,14 +380,14 @@ class TripGroupsPage {
         destination,
         budget: { total: budget, categories: {} }
       });
-      
+
       if (!result.success) {
         throw new Error(result.error);
       }
-      
+
       console.log('Group created:', result.groupId);
       console.log('Pending members to add:', this.pendingMembers);
-      
+
       // Add pending members
       const addedMembers = [];
       for (const member of this.pendingMembers) {
@@ -401,13 +401,13 @@ class TripGroupsPage {
           this.showToast(`Failed to add ${member.name}: ${addResult.error}`, 'warning');
         }
       }
-      
+
       console.log('Successfully added members:', addedMembers.length);
-      
+
       // Send invitation emails to members with valid emails
       const membersWithEmail = addedMembers.filter(m => m.email && m.email.trim() !== '');
       console.log('Members with email:', membersWithEmail);
-      
+
       if (membersWithEmail.length > 0) {
         try {
           console.log('Sending invitation emails...');
@@ -423,20 +423,20 @@ class TripGroupsPage {
             groupId: result.groupId
           };
           console.log('Email payload:', emailPayload);
-          
+
           const emailResponse = await fetch('/api/send-trip-invitation', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(emailPayload)
           });
-          
+
           if (!emailResponse.ok) {
             throw new Error(`HTTP error! status: ${emailResponse.status}`);
           }
-          
+
           const emailResult = await emailResponse.json();
           console.log('Email API response:', emailResult);
-          
+
           if (emailResult.success) {
             if (emailResult.sent > 0) {
               this.showToast(`✅ Invitations sent to ${emailResult.sent} member(s)!`, 'success');
@@ -454,15 +454,18 @@ class TripGroupsPage {
       } else {
         console.log('No members with email addresses to send invitations');
       }
-      
+
       this.showToast('✅ Group created successfully!', 'success');
       this.hideCreateSection();
+
+      // Reload groups to show the new one
       await this.loadGroups();
-      
-      // Navigate to the new group
+
+      // Navigate to the new group after a short delay
       setTimeout(() => {
         window.location.href = `trip-group-detail.html?id=${result.groupId}`;
-      }, 1000);
+      }, 1500);
+
     } catch (error) {
       console.error('Error creating group:', error);
       this.showToast(error.message || 'Failed to create group', 'error');
@@ -475,7 +478,7 @@ class TripGroupsPage {
     const btn = document.getElementById('inlineSaveGroupBtn');
     const text = document.getElementById('inlineSaveGroupBtnText');
     const spinner = document.getElementById('inlineSaveGroupBtnSpinner');
-    
+
     if (btn) btn.disabled = loading;
     if (text) text.style.display = loading ? 'none' : 'inline';
     if (spinner) spinner.style.display = loading ? 'inline-block' : 'none';
@@ -494,7 +497,7 @@ class TripGroupsPage {
 
   async confirmDelete() {
     if (!this.deletingGroupId) return;
-    
+
     // Note: Delete functionality would need to be implemented in the service
     this.showToast('Delete functionality coming soon', 'info');
     this.closeDeleteModal();
@@ -504,7 +507,7 @@ class TripGroupsPage {
   showLoading(show) {
     const loadingState = document.getElementById('loadingState');
     const groupsList = document.getElementById('groupsList');
-    
+
     if (show) {
       loadingState.style.display = 'block';
       groupsList.style.display = 'none';
@@ -518,7 +521,7 @@ class TripGroupsPage {
     const btn = document.getElementById('inlineSaveGroupBtn');
     const text = document.getElementById('inlineSaveGroupBtnText');
     const spinner = document.getElementById('inlineSaveGroupBtnSpinner');
-    
+
     if (btn) btn.disabled = loading;
     if (text) text.style.display = loading ? 'none' : 'inline';
     if (spinner) spinner.style.display = loading ? 'inline-block' : 'none';
@@ -546,13 +549,13 @@ class TripGroupsPage {
       container.className = 'toast-container';
       document.body.appendChild(container);
     }
-    
+
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
     toast.textContent = message;
-    
+
     container.appendChild(toast);
-    
+
     setTimeout(() => {
       toast.classList.add('fade-out');
       setTimeout(() => toast.remove(), 300);
