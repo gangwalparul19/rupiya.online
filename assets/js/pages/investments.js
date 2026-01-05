@@ -358,8 +358,9 @@ async function updateLivePrices() {
           }
         }
       } catch (error) {
-        console.warn(`Could not fetch live price for ${investment.symbol}:`, error);
+        console.warn(`Could not fetch live price for ${investment.symbol}:`, error.message);
         // Keep using the stored current price if live price fails
+        // Don't show error toast here - just silently use cached price
       }
     }
   }
@@ -388,6 +389,13 @@ function renderInvestments() {
       ? `<span class="price-change ${priceChangeClass}">${priceChangeSign}${investment.priceChange?.toFixed(2)} (${priceChangeSign}${investment.priceChangePercent?.toFixed(2)}%)</span>`
       : '';
 
+    // INR price change for US stocks
+    const inrChangeClass = investment.inrChange >= 0 ? 'positive' : 'negative';
+    const inrChangeSign = investment.inrChange >= 0 ? '+' : '';
+    const inrChangeDisplay = investment.hasInrConversion && investment.inrChange !== undefined
+      ? `<span class="price-change inr-change ${inrChangeClass}">${inrChangeSign}₹${investment.inrChange?.toFixed(2)} (${inrChangeSign}${investment.priceChangePercent?.toFixed(2)}%)</span>`
+      : '';
+
     // Live price indicator
     const liveIndicator = investment.livePrice 
       ? '<span class="live-indicator">🔴 LIVE</span>'
@@ -398,7 +406,7 @@ function renderInvestments() {
     
     // INR conversion display for US stocks
     const inrDisplay = investment.hasInrConversion && investment.inrPrice
-      ? `<div class="investment-stat-inr">₹${investment.inrPrice.toFixed(2)} INR</div>`
+      ? `<div class="investment-stat-inr">₹${investment.inrPrice.toFixed(2)} INR ${inrChangeDisplay}</div>`
       : '';
 
     return `
@@ -715,8 +723,7 @@ function selectSymbol(symbol, type) {
   const dropdown = document.getElementById('symbolDropdown');
   if (dropdown) dropdown.style.display = 'none';
 
-  // Trigger change event
-  symbolInput.dispatchEvent(new Event('change'));
+  // Don't trigger change event - it causes issues with type clearing
 }
 
 // Refresh live price for an investment
@@ -766,7 +773,12 @@ async function refreshInvestmentPrice(investmentId) {
     showToast(`Price updated: ${formatCurrency(priceData.price)}`, 'success');
   } catch (error) {
     console.error('Error refreshing price:', error);
-    showToast(`Failed to fetch live price: ${error.message}`, 'error');
+    // Show user-friendly error message
+    if (error.message.includes('not found')) {
+      showToast(`Symbol "${investment.symbol}" not found on Yahoo Finance. Please verify the symbol.`, 'error');
+    } else {
+      showToast(`Failed to fetch live price: ${error.message}`, 'error');
+    }
   }
 }
 

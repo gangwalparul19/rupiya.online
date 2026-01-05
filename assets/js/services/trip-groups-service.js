@@ -373,7 +373,7 @@ class TripGroupsService {
   }
 
   // Get all members of a trip group
-  async getGroupMembers(groupId) {
+  async getGroupMembers(groupId, retries = 3) {
     try {
       const membersQuery = query(
         collection(db, this.membersCollection),
@@ -385,6 +385,13 @@ class TripGroupsService {
       snapshot.forEach((doc) => {
         members.push({ id: doc.id, ...doc.data() });
       });
+
+      // If no members found and we have retries left, wait and retry
+      // This handles the case where a group was just created
+      if (members.length === 0 && retries > 0) {
+        await new Promise(resolve => setTimeout(resolve, 500));
+        return this.getGroupMembers(groupId, retries - 1);
+      }
 
       return members;
     } catch (error) {

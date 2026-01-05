@@ -75,6 +75,11 @@ class LivePriceService {
       const response = await fetch(`${this.API_ENDPOINT}?symbol=${encodeURIComponent(symbol)}`);
       
       if (!response.ok) {
+        // If API returns 404, it might be an invalid symbol
+        if (response.status === 404) {
+          console.warn(`Symbol not found on Yahoo Finance: ${symbol}`);
+          throw new Error(`Symbol "${symbol}" not found. Please check the symbol and try again.`);
+        }
         throw new Error(`API error: ${response.status}`);
       }
 

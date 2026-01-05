@@ -1,5 +1,47 @@
 /* Investments Page Styles */
 
+/* Override dark mode for investments page */
+[data-theme="dark"] .summary-card,
+[data-theme="dark"] .add-investment-section,
+[data-theme="dark"] .investments-container,
+[data-theme="dark"] .investment-card,
+[data-theme="dark"] .empty-state,
+[data-theme="dark"] .loading-state,
+[data-theme="dark"] .modal-container {
+  background: white;
+  color: #2C3E50;
+}
+
+[data-theme="dark"] .form-group input,
+[data-theme="dark"] .form-group select,
+[data-theme="dark"] .form-group textarea {
+  background: white;
+  color: #2C3E50;
+  border-color: #E8E8E8;
+}
+
+[data-theme="dark"] .form-group input:focus,
+[data-theme="dark"] .form-group select:focus,
+[data-theme="dark"] .form-group textarea:focus {
+  border-color: #4A90E2;
+}
+
+[data-theme="dark"] .form-group label {
+  color: #2C3E50;
+}
+
+[data-theme="dark"] .modal-header,
+[data-theme="dark"] .modal-body,
+[data-theme="dark"] .modal-footer {
+  background: white;
+  color: #2C3E50;
+  border-color: #E8E8E8;
+}
+
+[data-theme="dark"] .modal-title {
+  color: #2C3E50;
+}
+
 /* Portfolio Summary */
 .portfolio-summary {
   display: grid;
@@ -392,6 +434,12 @@
 
 .price-change.negative {
   color: #E74C3C;
+}
+
+.price-change.inr-change {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.7rem;
 }
 
 .live-indicator {
