@@ -74,27 +74,32 @@ class TripGroupDetailPage {
     document.getElementById('cancelMemberBtn')?.addEventListener('click', () => this.closeMemberModal());
     document.getElementById('memberForm')?.addEventListener('submit', (e) => this.handleMemberSubmit(e));
     
-    // Split type change
-    document.querySelectorAll('input[name="splitType"]').forEach(radio => {
-      radio.addEventListener('change', () => this.updateSplitInputs());
+    // Split type change - use event delegation
+    document.addEventListener('change', (e) => {
+      if (e.target.name === 'splitType') {
+        this.updateSplitInputs();
+      }
     });
     
-    // Amount change for split calculation
-    document.getElementById('expenseAmount')?.addEventListener('input', () => this.updateSplitAmounts());
+    // Amount change for split calculation - use event delegation
+    document.addEventListener('input', (e) => {
+      if (e.target.id === 'expenseAmount') {
+        this.updateSplitAmounts();
+      }
+    });
     
     // Filters
     document.getElementById('categoryFilter')?.addEventListener('change', () => this.filterExpenses());
     document.getElementById('memberFilter')?.addEventListener('change', () => this.filterExpenses());
     
-    // Close modals on overlay click
-    ['addExpenseModal', 'settlementModal', 'addMemberModal'].forEach(id => {
-      document.getElementById(id)?.addEventListener('click', (e) => {
-        if (e.target.id === id) {
-          if (id === 'addExpenseModal') this.closeExpenseModal();
-          else if (id === 'settlementModal') this.closeSettlementModal();
-          else if (id === 'addMemberModal') this.closeMemberModal();
-        }
-      });
+    // Close modals on overlay click - use event delegation
+    document.addEventListener('click', (e) => {
+      // Check if clicked element is a modal overlay
+      if (e.target.classList.contains('modal-overlay')) {
+        if (e.target.id === 'addExpenseModal') this.closeExpenseModal();
+        else if (e.target.id === 'settlementModal') this.closeSettlementModal();
+        else if (e.target.id === 'addMemberModal') this.closeMemberModal();
+      }
     });
   }
 
@@ -576,30 +581,45 @@ class TripGroupDetailPage {
       document.getElementById('expensePaidBy').value = currentUserMember.id;
     }
     
+    // Render split members after modal is about to open
     this.renderSplitMembers();
-    document.getElementById('addExpenseModal').classList.add('active');
+    
+    // Open modal with correct class
+    const modal = document.getElementById('addExpenseModal');
+    modal.classList.add('show');
+    modal.style.display = 'flex';
   }
 
   closeExpenseModal() {
-    document.getElementById('addExpenseModal').classList.remove('active');
+    const modal = document.getElementById('addExpenseModal');
+    modal.classList.remove('show');
+    modal.style.display = 'none';
   }
 
   openSettlementModal() {
     document.getElementById('settlementForm').reset();
-    document.getElementById('settlementModal').classList.add('active');
+    const modal = document.getElementById('settlementModal');
+    modal.classList.add('show');
+    modal.style.display = 'flex';
   }
 
   closeSettlementModal() {
-    document.getElementById('settlementModal').classList.remove('active');
+    const modal = document.getElementById('settlementModal');
+    modal.classList.remove('show');
+    modal.style.display = 'none';
   }
 
   openMemberModal() {
     document.getElementById('memberForm').reset();
-    document.getElementById('addMemberModal').classList.add('active');
+    const modal = document.getElementById('addMemberModal');
+    modal.classList.add('show');
+    modal.style.display = 'flex';
   }
 
   closeMemberModal() {
-    document.getElementById('addMemberModal').classList.remove('active');
+    const modal = document.getElementById('addMemberModal');
+    modal.classList.remove('show');
+    modal.style.display = 'none';
   }
 
   async handleExpenseSubmit(e) {
