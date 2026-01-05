@@ -462,25 +462,6 @@ async function handleLogout() {
   }
 }
 
-function formatDateForInput(date) {
-  if (!date) return '';
-  
-  let d;
-  if (date.toDate) {
-    d = date.toDate();
-  } else if (date instanceof Date) {
-    d = date;
-  } else {
-    d = new Date(date);
-  }
-  
-  const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  
-  return `${year}-${month}-${day}`;
-}
-
 window.viewDocument = viewDocument;
 window.openDocument = openDocument;
 window.editDocument = editDocument;

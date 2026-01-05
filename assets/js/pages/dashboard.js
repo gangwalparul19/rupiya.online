@@ -640,6 +640,24 @@ if (sidebarOverlay) {
   });
 }
 
+// KPI Card Click Handlers - Navigate to respective pages
+const incomeKpi = document.getElementById('incomeKpi');
+const expenseKpi = document.getElementById('expenseKpi');
+
+if (incomeKpi) {
+  incomeKpi.style.cursor = 'pointer';
+  incomeKpi.addEventListener('click', () => {
+    window.location.href = 'income.html';
+  });
+}
+
+if (expenseKpi) {
+  expenseKpi.style.cursor = 'pointer';
+  expenseKpi.addEventListener('click', () => {
+    window.location.href = 'expenses.html';
+  });
+}
+
 // Theme toggle
 const themeToggleBtn = document.getElementById('themeToggleBtn');
 if (themeToggleBtn) {
