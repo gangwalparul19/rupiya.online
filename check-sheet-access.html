@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Check Sheet Access</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 900px; margin: 20px auto; padding: 20px; }
+    .section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+    button { padding: 10px 20px; margin: 5px; cursor: pointer; background: #4A90E2; color: white; border: none; border-radius: 4px; }
+    .result { margin-top: 10px; padding: 10px; background: #f5f5f5; border-radius: 4px; white-space: pre-wrap; font-family: monospace; font-size: 12px; max-height: 400px; overflow-y: auto; }
+    .error { background: #ffebee; color: #c62828; }
+    .success { background: #e8f5e9; color: #2e7d32; }
+    .warning { background: #fff3e0; color: #e65100; }
+    input { padding: 8px; width: 100%; margin: 5px 0; border: 1px solid #ddd; border-radius: 4px; font-family: monospace; }
+    label { font-weight: bold; display: block; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h1>🔍 Google Sheet Access Checker</h1>
+  
+  <div class="section">
+    <h2>Test Your Sheet URL</h2>
+    <p>Enter your complete Google Sheets URL with GID to test if it's accessible:</p>
+    
+    <label>Sheet URL:</label>
+    <input type="text" id="sheetUrl" placeholder="https://docs.google.com/spreadsheets/d/SHEET_ID/gviz/tq?tqx=out:json&gid=GID">
+    
+    <button onclick="testSheetAccess()">Test Access</button>
+    <button onclick="useStocksDefault()">Use Stocks Sheet (Master_Feed)</button>
+    <button onclick="useMFDefault()">Use MF Sheet</button>
+    
+    <div id="testResult" class="result"></div>
+  </div>
+
+  <div class="section">
+    <h2>Common Issues & Solutions</h2>
+    <div class="result warning">
+      <strong>Issue 1: "Received HTML instead of JSON"</strong>
+      → Sheet is not publicly accessible
+      → Solution: Share → Anyone with link can view
+      
+      <strong>Issue 2: "404 Not Found"</strong>
+      → Wrong Sheet ID or GID
+      → Solution: Verify the URL is correct
+      
+      <strong>Issue 3: "401/403 Unauthorized"</strong>
+      → Sheet is private
+      → Solution: Make sheet public
+      
+      <strong>Issue 4: Empty or invalid response</strong>
+      → Wrong GID (tab ID)
+      → Solution: Click correct tab, copy GID from URL
+    </div>
+  </div>
+
+  <script>
+    function useStocksDefault() {
+      document.getElementById('sheetUrl').value = 'https://docs.google.com/spreadsheets/d/1BQHeZ6KihQV-kAChsMYHScNxFlyTcfm5NL05KWlCVhE/gviz/tq?tqx=out:json&gid=REPLACE_WITH_MASTER_FEED_GID';
+      document.getElementById('testResult').textContent = 'Replace REPLACE_WITH_MASTER_FEED_GID with your actual Master_Feed GID';
+      document.getElementById('testResult').className = 'result warning';
+    }
+
+    function useMFDefault() {
+      document.getElementById('sheetUrl').value = 'https://docs.google.com/spreadsheets/d/1fNaRqy_vr8P_GiCZvgydpm24Zs2ic-5oc1JGFraTrAE/gviz/tq?tqx=out:json&gid=0';
+    }
+
+    async function testSheetAccess() {
+      const url = document.getElementById('sheetUrl').value.trim();
+      const resultDiv = document.getElementById('testResult');
+      
+      if (!url) {
+        resultDiv.textContent = 'Please enter a URL';
+        resultDiv.className = 'result error';
+        return;
+      }
+
+      resultDiv.textContent = 'Testing...';
+      resultDiv.className = 'result';
+
+      try {
+        console.log('Testing URL:', url);
+        
+        const response = await fetch(url);
+        const text = await response.text();
+        
+        let report = `Status: ${response.status} ${response.statusText}\n`;
+        report += `Response Length: ${text.length} bytes\n\n`;
+        
+        // Check response type
+        if (text.trim().startsWith('<!DOCTYPE') || text.trim().startsWith('<html')) {
+          report += '❌ ERROR: Received HTML instead of JSON!\n\n';
+          report += 'This means the sheet is NOT publicly accessible.\n\n';
+          report += 'SOLUTION:\n';
+          report += '1. Open your Google Sheet\n';
+          report += '2. Click "Share" button (top right)\n';
+          report += '3. Click "Change to anyone with the link"\n';
+          report += '4. Set permission to "Viewer"\n';
+          report += '5. Click "Done"\n';
+          report += '6. Try again\n\n';
+          report += 'HTML Response Preview:\n';
+          report += text.substring(0, 300);
+          resultDiv.className = 'result error';
+        } else if (text.includes('google.visualization.Query.setResponse')) {
+          report += '✅ SUCCESS: Valid Google Sheets response!\n\n';
+          report += 'The sheet is publicly accessible and returning data.\n\n';
+          
+          // Try to parse and show sample data
+          try {
+            const startIndex = text.indexOf('(') + 1;
+            const endIndex = text.lastIndexOf(')');
+            const jsonString = text.substring(startIndex, endIndex);
+            const data = JSON.parse(jsonString);
+            
+            if (data.table && data.table.rows) {
+              report += `Rows found: ${data.table.rows.length}\n`;
+              report += `Columns: ${data.table.cols.length}\n\n`;
+              report += 'Column Names:\n';
+              data.table.cols.forEach((col, i) => {
+                report += `  ${i + 1}. ${col.label || col.id}\n`;
+              });
+              
+              report += '\nFirst row data:\n';
+              if (data.table.rows.length > 0) {
+                const firstRow = data.table.rows[0];
+                firstRow.c.forEach((cell, i) => {
+                  const colName = data.table.cols[i].label || data.table.cols[i].id;
+                  const value = cell ? cell.v : 'null';
+                  report += `  ${colName}: ${value}\n`;
+                });
+              }
+            }
+            resultDiv.className = 'result success';
+          } catch (parseError) {
+            report += '⚠️ Could not parse data structure\n';
+            report += `Parse error: ${parseError.message}\n`;
+            resultDiv.className = 'result warning';
+          }
+        } else if (response.status === 404) {
+          report += '❌ ERROR: Sheet not found (404)\n\n';
+          report += 'Possible causes:\n';
+          report += '1. Wrong Sheet ID\n';
+          report += '2. Wrong GID (tab ID)\n';
+          report += '3. Sheet was deleted\n\n';
+          report += 'SOLUTION:\n';
+          report += '1. Verify the Sheet ID is correct\n';
+          report += '2. Check the GID matches your tab\n';
+          report += '3. Open the sheet directly to verify it exists\n';
+          resultDiv.className = 'result error';
+        } else if (response.status === 401 || response.status === 403) {
+          report += '❌ ERROR: Access denied (401/403)\n\n';
+          report += 'The sheet is private or requires authentication.\n\n';
+          report += 'SOLUTION: Make the sheet publicly accessible (see above)\n';
+          resultDiv.className = 'result error';
+        } else {
+          report += '⚠️ UNEXPECTED RESPONSE\n\n';
+          report += 'Response Preview:\n';
+          report += text.substring(0, 500);
+          resultDiv.className = 'result warning';
+        }
+        
+        resultDiv.textContent = report;
+        
+      } catch (error) {
+        resultDiv.textContent = `❌ Error: ${error.message}\n\nThis usually means:\n- Network error\n- CORS issue\n- Invalid URL\n\nStack: ${error.stack}`;
+        resultDiv.className = 'result error';
+      }
+    }
+  </script>
+</body>
+</html>

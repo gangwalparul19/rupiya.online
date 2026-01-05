@@ -172,11 +172,48 @@
       resultDiv.className = 'result';
       
       try {
+        // First, test the raw API response
+        resultDiv.textContent = 'Step 1: Testing API endpoint...\n';
+        
+        const apiResponse = await fetch('/api/get-sheet-data?sheetType=stocks');
+        const apiText = await apiResponse.text();
+        
+        resultDiv.textContent += `API Status: ${apiResponse.status}\n`;
+        resultDiv.textContent += `Response Length: ${apiText.length} bytes\n`;
+        resultDiv.textContent += `Response Preview (first 200 chars):\n${apiText.substring(0, 200)}\n\n`;
+        
+        if (!apiResponse.ok) {
+          resultDiv.textContent += `ERROR: API returned ${apiResponse.status}\n`;
+          resultDiv.textContent += `Full response:\n${apiText}`;
+          resultDiv.className = 'result error';
+          return;
+        }
+        
+        // Check if response is HTML (error page)
+        if (apiText.trim().startsWith('<!DOCTYPE') || apiText.trim().startsWith('<html')) {
+          resultDiv.textContent += '\n❌ ERROR: Received HTML instead of JSON data!\n\n';
+          resultDiv.textContent += 'This usually means:\n';
+          resultDiv.textContent += '1. The sheet is not publicly accessible\n';
+          resultDiv.textContent += '2. The GID (tab ID) is incorrect\n';
+          resultDiv.textContent += '3. The sheet URL is wrong\n\n';
+          resultDiv.textContent += 'SOLUTION:\n';
+          resultDiv.textContent += '1. Open your sheet and make it public (Share → Anyone with link)\n';
+          resultDiv.textContent += '2. Verify the Master_Feed tab GID is correct\n';
+          resultDiv.textContent += '3. Test the URL directly in browser (see below)\n\n';
+          resultDiv.textContent += 'HTML Response:\n' + apiText.substring(0, 500);
+          resultDiv.className = 'result error';
+          return;
+        }
+        
+        resultDiv.textContent += 'Step 2: Parsing data...\n';
+        
         const data = await googleSheetsPriceService.getAllData();
-        resultDiv.textContent = `Stocks: ${data.stocks.length} rows\nMutual Funds: ${data.mutualFunds.length} rows\n\nFirst 3 stocks:\n${JSON.stringify(data.stocks.slice(0, 3), null, 2)}`;
+        resultDiv.textContent += `✅ Stocks: ${data.stocks.length} rows\n`;
+        resultDiv.textContent += `✅ Mutual Funds: ${data.mutualFunds.length} rows\n\n`;
+        resultDiv.textContent += `First 3 stocks:\n${JSON.stringify(data.stocks.slice(0, 3), null, 2)}`;
         resultDiv.className = 'result success';
       } catch (error) {
-        resultDiv.textContent = `Error: ${error.message}`;
+        resultDiv.textContent += `\n\n❌ Error: ${error.message}\n\nStack: ${error.stack}`;
         resultDiv.className = 'result error';
       }
     };

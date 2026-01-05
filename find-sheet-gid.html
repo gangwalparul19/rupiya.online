@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Find Google Sheet GID</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: 20px auto; padding: 20px; }
+    .instruction { background: #e3f2fd; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .step { margin: 15px 0; padding: 15px; background: #f5f5f5; border-left: 4px solid #4A90E2; }
+    code { background: #263238; color: #aed581; padding: 2px 6px; border-radius: 3px; }
+    .result { background: #fff3e0; padding: 15px; border-radius: 8px; margin: 20px 0; }
+  </style>
+</head>
+<body>
+  <h1>🔍 How to Find Google Sheet GID (Tab ID)</h1>
+  
+  <div class="instruction">
+    <h2>For Your Stocks Sheet (Master_Feed Tab)</h2>
+    
+    <div class="step">
+      <strong>Step 1:</strong> Open your stocks Google Sheet<br>
+      <a href="https://docs.google.com/spreadsheets/d/1BQHeZ6KihQV-kAChsMYHScNxFlyTcfm5NL05KWlCVhE" target="_blank">
+        Click here to open
+      </a>
+    </div>
+    
+    <div class="step">
+      <strong>Step 2:</strong> Click on the <strong>"Master_Feed"</strong> tab at the bottom
+    </div>
+    
+    <div class="step">
+      <strong>Step 3:</strong> Look at the URL in your browser's address bar<br>
+      It will look like: <code>...#gid=123456789</code>
+    </div>
+    
+    <div class="step">
+      <strong>Step 4:</strong> Copy the number after <code>gid=</code><br>
+      That's your GID!
+    </div>
+  </div>
+
+  <div class="result">
+    <h3>📝 Once you have the GID:</h3>
+    <p>Your environment variable should be:</p>
+    <code style="display: block; padding: 10px; background: #263238; color: #aed581;">
+      GOOGLE_SHEETS_STOCKS_URL=https://docs.google.com/spreadsheets/d/1BQHeZ6KihQV-kAChsMYHScNxFlyTcfm5NL05KWlCVhE/gviz/tq?tqx=out:json&gid=YOUR_MASTER_FEED_GID
+    </code>
+    <p>Replace <code>YOUR_MASTER_FEED_GID</code> with the number you found.</p>
+  </div>
+
+  <div class="instruction">
+    <h2>Example:</h2>
+    <p>If the URL shows: <code>...#gid=987654321</code></p>
+    <p>Then your environment variable should be:</p>
+    <code style="display: block; padding: 10px; background: #263238; color: #aed581;">
+      GOOGLE_SHEETS_STOCKS_URL=https://docs.google.com/spreadsheets/d/1BQHeZ6KihQV-kAChsMYHScNxFlyTcfm5NL05KWlCVhE/gviz/tq?tqx=out:json&gid=987654321
+    </code>
+  </div>
+
+  <div class="instruction">
+    <h2>🔄 Update in Vercel:</h2>
+    <ol>
+      <li>Go to Vercel Dashboard → Your Project → Settings → Environment Variables</li>
+      <li>Find <code>GOOGLE_SHEETS_STOCKS_URL</code></li>
+      <li>Click "Edit"</li>
+      <li>Update the GID in the URL</li>
+      <li>Save</li>
+      <li>Redeploy your application</li>
+    </ol>
+  </div>
+</body>
+</html>

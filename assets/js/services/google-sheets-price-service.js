@@ -27,12 +27,41 @@ class GoogleSheetsPriceService {
    */
   parseGoogleSheetsResponse(responseText) {
     try {
+      // Check if response looks like HTML (error page)
+      if (responseText.trim().startsWith('<!DOCTYPE') || responseText.trim().startsWith('<html')) {
+        console.error('Received HTML instead of JSON. Response preview:', responseText.substring(0, 200));
+        throw new Error('Sheet returned HTML instead of data. The sheet may not be publicly accessible or the URL is incorrect.');
+      }
+
+      // Check if response is empty
+      if (!responseText || responseText.trim().length === 0) {
+        throw new Error('Empty response from Google Sheets');
+      }
+
       // Remove the Google Visualization API wrapper
-      const jsonString = responseText.substring(47).slice(0, -2);
+      // Expected format: /*O_o*/\ngoogle.visualization.Query.setResponse({...});
+      let jsonString = responseText;
+      
+      // Try to extract JSON from the wrapper
+      if (responseText.includes('google.visualization.Query.setResponse')) {
+        const startIndex = responseText.indexOf('(') + 1;
+        const endIndex = responseText.lastIndexOf(')');
+        
+        if (startIndex > 0 && endIndex > startIndex) {
+          jsonString = responseText.substring(startIndex, endIndex);
+        } else {
+          throw new Error('Could not extract JSON from Google Sheets response');
+        }
+      } else {
+        // Fallback: try the old method
+        jsonString = responseText.substring(47).slice(0, -2);
+      }
+
       const data = JSON.parse(jsonString);
       
       if (!data.table || !data.table.rows) {
-        throw new Error('Invalid Google Sheets response format');
+        console.error('Invalid data structure:', data);
+        throw new Error('Invalid Google Sheets response format - missing table.rows');
       }
 
       const rows = data.table.rows;
@@ -51,7 +80,8 @@ class GoogleSheetsPriceService {
       return parsedData;
     } catch (error) {
       console.error('Error parsing Google Sheets response:', error);
-      throw new Error('Failed to parse Google Sheets data');
+      console.error('Response text (first 500 chars):', responseText.substring(0, 500));
+      throw new Error(`Failed to parse Google Sheets data: ${error.message}`);
     }
   }
 
