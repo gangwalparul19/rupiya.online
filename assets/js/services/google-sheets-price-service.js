@@ -9,19 +9,9 @@ class GoogleSheetsPriceService {
     this.priceCache = new Map();
     this.CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
     
-    // Your Google Sheets URLs
-    this.SHEETS = {
-      stocks: {
-        id: '1BQHeZ6KihQV-kAChsMYHScNxFlyTcfm5NL05KWlCVhE',
-        gid: '1081566114', // Stocks, Crypto, Forex sheet
-        url: 'https://docs.google.com/spreadsheets/d/1BQHeZ6KihQV-kAChsMYHScNxFlyTcfm5NL05KWlCVhE/gviz/tq?tqx=out:json&gid=1081566114'
-      },
-      mutualFunds: {
-        id: '1fNaRqy_vr8P_GiCZvgydpm24Zs2ic-5oc1JGFraTrAE',
-        gid: '0', // Mutual Funds sheet
-        url: 'https://docs.google.com/spreadsheets/d/1fNaRqy_vr8P_GiCZvgydpm24Zs2ic-5oc1JGFraTrAE/gviz/tq?tqx=out:json&gid=0'
-      }
-    };
+    // Use serverless API endpoint instead of direct Google Sheets URLs
+    // This keeps the actual sheet URLs secure in environment variables
+    this.API_ENDPOINT = '/api/get-sheet-data';
 
     // Data storage
     this.stocksData = [];
@@ -66,19 +56,19 @@ class GoogleSheetsPriceService {
   }
 
   /**
-   * Fetch data from Google Sheets
+   * Fetch data from Google Sheets via serverless API
    */
   async fetchSheetData(sheetType) {
-    const sheet = this.SHEETS[sheetType];
-    if (!sheet) {
+    if (!['stocks', 'mutualFunds'].includes(sheetType)) {
       throw new Error(`Unknown sheet type: ${sheetType}`);
     }
 
     try {
-      const response = await fetch(sheet.url);
+      const response = await fetch(`${this.API_ENDPOINT}?sheetType=${sheetType}`);
       
       if (!response.ok) {
-        throw new Error(`Failed to fetch sheet: ${response.status}`);
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Failed to fetch sheet: ${response.status}`);
       }
 
       const text = await response.text();
