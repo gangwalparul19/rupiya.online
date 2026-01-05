@@ -896,11 +896,11 @@ async function viewPriceHistory(investmentId) {
   if (!modal) {
     modal = document.createElement('div');
     modal.id = 'priceHistoryModal';
-    modal.className = 'modal';
+    modal.className = 'modal-overlay';
     modal.innerHTML = `
-      <div class="modal-content">
+      <div class="modal-container" style="max-width: 800px;">
         <div class="modal-header">
-          <h2>Price History - <span id="historyInvestmentName"></span></h2>
+          <h2 class="modal-title">Price History - <span id="historyInvestmentName"></span></h2>
           <button class="modal-close" onclick="document.getElementById('priceHistoryModal').classList.remove('show')">&times;</button>
         </div>
         <div class="modal-body" id="priceHistoryContent">
@@ -909,6 +909,13 @@ async function viewPriceHistory(investmentId) {
       </div>
     `;
     document.body.appendChild(modal);
+    
+    // Close modal when clicking outside
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.classList.remove('show');
+      }
+    });
   }
 
   modal.classList.add('show');

@@ -15,6 +15,7 @@ import {
   Timestamp
 } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
 import authService from './auth-service.js';
+import userService from './user-service.js';
 
 // Default trip categories
 const DEFAULT_TRIP_CATEGORIES = [
@@ -301,9 +302,17 @@ class TripGroupsService {
       let existingUserId = null;
 
       if (memberData.email) {
-        // TODO: Check if email exists in users collection
-        // For now, we'll mark as non-Rupiya user
-        isRupiyaUser = false;
+        // Check if email exists in users collection
+        const existingUser = await userService.getUserByEmail(memberData.email);
+        if (existingUser) {
+          isRupiyaUser = true;
+          existingUserId = existingUser.id;
+          
+          // If we found an existing user but no userId was provided, use the found one
+          if (!memberData.userId) {
+            memberData.userId = existingUserId;
+          }
+        }
       }
 
       // Generate member ID

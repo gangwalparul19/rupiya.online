@@ -378,6 +378,36 @@ class UserService {
     }
   }
 
+  /**
+   * Find user by email address
+   * Returns user data if found, null otherwise
+   */
+  async getUserByEmail(email) {
+    if (!email) {
+      return null;
+    }
+
+    try {
+      const { collection, query, where, getDocs } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js');
+      
+      const normalizedEmail = email.toLowerCase().trim();
+      const usersRef = collection(db, this.collectionName);
+      const q = query(usersRef, where('email', '==', normalizedEmail));
+      const querySnapshot = await getDocs(q);
+
+      if (querySnapshot.empty) {
+        return null;
+      }
+
+      // Return first matching user
+      const userDoc = querySnapshot.docs[0];
+      return { id: userDoc.id, ...userDoc.data() };
+    } catch (error) {
+      console.error('Error finding user by email:', error);
+      return null;
+    }
+  }
+
   // ============================================
   // USER PREFERENCES MANAGEMENT (Firestore)
   // ============================================
