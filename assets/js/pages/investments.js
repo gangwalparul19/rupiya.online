@@ -714,7 +714,7 @@ function renderSymbolDropdown(results) {
 // Select symbol from dropdown
 // Select symbol from dropdown
 // Select symbol from dropdown
-window.selectSymbol = async function (symbol, type) {
+async function selectSymbol(symbol, type) {
   const symbolInput = document.getElementById('symbol');
   const typeInput = document.getElementById('type');
   const currentPriceInput = document.getElementById('currentPrice');
