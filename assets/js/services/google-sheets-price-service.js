@@ -233,12 +233,21 @@ class GoogleSheetsPriceService {
     // Detect currency
     const currency = this.detectCurrency(row, symbol);
 
-    // Get name
-    const name = row.Name || row.name || row['Company Name'] || row['Scheme Name'] || symbol;
+    // Get name - try multiple column variations
+    const name = row.Name || row.name || row['Company Name'] || row['Scheme Name'] || 
+                row.CompanyName || row.companyName || row['Company'] || row.company || '';
+
+    // Get exchange
+    const exchange = row.Exchange || row.exchange || row.Market || row.market || '';
+
+    // Get type
+    const type = row.Type || row.type || row.Category || row.category || '';
 
     return {
       symbol: symbol,
       name: name,
+      exchange: exchange,
+      type: type,
       price: price,
       previousClose: previousClose,
       change: change,
@@ -261,10 +270,19 @@ class GoogleSheetsPriceService {
     // Detect based on symbol suffix
     const symbolUpper = symbol.toUpperCase();
     
+    // Indian stocks (NSE/BSE)
     if (symbolUpper.includes('.NS') || symbolUpper.includes('.BO')) {
-      return 'INR'; // NSE/BSE stocks
+      return 'INR';
     }
     
+    // Crypto currencies
+    if (symbolUpper.includes('BTC') || symbolUpper.includes('ETH') || 
+        symbolUpper.includes('USDT') || symbolUpper.includes('BNB') ||
+        symbolUpper.includes('-USD') || symbolUpper.includes('USDC')) {
+      return 'USD'; // Most crypto prices are in USD
+    }
+    
+    // Currency indicators in symbol
     if (symbolUpper.includes('INR') || symbolUpper.includes('₹')) {
       return 'INR';
     }
@@ -280,6 +298,18 @@ class GoogleSheetsPriceService {
     }
 
     if (exchange.includes('NASDAQ') || exchange.includes('NYSE') || exchange.includes('US')) {
+      return 'USD';
+    }
+    
+    // Check for crypto exchanges
+    if (exchange.includes('BINANCE') || exchange.includes('COINBASE') || 
+        exchange.includes('CRYPTO') || exchange.includes('KRAKEN')) {
+      return 'USD';
+    }
+
+    // Check type column for crypto
+    const type = (row.Type || row.type || row.Category || row.category || '').toString().toUpperCase();
+    if (type.includes('CRYPTO') || type.includes('CRYPTOCURRENCY') || type.includes('DIGITAL')) {
       return 'USD';
     }
 
@@ -334,14 +364,17 @@ class GoogleSheetsPriceService {
     // Search in stocks
     allData.stocks.forEach(row => {
       const symbol = this.stripExchangePrefix((row.Symbol || row.symbol || '').toString());
-      const name = (row.Name || row.name || '').toString();
+      const name = (row.Name || row.name || row['Company Name'] || row.CompanyName || 
+                    row.companyName || row['Company'] || row.company || '').toString();
+      const exchange = (row.Exchange || row.exchange || row.Market || row.market || '').toString();
+      const type = (row.Type || row.type || row.Category || row.category || 'Stock').toString();
       
       if (symbol.toUpperCase().includes(queryUpper) || name.toUpperCase().includes(queryUpper)) {
         results.push({
           symbol: symbol,
           name: name,
-          type: row.Type || row.type || 'Stock',
-          exchange: row.Exchange || row.exchange || ''
+          type: type,
+          exchange: exchange
         });
       }
     });
@@ -350,13 +383,14 @@ class GoogleSheetsPriceService {
     allData.mutualFunds.forEach(row => {
       const symbol = this.stripExchangePrefix((row.Symbol || row.symbol || row['Scheme Code'] || '').toString());
       const name = (row.Name || row.name || row['Scheme Name'] || '').toString();
+      const exchange = (row.Exchange || row.exchange || 'India').toString();
       
       if (symbol.toUpperCase().includes(queryUpper) || name.toUpperCase().includes(queryUpper)) {
         results.push({
           symbol: symbol,
           name: name,
           type: 'Mutual Fund',
-          exchange: 'India'
+          exchange: exchange
         });
       }
     });

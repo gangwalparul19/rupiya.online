@@ -47,13 +47,15 @@ class SymbolSearchService {
       const enhancedResults = filteredResults.map(r => {
         // Strip exchange prefix from symbol
         const cleanSymbol = this.stripExchangePrefix(r.symbol);
+        const name = r.name || '';
+        const exchange = r.exchange || '';
         
         return {
           symbol: cleanSymbol,
-          name: r.name || '',
+          name: name,
           type: this.normalizeType(r.type),
-          exchange: r.exchange || '',
-          displayName: this.formatSymbolDisplay({ ...r, symbol: cleanSymbol })
+          exchange: exchange,
+          displayName: name ? `${name} (${cleanSymbol})` : cleanSymbol
         };
       });
 

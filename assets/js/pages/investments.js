@@ -697,14 +697,18 @@ function renderSymbolDropdown(results) {
 
   selectedSymbolIndex = -1;
   dropdown.innerHTML = results.map((result, index) => {
-    // Display only ticker and name, no exchange prefix
+    // Display company name prominently with ticker in parentheses
     const symbolDisplay = escapeHtml(result.symbol);
     const nameDisplay = result.name ? escapeHtml(result.name) : '';
+    const exchangeDisplay = result.exchange ? escapeHtml(result.exchange) : '';
+    
+    // Format: "Company Name (TICKER)" or just "TICKER" if no name
+    const mainDisplay = nameDisplay ? `${nameDisplay} (${symbolDisplay})` : symbolDisplay;
     
     return `
-      <div class="symbol-item" onclick="window.selectSymbol('${result.symbol}', '${result.type}')">
-        <div class="symbol-name">${symbolDisplay}</div>
-        ${nameDisplay ? `<div class="symbol-detail">${nameDisplay}</div>` : ''}
+      <div class="symbol-item" onclick="window.selectSymbol('${result.symbol}', '${result.type}', '${result.name.replace(/'/g, "\\'")}')">
+        <div class="symbol-name">${mainDisplay}</div>
+        ${exchangeDisplay ? `<div class="symbol-detail">${exchangeDisplay}</div>` : ''}
       </div>
     `;
   }).join('');
@@ -714,7 +718,7 @@ function renderSymbolDropdown(results) {
 }
 
 // Select symbol from dropdown
-async function selectSymbol(symbol, type) {
+async function selectSymbol(symbol, type, name = '') {
   const symbolInput = document.getElementById('symbol');
   const typeInput = document.getElementById('type');
   const nameInput = document.getElementById('name');
@@ -734,6 +738,11 @@ async function selectSymbol(symbol, type) {
     }
   }
 
+  // Set company name if provided and name field is empty
+  if (nameInput && name && !nameInput.value) {
+    nameInput.value = name;
+  }
+
   const dropdown = document.getElementById('symbolDropdown');
   if (dropdown) dropdown.style.display = 'none';
 
@@ -743,8 +752,12 @@ async function selectSymbol(symbol, type) {
       currentPriceInput.placeholder = 'Fetching price...';
       currentPriceInput.disabled = true;
       
+      console.log(`Fetching live price for ${symbol}...`);
+      
       // Get price data from Google Sheets
       const priceData = await googleSheetsPriceService.getLivePrice(symbol);
+      
+      console.log('Price data received:', priceData);
       
       if (priceData && priceData.price) {
         // Set name if available
@@ -759,15 +772,17 @@ async function selectSymbol(symbol, type) {
         if (priceData.currency === 'USD') {
           // Convert USD to INR
           try {
+            console.log(`Converting ${priceData.price} USD to INR...`);
             inrPrice = await googleSheetsPriceService.convertUSDToINR(priceData.price);
-            displayMessage = `Price: $${priceData.price.toFixed(2)} USD (₹${inrPrice.toFixed(2)} INR)\n${priceData.name || symbol}`;
+            console.log(`Converted to ${inrPrice} INR`);
+            displayMessage = `${priceData.name || symbol}\nPrice: $${priceData.price.toFixed(2)} USD = ₹${inrPrice.toFixed(2)} INR`;
           } catch (conversionError) {
             console.warn('Could not convert to INR:', conversionError);
-            displayMessage = `Price: $${priceData.price.toFixed(2)} USD\n${priceData.name || symbol}\nNote: Could not convert to INR`;
+            displayMessage = `${priceData.name || symbol}\nPrice: $${priceData.price.toFixed(2)} USD\nNote: Could not convert to INR`;
           }
         } else {
           // Already in INR or other currency
-          displayMessage = `Price: ₹${inrPrice.toFixed(2)} INR\n${priceData.name || symbol}`;
+          displayMessage = `${priceData.name || symbol}\nPrice: ₹${inrPrice.toFixed(2)} INR`;
         }
         
         // Set the INR price in the form
@@ -791,16 +806,19 @@ async function selectSymbol(symbol, type) {
             `color: ${priceData.change >= 0 ? 'green' : 'red'}`
           );
         }
+      } else {
+        console.warn('No price data available');
+        showToast(`Symbol selected: ${name || symbol}. Please enter price manually.`, 'info');
       }
       
       currentPriceInput.disabled = false;
       currentPriceInput.placeholder = '0.00';
       
     } catch (error) {
-      console.warn('Could not auto-populate price:', error);
+      console.error('Could not auto-populate price:', error);
       currentPriceInput.placeholder = '0.00';
       currentPriceInput.disabled = false;
-      showToast(`Symbol selected: ${symbol}. Please enter price manually.`, 'info');
+      showToast(`Symbol selected: ${name || symbol}. Please enter price manually.`, 'info');
     }
   }
 }

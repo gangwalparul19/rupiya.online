@@ -722,7 +722,6 @@ class TripGroupDetailPage {
     const section = document.getElementById('addSettlementSection');
     if (section.classList.contains('show')) return;
 
-    this.renderSettlementMembers();
     document.getElementById('settlementForm').reset();
 
     // Close other sections
