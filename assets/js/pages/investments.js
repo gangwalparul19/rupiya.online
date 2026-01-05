@@ -160,8 +160,7 @@ function setupEventListeners() {
 
   if (typeInput) {
     typeInput.addEventListener('change', () => {
-      // Clear symbol search when type changes
-      symbolInput.value = '';
+      // Only hide the dropdown when type changes, don't clear the symbol
       const dropdown = document.getElementById('symbolDropdown');
       if (dropdown) dropdown.style.display = 'none';
     });
