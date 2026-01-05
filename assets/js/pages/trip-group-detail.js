@@ -153,15 +153,16 @@ class TripGroupDetailPage {
     document.getElementById('settingsBtn')?.addEventListener('click', () => this.handleArchiveGroup());
 
     // Settle up button
-    document.getElementById('settleUpBtn')?.addEventListener('click', () => this.openSettlementModal());
-    document.getElementById('closeSettlementModalBtn')?.addEventListener('click', () => this.closeSettlementModal());
-    document.getElementById('cancelSettlementBtn')?.addEventListener('click', () => this.closeSettlementModal());
+    // Settle up button
+    document.getElementById('settleUpBtn')?.addEventListener('click', () => this.toggleSettlementSection());
+    document.getElementById('closeSettlementFormBtn')?.addEventListener('click', () => this.closeSettlementSection());
+    document.getElementById('cancelSettlementBtn')?.addEventListener('click', () => this.closeSettlementSection());
     document.getElementById('settlementForm')?.addEventListener('submit', (e) => this.handleSettlementSubmit(e));
 
     // Add member button
-    document.getElementById('addMemberBtn')?.addEventListener('click', () => this.openMemberModal());
-    document.getElementById('closeMemberModalBtn')?.addEventListener('click', () => this.closeMemberModal());
-    document.getElementById('cancelMemberBtn')?.addEventListener('click', () => this.closeMemberModal());
+    document.getElementById('addMemberBtn')?.addEventListener('click', () => this.toggleMemberSection());
+    document.getElementById('closeMemberFormBtn')?.addEventListener('click', () => this.closeMemberSection());
+    document.getElementById('cancelMemberBtn')?.addEventListener('click', () => this.closeMemberSection());
     document.getElementById('memberForm')?.addEventListener('submit', (e) => this.handleMemberSubmit(e));
 
     // Split type change - use event delegation
@@ -716,30 +717,66 @@ class TripGroupDetailPage {
     section.classList.remove('show');
   }
 
-  openSettlementModal() {
+  openSettlementSection() {
+    // Check if section is already open
+    const section = document.getElementById('addSettlementSection');
+    if (section.classList.contains('show')) return;
+
+    this.renderSettlementMembers();
     document.getElementById('settlementForm').reset();
-    const modal = document.getElementById('settlementModal');
-    modal.classList.add('show');
-    modal.style.display = 'flex';
+
+    // Close other sections
+    this.closeExpenseModal();
+    this.closeMemberSection();
+
+    section.classList.add('show');
+    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  closeSettlementModal() {
-    const modal = document.getElementById('settlementModal');
-    modal.classList.remove('show');
-    modal.style.display = 'none';
+  closeSettlementSection() {
+    const section = document.getElementById('addSettlementSection');
+    section.classList.remove('show');
   }
 
-  openMemberModal() {
+  toggleSettlementSection() {
+    const section = document.getElementById('addSettlementSection');
+    const isVisible = section.classList.contains('show');
+
+    if (isVisible) {
+      this.closeSettlementSection();
+    } else {
+      this.openSettlementSection();
+    }
+  }
+
+  openMemberSection() {
+    const section = document.getElementById('addMemberSection');
+    if (section.classList.contains('show')) return;
+
     document.getElementById('memberForm').reset();
-    const modal = document.getElementById('addMemberModal');
-    modal.classList.add('show');
-    modal.style.display = 'flex';
+
+    // Close other sections
+    this.closeExpenseModal();
+    this.closeSettlementSection();
+
+    section.classList.add('show');
+    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  closeMemberModal() {
-    const modal = document.getElementById('addMemberModal');
-    modal.classList.remove('show');
-    modal.style.display = 'none';
+  closeMemberSection() {
+    const section = document.getElementById('addMemberSection');
+    section.classList.remove('show');
+  }
+
+  toggleMemberSection() {
+    const section = document.getElementById('addMemberSection');
+    const isVisible = section.classList.contains('show');
+
+    if (isVisible) {
+      this.closeMemberSection();
+    } else {
+      this.openMemberSection();
+    }
   }
 
   async handleExpenseSubmit(e) {

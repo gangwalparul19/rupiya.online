@@ -119,7 +119,7 @@
       </div>
 
       <!-- Add Expense Application Section (Inline) -->
-      <div class="create-group-section" id="addExpenseSection" style="display: none;">
+      <div class="create-group-section" id="addExpenseSection">
         <div class="create-group-header">
           <h2>Add Expense</h2>
           <button type="button" class="close-create-btn" id="closeExpenseFormBtn">
@@ -196,245 +196,243 @@
               <span id="saveExpenseBtnText">Add Expense</span>
               <span id="saveExpenseBtnSpinner" class="spinner" style="display: none;"></span>
             </button>
-          </div>
-        </form>
-      </div>
+            <!-- Settlement Application Section (Inline) -->
+            <div class="create-group-section" id="addSettlementSection" style="display: none;">
+              <div class="create-group-header">
+                <h2>Record Settlement</h2>
+                <button type="button" class="close-create-btn" id="closeSettlementFormBtn">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
 
-      <!-- Budget Progress (if set) -->
-      <div class="budget-section" id="budgetSection" style="display: none;">
-        <div class="budget-card">
-          <div class="budget-header">
-            <span class="budget-label">Trip Budget</span>
-            <span class="budget-amount" id="budgetAmount">₹0 / ₹0</span>
-          </div>
-          <div class="budget-progress-bar">
-            <div class="budget-progress-fill" id="budgetFill"></div>
-          </div>
-          <div class="budget-footer">
-            <span id="budgetRemaining">₹0 remaining</span>
-            <span id="budgetPercent">0%</span>
-          </div>
-        </div>
-      </div>
+              <form id="settlementForm">
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label for="settlementFrom">Who Paid *</label>
+                    <select id="settlementFrom" required>
+                      <option value="">Select member</option>
+                    </select>
+                  </div>
 
-      <!-- Balances Section -->
-      <div class="balances-section">
-        <div class="section-header">
-          <h2 class="section-title">Balances</h2>
-          <button class="btn btn-sm btn-outline" id="settleUpBtn">Settle Up</button>
-        </div>
+                  <div class="form-group">
+                    <label for="settlementTo">Paid To *</label>
+                    <select id="settlementTo" required>
+                      <option value="">Select member</option>
+                    </select>
+                  </div>
 
-        <div class="balances-grid" id="balancesGrid">
-          <!-- Balance cards will be loaded here -->
-        </div>
+                  <div class="form-group">
+                    <label for="settlementAmount">Amount *</label>
+                    <input type="number" id="settlementAmount" step="0.01" min="0.01" required placeholder="0.00">
+                  </div>
 
-        <!-- Simplified Debts -->
-        <div class="simplified-debts" id="simplifiedDebts">
-          <h3 class="debts-title">Who Owes Whom</h3>
-          <div class="debts-list" id="debtsList">
-            <!-- Debt items will be loaded here -->
-          </div>
-        </div>
-      </div>
+                  <div class="form-group">
+                    <label for="settlementNotes">Notes</label>
+                    <input type="text" id="settlementNotes" maxlength="200" placeholder="Optional notes">
+                  </div>
+                </div>
 
-      <!-- Tabs for Expenses/Settlements -->
-      <div class="detail-tabs">
-        <button class="tab-btn active" data-tab="expenses">Expenses</button>
-        <button class="tab-btn" data-tab="settlements">Settlements</button>
-        <button class="tab-btn" data-tab="members">Members</button>
-        <button class="tab-btn" data-tab="analytics">Analytics</button>
-      </div>
-
-      <!-- Expenses Tab -->
-      <div class="tab-content active" id="expensesTab">
-        <div class="expenses-filters">
-          <select id="categoryFilter" class="filter-select">
-            <option value="">All Categories</option>
-          </select>
-          <select id="memberFilter" class="filter-select">
-            <option value="">All Members</option>
-          </select>
-        </div>
-
-        <div class="expenses-list" id="expensesList">
-          <!-- Expenses will be loaded here -->
-        </div>
-
-        <div class="empty-state" id="expensesEmpty" style="display: none;">
-          <div class="empty-state-icon">💸</div>
-          <h3 class="empty-state-title">No expenses yet</h3>
-          <p class="empty-state-text">Add your first expense to start tracking.</p>
-        </div>
-      </div>
-
-      <!-- Settlements Tab -->
-      <div class="tab-content" id="settlementsTab">
-        <div class="settlements-list" id="settlementsList">
-          <!-- Settlements will be loaded here -->
-        </div>
-
-        <div class="empty-state" id="settlementsEmpty" style="display: none;">
-          <div class="empty-state-icon">🤝</div>
-          <h3 class="empty-state-title">No settlements yet</h3>
-          <p class="empty-state-text">Record a settlement when someone pays back.</p>
-        </div>
-      </div>
-
-      <!-- Members Tab -->
-      <div class="tab-content" id="membersTab">
-        <div class="members-grid" id="membersGrid">
-          <!-- Members will be loaded here -->
-        </div>
-
-        <button class="btn btn-outline btn-block" id="addMemberBtn">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-          </svg>
-          Add Member
-        </button>
-      </div>
-
-      <!-- Analytics Tab -->
-      <div class="tab-content" id="analyticsTab">
-        <div class="analytics-grid">
-          <!-- Category Breakdown -->
-          <div class="analytics-card">
-            <h3 class="analytics-title">Spending by Category</h3>
-            <div class="category-breakdown" id="categoryBreakdown">
-              <!-- Category bars will be loaded here -->
+                <div class="create-group-footer">
+                  <button type="button" class="btn btn-outline" id="cancelSettlementBtn">Cancel</button>
+                  <button type="submit" class="btn btn-primary" id="saveSettlementBtn">
+                    <span id="saveSettlementBtnText">Record Settlement</span>
+                    <span id="saveSettlementBtnSpinner" class="spinner" style="display: none;"></span>
+                  </button>
+                </div>
+              </form>
             </div>
-          </div>
 
-          <!-- Trip Stats -->
-          <div class="analytics-card">
-            <h3 class="analytics-title">Trip Statistics</h3>
-            <div class="trip-stats" id="tripStats">
-              <div class="stat-item">
-                <span class="stat-label">Total Expenses</span>
-                <span class="stat-value" id="statTotalExpenses">₹0</span>
+            <!-- Add Member Application Section (Inline) -->
+            <div class="create-group-section" id="addMemberSection" style="display: none;">
+              <div class="create-group-header">
+                <h2>Add Member</h2>
+                <button type="button" class="close-create-btn" id="closeMemberFormBtn">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
               </div>
-              <div class="stat-item">
-                <span class="stat-label">Number of Expenses</span>
-                <span class="stat-value" id="statExpenseCount">0</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-label">Average per Expense</span>
-                <span class="stat-value" id="statAvgExpense">₹0</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-label">Daily Average</span>
-                <span class="stat-value" id="statDailyAvg">₹0</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-label">Per Person Average</span>
-                <span class="stat-value" id="statPerPerson">₹0</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-label">Most Expensive Category</span>
-                <span class="stat-value" id="statTopCategory">-</span>
+
+              <form id="memberForm">
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label for="newMemberName">Name *</label>
+                    <input type="text" id="newMemberName" required maxlength="100" placeholder="Member name">
+                  </div>
+
+                  <div class="form-group">
+                    <label for="newMemberEmail">Email</label>
+                    <input type="email" id="newMemberEmail" placeholder="email@example.com">
+                  </div>
+
+                  <div class="form-group">
+                    <label for="newMemberPhone">Phone</label>
+                    <input type="tel" id="newMemberPhone" placeholder="+91 9876543210">
+                  </div>
+                </div>
+
+                <div class="create-group-footer">
+                  <button type="button" class="btn btn-outline" id="cancelMemberBtn">Cancel</button>
+                  <button type="submit" class="btn btn-primary" id="saveMemberBtn">
+                    <span id="saveMemberBtnText">Add Member</span>
+                    <span id="saveMemberBtnSpinner" class="spinner" style="display: none;"></span>
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Budget Progress (if set) -->
+            <div class="budget-section" id="budgetSection" style="display: none;">
+              <div class="budget-card">
+                <div class="budget-header">
+                  <span class="budget-label">Trip Budget</span>
+                  <span class="budget-amount" id="budgetAmount">₹0 / ₹0</span>
+                </div>
+                <div class="budget-progress-bar">
+                  <div class="budget-progress-fill" id="budgetFill"></div>
+                </div>
+                <div class="budget-footer">
+                  <span id="budgetRemaining">₹0 remaining</span>
+                  <span id="budgetPercent">0%</span>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
 
-      <!-- Loading State -->
-      <div id="loadingState" class="loading-state">
-        <div class="spinner-lg"></div>
-        <p>Loading group details...</p>
-      </div>
+            <!-- Balances Section -->
+            <div class="balances-section">
+              <div class="section-header">
+                <h2 class="section-title">Balances</h2>
+                <button class="btn btn-sm btn-outline" id="settleUpBtn">Settle Up</button>
+              </div>
+
+              <div class="balances-grid" id="balancesGrid">
+                <!-- Balance cards will be loaded here -->
+              </div>
+
+              <!-- Simplified Debts -->
+              <div class="simplified-debts" id="simplifiedDebts">
+                <h3 class="debts-title">Who Owes Whom</h3>
+                <div class="debts-list" id="debtsList">
+                  <!-- Debt items will be loaded here -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Tabs for Expenses/Settlements -->
+            <div class="detail-tabs">
+              <button class="tab-btn active" data-tab="expenses">Expenses</button>
+              <button class="tab-btn" data-tab="settlements">Settlements</button>
+              <button class="tab-btn" data-tab="members">Members</button>
+              <button class="tab-btn" data-tab="analytics">Analytics</button>
+            </div>
+
+            <!-- Expenses Tab -->
+            <div class="tab-content active" id="expensesTab">
+              <div class="expenses-filters">
+                <select id="categoryFilter" class="filter-select">
+                  <option value="">All Categories</option>
+                </select>
+                <select id="memberFilter" class="filter-select">
+                  <option value="">All Members</option>
+                </select>
+              </div>
+
+              <div class="expenses-list" id="expensesList">
+                <!-- Expenses will be loaded here -->
+              </div>
+
+              <div class="empty-state" id="expensesEmpty" style="display: none;">
+                <div class="empty-state-icon">💸</div>
+                <h3 class="empty-state-title">No expenses yet</h3>
+                <p class="empty-state-text">Add your first expense to start tracking.</p>
+              </div>
+            </div>
+
+            <!-- Settlements Tab -->
+            <div class="tab-content" id="settlementsTab">
+              <div class="settlements-list" id="settlementsList">
+                <!-- Settlements will be loaded here -->
+              </div>
+
+              <div class="empty-state" id="settlementsEmpty" style="display: none;">
+                <div class="empty-state-icon">🤝</div>
+                <h3 class="empty-state-title">No settlements yet</h3>
+                <p class="empty-state-text">Record a settlement when someone pays back.</p>
+              </div>
+            </div>
+
+            <!-- Members Tab -->
+            <div class="tab-content" id="membersTab">
+              <div class="members-grid" id="membersGrid">
+                <!-- Members will be loaded here -->
+              </div>
+
+              <button class="btn btn-outline btn-block" id="addMemberBtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                Add Member
+              </button>
+            </div>
+
+            <!-- Analytics Tab -->
+            <div class="tab-content" id="analyticsTab">
+              <div class="analytics-grid">
+                <!-- Category Breakdown -->
+                <div class="analytics-card">
+                  <h3 class="analytics-title">Spending by Category</h3>
+                  <div class="category-breakdown" id="categoryBreakdown">
+                    <!-- Category bars will be loaded here -->
+                  </div>
+                </div>
+
+                <!-- Trip Stats -->
+                <div class="analytics-card">
+                  <h3 class="analytics-title">Trip Statistics</h3>
+                  <div class="trip-stats" id="tripStats">
+                    <div class="stat-item">
+                      <span class="stat-label">Total Expenses</span>
+                      <span class="stat-value" id="statTotalExpenses">₹0</span>
+                    </div>
+                    <div class="stat-item">
+                      <span class="stat-label">Number of Expenses</span>
+                      <span class="stat-value" id="statExpenseCount">0</span>
+                    </div>
+                    <div class="stat-item">
+                      <span class="stat-label">Average per Expense</span>
+                      <span class="stat-value" id="statAvgExpense">₹0</span>
+                    </div>
+                    <div class="stat-item">
+                      <span class="stat-label">Daily Average</span>
+                      <span class="stat-value" id="statDailyAvg">₹0</span>
+                    </div>
+                    <div class="stat-item">
+                      <span class="stat-label">Per Person Average</span>
+                      <span class="stat-value" id="statPerPerson">₹0</span>
+                    </div>
+                    <div class="stat-item">
+                      <span class="stat-label">Most Expensive Category</span>
+                      <span class="stat-value" id="statTopCategory">-</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loadingState" class="loading-state">
+              <div class="spinner-lg"></div>
+              <p>Loading group details...</p>
+            </div>
     </main>
   </div>
 
   <!-- Add Expense Modal -->
 
 
-  <!-- Settlement Modal -->
-  <div class="modal-overlay" id="settlementModal">
-    <div class="modal-container modal-sm">
-      <div class="modal-header">
-        <h2 class="modal-title">Record Settlement</h2>
-        <button class="modal-close" id="closeSettlementModalBtn">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
 
-      <form id="settlementForm" class="modal-body">
-        <div class="form-group">
-          <label for="settlementFrom">Who Paid *</label>
-          <select id="settlementFrom" required>
-            <option value="">Select member</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="settlementTo">Paid To *</label>
-          <select id="settlementTo" required>
-            <option value="">Select member</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="settlementAmount">Amount *</label>
-          <input type="number" id="settlementAmount" step="0.01" min="0.01" required placeholder="0.00">
-        </div>
-
-        <div class="form-group">
-          <label for="settlementNotes">Notes</label>
-          <input type="text" id="settlementNotes" maxlength="200" placeholder="Optional notes">
-        </div>
-      </form>
-
-      <div class="modal-footer">
-        <button type="button" class="btn btn-outline" id="cancelSettlementBtn">Cancel</button>
-        <button type="submit" form="settlementForm" class="btn btn-primary" id="saveSettlementBtn">
-          <span id="saveSettlementBtnText">Record Settlement</span>
-          <span id="saveSettlementBtnSpinner" class="spinner" style="display: none;"></span>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Add Member Modal -->
-  <div class="modal-overlay" id="addMemberModal">
-    <div class="modal-container modal-sm">
-      <div class="modal-header">
-        <h2 class="modal-title">Add Member</h2>
-        <button class="modal-close" id="closeMemberModalBtn">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
-
-      <form id="memberForm" class="modal-body">
-        <div class="form-group">
-          <label for="newMemberName">Name *</label>
-          <input type="text" id="newMemberName" required maxlength="100" placeholder="Member name">
-        </div>
-
-        <div class="form-group">
-          <label for="newMemberEmail">Email</label>
-          <input type="email" id="newMemberEmail" placeholder="email@example.com">
-        </div>
-
-        <div class="form-group">
-          <label for="newMemberPhone">Phone</label>
-          <input type="tel" id="newMemberPhone" placeholder="+91 9876543210">
-        </div>
-      </form>
-
-      <div class="modal-footer">
-        <button type="button" class="btn btn-outline" id="cancelMemberBtn">Cancel</button>
-        <button type="submit" form="memberForm" class="btn btn-primary" id="saveMemberBtn">
-          <span id="saveMemberBtnText">Add Member</span>
-          <span id="saveMemberBtnSpinner" class="spinner" style="display: none;"></span>
-        </button>
-      </div>
-    </div>
-  </div>
 
   <!-- Scripts -->
   <script type="module" src="assets/js/utils/ux-enhancements.js"></script>
