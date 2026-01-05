@@ -21,25 +21,29 @@ class SymbolSearchService {
     const cacheKey = `search_${query}_${type}_${limit}`;
     const cached = this.getFromCache(cacheKey);
     if (cached) {
+      console.log('Returning cached results for:', query);
       return cached;
     }
 
     try {
-      const response = await fetch(
-        `${this.API_ENDPOINT}?query=${encodeURIComponent(query)}&type=${type}&limit=${limit}&action=search`
-      );
+      const url = `${this.API_ENDPOINT}?query=${encodeURIComponent(query)}&type=${type}&limit=${limit}&action=search`;
+      console.log('Fetching symbols from:', url);
+      
+      const response = await fetch(url);
 
       if (!response.ok) {
         throw new Error(`API error: ${response.status}`);
       }
 
       const data = await response.json();
+      console.log('API Response:', data);
 
       if (!data.success) {
         throw new Error(data.error || 'Search failed');
       }
 
       this.setCache(cacheKey, data.results);
+      console.log('Found results:', data.results);
       return data.results;
     } catch (error) {
       console.error('Error searching symbols:', error);

@@ -565,6 +565,8 @@ async function handleSymbolSearch(e) {
   const typeInput = document.getElementById('type');
   const type = typeInput?.value || 'all';
 
+  console.log('Symbol search triggered:', { query, type });
+
   if (query.length < 1) {
     const dropdown = document.getElementById('symbolDropdown');
     if (dropdown) dropdown.style.display = 'none';
@@ -574,6 +576,7 @@ async function handleSymbolSearch(e) {
   isSearching = true;
   try {
     symbolSearchResults = await symbolSearchService.searchSymbols(query, type, 15);
+    console.log('Search results received:', symbolSearchResults);
     renderSymbolDropdown(symbolSearchResults);
   } catch (error) {
     console.error('Error searching symbols:', error);
@@ -635,19 +638,32 @@ function updateSymbolSelection(items) {
 
 // Render symbol dropdown
 function renderSymbolDropdown(results) {
+  console.log('Rendering dropdown with results:', results);
+  
+  // Try to find existing dropdown first
   let dropdown = document.getElementById('symbolDropdown');
   
+  // If not found, create it inside the wrapper
   if (!dropdown) {
-    dropdown = document.createElement('div');
-    dropdown.id = 'symbolDropdown';
-    dropdown.className = 'symbol-dropdown';
     const symbolInput = document.getElementById('symbol');
-    symbolInput.parentNode.insertBefore(dropdown, symbolInput.nextSibling);
+    const wrapper = symbolInput?.parentNode;
+    
+    if (wrapper) {
+      dropdown = document.createElement('div');
+      dropdown.id = 'symbolDropdown';
+      dropdown.className = 'symbol-dropdown';
+      wrapper.appendChild(dropdown);
+      console.log('Created new dropdown in wrapper');
+    } else {
+      console.error('Could not find symbol input wrapper');
+      return;
+    }
   }
 
   if (results.length === 0) {
     dropdown.innerHTML = '<div class="symbol-item no-results">No symbols found. You can still enter a custom symbol.</div>';
     dropdown.style.display = 'block';
+    console.log('No results found, showing message');
     return;
   }
 
@@ -663,6 +679,7 @@ function renderSymbolDropdown(results) {
   }).join('');
 
   dropdown.style.display = 'block';
+  console.log('Dropdown rendered with', results.length, 'items');
 }
 
 // Select symbol from dropdown
