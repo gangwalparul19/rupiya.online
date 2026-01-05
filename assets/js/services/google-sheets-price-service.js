@@ -178,16 +178,19 @@ class GoogleSheetsPriceService {
     // Normalize symbol for comparison
     const normalizedSymbol = cleanSymbol.toUpperCase().trim();
 
-    // Search in stocks data first
+    // Search in stocks data first (Symbol column)
     let found = allData.stocks.find(row => {
       const rowSymbol = this.stripExchangePrefix((row.Symbol || row.symbol || '').toString()).toUpperCase().trim();
       return rowSymbol === normalizedSymbol;
     });
 
-    // If not found, search in mutual funds
+    // If not found, search in mutual funds (Scheme Code column)
     if (!found) {
       found = allData.mutualFunds.find(row => {
-        const rowSymbol = this.stripExchangePrefix((row.Symbol || row.symbol || row['Scheme Code'] || '').toString()).toUpperCase().trim();
+        const rowSymbol = this.stripExchangePrefix(
+          (row['Scheme Code'] || row.scheme_code || row['Scheme_Code'] || row.SchemeCode ||
+           row.Symbol || row.symbol || '').toString()
+        ).toUpperCase().trim();
         return rowSymbol === normalizedSymbol;
       });
     }
@@ -211,12 +214,29 @@ class GoogleSheetsPriceService {
   /**
    * Extract price data from sheet row
    * Adjust column names based on your actual Google Sheets structure
+   * 
+   * STOCKS Sheet columns:
+   * - Symbol_Name: Company/Asset name (e.g., "Accenture")
+   * - Ticker_Code: Exchange with ticker (e.g., "NYSE:ACN")
+   * - Category: Asset type (e.g., "Stock-US")
+   * - Symbol: Ticker symbol (e.g., "ACN")
+   * - Live_Price: Current price (e.g., "259.95")
+   * 
+   * MUTUAL FUNDS Sheet columns:
+   * - Scheme Code: Fund code (e.g., "119551")
+   * - Scheme Name: Fund name (e.g., "HDFC Balanced Advantage Fund")
+   * - Net Asset Value: NAV/Price (e.g., "345.67")
+   * - Date: NAV date
    */
   extractPriceData(row, symbol) {
-    // Common column name variations
+    console.log('Extracting price data from row:', row);
+    
+    // Extract price from Live_Price (stocks) or Net Asset Value (mutual funds)
     const price = parseFloat(
+      row.Live_Price || row.live_price || row['Live Price'] || row.LivePrice ||
+      row['Net Asset Value'] || row['Net_Asset_Value'] || row.NAV || row.nav ||
       row.Price || row.price || row['Current Price'] || row['LTP'] || 
-      row['Last Price'] || row.NAV || row.nav || 0
+      row['Last Price'] || 0
     );
 
     const previousClose = parseFloat(
@@ -230,18 +250,41 @@ class GoogleSheetsPriceService {
       (previousClose > 0 ? ((change / previousClose) * 100) : 0)
     );
 
-    // Detect currency
+    // Get name from Symbol_Name (stocks) or Scheme Name (mutual funds)
+    const name = row.Symbol_Name || row.symbol_name || row['Symbol Name'] || row.SymbolName ||
+                row['Scheme Name'] || row.scheme_name || row['Scheme_Name'] || row.SchemeName ||
+                row.Name || row.name || row['Company Name'] || 
+                row.CompanyName || row.companyName || '';
+
+    // Get exchange from Ticker_Code column (format: "NYSE:ACN")
+    // Extract just the exchange part before the colon
+    let exchange = '';
+    const tickerCode = row.Ticker_Code || row.ticker_code || row['Ticker Code'] || row.TickerCode || '';
+    if (tickerCode && tickerCode.includes(':')) {
+      exchange = tickerCode.split(':')[0];
+    } else {
+      // Fallback to other exchange columns
+      exchange = row.Exchange || row.exchange || row.Market || row.market || '';
+    }
+    
+    // For mutual funds, default to India
+    if (!exchange && (row['Scheme Name'] || row['Scheme Code'] || row['Net Asset Value'])) {
+      exchange = 'India';
+    }
+
+    // Get type from Category column (stocks) or default to Mutual Fund
+    let type = row.Category || row.category || 
+               row.Type || row.type || row.AssetType || row.asset_type || '';
+    
+    // If we detect mutual fund columns, set type to Mutual Fund
+    if (!type && (row['Scheme Name'] || row['Scheme Code'] || row['Net Asset Value'])) {
+      type = 'Mutual Fund';
+    }
+
+    // Detect currency based on category and exchange
     const currency = this.detectCurrency(row, symbol);
 
-    // Get name - try multiple column variations
-    const name = row.Name || row.name || row['Company Name'] || row['Scheme Name'] || 
-                row.CompanyName || row.companyName || row['Company'] || row.company || '';
-
-    // Get exchange
-    const exchange = row.Exchange || row.exchange || row.Market || row.market || '';
-
-    // Get type
-    const type = row.Type || row.type || row.Category || row.category || '';
+    console.log('Extracted data:', { symbol, name, exchange, type, price, currency });
 
     return {
       symbol: symbol,
@@ -259,12 +302,28 @@ class GoogleSheetsPriceService {
   }
 
   /**
-   * Detect currency based on symbol or row data
+   * Detect currency based on symbol, category, or row data
    */
   detectCurrency(row, symbol) {
     // Check if currency is explicitly mentioned in the sheet
     if (row.Currency || row.currency) {
       return row.Currency || row.currency;
+    }
+
+    // Check Category column first (e.g., "Stock-US", "Stock-IN", "Cryptocurrency")
+    const category = (row.Category || row.category || row.Type || row.type || '').toString().toUpperCase();
+    
+    if (category.includes('US') || category.includes('USA') || category.includes('STOCK-US')) {
+      return 'USD';
+    }
+    
+    if (category.includes('IN') || category.includes('INDIA') || category.includes('STOCK-IN') || 
+        category.includes('INDIAN')) {
+      return 'INR';
+    }
+    
+    if (category.includes('CRYPTO') || category.includes('CRYPTOCURRENCY') || category.includes('DIGITAL')) {
+      return 'USD'; // Most crypto prices are in USD
     }
 
     // Detect based on symbol suffix
@@ -279,7 +338,7 @@ class GoogleSheetsPriceService {
     if (symbolUpper.includes('BTC') || symbolUpper.includes('ETH') || 
         symbolUpper.includes('USDT') || symbolUpper.includes('BNB') ||
         symbolUpper.includes('-USD') || symbolUpper.includes('USDC')) {
-      return 'USD'; // Most crypto prices are in USD
+      return 'USD';
     }
     
     // Currency indicators in symbol
@@ -289,6 +348,15 @@ class GoogleSheetsPriceService {
 
     if (symbolUpper.includes('USD') || symbolUpper.includes('$')) {
       return 'USD';
+    }
+
+    // Check Ticker_Code column for exchange
+    const tickerCode = (row.Ticker_Code || row.ticker_code || row['Ticker Code'] || '').toString().toUpperCase();
+    if (tickerCode.includes('NYSE') || tickerCode.includes('NASDAQ')) {
+      return 'USD';
+    }
+    if (tickerCode.includes('NSE') || tickerCode.includes('BSE')) {
+      return 'INR';
     }
 
     // Check exchange column
@@ -304,12 +372,6 @@ class GoogleSheetsPriceService {
     // Check for crypto exchanges
     if (exchange.includes('BINANCE') || exchange.includes('COINBASE') || 
         exchange.includes('CRYPTO') || exchange.includes('KRAKEN')) {
-      return 'USD';
-    }
-
-    // Check type column for crypto
-    const type = (row.Type || row.type || row.Category || row.category || '').toString().toUpperCase();
-    if (type.includes('CRYPTO') || type.includes('CRYPTOCURRENCY') || type.includes('DIGITAL')) {
       return 'USD';
     }
 
@@ -354,6 +416,18 @@ class GoogleSheetsPriceService {
 
   /**
    * Search symbols (for autocomplete)
+   * 
+   * STOCKS Sheet columns:
+   * - Symbol_Name: Company/Asset name
+   * - Ticker_Code: Exchange with ticker (e.g., "NYSE:ACN")
+   * - Category: Asset type
+   * - Symbol: Ticker symbol
+   * - Live_Price: Current price
+   * 
+   * MUTUAL FUNDS Sheet columns:
+   * - Scheme Code: Fund code
+   * - Scheme Name: Fund name
+   * - Net Asset Value: NAV/Price
    */
   async searchSymbols(query, limit = 10) {
     const allData = await this.getAllData();
@@ -363,13 +437,31 @@ class GoogleSheetsPriceService {
 
     // Search in stocks
     allData.stocks.forEach(row => {
-      const symbol = this.stripExchangePrefix((row.Symbol || row.symbol || '').toString());
-      const name = (row.Name || row.name || row['Company Name'] || row.CompanyName || 
-                    row.companyName || row['Company'] || row.company || '').toString();
-      const exchange = (row.Exchange || row.exchange || row.Market || row.market || '').toString();
-      const type = (row.Type || row.type || row.Category || row.category || 'Stock').toString();
+      // Get symbol from Symbol column
+      const symbol = this.stripExchangePrefix(
+        (row.Symbol || row.symbol || row.Ticker || row.ticker || '').toString()
+      );
       
+      // Get name from Symbol_Name column
+      const name = (row.Symbol_Name || row.symbol_name || row['Symbol Name'] || row.SymbolName ||
+                    row.Name || row.name || row['Company Name'] || row.CompanyName || '').toString();
+      
+      // Get exchange from Ticker_Code column (format: "NYSE:ACN")
+      let exchange = '';
+      const tickerCode = (row.Ticker_Code || row.ticker_code || row['Ticker Code'] || row.TickerCode || '').toString();
+      if (tickerCode && tickerCode.includes(':')) {
+        exchange = tickerCode.split(':')[0];
+      } else {
+        exchange = (row.Exchange || row.exchange || row.Market || row.market || '').toString();
+      }
+      
+      // Get type from Category column
+      const type = (row.Category || row.category || 
+                    row.Type || row.type || 'Stock').toString();
+      
+      // Search by symbol or name
       if (symbol.toUpperCase().includes(queryUpper) || name.toUpperCase().includes(queryUpper)) {
+        console.log('Match found:', { symbol, name, type, exchange });
         results.push({
           symbol: symbol,
           name: name,
@@ -381,10 +473,20 @@ class GoogleSheetsPriceService {
 
     // Search in mutual funds
     allData.mutualFunds.forEach(row => {
-      const symbol = this.stripExchangePrefix((row.Symbol || row.symbol || row['Scheme Code'] || '').toString());
-      const name = (row.Name || row.name || row['Scheme Name'] || '').toString();
-      const exchange = (row.Exchange || row.exchange || 'India').toString();
+      // Get symbol from Scheme Code column
+      const symbol = this.stripExchangePrefix(
+        (row['Scheme Code'] || row.scheme_code || row['Scheme_Code'] || row.SchemeCode ||
+         row.Symbol || row.symbol || '').toString()
+      );
       
+      // Get name from Scheme Name column
+      const name = (row['Scheme Name'] || row.scheme_name || row['Scheme_Name'] || row.SchemeName ||
+                    row.Name || row.name || '').toString();
+      
+      // Mutual funds are always in India
+      const exchange = 'India';
+      
+      // Search by scheme code or scheme name
       if (symbol.toUpperCase().includes(queryUpper) || name.toUpperCase().includes(queryUpper)) {
         results.push({
           symbol: symbol,
@@ -395,6 +497,7 @@ class GoogleSheetsPriceService {
       }
     });
 
+    console.log('Search results:', results);
     return results.slice(0, limit);
   }
 
