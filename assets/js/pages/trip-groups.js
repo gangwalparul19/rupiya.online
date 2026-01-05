@@ -227,9 +227,27 @@ class TripGroupsPage {
     const btnText = document.getElementById('inlineSaveGroupBtnText');
     
     form?.reset();
-    if (membersList) membersList.innerHTML = '';
     if (title) title.textContent = 'Create Trip Group';
     if (btnText) btnText.textContent = 'Create Group';
+    
+    // Show creator in members list
+    const user = authService.getCurrentUser();
+    if (user && membersList) {
+      membersList.innerHTML = `
+        <div class="members-list-header">
+          <h4>Members</h4>
+        </div>
+        <div class="member-item creator-member">
+          <div class="member-info">
+            <div class="member-avatar">${(user.displayName || user.email || 'U')[0].toUpperCase()}</div>
+            <div class="member-details">
+              <div class="member-name">${user.displayName || user.email}</div>
+              <div class="member-role">Admin (You)</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
     
     // Show section
     document.getElementById('createGroupSection')?.classList.add('show');
@@ -282,23 +300,45 @@ class TripGroupsPage {
 
   renderPendingMembers() {
     const container = document.getElementById('inlineMembersList');
+    const user = authService.getCurrentUser();
     
-    container.innerHTML = this.pendingMembers.map((member, index) => `
-      <div class="member-item">
+    // Start with creator
+    let html = `
+      <div class="members-list-header">
+        <h4>Members</h4>
+      </div>
+      <div class="member-item creator-member">
         <div class="member-info">
-          <div class="member-avatar">${member.name.charAt(0).toUpperCase()}</div>
+          <div class="member-avatar">${(user.displayName || user.email || 'U')[0].toUpperCase()}</div>
           <div class="member-details">
-            <span class="member-name">${this.escapeHtml(member.name)}</span>
-            <span class="member-contact">${member.email || member.phone || 'No contact info'}</span>
+            <div class="member-name">${user.displayName || user.email}</div>
+            <div class="member-role">Admin (You)</div>
           </div>
         </div>
-        <button type="button" class="remove-member-btn" data-index="${index}">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-          </svg>
-        </button>
       </div>
-    `).join('');
+    `;
+    
+    // Add pending members
+    if (this.pendingMembers.length > 0) {
+      html += this.pendingMembers.map((member, index) => `
+        <div class="member-item">
+          <div class="member-info">
+            <div class="member-avatar">${member.name.charAt(0).toUpperCase()}</div>
+            <div class="member-details">
+              <span class="member-name">${this.escapeHtml(member.name)}</span>
+              <span class="member-contact">${member.email || member.phone || 'No contact info'}</span>
+            </div>
+          </div>
+          <button type="button" class="remove-member-btn" data-index="${index}">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+      `).join('');
+    }
+    
+    container.innerHTML = html;
     
     // Bind remove buttons
     container.querySelectorAll('.remove-member-btn').forEach(btn => {

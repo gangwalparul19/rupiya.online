@@ -247,8 +247,19 @@ class TripGroupsService {
     try {
       const userId = this.getUserId();
 
-      // Check if user is admin
-      const isAdmin = await this.isGroupAdmin(groupId, userId);
+      // Check if user is admin (with fallback)
+      let isAdmin = false;
+      try {
+        isAdmin = await this.isGroupAdmin(groupId, userId);
+      } catch (error) {
+        console.warn('Could not verify admin status, checking group creator:', error);
+        // Fallback: check if user is the group creator
+        const groupResult = await this.getGroup(groupId);
+        if (groupResult.success && groupResult.data.createdBy === userId) {
+          isAdmin = true;
+        }
+      }
+      
       if (!isAdmin) {
         return { success: false, error: 'Only admins can add members' };
       }

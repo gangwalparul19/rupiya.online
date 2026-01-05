@@ -411,37 +411,29 @@ service cloud.firestore {
     // TRIP GROUP MEMBERS
     // ============================================
     match /tripGroupMembers/{memberId} {
-      // Helper to check if user is a member of the same trip group
-      function isSameGroupMember() {
-        return isAuthenticated() && 
-               exists(/databases/$(database)/documents/tripGroupMembers/$(resource.data.groupId + '_' + request.auth.uid));
-      }
+      // Read: Allow if user is authenticated and either:
+      // 1. They are a member of the same group (can read all members)
+      // 2. They are reading their own member record
+      allow read: if isAuthenticated() && 
+                     (exists(/databases/$(database)/documents/tripGroupMembers/$(resource.data.groupId + '_' + request.auth.uid)) ||
+                      memberId.matches('.*_' + request.auth.uid + '$'));
       
-      // Helper to check if user is admin of the trip group
-      function isGroupAdmin() {
-        return isAuthenticated() && 
-               exists(/databases/$(database)/documents/tripGroupMembers/$(resource.data.groupId + '_' + request.auth.uid)) &&
-               get(/databases/$(database)/documents/tripGroupMembers/$(resource.data.groupId + '_' + request.auth.uid)).data.isAdmin == true;
-      }
-      
-      // Read: Allow if:
-      // 1. User is a member of the same group
-      // 2. User is reading their own member record
-      allow read: if isSameGroupMember() || 
-                     (isAuthenticated() && resource.data.userId == request.auth.uid);
-      
-      // Create: Allow any authenticated user to create a member record
-      // The service layer validates that only admins can add members
+      // Create: Allow any authenticated user to create
+      // The service layer validates authorization
       allow create: if isAuthenticated();
       
-      // Update: Allow if:
-      // 1. User is an admin of the group
-      // 2. User is updating their own record
-      allow update: if isGroupAdmin() || 
-                       (isAuthenticated() && resource.data.userId == request.auth.uid);
+      // Update: Allow if user is authenticated and either:
+      // 1. They are an admin of the group
+      // 2. They are updating their own record
+      allow update: if isAuthenticated() && 
+                       (exists(/databases/$(database)/documents/tripGroupMembers/$(resource.data.groupId + '_' + request.auth.uid)) &&
+                        get(/databases/$(database)/documents/tripGroupMembers/$(resource.data.groupId + '_' + request.auth.uid)).data.isAdmin == true ||
+                        resource.data.userId == request.auth.uid);
       
-      // Delete: Only admins can remove members
-      allow delete: if isGroupAdmin();
+      // Delete: Allow if user is an admin of the group
+      allow delete: if isAuthenticated() && 
+                       exists(/databases/$(database)/documents/tripGroupMembers/$(resource.data.groupId + '_' + request.auth.uid)) &&
+                       get(/databases/$(database)/documents/tripGroupMembers/$(resource.data.groupId + '_' + request.auth.uid)).data.isAdmin == true;
     }
     
     // ============================================
