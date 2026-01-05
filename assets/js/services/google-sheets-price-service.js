@@ -67,8 +67,19 @@ class GoogleSheetsPriceService {
       const response = await fetch(`${this.API_ENDPOINT}?sheetType=${sheetType}`);
       
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `Failed to fetch sheet: ${response.status}`);
+        // Try to get error details from response
+        let errorMessage = `Failed to fetch sheet: ${response.status}`;
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorData.error || errorMessage;
+          console.error('API Error Details:', errorData);
+        } catch (e) {
+          // Response might not be JSON
+          const text = await response.text();
+          console.error('API Error Response:', text);
+          errorMessage = text || errorMessage;
+        }
+        throw new Error(errorMessage);
       }
 
       const text = await response.text();

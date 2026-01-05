@@ -21,30 +21,60 @@ export default async function handler(req, res) {
   try {
     // Get sheet URL from environment variables
     let sheetUrl;
+    let envVarName;
     
     if (sheetType === 'stocks') {
       sheetUrl = process.env.GOOGLE_SHEETS_STOCKS_URL;
+      envVarName = 'GOOGLE_SHEETS_STOCKS_URL';
     } else if (sheetType === 'mutualFunds') {
       sheetUrl = process.env.GOOGLE_SHEETS_MUTUAL_FUNDS_URL;
+      envVarName = 'GOOGLE_SHEETS_MUTUAL_FUNDS_URL';
     }
 
     // Check if environment variable is set
     if (!sheetUrl) {
-      console.error(`Environment variable not set for ${sheetType}`);
+      console.error(`Environment variable ${envVarName} is not set`);
       return res.status(500).json({ 
         error: 'Sheet configuration missing',
-        message: 'Please configure environment variables in Vercel'
+        message: `Environment variable ${envVarName} is not configured in Vercel. Please add it in Settings → Environment Variables.`,
+        envVarName: envVarName,
+        instructions: 'https://vercel.com/docs/concepts/projects/environment-variables'
       });
     }
+
+    console.log(`Fetching ${sheetType} from Google Sheets...`);
 
     // Fetch data from Google Sheets
     const response = await fetch(sheetUrl);
 
     if (!response.ok) {
-      throw new Error(`Google Sheets API returned ${response.status}`);
+      console.error(`Google Sheets returned ${response.status} for ${sheetType}`);
+      
+      // Provide helpful error messages
+      if (response.status === 401 || response.status === 403) {
+        return res.status(500).json({
+          error: 'Google Sheets access denied',
+          message: 'The sheet is not publicly accessible. Please make sure the sheet is shared with "Anyone with the link can view".',
+          status: response.status
+        });
+      } else if (response.status === 404) {
+        return res.status(500).json({
+          error: 'Google Sheet not found',
+          message: 'The sheet URL is invalid or the sheet has been deleted. Please check the environment variable.',
+          status: response.status
+        });
+      } else {
+        return res.status(500).json({
+          error: 'Failed to fetch from Google Sheets',
+          message: `Google Sheets API returned status ${response.status}`,
+          status: response.status
+        });
+      }
     }
 
     const data = await response.text();
+
+    console.log(`Successfully fetched ${data.length} bytes from ${sheetType}`);
 
     // Set cache headers (5 minutes)
     res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate');
@@ -53,10 +83,11 @@ export default async function handler(req, res) {
     return res.status(200).send(data);
 
   } catch (error) {
-    console.error('Error fetching sheet data:', error);
+    console.error('Error in get-sheet-data API:', error);
     return res.status(500).json({ 
-      error: 'Failed to fetch sheet data',
-      message: error.message 
+      error: 'Internal server error',
+      message: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
   }
 }
