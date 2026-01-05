@@ -296,6 +296,10 @@ async function handleProcessNow() {
       showToast(`✅ Created ${result.processed} transaction(s) from recurring entries`, 'success');
       // Reload the list to show updated lastProcessedDate
       await loadRecurringTransactions();
+      
+      // Invalidate dashboard cache so it shows the new transactions
+      firestoreService.invalidateCache('expenses');
+      firestoreService.invalidateCache('income');
     } else if (result.error) {
       showToast(`Error: ${result.error}`, 'error');
     } else {

@@ -26,7 +26,7 @@ class SymbolSearchService {
     }
 
     try {
-      const url = `${this.API_ENDPOINT}?query=${encodeURIComponent(query)}&type=${type}&limit=${limit}&action=search`;
+      const url = `${this.API_ENDPOINT}?query=${encodeURIComponent(query)}&type=${encodeURIComponent(type)}&limit=${limit}&action=search`;
       console.log('Fetching symbols from:', url);
       
       const response = await fetch(url);
@@ -146,6 +146,7 @@ class SymbolSearchService {
    * Clear cache
    */
   clearCache() {
+    console.log('Clearing symbol search cache');
     this.cache.clear();
   }
 

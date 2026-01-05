@@ -84,6 +84,14 @@ class FirestoreService {
       for (const key of this.cache.keys()) {
         if (key.startsWith(prefix)) this.cache.delete(key);
       }
+      
+      // Also invalidate monthly summary cache if expenses or income changed
+      if (collectionName === 'expenses' || collectionName === 'income') {
+        const summaryPrefix = `${userId}:monthlySummary`;
+        for (const key of this.cache.keys()) {
+          if (key.startsWith(summaryPrefix)) this.cache.delete(key);
+        }
+      }
     } else {
       this.cache.clear();
     }

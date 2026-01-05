@@ -142,6 +142,10 @@ async function processRecurringTransactions() {
     if (result.processed > 0) {
       console.log(`[Dashboard] Processed ${result.processed} recurring transactions`);
       toast.success(`${result.processed} recurring transaction(s) added automatically`);
+      
+      // Refresh dashboard data to show new transactions
+      console.log('[Dashboard] Refreshing dashboard data after processing recurring transactions');
+      await loadDashboardData();
     } else if (result.skipped) {
       console.log('[Dashboard] Recurring transactions already processed today');
     } else if (result.error) {

@@ -23,8 +23,12 @@ class RecurringProcessor {
     const lastDate = new Date(lastProcess);
     const today = new Date();
     
+    // Normalize both dates to midnight for comparison (ignore time)
+    const lastDateNormalized = new Date(lastDate.getFullYear(), lastDate.getMonth(), lastDate.getDate());
+    const todayNormalized = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    
     // Process if last process was on a different day
-    return lastDate.toDateString() !== today.toDateString();
+    return lastDateNormalized.getTime() !== todayNormalized.getTime();
   }
 
   /**
@@ -117,6 +121,9 @@ class RecurringProcessor {
    */
   async processRecurring(forceProcess = false) {
     // Check if we should process
+    console.log('[RecurringProcessor] processRecurring called with forceProcess:', forceProcess);
+    console.log('[RecurringProcessor] shouldProcess() returns:', this.shouldProcess());
+    
     if (!forceProcess && !this.shouldProcess()) {
       console.log('[RecurringProcessor] Already processed today, skipping');
       return { processed: 0, skipped: true };
@@ -154,13 +161,15 @@ class RecurringProcessor {
           status: recurring.status,
           frequency: recurring.frequency,
           startDate: startDate.toISOString(),
-          lastProcessed: lastProcessed ? lastProcessed.toISOString() : null
+          lastProcessed: lastProcessed ? lastProcessed.toISOString() : null,
+          endDate: endDate ? endDate.toISOString() : null
         });
         
         // Get all due dates that need processing
         const dueDates = this.getDueDates(startDate, recurring.frequency, lastProcessed, endDate);
         
         if (dueDates.length === 0) {
+          console.log(`[RecurringProcessor] No due dates for ${recurring.description}`);
           continue;
         }
 
@@ -285,7 +294,10 @@ class RecurringProcessor {
    * Reset processing flag (for testing or manual re-processing)
    */
   resetProcessingFlag() {
+    console.log('[RecurringProcessor] Resetting processing flag');
+    console.log('[RecurringProcessor] Before reset - localStorage key:', localStorage.getItem(this.processingKey));
     localStorage.removeItem(this.processingKey);
+    console.log('[RecurringProcessor] After reset - localStorage key:', localStorage.getItem(this.processingKey));
   }
 }
 

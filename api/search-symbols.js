@@ -184,21 +184,24 @@ function searchSymbols(query, type = 'all', limit = 10) {
   }
 
   const q = query.toLowerCase();
+  const normalizedType = type.toLowerCase();
+  console.log(`[searchSymbols] Query: "${q}", Type: "${normalizedType}"`);
   let results = [];
 
   // Search stocks
-  if (type === 'all' || type === 'stock') {
+  if (normalizedType === 'all' || normalizedType === 'stock' || normalizedType === 'stocks') {
     const allStocks = [...POPULAR_STOCKS.us, ...POPULAR_STOCKS.india_nse, ...POPULAR_STOCKS.india_bse];
     const stockResults = allStocks.filter(stock =>
       stock.symbol.toLowerCase().includes(q) ||
       stock.name.toLowerCase().includes(q) ||
       (stock.searchAlias && stock.searchAlias.toLowerCase().includes(q))
     );
+    console.log(`[searchSymbols] Found ${stockResults.length} stocks matching "${q}"`);
     results = results.concat(stockResults.map(s => ({ ...s, type: 'stock' })));
   }
 
   // Search crypto
-  if (type === 'all' || type === 'crypto') {
+  if (normalizedType === 'all' || normalizedType === 'crypto' || normalizedType === 'cryptocurrencies') {
     const cryptoResults = POPULAR_CRYPTOS.filter(crypto =>
       crypto.symbol.toLowerCase().includes(q) ||
       crypto.name.toLowerCase().includes(q) ||
@@ -208,7 +211,7 @@ function searchSymbols(query, type = 'all', limit = 10) {
   }
 
   // Search mutual funds
-  if (type === 'all' || type === 'mf') {
+  if (normalizedType === 'all' || normalizedType === 'mf' || normalizedType === 'mutualfund' || normalizedType === 'mutualfunds') {
     const mfResults = POPULAR_MFS.filter(mf =>
       mf.symbol.toLowerCase().includes(q) ||
       mf.name.toLowerCase().includes(q) ||
@@ -228,17 +231,18 @@ function searchSymbols(query, type = 'all', limit = 10) {
  */
 function isSymbolSupported(symbol, type = 'all') {
   const s = symbol.toUpperCase();
+  const normalizedType = type.toLowerCase();
 
-  if (type === 'all' || type === 'stock') {
+  if (normalizedType === 'all' || normalizedType === 'stock' || normalizedType === 'stocks') {
     const allStocks = [...POPULAR_STOCKS.us, ...POPULAR_STOCKS.india_nse, ...POPULAR_STOCKS.india_bse];
     if (allStocks.some(stock => stock.symbol === s || (stock.searchAlias && stock.searchAlias === s))) return true;
   }
 
-  if (type === 'all' || type === 'crypto') {
+  if (normalizedType === 'all' || normalizedType === 'crypto' || normalizedType === 'cryptocurrencies') {
     if (POPULAR_CRYPTOS.some(crypto => crypto.symbol === s || crypto.code === s)) return true;
   }
 
-  if (type === 'all' || type === 'mf') {
+  if (normalizedType === 'all' || normalizedType === 'mf' || normalizedType === 'mutualfund' || normalizedType === 'mutualfunds') {
     if (POPULAR_MFS.some(mf => mf.symbol === s)) return true;
   }
 
@@ -249,18 +253,19 @@ function isSymbolSupported(symbol, type = 'all') {
  * Get all symbols of a type
  */
 function getAllSymbols(type = 'all') {
+  const normalizedType = type.toLowerCase();
   let results = [];
 
-  if (type === 'all' || type === 'stock') {
+  if (normalizedType === 'all' || normalizedType === 'stock' || normalizedType === 'stocks') {
     const allStocks = [...POPULAR_STOCKS.us, ...POPULAR_STOCKS.india_nse, ...POPULAR_STOCKS.india_bse];
     results = results.concat(allStocks.map(s => ({ ...s, type: 'stock' })));
   }
 
-  if (type === 'all' || type === 'crypto') {
+  if (normalizedType === 'all' || normalizedType === 'crypto' || normalizedType === 'cryptocurrencies') {
     results = results.concat(POPULAR_CRYPTOS.map(c => ({ ...c, type: 'crypto' })));
   }
 
-  if (type === 'all' || type === 'mf') {
+  if (normalizedType === 'all' || normalizedType === 'mf' || normalizedType === 'mutualfund' || normalizedType === 'mutualfunds') {
     results = results.concat(POPULAR_MFS.map(m => ({ ...m, type: 'mf' })));
   }
 
@@ -283,7 +288,24 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { query, type = 'all', limit = 10, action = 'search' } = req.query;
+    let { query, type = 'all', limit = 10, action = 'search' } = req.query;
+    
+    // Debug logging
+    console.log('[Handler] Raw req.query:', req.query);
+    console.log('[Handler] Parsed query:', query, 'type:', type);
+    
+    // Ensure query is a string (sometimes it can be an array)
+    if (Array.isArray(query)) {
+      query = query[0];
+    }
+    if (Array.isArray(type)) {
+      type = type[0];
+    }
+    if (Array.isArray(action)) {
+      action = action[0];
+    }
+    
+    console.log('[Handler] After normalization - query:', query, 'type:', type, 'action:', action);
 
     if (action === 'verify') {
       // Verify if symbol is supported
@@ -322,7 +344,9 @@ export default async function handler(req, res) {
       });
     }
 
+    console.log(`[Search API] Query: "${query}", Type: "${type}", Limit: ${limit}`);
     const results = searchSymbols(query, type, parseInt(limit) || 10);
+    console.log(`[Search API] Found ${results.length} results for "${query}"`);
 
     return res.status(200).json({
       success: true,
