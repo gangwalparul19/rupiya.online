@@ -1,10 +1,13 @@
 // Investments Page Logic
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
+import investmentHistoryService from '../services/investment-history-service.js';
+import livePriceService from '../services/live-price-service.js';
+import symbolSearchService from '../services/symbol-search-service.js';
 import familySwitcher from '../components/family-switcher.js';
 import toast from '../components/toast.js';
-import themeManager from '../utils/theme-manager.js';
-import { formatCurrency, formatDate, escapeHtml } from '../utils/helpers.js';
+import { formatCurrency, formatDate, escapeHtml, formatDateForInput } from '../utils/helpers.js';
+import timezoneService from '../utils/timezone.js';
 
 // Helper function for toast
 const showToast = (message, type) => toast.show(message, type);
@@ -12,6 +15,11 @@ const showToast = (message, type) => toast.show(message, type);
 // State
 let investments = [];
 let editingInvestmentId = null;
+
+// Symbol search state
+let symbolSearchResults = [];
+let selectedSymbolIndex = -1;
+let isSearching = false;
 
 // DOM Elements
 let addInvestmentBtn, addInvestmentSection, closeFormBtn, cancelFormBtn;
@@ -132,6 +140,32 @@ function setupEventListeners() {
   closeDeleteModalBtn.addEventListener('click', hideDeleteModal);
   cancelDeleteBtn.addEventListener('click', hideDeleteModal);
   confirmDeleteBtn.addEventListener('click', handleDelete);
+
+  // Symbol search
+  const symbolInput = document.getElementById('symbol');
+  const typeInput = document.getElementById('type');
+  
+  if (symbolInput) {
+    symbolInput.addEventListener('input', handleSymbolSearch);
+    symbolInput.addEventListener('keydown', handleSymbolKeydown);
+    symbolInput.addEventListener('blur', () => {
+      // Hide dropdown after a short delay to allow click
+      setTimeout(() => {
+        const dropdown = document.getElementById('symbolDropdown');
+        if (dropdown) dropdown.style.display = 'none';
+      }, 200);
+    });
+    symbolInput.addEventListener('focus', handleSymbolFocus);
+  }
+
+  if (typeInput) {
+    typeInput.addEventListener('change', () => {
+      // Clear symbol search when type changes
+      symbolInput.value = '';
+      const dropdown = document.getElementById('symbolDropdown');
+      if (dropdown) dropdown.style.display = 'none';
+    });
+  }
 }
 
 // Load user profile
@@ -180,6 +214,7 @@ function showEditForm(investment) {
   // Fill form
   document.getElementById('name').value = investment.name;
   document.getElementById('type').value = investment.type;
+  document.getElementById('symbol').value = investment.symbol || '';
   document.getElementById('quantity').value = investment.quantity;
   document.getElementById('purchasePrice').value = investment.purchasePrice;
   document.getElementById('currentPrice').value = investment.currentPrice;
@@ -198,12 +233,19 @@ async function handleSubmit(e) {
   const formData = {
     name: document.getElementById('name').value.trim(),
     type: document.getElementById('type').value,
+    symbol: document.getElementById('symbol').value.trim().toUpperCase(),
     quantity: parseFloat(document.getElementById('quantity').value),
     purchasePrice: parseFloat(document.getElementById('purchasePrice').value),
     currentPrice: parseFloat(document.getElementById('currentPrice').value),
-    purchaseDate: new Date(document.getElementById('purchaseDate').value),
+    purchaseDate: timezoneService.parseInputDate(document.getElementById('purchaseDate').value),
     notes: document.getElementById('notes').value.trim()
   };
+
+  // Validate symbol
+  if (!formData.symbol) {
+    showToast('Please enter a symbol (e.g., AAPL, BTC-USD, GC=F)', 'error');
+    return;
+  }
 
   // Show loading
   saveFormBtn.disabled = true;
@@ -211,17 +253,41 @@ async function handleSubmit(e) {
   saveFormBtnSpinner.style.display = 'inline-block';
 
   try {
+    // Try to fetch live price
+    let livePrice = null;
+    try {
+      const priceData = await livePriceService.getLivePrice(formData.symbol);
+      livePrice = priceData.price;
+      formData.currentPrice = livePrice;
+      showToast(`Live price fetched: ${formatCurrency(livePrice)}`, 'success');
+    } catch (error) {
+      console.warn('Could not fetch live price, using manual price:', error);
+      showToast('Using manual price (could not fetch live price)', 'info');
+    }
+
     let result;
     if (editingInvestmentId) {
       // Update existing investment
       result = await firestoreService.updateInvestment(editingInvestmentId, formData);
       if (result.success) {
+        // Record price update in history
+        await investmentHistoryService.recordPriceUpdate(
+          editingInvestmentId,
+          formData.currentPrice,
+          `Price updated: ${formData.notes}`
+        );
         showToast('Investment updated successfully', 'success');
       }
     } else {
       // Add new investment
       result = await firestoreService.addInvestment(formData);
       if (result.success) {
+        // Record initial price in history
+        await investmentHistoryService.recordPriceUpdate(
+          result.id,
+          formData.currentPrice,
+          'Initial price recorded'
+        );
         showToast('Investment added successfully', 'success');
       }
     }
@@ -254,6 +320,8 @@ async function loadInvestments() {
     if (investments.length === 0) {
       emptyState.style.display = 'block';
     } else {
+      // Fetch live prices for all investments
+      await updateLivePrices();
       renderInvestments();
       investmentsList.style.display = 'grid';
     }
@@ -267,11 +335,31 @@ async function loadInvestments() {
   }
 }
 
+// Update live prices for all investments
+async function updateLivePrices() {
+  for (const investment of investments) {
+    if (investment.symbol) {
+      try {
+        const priceData = await livePriceService.getLivePrice(investment.symbol);
+        investment.livePrice = priceData.price;
+        investment.priceChange = priceData.change;
+        investment.priceChangePercent = priceData.changePercent;
+        investment.lastPriceUpdate = priceData.lastUpdate;
+      } catch (error) {
+        console.warn(`Could not fetch live price for ${investment.symbol}:`, error);
+        // Keep using the stored current price if live price fails
+      }
+    }
+  }
+}
+
 // Render investments
 function renderInvestments() {
   investmentsList.innerHTML = investments.map(investment => {
+    // Use live price if available, otherwise use stored current price
+    const currentPrice = investment.livePrice || investment.currentPrice;
     const totalInvested = investment.quantity * investment.purchasePrice;
-    const currentValue = investment.quantity * investment.currentPrice;
+    const currentValue = investment.quantity * currentPrice;
     const returns = currentValue - totalInvested;
     const returnsPercentage = totalInvested > 0 ? ((returns / totalInvested) * 100).toFixed(2) : 0;
     const returnsClass = returns >= 0 ? 'positive' : 'negative';
@@ -279,6 +367,19 @@ function renderInvestments() {
     const escapedName = escapeHtml(investment.name);
     const escapedType = escapeHtml(investment.type);
     const escapedNotes = investment.notes ? escapeHtml(investment.notes) : '';
+    const escapedSymbol = escapeHtml(investment.symbol || '');
+
+    // Price change indicator
+    const priceChangeClass = investment.priceChange >= 0 ? 'positive' : 'negative';
+    const priceChangeSign = investment.priceChange >= 0 ? '+' : '';
+    const priceChangeDisplay = investment.priceChange !== undefined 
+      ? `<span class="price-change ${priceChangeClass}">${priceChangeSign}${investment.priceChange?.toFixed(2)} (${priceChangeSign}${investment.priceChangePercent?.toFixed(2)}%)</span>`
+      : '';
+
+    // Live price indicator
+    const liveIndicator = investment.livePrice 
+      ? '<span class="live-indicator">🔴 LIVE</span>'
+      : '';
 
     return `
       <div class="investment-card">
@@ -286,8 +387,19 @@ function renderInvestments() {
           <div class="investment-info">
             <div class="investment-name">${escapedName}</div>
             <span class="investment-type">${escapedType}</span>
+            ${escapedSymbol ? `<span class="investment-symbol">${escapedSymbol}</span>` : ''}
           </div>
           <div class="investment-actions">
+            <button class="btn-icon" onclick="window.refreshInvestmentPrice('${investment.id}')" title="Refresh Price">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+              </svg>
+            </button>
+            <button class="btn-icon" onclick="window.viewPriceHistory('${investment.id}')" title="View Price History">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+              </svg>
+            </button>
             <button class="btn-icon" onclick="window.editInvestment('${investment.id}')" title="Edit">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
@@ -314,8 +426,9 @@ function renderInvestments() {
               <div class="investment-stat-value">${formatCurrency(investment.purchasePrice)}</div>
             </div>
             <div class="investment-stat">
-              <div class="investment-stat-label">Current Price</div>
-              <div class="investment-stat-value">${formatCurrency(investment.currentPrice)}</div>
+              <div class="investment-stat-label">Current Price ${liveIndicator}</div>
+              <div class="investment-stat-value">${formatCurrency(currentPrice)}</div>
+              ${priceChangeDisplay}
             </div>
           </div>
           <div class="investment-stats-row">
@@ -341,6 +454,7 @@ function renderInvestments() {
         <div class="investment-card-footer">
           <div class="investment-date">
             Purchased: ${formatDate(investment.purchaseDate)}
+            ${investment.lastPriceUpdate ? `<br>Price Updated: ${formatDate(investment.lastPriceUpdate)}` : ''}
           </div>
         </div>
 
@@ -462,6 +576,355 @@ function formatDateForInput(date) {
 // Expose functions to window for onclick handlers
 window.editInvestment = editInvestment;
 window.showDeleteConfirmation = showDeleteConfirmation;
+window.viewPriceHistory = viewPriceHistory;
+window.refreshInvestmentPrice = refreshInvestmentPrice;
+
+// Handle symbol search input
+async function handleSymbolSearch(e) {
+  const query = e.target.value.trim();
+  const typeInput = document.getElementById('type');
+  const type = typeInput?.value || 'all';
+
+  if (query.length < 1) {
+    const dropdown = document.getElementById('symbolDropdown');
+    if (dropdown) dropdown.style.display = 'none';
+    return;
+  }
+
+  isSearching = true;
+  try {
+    symbolSearchResults = await symbolSearchService.searchSymbols(query, type, 15);
+    renderSymbolDropdown(symbolSearchResults);
+  } catch (error) {
+    console.error('Error searching symbols:', error);
+  } finally {
+    isSearching = false;
+  }
+}
+
+// Handle symbol focus
+async function handleSymbolFocus(e) {
+  const query = e.target.value.trim();
+  if (query.length > 0) {
+    handleSymbolSearch(e);
+  }
+}
+
+// Handle symbol keyboard navigation
+function handleSymbolKeydown(e) {
+  const dropdown = document.getElementById('symbolDropdown');
+  if (!dropdown || dropdown.style.display === 'none') return;
+
+  const items = dropdown.querySelectorAll('.symbol-item');
+  if (items.length === 0) return;
+
+  switch (e.key) {
+    case 'ArrowDown':
+      e.preventDefault();
+      selectedSymbolIndex = Math.min(selectedSymbolIndex + 1, items.length - 1);
+      updateSymbolSelection(items);
+      break;
+    case 'ArrowUp':
+      e.preventDefault();
+      selectedSymbolIndex = Math.max(selectedSymbolIndex - 1, -1);
+      updateSymbolSelection(items);
+      break;
+    case 'Enter':
+      e.preventDefault();
+      if (selectedSymbolIndex >= 0 && items[selectedSymbolIndex]) {
+        items[selectedSymbolIndex].click();
+      }
+      break;
+    case 'Escape':
+      dropdown.style.display = 'none';
+      break;
+  }
+}
+
+// Update symbol selection highlight
+function updateSymbolSelection(items) {
+  items.forEach((item, index) => {
+    if (index === selectedSymbolIndex) {
+      item.classList.add('selected');
+      item.scrollIntoView({ block: 'nearest' });
+    } else {
+      item.classList.remove('selected');
+    }
+  });
+}
+
+// Render symbol dropdown
+function renderSymbolDropdown(results) {
+  let dropdown = document.getElementById('symbolDropdown');
+  
+  if (!dropdown) {
+    dropdown = document.createElement('div');
+    dropdown.id = 'symbolDropdown';
+    dropdown.className = 'symbol-dropdown';
+    const symbolInput = document.getElementById('symbol');
+    symbolInput.parentNode.insertBefore(dropdown, symbolInput.nextSibling);
+  }
+
+  if (results.length === 0) {
+    dropdown.innerHTML = '<div class="symbol-item no-results">No symbols found. You can still enter a custom symbol.</div>';
+    dropdown.style.display = 'block';
+    return;
+  }
+
+  selectedSymbolIndex = -1;
+  dropdown.innerHTML = results.map((result, index) => {
+    const display = symbolSearchService.formatSymbolDisplay(result);
+    return `
+      <div class="symbol-item" onclick="window.selectSymbol('${result.symbol}', '${result.type}')">
+        <div class="symbol-name">${escapeHtml(result.symbol)}</div>
+        <div class="symbol-detail">${escapeHtml(display.split(' - ')[1] || '')}</div>
+      </div>
+    `;
+  }).join('');
+
+  dropdown.style.display = 'block';
+}
+
+// Select symbol from dropdown
+function selectSymbol(symbol, type) {
+  const symbolInput = document.getElementById('symbol');
+  const typeInput = document.getElementById('type');
+  
+  symbolInput.value = symbol;
+  typeInput.value = type;
+  
+  const dropdown = document.getElementById('symbolDropdown');
+  if (dropdown) dropdown.style.display = 'none';
+
+  // Trigger change event
+  symbolInput.dispatchEvent(new Event('change'));
+}
+
+// Refresh live price for an investment
+async function refreshInvestmentPrice(investmentId) {
+  const investment = investments.find(i => i.id === investmentId);
+  if (!investment || !investment.symbol) {
+    showToast('Investment symbol not found', 'error');
+    return;
+  }
+
+  try {
+    showToast('Fetching live price...', 'info');
+    const priceData = await livePriceService.getLivePrice(investment.symbol);
+    
+    investment.livePrice = priceData.price;
+    investment.priceChange = priceData.change;
+    investment.priceChangePercent = priceData.changePercent;
+    investment.lastPriceUpdate = priceData.lastUpdate;
+
+    // Update in Firestore
+    await firestoreService.updateInvestment(investmentId, {
+      currentPrice: priceData.price,
+      lastPriceUpdate: new Date()
+    });
+
+    // Record in history
+    await investmentHistoryService.recordPriceUpdate(
+      investmentId,
+      priceData.price,
+      `Live price updated from Yahoo Finance: ${priceData.price}`
+    );
+
+    renderInvestments();
+    updateSummary();
+    showToast(`Price updated: ${formatCurrency(priceData.price)}`, 'success');
+  } catch (error) {
+    console.error('Error refreshing price:', error);
+    showToast(`Failed to fetch live price: ${error.message}`, 'error');
+  }
+}
+
+// View price history for an investment
+async function viewPriceHistory(investmentId) {
+  const investment = investments.find(i => i.id === investmentId);
+  if (!investment) return;
+
+  // Create modal if it doesn't exist
+  let modal = document.getElementById('priceHistoryModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'priceHistoryModal';
+    modal.className = 'modal';
+    modal.innerHTML = `
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Price History - <span id="historyInvestmentName"></span></h2>
+          <button class="modal-close" onclick="document.getElementById('priceHistoryModal').classList.remove('show')">&times;</button>
+        </div>
+        <div class="modal-body" id="priceHistoryContent">
+          <div class="loading">Loading price history...</div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+  }
+
+  modal.classList.add('show');
+  document.getElementById('historyInvestmentName').textContent = investment.name;
+
+  try {
+    // Get price history
+    const history = await investmentHistoryService.getPriceHistory(investmentId, 100);
+    const changes = await investmentHistoryService.getMultiplePeriodChanges(investmentId);
+    const volatility7d = await investmentHistoryService.getPriceVolatility(investmentId, 7);
+    const volatility30d = await investmentHistoryService.getPriceVolatility(investmentId, 30);
+
+    let content = `
+      <div class="price-history-analytics">
+        <div class="analytics-section">
+          <h3>Performance Summary</h3>
+          <div class="analytics-grid">
+    `;
+
+    // Add period changes
+    if (changes.last3Days) {
+      const changeClass = changes.last3Days.change >= 0 ? 'positive' : 'negative';
+      const changeSign = changes.last3Days.change >= 0 ? '+' : '';
+      content += `
+        <div class="analytics-card">
+          <div class="analytics-label">Last 3 Days</div>
+          <div class="analytics-value ${changeClass}">
+            ${changeSign}${formatCurrency(changes.last3Days.change)}
+            <span class="analytics-percent">(${changeSign}${changes.last3Days.changePercent}%)</span>
+          </div>
+          <div class="analytics-detail">${formatCurrency(changes.last3Days.oldPrice)} → ${formatCurrency(changes.last3Days.newPrice)}</div>
+        </div>
+      `;
+    }
+
+    if (changes.lastWeek) {
+      const changeClass = changes.lastWeek.change >= 0 ? 'positive' : 'negative';
+      const changeSign = changes.lastWeek.change >= 0 ? '+' : '';
+      content += `
+        <div class="analytics-card">
+          <div class="analytics-label">Last Week</div>
+          <div class="analytics-value ${changeClass}">
+            ${changeSign}${formatCurrency(changes.lastWeek.change)}
+            <span class="analytics-percent">(${changeSign}${changes.lastWeek.changePercent}%)</span>
+          </div>
+          <div class="analytics-detail">${formatCurrency(changes.lastWeek.oldPrice)} → ${formatCurrency(changes.lastWeek.newPrice)}</div>
+        </div>
+      `;
+    }
+
+    if (changes.lastMonth) {
+      const changeClass = changes.lastMonth.change >= 0 ? 'positive' : 'negative';
+      const changeSign = changes.lastMonth.change >= 0 ? '+' : '';
+      content += `
+        <div class="analytics-card">
+          <div class="analytics-label">Last Month</div>
+          <div class="analytics-value ${changeClass}">
+            ${changeSign}${formatCurrency(changes.lastMonth.change)}
+            <span class="analytics-percent">(${changeSign}${changes.lastMonth.changePercent}%)</span>
+          </div>
+          <div class="analytics-detail">${formatCurrency(changes.lastMonth.oldPrice)} → ${formatCurrency(changes.lastMonth.newPrice)}</div>
+        </div>
+      `;
+    }
+
+    if (changes.lastYear) {
+      const changeClass = changes.lastYear.change >= 0 ? 'positive' : 'negative';
+      const changeSign = changes.lastYear.change >= 0 ? '+' : '';
+      content += `
+        <div class="analytics-card">
+          <div class="analytics-label">Last Year</div>
+          <div class="analytics-value ${changeClass}">
+            ${changeSign}${formatCurrency(changes.lastYear.change)}
+            <span class="analytics-percent">(${changeSign}${changes.lastYear.changePercent}%)</span>
+          </div>
+          <div class="analytics-detail">${formatCurrency(changes.lastYear.oldPrice)} → ${formatCurrency(changes.lastYear.newPrice)}</div>
+        </div>
+      `;
+    }
+
+    content += `
+          </div>
+        </div>
+    `;
+
+    // Add volatility info
+    if (volatility7d || volatility30d) {
+      content += `
+        <div class="analytics-section">
+          <h3>Price Volatility</h3>
+          <div class="analytics-grid">
+      `;
+      
+      if (volatility7d) {
+        content += `
+          <div class="analytics-card">
+            <div class="analytics-label">7-Day Volatility</div>
+            <div class="analytics-value">${volatility7d.volatility}%</div>
+            <div class="analytics-detail">Std Dev: ${volatility7d.stdDev}</div>
+          </div>
+        `;
+      }
+
+      if (volatility30d) {
+        content += `
+          <div class="analytics-card">
+            <div class="analytics-label">30-Day Volatility</div>
+            <div class="analytics-value">${volatility30d.volatility}%</div>
+            <div class="analytics-detail">Std Dev: ${volatility30d.stdDev}</div>
+          </div>
+        `;
+      }
+
+      content += `
+          </div>
+        </div>
+      `;
+    }
+
+    // Add price history table
+    if (history.length > 0) {
+      content += `
+        <div class="analytics-section">
+          <h3>Price History (Last 20 Updates)</h3>
+          <div class="price-history-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Price</th>
+                  <th>Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+      `;
+
+      history.slice(0, 20).forEach(record => {
+        const timestamp = record.timestamp?.toDate ? record.timestamp.toDate() : new Date(record.timestamp);
+        content += `
+          <tr>
+            <td>${formatDate(timestamp)}</td>
+            <td>${formatCurrency(record.price)}</td>
+            <td>${record.notes ? escapeHtml(record.notes) : '-'}</td>
+          </tr>
+        `;
+      });
+
+      content += `
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    document.getElementById('priceHistoryContent').innerHTML = content;
+  } catch (error) {
+    console.error('Error loading price history:', error);
+    document.getElementById('priceHistoryContent').innerHTML = `
+      <div class="error-message">Failed to load price history</div>
+    `;
+  }
+}
 
 // Initialize when DOM is ready
 if (document.readyState === 'loading') {

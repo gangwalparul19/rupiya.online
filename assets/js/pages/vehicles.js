@@ -2,7 +2,8 @@
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
 import toast from '../components/toast.js';
-import { formatCurrency, formatCurrencyCompact, formatDate, escapeHtml } from '../utils/helpers.js';
+import { formatCurrency, formatCurrencyCompact, formatDate, escapeHtml, formatDateForInput } from '../utils/helpers.js';
+import timezoneService from '../utils/timezone.js';
 
 // Helper function for toast
 const showToast = (message, type) => toast.show(message, type);
@@ -212,7 +213,7 @@ async function handleSubmit(e) {
     registrationNumber: document.getElementById('registrationNumber').value.trim(),
     currentMileage: parseFloat(document.getElementById('currentMileage').value) || 0,
     fuelType: document.getElementById('fuelType').value,
-    insuranceExpiry: document.getElementById('insuranceExpiry').value ? new Date(document.getElementById('insuranceExpiry').value) : null,
+    insuranceExpiry: document.getElementById('insuranceExpiry').value ? timezoneService.parseInputDate(document.getElementById('insuranceExpiry').value) : null,
     color: document.getElementById('color').value.trim() || '',
     notes: document.getElementById('notes').value.trim()
   };

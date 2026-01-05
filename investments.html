@@ -21,6 +21,8 @@
   <link rel="stylesheet" href="assets/css/dark-mode.css">
   <link rel="stylesheet" href="assets/css/dashboard.css">
   <link rel="stylesheet" href="assets/css/investments.css">
+  <link rel="stylesheet" href="assets/css/investments-mobile.css">
+  <link rel="stylesheet" href="assets/css/symbol-search.css">
   <link rel="stylesheet" href="assets/css/enhancements.css">
   <link rel="stylesheet" href="assets/css/animations.css">
   <link rel="stylesheet" href="assets/css/mobile-enhancements.css">
@@ -167,7 +169,20 @@
               <span class="error-message" id="typeError"></span>
             </div>
 
-            <!-- Row 2: Quantity and Purchase Price -->
+            <!-- Row 2: Symbol (with autocomplete) -->
+            <div class="form-group form-group-full">
+              <label for="symbol">Symbol (Yahoo Finance) *</label>
+              <div class="symbol-input-wrapper">
+                <input type="text" id="symbol" class="symbol-input" required maxlength="20" placeholder="e.g., AAPL, BTC-USD, RELIANCE.NS">
+                <div id="symbolDropdown" class="symbol-dropdown"></div>
+              </div>
+              <small style="color: #666; font-size: 12px; margin-top: 4px; display: block;">
+                Search for supported stocks, crypto, or mutual funds. You can also enter a custom symbol.
+              </small>
+              <span class="error-message" id="symbolError"></span>
+            </div>
+
+            <!-- Row 3: Quantity and Purchase Price -->
             <div class="form-group">
               <label for="quantity">Quantity *</label>
               <input type="number" id="quantity" step="0.01" min="0" required placeholder="0">
@@ -180,10 +195,13 @@
               <span class="error-message" id="purchasePriceError"></span>
             </div>
 
-            <!-- Row 3: Current Price and Purchase Date -->
+            <!-- Row 4: Current Price and Purchase Date -->
             <div class="form-group">
               <label for="currentPrice">Current Price *</label>
               <input type="number" id="currentPrice" step="0.01" min="0" required placeholder="0.00">
+              <small style="color: #666; font-size: 12px; margin-top: 2px; display: block;">
+                Will be auto-filled with live price if symbol is found
+              </small>
               <span class="error-message" id="currentPriceError"></span>
             </div>
 
@@ -193,7 +211,7 @@
               <span class="error-message" id="purchaseDateError"></span>
             </div>
 
-            <!-- Row 4: Notes (full width) -->
+            <!-- Row 5: Notes (full width) -->
             <div class="form-group form-group-full">
               <label for="notes">Notes</label>
               <textarea id="notes" rows="3" maxlength="500" placeholder="Add notes about this investment..."></textarea>

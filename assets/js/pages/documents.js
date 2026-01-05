@@ -3,7 +3,8 @@ import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
 import storageService from '../services/storage-service.js';
 import toast from '../components/toast.js';
-import { formatDate, escapeHtml } from '../utils/helpers.js';
+import { formatDate, escapeHtml, formatDateForInput } from '../utils/helpers.js';
+import timezoneService from '../utils/timezone.js';
 
 // Helper function for toast
 const showToast = (message, type) => toast.show(message, type);
@@ -225,7 +226,7 @@ async function handleSubmit(e) {
     const formData = {
       name: document.getElementById('name').value.trim(),
       category: document.getElementById('category').value,
-      documentDate: document.getElementById('documentDate').value ? new Date(document.getElementById('documentDate').value) : null,
+      documentDate: document.getElementById('documentDate').value ? timezoneService.parseInputDate(document.getElementById('documentDate').value) : null,
       description: document.getElementById('description').value.trim()
     };
 

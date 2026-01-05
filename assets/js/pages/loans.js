@@ -4,7 +4,8 @@ import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
 import toast from '../components/toast.js';
 import themeManager from '../utils/theme-manager.js';
-import { formatCurrency, formatDate, escapeHtml } from '../utils/helpers.js';
+import { formatCurrency, formatDate, escapeHtml, formatDateForInput } from '../utils/helpers.js';
+import timezoneService from '../utils/timezone.js';
 
 // Loan type icons
 const loanTypeIcons = {
@@ -495,7 +496,7 @@ async function saveLoan(e) {
     interestRate: parseFloat(document.getElementById('interestRate').value) || 0,
     tenure: parseInt(document.getElementById('tenure').value) || 0,
     emiAmount: parseFloat(document.getElementById('emiAmount').value) || 0,
-    startDate: new Date(document.getElementById('startDate').value),
+    startDate: timezoneService.parseInputDate(document.getElementById('startDate').value),
     emiDate: parseInt(document.getElementById('emiDate').value) || 1,
     emisPaid: parseInt(document.getElementById('emisPaid').value) || 0,
     outstandingAmount: parseFloat(document.getElementById('outstandingAmount').value) || 0,
@@ -609,7 +610,7 @@ async function savePayment(e) {
       amount: paymentAmount,
       category: 'EMI Payment',
       description: `${loan.loanName} - ${paymentType === 'emi' ? 'EMI' : 'Prepayment'}`,
-      date: new Date(document.getElementById('paymentDate').value)
+      date: timezoneService.parseInputDate(document.getElementById('paymentDate').value)
     });
     
     toast.success('Payment recorded successfully');

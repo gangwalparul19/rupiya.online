@@ -3,8 +3,7 @@
  * Automatically processes recurring transactions and creates actual expense/income entries
  */
 
-import { db } from '../config/firebase-config.js';
-import { doc, getDoc, setDoc, Timestamp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+import { Timestamp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
 import authService from './auth-service.js';
 import firestoreService from './firestore-service.js';
 
@@ -95,7 +94,7 @@ class RecurringProcessor {
       }
     }
     
-    // Collect all due dates up to today
+    // Collect all due dates up to today (inclusive)
     while (currentDate <= today) {
       // Check if end date has passed
       if (endDate) {

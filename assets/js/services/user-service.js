@@ -5,7 +5,8 @@ import {
   getDoc,
   setDoc,
   updateDoc,
-  serverTimestamp
+  serverTimestamp,
+  onSnapshot
 } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
 import authService from './auth-service.js';
 import locationService from './location-service.js';
@@ -538,7 +539,6 @@ class UserService {
     }
 
     try {
-      const { onSnapshot } = require('https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js');
       const prefsRef = doc(db, 'userPreferences', userId);
       
       const unsubscribe = onSnapshot(prefsRef, (docSnap) => {

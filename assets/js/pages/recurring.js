@@ -5,9 +5,9 @@ import categoriesService from '../services/categories-service.js';
 import paymentMethodsService from '../services/payment-methods-service.js';
 import familySwitcher from '../components/family-switcher.js';
 import toast from '../components/toast.js';
-import themeManager from '../utils/theme-manager.js';
 import recurringProcessor from '../services/recurring-processor.js';
-import { formatCurrency, formatDate, escapeHtml } from '../utils/helpers.js';
+import { formatCurrency, formatDate, escapeHtml, formatDateForInput } from '../utils/helpers.js';
+import timezoneService from '../utils/timezone.js';
 
 // Helper function for toast
 const showToast = (message, type) => toast.show(message, type);
@@ -408,8 +408,8 @@ async function handleSubmit(e) {
     amount: parseFloat(document.getElementById('amount').value),
     category: document.getElementById('category').value,
     frequency: document.getElementById('frequency').value,
-    startDate: new Date(document.getElementById('startDate').value),
-    endDate: document.getElementById('endDate').value ? new Date(document.getElementById('endDate').value) : null,
+    startDate: timezoneService.parseInputDate(document.getElementById('startDate').value),
+    endDate: document.getElementById('endDate').value ? timezoneService.parseInputDate(document.getElementById('endDate').value) : null,
     status: document.getElementById('status').value,
     paymentMethod: document.getElementById('paymentMethod')?.value || 'cash',
     paymentMethodId: specificMethodId || null,
