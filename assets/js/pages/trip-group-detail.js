@@ -143,7 +143,8 @@ class TripGroupDetailPage {
     });
 
     // Add expense button
-    document.getElementById('addExpenseBtn')?.addEventListener('click', () => this.openExpenseModal());
+    // Add expense button
+    document.getElementById('addExpenseBtn')?.addEventListener('click', () => this.toggleExpenseSection());
     document.getElementById('closeExpenseFormBtn')?.addEventListener('click', () => this.closeExpenseModal());
     document.getElementById('cancelExpenseBtn')?.addEventListener('click', () => this.closeExpenseModal());
     document.getElementById('expenseForm')?.addEventListener('submit', (e) => this.handleExpenseSubmit(e));
@@ -676,7 +677,23 @@ class TripGroupDetailPage {
 
 
   // Modal handlers
+  // Form handlers
+  toggleExpenseSection() {
+    const section = document.getElementById('addExpenseSection');
+    const isVisible = section.classList.contains('show');
+
+    if (isVisible) {
+      this.closeExpenseModal();
+    } else {
+      this.openExpenseModal();
+    }
+  }
+
   openExpenseModal() {
+    // Check if section is already open
+    const section = document.getElementById('addExpenseSection');
+    if (section.classList.contains('show')) return;
+
     document.getElementById('expenseForm').reset();
     document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0];
 
@@ -689,16 +706,14 @@ class TripGroupDetailPage {
     // Render split members after modal is about to open
     this.renderSplitMembers();
 
-    // Open modal with correct class
-    const modal = document.getElementById('addExpenseModal');
-    modal.classList.add('show');
-    modal.style.display = 'flex';
+    // Show inline section
+    section.classList.add('show');
+    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   closeExpenseModal() {
-    const modal = document.getElementById('addExpenseModal');
-    modal.classList.remove('show');
-    modal.style.display = 'none';
+    const section = document.getElementById('addExpenseSection');
+    section.classList.remove('show');
   }
 
   openSettlementModal() {

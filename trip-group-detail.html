@@ -118,6 +118,88 @@
         </div>
       </div>
 
+      <!-- Add Expense Application Section (Inline) -->
+      <div class="create-group-section" id="addExpenseSection" style="display: none;">
+        <div class="create-group-header">
+          <h2>Add Expense</h2>
+          <button type="button" class="close-create-btn" id="closeExpenseFormBtn">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <form id="expenseForm">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="expenseAmount">Amount *</label>
+              <input type="number" id="expenseAmount" step="0.01" min="0.01" required placeholder="0.00">
+            </div>
+
+            <div class="form-group">
+              <label for="expenseCategory">Category *</label>
+              <select id="expenseCategory" required>
+                <option value="">Select category</option>
+              </select>
+            </div>
+
+            <div class="form-group form-group-full">
+              <label for="expenseDescription">Description *</label>
+              <input type="text" id="expenseDescription" required maxlength="200"
+                placeholder="What was this expense for?">
+            </div>
+
+            <div class="form-group">
+              <label for="expenseDate">Date *</label>
+              <input type="date" id="expenseDate" required>
+            </div>
+
+            <div class="form-group">
+              <label for="expensePaidBy">Paid By *</label>
+              <select id="expensePaidBy" required>
+                <option value="">Select member</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Split Section -->
+          <div class="split-section">
+            <h3 class="section-title">Split Between</h3>
+
+            <div class="split-type-selector">
+              <label class="split-type-option">
+                <input type="radio" name="splitType" value="equal" checked>
+                <span>Equal Split</span>
+              </label>
+              <label class="split-type-option">
+                <input type="radio" name="splitType" value="custom">
+                <span>Custom Amounts</span>
+              </label>
+              <label class="split-type-option">
+                <input type="radio" name="splitType" value="percentage">
+                <span>Percentage</span>
+              </label>
+            </div>
+
+            <div class="split-members" id="splitMembers">
+              <!-- Split member checkboxes/inputs will be loaded here -->
+            </div>
+
+            <div class="split-summary" id="splitSummary">
+              <span>Total: ₹<span id="splitTotal">0.00</span></span>
+            </div>
+          </div>
+
+          <div class="create-group-footer">
+            <button type="button" class="btn btn-outline" id="cancelExpenseBtn">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="saveExpenseBtn">
+              <span id="saveExpenseBtnText">Add Expense</span>
+              <span id="saveExpenseBtnSpinner" class="spinner" style="display: none;"></span>
+            </button>
+          </div>
+        </form>
+      </div>
+
       <!-- Budget Progress (if set) -->
       <div class="budget-section" id="budgetSection" style="display: none;">
         <div class="budget-card">
@@ -265,88 +347,7 @@
   </div>
 
   <!-- Add Expense Modal -->
-  <div class="modal-overlay" id="addExpenseModal">
-    <div class="modal-container">
-      <div class="modal-header">
-        <h2 class="modal-title">Add Expense</h2>
-        <button class="modal-close" id="closeExpenseFormBtn">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
 
-      <form id="expenseForm" class="modal-body">
-        <div class="form-grid">
-          <div class="form-group">
-            <label for="expenseAmount">Amount *</label>
-            <input type="number" id="expenseAmount" step="0.01" min="0.01" required placeholder="0.00">
-          </div>
-
-          <div class="form-group">
-            <label for="expenseCategory">Category *</label>
-            <select id="expenseCategory" required>
-              <option value="">Select category</option>
-            </select>
-          </div>
-
-          <div class="form-group form-group-full">
-            <label for="expenseDescription">Description *</label>
-            <input type="text" id="expenseDescription" required maxlength="200"
-              placeholder="What was this expense for?">
-          </div>
-
-          <div class="form-group">
-            <label for="expenseDate">Date *</label>
-            <input type="date" id="expenseDate" required>
-          </div>
-
-          <div class="form-group">
-            <label for="expensePaidBy">Paid By *</label>
-            <select id="expensePaidBy" required>
-              <option value="">Select member</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Split Section -->
-        <div class="split-section">
-          <h3 class="section-title">Split Between</h3>
-
-          <div class="split-type-selector">
-            <label class="split-type-option">
-              <input type="radio" name="splitType" value="equal" checked>
-              <span>Equal Split</span>
-            </label>
-            <label class="split-type-option">
-              <input type="radio" name="splitType" value="custom">
-              <span>Custom Amounts</span>
-            </label>
-            <label class="split-type-option">
-              <input type="radio" name="splitType" value="percentage">
-              <span>Percentage</span>
-            </label>
-          </div>
-
-          <div class="split-members" id="splitMembers">
-            <!-- Split member checkboxes/inputs will be loaded here -->
-          </div>
-
-          <div class="split-summary" id="splitSummary">
-            <span>Total: ₹<span id="splitTotal">0.00</span></span>
-          </div>
-        </div>
-
-        <div class="modal-footer">
-          <button type="button" class="btn btn-outline" id="cancelExpenseBtn">Cancel</button>
-          <button type="submit" class="btn btn-primary" id="saveExpenseBtn">
-            <span id="saveExpenseBtnText">Add Expense</span>
-            <span id="saveExpenseBtnSpinner" class="spinner" style="display: none;"></span>
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
 
   <!-- Settlement Modal -->
   <div class="modal-overlay" id="settlementModal">
