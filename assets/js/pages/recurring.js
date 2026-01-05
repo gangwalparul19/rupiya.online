@@ -709,12 +709,6 @@ async function handleLogout() {
 }
 
 // Helper functions
-function formatDateForInput(date) {
-  if (!date) return '';
-  const d = date.toDate ? date.toDate() : new Date(date);
-  return d.toISOString().split('T')[0];
-}
-
 function capitalizeFirst(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
