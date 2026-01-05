@@ -702,11 +702,14 @@ function renderSymbolDropdown(results) {
     const nameDisplay = result.name ? escapeHtml(result.name) : '';
     const exchangeDisplay = result.exchange ? escapeHtml(result.exchange) : '';
     
+    // Use originalSymbol for lookup (handles CURRENCY:BTCUSD format for crypto)
+    const lookupSymbol = result.originalSymbol || result.symbol;
+    
     // Format: "Company Name (TICKER)" or just "TICKER" if no name
     const mainDisplay = nameDisplay ? `${nameDisplay} (${symbolDisplay})` : symbolDisplay;
     
     return `
-      <div class="symbol-item" onclick="window.selectSymbol('${result.symbol}', '${result.type}', '${result.name.replace(/'/g, "\\'")}')">
+      <div class="symbol-item" onclick="window.selectSymbol('${escapeHtml(lookupSymbol)}', '${result.type}', '${result.name.replace(/'/g, "\\'")}')">
         <div class="symbol-name">${mainDisplay}</div>
         ${exchangeDisplay ? `<div class="symbol-detail">${exchangeDisplay}</div>` : ''}
       </div>

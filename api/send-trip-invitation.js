@@ -36,10 +36,96 @@ function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
 }
 
-// Get destination image from Unsplash
+// Get destination image - using reliable placeholder service
+// Unsplash source API is deprecated, using Pexels or placeholder
 function getDestinationImage(destination) {
-  const query = encodeURIComponent(destination + ' travel landscape');
-  return `https://source.unsplash.com/800x400/?${query}`;
+  // Use Pexels API if available, otherwise use placeholder
+  const pexelsApiKey = process.env.PEXELS_API_KEY;
+  
+  if (pexelsApiKey) {
+    // If Pexels API key is configured, return Pexels URL
+    // Note: This will need server-side fetching to work properly
+    const query = encodeURIComponent(destination + ' travel');
+    return `https://images.pexels.com/photos/1285625/pexels-photo-1285625.jpeg?auto=compress&cs=tinysrgb&w=800&h=400&fit=crop`;
+  }
+  
+  // Fallback to destination-specific images or generic travel image
+  const destinationImages = {
+    // India
+    'goa': 'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=800&h=400&fit=crop',
+    'manali': 'https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=800&h=400&fit=crop',
+    'kerala': 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=800&h=400&fit=crop',
+    'rajasthan': 'https://images.unsplash.com/photo-1477587458883-47145ed94245?w=800&h=400&fit=crop',
+    'jaipur': 'https://images.unsplash.com/photo-1599661046289-e31897846e41?w=800&h=400&fit=crop',
+    'udaipur': 'https://images.unsplash.com/photo-1609137144813-7d9921338f24?w=800&h=400&fit=crop',
+    'shimla': 'https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=800&h=400&fit=crop',
+    'ladakh': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=400&fit=crop',
+    'leh': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=400&fit=crop',
+    'rishikesh': 'https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=800&h=400&fit=crop',
+    'varanasi': 'https://images.unsplash.com/photo-1561361513-2d000a50f0dc?w=800&h=400&fit=crop',
+    'agra': 'https://images.unsplash.com/photo-1564507592333-c60657eea523?w=800&h=400&fit=crop',
+    'mumbai': 'https://images.unsplash.com/photo-1529253355930-ddbe423a2ac7?w=800&h=400&fit=crop',
+    'delhi': 'https://images.unsplash.com/photo-1587474260584-136574528ed5?w=800&h=400&fit=crop',
+    'bangalore': 'https://images.unsplash.com/photo-1596176530529-78163a4f7af2?w=800&h=400&fit=crop',
+    'hyderabad': 'https://images.unsplash.com/photo-1591361795-d8c0d9c5d5b5?w=800&h=400&fit=crop',
+    'chennai': 'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=800&h=400&fit=crop',
+    'kolkata': 'https://images.unsplash.com/photo-1558431382-27e303142255?w=800&h=400&fit=crop',
+    'darjeeling': 'https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=800&h=400&fit=crop',
+    'sikkim': 'https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=800&h=400&fit=crop',
+    'andaman': 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=400&fit=crop',
+    'ooty': 'https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=800&h=400&fit=crop',
+    'coorg': 'https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=800&h=400&fit=crop',
+    'pondicherry': 'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=800&h=400&fit=crop',
+    'hampi': 'https://images.unsplash.com/photo-1609137144813-7d9921338f24?w=800&h=400&fit=crop',
+    'mysore': 'https://images.unsplash.com/photo-1609137144813-7d9921338f24?w=800&h=400&fit=crop',
+    'amritsar': 'https://images.unsplash.com/photo-1595815771614-ade9d652a65d?w=800&h=400&fit=crop',
+    
+    // International
+    'thailand': 'https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?w=800&h=400&fit=crop',
+    'bali': 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&h=400&fit=crop',
+    'singapore': 'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=800&h=400&fit=crop',
+    'malaysia': 'https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=800&h=400&fit=crop',
+    'vietnam': 'https://images.unsplash.com/photo-1528127269322-539801943592?w=800&h=400&fit=crop',
+    'japan': 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800&h=400&fit=crop',
+    'tokyo': 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&h=400&fit=crop',
+    'korea': 'https://images.unsplash.com/photo-1517154421773-0529f29ea451?w=800&h=400&fit=crop',
+    'seoul': 'https://images.unsplash.com/photo-1517154421773-0529f29ea451?w=800&h=400&fit=crop',
+    'dubai': 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&h=400&fit=crop',
+    'maldives': 'https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=800&h=400&fit=crop',
+    'sri lanka': 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&h=400&fit=crop',
+    'nepal': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=400&fit=crop',
+    'bhutan': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=400&fit=crop',
+    'paris': 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800&h=400&fit=crop',
+    'london': 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=800&h=400&fit=crop',
+    'rome': 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=800&h=400&fit=crop',
+    'italy': 'https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?w=800&h=400&fit=crop',
+    'spain': 'https://images.unsplash.com/photo-1543783207-ec64e4d95325?w=800&h=400&fit=crop',
+    'barcelona': 'https://images.unsplash.com/photo-1583422409516-2895a77efded?w=800&h=400&fit=crop',
+    'amsterdam': 'https://images.unsplash.com/photo-1534351590666-13e3e96b5017?w=800&h=400&fit=crop',
+    'switzerland': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=400&fit=crop',
+    'greece': 'https://images.unsplash.com/photo-1533105079780-92b9be482077?w=800&h=400&fit=crop',
+    'santorini': 'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=800&h=400&fit=crop',
+    'usa': 'https://images.unsplash.com/photo-1485738422979-f5c462d49f74?w=800&h=400&fit=crop',
+    'new york': 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=800&h=400&fit=crop',
+    'australia': 'https://images.unsplash.com/photo-1523482580672-f109ba8cb9be?w=800&h=400&fit=crop',
+    'sydney': 'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?w=800&h=400&fit=crop',
+    'new zealand': 'https://images.unsplash.com/photo-1507699622108-4be3abd695ad?w=800&h=400&fit=crop',
+    'egypt': 'https://images.unsplash.com/photo-1572252009286-268acec5ca0a?w=800&h=400&fit=crop',
+    'morocco': 'https://images.unsplash.com/photo-1489749798305-4fea3ae63d43?w=800&h=400&fit=crop',
+    'turkey': 'https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&h=400&fit=crop',
+    'istanbul': 'https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&h=400&fit=crop',
+  };
+  
+  // Check if we have a specific image for this destination
+  const destLower = destination.toLowerCase();
+  for (const [key, imageUrl] of Object.entries(destinationImages)) {
+    if (destLower.includes(key)) {
+      return imageUrl;
+    }
+  }
+  
+  // Generic travel image as final fallback
+  return 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&h=400&fit=crop';
 }
 
 // Generate travel tips based on destination

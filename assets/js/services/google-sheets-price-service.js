@@ -157,6 +157,7 @@ class GoogleSheetsPriceService {
   /**
    * Find price data for a symbol
    * Searches in both stocks and mutual funds sheets
+   * Handles crypto symbols in both formats: "BTC" and "CURRENCY:BTCUSD"
    */
   async findSymbolData(symbol) {
     if (!symbol) {
@@ -181,7 +182,29 @@ class GoogleSheetsPriceService {
     // Search in stocks data first (Symbol column)
     let found = allData.stocks.find(row => {
       const rowSymbol = this.stripExchangePrefix((row.Symbol || row.symbol || '').toString()).toUpperCase().trim();
-      return rowSymbol === normalizedSymbol;
+      
+      // Direct match
+      if (rowSymbol === normalizedSymbol) {
+        return true;
+      }
+      
+      // For crypto: check if searching for "BTC" and row has "CURRENCY:BTCUSD"
+      if (rowSymbol.includes('CURRENCY:')) {
+        const cryptoPart = rowSymbol.split(':')[1]; // Get "BTCUSD"
+        if (cryptoPart.endsWith('USD')) {
+          const cryptoTicker = cryptoPart.substring(0, cryptoPart.length - 3); // "BTC"
+          if (cryptoTicker === normalizedSymbol) {
+            return true;
+          }
+        }
+      }
+      
+      // Also check if user searched with full format "CURRENCY:BTCUSD"
+      if (normalizedSymbol.includes('CURRENCY:') && rowSymbol === normalizedSymbol) {
+        return true;
+      }
+      
+      return false;
     });
 
     // If not found, search in mutual funds (Scheme Code column)
@@ -419,9 +442,9 @@ class GoogleSheetsPriceService {
    * 
    * STOCKS Sheet columns:
    * - Symbol_Name: Company/Asset name
-   * - Ticker_Code: Exchange with ticker (e.g., "NYSE:ACN")
+   * - Ticker_Code: Exchange with ticker (e.g., "NYSE:ACN" or "CURRENCY:BTCUSD")
    * - Category: Asset type
-   * - Symbol: Ticker symbol
+   * - Symbol: Ticker symbol (e.g., "ACN" or "CURRENCY:BTCUSD")
    * - Live_Price: Current price
    * 
    * MUTUAL FUNDS Sheet columns:
@@ -438,19 +461,34 @@ class GoogleSheetsPriceService {
     // Search in stocks
     allData.stocks.forEach(row => {
       // Get symbol from Symbol column
-      const symbol = this.stripExchangePrefix(
-        (row.Symbol || row.symbol || row.Ticker || row.ticker || '').toString()
-      );
+      let symbol = (row.Symbol || row.symbol || row.Ticker || row.ticker || '').toString();
+      
+      // For crypto, extract the actual ticker from "CURRENCY:BTCUSD" format
+      // Extract BTC from BTCUSD, ETH from ETHUSD, etc.
+      let displaySymbol = symbol;
+      if (symbol.includes('CURRENCY:')) {
+        const cryptoPart = symbol.split(':')[1]; // Get "BTCUSD"
+        // Extract the crypto ticker (remove USD suffix)
+        if (cryptoPart.endsWith('USD')) {
+          displaySymbol = cryptoPart.substring(0, cryptoPart.length - 3); // "BTC", "ETH", etc.
+        } else {
+          displaySymbol = cryptoPart;
+        }
+      } else {
+        displaySymbol = this.stripExchangePrefix(symbol);
+      }
       
       // Get name from Symbol_Name column
       const name = (row.Symbol_Name || row.symbol_name || row['Symbol Name'] || row.SymbolName ||
                     row.Name || row.name || row['Company Name'] || row.CompanyName || '').toString();
       
-      // Get exchange from Ticker_Code column (format: "NYSE:ACN")
+      // Get exchange from Ticker_Code column (format: "NYSE:ACN" or "CURRENCY:BTCUSD")
       let exchange = '';
       const tickerCode = (row.Ticker_Code || row.ticker_code || row['Ticker Code'] || row.TickerCode || '').toString();
       if (tickerCode && tickerCode.includes(':')) {
-        exchange = tickerCode.split(':')[0];
+        const exchangePart = tickerCode.split(':')[0];
+        // For crypto, show the exchange as "Crypto" instead of "CURRENCY"
+        exchange = exchangePart === 'CURRENCY' ? 'Crypto' : exchangePart;
       } else {
         exchange = (row.Exchange || row.exchange || row.Market || row.market || '').toString();
       }
@@ -459,11 +497,14 @@ class GoogleSheetsPriceService {
       const type = (row.Category || row.category || 
                     row.Type || row.type || 'Stock').toString();
       
-      // Search by symbol or name
-      if (symbol.toUpperCase().includes(queryUpper) || name.toUpperCase().includes(queryUpper)) {
-        console.log('Match found:', { symbol, name, type, exchange });
+      // Search by display symbol, actual symbol, or name
+      if (displaySymbol.toUpperCase().includes(queryUpper) || 
+          symbol.toUpperCase().includes(queryUpper) ||
+          name.toUpperCase().includes(queryUpper)) {
+        console.log('Match found:', { symbol: displaySymbol, name, type, exchange, originalSymbol: symbol });
         results.push({
-          symbol: symbol,
+          symbol: displaySymbol, // Use clean symbol for display (BTC, ETH, etc.)
+          originalSymbol: symbol, // Keep original for lookup (CURRENCY:BTCUSD)
           name: name,
           type: type,
           exchange: exchange
@@ -490,6 +531,7 @@ class GoogleSheetsPriceService {
       if (symbol.toUpperCase().includes(queryUpper) || name.toUpperCase().includes(queryUpper)) {
         results.push({
           symbol: symbol,
+          originalSymbol: symbol, // Same for mutual funds
           name: name,
           type: 'Mutual Fund',
           exchange: exchange

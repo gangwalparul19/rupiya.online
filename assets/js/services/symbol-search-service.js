@@ -45,13 +45,15 @@ class SymbolSearchService {
 
       // Enhance results with additional info
       const enhancedResults = filteredResults.map(r => {
-        // Strip exchange prefix from symbol
-        const cleanSymbol = this.stripExchangePrefix(r.symbol);
+        // Use the clean symbol for display, but keep originalSymbol for lookup
+        const cleanSymbol = r.symbol; // Already cleaned by google-sheets-price-service
+        const originalSymbol = r.originalSymbol || r.symbol; // Keep original for crypto lookup
         const name = r.name || '';
         const exchange = r.exchange || '';
         
         return {
-          symbol: cleanSymbol,
+          symbol: cleanSymbol, // Display symbol (BTC, ETH, ACN, etc.)
+          originalSymbol: originalSymbol, // Original symbol for lookup (CURRENCY:BTCUSD, ACN, etc.)
           name: name,
           type: this.normalizeType(r.type),
           exchange: exchange,
