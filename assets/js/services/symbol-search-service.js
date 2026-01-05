@@ -44,13 +44,18 @@ class SymbolSearchService {
       }
 
       // Enhance results with additional info
-      const enhancedResults = filteredResults.map(r => ({
-        symbol: r.symbol,
-        name: r.name,
-        type: this.normalizeType(r.type),
-        exchange: r.exchange || '',
-        displayName: this.formatSymbolDisplay(r)
-      }));
+      const enhancedResults = filteredResults.map(r => {
+        // Strip exchange prefix from symbol
+        const cleanSymbol = this.stripExchangePrefix(r.symbol);
+        
+        return {
+          symbol: cleanSymbol,
+          name: r.name || '',
+          type: this.normalizeType(r.type),
+          exchange: r.exchange || '',
+          displayName: this.formatSymbolDisplay({ ...r, symbol: cleanSymbol })
+        };
+      });
 
       this.setCache(cacheKey, enhancedResults);
       console.log('Found results:', enhancedResults.length);
@@ -189,25 +194,47 @@ class SymbolSearchService {
    * Format symbol for display
    */
   formatSymbolDisplay(result) {
-    const symbol = result.symbol || result.Symbol;
-    const name = result.name || result.Name;
-    const exchange = result.exchange || result.Exchange;
-    const type = result.type || result.Type;
+    let symbol = result.symbol || result.Symbol || '';
+    const name = result.name || result.Name || '';
+    const exchange = result.exchange || result.Exchange || '';
+    const type = result.type || result.Type || '';
     
+    // Strip exchange prefix from symbol (e.g., "NSE:RELIANCE" -> "RELIANCE")
+    symbol = this.stripExchangePrefix(symbol);
+    
+    // Format display based on type
     if (type && type.toLowerCase().includes('mutual')) {
+      return name ? `${symbol} - ${name}` : symbol;
+    } else if (name) {
       return `${symbol} - ${name}`;
-    } else if (exchange) {
-      return `${symbol} - ${name} (${exchange})`;
     } else {
-      return `${symbol} - ${name}`;
+      return symbol;
     }
+  }
+
+  /**
+   * Strip exchange prefix from symbol
+   */
+  stripExchangePrefix(symbol) {
+    if (!symbol) return '';
+    
+    // Remove common exchange prefixes
+    const prefixes = ['NSE:', 'BSE:', 'NYSE:', 'NASDAQ:', 'MCX:'];
+    for (const prefix of prefixes) {
+      if (symbol.toUpperCase().startsWith(prefix)) {
+        return symbol.substring(prefix.length);
+      }
+    }
+    
+    return symbol;
   }
 
   /**
    * Get symbol from result
    */
   getSymbolFromResult(result) {
-    return result.symbol || result.Symbol;
+    const symbol = result.symbol || result.Symbol || '';
+    return this.stripExchangePrefix(symbol);
   }
 }
 

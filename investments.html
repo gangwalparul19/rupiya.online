@@ -172,12 +172,11 @@
               <span class="error-message" id="typeError"></span>
             </div>
 
-            <!-- Currency Selector -->
-            <div class="form-group">
+            <!-- Currency Selector - Hidden, auto-set to INR -->
+            <div class="form-group" style="display: none;">
               <label for="currency">Currency *</label>
-              <select id="currency" required>
-                <option value="INR">INR (₹)</option>
-                <option value="USD">USD ($)</option>
+              <select id="currency">
+                <option value="INR" selected>INR (₹)</option>
               </select>
             </div>
 

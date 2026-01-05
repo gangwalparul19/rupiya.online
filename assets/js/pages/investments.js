@@ -239,12 +239,12 @@ async function handleSubmit(e) {
     currentPrice: parseFloat(document.getElementById('currentPrice').value),
     purchaseDate: timezoneService.parseInputDate(document.getElementById('purchaseDate').value),
     notes: document.getElementById('notes').value.trim(),
-    currency: document.getElementById('currency').value
+    currency: 'INR' // Always store as INR
   };
 
   // Validate symbol
   if (!formData.symbol) {
-    showToast('Please enter a symbol (e.g., AAPL, BTC-USD, GC=F)', 'error');
+    showToast('Please enter a symbol (e.g., AAPL, RELIANCE, BTC-USD)', 'error');
     return;
   }
 
@@ -254,13 +254,19 @@ async function handleSubmit(e) {
   saveFormBtnSpinner.style.display = 'inline-block';
 
   try {
-    // Try to fetch live price
+    // Try to fetch live price and convert to INR
     let livePrice = null;
     try {
       const priceData = await googleSheetsPriceService.getLivePrice(formData.symbol);
       livePrice = priceData.price;
+      
+      // Convert USD to INR if needed
+      if (priceData.currency === 'USD') {
+        livePrice = await googleSheetsPriceService.convertUSDToINR(priceData.price);
+      }
+      
       formData.currentPrice = livePrice;
-      showToast(`Price fetched for ${symbol}: ${formatCurrency(livePrice)}`, 'success');
+      showToast(`Price fetched for ${formData.symbol}: ₹${livePrice.toFixed(2)}`, 'success');
     } catch (error) {
       console.warn('Could not fetch live price, using manual price:', error);
       showToast('Using manual price (symbol not found in Google Sheets)', 'info');
@@ -342,26 +348,29 @@ async function updateLivePrices() {
     if (investment.symbol) {
       try {
         const priceData = await googleSheetsPriceService.getLivePrice(investment.symbol);
-        investment.livePrice = priceData.price;
-        investment.priceChange = priceData.change;
-        investment.priceChangePercent = priceData.changePercent;
-        investment.lastPriceUpdate = priceData.lastUpdate;
-        investment.currency = priceData.currency;
-
-        // Add INR conversion for US stocks
+        
+        // Convert USD to INR if needed
+        let inrPrice = priceData.price;
+        let inrChange = priceData.change;
+        
         if (priceData.currency === 'USD') {
           try {
-            investment.inrPrice = await googleSheetsPriceService.convertUSDToINR(priceData.price);
-            investment.inrChange = await googleSheetsPriceService.convertUSDToINR(priceData.change);
-            investment.hasInrConversion = true;
+            inrPrice = await googleSheetsPriceService.convertUSDToINR(priceData.price);
+            inrChange = await googleSheetsPriceService.convertUSDToINR(priceData.change);
           } catch (error) {
             console.warn(`Could not convert ${investment.symbol} to INR:`, error);
           }
         }
+        
+        // Store INR prices
+        investment.livePrice = inrPrice;
+        investment.priceChange = inrChange;
+        investment.priceChangePercent = priceData.changePercent;
+        investment.lastPriceUpdate = priceData.lastUpdate;
+        investment.currency = 'INR'; // Always store as INR
       } catch (error) {
         console.warn(`Could not fetch live price for ${investment.symbol}:`, error.message);
         // Keep using the stored current price if live price fails
-        // Don't show error toast here - just silently use cached price
       }
     }
   }
@@ -383,31 +392,16 @@ function renderInvestments() {
     const escapedNotes = investment.notes ? escapeHtml(investment.notes) : '';
     const escapedSymbol = escapeHtml(investment.symbol || '');
 
-    // Price change indicator
+    // Price change indicator (always in INR)
     const priceChangeClass = investment.priceChange >= 0 ? 'positive' : 'negative';
     const priceChangeSign = investment.priceChange >= 0 ? '+' : '';
     const priceChangeDisplay = investment.priceChange !== undefined
-      ? `<span class="price-change ${priceChangeClass}">${priceChangeSign}${investment.priceChange?.toFixed(2)} (${priceChangeSign}${investment.priceChangePercent?.toFixed(2)}%)</span>`
-      : '';
-
-    // INR price change for US stocks
-    const inrChangeClass = investment.inrChange >= 0 ? 'positive' : 'negative';
-    const inrChangeSign = investment.inrChange >= 0 ? '+' : '';
-    const inrChangeDisplay = investment.hasInrConversion && investment.inrChange !== undefined
-      ? `<span class="price-change inr-change ${inrChangeClass}">${inrChangeSign}₹${investment.inrChange?.toFixed(2)} (${inrChangeSign}${investment.priceChangePercent?.toFixed(2)}%)</span>`
+      ? `<span class="price-change ${priceChangeClass}">${priceChangeSign}₹${investment.priceChange?.toFixed(2)} (${priceChangeSign}${investment.priceChangePercent?.toFixed(2)}%)</span>`
       : '';
 
     // Live price indicator
     const liveIndicator = investment.livePrice
       ? '<span class="live-indicator">🔴 LIVE</span>'
-      : '';
-
-    // Currency display
-    const currencyDisplay = investment.currency ? `(${investment.currency})` : '';
-
-    // INR conversion display for US stocks
-    const inrDisplay = investment.hasInrConversion && investment.inrPrice
-      ? `<div class="investment-stat-inr">₹${investment.inrPrice.toFixed(2)} INR ${inrChangeDisplay}</div>`
       : '';
 
     return `
@@ -452,30 +446,29 @@ function renderInvestments() {
           <div class="investment-stats-row">
             <div class="investment-stat">
               <div class="investment-stat-label">Purchase Price</div>
-              <div class="investment-stat-value">${formatCurrency(investment.purchasePrice, investment.currency === 'USD' ? '$' : '₹')}</div>
+              <div class="investment-stat-value">₹${investment.purchasePrice.toFixed(2)}</div>
             </div>
             <div class="investment-stat">
               <div class="investment-stat-label">Current Price ${liveIndicator}</div>
-              <div class="investment-stat-value">${formatCurrency(currentPrice, investment.currency === 'USD' ? '$' : '₹')} ${currencyDisplay}</div>
-              ${inrDisplay}
+              <div class="investment-stat-value">₹${currentPrice.toFixed(2)}</div>
               ${priceChangeDisplay}
             </div>
           </div>
           <div class="investment-stats-row">
             <div class="investment-stat">
               <div class="investment-stat-label">Total Invested</div>
-              <div class="investment-stat-value">${formatCurrency(totalInvested, investment.currency === 'USD' ? '$' : '₹')}</div>
+              <div class="investment-stat-value">₹${totalInvested.toFixed(2)}</div>
             </div>
             <div class="investment-stat">
               <div class="investment-stat-label">Current Value</div>
-              <div class="investment-stat-value">${formatCurrency(currentValue, investment.currency === 'USD' ? '$' : '₹')}</div>
+              <div class="investment-stat-value">₹${currentValue.toFixed(2)}</div>
             </div>
           </div>
           <div class="investment-stats-row investment-returns-row">
             <div class="investment-stat investment-stat-full">
               <div class="investment-stat-label">Returns</div>
               <div class="investment-stat-value ${returnsClass}">
-               ${returnsSign}${formatCurrency(Math.abs(returns), investment.currency === 'USD' ? '$' : '₹')} (${returnsSign}${returnsPercentage}%)
+               ${returnsSign}₹${Math.abs(returns).toFixed(2)} (${returnsSign}${returnsPercentage}%)
               </div>
             </div>
           </div>
@@ -499,28 +492,14 @@ function renderInvestments() {
 }
 
 // Update summary
-// Update summary
 async function updateSummary() {
   let totalInvested = 0;
   let currentValue = 0;
 
-  // Get exchange rate for Summary calculations
-  let usdToInrRate = 83.50; // Fallback
-  try {
-    usdToInrRate = await googleSheetsPriceService.getUSDToINRRate();
-  } catch (e) {
-    console.warn('Using fallback rate for summary:', e);
-  }
-
+  // All prices are now stored in INR, so no conversion needed
   investments.forEach(investment => {
-    let investPurchasePrice = investment.purchasePrice;
-    let investCurrentPrice = investment.currentPrice;
-
-    // Convert USD to INR for summary totals
-    if (investment.currency === 'USD') {
-      investPurchasePrice = investment.purchasePrice * usdToInrRate;
-      investCurrentPrice = (investment.inrPrice || (investment.currentPrice * usdToInrRate));
-    }
+    const investPurchasePrice = investment.purchasePrice;
+    const investCurrentPrice = investment.livePrice || investment.currentPrice;
 
     totalInvested += investment.quantity * investPurchasePrice;
     currentValue += investment.quantity * investCurrentPrice;
@@ -718,11 +697,14 @@ function renderSymbolDropdown(results) {
 
   selectedSymbolIndex = -1;
   dropdown.innerHTML = results.map((result, index) => {
-    const display = symbolSearchService.formatSymbolDisplay(result);
+    // Display only ticker and name, no exchange prefix
+    const symbolDisplay = escapeHtml(result.symbol);
+    const nameDisplay = result.name ? escapeHtml(result.name) : '';
+    
     return `
       <div class="symbol-item" onclick="window.selectSymbol('${result.symbol}', '${result.type}')">
-        <div class="symbol-name">${escapeHtml(result.symbol)}</div>
-        <div class="symbol-detail">${escapeHtml(display.split(' - ')[1] || '')}</div>
+        <div class="symbol-name">${symbolDisplay}</div>
+        ${nameDisplay ? `<div class="symbol-detail">${nameDisplay}</div>` : ''}
       </div>
     `;
   }).join('');
@@ -770,65 +752,40 @@ async function selectSymbol(symbol, type) {
           nameInput.value = priceData.name;
         }
         
-        // Determine currency and handle conversion
-        let displayPrice = priceData.price;
-        let displayCurrency = priceData.currency || 'INR';
+        // Always convert to INR and store in INR
+        let inrPrice = priceData.price;
+        let displayMessage = '';
         
-        // For USD stocks/crypto, show both USD and INR
-        if (displayCurrency === 'USD') {
+        if (priceData.currency === 'USD') {
+          // Convert USD to INR
           try {
-            const inrPrice = await googleSheetsPriceService.convertUSDToINR(priceData.price);
-            
-            // Show USD price in current price
-            currentPriceInput.value = priceData.price.toFixed(2);
-            if (purchasePriceInput && !purchasePriceInput.value) {
-              purchasePriceInput.value = priceData.price.toFixed(2);
-            }
-            
-            // Set currency to USD
-            if (currencyInput) {
-              currencyInput.value = 'USD';
-            }
-            
-            // Show INR equivalent in a toast
-            showToast(
-              `Price: $${priceData.price.toFixed(2)} USD (₹${inrPrice.toFixed(2)} INR)\n` +
-              `${priceData.name || symbol}`,
-              'success'
-            );
+            inrPrice = await googleSheetsPriceService.convertUSDToINR(priceData.price);
+            displayMessage = `Price: $${priceData.price.toFixed(2)} USD (₹${inrPrice.toFixed(2)} INR)\n${priceData.name || symbol}`;
           } catch (conversionError) {
             console.warn('Could not convert to INR:', conversionError);
-            currentPriceInput.value = priceData.price.toFixed(2);
-            if (purchasePriceInput && !purchasePriceInput.value) {
-              purchasePriceInput.value = priceData.price.toFixed(2);
-            }
-            if (currencyInput) {
-              currencyInput.value = 'USD';
-            }
-            showToast(`Price fetched: $${priceData.price.toFixed(2)} USD`, 'success');
+            displayMessage = `Price: $${priceData.price.toFixed(2)} USD\n${priceData.name || symbol}\nNote: Could not convert to INR`;
           }
         } else {
-          // INR or other currency
-          currentPriceInput.value = priceData.price.toFixed(2);
-          if (purchasePriceInput && !purchasePriceInput.value) {
-            purchasePriceInput.value = priceData.price.toFixed(2);
-          }
-          if (currencyInput) {
-            currencyInput.value = displayCurrency;
-          }
-          
-          const currencySymbol = displayCurrency === 'INR' ? '₹' : displayCurrency;
-          showToast(
-            `Price: ${currencySymbol}${priceData.price.toFixed(2)}\n` +
-            `${priceData.name || symbol}`,
-            'success'
-          );
+          // Already in INR or other currency
+          displayMessage = `Price: ₹${inrPrice.toFixed(2)} INR\n${priceData.name || symbol}`;
         }
+        
+        // Set the INR price in the form
+        currentPriceInput.value = inrPrice.toFixed(2);
+        if (purchasePriceInput && !purchasePriceInput.value) {
+          purchasePriceInput.value = inrPrice.toFixed(2);
+        }
+        
+        // Always set currency to INR
+        if (currencyInput) {
+          currencyInput.value = 'INR';
+        }
+        
+        showToast(displayMessage, 'success');
         
         // Show additional info if available
         if (priceData.change !== undefined) {
           const changeSign = priceData.change >= 0 ? '+' : '';
-          const changeClass = priceData.change >= 0 ? 'positive' : 'negative';
           console.log(
             `%cChange: ${changeSign}${priceData.change.toFixed(2)} (${changeSign}${priceData.changePercent?.toFixed(2)}%)`,
             `color: ${priceData.change >= 0 ? 'green' : 'red'}`
@@ -860,39 +817,43 @@ async function refreshInvestmentPrice(investmentId) {
     showToast('Fetching live price...', 'info');
     const priceData = await googleSheetsPriceService.getLivePrice(investment.symbol);
 
-    investment.livePrice = priceData.price;
-    investment.priceChange = priceData.change;
-    investment.priceChangePercent = priceData.changePercent;
-    investment.lastPriceUpdate = priceData.lastUpdate;
-    investment.currency = priceData.currency;
-
-    // Add INR conversion for US stocks
+    // Convert USD to INR if needed
+    let inrPrice = priceData.price;
+    let inrChange = priceData.change;
+    
     if (priceData.currency === 'USD') {
       try {
-        investment.inrPrice = await googleSheetsPriceService.convertUSDToINR(priceData.price);
-        investment.inrChange = await googleSheetsPriceService.convertUSDToINR(priceData.change);
-        investment.hasInrConversion = true;
+        inrPrice = await googleSheetsPriceService.convertUSDToINR(priceData.price);
+        inrChange = await googleSheetsPriceService.convertUSDToINR(priceData.change);
       } catch (error) {
         console.warn('Could not convert to INR:', error);
       }
     }
 
+    // Store INR prices
+    investment.livePrice = inrPrice;
+    investment.priceChange = inrChange;
+    investment.priceChangePercent = priceData.changePercent;
+    investment.lastPriceUpdate = priceData.lastUpdate;
+    investment.currency = 'INR';
+
     // Update in Firestore
     await firestoreService.updateInvestment(investmentId, {
-      currentPrice: priceData.price,
-      lastPriceUpdate: new Date()
+      currentPrice: inrPrice,
+      lastPriceUpdate: new Date(),
+      currency: 'INR'
     });
 
     // Record in history
     await investmentHistoryService.recordPriceUpdate(
       investmentId,
-      priceData.price,
-      `Live price updated from Google Sheets: ${priceData.price}`
+      inrPrice,
+      `Live price updated from Google Sheets: ₹${inrPrice.toFixed(2)}`
     );
 
     renderInvestments();
     updateSummary();
-    showToast(`Price updated: ${formatCurrency(priceData.price)}`, 'success');
+    showToast(`Price updated: ₹${inrPrice.toFixed(2)}`, 'success');
   } catch (error) {
     console.error('Error refreshing price:', error);
     // Show user-friendly error message

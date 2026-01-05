@@ -163,8 +163,11 @@ class GoogleSheetsPriceService {
       throw new Error('Symbol is required');
     }
 
-    // Check cache first
-    const cached = this.priceCache.get(symbol);
+    // Strip exchange prefix if present
+    const cleanSymbol = this.stripExchangePrefix(symbol);
+
+    // Check cache first (use clean symbol for cache key)
+    const cached = this.priceCache.get(cleanSymbol);
     if (cached && Date.now() - cached.timestamp < this.CACHE_DURATION) {
       return cached.data;
     }
@@ -173,31 +176,31 @@ class GoogleSheetsPriceService {
     const allData = await this.getAllData();
 
     // Normalize symbol for comparison
-    const normalizedSymbol = symbol.toUpperCase().trim();
+    const normalizedSymbol = cleanSymbol.toUpperCase().trim();
 
     // Search in stocks data first
     let found = allData.stocks.find(row => {
-      const rowSymbol = (row.Symbol || row.symbol || '').toString().toUpperCase().trim();
+      const rowSymbol = this.stripExchangePrefix((row.Symbol || row.symbol || '').toString()).toUpperCase().trim();
       return rowSymbol === normalizedSymbol;
     });
 
     // If not found, search in mutual funds
     if (!found) {
       found = allData.mutualFunds.find(row => {
-        const rowSymbol = (row.Symbol || row.symbol || row['Scheme Code'] || '').toString().toUpperCase().trim();
+        const rowSymbol = this.stripExchangePrefix((row.Symbol || row.symbol || row['Scheme Code'] || '').toString()).toUpperCase().trim();
         return rowSymbol === normalizedSymbol;
       });
     }
 
     if (!found) {
-      throw new Error(`Symbol ${symbol} not found in Google Sheets`);
+      throw new Error(`Symbol ${cleanSymbol} not found in Google Sheets`);
     }
 
     // Extract price data (adjust column names based on your sheet structure)
-    const priceData = this.extractPriceData(found, symbol);
+    const priceData = this.extractPriceData(found, cleanSymbol);
 
     // Cache the result
-    this.priceCache.set(symbol, {
+    this.priceCache.set(cleanSymbol, {
       data: priceData,
       timestamp: Date.now()
     });
@@ -330,7 +333,7 @@ class GoogleSheetsPriceService {
 
     // Search in stocks
     allData.stocks.forEach(row => {
-      const symbol = (row.Symbol || row.symbol || '').toString();
+      const symbol = this.stripExchangePrefix((row.Symbol || row.symbol || '').toString());
       const name = (row.Name || row.name || '').toString();
       
       if (symbol.toUpperCase().includes(queryUpper) || name.toUpperCase().includes(queryUpper)) {
@@ -345,7 +348,7 @@ class GoogleSheetsPriceService {
 
     // Search in mutual funds
     allData.mutualFunds.forEach(row => {
-      const symbol = (row.Symbol || row.symbol || row['Scheme Code'] || '').toString();
+      const symbol = this.stripExchangePrefix((row.Symbol || row.symbol || row['Scheme Code'] || '').toString());
       const name = (row.Name || row.name || row['Scheme Name'] || '').toString();
       
       if (symbol.toUpperCase().includes(queryUpper) || name.toUpperCase().includes(queryUpper)) {
@@ -359,6 +362,25 @@ class GoogleSheetsPriceService {
     });
 
     return results.slice(0, limit);
+  }
+
+  /**
+   * Strip exchange prefix from symbol
+   */
+  stripExchangePrefix(symbol) {
+    if (!symbol) return '';
+    
+    const symbolStr = symbol.toString();
+    
+    // Remove common exchange prefixes
+    const prefixes = ['NSE:', 'BSE:', 'NYSE:', 'NASDAQ:', 'MCX:'];
+    for (const prefix of prefixes) {
+      if (symbolStr.toUpperCase().startsWith(prefix)) {
+        return symbolStr.substring(prefix.length);
+      }
+    }
+    
+    return symbolStr;
   }
 
   /**
