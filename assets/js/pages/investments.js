@@ -44,7 +44,7 @@ async function init() {
 
   // Initialize family switcher
   await familySwitcher.init();
-  
+
   // Update subtitle based on context
   updatePageContext();
 
@@ -68,7 +68,7 @@ async function init() {
 function updatePageContext() {
   const context = familySwitcher.getCurrentContext();
   const subtitle = document.getElementById('investmentsSubtitle');
-  
+
   if (subtitle && context.context === 'family' && context.group) {
     subtitle.textContent = `Tracking investments for ${context.group.name}`;
   } else if (subtitle) {
@@ -144,7 +144,7 @@ function setupEventListeners() {
   // Symbol search
   const symbolInput = document.getElementById('symbol');
   const typeInput = document.getElementById('type');
-  
+
   if (symbolInput) {
     symbolInput.addEventListener('input', handleSymbolSearch);
     symbolInput.addEventListener('keydown', handleSymbolKeydown);
@@ -186,13 +186,13 @@ function showAddForm() {
   formTitle.textContent = 'Add Investment';
   saveFormBtnText.textContent = 'Save Investment';
   investmentForm.reset();
-  
+
   // Set default date if element exists
   const purchaseDateInput = document.getElementById('purchaseDate');
   if (purchaseDateInput) {
     purchaseDateInput.valueAsDate = new Date();
   }
-  
+
   addInvestmentSection.classList.add('show');
   addInvestmentSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
@@ -315,7 +315,7 @@ async function loadInvestments() {
 
   try {
     investments = await firestoreService.getInvestments();
-    
+
     if (investments.length === 0) {
       emptyState.style.display = 'block';
     } else {
@@ -345,7 +345,7 @@ async function updateLivePrices() {
         investment.priceChangePercent = priceData.changePercent;
         investment.lastPriceUpdate = priceData.lastUpdate;
         investment.currency = priceData.currency;
-        
+
         // Add INR conversion for US stocks
         if (priceData.currency === 'USD') {
           try {
@@ -384,7 +384,7 @@ function renderInvestments() {
     // Price change indicator
     const priceChangeClass = investment.priceChange >= 0 ? 'positive' : 'negative';
     const priceChangeSign = investment.priceChange >= 0 ? '+' : '';
-    const priceChangeDisplay = investment.priceChange !== undefined 
+    const priceChangeDisplay = investment.priceChange !== undefined
       ? `<span class="price-change ${priceChangeClass}">${priceChangeSign}${investment.priceChange?.toFixed(2)} (${priceChangeSign}${investment.priceChangePercent?.toFixed(2)}%)</span>`
       : '';
 
@@ -396,13 +396,13 @@ function renderInvestments() {
       : '';
 
     // Live price indicator
-    const liveIndicator = investment.livePrice 
+    const liveIndicator = investment.livePrice
       ? '<span class="live-indicator">🔴 LIVE</span>'
       : '';
-    
+
     // Currency display
     const currencyDisplay = investment.currency ? `(${investment.currency})` : '';
-    
+
     // INR conversion display for US stocks
     const inrDisplay = investment.hasInrConversion && investment.inrPrice
       ? `<div class="investment-stat-inr">₹${investment.inrPrice.toFixed(2)} INR ${inrChangeDisplay}</div>`
@@ -545,7 +545,7 @@ async function handleDelete() {
 
   try {
     const result = await firestoreService.deleteInvestment(deleteInvestmentId);
-    
+
     if (result.success) {
       showToast('Investment deleted successfully', 'success');
       hideDeleteModal();
@@ -668,15 +668,15 @@ function updateSymbolSelection(items) {
 // Render symbol dropdown
 function renderSymbolDropdown(results) {
   console.log('Rendering dropdown with results:', results);
-  
+
   // Try to find existing dropdown first
   let dropdown = document.getElementById('symbolDropdown');
-  
+
   // If not found, create it inside the wrapper
   if (!dropdown) {
     const symbolInput = document.getElementById('symbol');
     const wrapper = symbolInput?.parentNode;
-    
+
     if (wrapper) {
       dropdown = document.createElement('div');
       dropdown.id = 'symbolDropdown';
@@ -712,13 +712,49 @@ function renderSymbolDropdown(results) {
 }
 
 // Select symbol from dropdown
+// Select symbol from dropdown
 function selectSymbol(symbol, type) {
   const symbolInput = document.getElementById('symbol');
   const typeInput = document.getElementById('type');
-  
+
   symbolInput.value = symbol;
-  typeInput.value = type;
-  
+
+  // Normalize type to match select options
+  let normalizedType = type;
+  const upperType = type ? type.toUpperCase() : '';
+
+  if (upperType === 'EQUITY' || upperType === 'ETF' || upperType === 'INDEX') {
+    normalizedType = 'Stocks';
+  } else if (upperType.includes('FUND')) {
+    normalizedType = 'Mutual Funds';
+  } else if (upperType === 'CRYPTOCURRENCY' || upperType === 'CRYPTO') {
+    normalizedType = 'Cryptocurrency';
+  } else if (upperType.includes('GOLD') || upperType.includes('Currencies')) {
+    normalizedType = 'Gold';
+  }
+
+  // Check if normalized type exists in the select options
+  let typeExists = false;
+  for (let i = 0; i < typeInput.options.length; i++) {
+    if (typeInput.options[i].value === normalizedType) {
+      typeExists = true;
+      break;
+    }
+  }
+
+  // If normalized type exists, select it. Otherwise fallback to 'Other' or keep as is?
+  // Let's fallback to 'Other' if we can't match, or just don't change it if user already selected valid one
+  if (typeExists) {
+    typeInput.value = normalizedType;
+  } else if (upperType && !typeInput.value) {
+    // If we have a type from search but it doesn't match our options, and no type is selected, select 'Other'
+    // But verify 'Other' exists
+    const otherOption = Array.from(typeInput.options).find(o => o.value === 'Other');
+    if (otherOption) {
+      typeInput.value = 'Other';
+    }
+  }
+
   const dropdown = document.getElementById('symbolDropdown');
   if (dropdown) dropdown.style.display = 'none';
 
@@ -736,13 +772,13 @@ async function refreshInvestmentPrice(investmentId) {
   try {
     showToast('Fetching live price...', 'info');
     const priceData = await livePriceService.getLivePrice(investment.symbol);
-    
+
     investment.livePrice = priceData.price;
     investment.priceChange = priceData.change;
     investment.priceChangePercent = priceData.changePercent;
     investment.lastPriceUpdate = priceData.lastUpdate;
     investment.currency = priceData.currency;
-    
+
     // Add INR conversion for US stocks
     if (priceData.currency === 'USD') {
       try {
@@ -896,7 +932,7 @@ async function viewPriceHistory(investmentId) {
           <h3>Price Volatility</h3>
           <div class="analytics-grid">
       `;
-      
+
       if (volatility7d) {
         content += `
           <div class="analytics-card">

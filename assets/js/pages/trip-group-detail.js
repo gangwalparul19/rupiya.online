@@ -8,19 +8,19 @@ const originalLog = console.log;
 const originalError = console.error;
 const originalWarn = console.warn;
 
-console.log = function(...args) {
+console.log = function (...args) {
   originalLog.apply(console, args);
   debugLogs.push({ type: 'log', message: args.join(' '), time: new Date().toLocaleTimeString() });
   updateDebugPanel();
 };
 
-console.error = function(...args) {
+console.error = function (...args) {
   originalError.apply(console, args);
   debugLogs.push({ type: 'error', message: args.join(' '), time: new Date().toLocaleTimeString() });
   updateDebugPanel();
 };
 
-console.warn = function(...args) {
+console.warn = function (...args) {
   originalWarn.apply(console, args);
   debugLogs.push({ type: 'warn', message: args.join(' '), time: new Date().toLocaleTimeString() });
   updateDebugPanel();
@@ -29,10 +29,10 @@ console.warn = function(...args) {
 function updateDebugPanel() {
   const panel = document.getElementById('debugPanel');
   if (!panel) return;
-  
+
   const logsList = panel.querySelector('.debug-logs');
   if (!logsList) return;
-  
+
   logsList.innerHTML = debugLogs.slice(-20).map(log => `
     <div class="debug-log ${log.type}">
       <span class="debug-time">${log.time}</span>
@@ -40,7 +40,7 @@ function updateDebugPanel() {
       <span class="debug-message">${log.message}</span>
     </div>
   `).join('');
-  
+
   logsList.scrollTop = logsList.scrollHeight;
 }
 
@@ -54,34 +54,34 @@ class TripGroupDetailPage {
     this.balances = {};
     this.currentTab = 'expenses';
     this.currentUserId = null;
-    
+
     this.init();
   }
 
   async init() {
     // Create debug panel
     this.createDebugPanel();
-    
+
     console.log('Initializing Trip Group Detail Page');
-    
+
     // Get group ID from URL
     const params = new URLSearchParams(window.location.search);
     this.groupId = params.get('id');
-    
+
     console.log('Group ID from URL:', this.groupId);
-    
+
     if (!this.groupId) {
       console.error('No group ID provided');
       window.location.href = 'trip-groups.html';
       return;
     }
-    
+
     const user = await this.waitForAuth();
     if (!user) return; // Redirecting to login
-    
+
     this.currentUserId = authService.getCurrentUser()?.uid;
     console.log('Current user ID:', this.currentUserId);
-    
+
     this.bindEvents();
     await this.loadGroupData();
   }
@@ -105,7 +105,7 @@ class TripGroupDetailPage {
       z-index: 10000;
       box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     `;
-    
+
     panel.innerHTML = `
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid #4A90E2; padding-bottom: 5px;">
         <strong>Debug Logs</strong>
@@ -119,20 +119,20 @@ class TripGroupDetailPage {
         padding: 8px;
       "></div>
     `;
-    
+
     document.body.appendChild(panel);
   }
 
   async waitForAuth() {
     // Wait for auth service to initialize
     const user = await authService.waitForAuth();
-    
+
     if (!user) {
       // Not logged in, redirect to login
       window.location.href = 'login.html';
       return null;
     }
-    
+
     return user;
   }
 
@@ -141,46 +141,46 @@ class TripGroupDetailPage {
     document.querySelectorAll('.detail-tabs .tab-btn').forEach(btn => {
       btn.addEventListener('click', (e) => this.switchTab(e.target.dataset.tab));
     });
-    
+
     // Add expense button
     document.getElementById('addExpenseBtn')?.addEventListener('click', () => this.openExpenseModal());
-    document.getElementById('closeExpenseModalBtn')?.addEventListener('click', () => this.closeExpenseModal());
+    document.getElementById('closeExpenseFormBtn')?.addEventListener('click', () => this.closeExpenseModal());
     document.getElementById('cancelExpenseBtn')?.addEventListener('click', () => this.closeExpenseModal());
     document.getElementById('expenseForm')?.addEventListener('submit', (e) => this.handleExpenseSubmit(e));
-    
+
     // Settings/Archive button
     document.getElementById('settingsBtn')?.addEventListener('click', () => this.handleArchiveGroup());
-    
+
     // Settle up button
     document.getElementById('settleUpBtn')?.addEventListener('click', () => this.openSettlementModal());
     document.getElementById('closeSettlementModalBtn')?.addEventListener('click', () => this.closeSettlementModal());
     document.getElementById('cancelSettlementBtn')?.addEventListener('click', () => this.closeSettlementModal());
     document.getElementById('settlementForm')?.addEventListener('submit', (e) => this.handleSettlementSubmit(e));
-    
+
     // Add member button
     document.getElementById('addMemberBtn')?.addEventListener('click', () => this.openMemberModal());
     document.getElementById('closeMemberModalBtn')?.addEventListener('click', () => this.closeMemberModal());
     document.getElementById('cancelMemberBtn')?.addEventListener('click', () => this.closeMemberModal());
     document.getElementById('memberForm')?.addEventListener('submit', (e) => this.handleMemberSubmit(e));
-    
+
     // Split type change - use event delegation
     document.addEventListener('change', (e) => {
       if (e.target.name === 'splitType') {
         this.updateSplitInputs();
       }
     });
-    
+
     // Amount change for split calculation - use event delegation
     document.addEventListener('input', (e) => {
       if (e.target.id === 'expenseAmount') {
         this.updateSplitAmounts();
       }
     });
-    
+
     // Filters
     document.getElementById('categoryFilter')?.addEventListener('change', () => this.filterExpenses());
     document.getElementById('memberFilter')?.addEventListener('change', () => this.filterExpenses());
-    
+
     // Close modals on overlay click - use event delegation
     document.addEventListener('click', (e) => {
       // Check if clicked element is a modal overlay
@@ -194,21 +194,21 @@ class TripGroupDetailPage {
 
   async loadGroupData() {
     this.showLoading(true);
-    
+
     try {
       console.log('Loading group data for group:', this.groupId);
-      
+
       // Load group details
       console.log('Fetching group details...');
       const groupResult = await tripGroupsService.getGroup(this.groupId);
       console.log('Group result:', groupResult);
-      
+
       if (!groupResult.success) {
         throw new Error(groupResult.error);
       }
       this.group = groupResult.data;
       console.log('Group loaded:', this.group.name);
-      
+
       // Load members, expenses, settlements in parallel
       console.log('Loading members, expenses, and settlements...');
       [this.members, this.expenses, this.settlements] = await Promise.all([
@@ -216,16 +216,16 @@ class TripGroupDetailPage {
         tripGroupsService.getGroupExpenses(this.groupId),
         tripGroupsService.getSettlements(this.groupId)
       ]);
-      
+
       console.log('Members loaded:', this.members.length);
       console.log('Expenses loaded:', this.expenses.length);
       console.log('Settlements loaded:', this.settlements.length);
-      
+
       // Calculate balances
       console.log('Calculating balances...');
       this.balances = await tripGroupsService.calculateBalances(this.groupId);
       console.log('Balances calculated:', this.balances);
-      
+
       // Render everything
       console.log('Rendering UI...');
       this.renderHeader();
@@ -237,7 +237,7 @@ class TripGroupDetailPage {
       this.renderAnalytics();
       this.populateFilters();
       this.populateModalSelects();
-      
+
       console.log('UI rendered successfully');
     } catch (error) {
       console.error('Error loading group data:', error);
@@ -250,24 +250,24 @@ class TripGroupDetailPage {
   renderHeader() {
     document.getElementById('groupName').textContent = this.group.name;
     document.title = `${this.group.name} - Rupiya`;
-    
+
     const startDate = this.group.startDate?.toDate ? this.group.startDate.toDate() : null;
     const endDate = this.group.endDate?.toDate ? this.group.endDate.toDate() : null;
-    
+
     let dateText = 'No dates set';
     if (startDate && endDate) {
       dateText = `${this.formatDate(startDate)} - ${this.formatDate(endDate)}`;
     } else if (startDate) {
       dateText = `From ${this.formatDate(startDate)}`;
     }
-    
+
     // Add status badge if archived
     if (this.group.status === 'archived') {
       dateText += ' • Archived';
     }
-    
+
     document.getElementById('groupDates').textContent = dateText;
-    
+
     // Disable add expense button for archived groups
     const addExpenseBtn = document.getElementById('addExpenseBtn');
     if (addExpenseBtn) {
@@ -284,24 +284,24 @@ class TripGroupDetailPage {
   renderBudget() {
     const budgetSection = document.getElementById('budgetSection');
     const budget = this.group.budget?.total || 0;
-    
+
     if (budget <= 0) {
       budgetSection.style.display = 'none';
       return;
     }
-    
+
     budgetSection.style.display = 'block';
-    
+
     const spent = this.group.totalExpenses || 0;
     const remaining = budget - spent;
     const progress = Math.min(100, (spent / budget) * 100);
-    
+
     document.getElementById('budgetAmount').textContent = `₹${spent.toLocaleString('en-IN')} / ₹${budget.toLocaleString('en-IN')}`;
-    document.getElementById('budgetRemaining').textContent = remaining >= 0 
+    document.getElementById('budgetRemaining').textContent = remaining >= 0
       ? `₹${remaining.toLocaleString('en-IN')} remaining`
       : `₹${Math.abs(remaining).toLocaleString('en-IN')} over budget`;
     document.getElementById('budgetPercent').textContent = `${progress.toFixed(0)}%`;
-    
+
     const fill = document.getElementById('budgetFill');
     fill.style.width = `${progress}%`;
     fill.className = 'budget-progress-fill ' + (progress >= 100 ? 'danger' : progress >= 80 ? 'warning' : 'safe');
@@ -311,13 +311,13 @@ class TripGroupDetailPage {
   async renderBalances() {
     const grid = document.getElementById('balancesGrid');
     const debtsList = document.getElementById('debtsList');
-    
+
     // Render balance cards
     grid.innerHTML = this.members.map(member => {
       const balance = this.balances[member.id] || 0;
       const balanceClass = balance > 0.01 ? 'positive' : balance < -0.01 ? 'negative' : 'settled';
       const balanceLabel = balance > 0.01 ? 'gets back' : balance < -0.01 ? 'owes' : 'settled';
-      
+
       return `
         <div class="balance-card">
           <div class="balance-avatar">${member.name.charAt(0).toUpperCase()}</div>
@@ -327,10 +327,10 @@ class TripGroupDetailPage {
         </div>
       `;
     }).join('');
-    
+
     // Render simplified debts
     const simplifiedDebts = await tripGroupsService.simplifyDebts(this.groupId);
-    
+
     if (simplifiedDebts.length === 0) {
       debtsList.innerHTML = '<div class="debts-settled">✅ All settled up!</div>';
     } else {
@@ -348,23 +348,23 @@ class TripGroupDetailPage {
   renderExpenses() {
     const list = document.getElementById('expensesList');
     const empty = document.getElementById('expensesEmpty');
-    
+
     if (this.expenses.length === 0) {
       list.innerHTML = '';
       empty.style.display = 'block';
       return;
     }
-    
+
     empty.style.display = 'none';
-    
+
     // Get member lookup
     const memberLookup = {};
     this.members.forEach(m => memberLookup[m.id] = m);
-    
+
     list.innerHTML = this.expenses.map(expense => {
       const paidByMember = memberLookup[expense.paidBy];
       const date = expense.date?.toDate ? expense.date.toDate() : new Date();
-      
+
       return `
         <div class="expense-item" data-expense-id="${expense.id}">
           <div class="expense-main">
@@ -386,24 +386,24 @@ class TripGroupDetailPage {
   renderSettlements() {
     const list = document.getElementById('settlementsList');
     const empty = document.getElementById('settlementsEmpty');
-    
+
     if (this.settlements.length === 0) {
       list.innerHTML = '';
       empty.style.display = 'block';
       return;
     }
-    
+
     empty.style.display = 'none';
-    
+
     // Get member lookup
     const memberLookup = {};
     this.members.forEach(m => memberLookup[m.id] = m);
-    
+
     list.innerHTML = this.settlements.map(settlement => {
       const fromMember = memberLookup[settlement.fromMemberId];
       const toMember = memberLookup[settlement.toMemberId];
       const date = settlement.date?.toDate ? settlement.date.toDate() : new Date();
-      
+
       return `
         <div class="settlement-item">
           <div class="settlement-parties">
@@ -420,12 +420,12 @@ class TripGroupDetailPage {
 
   renderMembers() {
     const grid = document.getElementById('membersGrid');
-    
+
     grid.innerHTML = this.members.map(member => {
       const balance = this.balances[member.id] || 0;
       const balanceClass = balance > 0.01 ? 'positive' : balance < -0.01 ? 'negative' : 'settled';
       const isCurrentUser = member.userId === this.currentUserId;
-      
+
       return `
         <div class="member-card">
           <div class="member-avatar">${member.name.charAt(0).toUpperCase()}</div>
@@ -449,17 +449,17 @@ class TripGroupDetailPage {
     // Calculate category breakdown
     const categoryTotals = {};
     let totalExpenses = 0;
-    
+
     this.expenses.forEach(expense => {
       const category = expense.category || 'Other';
       categoryTotals[category] = (categoryTotals[category] || 0) + expense.amount;
       totalExpenses += expense.amount;
     });
-    
+
     // Sort categories by amount
     const sortedCategories = Object.entries(categoryTotals)
       .sort((a, b) => b[1] - a[1]);
-    
+
     // Render category breakdown
     const breakdownContainer = document.getElementById('categoryBreakdown');
     if (sortedCategories.length === 0) {
@@ -468,7 +468,7 @@ class TripGroupDetailPage {
       breakdownContainer.innerHTML = sortedCategories.map(([category, amount]) => {
         const percentage = totalExpenses > 0 ? (amount / totalExpenses) * 100 : 0;
         const categoryClass = category.toLowerCase().replace(/[^a-z]/g, '-');
-        
+
         return `
           <div class="category-bar-item">
             <div class="category-bar-header">
@@ -482,11 +482,11 @@ class TripGroupDetailPage {
         `;
       }).join('');
     }
-    
+
     // Calculate trip statistics
     const expenseCount = this.expenses.length;
     const avgExpense = expenseCount > 0 ? totalExpenses / expenseCount : 0;
-    
+
     // Calculate trip duration for daily average
     let dailyAvg = 0;
     if (this.group.startDate && this.group.endDate) {
@@ -502,10 +502,10 @@ class TripGroupDetailPage {
       const days = Math.max(1, Math.ceil((maxDate - minDate) / (1000 * 60 * 60 * 24)) + 1);
       dailyAvg = totalExpenses / days;
     }
-    
+
     const perPerson = this.members.length > 0 ? totalExpenses / this.members.length : 0;
     const topCategory = sortedCategories.length > 0 ? sortedCategories[0][0] : '-';
-    
+
     // Update stats
     document.getElementById('statTotalExpenses').textContent = `₹${totalExpenses.toLocaleString('en-IN')}`;
     document.getElementById('statExpenseCount').textContent = expenseCount;
@@ -519,10 +519,10 @@ class TripGroupDetailPage {
     // Category filter
     const categoryFilter = document.getElementById('categoryFilter');
     const categories = this.group.categories || tripGroupsService.getDefaultCategories();
-    
+
     categoryFilter.innerHTML = '<option value="">All Categories</option>' +
       categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
-    
+
     // Member filter
     const memberFilter = document.getElementById('memberFilter');
     memberFilter.innerHTML = '<option value="">All Members</option>' +
@@ -535,30 +535,30 @@ class TripGroupDetailPage {
     const categories = this.group.categories || tripGroupsService.getDefaultCategories();
     expenseCategory.innerHTML = '<option value="">Select category</option>' +
       categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
-    
+
     // Paid by select
     const paidBySelect = document.getElementById('expensePaidBy');
     paidBySelect.innerHTML = '<option value="">Select member</option>' +
       this.members.map(m => `<option value="${m.id}">${this.escapeHtml(m.name)}</option>`).join('');
-    
+
     // Set default to current user
     const currentUserMember = this.members.find(m => m.userId === this.currentUserId);
     if (currentUserMember) {
       paidBySelect.value = currentUserMember.id;
     }
-    
+
     // Settlement selects
     const settlementFrom = document.getElementById('settlementFrom');
     const settlementTo = document.getElementById('settlementTo');
     const memberOptions = '<option value="">Select member</option>' +
       this.members.map(m => `<option value="${m.id}">${this.escapeHtml(m.name)}</option>`).join('');
-    
+
     settlementFrom.innerHTML = memberOptions;
     settlementTo.innerHTML = memberOptions;
-    
+
     // Set default date
     document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0];
-    
+
     // Populate split members
     this.renderSplitMembers();
   }
@@ -566,7 +566,7 @@ class TripGroupDetailPage {
   renderSplitMembers() {
     const container = document.getElementById('splitMembers');
     const splitType = document.querySelector('input[name="splitType"]:checked')?.value || 'equal';
-    
+
     container.innerHTML = this.members.map(member => `
       <div class="split-member-row">
         <input type="checkbox" id="split_${member.id}" value="${member.id}" checked>
@@ -577,17 +577,17 @@ class TripGroupDetailPage {
         ` : ''}
       </div>
     `).join('');
-    
+
     // Bind checkbox changes
     container.querySelectorAll('input[type="checkbox"]').forEach(cb => {
       cb.addEventListener('change', () => this.updateSplitAmounts());
     });
-    
+
     // Bind amount changes
     container.querySelectorAll('.split-member-amount').forEach(input => {
       input.addEventListener('input', () => this.updateSplitTotal());
     });
-    
+
     this.updateSplitAmounts();
   }
 
@@ -599,27 +599,27 @@ class TripGroupDetailPage {
     const amount = parseFloat(document.getElementById('expenseAmount').value) || 0;
     const splitType = document.querySelector('input[name="splitType"]:checked')?.value || 'equal';
     const checkedMembers = document.querySelectorAll('#splitMembers input[type="checkbox"]:checked');
-    
+
     if (splitType === 'equal' && checkedMembers.length > 0) {
       const splitAmount = amount / checkedMembers.length;
       document.getElementById('splitTotal').textContent = amount.toFixed(2);
     }
-    
+
     this.updateSplitTotal();
   }
 
   updateSplitTotal() {
     const splitType = document.querySelector('input[name="splitType"]:checked')?.value || 'equal';
     const amount = parseFloat(document.getElementById('expenseAmount').value) || 0;
-    
+
     if (splitType === 'equal') {
       document.getElementById('splitTotal').textContent = amount.toFixed(2);
       return;
     }
-    
+
     const inputs = document.querySelectorAll('.split-member-amount');
     let total = 0;
-    
+
     inputs.forEach(input => {
       const row = input.closest('.split-member-row');
       const checkbox = row.querySelector('input[type="checkbox"]');
@@ -632,27 +632,27 @@ class TripGroupDetailPage {
         }
       }
     });
-    
+
     document.getElementById('splitTotal').textContent = total.toFixed(2);
   }
 
   filterExpenses() {
     const category = document.getElementById('categoryFilter').value;
     const memberId = document.getElementById('memberFilter').value;
-    
+
     let filtered = [...this.expenses];
-    
+
     if (category) {
       filtered = filtered.filter(e => e.category === category);
     }
-    
+
     if (memberId) {
-      filtered = filtered.filter(e => 
-        e.paidBy === memberId || 
+      filtered = filtered.filter(e =>
+        e.paidBy === memberId ||
         e.splits.some(s => s.memberId === memberId)
       );
     }
-    
+
     // Re-render with filtered expenses
     const originalExpenses = this.expenses;
     this.expenses = filtered;
@@ -662,15 +662,15 @@ class TripGroupDetailPage {
 
   switchTab(tab) {
     this.currentTab = tab;
-    
+
     document.querySelectorAll('.detail-tabs .tab-btn').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.tab === tab);
     });
-    
+
     document.querySelectorAll('.tab-content').forEach(content => {
       content.classList.remove('active');
     });
-    
+
     document.getElementById(`${tab}Tab`)?.classList.add('active');
   }
 
@@ -679,16 +679,16 @@ class TripGroupDetailPage {
   openExpenseModal() {
     document.getElementById('expenseForm').reset();
     document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0];
-    
+
     // Set default paid by to current user
     const currentUserMember = this.members.find(m => m.userId === this.currentUserId);
     if (currentUserMember) {
       document.getElementById('expensePaidBy').value = currentUserMember.id;
     }
-    
+
     // Render split members after modal is about to open
     this.renderSplitMembers();
-    
+
     // Open modal with correct class
     const modal = document.getElementById('addExpenseModal');
     modal.classList.add('show');
@@ -729,18 +729,18 @@ class TripGroupDetailPage {
 
   async handleExpenseSubmit(e) {
     e.preventDefault();
-    
+
     const amount = parseFloat(document.getElementById('expenseAmount').value);
     const category = document.getElementById('expenseCategory').value;
     const description = document.getElementById('expenseDescription').value.trim();
     const date = document.getElementById('expenseDate').value;
     const paidBy = document.getElementById('expensePaidBy').value;
     const splitType = document.querySelector('input[name="splitType"]:checked')?.value || 'equal';
-    
+
     // Get selected members and their splits
     const checkedMembers = document.querySelectorAll('#splitMembers input[type="checkbox"]:checked');
     const splits = [];
-    
+
     if (splitType === 'equal') {
       const splitAmount = amount / checkedMembers.length;
       checkedMembers.forEach(cb => {
@@ -754,7 +754,7 @@ class TripGroupDetailPage {
         const row = cb.closest('.split-member-row');
         const input = row.querySelector('.split-member-amount');
         const value = parseFloat(input?.value) || 0;
-        
+
         splits.push({
           memberId: cb.value,
           amount: splitType === 'percentage' ? Math.round((amount * value / 100) * 100) / 100 : value,
@@ -762,16 +762,16 @@ class TripGroupDetailPage {
         });
       });
     }
-    
+
     // Validate splits sum
     const splitSum = splits.reduce((sum, s) => sum + s.amount, 0);
     if (Math.abs(splitSum - amount) > 0.01) {
       this.showToast('Split amounts must equal total expense', 'error');
       return;
     }
-    
+
     this.setExpenseLoading(true);
-    
+
     try {
       const result = await tripGroupsService.addGroupExpense(this.groupId, {
         amount,
@@ -782,11 +782,11 @@ class TripGroupDetailPage {
         splitType,
         splits
       });
-      
+
       if (!result.success) {
         throw new Error(result.error);
       }
-      
+
       this.showToast('Expense added successfully!', 'success');
       this.closeExpenseModal();
       await this.loadGroupData();
@@ -800,19 +800,19 @@ class TripGroupDetailPage {
 
   async handleSettlementSubmit(e) {
     e.preventDefault();
-    
+
     const fromMemberId = document.getElementById('settlementFrom').value;
     const toMemberId = document.getElementById('settlementTo').value;
     const amount = parseFloat(document.getElementById('settlementAmount').value);
     const notes = document.getElementById('settlementNotes').value.trim();
-    
+
     if (fromMemberId === toMemberId) {
       this.showToast('Payer and receiver cannot be the same', 'error');
       return;
     }
-    
+
     this.setSettlementLoading(true);
-    
+
     try {
       const result = await tripGroupsService.recordSettlement(this.groupId, {
         fromMemberId,
@@ -820,11 +820,11 @@ class TripGroupDetailPage {
         amount,
         notes
       });
-      
+
       if (!result.success) {
         throw new Error(result.error);
       }
-      
+
       this.showToast('Settlement recorded!', 'success');
       this.closeSettlementModal();
       await this.loadGroupData();
@@ -838,24 +838,24 @@ class TripGroupDetailPage {
 
   async handleMemberSubmit(e) {
     e.preventDefault();
-    
+
     const name = document.getElementById('newMemberName').value.trim();
     const email = document.getElementById('newMemberEmail').value.trim();
     const phone = document.getElementById('newMemberPhone').value.trim();
-    
+
     this.setMemberLoading(true);
-    
+
     try {
       const result = await tripGroupsService.addMember(this.groupId, {
         name,
         email,
         phone
       });
-      
+
       if (!result.success) {
         throw new Error(result.error);
       }
-      
+
       this.showToast('Member added!', 'success');
       this.closeMemberModal();
       await this.loadGroupData();
@@ -877,7 +877,7 @@ class TripGroupDetailPage {
     const btn = document.getElementById('saveExpenseBtn');
     const text = document.getElementById('saveExpenseBtnText');
     const spinner = document.getElementById('saveExpenseBtnSpinner');
-    
+
     btn.disabled = loading;
     text.style.display = loading ? 'none' : 'inline';
     spinner.style.display = loading ? 'inline-block' : 'none';
@@ -887,7 +887,7 @@ class TripGroupDetailPage {
     const btn = document.getElementById('saveSettlementBtn');
     const text = document.getElementById('saveSettlementBtnText');
     const spinner = document.getElementById('saveSettlementBtnSpinner');
-    
+
     btn.disabled = loading;
     text.style.display = loading ? 'none' : 'inline';
     spinner.style.display = loading ? 'inline-block' : 'none';
@@ -897,7 +897,7 @@ class TripGroupDetailPage {
     const btn = document.getElementById('saveMemberBtn');
     const text = document.getElementById('saveMemberBtnText');
     const spinner = document.getElementById('saveMemberBtnSpinner');
-    
+
     btn.disabled = loading;
     text.style.display = loading ? 'none' : 'inline';
     spinner.style.display = loading ? 'inline-block' : 'none';
@@ -924,13 +924,13 @@ class TripGroupDetailPage {
       container.className = 'toast-container';
       document.body.appendChild(container);
     }
-    
+
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
     toast.textContent = message;
-    
+
     container.appendChild(toast);
-    
+
     setTimeout(() => {
       toast.classList.add('fade-out');
       setTimeout(() => toast.remove(), 300);
@@ -939,22 +939,22 @@ class TripGroupDetailPage {
 
   async handleArchiveGroup() {
     if (!this.group) return;
-    
+
     if (this.group.status === 'archived') {
       this.showToast('This group is already archived', 'info');
       return;
     }
-    
+
     const confirmed = confirm(`Are you sure you want to archive "${this.group.name}"?\n\nArchived groups cannot have new expenses added, but you can still view history and record settlements.`);
     if (!confirmed) return;
-    
+
     try {
       const result = await tripGroupsService.archiveGroup(this.groupId);
-      
+
       if (!result.success) {
         throw new Error(result.error);
       }
-      
+
       this.showToast('Group archived successfully', 'success');
       await this.loadGroupData();
     } catch (error) {

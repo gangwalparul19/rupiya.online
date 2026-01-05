@@ -264,7 +264,7 @@
     <div class="modal-container">
       <div class="modal-header">
         <h2 class="modal-title">Add Expense</h2>
-        <button class="modal-close" id="closeExpenseModalBtn">
+        <button class="modal-close" id="closeExpenseFormBtn">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
           </svg>
@@ -330,15 +330,15 @@
             <span>Total: ₹<span id="splitTotal">0.00</span></span>
           </div>
         </div>
-      </form>
 
-      <div class="modal-footer">
-        <button type="button" class="btn btn-outline" id="cancelExpenseBtn">Cancel</button>
-        <button type="submit" form="expenseForm" class="btn btn-primary" id="saveExpenseBtn">
-          <span id="saveExpenseBtnText">Add Expense</span>
-          <span id="saveExpenseBtnSpinner" class="spinner" style="display: none;"></span>
-        </button>
-      </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" id="cancelExpenseBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="saveExpenseBtn">
+            <span id="saveExpenseBtnText">Add Expense</span>
+            <span id="saveExpenseBtnSpinner" class="spinner" style="display: none;"></span>
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 

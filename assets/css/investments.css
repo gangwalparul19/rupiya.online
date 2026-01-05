@@ -1,6 +1,8 @@
 /* Investments Page Styles */
 
 /* Override dark mode for investments page */
+/* Override dark mode for investments page */
+/* We want to rely on the global dark mode variables where possible, but if specific overrides are needed, use variables */
 [data-theme="dark"] .summary-card,
 [data-theme="dark"] .add-investment-section,
 [data-theme="dark"] .investments-container,
@@ -8,38 +10,56 @@
 [data-theme="dark"] .empty-state,
 [data-theme="dark"] .loading-state,
 [data-theme="dark"] .modal-container {
-  background: white;
-  color: #2C3E50;
+  background: var(--bg-card);
+  border-color: var(--border-color);
+  color: var(--text-primary);
 }
 
 [data-theme="dark"] .form-group input,
 [data-theme="dark"] .form-group select,
 [data-theme="dark"] .form-group textarea {
-  background: white;
-  color: #2C3E50;
-  border-color: #E8E8E8;
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--border-color);
 }
 
 [data-theme="dark"] .form-group input:focus,
 [data-theme="dark"] .form-group select:focus,
 [data-theme="dark"] .form-group textarea:focus {
-  border-color: #4A90E2;
+  border-color: var(--primary-blue);
 }
 
 [data-theme="dark"] .form-group label {
-  color: #2C3E50;
+  color: var(--text-primary);
 }
 
 [data-theme="dark"] .modal-header,
 [data-theme="dark"] .modal-body,
 [data-theme="dark"] .modal-footer {
-  background: white;
-  color: #2C3E50;
-  border-color: #E8E8E8;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border-color: var(--border-color);
 }
 
 [data-theme="dark"] .modal-title {
-  color: #2C3E50;
+  color: var(--text-primary);
+}
+
+/* Fix text colors getting lost in dark mode */
+[data-theme="dark"] .summary-value {
+  color: var(--text-primary);
+}
+[data-theme="dark"] .add-investment-title {
+  color: var(--text-primary);
+}
+[data-theme="dark"] .investment-name {
+  color: var(--text-primary);
+}
+[data-theme="dark"] .investment-stat-value {
+  color: var(--text-primary);
+}
+[data-theme="dark"] .empty-state-title {
+  color: var(--text-primary);
 }
 
 /* Portfolio Summary */
