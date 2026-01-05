@@ -90,6 +90,10 @@ class TripGroupsService {
       const groupRef = await addDoc(collection(db, this.groupsCollection), tripGroup);
       const groupId = groupRef.id;
 
+      // Add a small delay to ensure the group document is readable
+      // This handles Firestore's eventual consistency
+      await new Promise(resolve => setTimeout(resolve, 100));
+
       // Add creator as admin member
       const memberId = `${groupId}_${userId}`;
       const memberData = {

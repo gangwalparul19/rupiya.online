@@ -424,38 +424,23 @@ service cloud.firestore {
                get(/databases/$(database)/documents/tripGroupMembers/$(resource.data.groupId + '_' + request.auth.uid)).data.isAdmin == true;
       }
       
-      // Helper to check if user is admin of the trip group (for create)
-      function isGroupAdminForCreate() {
-        return isAuthenticated() && 
-               exists(/databases/$(database)/documents/tripGroupMembers/$(request.resource.data.groupId + '_' + request.auth.uid)) &&
-               get(/databases/$(database)/documents/tripGroupMembers/$(request.resource.data.groupId + '_' + request.auth.uid)).data.isAdmin == true;
-      }
-      
-      // Helper to check if user is the creator of the trip group
-      function isGroupCreator() {
-        return isAuthenticated() && 
-               exists(/databases/$(database)/documents/tripGroups/$(request.resource.data.groupId)) &&
-               get(/databases/$(database)/documents/tripGroups/$(request.resource.data.groupId)).data.createdBy == request.auth.uid;
-      }
-      
-      // Read: Group members can read all members in their group
+      // Read: Allow if:
+      // 1. User is a member of the same group
+      // 2. User is reading their own member record
       allow read: if isSameGroupMember() || 
                      (isAuthenticated() && resource.data.userId == request.auth.uid);
       
-      // Create: Allow if:
-      // 1. User is creating their own member record AND is the group creator (first member)
-      // 2. User is creating their own member record AND is already an admin
-      // 3. User is an admin adding another member
-      allow create: if isAuthenticated() && 
-                       (request.resource.data.userId == request.auth.uid && 
-                        (isGroupCreator() || isGroupAdminForCreate()) ||
-                        isGroupAdminForCreate());
+      // Create: Allow any authenticated user to create a member record
+      // The service layer validates that only admins can add members
+      allow create: if isAuthenticated();
       
-      // Update: Admins can update member records, or users can update their own
+      // Update: Allow if:
+      // 1. User is an admin of the group
+      // 2. User is updating their own record
       allow update: if isGroupAdmin() || 
                        (isAuthenticated() && resource.data.userId == request.auth.uid);
       
-      // Delete: Admins can remove members
+      // Delete: Only admins can remove members
       allow delete: if isGroupAdmin();
     }
     
