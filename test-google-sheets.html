@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Google Sheets Integration</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 20px;
+    }
+    .test-section {
+      margin: 20px 0;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 5px;
+      cursor: pointer;
+      background: #4A90E2;
+      color: white;
+      border: none;
+      border-radius: 4px;
+    }
+    button:hover {
+      background: #357ABD;
+    }
+    .result {
+      margin-top: 10px;
+      padding: 10px;
+      background: #f5f5f5;
+      border-radius: 4px;
+      white-space: pre-wrap;
+      font-family: monospace;
+      font-size: 12px;
+    }
+    .error {
+      background: #ffebee;
+      color: #c62828;
+    }
+    .success {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+    input {
+      padding: 8px;
+      margin: 5px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      width: 200px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧪 Google Sheets Price Service Test</h1>
+  
+  <div class="test-section">
+    <h2>1. Test Single Symbol Lookup</h2>
+    <input type="text" id="symbolInput" placeholder="Enter symbol (e.g., RELIANCE.NS)" value="RELIANCE.NS">
+    <button onclick="testSingleSymbol()">Get Price</button>
+    <div id="singleResult" class="result"></div>
+  </div>
+
+  <div class="test-section">
+    <h2>2. Test Multiple Symbols</h2>
+    <button onclick="testMultipleSymbols()">Get Multiple Prices</button>
+    <div id="multipleResult" class="result"></div>
+  </div>
+
+  <div class="test-section">
+    <h2>3. Test Symbol Search</h2>
+    <input type="text" id="searchInput" placeholder="Search (e.g., RELIANCE)" value="RELIANCE">
+    <button onclick="testSearch()">Search</button>
+    <div id="searchResult" class="result"></div>
+  </div>
+
+  <div class="test-section">
+    <h2>4. Test USD to INR Conversion</h2>
+    <button onclick="testUSDToINR()">Get Exchange Rate</button>
+    <div id="exchangeResult" class="result"></div>
+  </div>
+
+  <div class="test-section">
+    <h2>5. View All Data</h2>
+    <button onclick="viewAllData()">Load All Sheet Data</button>
+    <div id="allDataResult" class="result"></div>
+  </div>
+
+  <script type="module">
+    import googleSheetsPriceService from './assets/js/services/google-sheets-price-service.js';
+
+    // Make service available globally for onclick handlers
+    window.googleSheetsPriceService = googleSheetsPriceService;
+
+    window.testSingleSymbol = async function() {
+      const symbol = document.getElementById('symbolInput').value;
+      const resultDiv = document.getElementById('singleResult');
+      
+      resultDiv.textContent = 'Loading...';
+      resultDiv.className = 'result';
+      
+      try {
+        const data = await googleSheetsPriceService.getLivePrice(symbol);
+        resultDiv.textContent = JSON.stringify(data, null, 2);
+        resultDiv.className = 'result success';
+      } catch (error) {
+        resultDiv.textContent = `Error: ${error.message}`;
+        resultDiv.className = 'result error';
+      }
+    };
+
+    window.testMultipleSymbols = async function() {
+      const symbols = ['RELIANCE.NS', 'TCS.NS', 'INFY.NS', 'HDFCBANK.NS'];
+      const resultDiv = document.getElementById('multipleResult');
+      
+      resultDiv.textContent = 'Loading...';
+      resultDiv.className = 'result';
+      
+      try {
+        const data = await googleSheetsPriceService.getMultiplePrices(symbols);
+        resultDiv.textContent = JSON.stringify(data, null, 2);
+        resultDiv.className = 'result success';
+      } catch (error) {
+        resultDiv.textContent = `Error: ${error.message}`;
+        resultDiv.className = 'result error';
+      }
+    };
+
+    window.testSearch = async function() {
+      const query = document.getElementById('searchInput').value;
+      const resultDiv = document.getElementById('searchResult');
+      
+      resultDiv.textContent = 'Loading...';
+      resultDiv.className = 'result';
+      
+      try {
+        const results = await googleSheetsPriceService.searchSymbols(query, 10);
+        resultDiv.textContent = JSON.stringify(results, null, 2);
+        resultDiv.className = 'result success';
+      } catch (error) {
+        resultDiv.textContent = `Error: ${error.message}`;
+        resultDiv.className = 'result error';
+      }
+    };
+
+    window.testUSDToINR = async function() {
+      const resultDiv = document.getElementById('exchangeResult');
+      
+      resultDiv.textContent = 'Loading...';
+      resultDiv.className = 'result';
+      
+      try {
+        const rate = await googleSheetsPriceService.getUSDToINRRate();
+        const converted = await googleSheetsPriceService.convertUSDToINR(100);
+        resultDiv.textContent = `Exchange Rate: 1 USD = ${rate} INR\n100 USD = ${converted} INR`;
+        resultDiv.className = 'result success';
+      } catch (error) {
+        resultDiv.textContent = `Error: ${error.message}`;
+        resultDiv.className = 'result error';
+      }
+    };
+
+    window.viewAllData = async function() {
+      const resultDiv = document.getElementById('allDataResult');
+      
+      resultDiv.textContent = 'Loading...';
+      resultDiv.className = 'result';
+      
+      try {
+        const data = await googleSheetsPriceService.getAllData();
+        resultDiv.textContent = `Stocks: ${data.stocks.length} rows\nMutual Funds: ${data.mutualFunds.length} rows\n\nFirst 3 stocks:\n${JSON.stringify(data.stocks.slice(0, 3), null, 2)}`;
+        resultDiv.className = 'result success';
+      } catch (error) {
+        resultDiv.textContent = `Error: ${error.message}`;
+        resultDiv.className = 'result error';
+      }
+    };
+
+    // Auto-test on load
+    console.log('Google Sheets Price Service loaded successfully');
+  </script>
+</body>
+</html>

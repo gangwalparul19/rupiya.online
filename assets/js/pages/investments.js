@@ -2,7 +2,7 @@
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
 import investmentHistoryService from '../services/investment-history-service.js';
-import livePriceService from '../services/live-price-service.js';
+import googleSheetsPriceService from '../services/google-sheets-price-service.js'; // Changed from livePriceService
 import symbolSearchService from '../services/symbol-search-service.js';
 import familySwitcher from '../components/family-switcher.js';
 import toast from '../components/toast.js';
@@ -257,13 +257,13 @@ async function handleSubmit(e) {
     // Try to fetch live price
     let livePrice = null;
     try {
-      const priceData = await livePriceService.getLivePrice(formData.symbol);
+      const priceData = await googleSheetsPriceService.getLivePrice(formData.symbol);
       livePrice = priceData.price;
       formData.currentPrice = livePrice;
-      showToast(`Live price fetched: ${formatCurrency(livePrice)}`, 'success');
+      showToast(`Price fetched for ${symbol}: ${formatCurrency(livePrice)}`, 'success');
     } catch (error) {
       console.warn('Could not fetch live price, using manual price:', error);
-      showToast('Using manual price (could not fetch live price)', 'info');
+      showToast('Using manual price (symbol not found in Google Sheets)', 'info');
     }
 
     let result;
@@ -341,7 +341,7 @@ async function updateLivePrices() {
   for (const investment of investments) {
     if (investment.symbol) {
       try {
-        const priceData = await livePriceService.getLivePrice(investment.symbol);
+        const priceData = await googleSheetsPriceService.getLivePrice(investment.symbol);
         investment.livePrice = priceData.price;
         investment.priceChange = priceData.change;
         investment.priceChangePercent = priceData.changePercent;
@@ -351,8 +351,8 @@ async function updateLivePrices() {
         // Add INR conversion for US stocks
         if (priceData.currency === 'USD') {
           try {
-            investment.inrPrice = await livePriceService.convertUSDToINR(priceData.price);
-            investment.inrChange = await livePriceService.convertUSDToINR(priceData.change);
+            investment.inrPrice = await googleSheetsPriceService.convertUSDToINR(priceData.price);
+            investment.inrChange = await googleSheetsPriceService.convertUSDToINR(priceData.change);
             investment.hasInrConversion = true;
           } catch (error) {
             console.warn(`Could not convert ${investment.symbol} to INR:`, error);
@@ -505,9 +505,9 @@ async function updateSummary() {
   let currentValue = 0;
 
   // Get exchange rate for Summary calculations
-  let usdToInrRate = 89.50; // Fallback
+  let usdToInrRate = 83.50; // Fallback
   try {
-    usdToInrRate = await livePriceService.getUSDToINRRate();
+    usdToInrRate = await googleSheetsPriceService.getUSDToINRRate();
   } catch (e) {
     console.warn('Using fallback rate for summary:', e);
   }
@@ -782,7 +782,7 @@ async function selectSymbol(symbol, type) {
   if (currentPriceInput) {
     try {
       currentPriceInput.placeholder = 'Fetching...';
-      const priceData = await livePriceService.getLivePrice(symbol);
+      const priceData = await googleSheetsPriceService.getLivePrice(symbol);
       if (priceData && priceData.price) {
         currentPriceInput.value = priceData.price;
 
@@ -816,7 +816,7 @@ async function refreshInvestmentPrice(investmentId) {
 
   try {
     showToast('Fetching live price...', 'info');
-    const priceData = await livePriceService.getLivePrice(investment.symbol);
+    const priceData = await googleSheetsPriceService.getLivePrice(investment.symbol);
 
     investment.livePrice = priceData.price;
     investment.priceChange = priceData.change;
@@ -827,8 +827,8 @@ async function refreshInvestmentPrice(investmentId) {
     // Add INR conversion for US stocks
     if (priceData.currency === 'USD') {
       try {
-        investment.inrPrice = await livePriceService.convertUSDToINR(priceData.price);
-        investment.inrChange = await livePriceService.convertUSDToINR(priceData.change);
+        investment.inrPrice = await googleSheetsPriceService.convertUSDToINR(priceData.price);
+        investment.inrChange = await googleSheetsPriceService.convertUSDToINR(priceData.change);
         investment.hasInrConversion = true;
       } catch (error) {
         console.warn('Could not convert to INR:', error);
@@ -845,7 +845,7 @@ async function refreshInvestmentPrice(investmentId) {
     await investmentHistoryService.recordPriceUpdate(
       investmentId,
       priceData.price,
-      `Live price updated from Yahoo Finance: ${priceData.price}`
+      `Live price updated from Google Sheets: ${priceData.price}`
     );
 
     renderInvestments();
@@ -855,7 +855,7 @@ async function refreshInvestmentPrice(investmentId) {
     console.error('Error refreshing price:', error);
     // Show user-friendly error message
     if (error.message.includes('not found')) {
-      showToast(`Symbol "${investment.symbol}" not found on Yahoo Finance. Please verify the symbol.`, 'error');
+      showToast(`Symbol "${investment.symbol}" not found in Google Sheets. Please verify the symbol.`, 'error');
     } else {
       showToast(`Failed to fetch live price: ${error.message}`, 'error');
     }
