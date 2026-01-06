@@ -988,6 +988,7 @@
     flex-direction: column;
     text-align: center;
     gap: 0.5rem;
+    min-height: 100px;
   }
   
   .summary-icon {
@@ -1053,10 +1054,14 @@
 
   .investment-card {
     padding: 1rem;
+    min-height: 320px;
+    display: flex;
+    flex-direction: column;
   }
 
   .investment-card-body {
     gap: 0.5rem;
+    flex: 1;
   }
 
   .investment-stats-row {
@@ -1070,6 +1075,7 @@
 
   .investment-card-footer {
     justify-content: flex-end;
+    margin-top: auto;
   }
 
   .modal-container {
