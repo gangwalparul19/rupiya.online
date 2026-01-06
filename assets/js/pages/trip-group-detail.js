@@ -926,32 +926,47 @@ class TripGroupDetailPage {
 
   setExpenseLoading(loading) {
     const btn = document.getElementById('saveExpenseBtn');
-    const text = document.getElementById('saveExpenseBtnText');
-    const spinner = document.getElementById('saveExpenseBtnSpinner');
 
-    btn.disabled = loading;
-    text.style.display = loading ? 'none' : 'inline';
-    spinner.style.display = loading ? 'inline-block' : 'none';
+    if (loading) {
+      btn.disabled = true;
+      btn.innerHTML = `
+        <span class="spinner"></span>
+        <span style="margin-left: 8px;">Saving...</span>
+      `;
+    } else {
+      btn.disabled = false;
+      btn.innerHTML = 'Save Expense';
+    }
   }
 
   setSettlementLoading(loading) {
     const btn = document.getElementById('saveSettlementBtn');
-    const text = document.getElementById('saveSettlementBtnText');
-    const spinner = document.getElementById('saveSettlementBtnSpinner');
 
-    btn.disabled = loading;
-    text.style.display = loading ? 'none' : 'inline';
-    spinner.style.display = loading ? 'inline-block' : 'none';
+    if (loading) {
+      btn.disabled = true;
+      btn.innerHTML = `
+        <span class="spinner"></span>
+        <span style="margin-left: 8px;">Recording...</span>
+      `;
+    } else {
+      btn.disabled = false;
+      btn.innerHTML = 'Record Settlement';
+    }
   }
 
   setMemberLoading(loading) {
     const btn = document.getElementById('saveMemberBtn');
-    const text = document.getElementById('saveMemberBtnText');
-    const spinner = document.getElementById('saveMemberBtnSpinner');
 
-    btn.disabled = loading;
-    text.style.display = loading ? 'none' : 'inline';
-    spinner.style.display = loading ? 'inline-block' : 'none';
+    if (loading) {
+      btn.disabled = true;
+      btn.innerHTML = `
+        <span class="spinner"></span>
+        <span style="margin-left: 8px;">Adding...</span>
+      `;
+    } else {
+      btn.disabled = false;
+      btn.innerHTML = 'Add Member';
+    }
   }
 
   formatDate(date) {

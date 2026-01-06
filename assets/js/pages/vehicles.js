@@ -218,9 +218,13 @@ async function handleSubmit(e) {
     notes: document.getElementById('notes').value.trim()
   };
 
+  // Show loading with text
+  const originalText = saveFormBtnText.textContent;
   saveFormBtn.disabled = true;
-  saveFormBtnText.style.display = 'none';
-  saveFormBtnSpinner.style.display = 'inline-block';
+  saveFormBtn.innerHTML = `
+    <span class="spinner"></span>
+    <span style="margin-left: 8px;">${editingVehicleId ? 'Updating...' : 'Saving...'}</span>
+  `;
 
   try {
     let result;
@@ -242,9 +246,9 @@ async function handleSubmit(e) {
     console.error('Error saving vehicle:', error);
     showToast('Failed to save vehicle', 'error');
   } finally {
+    // Reset button
     saveFormBtn.disabled = false;
-    saveFormBtnText.style.display = 'inline';
-    saveFormBtnSpinner.style.display = 'none';
+    saveFormBtn.innerHTML = originalText;
   }
 }
 
@@ -549,8 +553,10 @@ async function handleSaveFuelLog() {
   }
 
   saveFuelLogBtn.disabled = true;
-  saveFuelLogBtnText.style.display = 'none';
-  saveFuelLogBtnSpinner.style.display = 'inline-block';
+  saveFuelLogBtn.innerHTML = `
+    <span class="spinner"></span>
+    <span style="margin-left: 8px;">Saving...</span>
+  `;
 
   try {
     const fuelLogData = {
@@ -598,9 +604,9 @@ async function handleSaveFuelLog() {
     console.error('Error saving fuel log:', error);
     showToast('Failed to save fuel entry', 'error');
   } finally {
+    // Reset button
     saveFuelLogBtn.disabled = false;
-    saveFuelLogBtnText.style.display = 'inline';
-    saveFuelLogBtnSpinner.style.display = 'none';
+    saveFuelLogBtn.innerHTML = 'Save Fuel Entry';
   }
 }
 
@@ -750,12 +756,12 @@ async function handleSaveMaintenance() {
   }
 
   const saveBtn = document.getElementById('saveMaintenanceBtn');
-  const saveBtnText = document.getElementById('saveMaintenanceBtnText');
-  const saveBtnSpinner = document.getElementById('saveMaintenanceBtnSpinner');
 
   saveBtn.disabled = true;
-  saveBtnText.style.display = 'none';
-  saveBtnSpinner.style.display = 'inline-block';
+  saveBtn.innerHTML = `
+    <span class="spinner"></span>
+    <span style="margin-left: 8px;">Saving...</span>
+  `;
 
   try {
     const vehicle = vehicles.find(v => v.id === vehicleId);
@@ -782,9 +788,9 @@ async function handleSaveMaintenance() {
     console.error('Error saving maintenance:', error);
     showToast('Failed to save maintenance', 'error');
   } finally {
+    // Reset button
     saveBtn.disabled = false;
-    saveBtnText.style.display = 'inline';
-    saveBtnSpinner.style.display = 'none';
+    saveBtn.innerHTML = 'Save Maintenance';
   }
 }
 
@@ -816,12 +822,12 @@ async function handleSaveVehicleIncome() {
   }
 
   const saveBtn = document.getElementById('saveVehicleIncomeBtn');
-  const saveBtnText = document.getElementById('saveVehicleIncomeBtnText');
-  const saveBtnSpinner = document.getElementById('saveVehicleIncomeBtnSpinner');
 
   saveBtn.disabled = true;
-  saveBtnText.style.display = 'none';
-  saveBtnSpinner.style.display = 'inline-block';
+  saveBtn.innerHTML = `
+    <span class="spinner"></span>
+    <span style="margin-left: 8px;">Saving...</span>
+  `;
 
   try {
     const vehicle = vehicles.find(v => v.id === vehicleId);
@@ -849,9 +855,9 @@ async function handleSaveVehicleIncome() {
     console.error('Error saving vehicle income:', error);
     showToast('Failed to save income', 'error');
   } finally {
+    // Reset button
     saveBtn.disabled = false;
-    saveBtnText.style.display = 'inline';
-    saveBtnSpinner.style.display = 'none';
+    saveBtn.innerHTML = 'Save Income';
   }
 }
 
@@ -878,8 +884,10 @@ async function handleDelete() {
   if (!deleteVehicleId) return;
 
   confirmDeleteBtn.disabled = true;
-  deleteBtnText.style.display = 'none';
-  deleteBtnSpinner.style.display = 'inline-block';
+  confirmDeleteBtn.innerHTML = `
+    <span class="spinner"></span>
+    <span style="margin-left: 8px;">Deleting...</span>
+  `;
 
   try {
     const result = await firestoreService.delete('vehicles', deleteVehicleId);
@@ -895,9 +903,9 @@ async function handleDelete() {
     console.error('Error deleting vehicle:', error);
     showToast('Failed to delete vehicle', 'error');
   } finally {
+    // Reset button
     confirmDeleteBtn.disabled = false;
-    deleteBtnText.style.display = 'inline';
-    deleteBtnSpinner.style.display = 'none';
+    confirmDeleteBtn.innerHTML = 'Delete Vehicle';
   }
 }
 

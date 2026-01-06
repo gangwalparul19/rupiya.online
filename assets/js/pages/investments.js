@@ -141,6 +141,13 @@ function setupEventListeners() {
   cancelDeleteBtn.addEventListener('click', hideDeleteModal);
   confirmDeleteBtn.addEventListener('click', handleDelete);
 
+  // Tab buttons
+  document.querySelectorAll('.tab-button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      handleTabClick(btn.dataset.tab);
+    });
+  });
+
   // Symbol search
   const symbolInput = document.getElementById('symbol');
   const typeInput = document.getElementById('type');
@@ -376,9 +383,89 @@ async function updateLivePrices() {
   }
 }
 
+// Current active tab
+let activeTab = 'all';
+
+// Get filtered investments based on active tab
+function getFilteredInvestments() {
+  if (activeTab === 'all') {
+    return investments;
+  }
+  
+  const typeMap = {
+    'stocks': 'Stocks',
+    'mf': 'Mutual Funds',
+    'crypto': 'Cryptocurrency',
+    'other': ['Real Estate', 'Gold', 'Fixed Deposit', 'Other']
+  };
+  
+  const filterType = typeMap[activeTab];
+  
+  if (Array.isArray(filterType)) {
+    return investments.filter(inv => filterType.includes(inv.type));
+  } else {
+    return investments.filter(inv => inv.type === filterType);
+  }
+}
+
+// Handle tab click
+function handleTabClick(tabName) {
+  activeTab = tabName;
+  
+  // Update active tab button
+  document.querySelectorAll('.tab-button').forEach(btn => {
+    btn.classList.remove('active');
+    if (btn.dataset.tab === tabName) {
+      btn.classList.add('active');
+    }
+  });
+  
+  // Re-render investments
+  renderInvestments();
+  updateSummaryForTab();
+}
+
+// Update summary for current tab
+function updateSummaryForTab() {
+  const filteredInvestments = getFilteredInvestments();
+  let totalInvested = 0;
+  let currentValue = 0;
+
+  filteredInvestments.forEach(investment => {
+    const investPurchasePrice = investment.purchasePrice;
+    const investCurrentPrice = investment.livePrice || investment.currentPrice;
+
+    totalInvested += investment.quantity * investPurchasePrice;
+    currentValue += investment.quantity * investCurrentPrice;
+  });
+
+  const totalReturns = currentValue - totalInvested;
+  const returnsPercentage = totalInvested > 0 ? ((totalReturns / totalInvested) * 100).toFixed(2) : 0;
+  const returnsClass = totalReturns >= 0 ? 'positive' : 'negative';
+  const returnsSign = totalReturns >= 0 ? '+' : '';
+
+  totalInvestedEl.textContent = formatCurrency(totalInvested, '₹');
+  currentValueEl.textContent = formatCurrency(currentValue, '₹');
+  totalReturnsEl.textContent = `${returnsSign}${formatCurrency(Math.abs(totalReturns), '₹')}`;
+  returnsPercentageEl.textContent = `${returnsSign}${returnsPercentage}%`;
+  returnsPercentageEl.className = `summary-change ${returnsClass}`;
+}
+
 // Render investments
 function renderInvestments() {
-  investmentsList.innerHTML = investments.map(investment => {
+  const filteredInvestments = getFilteredInvestments();
+  
+  if (filteredInvestments.length === 0) {
+    investmentsList.innerHTML = '';
+    investmentsList.style.display = 'none';
+    emptyState.style.display = 'block';
+    return;
+  }
+  
+  investmentsList.style.display = 'grid';
+  emptyState.style.display = 'none';
+  
+  investmentsList.innerHTML = filteredInvestments.map(investment => {
     // Use live price if available, otherwise use stored current price
     const currentPrice = investment.livePrice || investment.currentPrice;
     const totalInvested = investment.quantity * investment.purchasePrice;
