@@ -7,6 +7,7 @@ import toast from '../components/toast.js';
 import themeManager from '../utils/theme-manager.js';
 import { formatCurrency, formatDate, escapeHtml, formatDateForInput } from '../utils/helpers.js';
 import timezoneService from '../utils/timezone.js';
+import encryptionReauthModal from '../components/encryption-reauth-modal.js';
 
 // Loan type icons
 const loanTypeIcons = {
@@ -46,6 +47,11 @@ async function checkAuth() {
 async function init() {
   const isAuthenticated = await checkAuth();
   if (isAuthenticated) {
+    // Check if encryption reauth is needed
+    encryptionReauthModal.checkAndPrompt(async () => {
+      await loadLoans();
+    });
+    
     await initLoansPage();
   }
 }

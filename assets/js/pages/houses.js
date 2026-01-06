@@ -4,6 +4,7 @@ import firestoreService from '../services/firestore-service.js';
 import crossFeatureIntegrationService from '../services/cross-feature-integration-service.js';
 import toast from '../components/toast.js';
 import { formatCurrency, formatDate, escapeHtml } from '../utils/helpers.js';
+import encryptionReauthModal from '../components/encryption-reauth-modal.js';
 
 // Helper function for toast
 const showToast = (message, type) => toast.show(message, type);
@@ -29,6 +30,11 @@ async function init() {
     window.location.href = 'login.html';
     return;
   }
+
+  // Check if encryption reauth is needed
+  encryptionReauthModal.checkAndPrompt(async () => {
+    await loadHouses();
+  });
 
   // Initialize DOM elements
   initDOMElements();

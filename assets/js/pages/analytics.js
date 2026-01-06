@@ -5,6 +5,7 @@ import familySwitcher from '../components/family-switcher.js';
 import toast from '../components/toast.js';
 import themeManager from '../utils/theme-manager.js';
 import { formatCurrency } from '../utils/helpers.js';
+import encryptionReauthModal from '../components/encryption-reauth-modal.js';
 
 // Helper function for toast
 const showToast = (message, type) => toast.show(message, type);
@@ -43,8 +44,10 @@ async function init() {
   // Load user profile
   loadUserProfile(user);
 
-  // Load data and render charts
-  await loadData();
+  // Check if encryption reauth is needed
+  encryptionReauthModal.checkAndPrompt(async () => {
+    await loadData();
+  });
 }
 
 // Update page context based on family switcher

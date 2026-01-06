@@ -6,6 +6,7 @@ import toast from '../components/toast.js';
 import themeManager from '../utils/theme-manager.js';
 import { Validator } from '../utils/validation.js';
 import { formatCurrency, formatDate, formatDateForInput } from '../utils/helpers.js';
+import encryptionReauthModal from '../components/encryption-reauth-modal.js';
 
 // State management
 const state = {
@@ -28,6 +29,11 @@ async function checkAuth() {
 async function init() {
   const isAuthenticated = await checkAuth();
   if (!isAuthenticated) return;
+  
+  // Check if encryption reauth is needed
+  encryptionReauthModal.checkAndPrompt(async () => {
+    await loadGoals();
+  });
   
   await initPage();
 }

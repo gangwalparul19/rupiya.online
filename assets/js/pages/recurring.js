@@ -8,6 +8,7 @@ import toast from '../components/toast.js';
 import recurringProcessor from '../services/recurring-processor.js';
 import { formatCurrency, formatDate, escapeHtml, formatDateForInput } from '../utils/helpers.js';
 import timezoneService from '../utils/timezone.js';
+import encryptionReauthModal from '../components/encryption-reauth-modal.js';
 
 // Helper function for toast
 const showToast = (message, type) => toast.show(message, type);
@@ -61,8 +62,10 @@ async function init() {
   // Load user payment methods
   await loadUserPaymentMethods();
 
-  // Load recurring transactions
-  await loadRecurringTransactions();
+  // Check if encryption reauth is needed
+  encryptionReauthModal.checkAndPrompt(async () => {
+    await loadRecurringTransactions();
+  });
 
   // Set default date to today if element exists
   const startDateInput = document.getElementById('startDate');

@@ -153,7 +153,12 @@ class EncryptionService {
     this.encryptionKey = null;
     this.salt = null;
     this.isInitialized = false;
-    sessionStorage.removeItem(this.SESSION_KEY_STORAGE);
+    this._restorePromise = null;
+    try {
+      sessionStorage.removeItem(this.SESSION_KEY_STORAGE);
+    } catch (e) {
+      console.warn('[Encryption] Could not clear session storage:', e);
+    }
     console.log('[Encryption] Keys cleared');
   }
 
@@ -299,7 +304,7 @@ class EncryptionService {
     }
 
     // If no encrypted data, return as-is
-    if (!data._encrypted) {
+    if (!data || !data._encrypted) {
       return data;
     }
 
@@ -307,8 +312,18 @@ class EncryptionService {
     await this.waitForRestore();
 
     if (!this.isReady()) {
-      console.warn('[Encryption] Not initialized, cannot decrypt data');
-      return data;
+      console.warn('[Encryption] Not initialized, returning data with encrypted fields visible');
+      // Return data but try to show something useful
+      const partialData = { ...data };
+      // Copy encrypted fields as-is so UI doesn't break completely
+      if (data._encrypted) {
+        for (const [field, value] of Object.entries(data._encrypted)) {
+          partialData[field] = '[Encrypted]';
+        }
+      }
+      delete partialData._encrypted;
+      delete partialData._encryptionVersion;
+      return partialData;
     }
 
     try {
@@ -322,8 +337,8 @@ class EncryptionService {
           decryptedData[field] = await this.decryptValue(encryptedValue);
         } catch (fieldError) {
           console.warn(`[Encryption] Failed to decrypt field ${field}:`, fieldError);
-          // Keep encrypted value if decryption fails
-          decryptedData[field] = encryptedValue;
+          // Show placeholder if decryption fails
+          decryptedData[field] = '[Decryption Failed]';
         }
       }
 

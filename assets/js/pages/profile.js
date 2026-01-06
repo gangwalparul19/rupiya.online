@@ -10,6 +10,7 @@ import { doc, setDoc, Timestamp } from 'https://www.gstatic.com/firebasejs/10.7.
 import { db, auth } from '../config/firebase-config.js';
 import paymentMethodsService from '../services/payment-methods-service.js';
 import { escapeHtml } from '../utils/helpers.js';
+import encryptionReauthModal from '../components/encryption-reauth-modal.js';
 // Helper function for toast
 const showToast = (message, type) => toast.show(message, type);
 
@@ -47,8 +48,12 @@ async function init() {
   setupEventListeners();
   loadUserProfile(currentUser);
   setupSecuritySection();
-  await loadUserPreferences();
-  await loadCategories();
+  
+  // Check if encryption reauth is needed
+  encryptionReauthModal.checkAndPrompt(async () => {
+    await loadUserPreferences();
+    await loadCategories();
+  });
 }
 
 function initDOMElements() {

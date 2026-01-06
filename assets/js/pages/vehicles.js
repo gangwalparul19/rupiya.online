@@ -5,6 +5,7 @@ import crossFeatureIntegrationService from '../services/cross-feature-integratio
 import toast from '../components/toast.js';
 import { formatCurrency, formatCurrencyCompact, formatDate, escapeHtml, formatDateForInput } from '../utils/helpers.js';
 import timezoneService from '../utils/timezone.js';
+import encryptionReauthModal from '../components/encryption-reauth-modal.js';
 
 // Helper function for toast
 const showToast = (message, type) => toast.show(message, type);
@@ -40,6 +41,11 @@ async function init() {
     window.location.href = 'login.html';
     return;
   }
+
+  // Check if encryption reauth is needed
+  encryptionReauthModal.checkAndPrompt(async () => {
+    await loadVehicles();
+  });
 
   initDOMElements();
   setupEventListeners();

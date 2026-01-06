@@ -5,6 +5,7 @@ import AIInsightsEngine from '../utils/ai-insights-engine.js';
 import familySwitcher from '../components/family-switcher.js';
 import toast from '../components/toast.js';
 import { formatCurrency, formatCurrencyCompact } from '../utils/helpers.js';
+import encryptionReauthModal from '../components/encryption-reauth-modal.js';
 
 const aiEngine = new AIInsightsEngine();
 
@@ -20,7 +21,11 @@ async function checkAuth() {
 async function init() {
   const isAuthenticated = await checkAuth();
   if (!isAuthenticated) return;
-  await initPage();
+  
+  // Check if encryption reauth is needed
+  encryptionReauthModal.checkAndPrompt(async () => {
+    await initPage();
+  });
 }
 
 init();

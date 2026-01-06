@@ -6,6 +6,7 @@ import smartDocumentService from '../services/smart-document-service.js';
 import toast from '../components/toast.js';
 import { formatDate, escapeHtml, formatDateForInput } from '../utils/helpers.js';
 import timezoneService from '../utils/timezone.js';
+import encryptionReauthModal from '../components/encryption-reauth-modal.js';
 
 // Helper function for toast
 const showToast = (message, type) => toast.show(message, type);
@@ -36,6 +37,11 @@ async function init() {
     window.location.href = 'login.html';
     return;
   }
+
+  // Check if encryption reauth is needed
+  encryptionReauthModal.checkAndPrompt(async () => {
+    await loadDocuments();
+  });
 
   initDOMElements();
   setupEventListeners();
