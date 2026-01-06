@@ -80,10 +80,10 @@
       ]
     },
     {
-      "name": "Achievements",
-      "short_name": "Badges",
-      "description": "View your achievements and badges",
-      "url": "/achievements.html",
+      "name": "Analytics",
+      "short_name": "Analytics",
+      "description": "View your financial analytics",
+      "url": "/analytics.html",
       "icons": [
         {
           "src": "/favicon-96x96.png",

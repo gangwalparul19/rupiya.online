@@ -20,6 +20,7 @@
 import { db } from '../config/firebase-config.js';
 import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
 import authService from '../services/auth-service.js';
+import { initLogoutHandler } from '../utils/logout-handler.js';
 
 // Check if current user is admin (non-blocking)
 async function checkIsAdmin() {
@@ -265,6 +266,9 @@ export async function initSidebar() {
   
   // Setup sidebar toggle for mobile
   setupMobileSidebar();
+  
+  // Initialize global logout handler
+  initLogoutHandler();
 }
 
 // Setup collapsible section toggles

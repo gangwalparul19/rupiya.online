@@ -1,8 +1,8 @@
 {
-  "date": "2026-01-06T10:29:40.124Z",
+  "date": "2026-01-06T11:03:54.780Z",
   "summary": {
-    "total": 32,
-    "passed": 32,
+    "total": 31,
+    "passed": 31,
     "warnings": 0,
     "failed": 0,
     "score": 100
@@ -270,26 +270,6 @@
     },
     {
       "file": "recurring.html",
-      "status": "pass",
-      "passed": 11,
-      "total": 11,
-      "checks": {
-        "hasTitle": true,
-        "hasMetaDescription": true,
-        "hasMetaKeywords": true,
-        "hasCanonical": true,
-        "hasOgTags": true,
-        "hasTwitterTags": true,
-        "hasStructuredData": true,
-        "hasViewport": true,
-        "hasThemeColor": true,
-        "hasManifest": true,
-        "hasFavicon": true
-      },
-      "message": "11/11 checks passed"
-    },
-    {
-      "file": "achievements.html",
       "status": "pass",
       "passed": 11,
       "total": 11,
