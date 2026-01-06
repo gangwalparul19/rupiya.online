@@ -1,6 +1,7 @@
 // Houses Page Logic
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
+import crossFeatureIntegrationService from '../services/cross-feature-integration-service.js';
 import toast from '../components/toast.js';
 import { formatCurrency, formatDate, escapeHtml } from '../utils/helpers.js';
 

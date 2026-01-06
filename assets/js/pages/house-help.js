@@ -1,6 +1,7 @@
 // House Help Page Logic
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
+import crossFeatureIntegrationService from '../services/cross-feature-integration-service.js';
 import toast from '../components/toast.js';
 import { formatCurrency, formatDate } from '../utils/helpers.js';
 
@@ -564,19 +565,18 @@ async function handleSavePayment() {
     const result = await firestoreService.add('houseHelpPayments', paymentData);
     
     if (result.success) {
-      // Also add as an expense so it shows on dashboard
-      const expenseData = {
-        amount: amount,
-        category: 'House Help',
-        description: `Payment to ${staffName} (${staffRole})${paymentNote.value.trim() ? ' - ' + paymentNote.value.trim() : ''}`,
-        date: new Date(paymentDate.value),
-        paymentMethod: 'Cash',
-        isHouseHelpPayment: true,
-        houseHelpPaymentId: result.id,
-        staffId: currentPaymentStaffId
-      };
-      
-      await firestoreService.addExpense(expenseData);
+      // Use cross-feature integration to create expense
+      await crossFeatureIntegrationService.createHouseHelpSalaryExpense(
+        currentPaymentStaffId,
+        staffName,
+        staffRole,
+        {
+          amount: amount,
+          date: new Date(paymentDate.value),
+          note: paymentNote.value.trim(),
+          paymentId: result.id
+        }
+      );
       
       showToast('Payment recorded successfully', 'success');
       

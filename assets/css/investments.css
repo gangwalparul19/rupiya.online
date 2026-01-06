@@ -1620,3 +1620,134 @@
     display: none;
   }
 }
+
+/* Investment Card Actions */
+.investment-card-actions {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid var(--border-color, #E5E7EB);
+  background: var(--bg-hover, #F9FAFB);
+  border-radius: 0 0 12px 12px;
+}
+
+.investment-card-actions .btn {
+  flex: 1;
+  font-size: 0.75rem;
+  padding: 0.5rem 0.75rem;
+}
+
+/* Investment Info Banner */
+.investment-info-banner {
+  background: var(--bg-hover, #F3F4F6);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+[data-theme="dark"] .investment-info-banner {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+/* Capital Gains Preview */
+.capital-gains-preview {
+  background: var(--bg-hover, #F3F4F6);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-top: 1rem;
+}
+
+.capital-gains-preview h4 {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary, #6B7280);
+}
+
+.preview-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border-color, #E5E7EB);
+}
+
+.preview-row:last-child {
+  border-bottom: none;
+}
+
+.gains-row {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.gains-row .positive {
+  color: var(--success-green, #10B981);
+}
+
+.gains-row .negative {
+  color: var(--danger-red, #EF4444);
+}
+
+[data-theme="dark"] .capital-gains-preview {
+  background: var(--bg-hover);
+}
+
+[data-theme="dark"] .capital-gains-preview h4 {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .preview-row {
+  border-color: var(--border-color);
+}
+
+/* Button variants */
+.btn-success {
+  background: var(--success-green, #10B981);
+  color: white;
+  border: none;
+}
+
+.btn-success:hover {
+  background: #059669;
+}
+
+/* Modal styles for dividend and capital gains */
+#dividendModal .modal-container,
+#capitalGainsModal .modal-container {
+  max-width: 500px;
+}
+
+#dividendModal .form-group,
+#capitalGainsModal .form-group {
+  margin-bottom: 1rem;
+}
+
+#dividendModal .form-group label,
+#capitalGainsModal .form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--text-primary, #1F2937);
+}
+
+#dividendModal .form-group input,
+#dividendModal .form-group textarea,
+#capitalGainsModal .form-group input,
+#capitalGainsModal .form-group textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color, #D1D5DB);
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+#dividendModal .form-group input:focus,
+#dividendModal .form-group textarea:focus,
+#capitalGainsModal .form-group input:focus,
+#capitalGainsModal .form-group textarea:focus {
+  outline: none;
+  border-color: var(--primary-blue, #4A90E2);
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}

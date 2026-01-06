@@ -4,6 +4,7 @@ import firestoreService from '../services/firestore-service.js';
 import investmentHistoryService from '../services/investment-history-service.js';
 import googleSheetsPriceService from '../services/google-sheets-price-service.js'; // Changed from livePriceService
 import symbolSearchService from '../services/symbol-search-service.js';
+import crossFeatureIntegrationService from '../services/cross-feature-integration-service.js';
 import familySwitcher from '../components/family-switcher.js';
 import toast from '../components/toast.js';
 import { formatCurrency, formatDate, escapeHtml, formatDateForInput } from '../utils/helpers.js';
@@ -571,6 +572,15 @@ function renderInvestments() {
           </div>
         </div>
 
+        <div class="investment-card-actions">
+          <button class="btn btn-sm btn-success" onclick="window.showDividendModal('${investment.id}')" title="Record Dividend">
+            💰 Dividend
+          </button>
+          <button class="btn btn-sm btn-primary" onclick="window.showCapitalGainsModal('${investment.id}')" title="Record Sale">
+            📈 Sell
+          </button>
+        </div>
+
         ${investment.notes ? `
           <div class="investment-notes">
             ${escapedNotes}
@@ -676,6 +686,343 @@ window.showDeleteConfirmation = showDeleteConfirmation;
 window.viewPriceHistory = viewPriceHistory;
 window.refreshInvestmentPrice = refreshInvestmentPrice;
 window.selectSymbol = selectSymbol;
+window.showDividendModal = showDividendModal;
+window.showCapitalGainsModal = showCapitalGainsModal;
+
+// ============================================
+// DIVIDEND INCOME MODAL
+// ============================================
+
+function showDividendModal(investmentId) {
+  const investment = investments.find(i => i.id === investmentId);
+  if (!investment) return;
+
+  // Create modal if it doesn't exist
+  let modal = document.getElementById('dividendModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'dividendModal';
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+      <div class="modal-container">
+        <div class="modal-header">
+          <h2 class="modal-title">Record Dividend Income</h2>
+          <button class="modal-close" onclick="document.getElementById('dividendModal').classList.remove('show')">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="investment-info-banner" id="dividendInvestmentInfo"></div>
+          <form id="dividendForm">
+            <input type="hidden" id="dividendInvestmentId">
+            <div class="form-group">
+              <label for="dividendAmount">Dividend Amount (₹) *</label>
+              <input type="number" id="dividendAmount" step="0.01" min="0" required placeholder="Enter total dividend received">
+            </div>
+            <div class="form-group">
+              <label for="dividendPerShare">Dividend Per Share (₹)</label>
+              <input type="number" id="dividendPerShare" step="0.01" min="0" placeholder="Optional">
+            </div>
+            <div class="form-group">
+              <label for="dividendDate">Date *</label>
+              <input type="date" id="dividendDate" required>
+            </div>
+            <div class="form-group">
+              <label for="dividendNote">Note</label>
+              <textarea id="dividendNote" rows="2" placeholder="e.g., Q3 2025 dividend"></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="document.getElementById('dividendModal').classList.remove('show')">Cancel</button>
+          <button type="button" class="btn btn-primary" id="saveDividendBtn">Record Dividend</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    
+    // Close modal when clicking outside
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.classList.remove('show');
+      }
+    });
+    
+    // Save button handler
+    document.getElementById('saveDividendBtn').addEventListener('click', handleSaveDividend);
+  }
+
+  // Populate modal
+  document.getElementById('dividendInvestmentId').value = investmentId;
+  document.getElementById('dividendInvestmentInfo').innerHTML = `
+    <strong>${escapeHtml(investment.name)}</strong> (${escapeHtml(investment.symbol || 'N/A')})
+    <br>Quantity: ${investment.quantity} units
+  `;
+  document.getElementById('dividendAmount').value = '';
+  document.getElementById('dividendPerShare').value = '';
+  document.getElementById('dividendDate').valueAsDate = new Date();
+  document.getElementById('dividendNote').value = '';
+
+  modal.classList.add('show');
+}
+
+async function handleSaveDividend() {
+  const investmentId = document.getElementById('dividendInvestmentId').value;
+  const investment = investments.find(i => i.id === investmentId);
+  if (!investment) return;
+
+  const amount = parseFloat(document.getElementById('dividendAmount').value);
+  const dividendPerShare = parseFloat(document.getElementById('dividendPerShare').value) || null;
+  const date = document.getElementById('dividendDate').value;
+  const note = document.getElementById('dividendNote').value.trim();
+
+  if (!amount || amount <= 0) {
+    showToast('Please enter a valid dividend amount', 'error');
+    return;
+  }
+
+  if (!date) {
+    showToast('Please select a date', 'error');
+    return;
+  }
+
+  const saveBtn = document.getElementById('saveDividendBtn');
+  saveBtn.disabled = true;
+  saveBtn.textContent = 'Saving...';
+
+  try {
+    // Use cross-feature integration to create income
+    const result = await crossFeatureIntegrationService.createDividendIncome(
+      investmentId,
+      investment.name,
+      {
+        amount: amount,
+        dividendPerShare: dividendPerShare,
+        quantity: investment.quantity,
+        date: new Date(date),
+        note: note
+      }
+    );
+
+    if (result.success) {
+      showToast('Dividend income recorded successfully', 'success');
+      document.getElementById('dividendModal').classList.remove('show');
+    } else {
+      showToast(result.error || 'Failed to record dividend', 'error');
+    }
+  } catch (error) {
+    console.error('Error recording dividend:', error);
+    showToast('Failed to record dividend', 'error');
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.textContent = 'Record Dividend';
+  }
+}
+
+// ============================================
+// CAPITAL GAINS MODAL
+// ============================================
+
+function showCapitalGainsModal(investmentId) {
+  const investment = investments.find(i => i.id === investmentId);
+  if (!investment) return;
+
+  // Create modal if it doesn't exist
+  let modal = document.getElementById('capitalGainsModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'capitalGainsModal';
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+      <div class="modal-container">
+        <div class="modal-header">
+          <h2 class="modal-title">Record Sale / Capital Gains</h2>
+          <button class="modal-close" onclick="document.getElementById('capitalGainsModal').classList.remove('show')">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="investment-info-banner" id="capitalGainsInvestmentInfo"></div>
+          <form id="capitalGainsForm">
+            <input type="hidden" id="capitalGainsInvestmentId">
+            <div class="form-group">
+              <label for="saleQuantity">Quantity Sold *</label>
+              <input type="number" id="saleQuantity" step="0.0001" min="0" required placeholder="Number of units sold">
+            </div>
+            <div class="form-group">
+              <label for="salePrice">Sale Price Per Unit (₹) *</label>
+              <input type="number" id="salePrice" step="0.01" min="0" required placeholder="Price at which you sold">
+            </div>
+            <div class="form-group">
+              <label for="saleDate">Sale Date *</label>
+              <input type="date" id="saleDate" required>
+            </div>
+            <div class="form-group">
+              <label for="saleNote">Note</label>
+              <textarea id="saleNote" rows="2" placeholder="e.g., Partial profit booking"></textarea>
+            </div>
+            <div class="capital-gains-preview" id="capitalGainsPreview" style="display: none;">
+              <h4>Capital Gains Preview</h4>
+              <div class="preview-row">
+                <span>Purchase Value:</span>
+                <span id="previewPurchaseValue">₹0</span>
+              </div>
+              <div class="preview-row">
+                <span>Sale Value:</span>
+                <span id="previewSaleValue">₹0</span>
+              </div>
+              <div class="preview-row gains-row">
+                <span>Capital Gains:</span>
+                <span id="previewCapitalGains">₹0</span>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="document.getElementById('capitalGainsModal').classList.remove('show')">Cancel</button>
+          <button type="button" class="btn btn-primary" id="saveCapitalGainsBtn">Record Sale</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    
+    // Close modal when clicking outside
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.classList.remove('show');
+      }
+    });
+    
+    // Save button handler
+    document.getElementById('saveCapitalGainsBtn').addEventListener('click', handleSaveCapitalGains);
+    
+    // Preview calculation on input change
+    document.getElementById('saleQuantity').addEventListener('input', updateCapitalGainsPreview);
+    document.getElementById('salePrice').addEventListener('input', updateCapitalGainsPreview);
+  }
+
+  // Populate modal
+  document.getElementById('capitalGainsInvestmentId').value = investmentId;
+  document.getElementById('capitalGainsInvestmentInfo').innerHTML = `
+    <strong>${escapeHtml(investment.name)}</strong> (${escapeHtml(investment.symbol || 'N/A')})
+    <br>Holdings: ${investment.quantity} units @ ₹${investment.purchasePrice.toFixed(2)}/unit
+    <br>Current Price: ₹${(investment.livePrice || investment.currentPrice).toFixed(2)}/unit
+  `;
+  document.getElementById('saleQuantity').value = '';
+  document.getElementById('saleQuantity').max = investment.quantity;
+  document.getElementById('salePrice').value = (investment.livePrice || investment.currentPrice).toFixed(2);
+  document.getElementById('saleDate').valueAsDate = new Date();
+  document.getElementById('saleNote').value = '';
+  document.getElementById('capitalGainsPreview').style.display = 'none';
+
+  modal.classList.add('show');
+  updateCapitalGainsPreview();
+}
+
+function updateCapitalGainsPreview() {
+  const investmentId = document.getElementById('capitalGainsInvestmentId').value;
+  const investment = investments.find(i => i.id === investmentId);
+  if (!investment) return;
+
+  const quantity = parseFloat(document.getElementById('saleQuantity').value) || 0;
+  const salePrice = parseFloat(document.getElementById('salePrice').value) || 0;
+
+  if (quantity > 0 && salePrice > 0) {
+    const purchaseValue = quantity * investment.purchasePrice;
+    const saleValue = quantity * salePrice;
+    const capitalGains = saleValue - purchaseValue;
+
+    document.getElementById('previewPurchaseValue').textContent = formatCurrency(purchaseValue);
+    document.getElementById('previewSaleValue').textContent = formatCurrency(saleValue);
+    document.getElementById('previewCapitalGains').textContent = formatCurrency(capitalGains);
+    document.getElementById('previewCapitalGains').className = capitalGains >= 0 ? 'positive' : 'negative';
+    document.getElementById('capitalGainsPreview').style.display = 'block';
+  } else {
+    document.getElementById('capitalGainsPreview').style.display = 'none';
+  }
+}
+
+async function handleSaveCapitalGains() {
+  const investmentId = document.getElementById('capitalGainsInvestmentId').value;
+  const investment = investments.find(i => i.id === investmentId);
+  if (!investment) return;
+
+  const quantity = parseFloat(document.getElementById('saleQuantity').value);
+  const salePrice = parseFloat(document.getElementById('salePrice').value);
+  const date = document.getElementById('saleDate').value;
+  const note = document.getElementById('saleNote').value.trim();
+
+  if (!quantity || quantity <= 0) {
+    showToast('Please enter a valid quantity', 'error');
+    return;
+  }
+
+  if (quantity > investment.quantity) {
+    showToast('Sale quantity cannot exceed holdings', 'error');
+    return;
+  }
+
+  if (!salePrice || salePrice <= 0) {
+    showToast('Please enter a valid sale price', 'error');
+    return;
+  }
+
+  if (!date) {
+    showToast('Please select a date', 'error');
+    return;
+  }
+
+  const saveBtn = document.getElementById('saveCapitalGainsBtn');
+  saveBtn.disabled = true;
+  saveBtn.textContent = 'Saving...';
+
+  try {
+    const purchaseAmount = quantity * investment.purchasePrice;
+    const saleAmount = quantity * salePrice;
+
+    // Use cross-feature integration to create income (only if profit)
+    const result = await crossFeatureIntegrationService.createCapitalGainsIncome(
+      investmentId,
+      investment.name,
+      {
+        quantity: quantity,
+        saleAmount: saleAmount,
+        purchaseAmount: purchaseAmount,
+        date: new Date(date),
+        note: note,
+        holdingPeriod: calculateHoldingPeriod(investment.purchaseDate)
+      }
+    );
+
+    // Update investment quantity
+    const newQuantity = investment.quantity - quantity;
+    if (newQuantity <= 0) {
+      // Delete investment if fully sold
+      await firestoreService.deleteInvestment(investmentId);
+      showToast('Investment fully sold and removed', 'success');
+    } else {
+      // Update remaining quantity
+      await firestoreService.updateInvestment(investmentId, {
+        quantity: newQuantity
+      });
+      showToast('Sale recorded successfully', 'success');
+    }
+
+    document.getElementById('capitalGainsModal').classList.remove('show');
+    await loadInvestments();
+  } catch (error) {
+    console.error('Error recording sale:', error);
+    showToast('Failed to record sale', 'error');
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.textContent = 'Record Sale';
+  }
+}
+
+function calculateHoldingPeriod(purchaseDate) {
+  if (!purchaseDate) return null;
+  const purchase = purchaseDate.toDate ? purchaseDate.toDate() : new Date(purchaseDate);
+  const now = new Date();
+  const diffTime = Math.abs(now - purchase);
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  return diffDays;
+}
 
 // Handle symbol search input
 async function handleSymbolSearch(e) {

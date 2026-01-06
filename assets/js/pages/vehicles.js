@@ -1,6 +1,7 @@
 // Vehicles Page Logic
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
+import crossFeatureIntegrationService from '../services/cross-feature-integration-service.js';
 import toast from '../components/toast.js';
 import { formatCurrency, formatCurrencyCompact, formatDate, escapeHtml, formatDateForInput } from '../utils/helpers.js';
 import timezoneService from '../utils/timezone.js';
@@ -580,16 +581,19 @@ async function handleSaveFuelLog() {
         currentMileage: odometerReading
       });
 
-      // Also add as expense
-      await firestoreService.add('expenses', {
-        amount: totalCost,
-        category: 'Vehicle Fuel',
-        description: `Fuel: ${fuelQuantity}L @ ₹${fuelPrice}/L${fuelStation ? ' at ' + fuelStation : ''}`,
-        date: new Date(fuelDate),
-        linkedType: 'vehicle',
-        linkedId: vehicleId,
-        linkedName: vehicle?.name || 'Vehicle'
-      });
+      // Use cross-feature integration to create expense
+      await crossFeatureIntegrationService.createFuelExpense(
+        vehicleId,
+        vehicle?.name || 'Vehicle',
+        {
+          fuelQuantity,
+          fuelPrice,
+          totalCost,
+          fuelStation,
+          date: new Date(fuelDate),
+          fuelLogId: result.id
+        }
+      );
 
       showToast('Fuel entry saved successfully', 'success');
       hideFuelLogModal();
@@ -766,16 +770,17 @@ async function handleSaveMaintenance() {
   try {
     const vehicle = vehicles.find(v => v.id === vehicleId);
     
-    // Add as expense
-    const result = await firestoreService.add('expenses', {
-      amount: maintenanceAmount,
-      category: 'Vehicle Maintenance',
-      description: `${maintenanceType}${maintenanceDescription ? ': ' + maintenanceDescription : ''}${serviceCenter ? ' at ' + serviceCenter : ''}`,
-      date: new Date(maintenanceDate),
-      linkedType: 'vehicle',
-      linkedId: vehicleId,
-      linkedName: vehicle?.name || 'Vehicle'
-    });
+    // Use cross-feature integration to create expense
+    const result = await crossFeatureIntegrationService.createVehicleMaintenanceExpense(
+      vehicleId,
+      vehicle?.name || 'Vehicle',
+      {
+        amount: maintenanceAmount,
+        description: `${maintenanceType}${maintenanceDescription ? ': ' + maintenanceDescription : ''}${serviceCenter ? ' at ' + serviceCenter : ''}`,
+        date: new Date(maintenanceDate),
+        maintenanceType: maintenanceType
+      }
+    );
 
     if (result.success) {
       showToast('Maintenance expense added', 'success');
@@ -832,17 +837,17 @@ async function handleSaveVehicleIncome() {
   try {
     const vehicle = vehicles.find(v => v.id === vehicleId);
     
-    // Add as income
-    const result = await firestoreService.add('income', {
-      amount: incomeAmount,
-      category: 'Vehicle Income',
-      source: incomeSource,
-      description: incomeDescription || `${incomeSource} from ${vehicle?.name || 'Vehicle'}`,
-      date: new Date(incomeDate),
-      linkedType: 'vehicle',
-      linkedId: vehicleId,
-      linkedName: vehicle?.name || 'Vehicle'
-    });
+    // Use cross-feature integration to create income
+    const result = await crossFeatureIntegrationService.createVehicleIncome(
+      vehicleId,
+      vehicle?.name || 'Vehicle',
+      {
+        amount: incomeAmount,
+        type: incomeSource.toLowerCase(),
+        description: incomeDescription || `${incomeSource} from ${vehicle?.name || 'Vehicle'}`,
+        date: new Date(incomeDate)
+      }
+    );
 
     if (result.success) {
       showToast('Vehicle income added', 'success');

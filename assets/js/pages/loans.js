@@ -2,6 +2,7 @@
 import '../services/services-init.js';
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
+import crossFeatureIntegrationService from '../services/cross-feature-integration-service.js';
 import toast from '../components/toast.js';
 import themeManager from '../utils/theme-manager.js';
 import { formatCurrency, formatDate, escapeHtml, formatDateForInput } from '../utils/helpers.js';
@@ -582,8 +583,16 @@ async function savePayment(e) {
   
   const paymentType = document.getElementById('paymentType').value;
   const paymentAmount = parseFloat(document.getElementById('paymentAmount').value) || 0;
+  const paymentDate = document.getElementById('paymentDate').value;
   
   try {
+    // Calculate EMI breakdown
+    const breakdown = crossFeatureIntegrationService.calculateEMIBreakdown(
+      loan.outstandingAmount || 0,
+      loan.interestRate,
+      paymentAmount
+    );
+    
     // Update loan
     const updates = {};
     
@@ -592,10 +601,7 @@ async function savePayment(e) {
     }
     
     // Recalculate outstanding
-    const monthlyRate = loan.interestRate / 12 / 100;
-    const interest = (loan.outstandingAmount || 0) * monthlyRate;
-    const principalPaid = paymentAmount - interest;
-    updates.outstandingAmount = Math.max(0, (loan.outstandingAmount || 0) - principalPaid);
+    updates.outstandingAmount = Math.max(0, (loan.outstandingAmount || 0) - breakdown.principalPaid);
     
     // Check if loan is closed
     if (updates.emisPaid >= loan.tenure || updates.outstandingAmount <= 0) {
@@ -605,13 +611,19 @@ async function savePayment(e) {
     
     await firestoreService.updateLoan(loanId, updates);
     
-    // Also add as expense
-    await firestoreService.addExpense({
-      amount: paymentAmount,
-      category: 'EMI Payment',
-      description: `${loan.loanName} - ${paymentType === 'emi' ? 'EMI' : 'Prepayment'}`,
-      date: timezoneService.parseInputDate(document.getElementById('paymentDate').value)
-    });
+    // Use cross-feature integration to create expense with breakdown
+    await crossFeatureIntegrationService.createLoanEMIExpense(
+      loanId,
+      loan.loanName,
+      loan.lender,
+      {
+        amount: paymentAmount,
+        type: paymentType,
+        date: timezoneService.parseInputDate(paymentDate),
+        principalPaid: breakdown.principalPaid,
+        interestPaid: breakdown.interestPaid
+      }
+    );
     
     toast.success('Payment recorded successfully');
     closePaymentModal();
