@@ -20,6 +20,7 @@ let editingInvestmentId = null;
 let symbolSearchResults = [];
 let selectedSymbolIndex = -1;
 let isSearching = false;
+let searchDebounceTimer = null;
 
 // DOM Elements
 let addInvestmentBtn, addInvestmentSection, closeFormBtn, cancelFormBtn;
@@ -156,11 +157,13 @@ function setupEventListeners() {
     symbolInput.addEventListener('input', handleSymbolSearch);
     symbolInput.addEventListener('keydown', handleSymbolKeydown);
     symbolInput.addEventListener('blur', () => {
-      // Hide dropdown after a short delay to allow click
+      // Hide dropdown after a longer delay on mobile to allow touch events to complete
       setTimeout(() => {
         const dropdown = document.getElementById('symbolDropdown');
-        if (dropdown) dropdown.style.display = 'none';
-      }, 200);
+        if (dropdown && !dropdown.matches(':hover') && !dropdown.contains(document.activeElement)) {
+          dropdown.style.display = 'none';
+        }
+      }, 300);
     });
     symbolInput.addEventListener('focus', handleSymbolFocus);
   }
@@ -688,16 +691,32 @@ async function handleSymbolSearch(e) {
     return;
   }
 
-  isSearching = true;
-  try {
-    symbolSearchResults = await symbolSearchService.searchSymbols(query, type, 15);
-    console.log('Search results received:', symbolSearchResults);
-    renderSymbolDropdown(symbolSearchResults);
-  } catch (error) {
-    console.error('Error searching symbols:', error);
-  } finally {
-    isSearching = false;
+  // Debounce the search to avoid too many API calls
+  if (searchDebounceTimer) {
+    clearTimeout(searchDebounceTimer);
   }
+
+  searchDebounceTimer = setTimeout(async () => {
+    if (isSearching) return;
+    
+    isSearching = true;
+    try {
+      console.log('Executing search for:', query);
+      symbolSearchResults = await symbolSearchService.searchSymbols(query, type, 15);
+      console.log('Search results received:', symbolSearchResults);
+      renderSymbolDropdown(symbolSearchResults);
+    } catch (error) {
+      console.error('Error searching symbols:', error);
+      // Show error in dropdown
+      const dropdown = document.getElementById('symbolDropdown');
+      if (dropdown) {
+        dropdown.innerHTML = '<div class="symbol-item no-results">Error searching. Please try again.</div>';
+        dropdown.style.display = 'block';
+      }
+    } finally {
+      isSearching = false;
+    }
+  }, 300); // 300ms debounce
 }
 
 // Handle symbol focus
@@ -796,12 +815,39 @@ function renderSymbolDropdown(results) {
     const mainDisplay = nameDisplay ? `${nameDisplay} (${symbolDisplay})` : symbolDisplay;
     
     return `
-      <div class="symbol-item" onclick="window.selectSymbol('${escapeHtml(lookupSymbol)}', '${result.type}', '${result.name.replace(/'/g, "\\'")}')">
+      <div class="symbol-item" data-symbol="${escapeHtml(lookupSymbol)}" data-type="${escapeHtml(result.type || 'Other')}" data-name="${escapeHtml(nameDisplay)}">
         <div class="symbol-name">${mainDisplay}</div>
         ${exchangeDisplay ? `<div class="symbol-detail">${exchangeDisplay}</div>` : ''}
       </div>
     `;
   }).join('');
+
+  // Add touch/click event listeners to each item
+  dropdown.querySelectorAll('.symbol-item:not(.no-results)').forEach(item => {
+    const handleSelect = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const symbol = item.dataset.symbol;
+      const type = item.dataset.type;
+      const name = item.dataset.name;
+      console.log('Symbol selected:', { symbol, type, name });
+      selectSymbol(symbol, type, name);
+    };
+    
+    // Use both touchend and click for better mobile support
+    item.addEventListener('touchend', handleSelect, { passive: false });
+    item.addEventListener('click', handleSelect);
+    
+    // Prevent touchstart from triggering blur
+    item.addEventListener('touchstart', (e) => {
+      e.stopPropagation();
+    }, { passive: true });
+    
+    // Prevent mousedown from triggering blur on desktop
+    item.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+    });
+  });
 
   dropdown.style.display = 'block';
   console.log('Dropdown rendered with', results.length, 'items');

@@ -532,6 +532,12 @@
   .add-investment-section {
     max-height: 80vh;
     overflow-y: auto;
+    overflow-x: visible;
+  }
+
+  /* Ensure symbol dropdown is visible in landscape mode */
+  .add-investment-section .form-group-full {
+    overflow: visible;
   }
 
   .form-group input,

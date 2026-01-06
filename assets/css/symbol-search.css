@@ -3,6 +3,17 @@
 .symbol-input-wrapper {
   position: relative;
   width: 100%;
+  z-index: 100;
+}
+
+/* Ensure parent containers don't clip the dropdown */
+.form-group:has(.symbol-input-wrapper) {
+  overflow: visible !important;
+}
+
+.form-group-full:has(.symbol-input-wrapper) {
+  overflow: visible !important;
+  z-index: 101;
 }
 
 .symbol-dropdown {
@@ -16,7 +27,7 @@
   border-radius: 0 0 8px 8px;
   max-height: 300px;
   overflow-y: auto;
-  z-index: 1000;
+  z-index: 9999;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   display: none;
   -webkit-overflow-scrolling: touch;
@@ -136,24 +147,34 @@
 /* Mobile Optimizations */
 @media (max-width: 768px) {
   .symbol-dropdown {
-    max-height: 280px;
+    max-height: 250px;
     border-radius: 8px;
-    position: fixed;
-    top: auto;
-    bottom: auto;
+    position: absolute;
+    top: 100%;
     left: 0;
     right: 0;
     margin: 0;
     width: 100%;
     max-width: 100%;
+    z-index: 9999;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    border: 1px solid #ccc;
+  }
+
+  .symbol-input-wrapper {
+    position: relative;
+    z-index: 100;
   }
 
   .symbol-item {
     padding: 14px 16px;
     min-height: 48px;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    touch-action: manipulation;
+    cursor: pointer;
   }
 
   .symbol-name {
@@ -174,7 +195,8 @@
 
 @media (max-width: 480px) {
   .symbol-dropdown {
-    max-height: 250px;
+    max-height: 220px;
+    z-index: 9999;
   }
 
   .symbol-item {
@@ -189,6 +211,18 @@
   .symbol-detail {
     font-size: 12px;
   }
+}
+
+/* Ensure dropdown is above other elements */
+.symbol-input-wrapper {
+  position: relative;
+  z-index: 100;
+}
+
+/* Active state for touch feedback */
+.symbol-item:active {
+  background-color: #e3f2fd !important;
+  transform: scale(0.98);
 }
 
 /* Tablet Optimizations */

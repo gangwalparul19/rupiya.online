@@ -94,7 +94,19 @@ class GoogleSheetsPriceService {
     }
 
     try {
-      const response = await fetch(`${this.API_ENDPOINT}?sheetType=${sheetType}`);
+      console.log(`[GoogleSheets] Fetching ${sheetType} data...`);
+      
+      const response = await fetch(`${this.API_ENDPOINT}?sheetType=${sheetType}`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'text/plain, application/json',
+          'Content-Type': 'application/json'
+        },
+        mode: 'cors',
+        credentials: 'omit'
+      });
+      
+      console.log(`[GoogleSheets] Response status: ${response.status}`);
       
       if (!response.ok) {
         // Try to get error details from response
@@ -102,17 +114,19 @@ class GoogleSheetsPriceService {
         try {
           const errorData = await response.json();
           errorMessage = errorData.message || errorData.error || errorMessage;
-          console.error('API Error Details:', errorData);
+          console.error('[GoogleSheets] API Error Details:', errorData);
         } catch (e) {
           // Response might not be JSON
           const text = await response.text();
-          console.error('API Error Response:', text);
+          console.error('[GoogleSheets] API Error Response:', text);
           errorMessage = text || errorMessage;
         }
         throw new Error(errorMessage);
       }
 
       const text = await response.text();
+      console.log(`[GoogleSheets] Received ${text.length} bytes`);
+      
       const data = this.parseGoogleSheetsResponse(text);
 
       // Store data
@@ -124,10 +138,10 @@ class GoogleSheetsPriceService {
 
       this.lastFetch[sheetType] = Date.now();
       
-      console.log(`Fetched ${data.length} rows from ${sheetType} sheet`);
+      console.log(`[GoogleSheets] Fetched ${data.length} rows from ${sheetType} sheet`);
       return data;
     } catch (error) {
-      console.error(`Error fetching ${sheetType} sheet:`, error);
+      console.error(`[GoogleSheets] Error fetching ${sheetType} sheet:`, error);
       throw error;
     }
   }

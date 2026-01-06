@@ -5,20 +5,13 @@
 
 export default async function handler(req, res) {
   // Enable CORS for mobile and cross-origin requests
-  const allowedOrigins = [
-    'https://www.rupiya.online',
-    'https://rupiya.online',
-    'http://localhost:3000',
-    'http://localhost:5000'
-  ];
+  // Allow all origins for mobile app compatibility
+  const origin = req.headers.origin || '*';
   
-  const origin = req.headers.origin;
-  if (allowedOrigins.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  }
-  
+  res.setHeader('Access-Control-Allow-Origin', origin);
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept, Origin, X-Requested-With');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Max-Age', '86400');
 
   // Handle preflight requests

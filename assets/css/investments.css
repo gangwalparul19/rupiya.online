@@ -262,11 +262,13 @@
   padding: 2rem;
   margin-bottom: 2rem;
   display: none;
+  overflow: visible;
 }
 
 .add-investment-section.show {
   display: block;
   animation: slideDown 0.3s ease-out;
+  overflow: visible;
 }
 
 @keyframes slideDown {
@@ -302,6 +304,7 @@
   grid-template-columns: repeat(2, 1fr);
   gap: 1.5rem;
   margin-bottom: 1.5rem;
+  overflow: visible;
 }
 
 .form-group {
@@ -311,6 +314,7 @@
 
 .form-group-full {
   grid-column: 1 / -1;
+  overflow: visible;
 }
 
 .form-group label {

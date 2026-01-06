@@ -125,22 +125,13 @@ function getYahooSymbol(investment) {
  * Main handler
  */
 export default async function handler(req, res) {
-  // Enable CORS - restrict to your domain only
-  const allowedOrigins = [
-    'https://www.rupiya.online',
-    'https://rupiya.online',
-    'http://localhost:3000', // Development only
-    'http://localhost:5000'  // Development only
-  ];
+  // Enable CORS - allow all origins for mobile app compatibility
+  const origin = req.headers.origin || '*';
   
-  const origin = req.headers.origin;
-  if (allowedOrigins.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  }
-  
+  res.setHeader('Access-Control-Allow-Origin', origin);
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept, Origin, X-Requested-With');
   res.setHeader('Access-Control-Max-Age', '86400');
 
   if (req.method === 'OPTIONS') {
