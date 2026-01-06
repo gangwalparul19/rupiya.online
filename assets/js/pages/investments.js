@@ -5,6 +5,7 @@ import investmentHistoryService from '../services/investment-history-service.js'
 import googleSheetsPriceService from '../services/google-sheets-price-service.js'; // Changed from livePriceService
 import symbolSearchService from '../services/symbol-search-service.js';
 import crossFeatureIntegrationService from '../services/cross-feature-integration-service.js';
+import investmentAnalyticsService from '../services/investment-analytics-service.js';
 import familySwitcher from '../components/family-switcher.js';
 import toast from '../components/toast.js';
 import { formatCurrency, formatDate, escapeHtml, formatDateForInput } from '../utils/helpers.js';
@@ -149,6 +150,13 @@ function setupEventListeners() {
       handleTabClick(btn.dataset.tab);
     });
   });
+
+  // Analytics toggle
+  const toggleAnalyticsBtn = document.getElementById('toggleAnalyticsBtn');
+  const refreshAnalyticsBtn = document.getElementById('refreshAnalyticsBtn');
+  
+  toggleAnalyticsBtn?.addEventListener('click', toggleAnalyticsSection);
+  refreshAnalyticsBtn?.addEventListener('click', () => loadAndRenderAnalytics(true));
 
   // Symbol search
   const symbolInput = document.getElementById('symbol');
@@ -1565,4 +1573,350 @@ if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', init);
 } else {
   init();
+}
+
+// ============================================
+// PORTFOLIO ANALYTICS FUNCTIONS
+// ============================================
+
+let analyticsVisible = false;
+let analyticsData = null;
+
+// Toggle analytics section visibility
+function toggleAnalyticsSection() {
+  const section = document.getElementById('portfolioAnalyticsSection');
+  const toggleText = document.getElementById('analyticsToggleText');
+  
+  analyticsVisible = !analyticsVisible;
+  
+  if (analyticsVisible) {
+    section.style.display = 'block';
+    toggleText.textContent = 'Hide Analytics';
+    loadAndRenderAnalytics();
+  } else {
+    section.style.display = 'none';
+    toggleText.textContent = 'Show Analytics';
+  }
+}
+
+// Load and render analytics
+async function loadAndRenderAnalytics(forceRefresh = false) {
+  if (!analyticsVisible) return;
+  
+  try {
+    // Show loading state
+    showAnalyticsLoading();
+    
+    // Get analytics data
+    analyticsData = await investmentAnalyticsService.getPortfolioAnalytics();
+    
+    // Render all sections
+    renderPerformanceMetrics(analyticsData.performance);
+    renderRiskAnalysis(analyticsData.riskAnalysis);
+    renderDiversificationScore(analyticsData.diversificationScore);
+    renderAllocationChart(analyticsData.allocation);
+    renderSectorChart(analyticsData.sectorDistribution);
+    renderBenchmarkComparison(analyticsData.performance.benchmarkComparison);
+    renderTopPerformers(analyticsData.topPerformers);
+    renderBottomPerformers(analyticsData.bottomPerformers);
+    renderRecommendations(analyticsData.recommendations);
+    
+    if (forceRefresh) {
+      showToast('Analytics refreshed', 'success');
+    }
+  } catch (error) {
+    console.error('Error loading analytics:', error);
+    showToast('Failed to load analytics', 'error');
+  }
+}
+
+// Show loading state for analytics
+function showAnalyticsLoading() {
+  const placeholders = document.querySelectorAll('.chart-placeholder');
+  placeholders.forEach(p => p.textContent = 'Loading...');
+}
+
+// Render performance metrics
+function renderPerformanceMetrics(performance) {
+  const cagrEl = document.getElementById('analyticsCAGR');
+  const xirrEl = document.getElementById('analyticsXIRR');
+  const absReturnsEl = document.getElementById('analyticsAbsoluteReturns');
+  const periodEl = document.getElementById('analyticsInvestmentPeriod');
+  
+  if (cagrEl) {
+    const cagrClass = performance.cagr >= 0 ? 'positive' : 'negative';
+    cagrEl.textContent = `${performance.cagr >= 0 ? '+' : ''}${performance.cagr}%`;
+    cagrEl.className = `metric-value ${cagrClass}`;
+  }
+  
+  if (xirrEl) {
+    const xirrClass = performance.xirr >= 0 ? 'positive' : 'negative';
+    xirrEl.textContent = `${performance.xirr >= 0 ? '+' : ''}${performance.xirr}%`;
+    xirrEl.className = `metric-value ${xirrClass}`;
+  }
+  
+  if (absReturnsEl) {
+    const absClass = performance.absoluteReturns >= 0 ? 'positive' : 'negative';
+    absReturnsEl.textContent = formatCurrency(performance.absoluteReturns);
+    absReturnsEl.className = `metric-value ${absClass}`;
+  }
+  
+  if (periodEl) {
+    periodEl.textContent = `${performance.investmentPeriodYears} years`;
+  }
+}
+
+// Render risk analysis
+function renderRiskAnalysis(riskAnalysis) {
+  const scoreEl = document.getElementById('riskScore');
+  const labelEl = document.getElementById('riskLabel');
+  const barFillEl = document.getElementById('riskBarFill');
+  
+  if (scoreEl) scoreEl.textContent = riskAnalysis.overallRiskScore;
+  if (labelEl) {
+    labelEl.textContent = riskAnalysis.overallRiskLevel;
+    labelEl.className = `risk-label risk-${riskAnalysis.overallRiskLevel.toLowerCase().replace(/\s+/g, '-')}`;
+  }
+  if (barFillEl) {
+    const percentage = (riskAnalysis.overallRiskScore / riskAnalysis.maxRiskScore) * 100;
+    barFillEl.style.width = `${percentage}%`;
+    
+    // Color based on risk level
+    if (riskAnalysis.overallRiskScore <= 3) {
+      barFillEl.style.background = 'linear-gradient(90deg, #10B981, #34D399)';
+    } else if (riskAnalysis.overallRiskScore <= 6) {
+      barFillEl.style.background = 'linear-gradient(90deg, #F59E0B, #FBBF24)';
+    } else {
+      barFillEl.style.background = 'linear-gradient(90deg, #EF4444, #F87171)';
+    }
+  }
+}
+
+// Render diversification score
+function renderDiversificationScore(score) {
+  const scoreEl = document.getElementById('diversificationScore');
+  const circleEl = document.getElementById('diversificationCircle');
+  const descEl = document.getElementById('diversificationDescription');
+  
+  if (scoreEl) scoreEl.textContent = score;
+  
+  if (circleEl) {
+    // Color based on score
+    if (score >= 70) {
+      circleEl.style.borderColor = '#10B981';
+      circleEl.style.color = '#10B981';
+    } else if (score >= 40) {
+      circleEl.style.borderColor = '#F59E0B';
+      circleEl.style.color = '#F59E0B';
+    } else {
+      circleEl.style.borderColor = '#EF4444';
+      circleEl.style.color = '#EF4444';
+    }
+  }
+  
+  if (descEl) {
+    if (score >= 70) {
+      descEl.textContent = 'Well diversified portfolio';
+    } else if (score >= 40) {
+      descEl.textContent = 'Moderate diversification';
+    } else {
+      descEl.textContent = 'Consider diversifying more';
+    }
+  }
+}
+
+// Render allocation chart (simple bar chart)
+function renderAllocationChart(allocation) {
+  const chartEl = document.getElementById('allocationChart');
+  const legendEl = document.getElementById('allocationLegend');
+  
+  if (!chartEl || allocation.data.length === 0) {
+    if (chartEl) chartEl.innerHTML = '<div class="chart-placeholder">No data available</div>';
+    return;
+  }
+  
+  const colors = ['#4A90E2', '#27AE60', '#E74C3C', '#F39C12', '#9B59B6', '#1ABC9C', '#E67E22', '#3498DB'];
+  
+  // Create simple horizontal bar chart
+  let chartHtml = '<div class="allocation-bars">';
+  allocation.data.forEach((item, index) => {
+    const color = colors[index % colors.length];
+    chartHtml += `
+      <div class="allocation-bar-item">
+        <div class="allocation-bar-label">${escapeHtml(item.type)}</div>
+        <div class="allocation-bar-container">
+          <div class="allocation-bar-fill" style="width: ${item.percentage}%; background: ${color}"></div>
+          <span class="allocation-bar-value">${item.percentage}%</span>
+        </div>
+      </div>
+    `;
+  });
+  chartHtml += '</div>';
+  
+  chartEl.innerHTML = chartHtml;
+  
+  // Legend
+  if (legendEl) {
+    legendEl.innerHTML = allocation.data.map((item, index) => `
+      <div class="legend-item">
+        <span class="legend-color" style="background: ${colors[index % colors.length]}"></span>
+        <span class="legend-label">${escapeHtml(item.type)}: ${formatCurrency(item.value)}</span>
+      </div>
+    `).join('');
+  }
+}
+
+// Render sector chart
+function renderSectorChart(sectorDistribution) {
+  const chartEl = document.getElementById('sectorChart');
+  const legendEl = document.getElementById('sectorLegend');
+  
+  if (!chartEl || sectorDistribution.data.length === 0) {
+    if (chartEl) chartEl.innerHTML = '<div class="chart-placeholder">No data available</div>';
+    return;
+  }
+  
+  const colors = ['#3498DB', '#2ECC71', '#E91E63', '#FF5722', '#00BCD4', '#9C27B0', '#607D8B'];
+  
+  // Create simple horizontal bar chart
+  let chartHtml = '<div class="allocation-bars">';
+  sectorDistribution.data.forEach((item, index) => {
+    const color = colors[index % colors.length];
+    chartHtml += `
+      <div class="allocation-bar-item">
+        <div class="allocation-bar-label">${escapeHtml(item.sector)}</div>
+        <div class="allocation-bar-container">
+          <div class="allocation-bar-fill" style="width: ${item.percentage}%; background: ${color}"></div>
+          <span class="allocation-bar-value">${item.percentage}%</span>
+        </div>
+      </div>
+    `;
+  });
+  chartHtml += '</div>';
+  
+  chartEl.innerHTML = chartHtml;
+  
+  // Legend
+  if (legendEl) {
+    legendEl.innerHTML = sectorDistribution.data.map((item, index) => `
+      <div class="legend-item">
+        <span class="legend-color" style="background: ${colors[index % colors.length]}"></span>
+        <span class="legend-label">${escapeHtml(item.sector)}: ${formatCurrency(item.value)}</span>
+      </div>
+    `).join('');
+  }
+}
+
+// Render benchmark comparison
+function renderBenchmarkComparison(benchmarkComparison) {
+  const tableEl = document.getElementById('benchmarkTable');
+  
+  if (!tableEl || Object.keys(benchmarkComparison).length === 0) {
+    if (tableEl) tableEl.innerHTML = '<div class="chart-placeholder">No data available</div>';
+    return;
+  }
+  
+  let html = `
+    <table class="benchmark-comparison-table">
+      <thead>
+        <tr>
+          <th>Benchmark</th>
+          <th>Expected Value</th>
+          <th>Your Value</th>
+          <th>Outperformance</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+  
+  for (const [benchmark, data] of Object.entries(benchmarkComparison)) {
+    const outperformClass = data.outperformance >= 0 ? 'positive' : 'negative';
+    const sign = data.outperformance >= 0 ? '+' : '';
+    
+    html += `
+      <tr>
+        <td>${escapeHtml(benchmark)}</td>
+        <td>${formatCurrency(data.expectedValue)}</td>
+        <td>${formatCurrency(data.actualValue)}</td>
+        <td class="${outperformClass}">${sign}${formatCurrency(data.outperformance)} (${sign}${data.outperformancePercentage}%)</td>
+      </tr>
+    `;
+  }
+  
+  html += '</tbody></table>';
+  tableEl.innerHTML = html;
+}
+
+// Render top performers
+function renderTopPerformers(performers) {
+  const listEl = document.getElementById('topPerformersList');
+  
+  if (!listEl || performers.length === 0) {
+    if (listEl) listEl.innerHTML = '<div class="chart-placeholder">No data available</div>';
+    return;
+  }
+  
+  listEl.innerHTML = performers.map(p => `
+    <div class="performer-item">
+      <div class="performer-info">
+        <span class="performer-name">${escapeHtml(p.name)}</span>
+        <span class="performer-symbol">${escapeHtml(p.symbol || '')}</span>
+      </div>
+      <div class="performer-returns positive">
+        +${p.returnsPercentage}%
+      </div>
+    </div>
+  `).join('');
+}
+
+// Render bottom performers
+function renderBottomPerformers(performers) {
+  const listEl = document.getElementById('bottomPerformersList');
+  
+  if (!listEl || performers.length === 0) {
+    if (listEl) listEl.innerHTML = '<div class="chart-placeholder">No data available</div>';
+    return;
+  }
+  
+  listEl.innerHTML = performers.map(p => {
+    const returnClass = p.returnsPercentage >= 0 ? 'positive' : 'negative';
+    const sign = p.returnsPercentage >= 0 ? '+' : '';
+    return `
+      <div class="performer-item">
+        <div class="performer-info">
+          <span class="performer-name">${escapeHtml(p.name)}</span>
+          <span class="performer-symbol">${escapeHtml(p.symbol || '')}</span>
+        </div>
+        <div class="performer-returns ${returnClass}">
+          ${sign}${p.returnsPercentage}%
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// Render recommendations
+function renderRecommendations(recommendations) {
+  const listEl = document.getElementById('recommendationsList');
+  
+  if (!listEl || recommendations.length === 0) {
+    if (listEl) listEl.innerHTML = '<div class="chart-placeholder">No recommendations at this time</div>';
+    return;
+  }
+  
+  const iconMap = {
+    'warning': '⚠️',
+    'info': 'ℹ️',
+    'suggestion': '💡'
+  };
+  
+  listEl.innerHTML = recommendations.map(r => `
+    <div class="recommendation-item recommendation-${r.type}">
+      <span class="recommendation-icon">${iconMap[r.type] || '💡'}</span>
+      <div class="recommendation-content">
+        <strong>${escapeHtml(r.title)}</strong>
+        <p>${escapeHtml(r.message)}</p>
+      </div>
+    </div>
+  `).join('');
 }

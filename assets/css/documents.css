@@ -634,3 +634,260 @@ input[type="file"]:focus {
     padding: 0;
   }
 }
+
+
+/* ============================================
+   SMART DOCUMENT ORGANIZATION STYLES
+   ============================================ */
+
+/* Summary cards for expiring/expired */
+.documents-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.summary-card.warning-card {
+  border-color: #F39C12;
+  background: linear-gradient(135deg, #FEF9E7 0%, #fff 100%);
+}
+
+.summary-card.warning-card .summary-icon {
+  background: linear-gradient(135deg, #F39C12 0%, #E67E22 100%);
+}
+
+.summary-card.danger-card {
+  border-color: #E74C3C;
+  background: linear-gradient(135deg, #FDEDEC 0%, #fff 100%);
+}
+
+.summary-card.danger-card .summary-icon {
+  background: linear-gradient(135deg, #E74C3C 0%, #C0392B 100%);
+}
+
+/* Document badges */
+.document-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.5rem 0;
+}
+
+.expiry-badge,
+.linked-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.expiry-badge.expired {
+  background: #FDEDEC;
+  color: #E74C3C;
+  border: 1px solid #E74C3C;
+}
+
+.expiry-badge.expiring {
+  background: #FEF9E7;
+  color: #F39C12;
+  border: 1px solid #F39C12;
+}
+
+.expiry-badge.valid {
+  background: #E8F8F5;
+  color: #27AE60;
+  border: 1px solid #27AE60;
+}
+
+.linked-badge {
+  background: #EBF5FB;
+  color: #4A90E2;
+  border: 1px solid #4A90E2;
+}
+
+/* Category suggestion styles */
+.category-suggestion {
+  margin-top: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(135deg, #E8F5E9 0%, #F1F8E9 100%);
+  border: 2px solid #27AE60;
+  border-radius: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.category-suggestion .suggestion-icon {
+  font-size: 1.25rem;
+}
+
+.category-suggestion .suggestion-text {
+  font-size: 0.875rem;
+  color: #2C3E50;
+}
+
+.category-suggestion .suggestion-text strong {
+  color: #27AE60;
+}
+
+.category-suggestion .suggestion-confidence {
+  font-size: 0.75rem;
+  color: #7F8C8D;
+}
+
+.category-suggestion .suggestion-apply {
+  margin-left: auto;
+  padding: 0.375rem 0.75rem;
+  background: #27AE60;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.category-suggestion .suggestion-apply:hover {
+  background: #1E8449;
+  transform: scale(1.05);
+}
+
+.category-suggestion .suggestion-dismiss {
+  padding: 0.25rem 0.5rem;
+  background: transparent;
+  color: #7F8C8D;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.category-suggestion .suggestion-dismiss:hover {
+  background: rgba(0, 0, 0, 0.1);
+  color: #E74C3C;
+}
+
+.category-suggestion .other-suggestions {
+  width: 100%;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px dashed #27AE60;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: #7F8C8D;
+}
+
+.category-suggestion .suggestion-alt {
+  padding: 0.25rem 0.5rem;
+  background: white;
+  color: #4A90E2;
+  border: 1px solid #4A90E2;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.category-suggestion .suggestion-alt:hover {
+  background: #4A90E2;
+  color: white;
+}
+
+/* Dark mode support */
+[data-theme="dark"] .summary-card.warning-card {
+  background: linear-gradient(135deg, rgba(243, 156, 18, 0.15) 0%, var(--bg-card) 100%);
+}
+
+[data-theme="dark"] .summary-card.danger-card {
+  background: linear-gradient(135deg, rgba(231, 76, 60, 0.15) 0%, var(--bg-card) 100%);
+}
+
+[data-theme="dark"] .expiry-badge.expired {
+  background: rgba(231, 76, 60, 0.2);
+}
+
+[data-theme="dark"] .expiry-badge.expiring {
+  background: rgba(243, 156, 18, 0.2);
+}
+
+[data-theme="dark"] .expiry-badge.valid {
+  background: rgba(39, 174, 96, 0.2);
+}
+
+[data-theme="dark"] .linked-badge {
+  background: rgba(74, 144, 226, 0.2);
+}
+
+[data-theme="dark"] .category-suggestion {
+  background: linear-gradient(135deg, rgba(39, 174, 96, 0.15) 0%, rgba(46, 204, 113, 0.1) 100%);
+}
+
+[data-theme="dark"] .category-suggestion .suggestion-text {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .category-suggestion .suggestion-alt {
+  background: var(--bg-card);
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .documents-summary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .document-badges {
+    gap: 0.375rem;
+  }
+  
+  .expiry-badge,
+  .linked-badge {
+    font-size: 0.65rem;
+    padding: 0.2rem 0.4rem;
+  }
+  
+  .category-suggestion {
+    padding: 0.625rem 0.75rem;
+    gap: 0.375rem;
+  }
+  
+  .category-suggestion .suggestion-icon {
+    font-size: 1rem;
+  }
+  
+  .category-suggestion .suggestion-text {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .documents-summary {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+  
+  .documents-summary .summary-card:nth-child(5) {
+    grid-column: 1 / -1;
+  }
+}

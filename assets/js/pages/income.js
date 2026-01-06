@@ -3,6 +3,7 @@ import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
 import categoriesService from '../services/categories-service.js';
 import paymentMethodsService from '../services/payment-methods-service.js';
+import smartCategorizationService from '../services/smart-categorization-service.js';
 import familySwitcher from '../components/family-switcher.js';
 import toast from '../components/toast.js';
 import themeManager from '../utils/theme-manager.js';
@@ -829,6 +830,22 @@ function setupEventListeners() {
   closeFormBtn.addEventListener('click', closeIncomeForm);
   cancelFormBtn.addEventListener('click', closeIncomeForm);
   
+  // Smart categorization on description input
+  descriptionInput.addEventListener('input', debounce(async () => {
+    const description = descriptionInput.value.trim();
+    if (description.length >= 3 && !sourceInput.value) {
+      const suggestion = await smartCategorizationService.suggestCategory(description, 'income');
+      if (suggestion.category && suggestion.confidence >= 0.5) {
+        // Show suggestion
+        showSourceSuggestion(suggestion);
+      } else {
+        hideSourceSuggestion();
+      }
+    } else {
+      hideSourceSuggestion();
+    }
+  }, 500));
+  
   // Form submit
   incomeForm.addEventListener('submit', handleFormSubmit);
   
@@ -1091,6 +1108,15 @@ async function handleFormSubmit(e) {
     }
     
     if (result.success) {
+      // Learn from this categorization for smart suggestions
+      if (incomeData.description && incomeData.source) {
+        smartCategorizationService.learnFromCategorization(
+          incomeData.description,
+          incomeData.source,
+          'income'
+        );
+      }
+      
       closeIncomeForm();
       
       // If came from house/vehicle page, redirect back
@@ -1190,3 +1216,65 @@ function handleExport() {
   exportToCSV(exportData, filename);
   toast.success('Income exported successfully');
 }
+
+
+// ============================================
+// SMART CATEGORIZATION HELPERS
+// ============================================
+
+// Show source suggestion
+function showSourceSuggestion(suggestion) {
+  // Remove existing suggestion if any
+  hideSourceSuggestion();
+  
+  const sourceGroup = sourceInput.closest('.form-group');
+  if (!sourceGroup) return;
+  
+  const suggestionDiv = document.createElement('div');
+  suggestionDiv.id = 'sourceSuggestion';
+  suggestionDiv.className = 'category-suggestion';
+  suggestionDiv.innerHTML = `
+    <span class="suggestion-icon">💡</span>
+    <span class="suggestion-text">Suggested: <strong>${escapeHtml(suggestion.category)}</strong></span>
+    <span class="suggestion-confidence">(${Math.round(suggestion.confidence * 100)}% match)</span>
+    <button type="button" class="suggestion-apply" onclick="applySourceSuggestion('${escapeHtml(suggestion.category)}')">Apply</button>
+    <button type="button" class="suggestion-dismiss" onclick="hideSourceSuggestion()">✕</button>
+  `;
+  
+  // Show other suggestions if available
+  if (suggestion.suggestions && suggestion.suggestions.length > 1) {
+    const otherSuggestions = suggestion.suggestions.slice(1, 4);
+    if (otherSuggestions.length > 0) {
+      const othersDiv = document.createElement('div');
+      othersDiv.className = 'other-suggestions';
+      othersDiv.innerHTML = `
+        <span>Other options: </span>
+        ${otherSuggestions.map(s => 
+          `<button type="button" class="suggestion-alt" onclick="applySourceSuggestion('${escapeHtml(s.category)}')">${escapeHtml(s.category)}</button>`
+        ).join('')}
+      `;
+      suggestionDiv.appendChild(othersDiv);
+    }
+  }
+  
+  sourceGroup.appendChild(suggestionDiv);
+}
+
+// Hide source suggestion
+function hideSourceSuggestion() {
+  const existing = document.getElementById('sourceSuggestion');
+  if (existing) {
+    existing.remove();
+  }
+}
+
+// Apply source suggestion
+function applySourceSuggestion(source) {
+  sourceInput.value = source;
+  hideSourceSuggestion();
+  toast.success(`Source set to "${source}"`);
+}
+
+// Expose to window for onclick handlers
+window.applySourceSuggestion = applySourceSuggestion;
+window.hideSourceSuggestion = hideSourceSuggestion;

@@ -422,34 +422,49 @@ async function loadVehicleKPIData() {
 
 // Calculate mileage for a specific vehicle
 function calculateVehicleMileage(vehicleFuelLogs) {
-  if (!vehicleFuelLogs || vehicleFuelLogs.length < 2) {
+  if (!vehicleFuelLogs || vehicleFuelLogs.length === 0) {
     return { avgMileage: 0, totalDistance: 0, totalFuelCost: 0, totalFuel: 0 };
   }
 
   // Sort by odometer reading
-  const sortedLogs = [...vehicleFuelLogs].sort((a, b) => a.odometerReading - b.odometerReading);
+  const sortedLogs = [...vehicleFuelLogs].sort((a, b) => (a.odometerReading || 0) - (b.odometerReading || 0));
   
   let totalDistance = 0;
   let totalFuel = 0;
   let totalFuelCost = 0;
 
-  // Calculate mileage between consecutive full tank fills
-  for (let i = 1; i < sortedLogs.length; i++) {
-    const prevLog = sortedLogs[i - 1];
-    const currLog = sortedLogs[i];
-    
-    const distance = currLog.odometerReading - prevLog.odometerReading;
-    totalDistance += distance;
-    totalFuel += currLog.fuelQuantity;
-    totalFuelCost += currLog.totalCost || (currLog.fuelQuantity * currLog.fuelPrice);
+  // Calculate total fuel cost for all entries
+  sortedLogs.forEach(log => {
+    const fuelQty = log.fuelQuantity || 0;
+    const fuelPrc = log.fuelPrice || 0;
+    const cost = log.totalCost || (fuelQty * fuelPrc);
+    totalFuelCost += cost;
+    totalFuel += fuelQty;
+  });
+
+  // Calculate mileage between consecutive entries (need at least 2)
+  if (sortedLogs.length >= 2) {
+    for (let i = 1; i < sortedLogs.length; i++) {
+      const prevLog = sortedLogs[i - 1];
+      const currLog = sortedLogs[i];
+      
+      const distance = (currLog.odometerReading || 0) - (prevLog.odometerReading || 0);
+      if (distance > 0) {
+        totalDistance += distance;
+      }
+    }
   }
 
-  // Add first entry's fuel cost
-  if (sortedLogs.length > 0) {
-    totalFuelCost += sortedLogs[0].totalCost || (sortedLogs[0].fuelQuantity * sortedLogs[0].fuelPrice);
+  // Calculate average mileage (distance / fuel consumed for trips after first fill)
+  // For mileage calculation, we use fuel from entries 2 onwards (since first entry establishes baseline)
+  let fuelForMileage = 0;
+  if (sortedLogs.length >= 2) {
+    for (let i = 1; i < sortedLogs.length; i++) {
+      fuelForMileage += sortedLogs[i].fuelQuantity || 0;
+    }
   }
-
-  const avgMileage = totalFuel > 0 ? totalDistance / totalFuel : 0;
+  
+  const avgMileage = fuelForMileage > 0 ? totalDistance / fuelForMileage : 0;
 
   return {
     avgMileage,
@@ -486,7 +501,8 @@ function calculateOverallMileageStats() {
 // Load fuel logs from Firestore
 async function loadFuelLogs() {
   try {
-    fuelLogs = await firestoreService.getAll('fuelLogs', 'date', 'desc');
+    // Use createdAt for ordering as it's more reliable
+    fuelLogs = await firestoreService.getAll('fuelLogs', 'createdAt', 'desc');
   } catch (error) {
     console.error('Error loading fuel logs:', error);
     fuelLogs = [];
@@ -622,6 +638,15 @@ async function showMileageHistory(vehicleId, vehicleName) {
   // Show loading
   fuelLogList.innerHTML = '<div class="loading-state"><div class="spinner"></div><p>Loading fuel logs...</p></div>';
   
+  // Reset stats while loading
+  vehicleAvgMileage.textContent = '-- km/l';
+  vehicleTotalDistance.textContent = '0 km';
+  vehicleTotalFuelCost.textContent = '₹0';
+  vehicleCostPerKm.textContent = '₹0/km';
+  
+  // Refresh fuel logs to ensure we have latest data
+  await loadFuelLogs();
+  
   // Get fuel logs for this vehicle
   const vehicleFuelLogs = fuelLogs.filter(log => log.vehicleId === vehicleId);
   const stats = calculateVehicleMileage(vehicleFuelLogs);
@@ -642,11 +667,11 @@ async function showMileageHistory(vehicleId, vehicleName) {
       </div>
     `;
   } else {
-    // Sort by date descending
+    // Sort by odometer reading descending (most recent first)
     const sortedLogs = [...vehicleFuelLogs].sort((a, b) => {
-      const dateA = a.date?.toDate ? a.date.toDate() : new Date(a.date);
-      const dateB = b.date?.toDate ? b.date.toDate() : new Date(b.date);
-      return dateB - dateA;
+      const odomA = a.odometerReading || 0;
+      const odomB = b.odometerReading || 0;
+      return odomB - odomA;
     });
     
     fuelLogList.innerHTML = `
@@ -668,19 +693,25 @@ async function showMileageHistory(vehicleId, vehicleName) {
             let mileage = '--';
             if (index < sortedLogs.length - 1) {
               const prevLog = sortedLogs[index + 1];
-              const distance = log.odometerReading - prevLog.odometerReading;
-              if (distance > 0 && log.fuelQuantity > 0) {
-                mileage = (distance / log.fuelQuantity).toFixed(2) + ' km/l';
+              const distance = (log.odometerReading || 0) - (prevLog.odometerReading || 0);
+              const fuelQty = log.fuelQuantity || 0;
+              if (distance > 0 && fuelQty > 0) {
+                mileage = (distance / fuelQty).toFixed(2) + ' km/l';
               }
             }
             
+            const logDate = log.date;
+            const fuelQty = log.fuelQuantity || 0;
+            const fuelPrc = log.fuelPrice || 0;
+            const totalCst = log.totalCost || (fuelQty * fuelPrc);
+            
             return `
               <tr>
-                <td>${formatDate(log.date)}</td>
-                <td>${log.odometerReading?.toLocaleString() || 0} km</td>
-                <td>${log.fuelQuantity?.toFixed(2) || 0} L</td>
-                <td>₹${log.fuelPrice?.toFixed(2) || 0}</td>
-                <td>₹${log.totalCost?.toFixed(2) || 0}</td>
+                <td>${formatDate(logDate)}</td>
+                <td>${(log.odometerReading || 0).toLocaleString()} km</td>
+                <td>${fuelQty.toFixed(2)} L</td>
+                <td>₹${fuelPrc.toFixed(2)}</td>
+                <td>₹${totalCst.toFixed(2)}</td>
                 <td class="${mileage !== '--' ? 'text-success' : ''}">${mileage}</td>
                 <td>
                   <button class="btn-icon btn-danger btn-sm" onclick="window.deleteFuelLog('${log.id}')" title="Delete">
@@ -708,6 +739,10 @@ async function deleteFuelLog(logId) {
   if (!confirm('Are you sure you want to delete this fuel entry?')) return;
   
   try {
+    // Find the log before deleting to get vehicleId
+    const logToDelete = fuelLogs.find(l => l.id === logId);
+    const vehicleId = logToDelete?.vehicleId;
+    
     const result = await firestoreService.delete('fuelLogs', logId);
     if (result.success) {
       showToast('Fuel entry deleted', 'success');
@@ -715,12 +750,9 @@ async function deleteFuelLog(logId) {
       await loadVehicles();
       
       // Refresh the modal if it's open
-      if (mileageHistoryModal.classList.contains('show')) {
+      if (mileageHistoryModal.classList.contains('show') && vehicleId) {
         const vehicleName = mileageVehicleName.textContent;
-        const vehicleId = fuelLogs.find(l => l.id === logId)?.vehicleId;
-        if (vehicleId) {
-          showMileageHistory(vehicleId, vehicleName);
-        }
+        await showMileageHistory(vehicleId, vehicleName);
       }
     } else {
       showToast('Failed to delete fuel entry', 'error');

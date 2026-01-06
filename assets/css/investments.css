@@ -1751,3 +1751,415 @@
   border-color: var(--primary-blue, #4A90E2);
   box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
 }
+
+/* ============================================
+   PORTFOLIO ANALYTICS STYLES
+   ============================================ */
+
+/* Analytics Toggle */
+.analytics-toggle-section {
+  margin: 1rem 0;
+  text-align: center;
+}
+
+.analytics-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Analytics Section */
+.portfolio-analytics-section {
+  background: var(--bg-card, #FFFFFF);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.analytics-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color, #E5E7EB);
+}
+
+.analytics-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: var(--text-primary, #1F2937);
+}
+
+/* Analytics Grid */
+.portfolio-analytics-section .analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.portfolio-analytics-section .analytics-card {
+  background: var(--bg-hover, #F9FAFB);
+  border-radius: 10px;
+  padding: 1.25rem;
+  border: 1px solid var(--border-color, #E5E7EB);
+}
+
+.portfolio-analytics-section .analytics-card h3 {
+  margin: 0 0 1rem 0;
+  font-size: 0.95rem;
+  color: var(--text-secondary, #6B7280);
+  font-weight: 600;
+}
+
+.analytics-card-wide {
+  grid-column: span 2;
+}
+
+.analytics-card-full {
+  grid-column: 1 / -1;
+}
+
+/* Performance Metrics */
+.performance-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.metric-item {
+  text-align: center;
+  padding: 0.75rem;
+  background: var(--bg-card, #FFFFFF);
+  border-radius: 8px;
+}
+
+.metric-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary, #6B7280);
+  margin-bottom: 0.25rem;
+}
+
+.metric-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary, #1F2937);
+}
+
+.metric-value.positive {
+  color: var(--success-green, #10B981);
+}
+
+.metric-value.negative {
+  color: var(--danger-red, #EF4444);
+}
+
+/* Risk Meter */
+.risk-meter {
+  text-align: center;
+}
+
+.risk-score {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--text-primary, #1F2937);
+}
+
+.risk-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 0.5rem 0;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  display: inline-block;
+}
+
+.risk-label.risk-very-low { background: #D1FAE5; color: #065F46; }
+.risk-label.risk-low { background: #D1FAE5; color: #065F46; }
+.risk-label.risk-medium-low { background: #FEF3C7; color: #92400E; }
+.risk-label.risk-medium { background: #FEF3C7; color: #92400E; }
+.risk-label.risk-medium-high { background: #FED7AA; color: #9A3412; }
+.risk-label.risk-high { background: #FEE2E2; color: #991B1B; }
+.risk-label.risk-very-high { background: #FEE2E2; color: #991B1B; }
+
+.risk-bar {
+  height: 8px;
+  background: var(--border-color, #E5E7EB);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 1rem;
+}
+
+.risk-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+/* Diversification Score */
+.diversification-score {
+  text-align: center;
+}
+
+.score-circle {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 6px solid var(--border-color, #E5E7EB);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.score-value {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.score-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary, #6B7280);
+}
+
+.score-description {
+  font-size: 0.85rem;
+  color: var(--text-secondary, #6B7280);
+  margin: 0;
+}
+
+/* Allocation Bars */
+.allocation-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.allocation-bar-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.allocation-bar-label {
+  font-size: 0.8rem;
+  color: var(--text-secondary, #6B7280);
+}
+
+.allocation-bar-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 24px;
+  background: var(--bg-card, #FFFFFF);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.allocation-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  min-width: 2px;
+  transition: width 0.5s ease;
+}
+
+.allocation-bar-value {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-primary, #1F2937);
+  padding-right: 0.5rem;
+}
+
+/* Legend */
+.allocation-legend,
+.sector-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-color, #E5E7EB);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.7rem;
+  color: var(--text-secondary, #6B7280);
+}
+
+.legend-color {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+/* Benchmark Table */
+.benchmark-comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.benchmark-comparison-table th,
+.benchmark-comparison-table td {
+  padding: 0.75rem 0.5rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color, #E5E7EB);
+}
+
+.benchmark-comparison-table th {
+  font-weight: 600;
+  color: var(--text-secondary, #6B7280);
+  font-size: 0.75rem;
+}
+
+.benchmark-comparison-table td.positive {
+  color: var(--success-green, #10B981);
+}
+
+.benchmark-comparison-table td.negative {
+  color: var(--danger-red, #EF4444);
+}
+
+/* Performers List */
+.performers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.performer-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  background: var(--bg-card, #FFFFFF);
+  border-radius: 6px;
+}
+
+.performer-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.performer-name {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-primary, #1F2937);
+}
+
+.performer-symbol {
+  font-size: 0.7rem;
+  color: var(--text-secondary, #6B7280);
+}
+
+.performer-returns {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.performer-returns.positive {
+  color: var(--success-green, #10B981);
+}
+
+.performer-returns.negative {
+  color: var(--danger-red, #EF4444);
+}
+
+/* Recommendations */
+.recommendations-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.recommendation-item {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: 8px;
+  background: var(--bg-card, #FFFFFF);
+}
+
+.recommendation-item.recommendation-warning {
+  border-left: 4px solid #F59E0B;
+}
+
+.recommendation-item.recommendation-info {
+  border-left: 4px solid #3B82F6;
+}
+
+.recommendation-item.recommendation-suggestion {
+  border-left: 4px solid #10B981;
+}
+
+.recommendation-icon {
+  font-size: 1.25rem;
+}
+
+.recommendation-content strong {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: var(--text-primary, #1F2937);
+}
+
+.recommendation-content p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary, #6B7280);
+}
+
+/* Chart Placeholder */
+.chart-placeholder {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-secondary, #6B7280);
+  font-size: 0.9rem;
+}
+
+/* Dark Mode */
+[data-theme="dark"] .portfolio-analytics-section {
+  background: var(--bg-card);
+}
+
+[data-theme="dark"] .portfolio-analytics-section .analytics-card {
+  background: var(--bg-hover);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .metric-item,
+[data-theme="dark"] .performer-item,
+[data-theme="dark"] .recommendation-item,
+[data-theme="dark"] .allocation-bar-container {
+  background: var(--bg-card);
+}
+
+[data-theme="dark"] .benchmark-comparison-table th,
+[data-theme="dark"] .benchmark-comparison-table td {
+  border-color: var(--border-color);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .analytics-card-wide {
+    grid-column: span 1;
+  }
+  
+  .performance-metrics {
+    grid-template-columns: 1fr;
+  }
+  
+  .benchmark-comparison-table {
+    font-size: 0.75rem;
+  }
+  
+  .benchmark-comparison-table th,
+  .benchmark-comparison-table td {
+    padding: 0.5rem 0.25rem;
+  }
+}

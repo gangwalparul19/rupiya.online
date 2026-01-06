@@ -1,0 +1,576 @@
+/* ============================================
+   RUPIYA - APP LOCK STYLES
+   PIN/Biometric lock screen and settings
+   ============================================ */
+
+/* ============================================
+   LOCK SCREEN OVERLAY
+   ============================================ */
+
+.app-lock-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.app-lock-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.app-lock-overlay::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+/* ============================================
+   LOCK SCREEN CONTAINER
+   ============================================ */
+
+.app-lock-container {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 24px;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+  padding: 48px 40px;
+  width: 100%;
+  max-width: 380px;
+  text-align: center;
+  position: relative;
+  animation: lockScreenEntrance 0.4s ease-out;
+}
+
+@keyframes lockScreenEntrance {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.app-lock-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary-blue), #764ba2, #f093fb);
+  border-radius: 24px 24px 0 0;
+}
+
+/* ============================================
+   LOCK ICON
+   ============================================ */
+
+.app-lock-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 24px;
+  background: linear-gradient(135deg, var(--primary-blue), #764ba2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(74, 144, 226, 0.3);
+}
+
+.app-lock-icon svg {
+  width: 40px;
+  height: 40px;
+  color: white;
+}
+
+.app-lock-icon.shake {
+  animation: iconShake 0.5s ease-in-out;
+}
+
+@keyframes iconShake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-8px); }
+  20%, 40%, 60%, 80% { transform: translateX(8px); }
+}
+
+/* ============================================
+   LOCK SCREEN TEXT
+   ============================================ */
+
+.app-lock-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.app-lock-subtitle {
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+  margin-bottom: 32px;
+}
+
+.app-lock-error {
+  font-size: 0.875rem;
+  color: #f5576c;
+  margin-top: 12px;
+  min-height: 20px;
+  animation: fadeIn 0.3s ease;
+}
+
+/* ============================================
+   PIN INPUT
+   ============================================ */
+
+.pin-input-container {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.pin-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--border-color);
+  transition: all 0.2s ease;
+}
+
+.pin-dot.filled {
+  background: linear-gradient(135deg, var(--primary-blue), #764ba2);
+  transform: scale(1.1);
+}
+
+.pin-dot.error {
+  background: #f5576c;
+  animation: dotShake 0.3s ease-in-out;
+}
+
+@keyframes dotShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+/* Hidden actual input */
+.pin-hidden-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ============================================
+   NUMERIC KEYPAD
+   ============================================ */
+
+.pin-keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  max-width: 280px;
+  margin: 0 auto;
+}
+
+.pin-key {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 2px solid var(--border-color);
+  background: var(--white);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pin-key:hover {
+  border-color: var(--primary-blue);
+  background: rgba(74, 144, 226, 0.05);
+}
+
+.pin-key:active {
+  transform: scale(0.95);
+  background: rgba(74, 144, 226, 0.1);
+}
+
+.pin-key.action {
+  border-color: transparent;
+  background: transparent;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.pin-key.action:hover {
+  color: var(--primary-blue);
+  background: rgba(74, 144, 226, 0.05);
+}
+
+.pin-key.action svg {
+  width: 24px;
+  height: 24px;
+}
+
+.pin-key:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ============================================
+   BIOMETRIC BUTTON
+   ============================================ */
+
+.biometric-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 24px;
+  padding: 12px 24px;
+  background: transparent;
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  color: var(--text-secondary);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.biometric-btn:hover {
+  border-color: var(--primary-blue);
+  color: var(--primary-blue);
+  background: rgba(74, 144, 226, 0.05);
+}
+
+.biometric-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* ============================================
+   LOCKOUT STATE
+   ============================================ */
+
+.lockout-message {
+  background: rgba(245, 87, 108, 0.1);
+  border: 1px solid rgba(245, 87, 108, 0.3);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 24px;
+}
+
+.lockout-message p {
+  color: #f5576c;
+  font-size: 0.9375rem;
+  margin: 0;
+}
+
+.lockout-timer {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #f5576c;
+  margin-top: 8px;
+}
+
+/* ============================================
+   SETTINGS SECTION
+   ============================================ */
+
+.app-lock-settings {
+  margin-top: 24px;
+}
+
+.app-lock-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  background: var(--light-gray);
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+
+.app-lock-toggle-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.app-lock-toggle-icon {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, var(--primary-blue), #764ba2);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.app-lock-toggle-icon svg {
+  width: 20px;
+  height: 20px;
+  color: white;
+}
+
+.app-lock-toggle-text h4 {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 2px 0;
+}
+
+.app-lock-toggle-text p {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* Settings Options */
+.app-lock-options {
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
+}
+
+.app-lock-options.visible {
+  display: flex;
+}
+
+.app-lock-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+}
+
+.app-lock-option-label {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+}
+
+.app-lock-option select {
+  padding: 8px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  background: var(--white);
+  color: var(--text-primary);
+}
+
+/* Action Buttons */
+.app-lock-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.app-lock-actions .btn {
+  width: 100%;
+}
+
+/* ============================================
+   PIN SETUP MODAL
+   ============================================ */
+
+.pin-setup-step {
+  text-align: center;
+}
+
+.pin-setup-step h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.pin-setup-step p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+}
+
+.pin-input-display {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.pin-input-box {
+  width: 48px;
+  height: 56px;
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+}
+
+.pin-input-box.active {
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.15);
+}
+
+.pin-input-box.filled {
+  background: rgba(74, 144, 226, 0.05);
+}
+
+/* ============================================
+   DARK MODE
+   ============================================ */
+
+[data-theme="dark"] .app-lock-container {
+  background: rgba(30, 30, 40, 0.95);
+}
+
+[data-theme="dark"] .app-lock-title {
+  color: var(--white);
+}
+
+[data-theme="dark"] .pin-key {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: var(--white);
+}
+
+[data-theme="dark"] .pin-key:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--primary-blue);
+}
+
+[data-theme="dark"] .pin-dot {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="dark"] .biometric-btn {
+  border-color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+[data-theme="dark"] .biometric-btn:hover {
+  border-color: var(--primary-blue);
+  color: var(--primary-blue);
+}
+
+[data-theme="dark"] .app-lock-toggle {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .app-lock-option {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .app-lock-option select {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: var(--white);
+}
+
+[data-theme="dark"] .pin-input-box {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: var(--white);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 480px) {
+  .app-lock-container {
+    padding: 32px 24px;
+    margin: 16px;
+    border-radius: 20px;
+  }
+  
+  .app-lock-icon {
+    width: 64px;
+    height: 64px;
+  }
+  
+  .app-lock-icon svg {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .app-lock-title {
+    font-size: 1.25rem;
+  }
+  
+  .pin-keypad {
+    gap: 8px;
+  }
+  
+  .pin-key {
+    width: 64px;
+    height: 64px;
+    font-size: 1.25rem;
+  }
+  
+  .pin-input-container {
+    gap: 8px;
+  }
+  
+  .pin-dot {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-lock-overlay,
+  .app-lock-container,
+  .pin-dot,
+  .pin-key,
+  .app-lock-icon {
+    animation: none;
+    transition: none;
+  }
+}

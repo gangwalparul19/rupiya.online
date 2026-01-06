@@ -128,6 +128,20 @@
             <div class="summary-value" id="storageUsed">0 MB</div>
           </div>
         </div>
+        <div class="summary-card warning-card">
+          <div class="summary-icon">⏰</div>
+          <div class="summary-content">
+            <div class="summary-label">Expiring Soon</div>
+            <div class="summary-value" id="expiringDocuments">0</div>
+          </div>
+        </div>
+        <div class="summary-card danger-card">
+          <div class="summary-icon">⚠️</div>
+          <div class="summary-content">
+            <div class="summary-label">Expired</div>
+            <div class="summary-value" id="expiredDocuments">0</div>
+          </div>
+        </div>
       </div>
 
       <!-- Search and Filter -->
@@ -175,8 +189,11 @@
                 <option value="Tax">Tax Documents</option>
                 <option value="Insurance">Insurance</option>
                 <option value="Property">Property</option>
+                <option value="Vehicle">Vehicle</option>
                 <option value="Investment">Investment</option>
+                <option value="Loan">Loan</option>
                 <option value="Personal">Personal</option>
+                <option value="Warranty">Warranty</option>
                 <option value="Other">Other</option>
               </select>
               <span class="error-message" id="categoryError"></span>
@@ -186,6 +203,26 @@
               <label for="documentDate">Document Date</label>
               <input type="date" id="documentDate">
               <span class="error-message" id="documentDateError"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="expiryDate">Expiry Date</label>
+              <input type="date" id="expiryDate">
+              <small class="form-help">For documents that expire (insurance, licenses, etc.)</small>
+            </div>
+
+            <div class="form-group">
+              <label for="reminderDays">Reminder (days before)</label>
+              <input type="number" id="reminderDays" min="1" max="365" value="30" placeholder="30">
+              <small class="form-help">Get reminded before expiry</small>
+            </div>
+
+            <div class="form-group form-group-full" style="display: none;">
+              <label for="linkedAsset">Link to Asset</label>
+              <select id="linkedAsset">
+                <option value="">No linked asset</option>
+              </select>
+              <small class="form-help">Link this document to a vehicle, property, loan, or investment</small>
             </div>
 
             <div class="form-group form-group-full">

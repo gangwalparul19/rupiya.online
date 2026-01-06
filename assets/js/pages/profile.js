@@ -5,6 +5,8 @@ import categoriesService from '../services/categories-service.js';
 import familySwitcher from '../components/family-switcher.js';
 import toast from '../components/toast.js';
 import themeManager from '../utils/theme-manager.js';
+import appLockService from '../services/app-lock-service.js';
+import pinSetupModal from '../components/pin-setup-modal.js';
 import { updateProfile, updatePassword, EmailAuthProvider, reauthenticateWithCredential, deleteUser, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
 import { doc, setDoc, Timestamp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
 import { db, auth } from '../config/firebase-config.js';
@@ -49,6 +51,9 @@ async function init() {
   setupSecuritySection();
   await loadUserPreferences();
   await loadCategories();
+  
+  // Initialize App Lock settings
+  initAppLockSettings();
 }
 
 function initDOMElements() {
@@ -691,6 +696,154 @@ async function handleResetCategories() {
 // Expose functions to window
 window.deleteExpenseCategory = deleteExpenseCategory;
 window.deleteIncomeCategory = deleteIncomeCategory;
+
+// ============================================
+// APP LOCK SETTINGS
+// ============================================
+
+let appLockToggle, appLockStatus, appLockOptions;
+let autoLockTimeoutSelect, lockOnBackgroundToggle, useBiometricToggle;
+let changePinBtn, biometricOption;
+
+function initAppLockSettings() {
+  // Get DOM elements
+  appLockToggle = document.getElementById('appLockToggle');
+  appLockStatus = document.getElementById('appLockStatus');
+  appLockOptions = document.getElementById('appLockOptions');
+  autoLockTimeoutSelect = document.getElementById('autoLockTimeout');
+  lockOnBackgroundToggle = document.getElementById('lockOnBackground');
+  useBiometricToggle = document.getElementById('useBiometric');
+  changePinBtn = document.getElementById('changePinBtn');
+  biometricOption = document.getElementById('biometricOption');
+
+  // Load current settings
+  loadAppLockSettings();
+  
+  // Setup event listeners
+  setupAppLockListeners();
+  
+  // Check biometric availability
+  checkBiometricAvailability();
+}
+
+function loadAppLockSettings() {
+  const settings = appLockService.getSettings();
+  const isEnabled = appLockService.isEnabled();
+  
+  // Update toggle state
+  if (appLockToggle) {
+    appLockToggle.checked = isEnabled;
+  }
+  
+  // Update status text
+  if (appLockStatus) {
+    appLockStatus.textContent = isEnabled ? 'Enabled' : 'Disabled';
+  }
+  
+  // Show/hide options
+  if (appLockOptions) {
+    appLockOptions.classList.toggle('visible', isEnabled);
+  }
+  
+  // Load option values
+  if (autoLockTimeoutSelect) {
+    autoLockTimeoutSelect.value = settings.autoLockTimeout.toString();
+  }
+  
+  if (lockOnBackgroundToggle) {
+    lockOnBackgroundToggle.checked = settings.lockOnBackground;
+  }
+  
+  if (useBiometricToggle) {
+    useBiometricToggle.checked = settings.useBiometric;
+  }
+}
+
+function setupAppLockListeners() {
+  // Toggle app lock
+  if (appLockToggle) {
+    appLockToggle.addEventListener('change', handleAppLockToggle);
+  }
+  
+  // Auto-lock timeout
+  if (autoLockTimeoutSelect) {
+    autoLockTimeoutSelect.addEventListener('change', handleAutoLockTimeoutChange);
+  }
+  
+  // Lock on background
+  if (lockOnBackgroundToggle) {
+    lockOnBackgroundToggle.addEventListener('change', handleLockOnBackgroundChange);
+  }
+  
+  // Biometric toggle
+  if (useBiometricToggle) {
+    useBiometricToggle.addEventListener('change', handleBiometricToggle);
+  }
+  
+  // Change PIN button
+  if (changePinBtn) {
+    changePinBtn.addEventListener('click', handleChangePinClick);
+  }
+}
+
+async function checkBiometricAvailability() {
+  const available = await appLockService.isBiometricAvailable();
+  if (biometricOption) {
+    biometricOption.style.display = available ? 'flex' : 'none';
+  }
+}
+
+function handleAppLockToggle() {
+  const isChecked = appLockToggle.checked;
+  
+  if (isChecked) {
+    // Show PIN setup modal
+    pinSetupModal.showSetup((success) => {
+      if (success) {
+        loadAppLockSettings();
+      } else {
+        // Revert toggle if setup was cancelled
+        appLockToggle.checked = false;
+      }
+    });
+  } else {
+    // Show PIN verification to disable
+    pinSetupModal.showDisable((success) => {
+      if (success) {
+        loadAppLockSettings();
+      } else {
+        // Revert toggle if disable was cancelled
+        appLockToggle.checked = true;
+      }
+    });
+  }
+}
+
+function handleAutoLockTimeoutChange() {
+  const timeout = parseInt(autoLockTimeoutSelect.value, 10);
+  appLockService.updateSettings({ autoLockTimeout: timeout });
+  showToast('Auto-lock timeout updated', 'success');
+}
+
+function handleLockOnBackgroundChange() {
+  const enabled = lockOnBackgroundToggle.checked;
+  appLockService.updateSettings({ lockOnBackground: enabled });
+  showToast(`Lock on background ${enabled ? 'enabled' : 'disabled'}`, 'success');
+}
+
+function handleBiometricToggle() {
+  const enabled = useBiometricToggle.checked;
+  appLockService.updateSettings({ useBiometric: enabled });
+  showToast(`Biometric authentication ${enabled ? 'enabled' : 'disabled'}`, 'success');
+}
+
+function handleChangePinClick() {
+  pinSetupModal.showChange((success) => {
+    if (success) {
+      loadAppLockSettings();
+    }
+  });
+}
 
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', init);

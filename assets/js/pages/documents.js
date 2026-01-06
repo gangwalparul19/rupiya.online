@@ -2,6 +2,7 @@
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
 import storageService from '../services/storage-service.js';
+import smartDocumentService from '../services/smart-document-service.js';
 import toast from '../components/toast.js';
 import { formatDate, escapeHtml, formatDateForInput } from '../utils/helpers.js';
 import timezoneService from '../utils/timezone.js';
@@ -24,6 +25,10 @@ let currentFileGroup, currentFileName, currentFileLink;
 let deleteModal, closeDeleteModalBtn, cancelDeleteBtn, confirmDeleteBtn;
 let deleteBtnText, deleteBtnSpinner, deleteDocumentName;
 let deleteDocumentId = null;
+
+// Smart document elements
+let expiryDateInput, reminderDaysInput, linkedAssetSelect, categorySuggestionEl;
+let expiringDocumentsEl, expiredDocumentsEl;
 
 async function init() {
   const user = await authService.waitForAuth();
@@ -76,6 +81,14 @@ function initDOMElements() {
   deleteBtnText = document.getElementById('deleteBtnText');
   deleteBtnSpinner = document.getElementById('deleteBtnSpinner');
   deleteDocumentName = document.getElementById('deleteDocumentName');
+  
+  // Smart document elements
+  expiryDateInput = document.getElementById('expiryDate');
+  reminderDaysInput = document.getElementById('reminderDays');
+  linkedAssetSelect = document.getElementById('linkedAsset');
+  categorySuggestionEl = document.getElementById('categorySuggestion');
+  expiringDocumentsEl = document.getElementById('expiringDocuments');
+  expiredDocumentsEl = document.getElementById('expiredDocuments');
 }
 
 function setupEventListeners() {
@@ -109,6 +122,55 @@ function setupEventListeners() {
   closeDeleteModalBtn.addEventListener('click', hideDeleteModal);
   cancelDeleteBtn.addEventListener('click', hideDeleteModal);
   confirmDeleteBtn.addEventListener('click', handleDelete);
+  
+  // Smart document event listeners
+  const nameInput = document.getElementById('name');
+  const categorySelect = document.getElementById('category');
+  
+  // Auto-suggest category on name input
+  nameInput?.addEventListener('input', debounce(() => {
+    const name = nameInput.value.trim();
+    const fileName = fileInput?.files[0]?.name || '';
+    if (name.length >= 3 && !categorySelect.value) {
+      const suggestion = smartDocumentService.suggestCategory(name, '', fileName);
+      if (suggestion.category !== 'Other' && suggestion.confidence >= 0.3) {
+        showCategorySuggestion(suggestion);
+      } else {
+        hideCategorySuggestion();
+      }
+    } else {
+      hideCategorySuggestion();
+    }
+  }, 300));
+  
+  // Load linkable assets when category changes
+  categorySelect?.addEventListener('change', async () => {
+    const category = categorySelect.value;
+    await loadLinkableAssets(category);
+    
+    // Suggest expiry date based on category
+    const expiryInfo = smartDocumentService.suggestExpiryDate(category);
+    if (expiryInfo.hasExpiry && expiryDateInput) {
+      const suggestedDate = expiryInfo.suggestedExpiryDate;
+      expiryDateInput.value = formatDateForInput(suggestedDate);
+      if (reminderDaysInput) {
+        reminderDaysInput.value = expiryInfo.defaultReminderDays;
+      }
+    }
+    
+    hideCategorySuggestion();
+  });
+  
+  // Auto-suggest category from file name
+  fileInput?.addEventListener('change', () => {
+    const file = fileInput.files[0];
+    if (file && !categorySelect.value) {
+      const suggestion = smartDocumentService.suggestCategory(nameInput.value || '', '', file.name);
+      if (suggestion.category !== 'Other' && suggestion.confidence >= 0.3) {
+        showCategorySuggestion(suggestion);
+      }
+    }
+  });
 }
 
 function loadUserProfile(user) {
@@ -162,6 +224,27 @@ function showEditForm(doc) {
   document.getElementById('category').value = doc.category;
   document.getElementById('documentDate').value = doc.documentDate ? formatDateForInput(doc.documentDate) : '';
   document.getElementById('description').value = doc.description || '';
+  
+  // Populate expiry fields
+  const expiryDateEl = document.getElementById('expiryDate');
+  const reminderDaysEl = document.getElementById('reminderDays');
+  if (expiryDateEl && doc.expiryDate) {
+    const expiry = doc.expiryDate.toDate ? doc.expiryDate.toDate() : new Date(doc.expiryDate);
+    expiryDateEl.value = formatDateForInput(expiry);
+  } else if (expiryDateEl) {
+    expiryDateEl.value = '';
+  }
+  if (reminderDaysEl) {
+    reminderDaysEl.value = doc.reminderDays || 30;
+  }
+  
+  // Load linkable assets and set selected
+  loadLinkableAssets(doc.category).then(() => {
+    const linkedAssetEl = document.getElementById('linkedAsset');
+    if (linkedAssetEl && doc.linkedAssetType && doc.linkedAssetId) {
+      linkedAssetEl.value = `${doc.linkedAssetType}:${doc.linkedAssetId}`;
+    }
+  });
   
   // Show current file
   if (doc.fileUrl) {
@@ -239,6 +322,27 @@ async function handleSubmit(e) {
       formData.fileType = fileType;
     }
 
+    // Add expiry date if set
+    const expiryDateValue = document.getElementById('expiryDate')?.value;
+    if (expiryDateValue) {
+      formData.expiryDate = timezoneService.parseInputDate(expiryDateValue);
+      const reminderDays = parseInt(document.getElementById('reminderDays')?.value) || 30;
+      formData.reminderDays = reminderDays;
+      
+      // Calculate reminder date
+      const reminderDate = new Date(formData.expiryDate);
+      reminderDate.setDate(reminderDate.getDate() - reminderDays);
+      formData.reminderDate = reminderDate;
+    }
+
+    // Add linked asset if selected
+    const linkedAssetValue = document.getElementById('linkedAsset')?.value;
+    if (linkedAssetValue) {
+      const [assetType, assetId] = linkedAssetValue.split(':');
+      formData.linkedAssetType = assetType;
+      formData.linkedAssetId = assetId;
+    }
+
     let result;
     if (editingDocumentId) {
       // If editing and new file uploaded, delete old file
@@ -292,6 +396,9 @@ async function loadDocuments() {
     }
 
     updateSummary();
+    
+    // Load expiring documents alert
+    await loadExpiringDocumentsAlert();
   } catch (error) {
     console.error('Error loading documents:', error);
     showToast('Failed to load documents', 'error');
@@ -336,6 +443,8 @@ function renderDocuments() {
     return;
   }
 
+  const now = new Date();
+
   documentsList.innerHTML = filteredDocuments.map(doc => {
     const icon = doc.fileName ? storageService.getFileIcon(doc.fileName) : getDocumentIcon(doc.category);
     const fileSize = doc.fileSize ? ` (${storageService.formatFileSize(doc.fileSize)})` : '';
@@ -344,6 +453,31 @@ function renderDocuments() {
     const escapedFileName = doc.fileName ? escapeHtml(doc.fileName) : '';
     const escapedDescription = doc.description ? escapeHtml(doc.description) : '';
     
+    // Check expiry status
+    let expiryBadge = '';
+    if (doc.expiryDate) {
+      const expiry = doc.expiryDate.toDate ? doc.expiryDate.toDate() : new Date(doc.expiryDate);
+      const daysUntil = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
+      
+      if (daysUntil < 0) {
+        expiryBadge = `<span class="expiry-badge expired">Expired ${Math.abs(daysUntil)} days ago</span>`;
+      } else if (daysUntil <= 30) {
+        expiryBadge = `<span class="expiry-badge expiring">Expires in ${daysUntil} days</span>`;
+      } else {
+        expiryBadge = `<span class="expiry-badge valid">Expires ${formatDate(expiry)}</span>`;
+      }
+    }
+    
+    // Check linked asset
+    let linkedBadge = '';
+    if (doc.linkedAssetType && doc.linkedAssetId) {
+      const assetIcon = doc.linkedAssetType === 'vehicle' ? '🚗' : 
+                        doc.linkedAssetType === 'house' ? '🏠' : 
+                        doc.linkedAssetType === 'loan' ? '🏦' : 
+                        doc.linkedAssetType === 'investment' ? '📈' : '🔗';
+      linkedBadge = `<span class="linked-badge">${assetIcon} Linked</span>`;
+    }
+    
     return `
     <div class="document-card" onclick="window.viewDocument('${doc.id}')">
       <div class="document-icon">${icon}</div>
@@ -351,6 +485,10 @@ function renderDocuments() {
       <div class="document-meta">
         <span class="document-category">${escapedCategory}</span>
         ${doc.documentDate ? `<span class="document-date">${formatDate(doc.documentDate)}</span>` : ''}
+      </div>
+      <div class="document-badges">
+        ${expiryBadge}
+        ${linkedBadge}
       </div>
       ${doc.fileName ? `<div class="document-description">${escapedFileName}${fileSize}</div>` : ''}
       ${doc.description ? `<div class="document-description">${escapedDescription}</div>` : ''}
@@ -466,6 +604,143 @@ window.viewDocument = viewDocument;
 window.openDocument = openDocument;
 window.editDocument = editDocument;
 window.showDeleteConfirmation = showDeleteConfirmation;
+
+// ============================================
+// SMART DOCUMENT HELPERS
+// ============================================
+
+// Debounce helper
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
+// Show category suggestion
+function showCategorySuggestion(suggestion) {
+  hideCategorySuggestion();
+  
+  const categoryGroup = document.getElementById('category')?.closest('.form-group');
+  if (!categoryGroup) return;
+  
+  const suggestionDiv = document.createElement('div');
+  suggestionDiv.id = 'categorySuggestion';
+  suggestionDiv.className = 'category-suggestion';
+  suggestionDiv.innerHTML = `
+    <span class="suggestion-icon">💡</span>
+    <span class="suggestion-text">Suggested: <strong>${escapeHtml(suggestion.category)}</strong></span>
+    <span class="suggestion-confidence">(${Math.round(suggestion.confidence * 100)}% match)</span>
+    <button type="button" class="suggestion-apply" onclick="applyCategorySuggestion('${escapeHtml(suggestion.category)}')">Apply</button>
+    <button type="button" class="suggestion-dismiss" onclick="hideCategorySuggestion()">✕</button>
+  `;
+  
+  // Show other suggestions if available
+  if (suggestion.suggestions && suggestion.suggestions.length > 1) {
+    const otherSuggestions = suggestion.suggestions.slice(1, 3);
+    if (otherSuggestions.length > 0) {
+      const othersDiv = document.createElement('div');
+      othersDiv.className = 'other-suggestions';
+      othersDiv.innerHTML = `
+        <span>Other options: </span>
+        ${otherSuggestions.map(s => 
+          `<button type="button" class="suggestion-alt" onclick="applyCategorySuggestion('${escapeHtml(s.category)}')">${escapeHtml(s.category)}</button>`
+        ).join('')}
+      `;
+      suggestionDiv.appendChild(othersDiv);
+    }
+  }
+  
+  categoryGroup.appendChild(suggestionDiv);
+}
+
+// Hide category suggestion
+function hideCategorySuggestion() {
+  const existing = document.getElementById('categorySuggestion');
+  if (existing) {
+    existing.remove();
+  }
+}
+
+// Apply category suggestion
+function applyCategorySuggestion(category) {
+  const categorySelect = document.getElementById('category');
+  if (categorySelect) {
+    // Check if category exists in options, if not add it
+    const options = Array.from(categorySelect.options).map(o => o.value);
+    if (!options.includes(category)) {
+      const option = document.createElement('option');
+      option.value = category;
+      option.textContent = category;
+      categorySelect.appendChild(option);
+    }
+    categorySelect.value = category;
+    categorySelect.dispatchEvent(new Event('change'));
+  }
+  hideCategorySuggestion();
+  showToast(`Category set to "${category}"`, 'success');
+}
+
+// Load linkable assets for a category
+async function loadLinkableAssets(category) {
+  if (!linkedAssetSelect) return;
+  
+  const assets = await smartDocumentService.getLinkableAssets(category);
+  
+  linkedAssetSelect.innerHTML = '<option value="">No linked asset</option>';
+  
+  if (assets.length > 0) {
+    assets.forEach(asset => {
+      const option = document.createElement('option');
+      option.value = `${asset.type}:${asset.id}`;
+      option.textContent = `${asset.icon} ${asset.name}`;
+      linkedAssetSelect.appendChild(option);
+    });
+    linkedAssetSelect.closest('.form-group').style.display = 'block';
+  } else {
+    linkedAssetSelect.closest('.form-group').style.display = 'none';
+  }
+}
+
+// Load expiring documents alert
+async function loadExpiringDocumentsAlert() {
+  try {
+    const [expiring, expired] = await Promise.all([
+      smartDocumentService.getExpiringDocuments(30),
+      smartDocumentService.getExpiredDocuments()
+    ]);
+    
+    // Update expiring documents count
+    if (expiringDocumentsEl) {
+      expiringDocumentsEl.textContent = expiring.length;
+      expiringDocumentsEl.closest('.summary-card')?.classList.toggle('warning', expiring.length > 0);
+    }
+    
+    // Update expired documents count
+    if (expiredDocumentsEl) {
+      expiredDocumentsEl.textContent = expired.length;
+      expiredDocumentsEl.closest('.summary-card')?.classList.toggle('danger', expired.length > 0);
+    }
+    
+    // Show alert if there are expiring/expired documents
+    if (expired.length > 0) {
+      showToast(`⚠️ ${expired.length} document(s) have expired!`, 'warning');
+    } else if (expiring.length > 0) {
+      showToast(`📅 ${expiring.length} document(s) expiring soon`, 'info');
+    }
+  } catch (error) {
+    console.error('Error loading expiring documents:', error);
+  }
+}
+
+// Expose functions to window
+window.applyCategorySuggestion = applyCategorySuggestion;
+window.hideCategorySuggestion = hideCategorySuggestion;
 
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', init);

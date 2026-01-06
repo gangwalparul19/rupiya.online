@@ -3,6 +3,7 @@ import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
 import categoriesService from '../services/categories-service.js';
 import paymentMethodsService from '../services/payment-methods-service.js';
+import smartCategorizationService from '../services/smart-categorization-service.js';
 import familySwitcher from '../components/family-switcher.js';
 import toast from '../components/toast.js';
 import themeManager from '../utils/theme-manager.js';
@@ -843,6 +844,22 @@ function setupEventListeners() {
   closeFormBtn.addEventListener('click', closeExpenseForm);
   cancelFormBtn.addEventListener('click', closeExpenseForm);
   
+  // Smart categorization on description input
+  descriptionInput.addEventListener('input', debounce(async () => {
+    const description = descriptionInput.value.trim();
+    if (description.length >= 3 && !categoryInput.value) {
+      const suggestion = await smartCategorizationService.suggestCategory(description, 'expense');
+      if (suggestion.category && suggestion.confidence >= 0.5) {
+        // Show suggestion
+        showCategorySuggestion(suggestion);
+      } else {
+        hideCategorySuggestion();
+      }
+    } else {
+      hideCategorySuggestion();
+    }
+  }, 500));
+  
   // Form submit
   expenseForm.addEventListener('submit', handleFormSubmit);
   
@@ -1105,6 +1122,15 @@ async function handleFormSubmit(e) {
     }
     
     if (result.success) {
+      // Learn from this categorization for smart suggestions
+      if (expenseData.description && expenseData.category) {
+        smartCategorizationService.learnFromCategorization(
+          expenseData.description,
+          expenseData.category,
+          'expense'
+        );
+      }
+      
       closeExpenseForm();
       
       // If came from house/vehicle page, redirect back
@@ -1204,3 +1230,64 @@ function handleExport() {
   exportToCSV(exportData, filename);
   toast.success('Expenses exported successfully');
 }
+
+// ============================================
+// SMART CATEGORIZATION HELPERS
+// ============================================
+
+// Show category suggestion
+function showCategorySuggestion(suggestion) {
+  // Remove existing suggestion if any
+  hideCategorySuggestion();
+  
+  const categoryGroup = categoryInput.closest('.form-group');
+  if (!categoryGroup) return;
+  
+  const suggestionDiv = document.createElement('div');
+  suggestionDiv.id = 'categorySuggestion';
+  suggestionDiv.className = 'category-suggestion';
+  suggestionDiv.innerHTML = `
+    <span class="suggestion-icon">💡</span>
+    <span class="suggestion-text">Suggested: <strong>${escapeHtml(suggestion.category)}</strong></span>
+    <span class="suggestion-confidence">(${Math.round(suggestion.confidence * 100)}% match)</span>
+    <button type="button" class="suggestion-apply" onclick="applyCategorySuggestion('${escapeHtml(suggestion.category)}')">Apply</button>
+    <button type="button" class="suggestion-dismiss" onclick="hideCategorySuggestion()">✕</button>
+  `;
+  
+  // Show other suggestions if available
+  if (suggestion.suggestions && suggestion.suggestions.length > 1) {
+    const otherSuggestions = suggestion.suggestions.slice(1, 4);
+    if (otherSuggestions.length > 0) {
+      const othersDiv = document.createElement('div');
+      othersDiv.className = 'other-suggestions';
+      othersDiv.innerHTML = `
+        <span>Other options: </span>
+        ${otherSuggestions.map(s => 
+          `<button type="button" class="suggestion-alt" onclick="applyCategorySuggestion('${escapeHtml(s.category)}')">${escapeHtml(s.category)}</button>`
+        ).join('')}
+      `;
+      suggestionDiv.appendChild(othersDiv);
+    }
+  }
+  
+  categoryGroup.appendChild(suggestionDiv);
+}
+
+// Hide category suggestion
+function hideCategorySuggestion() {
+  const existing = document.getElementById('categorySuggestion');
+  if (existing) {
+    existing.remove();
+  }
+}
+
+// Apply category suggestion
+function applyCategorySuggestion(category) {
+  categoryInput.value = category;
+  hideCategorySuggestion();
+  toast.success(`Category set to "${category}"`);
+}
+
+// Expose to window for onclick handlers
+window.applyCategorySuggestion = applyCategorySuggestion;
+window.hideCategorySuggestion = hideCategorySuggestion;

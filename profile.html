@@ -28,6 +28,7 @@
   <link rel="stylesheet" href="assets/css/ux-enhancements.css">
   <link rel="stylesheet" href="assets/css/sidebar.css">
   <link rel="stylesheet" href="assets/css/setup-wizard.css">
+  <link rel="stylesheet" href="assets/css/app-lock.css">
   
   <!-- Auth Guard - Must be loaded early to prevent flash of protected content -->
   <script src="assets/js/utils/auth-guard.js"></script>
@@ -259,6 +260,81 @@
                   <span id="sendResetEmailBtnText">Send Password Reset Email</span>
                   <span id="sendResetEmailBtnSpinner" class="spinner" style="display: none;"></span>
                 </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- App Lock Settings -->
+          <div class="settings-card" id="appLockSection">
+            <div class="settings-card-header">
+              <h2 class="settings-card-title">App Lock</h2>
+              <p class="settings-card-subtitle">Protect your financial data with PIN or biometric authentication</p>
+            </div>
+            <div class="settings-card-body">
+              <div class="app-lock-settings">
+                <!-- Enable/Disable Toggle -->
+                <div class="app-lock-toggle">
+                  <div class="app-lock-toggle-info">
+                    <div class="app-lock-toggle-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                        <path d="M7 11V7a5 5 0 0110 0v4"/>
+                      </svg>
+                    </div>
+                    <div class="app-lock-toggle-text">
+                      <h4>PIN Lock</h4>
+                      <p id="appLockStatus">Disabled</p>
+                    </div>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="appLockToggle">
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+
+                <!-- App Lock Options (shown when enabled) -->
+                <div class="app-lock-options" id="appLockOptions">
+                  <!-- Auto-lock Timeout -->
+                  <div class="app-lock-option">
+                    <span class="app-lock-option-label">Auto-lock after</span>
+                    <select id="autoLockTimeout">
+                      <option value="0">Immediately</option>
+                      <option value="1">1 minute</option>
+                      <option value="5" selected>5 minutes</option>
+                      <option value="15">15 minutes</option>
+                      <option value="30">30 minutes</option>
+                      <option value="-1">Never</option>
+                    </select>
+                  </div>
+
+                  <!-- Lock on Background -->
+                  <div class="app-lock-option">
+                    <span class="app-lock-option-label">Lock when app goes to background</span>
+                    <label class="toggle-switch">
+                      <input type="checkbox" id="lockOnBackground" checked>
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </div>
+
+                  <!-- Biometric Option (if available) -->
+                  <div class="app-lock-option" id="biometricOption" style="display: none;">
+                    <span class="app-lock-option-label">Use biometric authentication</span>
+                    <label class="toggle-switch">
+                      <input type="checkbox" id="useBiometric">
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </div>
+
+                  <!-- Action Buttons -->
+                  <div class="app-lock-actions">
+                    <button class="btn btn-outline" id="changePinBtn">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                      </svg>
+                      Change PIN
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -647,6 +723,7 @@
   </script>
 
   <!-- Scripts -->
+  <script type="module" src="assets/js/utils/app-lock-guard.js"></script>
   <script type="module" src="assets/js/utils/ux-enhancements.js"></script>
   <script type="module" src="assets/js/components/sidebar.js"></script>
   <script type="module" src="assets/js/pages/profile.js"></script>

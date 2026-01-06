@@ -31,6 +31,7 @@
   <link rel="stylesheet" href="assets/css/ux-enhancements.css">
   <link rel="stylesheet" href="assets/css/sidebar.css">
   <link rel="stylesheet" href="assets/css/setup-wizard.css">
+  <link rel="stylesheet" href="assets/css/app-lock.css">
 
   <!-- Auth Guard - Must be loaded early to prevent flash of protected content -->
   <script src="assets/js/utils/auth-guard.js"></script>
@@ -132,6 +133,129 @@
             <div class="summary-label">Total Returns</div>
             <div class="summary-value" id="totalReturns">₹0</div>
             <div class="summary-change" id="returnsPercentage">0%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Portfolio Analytics Toggle -->
+      <div class="analytics-toggle-section">
+        <button class="btn btn-outline analytics-toggle-btn" id="toggleAnalyticsBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+          </svg>
+          <span id="analyticsToggleText">Show Analytics</span>
+        </button>
+      </div>
+
+      <!-- Portfolio Analytics Section (Hidden by default) -->
+      <div class="portfolio-analytics-section" id="portfolioAnalyticsSection" style="display: none;">
+        <div class="analytics-header">
+          <h2>Portfolio Analytics</h2>
+          <button class="btn btn-sm btn-outline" id="refreshAnalyticsBtn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+            </svg>
+            Refresh
+          </button>
+        </div>
+
+        <!-- Analytics Grid -->
+        <div class="analytics-grid">
+          <!-- Performance Metrics -->
+          <div class="analytics-card analytics-card-wide">
+            <h3>Performance Metrics</h3>
+            <div class="performance-metrics">
+              <div class="metric-item">
+                <span class="metric-label">CAGR</span>
+                <span class="metric-value" id="analyticsCAGR">0%</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">XIRR</span>
+                <span class="metric-value" id="analyticsXIRR">0%</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">Absolute Returns</span>
+                <span class="metric-value" id="analyticsAbsoluteReturns">₹0</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">Investment Period</span>
+                <span class="metric-value" id="analyticsInvestmentPeriod">0 years</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Risk Analysis -->
+          <div class="analytics-card">
+            <h3>Risk Analysis</h3>
+            <div class="risk-meter">
+              <div class="risk-score" id="riskScore">0</div>
+              <div class="risk-label" id="riskLabel">N/A</div>
+              <div class="risk-bar">
+                <div class="risk-bar-fill" id="riskBarFill" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Diversification Score -->
+          <div class="analytics-card">
+            <h3>Diversification</h3>
+            <div class="diversification-score">
+              <div class="score-circle" id="diversificationCircle">
+                <span class="score-value" id="diversificationScore">0</span>
+                <span class="score-label">/100</span>
+              </div>
+              <p class="score-description" id="diversificationDescription">Add investments to see score</p>
+            </div>
+          </div>
+
+          <!-- Allocation Chart -->
+          <div class="analytics-card">
+            <h3>Asset Allocation</h3>
+            <div class="allocation-chart" id="allocationChart">
+              <div class="chart-placeholder">Loading...</div>
+            </div>
+            <div class="allocation-legend" id="allocationLegend"></div>
+          </div>
+
+          <!-- Sector Distribution -->
+          <div class="analytics-card">
+            <h3>Sector Distribution</h3>
+            <div class="sector-chart" id="sectorChart">
+              <div class="chart-placeholder">Loading...</div>
+            </div>
+            <div class="sector-legend" id="sectorLegend"></div>
+          </div>
+
+          <!-- Benchmark Comparison -->
+          <div class="analytics-card analytics-card-wide">
+            <h3>Benchmark Comparison</h3>
+            <div class="benchmark-table" id="benchmarkTable">
+              <div class="chart-placeholder">Loading...</div>
+            </div>
+          </div>
+
+          <!-- Top Performers -->
+          <div class="analytics-card">
+            <h3>🏆 Top Performers</h3>
+            <div class="performers-list" id="topPerformersList">
+              <div class="chart-placeholder">Loading...</div>
+            </div>
+          </div>
+
+          <!-- Bottom Performers -->
+          <div class="analytics-card">
+            <h3>📉 Underperformers</h3>
+            <div class="performers-list" id="bottomPerformersList">
+              <div class="chart-placeholder">Loading...</div>
+            </div>
+          </div>
+
+          <!-- Recommendations -->
+          <div class="analytics-card analytics-card-full">
+            <h3>💡 Recommendations</h3>
+            <div class="recommendations-list" id="recommendationsList">
+              <div class="chart-placeholder">Loading...</div>
+            </div>
           </div>
         </div>
       </div>
@@ -337,6 +461,7 @@
   </script>
 
   <!-- Scripts -->
+  <script type="module" src="assets/js/utils/app-lock-guard.js"></script>
   <script type="module" src="assets/js/utils/ux-enhancements.js"></script>
   <script type="module" src="assets/js/components/sidebar.js"></script>
   <script type="module" src="assets/js/pages/investments.js"></script>
