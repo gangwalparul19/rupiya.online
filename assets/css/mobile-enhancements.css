@@ -1138,98 +1138,144 @@ input, textarea, select {
    ============================================ */
 
 @media (max-width: 768px) {
-  /* KPI Cards - 3 per row */
+  /* KPI Cards - 3 per row like goals page */
   .portfolio-summary {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.5rem;
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 8px !important;
     margin-bottom: 1rem;
+    padding: 12px;
   }
   
   .summary-card {
-    padding: 0.75rem;
-    flex-direction: column;
-    text-align: center;
-    gap: 0.5rem;
-    min-height: 100px;
+    padding: 10px 8px !important;
+    flex-direction: column !important;
+    text-align: center !important;
+    align-items: center !important;
+    gap: 4px !important;
+    min-height: auto !important;
     border-radius: 10px;
+    background: white;
+    border: 2px solid #4A90E2;
   }
   
   .summary-icon {
-    width: 40px;
-    height: 40px;
-    font-size: 1.5rem;
+    width: auto !important;
+    height: auto !important;
+    font-size: 24px !important;
     margin: 0 auto;
   }
   
   .summary-label {
-    font-size: 0.65rem;
-    margin-bottom: 0.25rem;
+    font-size: 9px !important;
+    margin-bottom: 2px;
+    text-transform: uppercase;
   }
   
   .summary-value {
-    font-size: 1rem;
+    font-size: 14px !important;
     font-weight: 700;
   }
   
   .summary-change {
-    font-size: 0.75rem;
-    margin-top: 0.25rem;
+    font-size: 10px !important;
+    margin-top: 2px;
   }
   
-  /* Stock Cards - Proper sizing */
+  /* Investment Cards - 1 per row for readability */
   .investments-grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.75rem;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
   }
   
   .investment-card {
-    padding: 1rem;
-    min-height: 320px;
-    display: flex;
-    flex-direction: column;
-    border-radius: 10px;
+    padding: 0 !important;
+    min-height: auto !important;
+    display: block !important;
+    border-radius: 12px;
+    background: white;
+    border: 2px solid #4A90E2;
+    overflow: visible !important;
   }
   
   .investment-card-header {
-    margin-bottom: 0.75rem;
+    padding: 12px;
+    margin-bottom: 0 !important;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .investment-info {
+    flex: 1;
+    min-width: 0;
   }
   
   .investment-name {
-    font-size: 0.95rem;
-    font-weight: 700;
-    margin-bottom: 0.25rem;
+    font-size: 16px !important;
+    font-weight: 600;
+    margin-bottom: 4px;
     word-wrap: break-word;
     overflow-wrap: break-word;
+    display: block !important;
+    white-space: normal !important;
   }
   
   .investment-type {
-    font-size: 0.65rem;
-    padding: 0.25rem 0.5rem;
+    font-size: 11px !important;
+    padding: 2px 8px !important;
     display: inline-block;
+    background: #f0f0f0 !important;
+    color: #666 !important;
+    border-radius: 4px;
   }
   
   .investment-symbol {
-    font-size: 0.65rem;
-    padding: 0.25rem 0.5rem;
+    font-size: 11px !important;
+    padding: 2px 6px !important;
     display: inline-block;
-    margin-left: 0.25rem;
+    margin-left: 6px;
+    background: #e8f4fd !important;
+    color: #4A90E2 !important;
+    border-radius: 4px;
+    font-family: monospace;
   }
   
   .investment-actions {
-    gap: 0.5rem;
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 4px !important;
+    flex-shrink: 0;
   }
   
   .investment-actions .btn-icon {
-    width: 32px;
-    height: 32px;
-    font-size: 0.875rem;
-    padding: 0;
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    min-height: 32px !important;
+    font-size: 14px;
+    padding: 0 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    background: #f5f5f5;
+    border: none !important;
+  }
+  
+  .investment-actions .btn-icon.btn-danger {
+    background: #ffebee;
   }
   
   .investment-card-body {
-    gap: 0.5rem;
-    flex: 1;
-    margin-bottom: 0.75rem;
+    padding: 12px !important;
+    display: block !important;
+    gap: 0 !important;
+    flex: none !important;
+    margin-bottom: 0 !important;
   }
   
   .investment-stat {
@@ -1238,152 +1284,174 @@ input, textarea, select {
   }
   
   .investment-stat-label {
-    font-size: 0.65rem;
-    color: #7F8C8D;
-    margin-bottom: 0.25rem;
+    font-size: 10px !important;
+    color: #666;
+    margin-bottom: 4px;
     text-transform: uppercase;
-    letter-spacing: 0.3px;
+    letter-spacing: 0.5px;
+    display: block;
   }
   
   .investment-stat-value {
-    font-size: 0.9rem;
+    font-size: 14px !important;
     font-weight: 600;
+    display: block;
   }
   
   .investment-stat-inr {
-    font-size: 0.75rem;
-    margin-top: 0.125rem;
+    font-size: 12px;
+    margin-top: 2px;
   }
   
   .investment-stats-row {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.5rem;
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+    margin-bottom: 12px;
+  }
+  
+  .investment-stats-row:last-child {
+    margin-bottom: 0;
   }
   
   .investment-stats-row:first-child {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr) !important;
   }
   
   .investment-returns-row {
-    padding-top: 0.5rem;
-    border-top: 1px dashed #E8E8E8;
-    margin-top: 0.5rem;
+    padding-top: 12px !important;
+    border-top: 1px solid #eee !important;
+    margin-top: 12px !important;
+    display: block !important;
   }
   
   .investment-stat-full {
-    text-align: center;
+    text-align: left !important;
+    grid-column: 1 / -1;
   }
   
   .investment-stat-full .investment-stat-value {
-    font-size: 1rem;
+    font-size: 16px !important;
     font-weight: 700;
   }
   
   .price-change {
-    font-size: 0.7rem;
-    margin-top: 0.25rem;
+    font-size: 12px !important;
+    margin-top: 4px;
     font-weight: 600;
+    display: block;
   }
   
   .investment-card-footer {
-    padding-top: 0.75rem;
-    border-top: 1px solid #E8E8E8;
-    margin-top: auto;
-    display: flex;
-    justify-content: flex-end;
+    padding: 10px 12px !important;
+    border-top: 1px solid #eee;
+    margin-top: 0 !important;
+    display: block !important;
+    background: #fafafa;
+    border-radius: 0 0 10px 10px;
   }
   
   .investment-date {
-    font-size: 0.75rem;
-    color: #7F8C8D;
+    font-size: 11px !important;
+    color: #888;
   }
   
   .investment-notes {
-    margin-top: 0.75rem;
-    padding-top: 0.75rem;
-    border-top: 1px solid #E8E8E8;
-    font-size: 0.75rem;
-    color: #7F8C8D;
+    margin-top: 0 !important;
+    padding: 10px 12px !important;
+    border-top: 1px solid #eee;
+    font-size: 12px;
+    color: #666;
     line-height: 1.4;
+    background: #f9f9f9;
+  }
+  
+  .live-indicator {
+    font-size: 9px !important;
+    background: #4CAF50 !important;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 3px;
+    display: inline-block;
+    margin-left: 4px;
   }
 }
 
 @media (max-width: 480px) {
-  /* Extra small mobile - still 3 columns but more compact */
+  /* Extra small mobile - keep 3 summary cards */
   .portfolio-summary {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.4rem;
+    gap: 6px !important;
+    padding: 8px;
   }
   
   .summary-card {
-    padding: 0.5rem;
-    min-height: 90px;
+    padding: 8px 6px !important;
   }
   
   .summary-icon {
-    width: 32px;
-    height: 32px;
-    font-size: 1.25rem;
+    font-size: 20px !important;
   }
   
   .summary-label {
-    font-size: 0.6rem;
+    font-size: 8px !important;
   }
   
   .summary-value {
-    font-size: 0.85rem;
+    font-size: 12px !important;
   }
   
   .summary-change {
-    font-size: 0.65rem;
+    font-size: 9px !important;
   }
   
-  /* Stock cards - 3 columns, more compact */
+  /* Investment cards - still 1 per row */
   .investments-grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.5rem;
+    gap: 10px !important;
   }
   
   .investment-card {
-    padding: 0.75rem;
-    min-height: 300px;
+    padding: 0 !important;
+  }
+  
+  .investment-card-header {
+    padding: 10px;
+  }
+  
+  .investment-card-body {
+    padding: 10px !important;
   }
   
   .investment-name {
-    font-size: 0.85rem;
+    font-size: 14px !important;
   }
   
   .investment-type,
   .investment-symbol {
-    font-size: 0.6rem;
-    padding: 0.2rem 0.4rem;
+    font-size: 10px !important;
+    padding: 2px 6px !important;
   }
   
   .investment-actions .btn-icon {
-    width: 28px;
-    height: 28px;
-    font-size: 0.75rem;
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    min-height: 28px !important;
   }
   
   .investment-stat-label {
-    font-size: 0.6rem;
+    font-size: 9px !important;
   }
   
   .investment-stat-value {
-    font-size: 0.8rem;
-  }
-  
-  .investment-stat-inr {
-    font-size: 0.7rem;
+    font-size: 13px !important;
   }
   
   .investment-stat-full .investment-stat-value {
-    font-size: 0.9rem;
+    font-size: 14px !important;
   }
   
   .price-change {
-    font-size: 0.65rem;
+    font-size: 11px !important;
   }
 }
 

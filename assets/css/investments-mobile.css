@@ -1,10 +1,10 @@
 /* Investments Page - Mobile Responsive Styles */
 
 /* ============================================
-   MOBILE FIRST APPROACH (< 480px)
+   MOBILE STYLES (< 768px)
    ============================================ */
 
-@media (max-width: 480px) {
+@media (max-width: 768px) {
 
   /* Page Header */
   .page-header {
@@ -32,56 +32,64 @@
     justify-content: center;
   }
 
-  /* Portfolio Summary */
+  /* Portfolio Summary - 3 cards in a row like goals page */
   .portfolio-summary {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 8px !important;
     padding: 12px;
     margin: 0;
   }
 
   .summary-card {
-    padding: 14px;
+    padding: 10px 8px !important;
     border-radius: 8px;
-    display: flex;
-    gap: 12px;
-    align-items: center;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    gap: 4px !important;
+    background: white;
+    border: 2px solid #4A90E2;
   }
 
   .summary-icon {
-    font-size: 28px;
-    min-width: 40px;
+    font-size: 24px !important;
+    min-width: auto;
     text-align: center;
   }
 
   .summary-content {
     flex: 1;
     min-width: 0;
+    text-align: center;
   }
 
   .summary-label {
-    font-size: 12px;
+    font-size: 9px !important;
     color: #666;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
   }
 
   .summary-value {
-    font-size: 18px;
+    font-size: 14px !important;
     font-weight: 600;
     word-break: break-word;
   }
 
   .summary-change {
-    font-size: 12px;
+    font-size: 10px !important;
     margin-top: 2px;
   }
 
   /* Add Investment Form */
   .add-investment-section {
     padding: 16px;
-    margin: 0;
-    border-radius: 0;
+    margin: 12px;
+    border-radius: 12px;
+    overflow: visible;
   }
 
   .add-investment-header {
@@ -92,7 +100,7 @@
   }
 
   .add-investment-title {
-    font-size: 20px;
+    font-size: 18px;
     margin: 0;
   }
 
@@ -101,30 +109,32 @@
     min-width: auto;
   }
 
-  /* Form Grid */
+  /* Form Grid - 2 columns */
   .form-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+    overflow: visible;
   }
 
   .form-group {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 4px;
+    margin-bottom: 0 !important;
   }
 
   .form-group label {
-    font-size: 13px;
+    font-size: 13px !important;
     font-weight: 500;
+    margin-bottom: 4px !important;
   }
 
   .form-group input,
   .form-group select,
   .form-group textarea {
     font-size: 16px;
-    /* Prevents zoom on iOS */
-    padding: 12px;
+    padding: 10px 12px !important;
     border-radius: 6px;
     border: 1px solid #ddd;
     width: 100%;
@@ -133,11 +143,12 @@
 
   .form-group textarea {
     resize: vertical;
-    min-height: 80px;
+    min-height: 60px;
   }
 
   .form-group-full {
-    grid-column: 1 / -1;
+    grid-column: 1 / -1 !important;
+    overflow: visible;
   }
 
   .error-message {
@@ -148,30 +159,68 @@
 
   /* Form Actions */
   .form-actions {
-    display: flex;
-    gap: 8px;
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 10px !important;
     margin-top: 16px;
   }
 
   .form-actions .btn {
-    flex: 1;
+    flex: 1 !important;
     padding: 12px;
     font-size: 14px;
+    min-width: 0 !important;
   }
 
-  /* Investments Grid */
-  .investments-grid {
+  /* Investments Tabs */
+  .investments-tabs-container {
+    margin: 12px;
+    margin-bottom: 0;
+  }
+
+  .investments-tabs {
+    display: flex;
+    gap: 0;
+  }
+
+  .tab-button {
+    flex: 1;
+    padding: 10px 8px;
+    font-size: 12px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .tab-icon {
+    font-size: 16px;
+  }
+
+  .tab-label {
+    font-size: 10px;
+  }
+
+  /* Investments Container */
+  .investments-container {
     padding: 12px;
   }
 
+  /* Investments Grid - 1 card per row */
+  .investments-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    padding: 0;
+  }
+
+  /* Investment Card - Similar to Goals Card */
   .investment-card {
-    border-radius: 8px;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
+    background: white;
+    border: 2px solid #4A90E2;
+    border-radius: 12px;
+    overflow: visible;
+    display: block !important;
   }
 
   .investment-card-header {
@@ -180,6 +229,7 @@
     justify-content: space-between;
     align-items: flex-start;
     gap: 8px;
+    border-bottom: 1px solid #eee;
   }
 
   .investment-info {
@@ -188,87 +238,111 @@
   }
 
   .investment-name {
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 600;
     word-break: break-word;
+    display: block;
+    white-space: normal;
   }
 
   .investment-type {
     font-size: 12px;
     color: #666;
-    display: block;
-    margin-top: 2px;
+    display: inline-block;
+    margin-top: 4px;
+    background: #f0f0f0;
+    padding: 2px 8px;
+    border-radius: 4px;
   }
 
   .investment-symbol {
     font-size: 11px;
-    color: #999;
-    display: block;
-    margin-top: 2px;
+    color: #4A90E2;
+    display: inline-block;
+    margin-left: 8px;
     font-family: monospace;
+    background: #e8f4fd;
+    padding: 2px 6px;
+    border-radius: 4px;
   }
 
   .investment-actions {
     display: flex;
+    flex-direction: row !important;
     gap: 4px;
-    flex-wrap: wrap;
+    flex-shrink: 0;
   }
 
   .btn-icon {
-    padding: 8px;
-    min-width: 36px;
-    min-height: 36px;
+    padding: 6px !important;
+    min-width: 32px !important;
+    min-height: 32px !important;
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: 6px;
+    background: #f5f5f5;
+    border: none;
   }
 
   .btn-icon svg {
-    width: 18px;
-    height: 18px;
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  .btn-icon.btn-danger {
+    background: #ffebee;
   }
 
   /* Investment Card Body */
   .investment-card-body {
     padding: 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+    display: block !important;
   }
 
   .investment-stats-row {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+    margin-bottom: 12px;
+  }
+
+  .investment-stats-row:last-child {
+    margin-bottom: 0;
   }
 
   .investment-stat {
-    flex: 1;
-    min-width: 140px;
+    flex: none !important;
+    min-width: auto !important;
   }
 
   .investment-stat-label {
-    font-size: 11px;
+    font-size: 10px;
     color: #666;
     margin-bottom: 4px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    display: block;
   }
 
   .investment-stat-value {
     font-size: 14px;
     font-weight: 600;
     word-break: break-word;
+    display: block;
   }
 
   .investment-stat-full {
-    min-width: 100%;
+    grid-column: 1 / -1;
   }
 
   .investment-returns-row {
     border-top: 1px solid #eee;
-    padding-top: 10px;
-    margin-top: 4px;
+    padding-top: 12px;
+    margin-top: 12px;
+    display: block !important;
   }
 
   .price-change {
@@ -278,21 +352,29 @@
   }
 
   .live-indicator {
-    font-size: 10px;
-    background: #ff4444;
+    font-size: 9px;
+    background: #4CAF50;
     color: white;
     padding: 2px 6px;
     border-radius: 3px;
     display: inline-block;
     margin-left: 4px;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
   }
 
   /* Investment Card Footer */
   .investment-card-footer {
     padding: 10px 12px;
     border-top: 1px solid #eee;
-    font-size: 12px;
-    color: #666;
+    font-size: 11px;
+    color: #888;
+    background: #fafafa;
+    border-radius: 0 0 10px 10px;
   }
 
   .investment-notes {
@@ -384,118 +466,37 @@
 }
 
 /* ============================================
-   SMALL TABLETS (481px - 768px)
+   EXTRA SMALL MOBILE (< 380px)
    ============================================ */
 
-@media (min-width: 481px) and (max-width: 768px) {
-
-  /* Page Header */
-  .page-header {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px;
-    gap: 16px;
-  }
-
-  .page-title {
-    font-size: 28px;
-  }
-
-  .page-subtitle {
-    font-size: 14px;
-  }
-
-  .page-actions .btn {
-    padding: 10px 16px;
-    font-size: 14px;
-  }
-
-  /* Portfolio Summary */
+@media (max-width: 380px) {
   .portfolio-summary {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    padding: 16px;
-  }
-
-  .summary-card:nth-child(3) {
-    grid-column: 1 / -1;
+    gap: 6px !important;
+    padding: 8px;
   }
 
   .summary-card {
-    padding: 16px;
+    padding: 8px 6px !important;
   }
 
   .summary-icon {
-    font-size: 32px;
+    font-size: 20px !important;
+  }
+
+  .summary-label {
+    font-size: 8px !important;
   }
 
   .summary-value {
-    font-size: 20px;
-  }
-
-  /* Add Investment Form */
-  .add-investment-section {
-    padding: 20px;
-    margin: 16px;
-    border-radius: 8px;
-  }
-
-  .form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-  }
-
-  .form-group-full {
-    grid-column: 1 / -1;
-  }
-
-  .form-group input,
-  .form-group select,
-  .form-group textarea {
-    font-size: 15px;
-    padding: 12px;
-  }
-
-  /* Investments Grid */
-  .investments-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 16px;
-    padding: 16px;
-  }
-
-  .investment-card {
-    border-radius: 8px;
-  }
-
-  .investment-card-header {
-    padding: 14px;
+    font-size: 12px !important;
   }
 
   .investment-name {
-    font-size: 16px;
-  }
-
-  .investment-card-body {
-    padding: 14px;
-    gap: 12px;
-  }
-
-  .investment-stat {
-    min-width: 160px;
+    font-size: 14px;
   }
 
   .investment-stat-value {
-    font-size: 15px;
-  }
-
-  /* Modal */
-  .modal-container {
-    margin: 20px;
-    max-width: calc(100% - 40px);
+    font-size: 13px;
   }
 }
 
@@ -513,20 +514,20 @@
   }
 
   .portfolio-summary {
-    gap: 8px;
+    gap: 8px !important;
     padding: 8px;
   }
 
   .summary-card {
-    padding: 10px;
+    padding: 8px !important;
   }
 
   .summary-icon {
-    font-size: 24px;
+    font-size: 20px !important;
   }
 
   .summary-value {
-    font-size: 16px;
+    font-size: 14px !important;
   }
 
   .add-investment-section {
@@ -535,7 +536,6 @@
     overflow-x: visible;
   }
 
-  /* Ensure symbol dropdown is visible in landscape mode */
   .add-investment-section .form-group-full {
     overflow: visible;
   }
@@ -556,19 +556,16 @@
    ============================================ */
 
 @media (hover: none) and (pointer: coarse) {
-
-  /* Increase touch targets */
   .btn-icon {
-    min-width: 44px;
-    min-height: 44px;
+    min-width: 36px !important;
+    min-height: 36px !important;
   }
 
   .form-group input,
   .form-group select,
   .form-group textarea {
-    padding: 14px;
+    padding: 12px;
     font-size: 16px;
-    /* Prevents zoom on iOS */
   }
 
   .symbol-item {
@@ -576,7 +573,6 @@
     padding: 14px 16px;
   }
 
-  /* Remove hover effects on touch devices */
   .btn:hover {
     background-color: inherit;
   }
@@ -585,7 +581,6 @@
     transform: none;
   }
 
-  /* Improve tap feedback */
   .btn,
   .symbol-item,
   .btn-icon {
@@ -629,12 +624,12 @@
 
   .summary-card {
     background: var(--bg-card);
-    border: 1px solid var(--border-color);
+    border-color: var(--border-color);
   }
 
   .investment-card {
     background: var(--bg-card);
-    border: 1px solid var(--border-color);
+    border-color: var(--border-color);
   }
 
   .investment-returns-row {
@@ -643,6 +638,7 @@
 
   .investment-card-footer {
     border-top-color: var(--border-color);
+    background: var(--bg-secondary);
   }
 
   .investment-notes {
@@ -661,5 +657,23 @@
   .delete-info {
     background: var(--bg-secondary);
     border: 1px solid var(--border-color);
+  }
+
+  .investment-type {
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+  }
+
+  .investment-symbol {
+    background: var(--bg-secondary);
+    color: var(--primary-blue);
+  }
+
+  .btn-icon {
+    background: var(--bg-secondary);
+  }
+
+  .btn-icon.btn-danger {
+    background: rgba(244, 67, 54, 0.1);
   }
 }
