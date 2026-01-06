@@ -1,0 +1,316 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://rupiya.online/#organization",
+      "name": "Rupiya",
+      "url": "https://rupiya.online",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://rupiya.online/assets/images/logo.png",
+        "width": 512,
+        "height": 512
+      },
+      "description": "India's leading investment tracking and portfolio management app. Track stocks, mutual funds, crypto, and all investments in one place.",
+      "foundingDate": "2024",
+      "founders": [
+        {
+          "@type": "Person",
+          "name": "Rupiya Team"
+        }
+      ],
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "IN",
+        "addressRegion": "India"
+      },
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "Customer Support",
+        "email": "support@rupiya.online",
+        "availableLanguage": ["English", "Hindi"]
+      },
+      "sameAs": [
+        "https://twitter.com/RupiyaApp",
+        "https://facebook.com/RupiyaApp",
+        "https://linkedin.com/company/rupiya"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://rupiya.online/#website",
+      "url": "https://rupiya.online",
+      "name": "Rupiya - Investment Tracker & Portfolio Management",
+      "description": "Track investments, manage portfolio, and achieve financial goals with India's best investment app.",
+      "publisher": {
+        "@id": "https://rupiya.online/#organization"
+      },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://rupiya.online/search?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://rupiya.online/#app",
+      "name": "Rupiya Investment Tracker",
+      "applicationCategory": "FinanceApplication",
+      "applicationSubCategory": "Investment Portfolio Management",
+      "operatingSystem": "Web, Android, iOS",
+      "url": "https://rupiya.online",
+      "description": "Complete investment portfolio management app for Indian investors. Track stocks (NSE/BSE), mutual funds, ETFs, crypto, gold, real estate. Real-time prices, returns calculator, XIRR, CAGR, portfolio analytics, AI insights.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "INR",
+        "availability": "https://schema.org/InStock"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.9",
+        "ratingCount": "10000",
+        "bestRating": "5",
+        "worstRating": "1"
+      },
+      "screenshot": [
+        "https://rupiya.online/screenshots/dashboard.png",
+        "https://rupiya.online/screenshots/investments.png",
+        "https://rupiya.online/screenshots/analytics.png"
+      ],
+      "featureList": [
+        "Stock Portfolio Tracking (NSE/BSE)",
+        "Mutual Fund Tracker",
+        "Cryptocurrency Portfolio",
+        "Real Estate Investment Tracking",
+        "Gold Investment Tracker",
+        "Fixed Deposit Tracker",
+        "Real-time Price Updates",
+        "Portfolio Analytics",
+        "XIRR Calculator",
+        "CAGR Calculator",
+        "Returns Analysis",
+        "AI-Powered Insights",
+        "Expense Tracking",
+        "Income Management",
+        "Budget Planning",
+        "Financial Goals",
+        "Family Sharing",
+        "Offline Support",
+        "Bank-Level Security",
+        "Multi-Currency Support"
+      ],
+      "softwareVersion": "1.0",
+      "author": {
+        "@id": "https://rupiya.online/#organization"
+      },
+      "provider": {
+        "@id": "https://rupiya.online/#organization"
+      },
+      "downloadUrl": "https://rupiya.online/signup.html",
+      "installUrl": "https://rupiya.online/signup.html",
+      "softwareHelp": {
+        "@type": "CreativeWork",
+        "url": "https://rupiya.online/user-guide.html"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://rupiya.online/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is Rupiya Investment Tracker?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Rupiya is a comprehensive investment tracking and portfolio management app for Indian investors. Track stocks (NSE/BSE), mutual funds, ETFs, cryptocurrency, gold, real estate, and all investments in one place with real-time prices and AI-powered insights."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is Rupiya free to use?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, Rupiya is 100% free to use with all features included. No hidden charges, no premium plans, no credit card required. Track unlimited investments forever."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Which investments can I track with Rupiya?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "You can track stocks (NSE/BSE), mutual funds, ETFs, cryptocurrency (Bitcoin, Ethereum, etc.), gold, silver, real estate, fixed deposits, bonds, and other investments. Supports Indian and international markets."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does Rupiya provide real-time stock prices?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, Rupiya provides real-time price updates for stocks, mutual funds, and cryptocurrency. Track your portfolio value in real-time with automatic price updates."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I calculate XIRR and CAGR with Rupiya?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, Rupiya automatically calculates XIRR (Extended Internal Rate of Return) and CAGR (Compound Annual Growth Rate) for your investments. Get accurate returns analysis with detailed performance metrics."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is my investment data secure?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Absolutely. Rupiya uses bank-level encryption and security measures. Your data is stored securely with Firebase and never shared with third parties. We follow strict data protection standards."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I track family investments together?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, Rupiya has a Family Groups feature that lets you create groups, invite family members, and track shared investments and expenses together. Perfect for joint portfolio management."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does Rupiya work offline?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, Rupiya is a Progressive Web App (PWA) that works offline. Add investments, track expenses, and view your portfolio even without internet. Data syncs automatically when you're back online."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What makes Rupiya the best investment app in India?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Rupiya is the best investment app because it's: 100% free forever, supports all investment types (stocks, MF, crypto, real estate), provides real-time tracking, offers AI-powered insights, works offline, has family sharing, includes expense tracking, and is built specifically for Indian investors with INR support and NSE/BSE integration."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I get started with Rupiya?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Getting started is easy: 1) Sign up for free at rupiya.online/signup.html, 2) Add your investments (stocks, mutual funds, crypto, etc.), 3) Track portfolio performance and get AI insights. No credit card required, takes less than 2 minutes."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "ItemList",
+      "@id": "https://rupiya.online/#features",
+      "name": "Rupiya Investment App Features",
+      "description": "Complete list of features available in Rupiya investment tracking app",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Stock Portfolio Tracker",
+          "description": "Track stocks from NSE, BSE, and international markets with real-time prices"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Mutual Fund Tracker",
+          "description": "Track mutual funds, SIPs, and get NAV updates automatically"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Cryptocurrency Portfolio",
+          "description": "Track Bitcoin, Ethereum, and 1000+ cryptocurrencies"
+        },
+        {
+          "@type": "ListItem",
+          "position": 4,
+          "name": "Real Estate Investment Tracker",
+          "description": "Track property investments, rental income, and maintenance costs"
+        },
+        {
+          "@type": "ListItem",
+          "position": 5,
+          "name": "Portfolio Analytics",
+          "description": "Advanced analytics with XIRR, CAGR, returns analysis, and performance charts"
+        },
+        {
+          "@type": "ListItem",
+          "position": 6,
+          "name": "AI Investment Insights",
+          "description": "Get AI-powered investment recommendations and portfolio optimization suggestions"
+        },
+        {
+          "@type": "ListItem",
+          "position": 7,
+          "name": "Expense Tracking",
+          "description": "Track daily expenses, categorize spending, and monitor investment costs"
+        },
+        {
+          "@type": "ListItem",
+          "position": 8,
+          "name": "Budget Planning",
+          "description": "Create budgets, set spending limits, and achieve savings goals"
+        },
+        {
+          "@type": "ListItem",
+          "position": 9,
+          "name": "Financial Goals",
+          "description": "Set and track financial goals, investment targets, and wealth milestones"
+        },
+        {
+          "@type": "ListItem",
+          "position": 10,
+          "name": "Family Sharing",
+          "description": "Share portfolios and track joint investments with family members"
+        }
+      ]
+    },
+    {
+      "@type": "HowTo",
+      "@id": "https://rupiya.online/#howto",
+      "name": "How to Track Investments with Rupiya",
+      "description": "Step-by-step guide to tracking your investment portfolio with Rupiya app",
+      "step": [
+        {
+          "@type": "HowToStep",
+          "position": 1,
+          "name": "Sign Up",
+          "text": "Create a free Rupiya account at rupiya.online/signup.html. No credit card required.",
+          "url": "https://rupiya.online/signup.html"
+        },
+        {
+          "@type": "HowToStep",
+          "position": 2,
+          "name": "Add Investments",
+          "text": "Add your stocks, mutual funds, crypto, and other investments. Enter purchase price, quantity, and date.",
+          "url": "https://rupiya.online/investments.html"
+        },
+        {
+          "@type": "HowToStep",
+          "position": 3,
+          "name": "Track Performance",
+          "text": "View real-time portfolio value, returns, XIRR, CAGR, and performance analytics on your dashboard.",
+          "url": "https://rupiya.online/dashboard.html"
+        },
+        {
+          "@type": "HowToStep",
+          "position": 4,
+          "name": "Get AI Insights",
+          "text": "Receive AI-powered investment recommendations and portfolio optimization suggestions.",
+          "url": "https://rupiya.online/ai-insights.html"
+        },
+        {
+          "@type": "HowToStep",
+          "position": 5,
+          "name": "Achieve Goals",
+          "text": "Set financial goals, track progress, and achieve your wealth targets with goal-based investing.",
+          "url": "https://rupiya.online/goals.html"
+        }
+      ]
+    }
+  ]
+}

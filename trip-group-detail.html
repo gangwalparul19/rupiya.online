@@ -23,6 +23,7 @@
   <link rel="stylesheet" href="assets/css/dashboard.css">
   <link rel="stylesheet" href="assets/css/trip-groups.css">
   <link rel="stylesheet" href="assets/css/trip-group-detail.css">
+  <link rel="stylesheet" href="assets/css/trip-ux-enhancements.css">
   <link rel="stylesheet" href="assets/css/enhancements.css">
   <link rel="stylesheet" href="assets/css/animations.css">
   <link rel="stylesheet" href="assets/css/mobile-enhancements.css">
@@ -118,6 +119,28 @@
         </div>
       </div>
 
+      <!-- Quick Actions -->
+      <div class="quick-actions" id="quickActions">
+        <button class="quick-action-btn" id="quickAddExpenseBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          <span>Add Expense</span>
+        </button>
+        <button class="quick-action-btn secondary" id="quickSettleUpBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+          <span>Settle Up</span>
+        </button>
+        <button class="quick-action-btn secondary" id="quickAddMemberBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+          </svg>
+          <span>Add Member</span>
+        </button>
+      </div>
+
       <!-- Add Expense Application Section (Inline) -->
       <div class="create-group-section" id="addExpenseSection">
         <div class="create-group-header">
@@ -130,6 +153,14 @@
         </div>
 
         <form id="expenseForm">
+          <!-- Quick Expense Templates -->
+          <div class="expense-templates" id="expenseTemplates">
+            <label class="expense-templates-label">Quick Templates</label>
+            <div class="expense-templates-grid" id="expenseTemplatesGrid">
+              <!-- Templates will be loaded here -->
+            </div>
+          </div>
+
           <div class="form-grid">
             <div class="form-group">
               <label for="expenseAmount">Amount *</label>
@@ -334,7 +365,39 @@
 
       <!-- Expenses Tab -->
       <div class="tab-content active" id="expensesTab">
-        <div class="expenses-filters">
+        <!-- Search Bar -->
+        <div class="expense-search-container">
+          <input type="text" class="expense-search-bar" id="expenseSearchBar" placeholder="Search expenses...">
+          <button class="expense-search-clear" id="expenseSearchClear">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+          <div class="expense-search-results-count" id="expenseSearchCount" style="display: none;"></div>
+        </div>
+
+        <!-- Filter Chips -->
+        <div class="expense-filters" id="expenseFilterChips">
+          <div class="filter-chip" data-filter="my-expenses">
+            <span class="filter-chip-icon">👤</span>
+            <span>My Expenses</span>
+          </div>
+          <div class="filter-chip" data-filter="last-7-days">
+            <span class="filter-chip-icon">📅</span>
+            <span>Last 7 Days</span>
+          </div>
+          <div class="filter-chip" data-filter="last-30-days">
+            <span class="filter-chip-icon">📆</span>
+            <span>Last 30 Days</span>
+          </div>
+          <!-- Category chips will be added dynamically -->
+          <button class="filter-clear-btn" id="filterClearBtn" style="display: none;">
+            Clear Filters
+          </button>
+        </div>
+
+        <!-- Old filters (keeping for backward compatibility) -->
+        <div class="expenses-filters" style="display: none;">
           <select id="categoryFilter" class="filter-select">
             <option value="">All Categories</option>
           </select>
@@ -351,6 +414,13 @@
           <div class="empty-state-icon">💸</div>
           <h3 class="empty-state-title">No expenses yet</h3>
           <p class="empty-state-text">Add your first expense to start tracking.</p>
+        </div>
+
+        <!-- Empty state for search/filter with no results -->
+        <div class="expense-empty-state" id="expensesFilterEmpty" style="display: none;">
+          <div class="expense-empty-state-icon">🔍</div>
+          <h3 class="expense-empty-state-title">No expenses found</h3>
+          <p class="expense-empty-state-message">Try adjusting your search or filters</p>
         </div>
       </div>
 
@@ -431,6 +501,50 @@
         <p>Loading group details...</p>
       </div>
     </main>
+  </div>
+
+  <!-- Floating Action Button -->
+  <button class="trip-fab" id="tripFab" title="Add Expense (E)">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+    </svg>
+  </button>
+
+  <!-- Keyboard Shortcuts Help Button -->
+  <button class="shortcuts-help-btn" id="shortcutsHelpBtn" title="Keyboard Shortcuts (?)">
+    ?
+  </button>
+
+  <!-- Keyboard Shortcuts Modal -->
+  <div class="shortcuts-modal" id="shortcutsModal">
+    <div class="shortcuts-modal-content">
+      <div class="shortcuts-modal-header">
+        <h3 class="shortcuts-modal-title">Keyboard Shortcuts</h3>
+        <button class="shortcuts-modal-close" id="shortcutsModalClose">×</button>
+      </div>
+      <ul class="shortcuts-list">
+        <li class="shortcut-item">
+          <span class="shortcut-action">Add Expense</span>
+          <kbd class="shortcut-key">E</kbd>
+        </li>
+        <li class="shortcut-item">
+          <span class="shortcut-action">Settle Up</span>
+          <kbd class="shortcut-key">S</kbd>
+        </li>
+        <li class="shortcut-item">
+          <span class="shortcut-action">Add Member</span>
+          <kbd class="shortcut-key">M</kbd>
+        </li>
+        <li class="shortcut-item">
+          <span class="shortcut-action">Close Form/Modal</span>
+          <kbd class="shortcut-key">Esc</kbd>
+        </li>
+        <li class="shortcut-item">
+          <span class="shortcut-action">Show Shortcuts</span>
+          <kbd class="shortcut-key">?</kbd>
+        </li>
+      </ul>
+    </div>
   </div>
 
   <!-- Add Expense Modal -->

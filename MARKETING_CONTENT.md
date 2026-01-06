@@ -3,9 +3,9 @@
 > Your complete personal finance companion built for Indian households 🇮🇳
 
 **🔗 Key Links:**
-- **Demo (No Signup):** [rupiya.app/demo.html](https://rupiya.app/demo.html)
-- **User Guide:** [rupiya.app/user-guide.html](https://rupiya.app/user-guide.html)
-- **Main App:** [rupiya.app](https://rupiya.app)
+- **Demo (No Signup):** [rupiya.online/demo.html](https://rupiya.online/demo.html)
+- **User Guide:** [rupiya.online/user-guide.html](https://rupiya.online/user-guide.html)
+- **Main App:** [rupiya.online](https://rupiya.online)
 
 ---
 
@@ -45,8 +45,8 @@ Managing money shouldn't require an MBA. That's why Rupiya comes packed with fea
 ✅ Step-by-step user guide
 ✅ Weekly email reports with CSV
 
-👉 Try the demo instantly: rupiya.app/demo.html
-📖 Read the guide: rupiya.app/user-guide.html
+👉 Try the demo instantly: rupiya.online/demo.html
+📖 Read the guide: rupiya.online/user-guide.html
 
 #PersonalFinance #FinTech #MadeInIndia #MoneyManagement #FinancialFreedom #EMITracker #HouseholdFinance
 ```
@@ -72,7 +72,7 @@ Just pure exploration. 🔍
 
 If you like what you see, signing up takes 30 seconds.
 
-👉 Try it now: rupiya.app/demo.html
+👉 Try it now: rupiya.online/demo.html
 
 Why did we build this?
 Because we believe you should KNOW what you're getting before you commit.
@@ -109,8 +109,8 @@ That's why Rupiya includes:
 
 We don't just give you tools. We teach you how to use them.
 
-📖 Read the guide: rupiya.app/user-guide.html
-🎮 Try the demo: rupiya.app/demo.html
+📖 Read the guide: rupiya.online/user-guide.html
+🎮 Try the demo: rupiya.online/demo.html
 
 #UserOnboarding #ProductDesign #FinancialLiteracy #AppDesign #UXDesign
 ```
@@ -143,8 +143,8 @@ SMART FEATURES:
 The average Indian has 2-3 active EMIs.
 Are you tracking yours properly?
 
-Start tracking: rupiya.app
-See it in action: rupiya.app/demo.html
+Start tracking: rupiya.online
+See it in action: rupiya.online/demo.html
 
 #EMITracker #LoanManagement #DebtFree #FinancialPlanning #HomeLoan #CarLoan #PersonalLoan
 ```
@@ -180,7 +180,7 @@ Rupiya's House Help feature handles it all:
 
 Treat your household like a well-run business.
 
-Try it: rupiya.app/demo.html (see House Help section)
+Try it: rupiya.online/demo.html (see House Help section)
 
 #HouseholdManagement #DomesticHelp #HomeManagement #IndianHousehold #StaffManagement
 ```
@@ -210,7 +210,7 @@ Rupiya's Vehicle Tracker captures EVERYTHING:
 
 Finally know your true cost of ownership.
 
-See it in action: rupiya.app/demo.html
+See it in action: rupiya.online/demo.html
 
 #VehicleExpenses #CarMaintenance #BikeLovers #CostOfOwnership #AutoExpenses #MileageTracker
 ```
@@ -243,7 +243,7 @@ THEN FOR EVERY EXPENSE:
 
 Know exactly WHERE your money is going FROM.
 
-Set up in 2 minutes: rupiya.app
+Set up in 2 minutes: rupiya.online
 
 #PaymentTracking #UPIPayments #CreditCardRewards #DigitalPayments #MoneyManagement
 ```
@@ -276,7 +276,7 @@ FOR EACH INVESTMENT:
 
 ONE DASHBOARD. COMPLETE VISIBILITY.
 
-See sample portfolio: rupiya.app/demo.html
+See sample portfolio: rupiya.online/demo.html
 
 #InvestmentTracking #MutualFunds #StockMarket #PortfolioManagement #WealthManagement #FinancialPlanning
 ```
@@ -302,7 +302,7 @@ Good news - you can now TRY IT without signing up! 🎉
 → House help payments
 → Vehicle expenses
 
-Just open this link: rupiya.app/demo.html
+Just open this link: rupiya.online/demo.html
 
 No account needed. Explore everything!
 
@@ -329,7 +329,7 @@ If you're confused about managing money, I got you!
 
 It's like a free personal finance course!
 
-Read here: rupiya.app/user-guide.html
+Read here: rupiya.online/user-guide.html
 
 Forward to anyone who needs this 🙏
 ```
@@ -350,7 +350,7 @@ I built an *EMI Tracker* in Rupiya that:
 
 No more missed payments. No more late fees.
 
-Check it out: rupiya.app/demo.html
+Check it out: rupiya.online/demo.html
 (Scroll to EMI & Loan section)
 
 Game changer for anyone with loans! 💪
@@ -373,7 +373,7 @@ Rupiya has a *House Help* feature:
 
 Finally, professional management for household staff!
 
-See how it works: rupiya.app/demo.html
+See how it works: rupiya.online/demo.html
 
 Share with family 👨‍👩‍👧‍👦
 ```
@@ -407,8 +407,8 @@ SMART:
 📧 Weekly reports
 📱 Works offline
 
-*TRY WITHOUT SIGNUP:* rupiya.app/demo.html
-*LEARN EVERYTHING:* rupiya.app/user-guide.html
+*TRY WITHOUT SIGNUP:* rupiya.online/demo.html
+*LEARN EVERYTHING:* rupiya.online/user-guide.html
 
 Best part? It's FREE! 🆓
 ```
@@ -436,9 +436,9 @@ AFTER TRIP:
 
 No more "hisaab baad mein kar lenge" 😅
 
-Download before your next trip: rupiya.app
+Download before your next trip: rupiya.online
 
-Demo: rupiya.app/demo.html
+Demo: rupiya.online/demo.html
 ```
 
 ---
@@ -749,9 +749,9 @@ All FREE. No premium tier.
 ```
 11/ Want to try before signing up?
 
-🎮 Demo: rupiya.app/demo.html
-📖 Guide: rupiya.app/user-guide.html
-🚀 App: rupiya.app
+🎮 Demo: rupiya.online/demo.html
+📖 Guide: rupiya.online/user-guide.html
+🚀 App: rupiya.online
 
 Bookmark this thread for later!
 
@@ -765,7 +765,7 @@ Bookmark this thread for later!
 ### For Demo Page
 ```
 🎮 Try Rupiya without signing up!
-→ rupiya.app/demo.html
+→ rupiya.online/demo.html
 
 Explore all features with sample data. No email required.
 ```
@@ -773,7 +773,7 @@ Explore all features with sample data. No email required.
 ### For User Guide
 ```
 📖 Learn personal finance management for FREE
-→ rupiya.app/user-guide.html
+→ rupiya.online/user-guide.html
 
 14 detailed sections. Step-by-step guides. Available to everyone.
 ```
@@ -781,16 +781,16 @@ Explore all features with sample data. No email required.
 ### For Main App
 ```
 🚀 Start your financial clarity journey
-→ rupiya.app
+→ rupiya.online
 
 Free forever. No ads. No data selling.
 ```
 
 ### Combined CTA
 ```
-🎮 Try Demo: rupiya.app/demo.html
-📖 Read Guide: rupiya.app/user-guide.html
-🚀 Sign Up Free: rupiya.app
+🎮 Try Demo: rupiya.online/demo.html
+📖 Read Guide: rupiya.online/user-guide.html
+🚀 Sign Up Free: rupiya.online
 ```
 
 ---

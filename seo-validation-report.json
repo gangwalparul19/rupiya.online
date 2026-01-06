@@ -1,0 +1,652 @@
+{
+  "date": "2026-01-06T10:29:40.124Z",
+  "summary": {
+    "total": 32,
+    "passed": 32,
+    "warnings": 0,
+    "failed": 0,
+    "score": 100
+  },
+  "details": [
+    {
+      "file": "index.html",
+      "status": "pass",
+      "passed": 11,
+      "total": 11,
+      "checks": {
+        "hasTitle": true,
+        "hasMetaDescription": true,
+        "hasMetaKeywords": true,
+        "hasCanonical": true,
+        "hasOgTags": true,
+        "hasTwitterTags": true,
+        "hasStructuredData": true,
+        "hasViewport": true,
+        "hasThemeColor": true,
+        "hasManifest": true,
+        "hasFavicon": true
+      },
+      "message": "11/11 checks passed"
+    },
+    {
+      "file": "investments.html",
+      "status": "pass",
+      "passed": 11,
+      "total": 11,
+      "checks": {
+        "hasTitle": true,
+        "hasMetaDescription": true,
+        "hasMetaKeywords": true,
+        "hasCanonical": true,
+        "hasOgTags": true,
+        "hasTwitterTags": true,
+        "hasStructuredData": true,
+        "hasViewport": true,
+        "hasThemeColor": true,
+        "hasManifest": true,
+        "hasFavicon": true
+      },
+      "message": "11/11 checks passed"
+    },
+    {
+      "file": "dashboard.html",
+      "status": "pass",
+      "passed": 11,
+      "total": 11,
+      "checks": {
+        "hasTitle": true,
+        "hasMetaDescription": true,
+        "hasMetaKeywords": true,
+        "hasCanonical": true,
+        "hasOgTags": true,
+        "hasTwitterTags": true,
+        "hasStructuredData": true,
+        "hasViewport": true,
+        "hasThemeColor": true,
+        "hasManifest": true,
+        "hasFavicon": true
+      },
+      "message": "11/11 checks passed"
+    },
+    {
+      "file": "expenses.html",
+      "status": "pass",
+      "passed": 11,
+      "total": 11,
+      "checks": {
+        "hasTitle": true,
+        "hasMetaDescription": true,
+        "hasMetaKeywords": true,
+        "hasCanonical": true,
+        "hasOgTags": true,
+        "hasTwitterTags": true,
+        "hasStructuredData": true,
+        "hasViewport": true,
+        "hasThemeColor": true,
+        "hasManifest": true,
+        "hasFavicon": true
+      },
+      "message": "11/11 checks passed"
+    },
+    {
+      "file": "income.html",
+      "status": "pass",
+      "passed": 11,
+      "total": 11,
+      "checks": {
+        "hasTitle": true,
+        "hasMetaDescription": true,
+        "hasMetaKeywords": true,
+        "hasCanonical": true,
+        "hasOgTags": true,
+        "hasTwitterTags": true,
+        "hasStructuredData": true,
+        "hasViewport": true,
+        "hasThemeColor": true,
+        "hasManifest": true,
+        "hasFavicon": true
+      },
+      "message": "11/11 checks passed"
+    },
+    {
+      "file": "budgets.html",
+      "status": "pass",
+      "passed": 11,
+      "total": 11,
+      "checks": {
+        "hasTitle": true,
+        "hasMetaDescription": true,
+        "hasMetaKeywords": true,
+        "hasCanonical": true,
+        "hasOgTags": true,
+        "hasTwitterTags": true,
+        "hasStructuredData": true,
+        "hasViewport": true,
+        "hasThemeColor": true,
+        "hasManifest": true,
+        "hasFavicon": true
+      },
+      "message": "11/11 checks passed"
+    },
+    {
+      "file": "goals.html",
+      "status": "pass",
+      "passed": 11,
+      "total": 11,
+      "checks": {
+        "hasTitle": true,
+        "hasMetaDescription": true,
+        "hasMetaKeywords": true,
+        "hasCanonical": true,
+        "hasOgTags": true,
+        "hasTwitterTags": true,
+        "hasStructuredData": true,
+        "hasViewport": true,
+        "hasThemeColor": true,
+        "hasManifest": true,
+        "hasFavicon": true
+      },
+      "message": "11/11 checks passed"
+    },
+    {
+      "file": "analytics.html",
+      "status": "pass",
+      "passed": 11,
+      "total": 11,
+      "checks": {
+        "hasTitle": true,
+        "hasMetaDescription": true,
+        "hasMetaKeywords": true,
+        "hasCanonical": true,
+        "hasOgTags": true,
+        "hasTwitterTags": true,
+        "hasStructuredData": true,
+        "hasViewport": true,
+        "hasThemeColor": true,
+        "hasManifest": true,
+        "hasFavicon": true
+      },
+      "message": "11/11 checks passed"
+    },
+    {
+      "file": "ai-insights.html",
+      "status": "pass",
+      "passed": 11,
+      "total": 11,
+      "checks": {
+        "hasTitle": true,
+        "hasMetaDescription": true,
+        "hasMetaKeywords": true,
+        "hasCanonical": true,
+        "hasOgTags": true,
+        "hasTwitterTags": true,
+        "hasStructuredData": true,
+        "hasViewport": true,
+        "hasThemeColor": true,
+        "hasManifest": true,
+        "hasFavicon": true
+      },
+      "message": "11/11 checks passed"
+    },
+    {
+      "file": "family.html",
+      "status": "pass",
+      "passed": 11,
+      "total": 11,
+      "checks": {
+        "hasTitle": true,
+        "hasMetaDescription": true,
+        "hasMetaKeywords": true,
+        "hasCanonical": true,
+        "hasOgTags": true,
+        "hasTwitterTags": true,
+        "hasStructuredData": true,
+        "hasViewport": true,
+        "hasThemeColor": true,
+        "hasManifest": true,
+        "hasFavicon": true
+      },
+      "message": "11/11 checks passed"
+    },
+    {
+      "file": "vehicles.html",
+      "status": "pass",
+      "passed": 11,
+      "total": 11,
+      "checks": {
+        "hasTitle": true,
+        "hasMetaDescription": true,
+        "hasMetaKeywords": true,
+        "hasCanonical": true,
+        "hasOgTags": true,
+        "hasTwitterTags": true,
+        "hasStructuredData": true,
+        "hasViewport": true,
+        "hasThemeColor": true,
+        "hasManifest": true,
+        "hasFavicon": true
+      },
+      "message": "11/11 checks passed"
+    },
+    {
+      "file": "houses.html",
+      "status": "pass",
+      "passed": 11,
+      "total": 11,
+      "checks": {
+        "hasTitle": true,
+        "hasMetaDescription": true,
+        "hasMetaKeywords": true,
+        "hasCanonical": true,
+        "hasOgTags": true,
+        "hasTwitterTags": true,
+        "hasStructuredData": true,
+        "hasViewport": true,
+        "hasThemeColor": true,
+        "hasManifest": true,
+        "hasFavicon": true
+      },
+      "message": "11/11 checks passed"
+    },
+    {
+      "file": "loans.html",
+      "status": "pass",
+      "passed": 11,
+      "total": 11,
+      "checks": {
+        "hasTitle": true,
+        "hasMetaDescription": true,
+        "hasMetaKeywords": true,
+        "hasCanonical": true,
+        "hasOgTags": true,
+        "hasTwitterTags": true,
+        "hasStructuredData": true,
+        "hasViewport": true,
+        "hasThemeColor": true,
+        "hasManifest": true,
+        "hasFavicon": true
+      },
+      "message": "11/11 checks passed"
+    },
+    {
+      "file": "recurring.html",
+      "status": "pass",
+      "passed": 11,
+      "total": 11,
+      "checks": {
+        "hasTitle": true,
+        "hasMetaDescription": true,
+        "hasMetaKeywords": true,
+        "hasCanonical": true,
+        "hasOgTags": true,
+        "hasTwitterTags": true,
+        "hasStructuredData": true,
+        "hasViewport": true,
+        "hasThemeColor": true,
+        "hasManifest": true,
+        "hasFavicon": true
+      },
+      "message": "11/11 checks passed"
+    },
+    {
+      "file": "achievements.html",
+      "status": "pass",
+      "passed": 11,
+      "total": 11,
+      "checks": {
+        "hasTitle": true,
+        "hasMetaDescription": true,
+        "hasMetaKeywords": true,
+        "hasCanonical": true,
+        "hasOgTags": true,
+        "hasTwitterTags": true,
+        "hasStructuredData": true,
+        "hasViewport": true,
+        "hasThemeColor": true,
+        "hasManifest": true,
+        "hasFavicon": true
+      },
+      "message": "11/11 checks passed"
+    },
+    {
+      "file": "split-expense.html",
+      "status": "pass",
+      "passed": 11,
+      "total": 11,
+      "checks": {
+        "hasTitle": true,
+        "hasMetaDescription": true,
+        "hasMetaKeywords": true,
+        "hasCanonical": true,
+        "hasOgTags": true,
+        "hasTwitterTags": true,
+        "hasStructuredData": true,
+        "hasViewport": true,
+        "hasThemeColor": true,
+        "hasManifest": true,
+        "hasFavicon": true
+      },
+      "message": "11/11 checks passed"
+    },
+    {
+      "file": "trip-groups.html",
+      "status": "pass",
+      "passed": 11,
+      "total": 11,
+      "checks": {
+        "hasTitle": true,
+        "hasMetaDescription": true,
+        "hasMetaKeywords": true,
+        "hasCanonical": true,
+        "hasOgTags": true,
+        "hasTwitterTags": true,
+        "hasStructuredData": true,
+        "hasViewport": true,
+        "hasThemeColor": true,
+        "hasManifest": true,
+        "hasFavicon": true
+      },
+      "message": "11/11 checks passed"
+    },
+    {
+      "file": "house-help.html",
+      "status": "pass",
+      "passed": 11,
+      "total": 11,
+      "checks": {
+        "hasTitle": true,
+        "hasMetaDescription": true,
+        "hasMetaKeywords": true,
+        "hasCanonical": true,
+        "hasOgTags": true,
+        "hasTwitterTags": true,
+        "hasStructuredData": true,
+        "hasViewport": true,
+        "hasThemeColor": true,
+        "hasManifest": true,
+        "hasFavicon": true
+      },
+      "message": "11/11 checks passed"
+    },
+    {
+      "file": "documents.html",
+      "status": "pass",
+      "passed": 11,
+      "total": 11,
+      "checks": {
+        "hasTitle": true,
+        "hasMetaDescription": true,
+        "hasMetaKeywords": true,
+        "hasCanonical": true,
+        "hasOgTags": true,
+        "hasTwitterTags": true,
+        "hasStructuredData": true,
+        "hasViewport": true,
+        "hasThemeColor": true,
+        "hasManifest": true,
+        "hasFavicon": true
+      },
+      "message": "11/11 checks passed"
+    },
+    {
+      "file": "notes.html",
+      "status": "pass",
+      "passed": 11,
+      "total": 11,
+      "checks": {
+        "hasTitle": true,
+        "hasMetaDescription": true,
+        "hasMetaKeywords": true,
+        "hasCanonical": true,
+        "hasOgTags": true,
+        "hasTwitterTags": true,
+        "hasStructuredData": true,
+        "hasViewport": true,
+        "hasThemeColor": true,
+        "hasManifest": true,
+        "hasFavicon": true
+      },
+      "message": "11/11 checks passed"
+    },
+    {
+      "file": "profile.html",
+      "status": "pass",
+      "passed": 11,
+      "total": 11,
+      "checks": {
+        "hasTitle": true,
+        "hasMetaDescription": true,
+        "hasMetaKeywords": true,
+        "hasCanonical": true,
+        "hasOgTags": true,
+        "hasTwitterTags": true,
+        "hasStructuredData": true,
+        "hasViewport": true,
+        "hasThemeColor": true,
+        "hasManifest": true,
+        "hasFavicon": true
+      },
+      "message": "11/11 checks passed"
+    },
+    {
+      "file": "login.html",
+      "status": "pass",
+      "passed": 11,
+      "total": 11,
+      "checks": {
+        "hasTitle": true,
+        "hasMetaDescription": true,
+        "hasMetaKeywords": true,
+        "hasCanonical": true,
+        "hasOgTags": true,
+        "hasTwitterTags": true,
+        "hasStructuredData": true,
+        "hasViewport": true,
+        "hasThemeColor": true,
+        "hasManifest": true,
+        "hasFavicon": true
+      },
+      "message": "11/11 checks passed"
+    },
+    {
+      "file": "signup.html",
+      "status": "pass",
+      "passed": 11,
+      "total": 11,
+      "checks": {
+        "hasTitle": true,
+        "hasMetaDescription": true,
+        "hasMetaKeywords": true,
+        "hasCanonical": true,
+        "hasOgTags": true,
+        "hasTwitterTags": true,
+        "hasStructuredData": true,
+        "hasViewport": true,
+        "hasThemeColor": true,
+        "hasManifest": true,
+        "hasFavicon": true
+      },
+      "message": "11/11 checks passed"
+    },
+    {
+      "file": "demo.html",
+      "status": "pass",
+      "passed": 11,
+      "total": 11,
+      "checks": {
+        "hasTitle": true,
+        "hasMetaDescription": true,
+        "hasMetaKeywords": true,
+        "hasCanonical": true,
+        "hasOgTags": true,
+        "hasTwitterTags": true,
+        "hasStructuredData": true,
+        "hasViewport": true,
+        "hasThemeColor": true,
+        "hasManifest": true,
+        "hasFavicon": true
+      },
+      "message": "11/11 checks passed"
+    },
+    {
+      "file": "user-guide.html",
+      "status": "pass",
+      "passed": 11,
+      "total": 11,
+      "checks": {
+        "hasTitle": true,
+        "hasMetaDescription": true,
+        "hasMetaKeywords": true,
+        "hasCanonical": true,
+        "hasOgTags": true,
+        "hasTwitterTags": true,
+        "hasStructuredData": true,
+        "hasViewport": true,
+        "hasThemeColor": true,
+        "hasManifest": true,
+        "hasFavicon": true
+      },
+      "message": "11/11 checks passed"
+    },
+    {
+      "file": "feedback.html",
+      "status": "pass",
+      "passed": 11,
+      "total": 11,
+      "checks": {
+        "hasTitle": true,
+        "hasMetaDescription": true,
+        "hasMetaKeywords": true,
+        "hasCanonical": true,
+        "hasOgTags": true,
+        "hasTwitterTags": true,
+        "hasStructuredData": true,
+        "hasViewport": true,
+        "hasThemeColor": true,
+        "hasManifest": true,
+        "hasFavicon": true
+      },
+      "message": "11/11 checks passed"
+    },
+    {
+      "file": "about-us.html",
+      "status": "pass",
+      "passed": 11,
+      "total": 11,
+      "checks": {
+        "hasTitle": true,
+        "hasMetaDescription": true,
+        "hasMetaKeywords": true,
+        "hasCanonical": true,
+        "hasOgTags": true,
+        "hasTwitterTags": true,
+        "hasStructuredData": true,
+        "hasViewport": true,
+        "hasThemeColor": true,
+        "hasManifest": true,
+        "hasFavicon": true
+      },
+      "message": "11/11 checks passed"
+    },
+    {
+      "file": "contact-us.html",
+      "status": "pass",
+      "passed": 11,
+      "total": 11,
+      "checks": {
+        "hasTitle": true,
+        "hasMetaDescription": true,
+        "hasMetaKeywords": true,
+        "hasCanonical": true,
+        "hasOgTags": true,
+        "hasTwitterTags": true,
+        "hasStructuredData": true,
+        "hasViewport": true,
+        "hasThemeColor": true,
+        "hasManifest": true,
+        "hasFavicon": true
+      },
+      "message": "11/11 checks passed"
+    },
+    {
+      "file": "privacy-policy.html",
+      "status": "pass",
+      "passed": 11,
+      "total": 11,
+      "checks": {
+        "hasTitle": true,
+        "hasMetaDescription": true,
+        "hasMetaKeywords": true,
+        "hasCanonical": true,
+        "hasOgTags": true,
+        "hasTwitterTags": true,
+        "hasStructuredData": true,
+        "hasViewport": true,
+        "hasThemeColor": true,
+        "hasManifest": true,
+        "hasFavicon": true
+      },
+      "message": "11/11 checks passed"
+    },
+    {
+      "file": "terms-of-service.html",
+      "status": "pass",
+      "passed": 11,
+      "total": 11,
+      "checks": {
+        "hasTitle": true,
+        "hasMetaDescription": true,
+        "hasMetaKeywords": true,
+        "hasCanonical": true,
+        "hasOgTags": true,
+        "hasTwitterTags": true,
+        "hasStructuredData": true,
+        "hasViewport": true,
+        "hasThemeColor": true,
+        "hasManifest": true,
+        "hasFavicon": true
+      },
+      "message": "11/11 checks passed"
+    },
+    {
+      "file": "disclaimer.html",
+      "status": "pass",
+      "passed": 11,
+      "total": 11,
+      "checks": {
+        "hasTitle": true,
+        "hasMetaDescription": true,
+        "hasMetaKeywords": true,
+        "hasCanonical": true,
+        "hasOgTags": true,
+        "hasTwitterTags": true,
+        "hasStructuredData": true,
+        "hasViewport": true,
+        "hasThemeColor": true,
+        "hasManifest": true,
+        "hasFavicon": true
+      },
+      "message": "11/11 checks passed"
+    },
+    {
+      "file": "data-protection.html",
+      "status": "pass",
+      "passed": 11,
+      "total": 11,
+      "checks": {
+        "hasTitle": true,
+        "hasMetaDescription": true,
+        "hasMetaKeywords": true,
+        "hasCanonical": true,
+        "hasOgTags": true,
+        "hasTwitterTags": true,
+        "hasStructuredData": true,
+        "hasViewport": true,
+        "hasThemeColor": true,
+        "hasManifest": true,
+        "hasFavicon": true
+      },
+      "message": "11/11 checks passed"
+    }
+  ]
+}

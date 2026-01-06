@@ -1,47 +1,84 @@
-# Rupiya - Personal Finance App
-# https://rupiya.app
+# Robots.txt for Rupiya Investment Tracker App
+# https://rupiya.online
 
 User-agent: *
 Allow: /
 
-# Allow indexing of main pages
-Allow: /index.html
-Allow: /login.html
-Allow: /signup.html
+# Disallow admin and test pages
+Disallow: /admin.html
+Disallow: /auth-debug.html
+Disallow: /check-sheet-access.html
+Disallow: /debug-sheet-columns.html
+Disallow: /email-template-preview.html
+Disallow: /env-config.html
+Disallow: /find-sheet-gid.html
+Disallow: /force-relogin.html
+Disallow: /family-test.html
+Disallow: /family-modals.html
+Disallow: /test-*.html
 
-# Disallow private/authenticated pages from indexing
-Disallow: /dashboard.html
-Disallow: /expenses.html
-Disallow: /income.html
-Disallow: /budgets.html
-Disallow: /goals.html
-Disallow: /investments.html
-Disallow: /family.html
-Disallow: /profile.html
-Disallow: /analytics.html
-Disallow: /achievements.html
-Disallow: /vehicles.html
-Disallow: /houses.html
-Disallow: /notes.html
-Disallow: /documents.html
-Disallow: /recurring.html
-Disallow: /split-expense.html
-Disallow: /ai-insights.html
-Disallow: /house-help.html
-
-# Disallow API and config files
+# Disallow API endpoints
 Disallow: /api/
-Disallow: /.env*
+
+# Disallow Firebase config
+Disallow: /.firebase/
 Disallow: /firebase.json
 Disallow: /firestore.rules
+Disallow: /firestore.indexes.json
 Disallow: /storage.rules
 
-# Disallow assets that shouldn't be indexed
-Disallow: /assets/js/
+# Disallow build files
+Disallow: /build.js
+Disallow: /update-*.js
+Disallow: /optimize-seo.js
+Disallow: /seo-config.json
+
+# Disallow node modules and config
 Disallow: /node_modules/
+Disallow: /package.json
+Disallow: /package-lock.json
+Disallow: /.git/
+Disallow: /.gitignore
+Disallow: /.env
+Disallow: /.env.example
+
+# Allow important pages for crawling
+Allow: /index.html
+Allow: /investments.html
+Allow: /dashboard.html
+Allow: /expenses.html
+Allow: /income.html
+Allow: /budgets.html
+Allow: /goals.html
+Allow: /analytics.html
+Allow: /ai-insights.html
+Allow: /login.html
+Allow: /signup.html
+Allow: /demo.html
+Allow: /user-guide.html
+Allow: /about-us.html
+Allow: /contact-us.html
+
+# Allow CSS and JS for rendering
+Allow: /assets/css/
+Allow: /assets/js/
+Allow: /assets/images/
 
 # Sitemap location
-Sitemap: https://rupiya.app/sitemap.xml
+Sitemap: https://rupiya.online/sitemap.xml
 
-# Crawl delay (optional, be nice to servers)
+# Crawl-delay for respectful crawling
+Crawl-delay: 1
+
+# Specific rules for major search engines
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Slurp
+Allow: /
 Crawl-delay: 1

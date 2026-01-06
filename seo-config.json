@@ -1,0 +1,329 @@
+{
+  "siteName": "Rupiya",
+  "siteUrl": "https://rupiya.online",
+  "defaultImage": "https://rupiya.online/assets/images/og-image.png",
+  "twitterHandle": "@RupiyaApp",
+  "locale": "en_IN",
+  "pages": {
+    "index.html": {
+      "title": "Rupiya - Best Investment Tracker & Portfolio Management App India 2026",
+      "description": "Track investments, stocks, mutual funds, crypto & expenses in one app. AI-powered portfolio analysis, real-time tracking, family sharing. #1 investment app for Indian investors. Free forever!",
+      "keywords": "investment app India, portfolio tracker, stock tracker, mutual fund tracker, crypto portfolio, investment management app, best investment app, portfolio management, wealth tracker, investment portfolio app, stock portfolio tracker India, investment tracking app",
+      "ogTitle": "Rupiya - India's #1 Investment & Portfolio Tracker App",
+      "ogDescription": "Track all investments, analyze portfolio, get AI insights. Stocks, MF, crypto, real estate - all in one app. Join 10,000+ smart investors!",
+      "canonical": "https://rupiya.online/",
+      "priority": "1.0",
+      "changefreq": "daily"
+    },
+    "investments.html": {
+      "title": "Investment Portfolio Tracker - Stocks, Mutual Funds, Crypto, Gold | Rupiya",
+      "description": "Complete investment portfolio management app. Track stocks (NSE/BSE), mutual funds, ETFs, crypto, gold, real estate. Real-time prices, returns calculator, XIRR, portfolio analytics. Best investment tracker India 2026.",
+      "keywords": "investment portfolio tracker, stock portfolio app, mutual fund tracker India, crypto portfolio tracker, investment tracker app, portfolio management app, stock market tracker, investment returns calculator, XIRR calculator, portfolio analyzer India",
+      "ogTitle": "Investment Portfolio Tracker - Track All Your Investments",
+      "ogDescription": "Track stocks, mutual funds, crypto, gold & more. Real-time portfolio analysis, returns tracking, AI insights.",
+      "canonical": "https://rupiya.online/investments.html",
+      "priority": "1.0",
+      "changefreq": "daily"
+    },
+    "dashboard.html": {
+      "title": "Investment Dashboard - Real-Time Portfolio & Expense Tracking | Rupiya",
+      "description": "Comprehensive investment dashboard with real-time portfolio tracking, expense monitoring, income analysis, and AI-powered insights. Track net worth, savings rate, and financial goals in one place.",
+      "keywords": "investment dashboard, portfolio dashboard, financial dashboard, wealth tracker dashboard, investment tracking dashboard, portfolio monitoring, net worth tracker, savings rate calculator",
+      "ogTitle": "Investment Dashboard - Track Portfolio & Finances",
+      "ogDescription": "Real-time investment tracking, portfolio analysis, and financial insights dashboard",
+      "canonical": "https://rupiya.online/dashboard.html",
+      "priority": "0.9",
+      "changefreq": "daily"
+    },
+    "expenses.html": {
+      "title": "Expense Tracker - Smart Money Management for Investors | Rupiya",
+      "description": "Track daily expenses, categorize spending, monitor investment costs. AI-powered expense analysis helps investors save more and invest better. Best expense tracker for investment-focused individuals.",
+      "keywords": "expense tracker, money management app, spending tracker, expense manager India, investment expense tracker, portfolio cost tracker, expense tracking app, budget expense tracker",
+      "ogTitle": "Expense Tracker - Smart Money Management",
+      "ogDescription": "Track expenses, categorize spending, get AI insights to save more for investments",
+      "canonical": "https://rupiya.online/expenses.html",
+      "priority": "0.9",
+      "changefreq": "daily"
+    },
+    "income.html": {
+      "title": "Income Tracker - Track Salary, Dividends, Investment Returns | Rupiya",
+      "description": "Track all income sources: salary, dividends, rental income, investment returns, capital gains. Comprehensive income management for investors. Monitor passive income and investment earnings.",
+      "keywords": "income tracker, dividend tracker, investment income tracker, passive income tracker, salary tracker, rental income tracker, capital gains tracker, investment returns tracker",
+      "ogTitle": "Income Tracker - Track All Revenue Sources",
+      "ogDescription": "Track salary, dividends, rental income, and investment returns in one place",
+      "canonical": "https://rupiya.online/income.html",
+      "priority": "0.8",
+      "changefreq": "daily"
+    },
+    "budgets.html": {
+      "title": "Budget Planner - Investment-Focused Budgeting Tool | Rupiya",
+      "description": "Create smart budgets that prioritize investments. Track spending limits, savings goals, and investment allocations. AI-powered budget recommendations for wealth building.",
+      "keywords": "budget planner, investment budget, financial planning app, budget tracker India, smart budgeting, savings planner, investment allocation planner, wealth building budget",
+      "ogTitle": "Budget Planner - Smart Budgeting for Investors",
+      "ogDescription": "Create budgets that prioritize investments and wealth building",
+      "canonical": "https://rupiya.online/budgets.html",
+      "priority": "0.8",
+      "changefreq": "weekly"
+    },
+    "goals.html": {
+      "title": "Financial Goals Tracker - Investment & Savings Goals | Rupiya",
+      "description": "Set and track financial goals, investment targets, retirement planning, wealth milestones. Goal-based investing made easy. Track progress towards financial freedom.",
+      "keywords": "financial goals tracker, investment goals, savings goals tracker, retirement planning app, wealth goals, goal-based investing, financial targets tracker, investment milestone tracker",
+      "ogTitle": "Financial Goals - Achieve Investment Targets",
+      "ogDescription": "Set and track investment goals, savings targets, and wealth milestones",
+      "canonical": "https://rupiya.online/goals.html",
+      "priority": "0.8",
+      "changefreq": "weekly"
+    },
+    "analytics.html": {
+      "title": "Investment Analytics - Portfolio Performance & ROI Analysis | Rupiya",
+      "description": "Advanced investment analytics: portfolio performance charts, ROI calculator, XIRR, CAGR, asset allocation analysis, sector distribution. Data-driven investment insights for smart investors.",
+      "keywords": "investment analytics, portfolio analysis, ROI calculator, XIRR calculator, CAGR calculator, portfolio performance tracker, investment performance analysis, wealth analytics India",
+      "ogTitle": "Investment Analytics - Portfolio Performance Insights",
+      "ogDescription": "Advanced analytics, performance charts, ROI calculator, and investment insights",
+      "canonical": "https://rupiya.online/analytics.html",
+      "priority": "0.8",
+      "changefreq": "weekly"
+    },
+    "ai-insights.html": {
+      "title": "AI Investment Insights - Smart Portfolio Recommendations | Rupiya",
+      "description": "Get AI-powered investment recommendations, portfolio optimization suggestions, spending analysis, and personalized financial advice. Smart AI insights for better investment decisions.",
+      "keywords": "AI investment advisor, AI portfolio analysis, investment recommendations, robo advisor India, AI financial insights, smart investing AI, portfolio optimization AI, investment AI assistant",
+      "ogTitle": "AI Investment Insights - Smart Recommendations",
+      "ogDescription": "AI-powered investment recommendations and portfolio optimization",
+      "canonical": "https://rupiya.online/ai-insights.html",
+      "priority": "0.8",
+      "changefreq": "weekly"
+    },
+    "family.html": {
+      "title": "Family Investment Management - Shared Portfolio Tracking | Rupiya",
+      "description": "Manage family investments together. Share portfolios, track joint expenses, collaborative wealth management. Best family investment app for Indian families.",
+      "keywords": "family investment app, joint portfolio tracker, family wealth management, shared investment tracking, family finance app India, joint account tracker, family portfolio management",
+      "ogTitle": "Family Investment Management - Collaborative Wealth",
+      "ogDescription": "Manage investments and finances with your family members",
+      "canonical": "https://rupiya.online/family.html",
+      "priority": "0.7",
+      "changefreq": "weekly"
+    },
+    "vehicles.html": {
+      "title": "Vehicle Expense Tracker - Fuel, Service, Mileage Tracking | Rupiya",
+      "description": "Track vehicle expenses, fuel costs, service records, mileage, and maintenance. Complete vehicle expense management for car and bike owners in India.",
+      "keywords": "vehicle expense tracker, fuel tracker, car expense tracker, mileage tracker, vehicle maintenance tracker, auto expense tracker India, bike expense tracker",
+      "ogTitle": "Vehicle Expense Tracker - Track Fuel & Maintenance",
+      "ogDescription": "Track vehicle expenses, fuel costs, service records, and mileage",
+      "canonical": "https://rupiya.online/vehicles.html",
+      "priority": "0.7",
+      "changefreq": "weekly"
+    },
+    "houses.html": {
+      "title": "Property Management - Real Estate Investment Tracker | Rupiya",
+      "description": "Track real estate investments, property expenses, rental income, maintenance costs. Complete property portfolio management for real estate investors in India.",
+      "keywords": "property management app, real estate tracker, rental income tracker, property expense tracker, real estate investment app India, property portfolio tracker",
+      "ogTitle": "Property Management - Real Estate Investment Tracker",
+      "ogDescription": "Track real estate investments, rental income, and property expenses",
+      "canonical": "https://rupiya.online/houses.html",
+      "priority": "0.7",
+      "changefreq": "weekly"
+    },
+    "loans.html": {
+      "title": "Loan & EMI Tracker - Manage Loans, EMIs, Debt | Rupiya",
+      "description": "Track loans, EMIs, credit card debt, and payment schedules. Complete debt management for investors. Monitor loan repayments and interest costs.",
+      "keywords": "loan tracker, EMI tracker, debt tracker, loan management app India, EMI calculator, debt management app, loan repayment tracker, credit tracker",
+      "ogTitle": "Loan & EMI Tracker - Manage Debt Efficiently",
+      "ogDescription": "Track loans, EMIs, and debt repayment schedules",
+      "canonical": "https://rupiya.online/loans.html",
+      "priority": "0.7",
+      "changefreq": "weekly"
+    },
+    "recurring.html": {
+      "title": "Recurring Transactions - Subscription & SIP Tracker | Rupiya",
+      "description": "Track recurring expenses, subscriptions, SIPs, and automated investments. Never miss a payment or investment. Manage all recurring transactions in one place.",
+      "keywords": "recurring expense tracker, subscription tracker, SIP tracker, recurring payment tracker, subscription management app India, automated investment tracker",
+      "ogTitle": "Recurring Transactions - Track Subscriptions & SIPs",
+      "ogDescription": "Track recurring expenses, subscriptions, and automated investments",
+      "canonical": "https://rupiya.online/recurring.html",
+      "priority": "0.6",
+      "changefreq": "weekly"
+    },
+    "achievements.html": {
+      "title": "Financial Achievements - Gamified Investment Tracking | Rupiya",
+      "description": "Earn achievements, track financial milestones, and stay motivated on your investment journey. Gamified personal finance for better money habits.",
+      "keywords": "financial achievements, investment milestones, gamified finance, financial goals achievements, investment tracking gamification",
+      "ogTitle": "Financial Achievements - Track Your Progress",
+      "ogDescription": "Earn achievements and track financial milestones",
+      "canonical": "https://rupiya.online/achievements.html",
+      "priority": "0.6",
+      "changefreq": "monthly"
+    },
+    "split-expense.html": {
+      "title": "Split Expense - Bill Splitting & Group Expenses | Rupiya",
+      "description": "Split bills with friends, track group expenses, manage shared costs. Easy bill splitting calculator for trips, dinners, and shared expenses.",
+      "keywords": "bill splitter, expense splitting app, group expense tracker, split bills app India, shared expense tracker, bill splitting calculator",
+      "ogTitle": "Split Expense - Easy Bill Splitting",
+      "ogDescription": "Split bills with friends and track group expenses easily",
+      "canonical": "https://rupiya.online/split-expense.html",
+      "priority": "0.6",
+      "changefreq": "monthly"
+    },
+    "trip-groups.html": {
+      "title": "Trip Expense Tracker - Group Travel Budget Management | Rupiya",
+      "description": "Track trip expenses, manage group travel budgets, split costs with travel companions. Perfect for vacation expense management and group trips.",
+      "keywords": "trip expense tracker, travel expense tracker, group travel budget, vacation expense tracker, trip budget app India, travel cost splitter",
+      "ogTitle": "Trip Expense Tracker - Manage Group Travel Budgets",
+      "ogDescription": "Track trip expenses and split costs with travel companions",
+      "canonical": "https://rupiya.online/trip-groups.html",
+      "priority": "0.6",
+      "changefreq": "monthly"
+    },
+    "house-help.html": {
+      "title": "House Help Management - Staff Payment Tracker | Rupiya",
+      "description": "Track house help payments, manage staff schedules, monitor domestic worker expenses. Complete household staff management for Indian homes.",
+      "keywords": "house help tracker, domestic worker payment tracker, staff payment management, household staff tracker India, maid payment tracker",
+      "ogTitle": "House Help Management - Track Staff Payments",
+      "ogDescription": "Manage house help payments and schedules efficiently",
+      "canonical": "https://rupiya.online/house-help.html",
+      "priority": "0.5",
+      "changefreq": "monthly"
+    },
+    "documents.html": {
+      "title": "Document Vault - Secure Financial Document Storage | Rupiya",
+      "description": "Store investment documents, receipts, bills, and financial records securely. Digital document vault for investors.",
+      "keywords": "document vault, financial document storage, investment document manager, receipt storage app, secure document storage India",
+      "ogTitle": "Document Vault - Secure Financial Storage",
+      "ogDescription": "Store investment documents and financial records securely",
+      "canonical": "https://rupiya.online/documents.html",
+      "priority": "0.5",
+      "changefreq": "monthly"
+    },
+    "notes.html": {
+      "title": "Financial Notes - Investment Ideas & Money Logs | Rupiya",
+      "description": "Keep financial notes, investment ideas, money logs, and personal finance observations. Digital notebook for investors.",
+      "keywords": "financial notes app, investment notes, money journal, finance notebook, investment ideas tracker",
+      "ogTitle": "Financial Notes - Track Investment Ideas",
+      "ogDescription": "Keep financial notes and investment observations",
+      "canonical": "https://rupiya.online/notes.html",
+      "priority": "0.4",
+      "changefreq": "monthly"
+    },
+    "profile.html": {
+      "title": "Profile & Settings - Manage Your Investment Account | Rupiya",
+      "description": "Manage your Rupiya account settings, preferences, and profile. Customize your investment tracking experience.",
+      "keywords": "account settings, profile management, user preferences, investment app settings",
+      "ogTitle": "Profile & Settings - Rupiya",
+      "ogDescription": "Manage your account settings and preferences",
+      "canonical": "https://rupiya.online/profile.html",
+      "priority": "0.4",
+      "changefreq": "monthly"
+    },
+    "login.html": {
+      "title": "Login - Access Your Investment Portfolio | Rupiya",
+      "description": "Login to Rupiya investment tracker. Access your portfolio, track investments, and manage finances securely.",
+      "keywords": "investment app login, portfolio tracker login, Rupiya login",
+      "ogTitle": "Login - Rupiya Investment Tracker",
+      "ogDescription": "Access your investment portfolio and financial dashboard",
+      "canonical": "https://rupiya.online/login.html",
+      "priority": "0.8",
+      "changefreq": "monthly"
+    },
+    "signup.html": {
+      "title": "Sign Up Free - Start Tracking Investments Today | Rupiya",
+      "description": "Create free Rupiya account. Start tracking investments, stocks, mutual funds, and expenses. No credit card required. Join 10,000+ investors.",
+      "keywords": "investment app signup, create investment account, free portfolio tracker, investment tracker registration",
+      "ogTitle": "Sign Up Free - Rupiya Investment Tracker",
+      "ogDescription": "Create free account and start tracking your investments today",
+      "canonical": "https://rupiya.online/signup.html",
+      "priority": "0.9",
+      "changefreq": "monthly"
+    },
+    "demo.html": {
+      "title": "Try Demo - Experience Rupiya Investment Tracker | Rupiya",
+      "description": "Try Rupiya investment tracker with sample data. No signup required. Experience portfolio tracking, expense management, and AI insights.",
+      "keywords": "investment app demo, portfolio tracker demo, free investment app trial",
+      "ogTitle": "Try Demo - Rupiya Investment Tracker",
+      "ogDescription": "Experience Rupiya with sample data - no signup required",
+      "canonical": "https://rupiya.online/demo.html",
+      "priority": "0.9",
+      "changefreq": "monthly"
+    },
+    "user-guide.html": {
+      "title": "User Guide - How to Use Rupiya Investment Tracker | Rupiya",
+      "description": "Complete guide to using Rupiya investment tracker. Learn how to track investments, manage portfolio, analyze returns, and use all features.",
+      "keywords": "investment app guide, portfolio tracker tutorial, how to track investments, Rupiya user guide",
+      "ogTitle": "User Guide - Rupiya Investment Tracker",
+      "ogDescription": "Learn how to use Rupiya to track investments and manage your portfolio",
+      "canonical": "https://rupiya.online/user-guide.html",
+      "priority": "0.7",
+      "changefreq": "monthly"
+    },
+    "feedback.html": {
+      "title": "Feedback - Share Your Investment App Experience | Rupiya",
+      "description": "Share feedback about Rupiya investment tracker. Help us improve the best investment app for Indian investors.",
+      "keywords": "investment app feedback, portfolio tracker feedback, Rupiya feedback",
+      "ogTitle": "Feedback - Rupiya",
+      "ogDescription": "Share your feedback and help us improve",
+      "canonical": "https://rupiya.online/feedback.html",
+      "priority": "0.4",
+      "changefreq": "monthly"
+    },
+    "about-us.html": {
+      "title": "About Us - India's Leading Investment Tracker App | Rupiya",
+      "description": "Learn about Rupiya - India's most comprehensive investment tracking and portfolio management app. Our mission to democratize wealth management.",
+      "keywords": "about Rupiya, investment app India, portfolio tracker company, about investment app",
+      "ogTitle": "About Us - Rupiya Investment Tracker",
+      "ogDescription": "Learn about India's leading investment tracking app",
+      "canonical": "https://rupiya.online/about-us.html",
+      "priority": "0.6",
+      "changefreq": "monthly"
+    },
+    "contact-us.html": {
+      "title": "Contact Us - Get Investment App Support | Rupiya",
+      "description": "Contact Rupiya support team. Get help with investment tracking, portfolio management, and app features.",
+      "keywords": "contact Rupiya, investment app support, portfolio tracker help, customer support",
+      "ogTitle": "Contact Us - Rupiya",
+      "ogDescription": "Get in touch with our support team",
+      "canonical": "https://rupiya.online/contact-us.html",
+      "priority": "0.5",
+      "changefreq": "monthly"
+    },
+    "privacy-policy.html": {
+      "title": "Privacy Policy - Data Security & Protection | Rupiya",
+      "description": "Rupiya privacy policy. Learn how we protect your investment data and financial information with bank-level security.",
+      "keywords": "privacy policy, data protection, investment app security, financial data privacy",
+      "ogTitle": "Privacy Policy - Rupiya",
+      "ogDescription": "How we protect your investment and financial data",
+      "canonical": "https://rupiya.online/privacy-policy.html",
+      "priority": "0.5",
+      "changefreq": "yearly"
+    },
+    "terms-of-service.html": {
+      "title": "Terms of Service - Investment App Terms | Rupiya",
+      "description": "Rupiya terms of service. Read our terms and conditions for using the investment tracking app.",
+      "keywords": "terms of service, investment app terms, user agreement",
+      "ogTitle": "Terms of Service - Rupiya",
+      "ogDescription": "Terms and conditions for using Rupiya",
+      "canonical": "https://rupiya.online/terms-of-service.html",
+      "priority": "0.4",
+      "changefreq": "yearly"
+    },
+    "disclaimer.html": {
+      "title": "Disclaimer - Investment Information Disclaimer | Rupiya",
+      "description": "Rupiya disclaimer. Important information about investment tracking and financial management tools.",
+      "keywords": "investment disclaimer, financial app disclaimer, investment information disclaimer",
+      "ogTitle": "Disclaimer - Rupiya",
+      "ogDescription": "Important disclaimer about investment information",
+      "canonical": "https://rupiya.online/disclaimer.html",
+      "priority": "0.4",
+      "changefreq": "yearly"
+    },
+    "data-protection.html": {
+      "title": "Data Protection - Bank-Level Security | Rupiya",
+      "description": "Learn about Rupiya's bank-level security measures. How we protect your investment portfolio and financial data.",
+      "keywords": "data protection, investment app security, financial data security, bank-level encryption",
+      "ogTitle": "Data Protection - Rupiya",
+      "ogDescription": "Bank-level security for your investment data",
+      "canonical": "https://rupiya.online/data-protection.html",
+      "priority": "0.5",
+      "changefreq": "yearly"
+    }
+  }
+}

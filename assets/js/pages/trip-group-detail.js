@@ -158,6 +158,14 @@ class TripGroupDetailPage {
       this.populateFilters();
       this.populateModalSelects();
 
+      // Initialize UX enhancements
+      this.initializeFAB();
+      this.initializeTemplates();
+      this.initializeSearch();
+      this.initializeFilters();
+      this.initializeQuickActions();
+      this.initializeKeyboardShortcuts();
+
       console.log('UI rendered successfully');
     } catch (error) {
       console.error('Error loading group data:', error);
@@ -965,6 +973,547 @@ class TripGroupDetailPage {
       console.error('Error archiving group:', error);
       this.showToast(error.message || 'Failed to archive group', 'error');
     }
+  }
+
+  // ============================================
+  // UX ENHANCEMENTS
+  // ============================================
+
+  /**
+   * Initialize Floating Action Button
+   */
+  initializeFAB() {
+    const fab = document.getElementById('tripFab');
+    if (!fab) return;
+
+    // Click handler
+    fab.addEventListener('click', () => {
+      this.openExpenseModal();
+    });
+
+    // Show/hide based on scroll
+    let lastScrollTop = 0;
+    window.addEventListener('scroll', () => {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      
+      // Hide FAB when scrolling down, show when scrolling up
+      if (scrollTop > lastScrollTop && scrollTop > 100) {
+        fab.classList.add('hidden');
+      } else {
+        fab.classList.remove('hidden');
+      }
+      
+      lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+    });
+
+    // Hide FAB when expense form is open
+    const expenseSection = document.getElementById('addExpenseSection');
+    if (expenseSection) {
+      const observer = new MutationObserver(() => {
+        if (expenseSection.classList.contains('show')) {
+          fab.classList.add('hidden');
+        } else if (this.group && this.group.status !== 'archived') {
+          fab.classList.remove('hidden');
+        }
+      });
+
+      observer.observe(expenseSection, { attributes: true, attributeFilter: ['class'] });
+    }
+
+    // Hide FAB if group is archived
+    if (this.group && this.group.status === 'archived') {
+      fab.classList.add('hidden');
+    }
+  }
+
+  /**
+   * Initialize Expense Templates
+   */
+  async initializeTemplates() {
+    const { default: expenseTemplatesService } = await import('../services/expense-templates-service.js');
+    
+    const templatesGrid = document.getElementById('expenseTemplatesGrid');
+    if (!templatesGrid) return;
+
+    const templates = expenseTemplatesService.getDefaultTemplates();
+
+    templatesGrid.innerHTML = templates.map(template => `
+      <div class="template-chip" data-template-id="${template.id}">
+        <span class="template-chip-icon">${template.icon}</span>
+        <span class="template-chip-name">${template.name}</span>
+      </div>
+    `).join('');
+
+    // Add click handlers
+    templatesGrid.querySelectorAll('.template-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const templateId = chip.dataset.templateId;
+        this.applyTemplate(templateId);
+        
+        // Visual feedback
+        templatesGrid.querySelectorAll('.template-chip').forEach(c => c.classList.remove('selected'));
+        chip.classList.add('selected');
+      });
+    });
+  }
+
+  /**
+   * Apply expense template
+   */
+  async applyTemplate(templateId) {
+    const { default: expenseTemplatesService } = await import('../services/expense-templates-service.js');
+    
+    const template = expenseTemplatesService.getTemplate(templateId);
+    if (!template) return;
+
+    // Apply template values to form
+    const categorySelect = document.getElementById('expenseCategory');
+    const descriptionInput = document.getElementById('expenseDescription');
+    const splitTypeRadios = document.querySelectorAll('input[name="splitType"]');
+
+    if (categorySelect) {
+      categorySelect.value = template.category;
+    }
+
+    if (descriptionInput) {
+      // Only set prefix if description is empty
+      if (!descriptionInput.value.trim()) {
+        descriptionInput.value = template.descriptionPrefix;
+      }
+      descriptionInput.focus();
+      // Move cursor to end
+      descriptionInput.setSelectionRange(descriptionInput.value.length, descriptionInput.value.length);
+    }
+
+    if (splitTypeRadios) {
+      splitTypeRadios.forEach(radio => {
+        if (radio.value === template.splitType) {
+          radio.checked = true;
+          // Trigger change event to update split inputs
+          radio.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+      });
+    }
+
+    this.showToast(`Applied "${template.name}" template`, 'success');
+  }
+
+  /**
+   * Initialize Search functionality
+   */
+  initializeSearch() {
+    const searchBar = document.getElementById('expenseSearchBar');
+    const searchClear = document.getElementById('expenseSearchClear');
+    const searchCount = document.getElementById('expenseSearchCount');
+
+    if (!searchBar) return;
+
+    let searchTimeout;
+
+    searchBar.addEventListener('input', (e) => {
+      const query = e.target.value.trim();
+
+      // Show/hide clear button
+      if (query) {
+        searchClear.classList.add('visible');
+      } else {
+        searchClear.classList.remove('visible');
+      }
+
+      // Debounce search
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        this.handleSearch(query);
+      }, 300);
+    });
+
+    searchClear.addEventListener('click', () => {
+      searchBar.value = '';
+      searchClear.classList.remove('visible');
+      this.handleSearch('');
+    });
+  }
+
+  /**
+   * Handle search query
+   */
+  handleSearch(query) {
+    const searchCount = document.getElementById('expenseSearchCount');
+    
+    if (!query) {
+      // Reset to show all expenses (with current filters)
+      this.applyFiltersAndSearch();
+      if (searchCount) searchCount.style.display = 'none';
+      return;
+    }
+
+    // Filter expenses by description
+    const filtered = this.expenses.filter(expense => 
+      expense.description.toLowerCase().includes(query.toLowerCase())
+    );
+
+    // Apply any active filters on top of search
+    const finalFiltered = this.applyActiveFilters(filtered);
+
+    // Update display
+    this.displayFilteredExpenses(finalFiltered);
+
+    // Show count
+    if (searchCount) {
+      searchCount.textContent = `${finalFiltered.length} expense${finalFiltered.length !== 1 ? 's' : ''} found`;
+      searchCount.style.display = 'block';
+    }
+  }
+
+  /**
+   * Initialize Filter Chips
+   */
+  initializeFilters() {
+    const filterChips = document.querySelectorAll('.filter-chip');
+    const clearBtn = document.getElementById('filterClearBtn');
+
+    this.activeFilters = new Set();
+
+    filterChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        const filterType = chip.dataset.filter;
+        
+        if (chip.classList.contains('active')) {
+          chip.classList.remove('active');
+          this.activeFilters.delete(filterType);
+        } else {
+          chip.classList.add('active');
+          this.activeFilters.add(filterType);
+        }
+
+        this.applyFiltersAndSearch();
+        this.updateClearButton();
+      });
+    });
+
+    if (clearBtn) {
+      clearBtn.addEventListener('click', () => {
+        this.clearAllFilters();
+      });
+    }
+
+    // Add category filter chips dynamically
+    this.addCategoryFilterChips();
+  }
+
+  /**
+   * Add category filter chips
+   */
+  addCategoryFilterChips() {
+    const filterContainer = document.getElementById('expenseFilterChips');
+    if (!filterContainer || !this.group) return;
+
+    const categories = this.group.categories || [];
+    const clearBtn = document.getElementById('filterClearBtn');
+
+    // Add category chips before clear button
+    categories.forEach(category => {
+      const chip = document.createElement('div');
+      chip.className = 'filter-chip';
+      chip.dataset.filter = `category:${category}`;
+      chip.innerHTML = `<span>${category}</span>`;
+      
+      chip.addEventListener('click', () => {
+        if (chip.classList.contains('active')) {
+          chip.classList.remove('active');
+          this.activeFilters.delete(`category:${category}`);
+        } else {
+          chip.classList.add('active');
+          this.activeFilters.add(`category:${category}`);
+        }
+
+        this.applyFiltersAndSearch();
+        this.updateClearButton();
+      });
+
+      if (clearBtn) {
+        filterContainer.insertBefore(chip, clearBtn);
+      } else {
+        filterContainer.appendChild(chip);
+      }
+    });
+  }
+
+  /**
+   * Apply all active filters and search
+   */
+  applyFiltersAndSearch() {
+    const searchBar = document.getElementById('expenseSearchBar');
+    const query = searchBar ? searchBar.value.trim() : '';
+
+    let filtered = [...this.expenses];
+
+    // Apply search first
+    if (query) {
+      filtered = filtered.filter(expense => 
+        expense.description.toLowerCase().includes(query.toLowerCase())
+      );
+    }
+
+    // Apply filters
+    filtered = this.applyActiveFilters(filtered);
+
+    // Display
+    this.displayFilteredExpenses(filtered);
+  }
+
+  /**
+   * Apply active filters to expense list
+   */
+  applyActiveFilters(expenses) {
+    let filtered = [...expenses];
+
+    this.activeFilters.forEach(filter => {
+      if (filter === 'my-expenses') {
+        const currentUserMember = this.members.find(m => m.userId === this.currentUserId);
+        if (currentUserMember) {
+          filtered = filtered.filter(e => 
+            e.paidBy === currentUserMember.id ||
+            e.splits.some(s => s.memberId === currentUserMember.id)
+          );
+        }
+      } else if (filter === 'last-7-days') {
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        filtered = filtered.filter(e => {
+          const expenseDate = e.date?.toDate ? e.date.toDate() : new Date(e.date);
+          return expenseDate >= sevenDaysAgo;
+        });
+      } else if (filter === 'last-30-days') {
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        filtered = filtered.filter(e => {
+          const expenseDate = e.date?.toDate ? e.date.toDate() : new Date(e.date);
+          return expenseDate >= thirtyDaysAgo;
+        });
+      } else if (filter.startsWith('category:')) {
+        const category = filter.replace('category:', '');
+        filtered = filtered.filter(e => e.category === category);
+      }
+    });
+
+    return filtered;
+  }
+
+  /**
+   * Display filtered expenses
+   */
+  displayFilteredExpenses(expenses) {
+    const list = document.getElementById('expensesList');
+    const empty = document.getElementById('expensesEmpty');
+    const filterEmpty = document.getElementById('expensesFilterEmpty');
+
+    if (expenses.length === 0) {
+      list.innerHTML = '';
+      
+      // Show appropriate empty state
+      if (this.expenses.length === 0) {
+        empty.style.display = 'block';
+        filterEmpty.style.display = 'none';
+      } else {
+        empty.style.display = 'none';
+        filterEmpty.style.display = 'block';
+      }
+      return;
+    }
+
+    empty.style.display = 'none';
+    filterEmpty.style.display = 'none';
+
+    // Get member lookup
+    const memberLookup = {};
+    this.members.forEach(m => memberLookup[m.id] = m);
+
+    list.innerHTML = expenses.map(expense => {
+      const paidByMember = memberLookup[expense.paidBy];
+      const date = expense.date?.toDate ? expense.date.toDate() : new Date();
+
+      return `
+        <div class="expense-item" data-expense-id="${expense.id}">
+          <div class="expense-main">
+            <div class="expense-description">${this.escapeHtml(expense.description)}</div>
+            <div class="expense-meta">
+              <span class="expense-category">${expense.category}</span>
+              <span>${this.formatDate(date)}</span>
+            </div>
+          </div>
+          <div class="expense-right">
+            <div class="expense-amount">₹${expense.amount.toLocaleString('en-IN')}</div>
+            <div class="expense-paid-by">Paid by ${paidByMember?.name || 'Unknown'}</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  /**
+   * Clear all filters
+   */
+  clearAllFilters() {
+    this.activeFilters.clear();
+    
+    document.querySelectorAll('.filter-chip').forEach(chip => {
+      chip.classList.remove('active');
+    });
+
+    this.applyFiltersAndSearch();
+    this.updateClearButton();
+  }
+
+  /**
+   * Update clear button visibility
+   */
+  updateClearButton() {
+    const clearBtn = document.getElementById('filterClearBtn');
+    if (!clearBtn) return;
+
+    if (this.activeFilters.size > 0) {
+      clearBtn.style.display = 'inline-block';
+    } else {
+      clearBtn.style.display = 'none';
+    }
+  }
+
+  /**
+   * Initialize Quick Actions
+   */
+  initializeQuickActions() {
+    const quickAddExpense = document.getElementById('quickAddExpenseBtn');
+    const quickSettleUp = document.getElementById('quickSettleUpBtn');
+    const quickAddMember = document.getElementById('quickAddMemberBtn');
+
+    if (quickAddExpense) {
+      quickAddExpense.addEventListener('click', () => this.openExpenseModal());
+    }
+
+    if (quickSettleUp) {
+      quickSettleUp.addEventListener('click', () => this.openSettlementSection());
+    }
+
+    if (quickAddMember) {
+      quickAddMember.addEventListener('click', () => this.openMemberSection());
+    }
+
+    // Update button states based on group status
+    this.updateQuickActionStates();
+  }
+
+  /**
+   * Update quick action button states
+   */
+  updateQuickActionStates() {
+    const quickAddExpense = document.getElementById('quickAddExpenseBtn');
+    const quickSettleUp = document.getElementById('quickSettleUpBtn');
+
+    if (!this.group) return;
+
+    // Disable add expense if archived
+    if (quickAddExpense) {
+      if (this.group.status === 'archived') {
+        quickAddExpense.disabled = true;
+        quickAddExpense.title = 'Cannot add expenses to archived groups';
+      } else {
+        quickAddExpense.disabled = false;
+        quickAddExpense.title = '';
+      }
+    }
+
+    // Show "Settled" badge if fully settled
+    if (quickSettleUp && this.balances) {
+      const isSettled = Object.values(this.balances).every(b => Math.abs(b) < 0.01);
+      if (isSettled) {
+        quickSettleUp.classList.add('success');
+        quickSettleUp.innerHTML = `
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+          <span>Settled</span>
+        `;
+        quickSettleUp.disabled = true;
+      }
+    }
+  }
+
+  /**
+   * Initialize Keyboard Shortcuts
+   */
+  initializeKeyboardShortcuts() {
+    const shortcutsBtn = document.getElementById('shortcutsHelpBtn');
+    const shortcutsModal = document.getElementById('shortcutsModal');
+    const shortcutsClose = document.getElementById('shortcutsModalClose');
+
+    // Show shortcuts modal
+    if (shortcutsBtn) {
+      shortcutsBtn.addEventListener('click', () => {
+        shortcutsModal.classList.add('visible');
+      });
+    }
+
+    // Close shortcuts modal
+    if (shortcutsClose) {
+      shortcutsClose.addEventListener('click', () => {
+        shortcutsModal.classList.remove('visible');
+      });
+    }
+
+    // Close on overlay click
+    if (shortcutsModal) {
+      shortcutsModal.addEventListener('click', (e) => {
+        if (e.target === shortcutsModal) {
+          shortcutsModal.classList.remove('visible');
+        }
+      });
+    }
+
+    // Keyboard event handler
+    document.addEventListener('keydown', (e) => {
+      // Ignore if user is typing in an input
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+        return;
+      }
+
+      // Ignore if modal is open
+      if (shortcutsModal && shortcutsModal.classList.contains('visible')) {
+        if (e.key === 'Escape') {
+          shortcutsModal.classList.remove('visible');
+        }
+        return;
+      }
+
+      switch (e.key.toLowerCase()) {
+        case 'e':
+          e.preventDefault();
+          if (this.group && this.group.status !== 'archived') {
+            this.openExpenseModal();
+          }
+          break;
+        case 's':
+          e.preventDefault();
+          this.openSettlementSection();
+          break;
+        case 'm':
+          e.preventDefault();
+          this.openMemberSection();
+          break;
+        case '?':
+          e.preventDefault();
+          if (shortcutsModal) {
+            shortcutsModal.classList.add('visible');
+          }
+          break;
+        case 'escape':
+          e.preventDefault();
+          this.closeExpenseModal();
+          this.closeSettlementSection();
+          this.closeMemberSection();
+          break;
+      }
+    });
   }
 }
 

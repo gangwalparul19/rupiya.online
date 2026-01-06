@@ -1,93 +1,236 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  
+  <!-- Homepage - Highest Priority -->
   <url>
-    <loc>https://rupiya.app/</loc>
-    <lastmod>2026-01-03</lastmod>
-    <changefreq>weekly</changefreq>
+    <loc>https://rupiya.online/</loc>
+    <lastmod>2026-01-06</lastmod>
+    <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
+  
+  <!-- Core Investment Features - Very High Priority -->
   <url>
-    <loc>https://rupiya.app/login.html</loc>
-    <lastmod>2026-01-03</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <loc>https://rupiya.online/investments.html</loc>
+    <lastmod>2026-01-06</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
   </url>
+  
   <url>
-    <loc>https://rupiya.app/signup.html</loc>
-    <lastmod>2026-01-03</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://rupiya.app/demo.html</loc>
-    <lastmod>2026-01-03</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://rupiya.app/dashboard.html</loc>
-    <lastmod>2026-01-03</lastmod>
+    <loc>https://rupiya.online/dashboard.html</loc>
+    <lastmod>2026-01-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
+  
+  <!-- User Acquisition Pages - High Priority -->
   <url>
-    <loc>https://rupiya.app/expenses.html</loc>
-    <lastmod>2026-01-03</lastmod>
+    <loc>https://rupiya.online/signup.html</loc>
+    <lastmod>2026-01-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <url>
+    <loc>https://rupiya.online/demo.html</loc>
+    <lastmod>2026-01-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <url>
+    <loc>https://rupiya.online/login.html</loc>
+    <lastmod>2026-01-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- Main Features - High Priority -->
+  <url>
+    <loc>https://rupiya.online/expenses.html</loc>
+    <lastmod>2026-01-06</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <url>
+    <loc>https://rupiya.online/income.html</loc>
+    <lastmod>2026-01-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
+  
   <url>
-    <loc>https://rupiya.app/income.html</loc>
-    <lastmod>2026-01-03</lastmod>
-    <changefreq>daily</changefreq>
+    <loc>https://rupiya.online/budgets.html</loc>
+    <lastmod>2026-01-06</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
+  
   <url>
-    <loc>https://rupiya.app/budgets.html</loc>
-    <lastmod>2026-01-03</lastmod>
+    <loc>https://rupiya.online/goals.html</loc>
+    <lastmod>2026-01-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>https://rupiya.online/analytics.html</loc>
+    <lastmod>2026-01-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>https://rupiya.online/ai-insights.html</loc>
+    <lastmod>2026-01-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- Secondary Features - Medium Priority -->
+  <url>
+    <loc>https://rupiya.online/family.html</loc>
+    <lastmod>2026-01-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
+  
   <url>
-    <loc>https://rupiya.app/goals.html</loc>
-    <lastmod>2026-01-03</lastmod>
+    <loc>https://rupiya.online/vehicles.html</loc>
+    <lastmod>2026-01-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
+  
   <url>
-    <loc>https://rupiya.app/investments.html</loc>
-    <lastmod>2026-01-03</lastmod>
+    <loc>https://rupiya.online/houses.html</loc>
+    <lastmod>2026-01-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
+  
   <url>
-    <loc>https://rupiya.app/family.html</loc>
-    <lastmod>2026-01-03</lastmod>
+    <loc>https://rupiya.online/loans.html</loc>
+    <lastmod>2026-01-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
+  
   <url>
-    <loc>https://rupiya.app/achievements.html</loc>
-    <lastmod>2026-01-03</lastmod>
+    <loc>https://rupiya.online/recurring.html</loc>
+    <lastmod>2026-01-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
+  
   <url>
-    <loc>https://rupiya.app/analytics.html</loc>
-    <lastmod>2026-01-03</lastmod>
-    <changefreq>weekly</changefreq>
+    <loc>https://rupiya.online/user-guide.html</loc>
+    <lastmod>2026-01-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- Additional Features - Lower Priority -->
+  <url>
+    <loc>https://rupiya.online/achievements.html</loc>
+    <lastmod>2026-01-06</lastmod>
+    <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
+  
   <url>
-    <loc>https://rupiya.app/vehicles.html</loc>
-    <lastmod>2026-01-03</lastmod>
-    <changefreq>weekly</changefreq>
+    <loc>https://rupiya.online/split-expense.html</loc>
+    <lastmod>2026-01-06</lastmod>
+    <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
+  
   <url>
-    <loc>https://rupiya.app/houses.html</loc>
-    <lastmod>2026-01-03</lastmod>
-    <changefreq>weekly</changefreq>
+    <loc>https://rupiya.online/trip-groups.html</loc>
+    <lastmod>2026-01-06</lastmod>
+    <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
+  
+  <url>
+    <loc>https://rupiya.online/house-help.html</loc>
+    <lastmod>2026-01-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://rupiya.online/documents.html</loc>
+    <lastmod>2026-01-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://rupiya.online/notes.html</loc>
+    <lastmod>2026-01-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  
+  <url>
+    <loc>https://rupiya.online/profile.html</loc>
+    <lastmod>2026-01-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  
+  <url>
+    <loc>https://rupiya.online/feedback.html</loc>
+    <lastmod>2026-01-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  
+  <!-- Company & Legal Pages -->
+  <url>
+    <loc>https://rupiya.online/about-us.html</loc>
+    <lastmod>2026-01-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://rupiya.online/contact-us.html</loc>
+    <lastmod>2026-01-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://rupiya.online/privacy-policy.html</loc>
+    <lastmod>2026-01-06</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://rupiya.online/terms-of-service.html</loc>
+    <lastmod>2026-01-06</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  
+  <url>
+    <loc>https://rupiya.online/disclaimer.html</loc>
+    <lastmod>2026-01-06</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  
+  <url>
+    <loc>https://rupiya.online/data-protection.html</loc>
+    <lastmod>2026-01-06</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
 </urlset>

@@ -40,7 +40,7 @@ This implementation plan breaks down the Trip Groups feature into incremental ta
     - _Requirements: 3.1, 3.2_
     - ✅ Completed: Integrated into trip-groups-service.js
   
-  - [ ] 3.2 Write property test for balance conservation
+  - [x] 3.2 Write property test for balance conservation
     - **Property 5: Balance Conservation Invariant**
     - **Validates: Requirements 2.6, 3.2**
   
@@ -235,7 +235,7 @@ This implementation plan breaks down the Trip Groups feature into incremental ta
     - _Requirements: 10.3, 10.5_
     - ✅ Completed: Category breakdown with progress bars
   
-  - [ ] 14.2 Write property test for category breakdown
+  - [x] 14.2 Write property test for category breakdown
     - **Property 14: Category Breakdown Sum**
     - **Validates: Requirements 10.3**
   
