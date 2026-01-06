@@ -1,10 +1,10 @@
 // Service Worker for Rupiya PWA
 // Provides offline support and caching
 
-import { APP_VERSION } from './assets/js/config/version.js';
-
-const CACHE_NAME = `rupiya-v${APP_VERSION}`;
-const RUNTIME_CACHE = `rupiya-runtime-v${APP_VERSION}`;
+// CACHE_VERSION is injected by build.js during deployment
+const CACHE_VERSION = '__CACHE_VERSION__';
+const CACHE_NAME = `rupiya-v${CACHE_VERSION}`;
+const RUNTIME_CACHE = `rupiya-runtime-v${CACHE_VERSION}`;
 
 // Assets to cache on install
 const STATIC_ASSETS = [

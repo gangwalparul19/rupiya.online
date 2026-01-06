@@ -120,6 +120,47 @@ if (sidebarHTML) {
   console.log('⚠️ Sidebar component template not found\n');
 }
 
+// Inject cache version into service worker
+function injectServiceWorkerVersion() {
+  const swPath = path.join(__dirname, 'service-worker.js');
+  
+  if (!fs.existsSync(swPath)) {
+    console.log('⚠️  service-worker.js not found');
+    return;
+  }
+
+  try {
+    // Read version from version.js
+    const versionPath = path.join(__dirname, 'assets', 'js', 'config', 'version.js');
+    let version = '1.0.0'; // Default fallback
+    
+    if (fs.existsSync(versionPath)) {
+      const versionContent = fs.readFileSync(versionPath, 'utf8');
+      const versionMatch = versionContent.match(/export const APP_VERSION = ['"]([^'"]+)['"]/);
+      if (versionMatch) {
+        version = versionMatch[1];
+      }
+    }
+
+    // Read service worker
+    let swContent = fs.readFileSync(swPath, 'utf8');
+    
+    // Replace placeholder with actual version
+    if (swContent.includes('__CACHE_VERSION__')) {
+      swContent = swContent.replace(/__CACHE_VERSION__/g, version);
+      fs.writeFileSync(swPath, swContent, 'utf8');
+      console.log(`✓ Injected cache version ${version} into service-worker.js\n`);
+    } else {
+      console.log('⚠️  Could not find __CACHE_VERSION__ placeholder in service-worker.js\n');
+    }
+  } catch (error) {
+    console.error('❌ Error injecting service worker version:', error.message);
+  }
+}
+
+// Inject service worker version first
+injectServiceWorkerVersion();
+
 // Process each HTML file
 htmlFiles.forEach(file => {
   const filePath = path.join(__dirname, file);
