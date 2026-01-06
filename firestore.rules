@@ -423,6 +423,18 @@ service cloud.firestore {
       // Delete: Any authenticated user can delete
       allow delete: if isAuthenticated();
     }
+
+        // ============================================
+    // CATEGORIZATION PATTERNS (Smart Categorization)
+    // ============================================
+    match /categorizationPatterns/{userId} {
+      // Categorization patterns document ID is the userId itself
+      // Users can only access their own categorization patterns
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId);
+    }
     
     // ============================================
     // TRIP GROUP SETTLEMENTS - Simple and permissive

@@ -11,6 +11,7 @@ import Pagination from '../components/pagination.js';
 import { Validator } from '../utils/validation.js';
 import { formatCurrency, formatCurrencyCompact, formatDate, formatDateForInput, debounce, exportToCSV, escapeHtml } from '../utils/helpers.js';
 import timezoneService from '../utils/timezone.js';
+import encryptionReauthModal from '../components/encryption-reauth-modal.js';
 
 // State management
 const state = {
@@ -78,6 +79,11 @@ async function init() {
   const isAuthenticated = await checkAuth();
   if (!isAuthenticated) return;
   
+  // Check if encryption reauth is needed
+  encryptionReauthModal.checkAndPrompt(async () => {
+    // On successful reauth, reload expenses
+    await loadExpenses();
+  });
   await initPage();
 }
 

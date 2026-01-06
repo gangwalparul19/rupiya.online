@@ -7,6 +7,7 @@ import toast from '../components/toast.js';
 import themeManager from '../utils/theme-manager.js';
 import setupWizard from '../components/setup-wizard.js';
 import recurringProcessor from '../services/recurring-processor.js';
+import encryptionReauthModal from '../components/encryption-reauth-modal.js';
 import { formatCurrency, formatCurrencyCompact, formatDate, getRelativeTime, escapeHtml } from '../utils/helpers.js';
 import timezoneService from '../utils/timezone.js';
 
@@ -52,9 +53,21 @@ async function init() {
   console.log('[Dashboard] Initializing...');
   const isAuthenticated = await checkAuth();
   if (isAuthenticated) {
-    await initDashboard();
-    // Check for first-time setup after dashboard loads
-    await checkFirstTimeSetup();
+    // Check if encryption reauth is needed (after page refresh)
+    const needsReauth = encryptionReauthModal.checkAndPrompt(async () => {
+      // On successful reauth, reload dashboard data
+      await loadDashboardData();
+    });
+    
+    if (!needsReauth) {
+      // No reauth needed, proceed normally
+      await initDashboard();
+      // Check for first-time setup after dashboard loads
+      await checkFirstTimeSetup();
+    } else {
+      // Show basic UI while waiting for reauth
+      await initDashboard();
+    }
   }
 }
 

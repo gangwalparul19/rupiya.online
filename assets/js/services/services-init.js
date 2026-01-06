@@ -6,6 +6,7 @@
 
 import authService from './auth-service.js';
 import userService from './user-service.js';
+import encryptionService from './encryption-service.js';
 
 // Connect auth service with user service (avoid circular dependency)
 authService.setUserService(userService);
@@ -25,17 +26,27 @@ authService.onAuthStateChanged(async (user) => {
           console.log('✅ User profile loaded from Firestore');
         }
       }
+      
+      // Check encryption status
+      const encryptionStatus = encryptionService.getStatus();
+      if (encryptionStatus.enabled && !encryptionStatus.ready) {
+        console.log('🔐 Encryption enabled but not initialized - user may need to re-authenticate');
+      }
     } catch (error) {
       console.error('❌ Error initializing user profile:', error);
     }
+  } else {
+    // User signed out - clear encryption
+    encryptionService.clear();
   }
 });
 
 // Export services for convenience
-export { authService, userService };
+export { authService, userService, encryptionService };
 
 // Export default object with all services
 export default {
   auth: authService,
-  user: userService
+  user: userService,
+  encryption: encryptionService
 };

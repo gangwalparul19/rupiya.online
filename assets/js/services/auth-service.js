@@ -171,6 +171,14 @@ class AuthService {
       // Clear auth flag
       localStorage.removeItem('rupiya_user_logged_in');
       
+      // Clear encryption keys - import dynamically to avoid circular dependency
+      try {
+        const { default: authEncryptionHelper } = await import('../utils/auth-encryption-helper.js');
+        authEncryptionHelper.clearEncryption();
+      } catch (e) {
+        console.warn('[Auth] Could not clear encryption:', e);
+      }
+      
       await signOut(auth);
       return { success: true };
     } catch (error) {

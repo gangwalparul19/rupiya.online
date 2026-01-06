@@ -1,6 +1,7 @@
 // Signup Page Logic
 import '../services/services-init.js'; // Initialize services
 import authService from '../services/auth-service.js';
+import authEncryptionHelper from '../utils/auth-encryption-helper.js';
 import toast from '../components/toast.js';
 import { validateForm, setupRealtimeValidation } from '../utils/validation.js';
 
@@ -109,6 +110,16 @@ signupForm.addEventListener('submit', async (e) => {
     const result = await authService.signUp(email, password, displayName);
     
     if (result.success) {
+      // Initialize encryption with user's password
+      const encryptionInitialized = await authEncryptionHelper.initializeAfterLogin(
+        password, 
+        result.user.uid
+      );
+      
+      if (!encryptionInitialized) {
+        console.warn('[Signup] Encryption initialization failed, data will not be encrypted');
+      }
+      
       toast.success('Account created successfully! Redirecting...');
       const redirectUrl = getRedirectUrl();
       setTimeout(() => {
@@ -137,6 +148,10 @@ googleSignUpBtn.addEventListener('click', async () => {
     const result = await authService.signInWithGoogle();
     
     if (result.success) {
+      // Note: Google sign-up doesn't provide a password, so encryption won't be initialized
+      // Users who sign up with Google will need to set an encryption password separately
+      console.warn('[Signup] Google sign-up: Encryption not available without password');
+      
       toast.success('Account created successfully! Redirecting...');
       const redirectUrl = getRedirectUrl();
       setTimeout(() => {

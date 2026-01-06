@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Encryption Test - Rupiya</title>
+  <link rel="stylesheet" href="assets/css/main.css">
+  <style>
+    .test-container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 2rem;
+    }
+    .test-section {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow-sm);
+    }
+    .test-section h3 {
+      margin-bottom: 1rem;
+      color: var(--text-primary);
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+    .status-badge.success {
+      background: rgba(39, 174, 96, 0.1);
+      color: #27AE60;
+    }
+    .status-badge.warning {
+      background: rgba(243, 156, 18, 0.1);
+      color: #F39C12;
+    }
+    .status-badge.error {
+      background: rgba(231, 76, 60, 0.1);
+      color: #E74C3C;
+    }
+    .test-result {
+      margin-top: 1rem;
+      padding: 1rem;
+      background: var(--bg-secondary);
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 0.875rem;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    .btn-test {
+      margin-right: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="test-container">
+    <h1>🔐 Encryption Test Page</h1>
+    <p style="color: var(--text-secondary); margin-bottom: 2rem;">
+      This page helps verify that encryption is working correctly.
+    </p>
+
+    <!-- Encryption Status -->
+    <div class="test-section">
+      <h3>Encryption Status</h3>
+      <div id="encryptionStatus">Loading...</div>
+    </div>
+
+    <!-- Test Encryption -->
+    <div class="test-section">
+      <h3>Test Encryption/Decryption</h3>
+      <div class="form-group">
+        <label class="form-label">Test Data</label>
+        <input type="text" id="testData" class="form-input" value="Hello, this is sensitive data!" placeholder="Enter test data">
+      </div>
+      <button class="btn btn-primary btn-test" onclick="testEncryption()">Test Encrypt/Decrypt</button>
+      <div id="encryptionResult" class="test-result" style="display: none;"></div>
+    </div>
+
+    <!-- Test Firestore -->
+    <div class="test-section">
+      <h3>Test Firestore Encryption</h3>
+      <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+        This will create a test expense and show how it's stored in Firestore.
+      </p>
+      <button class="btn btn-primary btn-test" onclick="testFirestoreEncryption()">Create Test Expense</button>
+      <button class="btn btn-secondary btn-test" onclick="readTestExpenses()">Read Expenses</button>
+      <div id="firestoreResult" class="test-result" style="display: none;"></div>
+    </div>
+
+    <!-- Initialize Encryption -->
+    <div class="test-section">
+      <h3>Initialize Encryption (Manual)</h3>
+      <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+        If encryption is not initialized, enter your password to initialize it.
+      </p>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input type="password" id="manualPassword" class="form-input" placeholder="Enter your password">
+      </div>
+      <button class="btn btn-primary btn-test" onclick="initializeEncryption()">Initialize Encryption</button>
+      <div id="initResult" class="test-result" style="display: none;"></div>
+    </div>
+
+    <div style="margin-top: 2rem;">
+      <a href="dashboard.html" class="btn btn-secondary">← Back to Dashboard</a>
+    </div>
+  </div>
+
+  <script type="module">
+    import './assets/js/services/services-init.js';
+    import authService from './assets/js/services/auth-service.js';
+    import encryptionService from './assets/js/services/encryption-service.js';
+    import authEncryptionHelper from './assets/js/utils/auth-encryption-helper.js';
+    import firestoreService from './assets/js/services/firestore-service.js';
+    import privacyConfig from './assets/js/config/privacy-config.js';
+
+    // Make functions available globally
+    window.testEncryption = async function() {
+      const resultDiv = document.getElementById('encryptionResult');
+      resultDiv.style.display = 'block';
+      
+      try {
+        const testData = document.getElementById('testData').value;
+        
+        if (!encryptionService.isReady()) {
+          resultDiv.innerHTML = '❌ Encryption not initialized. Please initialize first.';
+          return;
+        }
+        
+        // Encrypt
+        const encrypted = await encryptionService.encryptValue(testData);
+        
+        // Decrypt
+        const decrypted = await encryptionService.decryptValue(encrypted);
+        
+        resultDiv.innerHTML = `✅ Encryption Test Successful!
+
+Original: ${testData}
+Encrypted: ${encrypted.substring(0, 50)}...
+Decrypted: ${decrypted}
+Match: ${testData === decrypted ? '✅ Yes' : '❌ No'}`;
+      } catch (error) {
+        resultDiv.innerHTML = `❌ Error: ${error.message}`;
+      }
+    };
+
+    window.testFirestoreEncryption = async function() {
+      const resultDiv = document.getElementById('firestoreResult');
+      resultDiv.style.display = 'block';
+      
+      try {
+        const testExpense = {
+          amount: 1234.56,
+          description: 'Test encrypted expense',
+          category: 'Food',
+          paymentMethod: 'Credit Card',
+          date: new Date()
+        };
+        
+        resultDiv.innerHTML = 'Creating test expense...';
+        
+        const result = await firestoreService.addExpense(testExpense);
+        
+        if (result.success) {
+          resultDiv.innerHTML = `✅ Test expense created!
+
+ID: ${result.id}
+Original Data: ${JSON.stringify(testExpense, null, 2)}
+
+Note: Check Firebase Console to see the encrypted data.
+The 'amount', 'description', and 'paymentMethod' fields should be encrypted.`;
+        } else {
+          resultDiv.innerHTML = `❌ Error: ${result.error}`;
+        }
+      } catch (error) {
+        resultDiv.innerHTML = `❌ Error: ${error.message}`;
+      }
+    };
+
+    window.readTestExpenses = async function() {
+      const resultDiv = document.getElementById('firestoreResult');
+      resultDiv.style.display = 'block';
+      
+      try {
+        resultDiv.innerHTML = 'Reading expenses...';
+        
+        const expenses = await firestoreService.getExpenses(5);
+        
+        if (expenses.length > 0) {
+          resultDiv.innerHTML = `✅ Found ${expenses.length} expenses (decrypted):
+
+${expenses.map(e => `- ${e.description || 'No description'}: ₹${e.amount}`).join('\n')}`;
+        } else {
+          resultDiv.innerHTML = 'No expenses found.';
+        }
+      } catch (error) {
+        resultDiv.innerHTML = `❌ Error: ${error.message}`;
+      }
+    };
+
+    window.initializeEncryption = async function() {
+      const resultDiv = document.getElementById('initResult');
+      resultDiv.style.display = 'block';
+      
+      try {
+        const password = document.getElementById('manualPassword').value;
+        
+        if (!password) {
+          resultDiv.innerHTML = '❌ Please enter your password';
+          return;
+        }
+        
+        const user = authService.getCurrentUser();
+        if (!user) {
+          resultDiv.innerHTML = '❌ Not logged in. Please login first.';
+          return;
+        }
+        
+        resultDiv.innerHTML = 'Initializing encryption...';
+        
+        const success = await authEncryptionHelper.initializeAfterLogin(password, user.uid);
+        
+        if (success) {
+          resultDiv.innerHTML = '✅ Encryption initialized successfully!';
+          updateStatus();
+        } else {
+          resultDiv.innerHTML = '❌ Failed to initialize encryption. Check password.';
+        }
+      } catch (error) {
+        resultDiv.innerHTML = `❌ Error: ${error.message}`;
+      }
+    };
+
+    function updateStatus() {
+      const statusDiv = document.getElementById('encryptionStatus');
+      const status = encryptionService.getStatus();
+      const user = authService.getCurrentUser();
+      
+      let html = `
+<p><strong>Encryption Enabled:</strong> <span class="status-badge ${status.enabled ? 'success' : 'warning'}">${status.enabled ? 'Yes' : 'No'}</span></p>
+<p><strong>Encryption Initialized:</strong> <span class="status-badge ${status.initialized ? 'success' : 'warning'}">${status.initialized ? 'Yes' : 'No'}</span></p>
+<p><strong>Encryption Ready:</strong> <span class="status-badge ${status.ready ? 'success' : 'error'}">${status.ready ? 'Yes' : 'No'}</span></p>
+<p><strong>Encryption Version:</strong> ${status.version}</p>
+<p><strong>User Logged In:</strong> <span class="status-badge ${user ? 'success' : 'error'}">${user ? user.email : 'No'}</span></p>
+`;
+      
+      if (!status.ready && user) {
+        html += `<p style="color: var(--warning); margin-top: 1rem;">⚠️ Encryption not ready. Enter your password below to initialize.</p>`;
+      }
+      
+      statusDiv.innerHTML = html;
+    }
+
+    // Initialize on page load
+    async function init() {
+      await authService.waitForAuth();
+      updateStatus();
+      
+      // Update status every 2 seconds
+      setInterval(updateStatus, 2000);
+    }
+
+    init();
+  </script>
+</body>
+</html>

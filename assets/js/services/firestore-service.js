@@ -1,4 +1,4 @@
-// Firestore Service - Optimized with caching, pagination, and batch operations
+// Firestore Service - Optimized with caching, pagination, batch operations, and encryption
 import { db } from '../config/firebase-config.js';
 import {
   collection,
@@ -18,6 +18,8 @@ import {
   writeBatch
 } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
 import authService from './auth-service.js';
+import encryptionService from './encryption-service.js';
+import privacyConfig from '../config/privacy-config.js';
 
 class FirestoreService {
   constructor() {
@@ -105,8 +107,12 @@ class FirestoreService {
   async add(collectionName, data) {
     try {
       const userId = this.getUserId();
+      
+      // Encrypt data before saving
+      const dataToSave = await encryptionService.encryptObject(data, collectionName);
+      
       const docRef = await addDoc(collection(db, collectionName), {
-        ...data,
+        ...dataToSave,
         userId,
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now()
@@ -129,7 +135,11 @@ class FirestoreService {
       const docSnap = await getDoc(docRef);
       
       if (docSnap.exists()) {
-        const data = { id: docSnap.id, ...docSnap.data() };
+        let data = { id: docSnap.id, ...docSnap.data() };
+        
+        // Decrypt data after reading
+        data = await encryptionService.decryptObject(data, collectionName);
+        
         this.setCache(cacheKey, data);
         return { success: true, data };
       }
@@ -159,8 +169,11 @@ class FirestoreService {
       const data = [];
       querySnapshot.forEach((doc) => data.push({ id: doc.id, ...doc.data() }));
       
-      this.setCache(cacheKey, data);
-      return data;
+      // Decrypt all documents
+      const decryptedData = await encryptionService.decryptArray(data, collectionName);
+      
+      this.setCache(cacheKey, decryptedData);
+      return decryptedData;
     } catch (error) {
       console.error(`Error getting all from ${collectionName}:`, error);
       return [];
@@ -204,7 +217,10 @@ class FirestoreService {
         lastVisible = doc;
       });
       
-      return { data, lastDoc: lastVisible, hasMore: data.length === pageSize };
+      // Decrypt all documents
+      const decryptedData = await encryptionService.decryptArray(data, collectionName);
+      
+      return { data: decryptedData, lastDoc: lastVisible, hasMore: data.length === pageSize };
     } catch (error) {
       console.error(`Error getting paginated from ${collectionName}:`, error);
       return { data: [], lastDoc: null, hasMore: false };
@@ -228,8 +244,11 @@ class FirestoreService {
 
   async update(collectionName, docId, data) {
     try {
+      // Encrypt data before updating
+      const dataToUpdate = await encryptionService.encryptObject(data, collectionName);
+      
       const docRef = doc(db, collectionName, docId);
-      await updateDoc(docRef, { ...data, updatedAt: Timestamp.now() });
+      await updateDoc(docRef, { ...dataToUpdate, updatedAt: Timestamp.now() });
       this.invalidateCache(collectionName);
       return { success: true };
     } catch (error) {
@@ -259,11 +278,13 @@ class FirestoreService {
       const batch = writeBatch(db);
       const ids = [];
       
-      items.forEach(item => {
+      for (const item of items) {
         const docRef = doc(collection(db, collectionName));
-        batch.set(docRef, { ...item, userId, createdAt: Timestamp.now(), updatedAt: Timestamp.now() });
+        // Encrypt each item before saving
+        const encryptedItem = await encryptionService.encryptObject(item, collectionName);
+        batch.set(docRef, { ...encryptedItem, userId, createdAt: Timestamp.now(), updatedAt: Timestamp.now() });
         ids.push(docRef.id);
-      });
+      }
       
       await batch.commit();
       this.invalidateCache(collectionName);
@@ -290,9 +311,13 @@ class FirestoreService {
   async batchUpdate(collectionName, updates) {
     try {
       const batch = writeBatch(db);
-      updates.forEach(({ id, data }) => {
-        batch.update(doc(db, collectionName, id), { ...data, updatedAt: Timestamp.now() });
-      });
+      
+      for (const { id, data } of updates) {
+        // Encrypt each update before saving
+        const encryptedData = await encryptionService.encryptObject(data, collectionName);
+        batch.update(doc(db, collectionName, id), { ...encryptedData, updatedAt: Timestamp.now() });
+      }
+      
       await batch.commit();
       this.invalidateCache(collectionName);
       return { success: true };
@@ -517,7 +542,10 @@ class FirestoreService {
         data.push({ id: doc.id, ...doc.data() });
       });
       
-      return data;
+      // Decrypt all documents
+      const decryptedData = await encryptionService.decryptArray(data, collectionName);
+      
+      return decryptedData;
     } catch (error) {
       console.error(`Error querying ${collectionName}:`, error);
       return [];
@@ -539,6 +567,7 @@ class FirestoreService {
         this.getAll(this.collections.income, 'date', 'desc', limitCount)
       ]);
       
+      // Data is already decrypted by getAll
       const combined = [
         ...expenses.map(e => ({ ...e, type: 'expense' })),
         ...income.map(i => ({ ...i, type: 'income' }))
@@ -601,7 +630,11 @@ class FirestoreService {
       const querySnapshot = await getDocs(q);
       const data = [];
       querySnapshot.forEach((doc) => data.push({ id: doc.id, ...doc.data() }));
-      return data;
+      
+      // Decrypt all documents
+      const decryptedData = await encryptionService.decryptArray(data, collectionName);
+      
+      return decryptedData;
     } catch (error) {
       console.error(`Error querying ${collectionName} by date range:`, error);
       return [];
@@ -672,7 +705,11 @@ class FirestoreService {
       const querySnapshot = await getDocs(q);
       const data = [];
       querySnapshot.forEach((doc) => data.push({ id: doc.id, ...doc.data() }));
-      return data;
+      
+      // Decrypt all documents
+      const decryptedData = await encryptionService.decryptArray(data, this.collections.expenses);
+      
+      return decryptedData;
     } catch (error) {
       console.error(`Error getting expenses for ${linkedType} ${linkedId}:`, error);
       return [];
@@ -693,7 +730,11 @@ class FirestoreService {
       const querySnapshot = await getDocs(q);
       const data = [];
       querySnapshot.forEach((doc) => data.push({ id: doc.id, ...doc.data() }));
-      return data;
+      
+      // Decrypt all documents
+      const decryptedData = await encryptionService.decryptArray(data, this.collections.income);
+      
+      return decryptedData;
     } catch (error) {
       console.error(`Error getting income for ${linkedType} ${linkedId}:`, error);
       return [];
