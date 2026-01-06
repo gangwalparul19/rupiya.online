@@ -9,8 +9,65 @@ class EncryptionService {
     this.salt = null;
     this.isInitialized = false;
     this.SALT_KEY = 'rupiya_encryption_salt';
+    this.SESSION_KEY_STORAGE = 'rupiya_session_key';
     this.PBKDF2_ITERATIONS = 100000;
     this.KEY_LENGTH = 256;
+    this._restorePromise = null;
+    
+    // Try to restore encryption key from session storage on construction
+    this._restorePromise = this._restoreFromSession();
+  }
+  
+  // Wait for restoration to complete
+  async waitForRestore() {
+    if (this._restorePromise) {
+      await this._restorePromise;
+    }
+  }
+  
+  // Restore encryption key from session storage
+  async _restoreFromSession() {
+    try {
+      const sessionData = sessionStorage.getItem(this.SESSION_KEY_STORAGE);
+      if (sessionData) {
+        const { keyData, saltBase64, userId } = JSON.parse(sessionData);
+        
+        // Import the raw key back
+        this.encryptionKey = await crypto.subtle.importKey(
+          'raw',
+          Uint8Array.from(atob(keyData), c => c.charCodeAt(0)),
+          { name: 'AES-GCM', length: this.KEY_LENGTH },
+          true,
+          ['encrypt', 'decrypt']
+        );
+        
+        this.salt = Uint8Array.from(atob(saltBase64), c => c.charCodeAt(0));
+        this.isInitialized = true;
+        console.log('[Encryption] Restored from session storage');
+      }
+    } catch (error) {
+      console.warn('[Encryption] Could not restore from session:', error);
+      this.clear();
+    }
+  }
+  
+  // Save encryption key to session storage
+  async _saveToSession(userId) {
+    try {
+      // Export the key to raw format
+      const keyData = await crypto.subtle.exportKey('raw', this.encryptionKey);
+      const keyBase64 = btoa(String.fromCharCode(...new Uint8Array(keyData)));
+      const saltBase64 = btoa(String.fromCharCode(...this.salt));
+      
+      sessionStorage.setItem(this.SESSION_KEY_STORAGE, JSON.stringify({
+        keyData: keyBase64,
+        saltBase64,
+        userId
+      }));
+      console.log('[Encryption] Saved to session storage');
+    } catch (error) {
+      console.warn('[Encryption] Could not save to session:', error);
+    }
   }
 
   // Initialize encryption with user's password
@@ -27,6 +84,9 @@ class EncryptionService {
       // Derive encryption key from password
       this.encryptionKey = await this.deriveKey(password, this.salt);
       this.isInitialized = true;
+      
+      // Save to session storage for persistence across page loads
+      await this._saveToSession(userId);
       
       console.log('[Encryption] Initialized successfully');
       return true;
@@ -68,7 +128,7 @@ class EncryptionService {
       ['deriveKey']
     );
 
-    // Derive AES-GCM key
+    // Derive AES-GCM key (exportable so we can save to session)
     return await crypto.subtle.deriveKey(
       {
         name: 'PBKDF2',
@@ -78,7 +138,7 @@ class EncryptionService {
       },
       keyMaterial,
       { name: 'AES-GCM', length: this.KEY_LENGTH },
-      false,
+      true, // extractable - needed to save to session
       ['encrypt', 'decrypt']
     );
   }
@@ -93,6 +153,7 @@ class EncryptionService {
     this.encryptionKey = null;
     this.salt = null;
     this.isInitialized = false;
+    sessionStorage.removeItem(this.SESSION_KEY_STORAGE);
     console.log('[Encryption] Keys cleared');
   }
 
@@ -179,6 +240,9 @@ class EncryptionService {
       return data;
     }
 
+    // Wait for session restoration to complete
+    await this.waitForRestore();
+
     if (!this.isReady()) {
       console.warn('[Encryption] Not initialized, storing data unencrypted');
       return data;
@@ -238,6 +302,9 @@ class EncryptionService {
     if (!data._encrypted) {
       return data;
     }
+
+    // Wait for session restoration to complete
+    await this.waitForRestore();
 
     if (!this.isReady()) {
       console.warn('[Encryption] Not initialized, cannot decrypt data');
