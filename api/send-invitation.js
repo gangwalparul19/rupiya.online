@@ -1,53 +1,35 @@
-import nodemailer from 'nodemailer';
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
-import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+const nodemailer = require('nodemailer');
 
-// Initialize Firebase for rate limiting
-const firebaseConfig = {
-  apiKey: process.env.VITE_FIREBASE_API_KEY,
-  authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.VITE_FIREBASE_APP_ID
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+// Simple in-memory rate limiting (resets on server restart)
+const rateLimitStore = new Map();
 
 const RATE_LIMIT_WINDOW = 60 * 60 * 1000; // 1 hour
 const MAX_INVITATIONS_PER_WINDOW = 10; // Max 10 invitations per hour per sender
 
 /**
- * Check rate limit using Firestore
- * Persistent across server restarts
+ * Check rate limit using in-memory store
  */
-async function checkRateLimit(senderEmail) {
+function checkRateLimit(senderEmail) {
   try {
     const now = Date.now();
     const key = senderEmail.toLowerCase();
-    const docRef = doc(db, 'rateLimits', `invitation_${key}`);
     
-    const docSnap = await getDoc(docRef);
+    const record = rateLimitStore.get(key);
     
-    if (!docSnap.exists()) {
+    if (!record) {
       // First request from this sender
-      await setDoc(docRef, {
+      rateLimitStore.set(key, {
         count: 1,
-        windowStart: now,
-        lastUpdated: serverTimestamp()
+        windowStart: now
       });
       return true;
     }
     
-    const record = docSnap.data();
-    
     // Reset window if expired
     if (now - record.windowStart > RATE_LIMIT_WINDOW) {
-      await setDoc(docRef, {
+      rateLimitStore.set(key, {
         count: 1,
-        windowStart: now,
-        lastUpdated: serverTimestamp()
+        windowStart: now
       });
       return true;
     }
@@ -58,11 +40,8 @@ async function checkRateLimit(senderEmail) {
     }
     
     // Increment count
-    await setDoc(docRef, {
-      count: record.count + 1,
-      windowStart: record.windowStart,
-      lastUpdated: serverTimestamp()
-    });
+    record.count++;
+    rateLimitStore.set(key, record);
     
     return true;
   } catch (error) {
@@ -91,7 +70,18 @@ function isValidEmail(email) {
   return re.test(email);
 }
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
+  // Set CORS headers
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
+  
+  // Handle OPTIONS request
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+  
   // Only allow POST requests
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -122,7 +112,7 @@ export default async function handler(req, res) {
     
     // Check rate limit (use invitedByEmail if provided, otherwise use a hash of invitedByName)
     const rateLimitKey = invitedByEmail || `name:${invitedByName}`;
-    const isWithinLimit = await checkRateLimit(rateLimitKey);
+    const isWithinLimit = checkRateLimit(rateLimitKey);
     if (!isWithinLimit) {
       return res.status(429).json({ error: 'Too many invitations sent. Please try again later.' });
     }

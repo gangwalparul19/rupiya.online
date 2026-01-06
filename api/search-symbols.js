@@ -8,9 +8,11 @@
  * GET /api/search-symbols?query=hdfc&type=mf
  */
 
-export const config = {
+const config = {
   maxDuration: 10
 };
+
+module.exports.config = config;
 
 // Popular stocks database (cached locally to avoid API calls)
 const POPULAR_STOCKS = {
@@ -275,7 +277,7 @@ function getAllSymbols(type = 'all') {
 /**
  * Main handler
  */
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // Enable CORS
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');

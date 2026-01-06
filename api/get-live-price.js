@@ -9,9 +9,11 @@
  * GET /api/get-live-price?symbol=BTC-USD (Bitcoin)
  */
 
-export const config = {
+const config = {
   maxDuration: 10
 };
+
+module.exports.config = config;
 
 // Cache for prices to avoid hitting API too frequently
 const priceCache = new Map();
@@ -124,7 +126,7 @@ function getYahooSymbol(investment) {
 /**
  * Main handler
  */
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // Enable CORS - allow all origins for mobile app compatibility
   const origin = req.headers.origin || '*';
   

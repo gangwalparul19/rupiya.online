@@ -1,5 +1,5 @@
-import { initializeApp, cert, getApps } from 'firebase-admin/app';
-import { getFirestore, Timestamp } from 'firebase-admin/firestore';
+const { initializeApp, cert, getApps } = require('firebase-admin/app');
+const { getFirestore, Timestamp } = require('firebase-admin/firestore');
 
 // Initialize Firebase Admin
 if (!getApps().length) {
@@ -11,11 +11,13 @@ if (!getApps().length) {
 
 const db = getFirestore();
 
-export const config = {
+const config = {
   maxDuration: 60
 };
 
-export default async function handler(req, res) {
+module.exports.config = config;
+
+module.exports = async function handler(req, res) {
   // Verify cron secret
   const authHeader = req.headers.authorization;
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {

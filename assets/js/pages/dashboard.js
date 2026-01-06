@@ -5,8 +5,6 @@ import firestoreService from '../services/firestore-service.js';
 import familySwitcher from '../components/family-switcher.js';
 import toast from '../components/toast.js';
 import themeManager from '../utils/theme-manager.js';
-import gamificationService from '../services/gamification-service.js';
-import gamificationUI from '../components/gamification-ui.js';
 import setupWizard from '../components/setup-wizard.js';
 import recurringProcessor from '../services/recurring-processor.js';
 import { formatCurrency, formatCurrencyCompact, formatDate, getRelativeTime, escapeHtml } from '../utils/helpers.js';
@@ -123,12 +121,6 @@ async function initDashboard() {
     // Process recurring transactions (runs once per day)
     await processRecurringTransactions();
     
-    // Load gamification data
-    await loadGamificationWidget();
-    
-    // Update streak on login
-    await gamificationService.updateStreak();
-    
     // Load dashboard data
     await loadDashboardData();
   }
@@ -153,44 +145,6 @@ async function processRecurringTransactions() {
     }
   } catch (error) {
     console.error('[Dashboard] Error in recurring processor:', error);
-  }
-}
-
-// Load gamification widget
-async function loadGamificationWidget() {
-  try {
-    const data = await gamificationService.getUserGamification();
-    if (!data) return;
-    
-    const level = gamificationService.calculateLevel(data.points);
-    const nextLevel = gamificationService.getNextLevel(data.points);
-    
-    // Update widget elements
-    const levelIcon = document.getElementById('dashLevelIcon');
-    const levelName = document.getElementById('dashLevelName');
-    const levelNumber = document.getElementById('dashLevelNumber');
-    const totalPoints = document.getElementById('dashTotalPoints');
-    const progressText = document.getElementById('dashProgressText');
-    const streakDisplay = document.getElementById('dashStreakDisplay');
-    const levelProgress = document.getElementById('dashLevelProgress');
-    
-    if (levelIcon) levelIcon.textContent = level.icon;
-    if (levelName) levelName.textContent = level.name;
-    if (levelNumber) levelNumber.textContent = level.level;
-    if (totalPoints) totalPoints.textContent = data.points;
-    if (streakDisplay) streakDisplay.textContent = `🔥 ${data.streak?.current || 0}`;
-    
-    if (nextLevel) {
-      const currentLevelMin = level.minPoints;
-      const progress = ((data.points - currentLevelMin) / (nextLevel.minPoints - currentLevelMin)) * 100;
-      if (progressText) progressText.textContent = `${nextLevel.pointsNeeded} pts to ${nextLevel.name}`;
-      if (levelProgress) levelProgress.style.width = `${Math.min(progress, 100)}%`;
-    } else {
-      if (progressText) progressText.textContent = 'Max level reached! 🌟';
-      if (levelProgress) levelProgress.style.width = '100%';
-    }
-  } catch (error) {
-    console.error('Error loading gamification widget:', error);
   }
 }
 

@@ -33,7 +33,6 @@ const htmlFiles = [
   'split-expense.html',
   'family.html',
   'feedback.html',
-  'achievements.html',
   'user-guide.html',
   'demo.html',
   'offline.html',
@@ -63,7 +62,6 @@ const pagesWithSidebar = [
   'split-expense.html',
   'family.html',
   'feedback.html',
-  'achievements.html',
   'trip-groups.html',
   'trip-group-detail.html',
   'admin.html'

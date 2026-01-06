@@ -145,16 +145,6 @@
       "priority": "0.6",
       "changefreq": "weekly"
     },
-    "achievements.html": {
-      "title": "Financial Achievements - Gamified Investment Tracking | Rupiya",
-      "description": "Earn achievements, track financial milestones, and stay motivated on your investment journey. Gamified personal finance for better money habits.",
-      "keywords": "financial achievements, investment milestones, gamified finance, financial goals achievements, investment tracking gamification",
-      "ogTitle": "Financial Achievements - Track Your Progress",
-      "ogDescription": "Earn achievements and track financial milestones",
-      "canonical": "https://rupiya.online/achievements.html",
-      "priority": "0.6",
-      "changefreq": "monthly"
-    },
     "split-expense.html": {
       "title": "Split Expense - Bill Splitting & Group Expenses | Rupiya",
       "description": "Split bills with friends, track group expenses, manage shared costs. Easy bill splitting calculator for trips, dinners, and shared expenses.",

@@ -3,7 +3,7 @@
  * Keeps sheet URLs secure in environment variables
  */
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // Enable CORS for mobile and cross-origin requests
   // Allow all origins for mobile app compatibility
   const origin = req.headers.origin || '*';
