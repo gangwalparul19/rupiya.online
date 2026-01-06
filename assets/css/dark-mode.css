@@ -256,3 +256,85 @@ textarea,
 .btn-outline {
   transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
+
+/* Dashboard Widgets Dark Mode */
+[data-theme="dark"] .savings-rate-widget,
+[data-theme="dark"] .goal-progress-widget,
+[data-theme="dark"] .top-categories-widget,
+[data-theme="dark"] .upcoming-bills-widget,
+[data-theme="dark"] .transactions-card {
+  background: var(--bg-card);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .savings-rate-widget:hover,
+[data-theme="dark"] .goal-progress-widget:hover,
+[data-theme="dark"] .top-categories-widget:hover,
+[data-theme="dark"] .upcoming-bills-widget:hover {
+  border-color: var(--primary-blue);
+}
+
+[data-theme="dark"] .savings-rate-bar,
+[data-theme="dark"] .goal-progress-bar,
+[data-theme="dark"] .category-bar {
+  background: var(--bg-hover);
+}
+
+[data-theme="dark"] .savings-detail {
+  background: var(--bg-hover);
+}
+
+[data-theme="dark"] .savings-rate-tip {
+  background: rgba(91, 163, 245, 0.15);
+  border-left-color: var(--primary-blue);
+}
+
+[data-theme="dark"] .category-item:hover {
+  background: var(--bg-hover);
+}
+
+[data-theme="dark"] .category-icon {
+  background: var(--bg-hover);
+}
+
+[data-theme="dark"] .bill-item {
+  background: var(--bg-hover);
+}
+
+[data-theme="dark"] .bill-item.due-soon {
+  background: rgba(244, 67, 54, 0.1);
+}
+
+[data-theme="dark"] .spending-alert {
+  background: rgba(244, 67, 54, 0.15);
+  border-color: var(--accent-red);
+}
+
+[data-theme="dark"] .transaction-item {
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .transaction-item:hover {
+  background: var(--bg-hover);
+  border-color: var(--primary-blue);
+}
+
+[data-theme="dark"] .transaction-icon {
+  background: var(--bg-hover);
+}
+
+[data-theme="dark"] .mobile-header {
+  background: var(--bg-card);
+  border-bottom-color: var(--border-color);
+}
+
+[data-theme="dark"] .chart-filter {
+  background: var(--bg-hover);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .chart-filter:hover,
+[data-theme="dark"] .chart-filter:focus {
+  border-color: var(--primary-blue);
+}

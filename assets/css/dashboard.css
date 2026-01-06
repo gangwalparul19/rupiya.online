@@ -303,6 +303,489 @@
   color: var(--accent-red);
 }
 
+/* ============================================
+   PWA INSTALL BANNER
+   ============================================ */
+.pwa-install-banner-dashboard {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: var(--border-radius-lg);
+  padding: 1rem 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  animation: slideDown 0.5s ease-out;
+  position: relative;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.pwa-install-banner-dashboard .pwa-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: white;
+}
+
+.pwa-install-banner-dashboard .pwa-banner-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.pwa-install-banner-dashboard .pwa-banner-text {
+  flex: 1;
+}
+
+.pwa-install-banner-dashboard .pwa-banner-text strong {
+  display: block;
+  font-size: 1.1rem;
+  margin-bottom: 0.25rem;
+}
+
+.pwa-install-banner-dashboard .pwa-banner-text p {
+  margin: 0;
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.pwa-install-banner-dashboard .btn {
+  background: white;
+  color: var(--primary-blue);
+  border: none;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.pwa-install-banner-dashboard .btn:hover {
+  background: #f0f0f0;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.pwa-install-banner-dashboard .pwa-banner-close {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  font-size: 1.25rem;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+  line-height: 1;
+  padding: 0;
+  margin-left: 0.5rem;
+}
+
+.pwa-install-banner-dashboard .pwa-banner-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: rotate(90deg);
+}
+
+/* ============================================
+   DASHBOARD WIDGETS ROW
+   ============================================ */
+.widgets-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+/* ============================================
+   SAVINGS RATE WIDGET
+   ============================================ */
+.savings-rate-widget {
+  background: var(--white);
+  border: 2px solid var(--primary-blue);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  transition: all var(--transition-base);
+}
+
+.savings-rate-widget:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+  border-color: var(--accent-cyan);
+}
+
+.savings-rate-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-md);
+}
+
+.savings-rate-title {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.savings-rate-value {
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  color: var(--accent-green);
+}
+
+.savings-rate-bar {
+  position: relative;
+  height: 12px;
+  background: var(--bg-secondary);
+  border-radius: 6px;
+  margin-bottom: var(--spacing-lg);
+  overflow: visible;
+}
+
+.savings-rate-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-red) 0%, var(--accent-orange) 30%, var(--accent-green) 100%);
+  border-radius: 6px;
+  transition: width 0.5s ease;
+  position: relative;
+}
+
+.savings-rate-markers {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 4px;
+}
+
+.savings-rate-markers .marker {
+  position: absolute;
+  font-size: 10px;
+  color: var(--text-light);
+  transform: translateX(-50%);
+}
+
+.savings-rate-details {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.savings-detail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  padding: var(--spacing-sm);
+  background: var(--bg-secondary);
+  border-radius: var(--border-radius);
+}
+
+.savings-detail .detail-label {
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.savings-detail .detail-value {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.savings-detail .detail-value.positive {
+  color: var(--accent-green);
+}
+
+.savings-detail .detail-value.negative {
+  color: var(--accent-red);
+}
+
+.savings-rate-tip {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: rgba(74, 144, 226, 0.1);
+  border-radius: var(--border-radius);
+  border-left: 3px solid var(--primary-blue);
+}
+
+/* ============================================
+   GOAL PROGRESS WIDGET
+   ============================================ */
+.goal-progress-widget {
+  background: var(--white);
+  border: 2px solid var(--primary-blue);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  transition: all var(--transition-base);
+}
+
+.goal-progress-widget:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+  border-color: var(--accent-cyan);
+}
+
+.goal-progress-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-md);
+}
+
+.goal-progress-title {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.goal-progress-percent {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--accent-green);
+}
+
+.goal-progress-bar {
+  height: 10px;
+  background: var(--bg-secondary);
+  border-radius: 5px;
+  margin-bottom: var(--spacing-md);
+  overflow: hidden;
+}
+
+.goal-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary-blue), var(--accent-cyan));
+  border-radius: 5px;
+  transition: width 0.5s ease;
+}
+
+.goal-progress-details {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.goal-progress-details span:first-child {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* ============================================
+   TOP CATEGORIES WIDGET
+   ============================================ */
+.top-categories-widget {
+  background: var(--white);
+  border: 2px solid var(--primary-blue);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  transition: all var(--transition-base);
+}
+
+.top-categories-widget:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+  border-color: var(--accent-cyan);
+}
+
+.top-categories-title {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+}
+
+#topCategoriesList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.category-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-sm);
+  border-radius: var(--border-radius);
+  transition: background-color var(--transition-fast);
+}
+
+.category-item:hover {
+  background: var(--bg-secondary);
+}
+
+.category-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--border-radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  background: var(--bg-secondary);
+}
+
+.category-info {
+  flex: 1;
+}
+
+.category-name {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.category-bar {
+  height: 4px;
+  background: var(--bg-secondary);
+  border-radius: 2px;
+  margin-top: 4px;
+  overflow: hidden;
+}
+
+.category-bar-fill {
+  height: 100%;
+  background: var(--primary-blue);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.category-amount {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* ============================================
+   UPCOMING BILLS WIDGET
+   ============================================ */
+.upcoming-bills-widget {
+  background: var(--white);
+  border: 2px solid var(--primary-blue);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  transition: all var(--transition-base);
+}
+
+.upcoming-bills-widget:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+  border-color: var(--accent-cyan);
+}
+
+.upcoming-bills-title {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+}
+
+#upcomingBillsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.bill-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-sm);
+  border-radius: var(--border-radius);
+  border-left: 3px solid var(--accent-orange);
+  background: var(--bg-secondary);
+}
+
+.bill-item.due-soon {
+  border-left-color: var(--accent-red);
+  background: rgba(231, 76, 60, 0.05);
+}
+
+.bill-icon {
+  font-size: 20px;
+}
+
+.bill-info {
+  flex: 1;
+}
+
+.bill-name {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.bill-due {
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+}
+
+.bill-amount {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--accent-red);
+}
+
+/* Spending Alert */
+.spending-alert {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: rgba(231, 76, 60, 0.1);
+  border: 1px solid var(--accent-red);
+  border-radius: var(--border-radius-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+.spending-alert-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.spending-alert-content {
+  flex: 1;
+}
+
+.spending-alert-title {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--accent-red);
+  margin-bottom: 2px;
+}
+
+.spending-alert-text {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.spending-alert-close {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+  transition: color var(--transition-fast);
+}
+
+.spending-alert-close:hover {
+  color: var(--accent-red);
+}
+
 /* Recent Transactions */
 .transactions-card {
   background: var(--white);
@@ -705,128 +1188,85 @@
     transform: scale(0.95);
   }
   
-  /* PWA Install Banner for Dashboard */
+  /* PWA Install Banner Mobile Overrides */
   .pwa-install-banner-dashboard {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: var(--border-radius-lg);
-    padding: 1rem 1.5rem;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-    animation: slideDown 0.5s ease-out;
-    position: relative;
-  }
-  
-  @keyframes slideDown {
-    from {
-      opacity: 0;
-      transform: translateY(-20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    padding: 1rem;
   }
   
   .pwa-install-banner-dashboard .pwa-banner-content {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    color: white;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    position: relative;
   }
   
   .pwa-install-banner-dashboard .pwa-banner-icon {
-    font-size: 2rem;
-    flex-shrink: 0;
+    order: 1;
   }
   
   .pwa-install-banner-dashboard .pwa-banner-text {
     flex: 1;
-  }
-  
-  .pwa-install-banner-dashboard .pwa-banner-text strong {
-    display: block;
-    font-size: 1.1rem;
-    margin-bottom: 0.25rem;
-  }
-  
-  .pwa-install-banner-dashboard .pwa-banner-text p {
-    margin: 0;
-    font-size: 0.9rem;
-    opacity: 0.9;
-  }
-  
-  .pwa-install-banner-dashboard .btn {
-    background: white;
-    color: var(--primary-blue);
-    border: none;
-    font-weight: 600;
-    white-space: nowrap;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  }
-  
-  .pwa-install-banner-dashboard .btn:hover {
-    background: #f0f0f0;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    order: 2;
+    min-width: 0;
   }
   
   .pwa-install-banner-dashboard .pwa-banner-close {
-    background: rgba(255, 255, 255, 0.2);
-    border: none;
-    color: white;
-    font-size: 1.25rem;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
-    flex-shrink: 0;
-    line-height: 1;
-    padding: 0;
-    margin-left: 0.5rem;
+    order: 3;
+    position: absolute;
+    top: 0;
+    right: 0;
   }
   
-  .pwa-install-banner-dashboard .pwa-banner-close:hover {
-    background: rgba(255, 255, 255, 0.3);
-    transform: rotate(90deg);
+  .pwa-install-banner-dashboard .btn {
+    order: 4;
+    width: 100%;
+    margin-top: 0.5rem;
   }
   
-  @media (max-width: 768px) {
-    .pwa-install-banner-dashboard {
-      padding: 1rem;
-    }
-    
-    .pwa-install-banner-dashboard .pwa-banner-content {
-      flex-wrap: wrap;
-      gap: 0.75rem;
-      position: relative;
-    }
-    
-    .pwa-install-banner-dashboard .pwa-banner-icon {
-      order: 1;
-    }
-    
-    .pwa-install-banner-dashboard .pwa-banner-text {
-      flex: 1;
-      order: 2;
-      min-width: 0;
-    }
-    
-    .pwa-install-banner-dashboard .pwa-banner-close {
-      order: 3;
-      position: absolute;
-      top: 0;
-      right: 0;
-    }
-    
-    .pwa-install-banner-dashboard .btn {
-      order: 4;
-      width: 100%;
-      margin-top: 0.5rem;
-    }
+  /* Widgets Row Mobile */
+  .widgets-row {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .savings-rate-widget,
+  .goal-progress-widget,
+  .top-categories-widget,
+  .upcoming-bills-widget {
+    padding: var(--spacing-md);
+  }
+  
+  .savings-rate-header {
+    margin-bottom: var(--spacing-sm);
+  }
+  
+  .savings-rate-title {
+    font-size: var(--font-size-sm);
+  }
+  
+  .savings-rate-value {
+    font-size: var(--font-size-xl);
+  }
+  
+  .savings-rate-details {
+    gap: var(--spacing-sm);
+  }
+  
+  .savings-detail {
+    padding: var(--spacing-xs);
+  }
+  
+  .savings-detail .detail-label {
+    font-size: 9px;
+  }
+  
+  .savings-detail .detail-value {
+    font-size: var(--font-size-sm);
+  }
+  
+  .savings-rate-tip {
+    font-size: var(--font-size-xs);
+    padding: var(--spacing-xs) var(--spacing-sm);
   }
   
   .theme-toggle-btn {
