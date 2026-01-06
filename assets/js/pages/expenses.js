@@ -960,6 +960,11 @@ function openAddForm() {
   formTitle.textContent = 'Add Expense';
   saveFormBtnText.textContent = 'Save Expense';
   
+  // Reset button state
+  saveFormBtn.disabled = false;
+  saveFormBtnText.style.display = 'inline';
+  saveFormBtnSpinner.style.display = 'none';
+  
   // Reset form
   expenseForm.reset();
   dateInput.value = timezoneService.formatDateForInput(new Date());
@@ -980,6 +985,11 @@ function openEditForm(id) {
   state.editingExpenseId = id;
   formTitle.textContent = 'Edit Expense';
   saveFormBtnText.textContent = 'Update Expense';
+  
+  // Reset button state
+  saveFormBtn.disabled = false;
+  saveFormBtnText.style.display = 'inline';
+  saveFormBtnSpinner.style.display = 'none';
   
   // Populate form
   amountInput.value = expense.amount;

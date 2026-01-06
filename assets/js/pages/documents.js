@@ -192,6 +192,11 @@ function showAddForm() {
   saveFormBtnText.textContent = 'Save Document';
   documentForm.reset();
   
+  // Reset button state
+  saveFormBtn.disabled = false;
+  saveFormBtnText.style.display = 'inline';
+  saveFormBtnSpinner.style.display = 'none';
+  
   // Set default date if element exists
   const documentDateInput = document.getElementById('documentDate');
   if (documentDateInput) {
@@ -219,6 +224,11 @@ function showEditForm(doc) {
   uploadedFile = null;
   formTitle.textContent = 'Edit Document';
   saveFormBtnText.textContent = 'Update Document';
+
+  // Reset button state
+  saveFormBtn.disabled = false;
+  saveFormBtnText.style.display = 'inline';
+  saveFormBtnSpinner.style.display = 'none';
 
   document.getElementById('name').value = doc.name;
   document.getElementById('category').value = doc.category;

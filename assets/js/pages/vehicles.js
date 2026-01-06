@@ -171,6 +171,12 @@ function showAddForm() {
   formTitle.textContent = 'Add Vehicle';
   saveFormBtnText.textContent = 'Save Vehicle';
   vehicleForm.reset();
+  
+  // Reset button state
+  saveFormBtn.disabled = false;
+  saveFormBtnText.style.display = 'inline';
+  saveFormBtnSpinner.style.display = 'none';
+  
   addVehicleSection.classList.add('show');
   addVehicleSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
@@ -185,6 +191,11 @@ function showEditForm(vehicle) {
   editingVehicleId = vehicle.id;
   formTitle.textContent = 'Edit Vehicle';
   saveFormBtnText.textContent = 'Update Vehicle';
+
+  // Reset button state
+  saveFormBtn.disabled = false;
+  saveFormBtnText.style.display = 'inline';
+  saveFormBtnSpinner.style.display = 'none';
 
   document.getElementById('name').value = vehicle.name;
   document.getElementById('type').value = vehicle.type;

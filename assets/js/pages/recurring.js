@@ -339,6 +339,11 @@ function showAddForm() {
   saveFormBtnText.textContent = 'Save Recurring';
   recurringForm.reset();
   
+  // Reset button state
+  saveFormBtn.disabled = false;
+  saveFormBtnText.style.display = 'inline';
+  saveFormBtnSpinner.style.display = 'none';
+  
   // Set default date if element exists
   const startDateInput = document.getElementById('startDate');
   if (startDateInput) {
@@ -374,6 +379,11 @@ function showEditForm(recurring) {
   editingRecurringId = recurring.id;
   formTitle.textContent = 'Edit Recurring Transaction';
   saveFormBtnText.textContent = 'Update Recurring';
+
+  // Reset button state
+  saveFormBtn.disabled = false;
+  saveFormBtnText.style.display = 'inline';
+  saveFormBtnSpinner.style.display = 'none';
 
   // Fill form
   document.getElementById('type').value = recurring.type;

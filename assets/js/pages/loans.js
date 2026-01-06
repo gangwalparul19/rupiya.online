@@ -427,6 +427,11 @@ function showAddForm(loanId = null) {
   
   editingLoanId = loanId;
   
+  // Reset button state
+  saveFormBtn.disabled = false;
+  saveFormBtnText.style.display = 'inline';
+  saveFormBtnSpinner.style.display = 'none';
+  
   if (loanId) {
     const loan = loans.find(l => l.id === loanId);
     if (loan) {

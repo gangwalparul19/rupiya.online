@@ -133,6 +133,12 @@ function showAddForm() {
   formTitle.textContent = 'Add House';
   saveFormBtnText.textContent = 'Save House';
   houseForm.reset();
+  
+  // Reset button state
+  saveFormBtn.disabled = false;
+  saveFormBtnText.style.display = 'inline';
+  saveFormBtnSpinner.style.display = 'none';
+  
   addHouseSection.classList.add('show');
   addHouseSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
@@ -149,6 +155,11 @@ function showEditForm(house) {
   editingHouseId = house.id;
   formTitle.textContent = 'Edit House';
   saveFormBtnText.textContent = 'Update House';
+
+  // Reset button state
+  saveFormBtn.disabled = false;
+  saveFormBtnText.style.display = 'inline';
+  saveFormBtnSpinner.style.display = 'none';
 
   // Fill form
   document.getElementById('name').value = house.name;

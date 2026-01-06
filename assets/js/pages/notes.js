@@ -116,6 +116,12 @@ function showAddForm() {
   formTitle.textContent = 'Add Note';
   saveFormBtnText.textContent = 'Save Note';
   noteForm.reset();
+  
+  // Reset button state
+  saveFormBtn.disabled = false;
+  saveFormBtnText.style.display = 'inline';
+  saveFormBtnSpinner.style.display = 'none';
+  
   addNoteSection.classList.add('show');
   addNoteSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
@@ -130,6 +136,11 @@ function showEditForm(note) {
   editingNoteId = note.id;
   formTitle.textContent = 'Edit Note';
   saveFormBtnText.textContent = 'Update Note';
+
+  // Reset button state
+  saveFormBtn.disabled = false;
+  saveFormBtnText.style.display = 'inline';
+  saveFormBtnSpinner.style.display = 'none';
 
   document.getElementById('title').value = note.title;
   document.getElementById('category').value = note.category;

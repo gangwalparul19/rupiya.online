@@ -946,6 +946,11 @@ function openAddForm() {
   formTitle.textContent = 'Add Income';
   saveFormBtnText.textContent = 'Save Income';
   
+  // Reset button state
+  saveFormBtn.disabled = false;
+  saveFormBtnText.style.display = 'inline';
+  saveFormBtnSpinner.style.display = 'none';
+  
   // Reset form
   incomeForm.reset();
   dateInput.value = timezoneService.formatDateForInput(new Date());
@@ -966,6 +971,11 @@ function openEditForm(id) {
   state.editingIncomeId = id;
   formTitle.textContent = 'Edit Income';
   saveFormBtnText.textContent = 'Update Income';
+  
+  // Reset button state
+  saveFormBtn.disabled = false;
+  saveFormBtnText.style.display = 'inline';
+  saveFormBtnSpinner.style.display = 'none';
   
   // Populate form
   amountInput.value = income.amount;

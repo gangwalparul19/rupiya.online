@@ -167,6 +167,11 @@ function showAddForm() {
   saveFormBtnText.textContent = 'Save Staff';
   helpForm.reset();
   
+  // Reset button state
+  saveFormBtn.disabled = false;
+  saveFormBtnText.style.display = 'inline';
+  saveFormBtnSpinner.style.display = 'none';
+  
   // Set default date if element exists
   const joinDateInput = document.querySelector('#helpForm #joinDate');
   if (joinDateInput) {
@@ -188,6 +193,11 @@ function showEditForm(help) {
   editingHelpId = help.id;
   formTitle.textContent = 'Edit Staff';
   saveFormBtnText.textContent = 'Update Staff';
+
+  // Reset button state
+  saveFormBtn.disabled = false;
+  saveFormBtnText.style.display = 'inline';
+  saveFormBtnSpinner.style.display = 'none';
 
   const nameInput = document.querySelector('#helpForm #name');
   const roleInput = document.querySelector('#helpForm #role');

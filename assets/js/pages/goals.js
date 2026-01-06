@@ -438,6 +438,11 @@ function openAddForm() {
   formTitle.textContent = 'Add Goal';
   saveFormBtnText.textContent = 'Save Goal';
   
+  // Reset button state
+  saveFormBtn.disabled = false;
+  saveFormBtnText.style.display = 'inline';
+  saveFormBtnSpinner.style.display = 'none';
+  
   // Reset form
   goalForm.reset();
   const oneYearFromNow = new Date();
@@ -461,6 +466,11 @@ function openEditForm(id) {
   state.editingGoalId = id;
   formTitle.textContent = 'Edit Goal';
   saveFormBtnText.textContent = 'Update Goal';
+  
+  // Reset button state
+  saveFormBtn.disabled = false;
+  saveFormBtnText.style.display = 'inline';
+  saveFormBtnSpinner.style.display = 'none';
   
   // Populate form
   nameInput.value = goal.name;

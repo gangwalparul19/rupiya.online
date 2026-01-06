@@ -426,6 +426,11 @@ function openAddForm() {
   formTitle.textContent = 'Add Budget';
   saveFormBtnText.textContent = 'Save Budget';
   
+  // Reset button state
+  saveFormBtn.disabled = false;
+  saveFormBtnText.style.display = 'inline';
+  saveFormBtnSpinner.style.display = 'none';
+  
   // Reset form
   budgetForm.reset();
   const now = new Date();
@@ -449,6 +454,11 @@ function openEditForm(id) {
   state.editingBudgetId = id;
   formTitle.textContent = 'Edit Budget';
   saveFormBtnText.textContent = 'Update Budget';
+  
+  // Reset button state
+  saveFormBtn.disabled = false;
+  saveFormBtnText.style.display = 'inline';
+  saveFormBtnSpinner.style.display = 'none';
   
   // Populate form
   categoryInput.value = budget.category;

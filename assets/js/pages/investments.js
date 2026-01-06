@@ -206,6 +206,11 @@ function showAddForm() {
   saveFormBtnText.textContent = 'Save Investment';
   investmentForm.reset();
 
+  // Reset button state
+  saveFormBtn.disabled = false;
+  saveFormBtnText.style.display = 'inline';
+  saveFormBtnSpinner.style.display = 'none';
+
   // Set default date if element exists
   const purchaseDateInput = document.getElementById('purchaseDate');
   if (purchaseDateInput) {
@@ -228,6 +233,11 @@ function showEditForm(investment) {
   editingInvestmentId = investment.id;
   formTitle.textContent = 'Edit Investment';
   saveFormBtnText.textContent = 'Update Investment';
+
+  // Reset button state
+  saveFormBtn.disabled = false;
+  saveFormBtnText.style.display = 'inline';
+  saveFormBtnSpinner.style.display = 'none';
 
   // Fill form
   document.getElementById('name').value = investment.name;
