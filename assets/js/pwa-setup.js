@@ -1,7 +1,7 @@
 // PWA Setup - Service Worker Registration and Install Prompt
 // This file should be included in all HTML pages
 
-const APP_VERSION = '1.1.8'; // Update this on every deployment
+import { APP_VERSION } from './config/version.js';
 
 // Register Service Worker
 if ('serviceWorker' in navigator) {
@@ -22,28 +22,15 @@ if ('serviceWorker' in navigator) {
 
           newWorker.addEventListener('statechange', () => {
             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              console.log('[PWA] New content available, reloading...');
+              console.log('[PWA] New content available');
 
-              // Show notification and auto-reload after 2 seconds
-              if (typeof toast !== 'undefined') {
-                toast.info('New version available! Updating...');
-              }
-
-              // Tell the new service worker to skip waiting
-              newWorker.postMessage({ type: 'SKIP_WAITING' });
-
-              // Reload after a short delay
-              setTimeout(() => {
-                window.location.reload();
-              }, 2000);
+              // Show update notification and let user decide when to reload
+              showUpdateNotification(() => {
+                // Tell the new service worker to skip waiting
+                newWorker.postMessage({ type: 'SKIP_WAITING' });
+              });
             }
           });
-        });
-
-        // Listen for controller change (new service worker activated)
-        navigator.serviceWorker.addEventListener('controllerchange', () => {
-          console.log('[PWA] New Service Worker activated, reloading...');
-          window.location.reload();
         });
       })
       .catch(error => {
@@ -208,6 +195,70 @@ function showManualInstructions() {
   } else {
     alert(message);
   }
+}
+
+// Show update notification with user control
+function showUpdateNotification(onUpdate) {
+  const updateBanner = document.createElement('div');
+  updateBanner.id = 'pwaUpdateBanner';
+  updateBanner.style.cssText = `
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    max-width: 400px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 16px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 14px;
+    z-index: 10000;
+  `;
+  
+  updateBanner.innerHTML = `
+    <span>✨ A new version is available</span>
+    <div style="display: flex; gap: 8px;">
+      <button id="updateNow" style="
+        background: white;
+        color: #667eea;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 13px;
+      ">Update Now</button>
+      <button id="updateLater" style="
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 13px;
+      ">Later</button>
+    </div>
+  `;
+  
+  document.body.appendChild(updateBanner);
+  
+  document.getElementById('updateNow').addEventListener('click', () => {
+    onUpdate();
+    updateBanner.remove();
+    // Reload after user clicks update
+    setTimeout(() => {
+      window.location.reload();
+    }, 500);
+  });
+  
+  document.getElementById('updateLater').addEventListener('click', () => {
+    updateBanner.remove();
+  });
 }
 
 console.log(`[PWA] Setup loaded - Version ${APP_VERSION}`);

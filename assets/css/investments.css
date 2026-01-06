@@ -998,7 +998,7 @@
   }
 
   .portfolio-summary {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
     gap: 0.75rem;
   }
   
@@ -1072,13 +1072,13 @@
   }
 
   .investments-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
     gap: 0.75rem;
   }
 
   .investment-card {
     padding: 1rem;
-    min-height: 380px;
+    min-height: auto;
     display: flex;
     flex-direction: column;
   }
@@ -1388,7 +1388,7 @@
   }
 
   .portfolio-summary {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
     gap: 0.5rem;
   }
   
@@ -1446,7 +1446,7 @@
 
   .investment-card {
     padding: 0.75rem;
-    min-height: 340px;
+    min-height: auto;
   }
 
   .investment-card-header {

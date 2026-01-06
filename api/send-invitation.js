@@ -1,35 +1,75 @@
 import nodemailer from 'nodemailer';
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
+import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
 
-// Simple in-memory rate limiting (resets on server restart)
-const rateLimitMap = new Map();
+// Initialize Firebase for rate limiting
+const firebaseConfig = {
+  apiKey: process.env.VITE_FIREBASE_API_KEY,
+  authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.VITE_FIREBASE_APP_ID
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
 const RATE_LIMIT_WINDOW = 60 * 60 * 1000; // 1 hour
 const MAX_INVITATIONS_PER_WINDOW = 10; // Max 10 invitations per hour per sender
 
-function checkRateLimit(senderEmail) {
-  const now = Date.now();
-  const key = senderEmail.toLowerCase();
-  
-  if (!rateLimitMap.has(key)) {
-    rateLimitMap.set(key, { count: 1, windowStart: now });
+/**
+ * Check rate limit using Firestore
+ * Persistent across server restarts
+ */
+async function checkRateLimit(senderEmail) {
+  try {
+    const now = Date.now();
+    const key = senderEmail.toLowerCase();
+    const docRef = doc(db, 'rateLimits', `invitation_${key}`);
+    
+    const docSnap = await getDoc(docRef);
+    
+    if (!docSnap.exists()) {
+      // First request from this sender
+      await setDoc(docRef, {
+        count: 1,
+        windowStart: now,
+        lastUpdated: serverTimestamp()
+      });
+      return true;
+    }
+    
+    const record = docSnap.data();
+    
+    // Reset window if expired
+    if (now - record.windowStart > RATE_LIMIT_WINDOW) {
+      await setDoc(docRef, {
+        count: 1,
+        windowStart: now,
+        lastUpdated: serverTimestamp()
+      });
+      return true;
+    }
+    
+    // Check if limit exceeded
+    if (record.count >= MAX_INVITATIONS_PER_WINDOW) {
+      return false;
+    }
+    
+    // Increment count
+    await setDoc(docRef, {
+      count: record.count + 1,
+      windowStart: record.windowStart,
+      lastUpdated: serverTimestamp()
+    });
+    
+    return true;
+  } catch (error) {
+    console.error('Rate limit check error:', error);
+    // Fail open - allow request if rate limit check fails
     return true;
   }
-  
-  const record = rateLimitMap.get(key);
-  
-  // Reset window if expired
-  if (now - record.windowStart > RATE_LIMIT_WINDOW) {
-    rateLimitMap.set(key, { count: 1, windowStart: now });
-    return true;
-  }
-  
-  // Check if limit exceeded
-  if (record.count >= MAX_INVITATIONS_PER_WINDOW) {
-    return false;
-  }
-  
-  // Increment count
-  record.count++;
-  return true;
 }
 
 // Helper function to escape HTML to prevent XSS
@@ -82,7 +122,8 @@ export default async function handler(req, res) {
     
     // Check rate limit (use invitedByEmail if provided, otherwise use a hash of invitedByName)
     const rateLimitKey = invitedByEmail || `name:${invitedByName}`;
-    if (!checkRateLimit(rateLimitKey)) {
+    const isWithinLimit = await checkRateLimit(rateLimitKey);
+    if (!isWithinLimit) {
       return res.status(429).json({ error: 'Too many invitations sent. Please try again later.' });
     }
 
@@ -253,8 +294,7 @@ If you didn't expect this invitation, you can safely ignore this email.
   } catch (error) {
     console.error('Error sending invitation email:', error);
     return res.status(500).json({ 
-      error: 'Failed to send invitation email',
-      details: error.message 
+      error: 'Failed to send invitation email'
     });
   }
 }
