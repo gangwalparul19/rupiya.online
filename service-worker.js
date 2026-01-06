@@ -81,7 +81,6 @@ const STATIC_ASSETS = [
   '/assets/css/symbol-search.css',
   '/assets/css/legal-pages.css',
   '/assets/css/native-app.css',
-  '/assets/css/app-lock.css',
   
   // Config
   '/assets/js/config/firebase-config.js',
@@ -114,7 +113,6 @@ const STATIC_ASSETS = [
   '/assets/js/services/cross-feature-integration-service.js',
   '/assets/js/services/smart-categorization-service.js',
   '/assets/js/services/smart-document-service.js',
-  '/assets/js/services/app-lock-service.js',
   '/assets/js/services/services-init.js',
   
   // Components
@@ -126,8 +124,6 @@ const STATIC_ASSETS = [
   '/assets/js/components/onboarding-ui.js',
   '/assets/js/components/setup-wizard.js',
   '/assets/js/components/pagination.js',
-  '/assets/js/components/app-lock.js',
-  '/assets/js/components/pin-setup-modal.js',
   
   // Utils
   '/assets/js/utils/helpers.js',
@@ -137,7 +133,6 @@ const STATIC_ASSETS = [
   '/assets/js/utils/error-handler.js',
   '/assets/js/utils/daily-tips.js',
   '/assets/js/utils/auth-guard.js',
-  '/assets/js/utils/app-lock-guard.js',
   '/assets/js/utils/ux-enhancements.js',
   '/assets/js/utils/validation.js',
   '/assets/js/utils/button-state.js',

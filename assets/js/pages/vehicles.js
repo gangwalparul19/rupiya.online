@@ -432,6 +432,7 @@ function calculateVehicleMileage(vehicleFuelLogs) {
   let totalDistance = 0;
   let totalFuel = 0;
   let totalFuelCost = 0;
+  let fuelForMileage = 0;
 
   // Calculate total fuel cost for all entries
   sortedLogs.forEach(log => {
@@ -443,24 +444,20 @@ function calculateVehicleMileage(vehicleFuelLogs) {
   });
 
   // Calculate mileage between consecutive entries (need at least 2)
+  // For each segment, the fuel used is the fuel added at the END of that segment
   if (sortedLogs.length >= 2) {
     for (let i = 1; i < sortedLogs.length; i++) {
       const prevLog = sortedLogs[i - 1];
       const currLog = sortedLogs[i];
       
       const distance = (currLog.odometerReading || 0) - (prevLog.odometerReading || 0);
-      if (distance > 0) {
+      const fuelUsed = currLog.fuelQuantity || 0;
+      
+      // Only count segments with positive distance and fuel
+      if (distance > 0 && fuelUsed > 0) {
         totalDistance += distance;
+        fuelForMileage += fuelUsed;
       }
-    }
-  }
-
-  // Calculate average mileage (distance / fuel consumed for trips after first fill)
-  // For mileage calculation, we use fuel from entries 2 onwards (since first entry establishes baseline)
-  let fuelForMileage = 0;
-  if (sortedLogs.length >= 2) {
-    for (let i = 1; i < sortedLogs.length; i++) {
-      fuelForMileage += sortedLogs[i].fuelQuantity || 0;
     }
   }
   
