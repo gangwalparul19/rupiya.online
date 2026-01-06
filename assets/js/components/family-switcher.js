@@ -401,10 +401,8 @@ class FamilySwitcher {
   }
 
   showCreateFamilyModal() {
-    const modal = document.getElementById('createFamilyModal');
-    if (modal) {
-      modal.classList.add('show');
-    }
+    // Redirect to family page to create a new group
+    window.location.href = 'family.html?action=create';
   }
 
   async refresh() {

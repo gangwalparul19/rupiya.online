@@ -19,7 +19,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "nodemailer": "^6.9.8"
+    "nodemailer": "^7.0.12"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",

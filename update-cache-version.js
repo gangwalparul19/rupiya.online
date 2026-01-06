@@ -6,8 +6,12 @@
  * Run this script before deploying to ensure cache is cleared
  */
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const SERVICE_WORKER_PATH = path.join(__dirname, 'service-worker.js');
 
@@ -49,9 +53,7 @@ function updateCacheVersion() {
   }
 }
 
-// Run if called directly
-if (require.main === module) {
-  updateCacheVersion();
-}
+// Run the update
+updateCacheVersion();
 
-module.exports = updateCacheVersion;
+export default updateCacheVersion;
