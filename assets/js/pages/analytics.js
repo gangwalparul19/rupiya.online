@@ -178,8 +178,8 @@ function filterByPeriod(data, period) {
 
 // Update summary
 function updateSummary() {
-  const totalIncome = income.reduce((sum, item) => sum + item.amount, 0);
-  const totalExpenses = expenses.reduce((sum, item) => sum + item.amount, 0);
+  const totalIncome = income.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
+  const totalExpenses = expenses.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
   const netSavings = totalIncome - totalExpenses;
   const savingsRate = totalIncome > 0 ? ((netSavings / totalIncome) * 100).toFixed(1) : 0;
 
@@ -210,7 +210,7 @@ function renderExpenseByCategoryChart() {
   const categoryData = {};
   expenses.forEach(expense => {
     const category = expense.category || 'Other';
-    categoryData[category] = (categoryData[category] || 0) + expense.amount;
+    categoryData[category] = (categoryData[category] || 0) + (parseFloat(expense.amount) || 0);
   });
 
   const labels = Object.keys(categoryData);
@@ -266,8 +266,8 @@ function renderIncomeVsExpensesChart() {
     charts.incomeVsExpenses.destroy();
   }
 
-  const totalIncome = income.reduce((sum, item) => sum + item.amount, 0);
-  const totalExpenses = expenses.reduce((sum, item) => sum + item.amount, 0);
+  const totalIncome = income.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
+  const totalExpenses = expenses.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
 
   charts.incomeVsExpenses = new Chart(ctx, {
     type: 'bar',
@@ -330,21 +330,21 @@ function renderMonthlyTrendChart() {
   const monthlyData = {};
   
   expenses.forEach(expense => {
-    const date = expense.date.toDate ? expense.date.toDate() : new Date(expense.date);
+    const date = expense.date?.toDate ? expense.date.toDate() : new Date(expense.date);
     const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
     if (!monthlyData[monthKey]) {
       monthlyData[monthKey] = { income: 0, expenses: 0 };
     }
-    monthlyData[monthKey].expenses += expense.amount;
+    monthlyData[monthKey].expenses += (parseFloat(expense.amount) || 0);
   });
 
   income.forEach(inc => {
-    const date = inc.date.toDate ? inc.date.toDate() : new Date(inc.date);
+    const date = inc.date?.toDate ? inc.date.toDate() : new Date(inc.date);
     const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
     if (!monthlyData[monthKey]) {
       monthlyData[monthKey] = { income: 0, expenses: 0 };
     }
-    monthlyData[monthKey].income += inc.amount;
+    monthlyData[monthKey].income += (parseFloat(inc.amount) || 0);
   });
 
   // Sort by month
@@ -427,7 +427,7 @@ function renderTopCategories() {
     if (!categoryData[category]) {
       categoryData[category] = { amount: 0, count: 0 };
     }
-    categoryData[category].amount += expense.amount;
+    categoryData[category].amount += (parseFloat(expense.amount) || 0);
     categoryData[category].count += 1;
   });
 
@@ -436,7 +436,7 @@ function renderTopCategories() {
     .sort((a, b) => b[1].amount - a[1].amount)
     .slice(0, 10);
 
-  const totalExpenses = expenses.reduce((sum, item) => sum + item.amount, 0);
+  const totalExpenses = expenses.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
 
   if (sortedCategories.length === 0) {
     topCategoriesTable.innerHTML = '<tr><td colspan="4" class="text-center">No data available</td></tr>';

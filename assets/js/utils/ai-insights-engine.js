@@ -60,9 +60,10 @@ class AIInsightsEngine {
     let validBudgets = 0;
     
     this.budgets.forEach(budget => {
+      const budgetAmount = parseFloat(budget.amount) || 0;
       const spent = this.getCategorySpending(budget.category, budget.month);
-      if (budget.amount > 0) {
-        const adherence = Math.min(100, (1 - (spent / budget.amount)) * 100);
+      if (budgetAmount > 0) {
+        const adherence = Math.min(100, (1 - (spent / budgetAmount)) * 100);
         totalAdherence += Math.max(0, adherence);
         validBudgets++;
       }
@@ -90,8 +91,8 @@ class AIInsightsEngine {
     const thisMonth = this.getCurrentMonthExpenses();
     const lastMonth = this.getLastMonthExpenses();
     
-    const thisMonthTotal = thisMonth.reduce((sum, e) => sum + e.amount, 0);
-    const lastMonthTotal = lastMonth.reduce((sum, e) => sum + e.amount, 0);
+    const thisMonthTotal = thisMonth.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+    const lastMonthTotal = lastMonth.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
     
     const change = lastMonthTotal > 0 ? ((thisMonthTotal - lastMonthTotal) / lastMonthTotal) * 100 : 0;
     
@@ -133,14 +134,15 @@ class AIInsightsEngine {
     const avgExpense = this.getAverageExpenseAmount();
     
     // Find unusually large expenses
-    const largeExpenses = this.expenses.filter(e => e.amount > avgExpense * 3);
+    const largeExpenses = this.expenses.filter(e => (parseFloat(e.amount) || 0) > avgExpense * 3);
     if (largeExpenses.length > 0) {
       largeExpenses.slice(0, 3).forEach(expense => {
+        const amount = parseFloat(expense.amount) || 0;
         anomalies.push({
           type: 'alert',
           title: 'Large Expense Detected',
-          value: `₹${expense.amount.toFixed(2)}`,
-          description: `${expense.category} expense is ${(expense.amount / avgExpense).toFixed(1)}x your average.`,
+          value: `₹${amount.toFixed(2)}`,
+          description: `${expense.category} expense is ${(amount / avgExpense).toFixed(1)}x your average.`,
           badge: 'high'
         });
       });
@@ -165,9 +167,10 @@ class AIInsightsEngine {
     
     // Check for overspending categories
     this.budgets.forEach(budget => {
+      const budgetAmount = parseFloat(budget.amount) || 0;
       const spent = this.getCategorySpending(budget.category, budget.month);
-      if (spent > budget.amount) {
-        const overspend = spent - budget.amount;
+      if (spent > budgetAmount) {
+        const overspend = spent - budgetAmount;
         opportunities.push({
           type: 'warning',
           title: `Reduce ${budget.category}`,
@@ -283,7 +286,9 @@ class AIInsightsEngine {
     
     // Goal predictions
     this.goals.forEach(goal => {
-      const remaining = goal.targetAmount - goal.currentAmount;
+      const targetAmount = parseFloat(goal.targetAmount) || 0;
+      const currentAmount = parseFloat(goal.currentAmount) || 0;
+      const remaining = targetAmount - currentAmount;
       const monthsToGoal = this.calculateMonthsToGoal(goal);
       
       if (monthsToGoal > 0) {
@@ -330,11 +335,11 @@ class AIInsightsEngine {
 
   // Helper methods
   getTotalIncome() {
-    return this.income.reduce((sum, i) => sum + i.amount, 0);
+    return this.income.reduce((sum, i) => sum + (parseFloat(i.amount) || 0), 0);
   }
 
   getTotalExpenses() {
-    return this.expenses.reduce((sum, e) => sum + e.amount, 0);
+    return this.expenses.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
   }
 
   getCurrentMonthExpenses() {
@@ -359,7 +364,7 @@ class AIInsightsEngine {
     this.expenses.forEach(e => {
       const date = e.date.toDate ? e.date.toDate() : new Date(e.date);
       const key = `${date.getFullYear()}-${date.getMonth()}`;
-      monthlyTotals[key] = (monthlyTotals[key] || 0) + e.amount;
+      monthlyTotals[key] = (monthlyTotals[key] || 0) + (parseFloat(e.amount) || 0);
     });
     return Object.values(monthlyTotals);
   }
@@ -389,13 +394,13 @@ class AIInsightsEngine {
   getCategorySpending(category, month) {
     return this.expenses
       .filter(e => e.category === category)
-      .reduce((sum, e) => sum + e.amount, 0);
+      .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
   }
 
   getTopSpendingCategories(limit = 5) {
     const categoryTotals = {};
     this.expenses.forEach(e => {
-      categoryTotals[e.category] = (categoryTotals[e.category] || 0) + e.amount;
+      categoryTotals[e.category] = (categoryTotals[e.category] || 0) + (parseFloat(e.amount) || 0);
     });
     
     return Object.entries(categoryTotals)
@@ -409,11 +414,11 @@ class AIInsightsEngine {
     const lastCats = {};
     
     thisMonth.forEach(e => {
-      thisCats[e.category] = (thisCats[e.category] || 0) + e.amount;
+      thisCats[e.category] = (thisCats[e.category] || 0) + (parseFloat(e.amount) || 0);
     });
     
     lastMonth.forEach(e => {
-      lastCats[e.category] = (lastCats[e.category] || 0) + e.amount;
+      lastCats[e.category] = (lastCats[e.category] || 0) + (parseFloat(e.amount) || 0);
     });
     
     const changes = [];
@@ -433,12 +438,13 @@ class AIInsightsEngine {
     
     this.getCurrentMonthExpenses().forEach(expense => {
       const avg = categoryAvgs[expense.category] || 0;
-      if (avg > 0 && expense.amount > avg * 2) {
+      const amount = parseFloat(expense.amount) || 0;
+      if (avg > 0 && amount > avg * 2) {
         anomalies.push({
           type: 'alert',
           title: `High ${expense.category} Expense`,
-          value: `₹${expense.amount.toFixed(2)}`,
-          description: `This expense is ${(expense.amount / avg).toFixed(1)}x your average for this category.`,
+          value: `₹${amount.toFixed(2)}`,
+          description: `This expense is ${(amount / avg).toFixed(1)}x your average for this category.`,
           badge: 'medium'
         });
       }
@@ -452,7 +458,8 @@ class AIInsightsEngine {
     const categoryCounts = {};
     
     this.expenses.forEach(e => {
-      categoryTotals[e.category] = (categoryTotals[e.category] || 0) + e.amount;
+      const amount = parseFloat(e.amount) || 0;
+      categoryTotals[e.category] = (categoryTotals[e.category] || 0) + amount;
       categoryCounts[e.category] = (categoryCounts[e.category] || 0) + 1;
     });
     
@@ -470,7 +477,8 @@ class AIInsightsEngine {
     const grouped = {};
     
     this.expenses.forEach(e => {
-      const key = `${e.category}-${e.amount}`;
+      const amount = parseFloat(e.amount) || 0;
+      const key = `${e.category}-${amount}`;
       grouped[key] = (grouped[key] || 0) + 1;
     });
     
@@ -484,7 +492,9 @@ class AIInsightsEngine {
   }
 
   calculateMonthsToGoal(goal) {
-    const remaining = goal.targetAmount - goal.currentAmount;
+    const targetAmount = parseFloat(goal.targetAmount) || 0;
+    const currentAmount = parseFloat(goal.currentAmount) || 0;
+    const remaining = targetAmount - currentAmount;
     const monthlySavings = this.getTotalIncome() - this.getTotalExpenses();
     
     if (monthlySavings <= 0) return -1;

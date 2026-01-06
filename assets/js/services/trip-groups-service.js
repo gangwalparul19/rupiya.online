@@ -16,6 +16,7 @@ import {
 } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
 import authService from './auth-service.js';
 import userService from './user-service.js';
+import encryptionService from './encryption-service.js';
 
 // Default trip categories
 const DEFAULT_TRIP_CATEGORIES = [
@@ -566,8 +567,11 @@ class TripGroupsService {
         createdAt: now
       };
 
+      // Encrypt expense data before saving
+      const encryptedExpense = await encryptionService.encryptObject(expense, this.expensesCollection);
+
       // Create group expense
-      const expenseRef = await addDoc(collection(db, this.expensesCollection), expense);
+      const expenseRef = await addDoc(collection(db, this.expensesCollection), encryptedExpense);
       const expenseId = expenseRef.id;
 
       // Create linked personal expense if current user paid
@@ -586,7 +590,9 @@ class TripGroupsService {
           updatedAt: now
         };
 
-        const personalExpenseRef = await addDoc(collection(db, this.personalExpensesCollection), personalExpense);
+        // Encrypt personal expense before saving
+        const encryptedPersonalExpense = await encryptionService.encryptObject(personalExpense, this.personalExpensesCollection);
+        const personalExpenseRef = await addDoc(collection(db, this.personalExpensesCollection), encryptedPersonalExpense);
         
         // Update group expense with linked expense ID
         await updateDoc(doc(db, this.expensesCollection, expenseId), {
@@ -622,9 +628,12 @@ class TripGroupsService {
       const snapshot = await getDocs(expensesQuery);
       let expenses = [];
 
-      snapshot.forEach((doc) => {
-        expenses.push({ id: doc.id, ...doc.data() });
-      });
+      for (const docSnap of snapshot.docs) {
+        const data = { id: docSnap.id, ...docSnap.data() };
+        // Decrypt expense data
+        const decryptedData = await encryptionService.decryptObject(data, this.expensesCollection);
+        expenses.push(decryptedData);
+      }
 
       // Apply filters
       if (filters.category) {
@@ -633,16 +642,16 @@ class TripGroupsService {
       if (filters.memberId) {
         expenses = expenses.filter(e => 
           e.paidBy === filters.memberId || 
-          e.splits.some(s => s.memberId === filters.memberId)
+          (e.splits && e.splits.some(s => s.memberId === filters.memberId))
         );
       }
       if (filters.startDate) {
         const start = new Date(filters.startDate);
-        expenses = expenses.filter(e => e.date.toDate() >= start);
+        expenses = expenses.filter(e => e.date && e.date.toDate() >= start);
       }
       if (filters.endDate) {
         const end = new Date(filters.endDate);
-        expenses = expenses.filter(e => e.date.toDate() <= end);
+        expenses = expenses.filter(e => e.date && e.date.toDate() <= end);
       }
 
       return expenses;
@@ -744,7 +753,9 @@ class TripGroupsService {
         createdAt: now
       };
 
-      const settlementRef = await addDoc(collection(db, this.settlementsCollection), settlement);
+      // Encrypt settlement data before saving
+      const encryptedSettlement = await encryptionService.encryptObject(settlement, this.settlementsCollection);
+      const settlementRef = await addDoc(collection(db, this.settlementsCollection), encryptedSettlement);
 
       return { success: true, settlementId: settlementRef.id, data: { id: settlementRef.id, ...settlement } };
     } catch (error) {
@@ -765,9 +776,12 @@ class TripGroupsService {
       const snapshot = await getDocs(settlementsQuery);
       const settlements = [];
 
-      snapshot.forEach((doc) => {
-        settlements.push({ id: doc.id, ...doc.data() });
-      });
+      for (const docSnap of snapshot.docs) {
+        const data = { id: docSnap.id, ...docSnap.data() };
+        // Decrypt settlement data
+        const decryptedData = await encryptionService.decryptObject(data, this.settlementsCollection);
+        settlements.push(decryptedData);
+      }
 
       return settlements;
     } catch (error) {

@@ -190,8 +190,8 @@ function updateSummary() {
   // Filter budgets for current month
   const currentBudgets = state.budgets.filter(b => b.month === currentMonth);
   
-  // Calculate totals
-  const budgetTotal = currentBudgets.reduce((sum, b) => sum + b.amount, 0);
+  // Calculate totals (ensure amounts are numbers)
+  const budgetTotal = currentBudgets.reduce((sum, b) => sum + (parseFloat(b.amount) || 0), 0);
   
   // Calculate spent for each budget
   let spentTotal = 0;
@@ -229,7 +229,7 @@ function calculateSpent(budget) {
              expenseDate >= startDate && 
              expenseDate <= endDate;
     })
-    .reduce((sum, e) => sum + e.amount, 0);
+    .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
   
   return spent;
 }
@@ -259,9 +259,13 @@ function renderBudgets() {
 
 // Create budget card HTML
 function createBudgetCard(budget) {
+  // Ensure amount and alertThreshold are numbers (may be strings after decryption)
+  const budgetAmount = parseFloat(budget.amount) || 0;
+  const alertThreshold = parseFloat(budget.alertThreshold) || 80;
+  
   const spent = calculateSpent(budget);
-  const remaining = budget.amount - spent;
-  const percentage = budget.amount > 0 ? (spent / budget.amount) * 100 : 0;
+  const remaining = budgetAmount - spent;
+  const percentage = budgetAmount > 0 ? (spent / budgetAmount) * 100 : 0;
   
   // Determine status
   let statusClass = '';
@@ -279,7 +283,7 @@ function createBudgetCard(budget) {
         Budget exceeded!
       </div>
     `;
-  } else if (percentage >= budget.alertThreshold) {
+  } else if (percentage >= alertThreshold) {
     statusClass = 'near-limit';
     progressClass = 'warning';
     alertHtml = `
@@ -321,7 +325,7 @@ function createBudgetCard(budget) {
       <div class="budget-amounts">
         <div class="budget-amount">
           <div class="budget-amount-label">Budget</div>
-          <div class="budget-amount-value">${formatCurrency(budget.amount)}</div>
+          <div class="budget-amount-value">${formatCurrency(budgetAmount)}</div>
         </div>
         <div class="budget-amount">
           <div class="budget-amount-label">Spent</div>
@@ -338,7 +342,7 @@ function createBudgetCard(budget) {
           <div class="progress-bar ${progressClass}" style="width: ${Math.min(percentage, 100)}%"></div>
         </div>
         <div class="progress-text">
-          <span>${formatCurrency(spent)} of ${formatCurrency(budget.amount)}</span>
+          <span>${formatCurrency(spent)} of ${formatCurrency(budgetAmount)}</span>
           <span class="progress-percentage">${percentage.toFixed(1)}%</span>
         </div>
       </div>

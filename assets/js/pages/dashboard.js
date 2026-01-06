@@ -192,11 +192,12 @@ async function loadDashboardData() {
       firestoreService.getRecurring ? firestoreService.getRecurring() : Promise.resolve([])
     ]);
     
-    // Get limited expenses/income for charts (last 6 months only)
+    // Get limited expenses/income/splits for charts (last 6 months only)
     const sixMonthsAgo = new Date(currentYear, currentMonth - 5, 1);
-    const [expenses, income] = await Promise.all([
+    const [expenses, income, splits] = await Promise.all([
       firestoreService.getExpenses(200), // Limit to 200 for charts
-      firestoreService.getIncome(200)
+      firestoreService.getIncome(200),
+      firestoreService.getSplits ? firestoreService.getSplits() : Promise.resolve([])
     ]);
     
     console.log('Current month summary:', currentSummary);
@@ -253,16 +254,16 @@ async function loadDashboardData() {
     checkSpendingAlerts(currentMonthExpenses, lastMonthExpenses);
     
     // Load widgets
-    loadTopCategoriesWidget(expenses, firstDayOfMonth, lastDayOfMonth);
+    loadTopCategoriesWidget(expenses, splits, firstDayOfMonth, lastDayOfMonth);
     loadUpcomingBillsWidget(recurring);
     loadGoalProgressWidget(goals);
     
-    // Load recent transactions
-    loadRecentTransactions(expenses, income);
+    // Load recent transactions (include splits)
+    loadRecentTransactions(expenses, income, splits);
     
-    // Load charts
-    createTrendChart(expenses, income, 6);
-    createCategoryChart(expenses, 'current');
+    // Load charts (include splits in category chart)
+    createTrendChart(expenses, income, 6, splits);
+    createCategoryChart(expenses, 'current', splits);
     
     console.log('Dashboard data loaded successfully');
     
@@ -300,7 +301,7 @@ function checkSpendingAlerts(currentExpenses, lastMonthExpenses) {
 }
 
 // Load top spending categories widget
-function loadTopCategoriesWidget(expenses, startDate, endDate) {
+function loadTopCategoriesWidget(expenses, splits, startDate, endDate) {
   const container = document.getElementById('topCategoriesList');
   if (!container) return;
   
@@ -311,11 +312,28 @@ function loadTopCategoriesWidget(expenses, startDate, endDate) {
     return date >= startDate && date <= endDate;
   });
   
-  // Group by category
+  // Filter current month splits and convert to expense-like objects
+  const monthSplits = (splits || []).filter(s => {
+    if (!s.date) return false;
+    const date = s.date.toDate ? s.date.toDate() : new Date(s.date);
+    return date >= startDate && date <= endDate;
+  });
+  
+  // Group by category (parse amount as number)
   const categoryTotals = {};
   monthExpenses.forEach(e => {
     const cat = e.category || 'Other';
-    categoryTotals[cat] = (categoryTotals[cat] || 0) + e.amount;
+    categoryTotals[cat] = (categoryTotals[cat] || 0) + (parseFloat(e.amount) || 0);
+  });
+  
+  // Add split expenses to categories (your share only)
+  monthSplits.forEach(split => {
+    const myShare = split.participants?.find(p => p.name === 'Me');
+    const myAmount = myShare ? parseFloat(myShare.amount) || 0 : 0;
+    if (myAmount > 0) {
+      const cat = split.category || 'Split Expense';
+      categoryTotals[cat] = (categoryTotals[cat] || 0) + myAmount;
+    }
   });
   
   // Sort and get top 5
@@ -383,6 +401,7 @@ function loadUpcomingBillsWidget(recurring) {
     const dueClass = daysUntil === 0 ? 'today' : daysUntil < 0 ? 'overdue' : '';
     const dueText = daysUntil === 0 ? 'Due today' : daysUntil < 0 ? 'Overdue' : `Due in ${daysUntil} days`;
     const billName = escapeHtml(bill.description || bill.category || 'Unnamed');
+    const billAmount = parseFloat(bill.amount) || 0;
     
     return `
       <div class="bill-item">
@@ -391,7 +410,7 @@ function loadUpcomingBillsWidget(recurring) {
           <div class="bill-name">${billName}</div>
           <div class="bill-due ${dueClass}">${dueText}</div>
         </div>
-        <div class="bill-amount">${formatCurrencyCompact(bill.amount)}</div>
+        <div class="bill-amount">${formatCurrencyCompact(billAmount)}</div>
       </div>
     `;
   }).join('');
@@ -438,8 +457,8 @@ function loadGoalProgressWidget(goals) {
   const activeGoal = goals.find(g => g.status !== 'completed') || goals[0];
   if (!activeGoal) return;
   
-  const current = activeGoal.currentAmount || 0;
-  const target = activeGoal.targetAmount || 1;
+  const current = parseFloat(activeGoal.currentAmount) || 0;
+  const target = parseFloat(activeGoal.targetAmount) || 1;
   const percent = Math.min((current / target) * 100, 100);
   
   document.getElementById('goalName').textContent = activeGoal.name || 'Savings Goal';
@@ -542,11 +561,25 @@ function updateSavingsRateWidget(income, expenses, saved, rate) {
 }
 
 // Load recent transactions
-function loadRecentTransactions(expenses, income) {
+function loadRecentTransactions(expenses, income, splits) {
+  // Convert splits to transaction-like objects
+  const splitTransactions = (splits || []).map(split => {
+    const myShare = split.participants?.find(p => p.name === 'Me');
+    const myAmount = myShare ? parseFloat(myShare.amount) || 0 : 0;
+    return {
+      ...split,
+      amount: myAmount,
+      type: 'split',
+      description: split.description || 'Split Expense',
+      category: split.category || 'Split Expense'
+    };
+  }).filter(t => t.amount > 0);
+  
   // Combine and sort by date (with null checks)
   const allTransactions = [
     ...expenses.map(e => ({ ...e, type: 'expense' })),
-    ...income.map(i => ({ ...i, type: 'income' }))
+    ...income.map(i => ({ ...i, type: 'income' })),
+    ...splitTransactions
   ].filter(t => t.date) // Filter out items without dates
   .sort((a, b) => {
     const dateA = a.date.toDate ? a.date.toDate() : new Date(a.date);
@@ -564,18 +597,32 @@ function loadRecentTransactions(expenses, income) {
     <div class="transaction-list">
       ${allTransactions.map(t => {
         const date = t.date.toDate ? t.date.toDate() : new Date(t.date);
-        const icon = t.type === 'expense' ? '💸' : '💰';
-        const amountClass = t.type === 'expense' ? 'expense' : 'income';
-        const amountPrefix = t.type === 'expense' ? '-' : '+';
+        let icon, amountClass, amountPrefix;
+        
+        if (t.type === 'split') {
+          icon = '🤝';
+          amountClass = 'expense';
+          amountPrefix = '-';
+        } else if (t.type === 'expense') {
+          icon = '💸';
+          amountClass = 'expense';
+          amountPrefix = '-';
+        } else {
+          icon = '💰';
+          amountClass = 'income';
+          amountPrefix = '+';
+        }
+        
+        const amount = parseFloat(t.amount) || 0;
         
         return `
           <div class="transaction-item">
             <div class="transaction-icon">${icon}</div>
             <div class="transaction-details">
               <div class="transaction-title">${escapeHtml(t.description || t.category || 'Transaction')}</div>
-              <div class="transaction-meta">${escapeHtml(t.category || t.source || 'Uncategorized')} • ${getRelativeTime(date)}</div>
+              <div class="transaction-meta">${escapeHtml(t.category || t.source || 'Uncategorized')}${t.type === 'split' ? ' (Split)' : ''} • ${getRelativeTime(date)}</div>
             </div>
-            <div class="transaction-amount ${amountClass}">${amountPrefix}${formatCurrency(t.amount)}</div>
+            <div class="transaction-amount ${amountClass}">${amountPrefix}${formatCurrency(amount)}</div>
           </div>
         `;
       }).join('')}
@@ -651,7 +698,7 @@ logoutBtn.addEventListener('click', async () => {
 });
 
 // Chart Functions
-function createTrendChart(expenses, income, months = 6) {
+function createTrendChart(expenses, income, months = 6, splits = []) {
   const ctx = trendChart.getContext('2d');
   
   // Destroy existing chart
@@ -677,7 +724,20 @@ function createTrendChart(expenses, income, months = 6) {
         return expenseDate.getMonth() === date.getMonth() && 
                expenseDate.getFullYear() === date.getFullYear();
       })
-      .reduce((sum, e) => sum + e.amount, 0);
+      .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+    
+    // Calculate split expenses for this month (your share only)
+    const monthSplitExpenses = (splits || [])
+      .filter(s => {
+        if (!s.date) return false;
+        const splitDate = timezoneService.toLocalDate(s.date);
+        return splitDate.getMonth() === date.getMonth() && 
+               splitDate.getFullYear() === date.getFullYear();
+      })
+      .reduce((sum, split) => {
+        const myShare = split.participants?.find(p => p.name === 'Me');
+        return sum + (myShare ? parseFloat(myShare.amount) || 0 : 0);
+      }, 0);
     
     // Calculate income for this month
     const monthIncome = income
@@ -686,10 +746,25 @@ function createTrendChart(expenses, income, months = 6) {
         return incomeDate.getMonth() === date.getMonth() && 
                incomeDate.getFullYear() === date.getFullYear();
       })
-      .reduce((sum, i) => sum + i.amount, 0);
+      .reduce((sum, i) => sum + (parseFloat(i.amount) || 0), 0);
     
-    expenseData.push(monthExpenses);
-    incomeData.push(monthIncome);
+    // Calculate settled split income for this month (money received from others)
+    const monthSplitIncome = (splits || [])
+      .filter(s => {
+        if (!s.date || s.status !== 'settled' || s.paidBy !== 'me') return false;
+        const splitDate = timezoneService.toLocalDate(s.date);
+        return splitDate.getMonth() === date.getMonth() && 
+               splitDate.getFullYear() === date.getFullYear();
+      })
+      .reduce((sum, split) => {
+        const othersTotal = split.participants
+          ?.filter(p => p.name !== 'Me')
+          .reduce((s, p) => s + (parseFloat(p.amount) || 0), 0) || 0;
+        return sum + othersTotal;
+      }, 0);
+    
+    expenseData.push(monthExpenses + monthSplitExpenses);
+    incomeData.push(monthIncome + monthSplitIncome);
   }
   
   trendChartInstance = new Chart(ctx, {
@@ -775,7 +850,7 @@ function createTrendChart(expenses, income, months = 6) {
   });
 }
 
-function createCategoryChart(expenses, period = 'current') {
+function createCategoryChart(expenses, period = 'current', splits = []) {
   const ctx = categoryChart.getContext('2d');
   
   // Destroy existing chart
@@ -785,11 +860,18 @@ function createCategoryChart(expenses, period = 'current') {
   
   // Filter expenses based on period
   let filteredExpenses = expenses;
+  let filteredSplits = splits || [];
   const now = new Date();
   
   if (period === 'current') {
     filteredExpenses = expenses.filter(e => {
       const date = e.date.toDate ? e.date.toDate() : new Date(e.date);
+      return date.getMonth() === now.getMonth() && 
+             date.getFullYear() === now.getFullYear();
+    });
+    filteredSplits = (splits || []).filter(s => {
+      if (!s.date) return false;
+      const date = s.date.toDate ? s.date.toDate() : new Date(s.date);
       return date.getMonth() === now.getMonth() && 
              date.getFullYear() === now.getFullYear();
     });
@@ -800,13 +882,29 @@ function createCategoryChart(expenses, period = 'current') {
       return date.getMonth() === lastMonth.getMonth() && 
              date.getFullYear() === lastMonth.getFullYear();
     });
+    filteredSplits = (splits || []).filter(s => {
+      if (!s.date) return false;
+      const date = s.date.toDate ? s.date.toDate() : new Date(s.date);
+      return date.getMonth() === lastMonth.getMonth() && 
+             date.getFullYear() === lastMonth.getFullYear();
+    });
   }
   
   // Group by category
   const categoryTotals = {};
   filteredExpenses.forEach(e => {
     const category = e.category || 'Uncategorized';
-    categoryTotals[category] = (categoryTotals[category] || 0) + e.amount;
+    categoryTotals[category] = (categoryTotals[category] || 0) + (parseFloat(e.amount) || 0);
+  });
+  
+  // Add split expenses to categories (your share only)
+  filteredSplits.forEach(split => {
+    const myShare = split.participants?.find(p => p.name === 'Me');
+    const myAmount = myShare ? parseFloat(myShare.amount) || 0 : 0;
+    if (myAmount > 0) {
+      const category = split.category || 'Split Expense';
+      categoryTotals[category] = (categoryTotals[category] || 0) + myAmount;
+    }
   });
   
   // Sort by amount and get top 8
@@ -886,11 +984,12 @@ function createCategoryChart(expenses, period = 'current') {
 // Chart period change handlers
 trendPeriod.addEventListener('change', async () => {
   try {
-    const [expenses, income] = await Promise.all([
+    const [expenses, income, splits] = await Promise.all([
       firestoreService.getExpenses(),
-      firestoreService.getIncome()
+      firestoreService.getIncome(),
+      firestoreService.getSplits ? firestoreService.getSplits() : Promise.resolve([])
     ]);
-    createTrendChart(expenses, income, parseInt(trendPeriod.value));
+    createTrendChart(expenses, income, parseInt(trendPeriod.value), splits);
   } catch (error) {
     console.error('Error updating trend chart:', error);
   }
@@ -898,8 +997,11 @@ trendPeriod.addEventListener('change', async () => {
 
 categoryPeriod.addEventListener('change', async () => {
   try {
-    const expenses = await firestoreService.getExpenses();
-    createCategoryChart(expenses, categoryPeriod.value);
+    const [expenses, splits] = await Promise.all([
+      firestoreService.getExpenses(),
+      firestoreService.getSplits ? firestoreService.getSplits() : Promise.resolve([])
+    ]);
+    createCategoryChart(expenses, categoryPeriod.value, splits);
   } catch (error) {
     console.error('Error updating category chart:', error);
   }

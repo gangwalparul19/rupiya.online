@@ -40,7 +40,8 @@ class FirestoreService {
       houseHelps: 'houseHelps',
       houseHelpPayments: 'houseHelpPayments',
       fuelLogs: 'fuelLogs',
-      splits: 'splits'
+      splits: 'splits',
+      paymentMethods: 'paymentMethods'
     };
     
     // Cache configuration
@@ -509,6 +510,30 @@ class FirestoreService {
   async getSplitsPaginated(options = {}) { return this.getPaginated(this.collections.splits, { orderByField: 'createdAt', orderDirection: 'desc', ...options }); }
 
   // ============================================
+  // PAYMENT METHODS - Encrypted
+  // ============================================
+
+  async addPaymentMethod(paymentMethod) {
+    return this.add(this.collections.paymentMethods, paymentMethod);
+  }
+
+  async getPaymentMethods() {
+    return this.getAll(this.collections.paymentMethods, 'createdAt', 'desc');
+  }
+
+  async getPaymentMethod(id) {
+    return this.get(this.collections.paymentMethods, id);
+  }
+
+  async updatePaymentMethod(id, paymentMethod) {
+    return this.update(this.collections.paymentMethods, id, paymentMethod);
+  }
+
+  async deletePaymentMethod(id) {
+    return this.delete(this.collections.paymentMethods, id);
+  }
+
+  // ============================================
   // CUSTOM QUERY METHOD
   // ============================================
 
@@ -594,17 +619,48 @@ class FirestoreService {
       const startDate = new Date(year, month, 1);
       const endDate = new Date(year, month + 1, 0, 23, 59, 59);
       
-      const [expenses, income] = await Promise.all([
+      const [expenses, income, splits] = await Promise.all([
         this.queryByDateRange(this.collections.expenses, startDate, endDate),
-        this.queryByDateRange(this.collections.income, startDate, endDate)
+        this.queryByDateRange(this.collections.income, startDate, endDate),
+        this.getSplitsByDateRange(startDate, endDate)
       ]);
       
+      // Calculate split expenses and income
+      // Your share of splits where you paid = expense (you spent money)
+      // Your share of splits where someone else paid = expense (you owe money)
+      // When you're owed money (you paid, others owe you) = potential income when settled
+      let splitExpenses = 0;
+      let splitIncome = 0;
+      
+      splits.forEach(split => {
+        const myShare = split.participants?.find(p => p.name === 'Me');
+        const myAmount = myShare ? parseFloat(myShare.amount) || 0 : 0;
+        
+        if (split.paidBy === 'me') {
+          // I paid - my share is my expense
+          splitExpenses += myAmount;
+          // If settled, the amount others owed me is income I received
+          if (split.status === 'settled') {
+            const othersTotal = split.participants
+              ?.filter(p => p.name !== 'Me')
+              .reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0) || 0;
+            splitIncome += othersTotal;
+          }
+        } else {
+          // Someone else paid - my share is my expense (I owe them)
+          splitExpenses += myAmount;
+        }
+      });
+      
       const summary = {
-        totalExpenses: expenses.reduce((sum, e) => sum + (e.amount || 0), 0),
-        totalIncome: income.reduce((sum, i) => sum + (i.amount || 0), 0),
+        totalExpenses: expenses.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0) + splitExpenses,
+        totalIncome: income.reduce((sum, i) => sum + (parseFloat(i.amount) || 0), 0) + splitIncome,
         netSavings: 0,
         expenseCount: expenses.length,
-        incomeCount: income.length
+        incomeCount: income.length,
+        splitExpenses: splitExpenses,
+        splitIncome: splitIncome,
+        splitCount: splits.length
       };
       summary.netSavings = summary.totalIncome - summary.totalExpenses;
       
@@ -612,7 +668,61 @@ class FirestoreService {
       return summary;
     } catch (error) {
       console.error('Error getting monthly summary:', error);
-      return { totalExpenses: 0, totalIncome: 0, netSavings: 0, expenseCount: 0, incomeCount: 0 };
+      return { totalExpenses: 0, totalIncome: 0, netSavings: 0, expenseCount: 0, incomeCount: 0, splitExpenses: 0, splitIncome: 0, splitCount: 0 };
+    }
+  }
+
+  async getSplitsByDateRange(startDate, endDate) {
+    try {
+      const userId = this.getUserId();
+      const q = query(
+        collection(db, this.collections.splits),
+        where('userId', '==', userId),
+        where('date', '>=', Timestamp.fromDate(startDate)),
+        where('date', '<=', Timestamp.fromDate(endDate)),
+        orderBy('date', 'desc')
+      );
+      
+      const querySnapshot = await getDocs(q);
+      const data = [];
+      querySnapshot.forEach((doc) => data.push({ id: doc.id, ...doc.data() }));
+      
+      // Decrypt all documents
+      const decryptedData = await encryptionService.decryptArray(data, this.collections.splits);
+      
+      return decryptedData;
+    } catch (error) {
+      console.error('Error querying splits by date range:', error);
+      return [];
+    }
+  }
+
+  // Get trip group expenses linked to current user's personal expenses
+  async getTripGroupExpensesByDateRange(startDate, endDate) {
+    try {
+      const userId = this.getUserId();
+      // Query personal expenses that are linked to trip groups
+      const q = query(
+        collection(db, this.collections.expenses),
+        where('userId', '==', userId),
+        where('tripGroupId', '!=', null),
+        where('date', '>=', Timestamp.fromDate(startDate)),
+        where('date', '<=', Timestamp.fromDate(endDate)),
+        orderBy('tripGroupId'),
+        orderBy('date', 'desc')
+      );
+      
+      const querySnapshot = await getDocs(q);
+      const data = [];
+      querySnapshot.forEach((doc) => data.push({ id: doc.id, ...doc.data() }));
+      
+      // Decrypt all documents
+      const decryptedData = await encryptionService.decryptArray(data, this.collections.expenses);
+      
+      return decryptedData;
+    } catch (error) {
+      console.error('Error querying trip group expenses by date range:', error);
+      return [];
     }
   }
 

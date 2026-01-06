@@ -151,9 +151,16 @@ function setupEventListeners() {
   const principalInput = document.getElementById('principalAmount');
   const rateInput = document.getElementById('interestRate');
   const tenureInput = document.getElementById('tenure');
+  const emisPaidInput = document.getElementById('emisPaid');
+  const emiAmountInput = document.getElementById('emiAmount');
   
   [principalInput, rateInput, tenureInput].forEach(input => {
     input?.addEventListener('input', calculateEMI);
+  });
+  
+  // Auto-calculate outstanding when EMIs paid changes
+  [emisPaidInput, principalInput, rateInput, tenureInput, emiAmountInput].forEach(input => {
+    input?.addEventListener('input', calculateOutstanding);
   });
   
   // Prepayment calculator
@@ -183,9 +190,10 @@ async function loadLoans() {
 function updateSummary() {
   const activeLoans = loans.filter(l => l.status !== 'closed');
   
-  const totalOutstanding = activeLoans.reduce((sum, l) => sum + (l.outstandingAmount || 0), 0);
-  const totalMonthlyEmi = activeLoans.reduce((sum, l) => sum + (l.emiAmount || 0), 0);
-  const totalPaid = loans.reduce((sum, l) => sum + ((l.emisPaid || 0) * (l.emiAmount || 0)), 0);
+  // Parse amounts as numbers (may be strings after decryption)
+  const totalOutstanding = activeLoans.reduce((sum, l) => sum + (parseFloat(l.outstandingAmount) || 0), 0);
+  const totalMonthlyEmi = activeLoans.reduce((sum, l) => sum + (parseFloat(l.emiAmount) || 0), 0);
+  const totalPaid = loans.reduce((sum, l) => sum + ((parseFloat(l.emisPaid) || 0) * (parseFloat(l.emiAmount) || 0)), 0);
   
   document.getElementById('totalOutstanding').textContent = formatCurrency(totalOutstanding);
   document.getElementById('totalMonthlyEmi').textContent = formatCurrency(totalMonthlyEmi);
@@ -217,8 +225,14 @@ function renderLoans() {
   
   container.innerHTML = filteredLoans.map(loan => {
     const icon = loanTypeIcons[loan.loanType] || '📋';
-    const progress = loan.tenure > 0 ? ((loan.emisPaid || 0) / loan.tenure) * 100 : 0;
-    const remainingEmis = loan.tenure - (loan.emisPaid || 0);
+    const tenure = parseFloat(loan.tenure) || 0;
+    const emisPaid = parseFloat(loan.emisPaid) || 0;
+    const emiAmount = parseFloat(loan.emiAmount) || 0;
+    const outstandingAmount = parseFloat(loan.outstandingAmount) || 0;
+    const interestRate = parseFloat(loan.interestRate) || 0;
+    
+    const progress = tenure > 0 ? (emisPaid / tenure) * 100 : 0;
+    const remainingEmis = tenure - emisPaid;
     const endDate = calculateEndDate(loan);
     
     return `
@@ -237,7 +251,7 @@ function renderLoans() {
         <div class="loan-progress">
           <div class="progress-header">
             <span class="progress-label">EMIs Paid</span>
-            <span class="progress-value">${loan.emisPaid || 0} / ${loan.tenure}</span>
+            <span class="progress-value">${emisPaid} / ${tenure}</span>
           </div>
           <div class="progress-bar">
             <div class="progress-fill" style="width: ${progress}%"></div>
@@ -247,15 +261,15 @@ function renderLoans() {
         <div class="loan-stats">
           <div class="stat-item">
             <div class="stat-label">EMI Amount</div>
-            <div class="stat-value">${formatCurrency(loan.emiAmount)}</div>
+            <div class="stat-value">${formatCurrency(emiAmount)}</div>
           </div>
           <div class="stat-item">
             <div class="stat-label">Outstanding</div>
-            <div class="stat-value">${formatCurrency(loan.outstandingAmount)}</div>
+            <div class="stat-value">${formatCurrency(outstandingAmount)}</div>
           </div>
           <div class="stat-item">
             <div class="stat-label">Interest Rate</div>
-            <div class="stat-value">${loan.interestRate}%</div>
+            <div class="stat-value">${interestRate}%</div>
           </div>
           <div class="stat-item">
             <div class="stat-label">EMI Date</div>
@@ -411,6 +425,36 @@ function calculateEMI() {
       const end = new Date(startDate);
       end.setMonth(end.getMonth() + tenure);
       document.getElementById('previewEndDate').textContent = formatDate(end);
+    }
+    
+    // Also calculate outstanding
+    calculateOutstanding();
+  }
+}
+
+// Calculate outstanding amount based on EMIs paid
+function calculateOutstanding() {
+  const principal = parseFloat(document.getElementById('principalAmount').value) || 0;
+  const rate = parseFloat(document.getElementById('interestRate').value) || 0;
+  const tenure = parseInt(document.getElementById('tenure').value) || 0;
+  const emisPaid = parseInt(document.getElementById('emisPaid').value) || 0;
+  const emiAmount = parseFloat(document.getElementById('emiAmount').value) || 0;
+  
+  if (principal > 0 && rate > 0 && emiAmount > 0) {
+    const monthlyRate = rate / 12 / 100;
+    let balance = principal;
+    
+    // Calculate remaining balance after EMIs paid
+    for (let i = 0; i < emisPaid && balance > 0; i++) {
+      const interest = balance * monthlyRate;
+      const principalPaid = emiAmount - interest;
+      balance -= principalPaid;
+    }
+    
+    // Update outstanding field
+    const outstandingField = document.getElementById('outstandingAmount');
+    if (outstandingField) {
+      outstandingField.value = Math.max(0, Math.round(balance));
     }
   }
 }

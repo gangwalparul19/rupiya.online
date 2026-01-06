@@ -210,9 +210,30 @@ class EncryptionService {
       return encryptedValue;
     }
 
+    // Check if value looks like it's encrypted (base64 encoded with minimum length)
+    // Encrypted values should be at least 12 bytes IV + some data
+    if (typeof encryptedValue !== 'string' || encryptedValue.length < 20) {
+      // Value doesn't look encrypted, return as-is
+      console.warn('[Encryption] Value does not appear to be encrypted, returning as-is');
+      return encryptedValue;
+    }
+
     try {
       // Decode from base64
-      const combined = Uint8Array.from(atob(encryptedValue), c => c.charCodeAt(0));
+      let combined;
+      try {
+        combined = Uint8Array.from(atob(encryptedValue), c => c.charCodeAt(0));
+      } catch (base64Error) {
+        // Not valid base64, return original value
+        console.warn('[Encryption] Value is not valid base64, returning as-is');
+        return encryptedValue;
+      }
+      
+      // Check minimum length (12 bytes IV + at least 1 byte data + 16 bytes auth tag)
+      if (combined.length < 29) {
+        console.warn('[Encryption] Encrypted data too short, returning as-is');
+        return encryptedValue;
+      }
       
       // Extract IV and encrypted data
       const iv = combined.slice(0, 12);
@@ -227,10 +248,15 @@ class EncryptionService {
 
       const decryptedString = new TextDecoder().decode(decryptedData);
       
-      // Try to parse as JSON, return as-is if not JSON
+      // Try to parse as JSON first (handles objects, arrays, booleans, numbers)
       try {
         return JSON.parse(decryptedString);
       } catch {
+        // Not valid JSON, check if it's a number
+        if (!isNaN(decryptedString) && decryptedString.trim() !== '') {
+          return parseFloat(decryptedString);
+        }
+        // Return as string
         return decryptedString;
       }
     } catch (error) {
@@ -303,7 +329,7 @@ class EncryptionService {
       return data;
     }
 
-    // If no encrypted data, return as-is
+    // If no encrypted data marker, return as-is (data was never encrypted)
     if (!data || !data._encrypted) {
       return data;
     }
@@ -334,11 +360,22 @@ class EncryptionService {
       // Decrypt each encrypted field
       for (const [field, encryptedValue] of Object.entries(data._encrypted)) {
         try {
-          decryptedData[field] = await this.decryptValue(encryptedValue);
+          const decrypted = await this.decryptValue(encryptedValue);
+          decryptedData[field] = decrypted;
         } catch (fieldError) {
           console.warn(`[Encryption] Failed to decrypt field ${field}:`, fieldError);
-          // Show placeholder if decryption fails
-          decryptedData[field] = '[Decryption Failed]';
+          // If decryption fails, try to use the encrypted value as-is
+          // (it might be unencrypted data that was stored in _encrypted by mistake)
+          if (typeof encryptedValue === 'string' && encryptedValue.length < 100) {
+            // Short string - might be unencrypted, use as-is
+            decryptedData[field] = encryptedValue;
+          } else if (typeof encryptedValue === 'number') {
+            // Number - definitely unencrypted
+            decryptedData[field] = encryptedValue;
+          } else {
+            // Show placeholder if we can't recover
+            decryptedData[field] = '[Decryption Failed]';
+          }
         }
       }
 

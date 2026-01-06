@@ -310,13 +310,14 @@ function renderVehicles() {
     const vehicleFuelLogs = fuelLogs.filter(log => log.vehicleId === vehicle.id);
     const mileageStats = calculateVehicleMileage(vehicleFuelLogs);
 
-    // Escape user-provided data
-    const escapedName = escapeHtml(vehicle.name);
-    const escapedType = escapeHtml(vehicle.type);
+    // Escape user-provided data (handle undefined/null values from decryption failures)
+    const vehicleName = vehicle.name || 'Unnamed Vehicle';
+    const escapedName = escapeHtml(vehicleName);
+    const escapedType = escapeHtml(vehicle.type || 'Unknown');
     const escapedRegNumber = vehicle.registrationNumber ? escapeHtml(vehicle.registrationNumber) : '';
     const escapedNotes = vehicle.notes ? escapeHtml(vehicle.notes) : '';
     // Escape name for use in onclick handlers
-    const safeNameForJs = vehicle.name.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"');
+    const safeNameForJs = vehicleName.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"');
 
     return `
       <div class="vehicle-card">

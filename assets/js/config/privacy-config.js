@@ -43,6 +43,7 @@ export const privacyConfig = {
     'income',
     'budgets',
     'investments',
+    'investmentPriceHistory',
     'goals',
     'loans',
     'houses',
@@ -55,7 +56,10 @@ export const privacyConfig = {
     'fuelLogs',
     'splits',
     'categories',
-    'wallets'
+    'wallets',
+    'paymentMethods',
+    'tripGroupExpenses',
+    'tripGroupSettlements'
   ],
   
   // Collections that should NOT be encrypted
@@ -66,9 +70,7 @@ export const privacyConfig = {
     'familyGroups',       // Family group metadata
     'familyInvitations',  // Invitation data
     'tripGroups',         // Trip group metadata
-    'tripGroupMembers',   // Member info
-    'tripGroupExpenses',  // Will be encrypted separately
-    'tripGroupSettlements' // Settlement records
+    'tripGroupMembers'    // Member info
   ],
   
   // Sensitive fields that MUST be encrypted in each collection
@@ -77,6 +79,7 @@ export const privacyConfig = {
     income: ['amount', 'description', 'source', 'paymentMethod', 'notes'],
     budgets: ['amount', 'notes', 'spent'],
     investments: ['name', 'quantity', 'purchasePrice', 'currentPrice', 'notes', 'symbol', 'broker', 'accountNumber'],
+    investmentPriceHistory: ['price', 'quantity', 'totalValue', 'notes'],
     goals: ['name', 'targetAmount', 'currentAmount', 'description', 'notes'],
     loans: ['name', 'lender', 'accountNumber', 'principalAmount', 'emiAmount', 'outstandingAmount', 'interestRate', 'notes'],
     houses: ['name', 'address', 'purchasePrice', 'currentValue', 'notes', 'rentAmount'],
@@ -89,7 +92,26 @@ export const privacyConfig = {
     fuelLogs: ['fuelPrice', 'totalCost', 'fuelStation', 'notes', 'odometer', 'quantity'],
     splits: ['amount', 'description', 'notes'],
     categories: ['name', 'description'],
-    wallets: ['name', 'balance', 'notes']
+    wallets: ['name', 'balance', 'notes'],
+    paymentMethods: [
+      'name',
+      'cardNumber',
+      'cardLast4',
+      'cardHolderName',
+      'expiryMonth',
+      'expiryYear',
+      'cvv',
+      'bankName',
+      'bankAccountNumber',
+      'bankAccountHolderName',
+      'ifscCode',
+      'branchName',
+      'upiId',
+      'walletId',
+      'notes'
+    ],
+    tripGroupExpenses: ['amount', 'description', 'notes', 'splits'],
+    tripGroupSettlements: ['amount', 'notes']
   }
 };
 

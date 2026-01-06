@@ -1,10 +1,22 @@
 // Split Service - Manage split expenses in Firestore
 import { db, auth } from '../config/firebase-config.js';
 import { collection, addDoc, updateDoc, deleteDoc, doc, getDocs, query, where, orderBy, Timestamp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+import firestoreService from './firestore-service.js';
 
 class SplitService {
   constructor() {
     this.collectionName = 'splits';
+  }
+
+  // Invalidate related caches when splits change
+  invalidateSplitCaches() {
+    try {
+      // Invalidate splits cache and monthly summary cache (since splits affect KPIs)
+      firestoreService.invalidateCache('splits');
+      firestoreService.invalidateCache('monthlySummary');
+    } catch (error) {
+      console.warn('Could not invalidate cache:', error);
+    }
   }
 
   async addSplit(splitData) {
@@ -18,6 +30,9 @@ class SplitService {
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now()
       });
+
+      // Invalidate caches so dashboard reflects new split
+      this.invalidateSplitCaches();
 
       return { success: true, id: docRef.id };
     } catch (error) {
@@ -58,6 +73,9 @@ class SplitService {
         updatedAt: Timestamp.now()
       });
 
+      // Invalidate caches so dashboard reflects updated split
+      this.invalidateSplitCaches();
+
       return { success: true };
     } catch (error) {
       console.error('Error updating split:', error);
@@ -75,6 +93,9 @@ class SplitService {
         updatedAt: Timestamp.now()
       });
 
+      // Invalidate caches so dashboard reflects settled split (affects income)
+      this.invalidateSplitCaches();
+
       return { success: true };
     } catch (error) {
       console.error('Error settling split:', error);
@@ -85,6 +106,10 @@ class SplitService {
   async deleteSplit(id) {
     try {
       await deleteDoc(doc(db, this.collectionName, id));
+      
+      // Invalidate caches so dashboard reflects deleted split
+      this.invalidateSplitCaches();
+      
       return { success: true };
     } catch (error) {
       console.error('Error deleting split:', error);
