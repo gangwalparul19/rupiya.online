@@ -1,4 +1,4 @@
-const nodemailer = require('nodemailer');
+import nodemailer from 'nodemailer';
 
 // Simple in-memory rate limiting (resets on server restart)
 const rateLimitMap = new Map();
@@ -51,7 +51,7 @@ function isValidEmail(email) {
   return re.test(email);
 }
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');

@@ -562,11 +562,22 @@ class FamilyService {
         })
       });
 
-      const result = await response.json();
+      // Check if response is JSON
+      const contentType = response.headers.get('content-type');
+      let result;
+      
+      if (contentType && contentType.includes('application/json')) {
+        result = await response.json();
+      } else {
+        // Server returned HTML or other non-JSON content (likely an error page)
+        const text = await response.text();
+        console.error('Server returned non-JSON response:', text.substring(0, 200));
+        result = { error: 'Server error: Email service is not configured properly' };
+      }
       
       if (!response.ok) {
         console.error('Failed to send invitation email:', result.error);
-        return { success: false, error: result.error };
+        return { success: false, error: result.error || 'Failed to send invitation email' };
       }
 
       console.log('Invitation email sent successfully');

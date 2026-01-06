@@ -290,7 +290,11 @@ See sample portfolio: rupiya.online/demo.html
 ```
 Hey! 👋
 
-Remember I told you about that finance app I built?
+I created a finance app that you can utilize to track your expenses, income, recurring expenses, house expense, vechile expense, mileage, house-help?
+You can also group Family members to track Expenses as a Family.
+Planning for Trip manage expense in Rupiya.online
+
+Also, use this app to store you documents, notes and many more features.
 
 Good news - you can now TRY IT without signing up! 🎉
 
