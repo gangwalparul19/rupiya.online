@@ -31,7 +31,7 @@ async function init() {
   if (!isAuthenticated) return;
   
   // Check if encryption reauth is needed
-  encryptionReauthModal.checkAndPrompt(async () => {
+  await encryptionReauthModal.checkAndPrompt(async () => {
     await loadGoals();
   });
   

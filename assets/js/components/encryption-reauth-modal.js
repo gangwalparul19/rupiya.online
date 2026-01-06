@@ -216,15 +216,20 @@ class EncryptionReauthModal {
   }
 
   // Check if reauth is needed and show modal
-  checkAndPrompt(onSuccess = null) {
+  async checkAndPrompt(onSuccess = null) {
     const user = authService.getCurrentUser();
     if (!user) return false;
 
     // Check if encryption is needed but not initialized
-    if (authEncryptionHelper.needsReinitialization()) {
+    const needsReinit = await authEncryptionHelper.needsReinitialization();
+    if (needsReinit) {
       // Don't prompt for Google users
       if (authEncryptionHelper.isGoogleUser()) {
         console.log('[EncryptionReauth] Google user - encryption not available');
+        // Still call onSuccess for Google users so data loads
+        if (onSuccess) {
+          onSuccess();
+        }
         return false;
       }
 
@@ -232,6 +237,10 @@ class EncryptionReauthModal {
       return true;
     }
 
+    // Encryption is ready, call onSuccess
+    if (onSuccess) {
+      onSuccess();
+    }
     return false;
   }
 }

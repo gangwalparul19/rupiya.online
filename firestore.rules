@@ -424,11 +424,23 @@ service cloud.firestore {
       allow delete: if isAuthenticated();
     }
 
-        // ============================================
+    // ============================================
     // CATEGORIZATION PATTERNS (Smart Categorization)
     // ============================================
     match /categorizationPatterns/{userId} {
       // Categorization patterns document ID is the userId itself
+      // Users can only access their own categorization patterns
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId);
+    }
+    
+    // ============================================
+    // USER CATEGORIZATION PATTERNS (Smart Categorization - Alternative)
+    // ============================================
+    match /userCategorizationPatterns/{userId} {
+      // User categorization patterns document ID is the userId itself
       // Users can only access their own categorization patterns
       allow read: if isOwner(userId);
       allow create: if isOwner(userId);

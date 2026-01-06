@@ -32,7 +32,7 @@ async function init() {
   }
 
   // Check if encryption reauth is needed
-  encryptionReauthModal.checkAndPrompt(async () => {
+  await encryptionReauthModal.checkAndPrompt(async () => {
     await loadHouses();
   });
 

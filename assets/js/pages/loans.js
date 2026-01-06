@@ -48,7 +48,7 @@ async function init() {
   const isAuthenticated = await checkAuth();
   if (isAuthenticated) {
     // Check if encryption reauth is needed
-    encryptionReauthModal.checkAndPrompt(async () => {
+    await encryptionReauthModal.checkAndPrompt(async () => {
       await loadLoans();
     });
     

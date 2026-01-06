@@ -46,9 +46,12 @@ class AuthEncryptionHelper {
   }
 
   // Check if encryption needs re-initialization (after page refresh)
-  needsReinitialization() {
+  async needsReinitialization() {
     const user = authService.getCurrentUser();
     if (!user) return false;
+    
+    // Wait for session restoration to complete
+    await encryptionService.waitForRestore();
     
     // If user is logged in but encryption is not ready
     return !encryptionService.isReady();

@@ -50,7 +50,7 @@ async function init() {
   setupSecuritySection();
   
   // Check if encryption reauth is needed
-  encryptionReauthModal.checkAndPrompt(async () => {
+  await encryptionReauthModal.checkAndPrompt(async () => {
     await loadUserPreferences();
     await loadCategories();
   });

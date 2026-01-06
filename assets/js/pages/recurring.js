@@ -63,7 +63,7 @@ async function init() {
   await loadUserPaymentMethods();
 
   // Check if encryption reauth is needed
-  encryptionReauthModal.checkAndPrompt(async () => {
+  await encryptionReauthModal.checkAndPrompt(async () => {
     await loadRecurringTransactions();
   });
 

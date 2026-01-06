@@ -54,7 +54,7 @@ async function init() {
   const isAuthenticated = await checkAuth();
   if (isAuthenticated) {
     // Check if encryption reauth is needed (after page refresh)
-    const needsReauth = encryptionReauthModal.checkAndPrompt(async () => {
+    const needsReauth = await encryptionReauthModal.checkAndPrompt(async () => {
       // On successful reauth, reload dashboard data
       await loadDashboardData();
     });
