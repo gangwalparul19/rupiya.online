@@ -998,22 +998,23 @@
   }
 
   .portfolio-summary {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.5rem;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
   }
   
   .summary-card {
     padding: 0.75rem;
-    flex-direction: column;
-    text-align: center;
-    gap: 0.5rem;
-    min-height: 100px;
+    flex-direction: row;
+    text-align: left;
+    gap: 0.75rem;
+    min-height: auto;
   }
   
   .summary-icon {
     width: 40px;
     height: 40px;
     font-size: 1.5rem;
+    flex-shrink: 0;
   }
   
   .summary-label {
@@ -1021,7 +1022,11 @@
   }
   
   .summary-value {
-    font-size: 1rem;
+    font-size: 0.95rem;
+  }
+  
+  .summary-change {
+    font-size: 0.75rem;
   }
 
   .add-investment-section {
@@ -1067,7 +1072,7 @@
   }
 
   .investments-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 0.75rem;
   }
 
@@ -1383,12 +1388,15 @@
   }
 
   .portfolio-summary {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.4rem;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
   }
   
   .summary-card {
     padding: 0.5rem;
+    flex-direction: row;
+    text-align: left;
+    gap: 0.5rem;
   }
   
   .summary-icon {
@@ -1396,6 +1404,7 @@
     height: 32px;
     font-size: 1.25rem;
     border-radius: 8px;
+    flex-shrink: 0;
   }
   
   .summary-label {
@@ -1403,7 +1412,11 @@
   }
   
   .summary-value {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
+  }
+  
+  .summary-change {
+    font-size: 0.65rem;
   }
 
   .form-grid {
@@ -1427,7 +1440,7 @@
   }
 
   .investments-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 0.5rem;
   }
 

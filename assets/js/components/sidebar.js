@@ -108,7 +108,15 @@ const navigationConfig = {
         { href: 'documents.html', icon: '📄', label: 'Documents' },
         { href: 'analytics.html', icon: '📉', label: 'Analytics' },
         { href: 'feedback.html', icon: '💬', label: 'Feedback' },
-        { href: 'profile.html', icon: '⚙️', label: 'Settings' },
+        { href: 'profile.html', icon: '⚙️', label: 'Settings' }
+      ]
+    },
+    {
+      id: 'help',
+      title: 'Help',
+      icon: '📖',
+      expanded: false,
+      items: [
         { href: 'user-guide.html', icon: '📖', label: 'User Guide' }
       ]
     },
