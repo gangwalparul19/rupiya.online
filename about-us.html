@@ -22,12 +22,41 @@
   <link rel="stylesheet" href="assets/css/components.css">
   <link rel="stylesheet" href="assets/css/dark-mode.css">
   <link rel="stylesheet" href="assets/css/legal-pages.css">
-
-  <!-- Auth Guard -->
-  <script src="assets/js/utils/auth-guard.js"></script>
+  <link rel="stylesheet" href="assets/css/landing.css">
+  <link rel="stylesheet" href="assets/css/animations.css">
+  <link rel="stylesheet" href="assets/css/mobile-enhancements.css">
 </head>
 
 <body>
+  <!-- Navigation -->
+  <nav class="landing-nav" id="landingNav">
+    <div class="container">
+      <div class="nav-content">
+        <a href="index.html" class="landing-logo">
+          <img src="assets/images/logo.png" alt="Rupiya Logo">
+        </a>
+        <div class="landing-nav-links">
+          <a href="user-guide.html" class="btn btn-sm btn-nav-signin">User Guide</a>
+          <a href="login.html" class="btn btn-sm btn-nav-signin">Sign In</a>
+          <a href="signup.html" class="btn btn-sm btn-primary">Sign Up</a>
+        </div>
+        <button class="mobile-menu-toggle" id="mobileMenuToggle">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <div class="mobile-menu-content">
+      <a href="login.html" class="btn btn-nav-signin w-100">Sign In</a>
+      <a href="signup.html" class="btn btn-primary w-100">Sign Up</a>
+    </div>
+  </div>
+
   <div class="legal-page-container">
     <div class="legal-page-content">
       <h1>About Rupiya</h1>
@@ -192,6 +221,40 @@
       </section>
     </div>
   </div>
+
+  <!-- Footer -->
+  <footer class="landing-footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="about-us.html">About Us</a></li>
+            <li><a href="contact-us.html">Contact Us</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="privacy-policy.html">Privacy Policy</a></li>
+            <li><a href="terms-of-service.html">Terms of Service</a></li>
+            <li><a href="disclaimer.html">Disclaimer</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h4>Security</h4>
+          <ul>
+            <li><a href="data-protection.html">Data Protection</a></li>
+          </ul>
+        </div>
+      </div>
+              
+      <div class="footer-bottom">
+        <p class="footer-copyright">© 2026 Rupiya. Built with ❤️ for modern professionals.</p>
+        <p class="footer-disclaimer">Rupiya is a financial management tool only. We do not provide investment advice or tips. Always consult with qualified financial professionals.</p>
+      </div>
+    </div>
+  </footer>
 
   <script src="assets/js/pwa-setup.js"></script>
 </body>
