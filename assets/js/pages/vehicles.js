@@ -199,14 +199,10 @@ function showEditForm(vehicle) {
 
   document.getElementById('name').value = vehicle.name;
   document.getElementById('type').value = vehicle.type;
-  document.getElementById('make').value = vehicle.make || '';
-  document.getElementById('model').value = vehicle.model || '';
-  document.getElementById('year').value = vehicle.year || '';
   document.getElementById('registrationNumber').value = vehicle.registrationNumber || '';
   document.getElementById('currentMileage').value = vehicle.currentMileage || 0;
   document.getElementById('fuelType').value = vehicle.fuelType || '';
   document.getElementById('insuranceExpiry').value = vehicle.insuranceExpiry ? formatDateForInput(vehicle.insuranceExpiry) : '';
-  document.getElementById('color').value = vehicle.color || '';
   document.getElementById('notes').value = vehicle.notes || '';
 
   addVehicleSection.classList.add('show');
@@ -219,14 +215,10 @@ async function handleSubmit(e) {
   const formData = {
     name: document.getElementById('name').value.trim(),
     type: document.getElementById('type').value,
-    make: document.getElementById('make').value.trim() || '',
-    model: document.getElementById('model').value.trim() || '',
-    year: document.getElementById('year').value ? parseInt(document.getElementById('year').value) : null,
     registrationNumber: document.getElementById('registrationNumber').value.trim(),
     currentMileage: parseFloat(document.getElementById('currentMileage').value) || 0,
     fuelType: document.getElementById('fuelType').value,
     insuranceExpiry: document.getElementById('insuranceExpiry').value ? timezoneService.parseInputDate(document.getElementById('insuranceExpiry').value) : null,
-    color: document.getElementById('color').value.trim() || '',
     notes: document.getElementById('notes').value.trim()
   };
 
@@ -315,10 +307,7 @@ function renderVehicles() {
     // Escape user-provided data
     const escapedName = escapeHtml(vehicle.name);
     const escapedType = escapeHtml(vehicle.type);
-    const escapedMake = vehicle.make ? escapeHtml(vehicle.make) : '';
-    const escapedModel = vehicle.model ? escapeHtml(vehicle.model) : '';
     const escapedRegNumber = vehicle.registrationNumber ? escapeHtml(vehicle.registrationNumber) : '';
-    const escapedColor = vehicle.color ? escapeHtml(vehicle.color) : '';
     const escapedNotes = vehicle.notes ? escapeHtml(vehicle.notes) : '';
     // Escape name for use in onclick handlers
     const safeNameForJs = vehicle.name.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"');
@@ -329,15 +318,7 @@ function renderVehicles() {
           <div class="vehicle-info">
             <div class="vehicle-name">${escapedName}</div>
             <span class="vehicle-type">${escapedType}</span>
-            ${(() => {
-              const detailsParts = [];
-              if (escapedMake) detailsParts.push(escapedMake);
-              if (escapedModel) detailsParts.push(escapedModel);
-              if (vehicle.year) detailsParts.push(`(${vehicle.year})`);
-              return detailsParts.length > 0 ? `<div class="vehicle-details">${detailsParts.join(' ')}</div>` : '';
-            })()}
             ${escapedRegNumber ? `<div class="vehicle-details">Reg: ${escapedRegNumber}</div>` : ''}
-            ${escapedColor ? `<div class="vehicle-details">Color: ${escapedColor}</div>` : ''}
             ${insuranceStatus}
           </div>
           <div class="vehicle-actions">
@@ -918,11 +899,7 @@ function showDeleteConfirmation(id) {
 
   deleteVehicleId = id;
   deleteVehicleName.textContent = vehicle.name;
-  const detailsParts = [];
-  if (vehicle.make) detailsParts.push(vehicle.make);
-  if (vehicle.model) detailsParts.push(vehicle.model);
-  if (vehicle.year) detailsParts.push(`(${vehicle.year})`);
-  deleteVehicleDetails.textContent = detailsParts.length > 0 ? detailsParts.join(' ') : vehicle.type;
+  deleteVehicleDetails.textContent = vehicle.type;
   deleteModal.classList.add('show');
 }
 

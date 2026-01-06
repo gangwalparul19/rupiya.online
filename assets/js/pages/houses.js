@@ -165,7 +165,6 @@ function showEditForm(house) {
   document.getElementById('name').value = house.name;
   document.getElementById('type').value = house.type;
   document.getElementById('address').value = house.address;
-  document.getElementById('area').value = house.area || '';
   document.getElementById('ownership').value = house.ownership || 'Owned';
   document.getElementById('notes').value = house.notes || '';
 
@@ -182,7 +181,6 @@ async function handleSubmit(e) {
     name: document.getElementById('name').value.trim(),
     type: document.getElementById('type').value,
     address: document.getElementById('address').value.trim(),
-    area: parseFloat(document.getElementById('area').value) || 0,
     ownership: document.getElementById('ownership').value,
     notes: document.getElementById('notes').value.trim()
   };
@@ -286,15 +284,6 @@ function renderHouses() {
               </svg>
             </button>
           </div>
-        </div>
-
-        <div class="house-card-body">
-          ${house.area ? `
-            <div class="house-stat">
-              <div class="house-stat-label">Area</div>
-              <div class="house-stat-value">${house.area.toLocaleString()} sq ft</div>
-            </div>
-          ` : ''}
         </div>
 
         <div class="house-card-actions">
