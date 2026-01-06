@@ -351,7 +351,7 @@
 /* Members Grid */
 .members-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1rem;
   margin-bottom: 1rem;
 }
@@ -363,13 +363,19 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   border: 1px solid var(--border-color, #e5e7eb);
   display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.member-card-header {
+  display: flex;
   align-items: center;
   gap: 0.75rem;
 }
 
 .member-card .member-avatar {
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   background: var(--primary-color, #4A90E2);
   color: #fff;
@@ -377,25 +383,77 @@
   align-items: center;
   justify-content: center;
   font-weight: 600;
+  font-size: 1.25rem;
+  flex-shrink: 0;
 }
 
 .member-card .member-info {
   flex: 1;
+  min-width: 0;
 }
 
 .member-card .member-name {
-  font-weight: 500;
+  font-weight: 600;
   color: var(--text-primary, #1f2937);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.member-crown {
+  font-size: 1.125rem;
+  display: inline-block;
+  animation: crownShine 2s ease-in-out infinite;
+}
+
+@keyframes crownShine {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
 }
 
 .member-card .member-role {
   font-size: 0.75rem;
   color: var(--text-secondary, #6b7280);
+  margin-top: 0.125rem;
 }
 
-.member-card .member-balance {
+.member-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-color, #e5e7eb);
+}
+
+.member-kpi {
+  text-align: center;
+}
+
+.member-kpi-label {
+  font-size: 0.6875rem;
+  color: var(--text-secondary, #6b7280);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.25rem;
+}
+
+.member-kpi-value {
   font-weight: 600;
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
+  color: var(--text-primary, #1f2937);
+}
+
+.member-kpi-value.positive {
+  color: #16a34a;
+}
+
+.member-kpi-value.negative {
+  color: #dc2626;
+}
+
+.member-kpi-value.settled {
+  color: var(--text-secondary, #6b7280);
 }
 
 /* Split Section in Modal */
@@ -493,8 +551,36 @@
     grid-template-columns: repeat(2, 1fr);
   }
 
+  /* Members Grid - 2 per row on mobile */
   .members-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .member-card {
+    padding: 0.75rem;
+  }
+
+  .member-card .member-avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+
+  .member-card .member-name {
+    font-size: 0.875rem;
+  }
+
+  .member-kpi-grid {
+    gap: 0.5rem;
+  }
+
+  .member-kpi-label {
+    font-size: 0.625rem;
+  }
+
+  .member-kpi-value {
+    font-size: 0.875rem;
   }
 
   .expenses-filters {
@@ -523,6 +609,40 @@
 
   .split-type-option {
     justify-content: center;
+  }
+
+  /* Form Grid - 2 columns on mobile for better space usage */
+  .form-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .form-group {
+    margin-bottom: 0;
+  }
+
+  .form-group label {
+    font-size: 0.8125rem;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: 0.625rem 0.75rem;
+    font-size: 0.875rem;
+  }
+
+  .create-group-section {
+    padding: 1rem;
+  }
+
+  .create-group-footer {
+    flex-direction: row;
+    gap: 0.5rem;
+  }
+
+  .create-group-footer .btn {
+    flex: 1;
   }
 }
 
@@ -669,7 +789,7 @@
 /* Mobile Responsive */
 @media (max-width: 768px) {
   .analytics-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .trip-stats {
@@ -1030,17 +1150,34 @@
     padding: 1rem;
   }
 
+  /* Form Grid - 2 columns on mobile */
   .form-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .form-group {
+    margin-bottom: 0;
+  }
+
+  .form-group label {
+    font-size: 0.8125rem;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: 0.625rem 0.75rem;
+    font-size: 0.875rem;
   }
 
   .create-group-footer {
-    flex-direction: column;
+    flex-direction: row;
     gap: 0.5rem;
   }
 
   .create-group-footer .btn {
-    width: 100%;
+    flex: 1;
   }
 
   .split-type-selector {

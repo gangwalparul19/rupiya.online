@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Insights Mobile Enhancement Test</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #2C3E50;
+    }
+
+    .comparison {
+      display: grid;
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .section {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: #2C3E50;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .badge {
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-weight: 600;
+    }
+
+    .badge-old {
+      background: #ffebee;
+      color: #c62828;
+    }
+
+    .badge-new {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    /* Old Style */
+    .old-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .old-list li {
+      padding: 8px 0 8px 24px;
+      position: relative;
+      font-size: 14px;
+      color: #2C3E50;
+    }
+
+    .old-list li::before {
+      content: "→";
+      position: absolute;
+      left: 0;
+      color: #4A90E2;
+      font-weight: 600;
+    }
+
+    /* New Style */
+    .top-categories-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .category-card {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 12px 8px;
+      text-align: center;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+      cursor: pointer;
+    }
+
+    .category-card:hover {
+      border-color: #4A90E2;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(74, 144, 226, 0.15);
+    }
+
+    .category-card-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      margin: 0 auto 8px;
+    }
+
+    .category-card-name {
+      font-size: 11px;
+      font-weight: 600;
+      color: #2C3E50;
+      margin-bottom: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .category-card-amount {
+      font-size: 13px;
+      font-weight: 700;
+      color: #4A90E2;
+    }
+
+    .benefits {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 16px;
+      padding: 24px;
+      margin-top: 20px;
+    }
+
+    .benefits h2 {
+      font-size: 20px;
+      margin-bottom: 16px;
+    }
+
+    .benefits ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .benefits li {
+      padding: 8px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .benefits li::before {
+      content: "✓";
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    @media (max-width: 480px) {
+      .top-categories-grid {
+        gap: 6px;
+      }
+
+      .category-card {
+        padding: 10px 6px;
+      }
+
+      .category-card-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 16px;
+      }
+
+      .category-card-name {
+        font-size: 10px;
+      }
+
+      .category-card-amount {
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎨 AI Insights Mobile Enhancement</h1>
+
+    <div class="comparison">
+      <!-- Old Style -->
+      <div class="section">
+        <div class="section-title">
+          <span>🏷️ Top Spending Categories</span>
+          <span class="badge badge-old">OLD</span>
+        </div>
+        <ul class="old-list">
+          <li><strong>Food:</strong> ₹5,000</li>
+          <li><strong>Transport:</strong> ₹3,000</li>
+          <li><strong>Shopping:</strong> ₹2,500</li>
+        </ul>
+      </div>
+
+      <!-- New Style -->
+      <div class="section">
+        <div class="section-title">
+          <span>🏷️ Top Spending Categories</span>
+          <span class="badge badge-new">NEW</span>
+        </div>
+        <div class="top-categories-grid">
+          <div class="category-card">
+            <div class="category-card-icon" style="background: rgba(74, 144, 226, 0.2); color: #4A90E2;">
+              🍔
+            </div>
+            <div class="category-card-name">Food</div>
+            <div class="category-card-amount">₹5,000</div>
+          </div>
+          <div class="category-card">
+            <div class="category-card-icon" style="background: rgba(231, 76, 60, 0.2); color: #E74C3C;">
+              🚗
+            </div>
+            <div class="category-card-name">Transport</div>
+            <div class="category-card-amount">₹3,000</div>
+          </div>
+          <div class="category-card">
+            <div class="category-card-icon" style="background: rgba(243, 156, 18, 0.2); color: #F39C12;">
+              🛍️
+            </div>
+            <div class="category-card-name">Shopping</div>
+            <div class="category-card-amount">₹2,500</div>
+          </div>
+          <div class="category-card">
+            <div class="category-card-icon" style="background: rgba(39, 174, 96, 0.2); color: #27AE60;">
+              🎬
+            </div>
+            <div class="category-card-name">Entertainment</div>
+            <div class="category-card-amount">₹1,800</div>
+          </div>
+          <div class="category-card">
+            <div class="category-card-icon" style="background: rgba(155, 89, 182, 0.2); color: #9B59B6;">
+              💡
+            </div>
+            <div class="category-card-name">Utilities</div>
+            <div class="category-card-amount">₹1,200</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="benefits">
+      <h2>✨ Key Improvements</h2>
+      <ul>
+        <li>Visual cards with colorful icons</li>
+        <li>3 cards per row for optimal mobile viewing</li>
+        <li>Better space utilization</li>
+        <li>Interactive hover effects</li>
+        <li>Modern, engaging design</li>
+        <li>Consistent with app design language</li>
+      </ul>
+    </div>
+
+    <div class="section" style="margin-top: 20px; text-align: center;">
+      <p style="color: #666; font-size: 14px;">
+        📱 Resize your browser window to see the responsive behavior!
+      </p>
+    </div>
+  </div>
+</body>
+</html>

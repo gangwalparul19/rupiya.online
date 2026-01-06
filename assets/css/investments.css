@@ -1571,12 +1571,16 @@
   }
 
   .analytics-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
     gap: 0.5rem;
   }
 
   .analytics-card {
     padding: 0.625rem;
+  }
+  
+  .analytics-card-full {
+    grid-column: 1 / -1;
   }
 
   .analytics-label {
@@ -2148,6 +2152,10 @@
 @media (max-width: 768px) {
   .analytics-card-wide {
     grid-column: span 1;
+  }
+  
+  .analytics-card-full {
+    grid-column: 1 / -1;
   }
   
   .performance-metrics {

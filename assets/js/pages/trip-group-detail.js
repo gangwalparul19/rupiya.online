@@ -2,48 +2,6 @@
 import tripGroupsService from '../services/trip-groups-service.js';
 import authService from '../services/auth-service.js';
 
-// Debug panel setup
-const debugLogs = [];
-const originalLog = console.log;
-const originalError = console.error;
-const originalWarn = console.warn;
-
-console.log = function (...args) {
-  originalLog.apply(console, args);
-  debugLogs.push({ type: 'log', message: args.join(' '), time: new Date().toLocaleTimeString() });
-  updateDebugPanel();
-};
-
-console.error = function (...args) {
-  originalError.apply(console, args);
-  debugLogs.push({ type: 'error', message: args.join(' '), time: new Date().toLocaleTimeString() });
-  updateDebugPanel();
-};
-
-console.warn = function (...args) {
-  originalWarn.apply(console, args);
-  debugLogs.push({ type: 'warn', message: args.join(' '), time: new Date().toLocaleTimeString() });
-  updateDebugPanel();
-};
-
-function updateDebugPanel() {
-  const panel = document.getElementById('debugPanel');
-  if (!panel) return;
-
-  const logsList = panel.querySelector('.debug-logs');
-  if (!logsList) return;
-
-  logsList.innerHTML = debugLogs.slice(-20).map(log => `
-    <div class="debug-log ${log.type}">
-      <span class="debug-time">${log.time}</span>
-      <span class="debug-type">${log.type.toUpperCase()}</span>
-      <span class="debug-message">${log.message}</span>
-    </div>
-  `).join('');
-
-  logsList.scrollTop = logsList.scrollHeight;
-}
-
 class TripGroupDetailPage {
   constructor() {
     this.groupId = null;
@@ -59,9 +17,6 @@ class TripGroupDetailPage {
   }
 
   async init() {
-    // Create debug panel
-    this.createDebugPanel();
-
     console.log('Initializing Trip Group Detail Page');
 
     // Get group ID from URL
@@ -84,43 +39,6 @@ class TripGroupDetailPage {
 
     this.bindEvents();
     await this.loadGroupData();
-  }
-
-  createDebugPanel() {
-    const panel = document.createElement('div');
-    panel.id = 'debugPanel';
-    panel.style.cssText = `
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      width: 400px;
-      max-height: 300px;
-      background: #1a1a1a;
-      border: 2px solid #4A90E2;
-      border-radius: 8px;
-      padding: 10px;
-      font-family: monospace;
-      font-size: 11px;
-      color: #fff;
-      z-index: 10000;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    `;
-
-    panel.innerHTML = `
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid #4A90E2; padding-bottom: 5px;">
-        <strong>Debug Logs</strong>
-        <button onclick="this.parentElement.parentElement.style.display='none'" style="background: none; border: none; color: #fff; cursor: pointer; font-size: 16px;">×</button>
-      </div>
-      <div class="debug-logs" style="
-        max-height: 250px;
-        overflow-y: auto;
-        background: #0a0a0a;
-        border-radius: 4px;
-        padding: 8px;
-      "></div>
-    `;
-
-    document.body.appendChild(panel);
   }
 
   async waitForAuth() {
@@ -428,19 +346,39 @@ class TripGroupDetailPage {
       const balanceClass = balance > 0.01 ? 'positive' : balance < -0.01 ? 'negative' : 'settled';
       const isCurrentUser = member.userId === this.currentUserId;
 
+      // Calculate member stats
+      const memberExpenses = this.expenses.filter(e => e.paidBy === member.id);
+      const totalPaid = memberExpenses.reduce((sum, e) => sum + e.amount, 0);
+      const expenseCount = memberExpenses.length;
+
       return `
         <div class="member-card">
-          <div class="member-avatar">${member.name.charAt(0).toUpperCase()}</div>
-          <div class="member-info">
-            <div class="member-name">
-              ${this.escapeHtml(member.name)}
-              ${member.isAdmin ? '<span class="member-badge">Admin</span>' : ''}
-              ${isCurrentUser ? '<span class="member-badge">You</span>' : ''}
+          <div class="member-card-header">
+            <div class="member-avatar">${member.name.charAt(0).toUpperCase()}</div>
+            <div class="member-info">
+              <div class="member-name">
+                ${this.escapeHtml(member.name)}
+                ${member.isAdmin ? '<span class="member-crown" title="Admin">👑</span>' : ''}
+                ${isCurrentUser ? '<span class="member-badge">You</span>' : ''}
+              </div>
+              <div class="member-role">${member.email || member.phone || 'No contact'}</div>
             </div>
-            <div class="member-role">${member.email || member.phone || 'No contact'}</div>
           </div>
-          <div class="member-balance ${balanceClass}">
-            ${balance > 0.01 ? '+' : ''}₹${Math.abs(balance).toLocaleString('en-IN')}
+          <div class="member-kpi-grid">
+            <div class="member-kpi">
+              <div class="member-kpi-label">Balance</div>
+              <div class="member-kpi-value ${balanceClass}">
+                ${balance > 0.01 ? '+' : ''}₹${Math.abs(balance).toLocaleString('en-IN')}
+              </div>
+            </div>
+            <div class="member-kpi">
+              <div class="member-kpi-label">Paid</div>
+              <div class="member-kpi-value">₹${totalPaid.toLocaleString('en-IN')}</div>
+            </div>
+            <div class="member-kpi">
+              <div class="member-kpi-label">Expenses</div>
+              <div class="member-kpi-value">${expenseCount}</div>
+            </div>
           </div>
         </div>
       `;

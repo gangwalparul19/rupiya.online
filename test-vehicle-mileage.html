@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Vehicle Mileage</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+    }
+    .test-section {
+      background: #f5f5f5;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 8px;
+    }
+    .result {
+      background: white;
+      padding: 15px;
+      margin: 10px 0;
+      border-left: 4px solid #4A90E2;
+    }
+    .error {
+      border-left-color: #E74C3C;
+      background: #fff5f5;
+    }
+    .success {
+      border-left-color: #27AE60;
+      background: #f0fff4;
+    }
+    button {
+      background: #4A90E2;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 5px;
+    }
+    button:hover {
+      background: #357ABD;
+    }
+    pre {
+      background: #2C3E50;
+      color: #ECF0F1;
+      padding: 15px;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>🚗 Vehicle Mileage Debugging Tool</h1>
+  
+  <div class="test-section">
+    <h2>Test Mileage Calculation</h2>
+    <p>This tool tests the mileage calculation logic with sample data.</p>
+    <button onclick="testMileageCalculation()">Run Test</button>
+    <button onclick="checkFirestoreData()">Check Firestore Data</button>
+    <div id="testResults"></div>
+  </div>
+
+  <div class="test-section">
+    <h2>Console Logs</h2>
+    <p>Open browser console (F12) to see detailed logs</p>
+  </div>
+
+  <script type="module">
+    import firestoreService from './assets/js/services/firestore-service.js';
+    
+    // Make functions available globally
+    window.firestoreService = firestoreService;
+    
+    window.testMileageCalculation = function() {
+      const resultsDiv = document.getElementById('testResults');
+      resultsDiv.innerHTML = '<p>Running tests...</p>';
+      
+      // Test data
+      const testLogs = [
+        { id: '1', vehicleId: 'test-vehicle', odometerReading: 1000, fuelQuantity: 40, fuelPrice: 100, totalCost: 4000 },
+        { id: '2', vehicleId: 'test-vehicle', odometerReading: 1500, fuelQuantity: 50, fuelPrice: 100, totalCost: 5000 },
+        { id: '3', vehicleId: 'test-vehicle', odometerReading: 2100, fuelQuantity: 60, fuelPrice: 100, totalCost: 6000 }
+      ];
+      
+      console.log('Test logs:', testLogs);
+      
+      // Calculate mileage
+      const stats = calculateVehicleMileage(testLogs);
+      
+      const expectedDistance = (1500 - 1000) + (2100 - 1500); // 500 + 600 = 1100 km
+      const expectedFuel = 50 + 60; // 110 L
+      const expectedMileage = expectedDistance / expectedFuel; // 1100 / 110 = 10 km/l
+      
+      let html = '<h3>Test Results:</h3>';
+      html += `<div class="result ${stats.avgMileage === expectedMileage ? 'success' : 'error'}">`;
+      html += `<strong>Average Mileage:</strong> ${stats.avgMileage.toFixed(2)} km/l<br>`;
+      html += `<strong>Expected:</strong> ${expectedMileage.toFixed(2)} km/l<br>`;
+      html += `<strong>Status:</strong> ${stats.avgMileage === expectedMileage ? '✅ PASS' : '❌ FAIL'}`;
+      html += `</div>`;
+      
+      html += `<div class="result">`;
+      html += `<strong>Total Distance:</strong> ${stats.totalDistance} km (Expected: ${expectedDistance} km)<br>`;
+      html += `<strong>Fuel Used:</strong> ${stats.totalFuel} L (Total: ${expectedFuel + 40} L)<br>`;
+      html += `<strong>Total Cost:</strong> ₹${stats.totalFuelCost}`;
+      html += `</div>`;
+      
+      html += '<pre>' + JSON.stringify(stats, null, 2) + '</pre>';
+      
+      resultsDiv.innerHTML = html;
+    };
+    
+    window.checkFirestoreData = async function() {
+      const resultsDiv = document.getElementById('testResults');
+      resultsDiv.innerHTML = '<p>Checking Firestore data...</p>';
+      
+      try {
+        const vehicles = await firestoreService.getAll('vehicles', 'createdAt', 'desc');
+        const fuelLogs = await firestoreService.getAll('fuelLogs', 'createdAt', 'desc');
+        
+        console.log('Vehicles:', vehicles);
+        console.log('Fuel Logs:', fuelLogs);
+        
+        let html = '<h3>Firestore Data:</h3>';
+        html += `<div class="result ${vehicles.length > 0 ? 'success' : 'error'}">`;
+        html += `<strong>Vehicles:</strong> ${vehicles.length} found`;
+        html += `</div>`;
+        
+        html += `<div class="result ${fuelLogs.length > 0 ? 'success' : 'error'}">`;
+        html += `<strong>Fuel Logs:</strong> ${fuelLogs.length} found`;
+        html += `</div>`;
+        
+        if (vehicles.length > 0) {
+          html += '<h4>Vehicles:</h4>';
+          vehicles.forEach(v => {
+            const vehicleLogs = fuelLogs.filter(log => log.vehicleId === v.id);
+            html += `<div class="result">`;
+            html += `<strong>${v.name}</strong> (ID: ${v.id})<br>`;
+            html += `Fuel Logs: ${vehicleLogs.length}<br>`;
+            html += `Current Mileage: ${v.currentMileage || 0} km`;
+            html += `</div>`;
+            
+            if (vehicleLogs.length > 0) {
+              html += '<pre>' + JSON.stringify(vehicleLogs, null, 2) + '</pre>';
+            }
+          });
+        }
+        
+        resultsDiv.innerHTML = html;
+      } catch (error) {
+        console.error('Error checking Firestore:', error);
+        resultsDiv.innerHTML = `<div class="result error"><strong>Error:</strong> ${error.message}</div>`;
+      }
+    };
+    
+    // Mileage calculation function (same as in vehicles.js)
+    function calculateVehicleMileage(vehicleFuelLogs) {
+      console.log('calculateVehicleMileage called with:', vehicleFuelLogs);
+      
+      if (!vehicleFuelLogs || vehicleFuelLogs.length === 0) {
+        console.log('No fuel logs found');
+        return { avgMileage: 0, totalDistance: 0, totalFuelCost: 0, totalFuel: 0 };
+      }
+
+      // Sort by odometer reading
+      const sortedLogs = [...vehicleFuelLogs].sort((a, b) => {
+        const odomA = parseFloat(a.odometerReading) || 0;
+        const odomB = parseFloat(b.odometerReading) || 0;
+        return odomA - odomB;
+      });
+      
+      console.log('Sorted logs:', sortedLogs.map(l => ({
+        id: l.id,
+        odometer: l.odometerReading,
+        fuel: l.fuelQuantity
+      })));
+      
+      let totalDistance = 0;
+      let totalFuel = 0;
+      let totalFuelCost = 0;
+      let fuelForMileage = 0;
+
+      // Calculate total fuel cost for all entries
+      sortedLogs.forEach(log => {
+        const fuelQty = parseFloat(log.fuelQuantity) || 0;
+        const fuelPrc = parseFloat(log.fuelPrice) || 0;
+        const cost = parseFloat(log.totalCost) || (fuelQty * fuelPrc);
+        totalFuelCost += cost;
+        totalFuel += fuelQty;
+      });
+
+      // Calculate mileage between consecutive entries (need at least 2)
+      // For each segment, the fuel used is the fuel added at the END of that segment
+      if (sortedLogs.length >= 2) {
+        for (let i = 1; i < sortedLogs.length; i++) {
+          const prevLog = sortedLogs[i - 1];
+          const currLog = sortedLogs[i];
+          
+          const prevOdometer = parseFloat(prevLog.odometerReading) || 0;
+          const currOdometer = parseFloat(currLog.odometerReading) || 0;
+          const distance = currOdometer - prevOdometer;
+          const fuelUsed = parseFloat(currLog.fuelQuantity) || 0;
+          
+          console.log(`Segment ${i}: ${prevOdometer} -> ${currOdometer} = ${distance} km, fuel: ${fuelUsed} L`);
+          
+          // Only count segments with positive distance and fuel
+          if (distance > 0 && fuelUsed > 0) {
+            totalDistance += distance;
+            fuelForMileage += fuelUsed;
+          }
+        }
+      }
+      
+      const avgMileage = fuelForMileage > 0 ? totalDistance / fuelForMileage : 0;
+      
+      console.log('Final stats:', {
+        avgMileage,
+        totalDistance,
+        totalFuelCost,
+        totalFuel,
+        fuelForMileage
+      });
+
+      return {
+        avgMileage,
+        totalDistance,
+        totalFuelCost,
+        totalFuel
+      };
+    }
+    
+    window.calculateVehicleMileage = calculateVehicleMileage;
+  </script>
+</body>
+</html>

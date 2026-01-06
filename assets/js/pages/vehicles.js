@@ -427,7 +427,11 @@ function calculateVehicleMileage(vehicleFuelLogs) {
   }
 
   // Sort by odometer reading
-  const sortedLogs = [...vehicleFuelLogs].sort((a, b) => (a.odometerReading || 0) - (b.odometerReading || 0));
+  const sortedLogs = [...vehicleFuelLogs].sort((a, b) => {
+    const odomA = parseFloat(a.odometerReading) || 0;
+    const odomB = parseFloat(b.odometerReading) || 0;
+    return odomA - odomB;
+  });
   
   let totalDistance = 0;
   let totalFuel = 0;
@@ -436,9 +440,9 @@ function calculateVehicleMileage(vehicleFuelLogs) {
 
   // Calculate total fuel cost for all entries
   sortedLogs.forEach(log => {
-    const fuelQty = log.fuelQuantity || 0;
-    const fuelPrc = log.fuelPrice || 0;
-    const cost = log.totalCost || (fuelQty * fuelPrc);
+    const fuelQty = parseFloat(log.fuelQuantity) || 0;
+    const fuelPrc = parseFloat(log.fuelPrice) || 0;
+    const cost = parseFloat(log.totalCost) || (fuelQty * fuelPrc);
     totalFuelCost += cost;
     totalFuel += fuelQty;
   });
@@ -450,8 +454,10 @@ function calculateVehicleMileage(vehicleFuelLogs) {
       const prevLog = sortedLogs[i - 1];
       const currLog = sortedLogs[i];
       
-      const distance = (currLog.odometerReading || 0) - (prevLog.odometerReading || 0);
-      const fuelUsed = currLog.fuelQuantity || 0;
+      const prevOdometer = parseFloat(prevLog.odometerReading) || 0;
+      const currOdometer = parseFloat(currLog.odometerReading) || 0;
+      const distance = currOdometer - prevOdometer;
+      const fuelUsed = parseFloat(currLog.fuelQuantity) || 0;
       
       // Only count segments with positive distance and fuel
       if (distance > 0 && fuelUsed > 0) {

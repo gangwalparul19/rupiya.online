@@ -667,6 +667,55 @@
   font-weight: 600;
 }
 
+/* Top Categories Grid */
+.top-categories-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.category-card {
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.category-card:hover {
+  border-color: var(--primary-blue);
+  transform: translateY(-2px);
+}
+
+.category-card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  margin: 0 auto 12px;
+}
+
+.category-card-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.category-card-amount {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--primary-blue);
+}
+
 .report-highlight-box {
   background: linear-gradient(135deg, rgba(74, 144, 226, 0.1) 0%, rgba(102, 126, 234, 0.1) 100%);
   border-left: 4px solid var(--primary-blue);
@@ -807,6 +856,53 @@
   .ai-report-title h2 {
     font-size: 18px;
   }
+
+  .ai-report-section {
+    padding: 16px;
+  }
+
+  /* Top Categories Grid - 3 per row on mobile */
+  .top-categories-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .category-card {
+    padding: 12px 8px;
+  }
+
+  .category-card-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+
+  .category-card-name {
+    font-size: 11px;
+    margin-bottom: 6px;
+  }
+
+  .category-card-amount {
+    font-size: 13px;
+  }
+
+  .report-block {
+    margin-bottom: 20px;
+  }
+
+  .report-block-title {
+    font-size: 15px;
+  }
+
+  .report-block-content {
+    font-size: 13px;
+  }
+
+  .report-highlight-box {
+    padding: 12px;
+    font-size: 13px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -864,6 +960,75 @@
 
   .tab-icon {
     font-size: 16px;
+  }
+
+  .ai-report-section {
+    padding: 12px;
+    border-radius: 16px;
+  }
+
+  /* Top Categories Grid - maintain 3 per row */
+  .top-categories-grid {
+    gap: 6px;
+  }
+
+  .category-card {
+    padding: 10px 6px;
+    border-radius: 10px;
+  }
+
+  .category-card-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+    margin-bottom: 6px;
+    border-radius: 8px;
+  }
+
+  .category-card-name {
+    font-size: 10px;
+    margin-bottom: 4px;
+  }
+
+  .category-card-amount {
+    font-size: 12px;
+  }
+
+  .report-block {
+    margin-bottom: 16px;
+  }
+
+  .report-block-title {
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+
+  .report-block-content {
+    font-size: 12px;
+  }
+
+  .report-highlight-box {
+    padding: 10px;
+    font-size: 12px;
+  }
+
+  .insight-item-new {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .insight-item-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+  }
+
+  .insight-item-title {
+    font-size: 13px;
+  }
+
+  .insight-item-desc {
+    font-size: 12px;
   }
 }
 

@@ -398,11 +398,21 @@ function renderMonthlyReport() {
     <div class="report-block">
       <div class="report-block-title">🏷️ Top Spending Categories</div>
       <div class="report-block-content">
-        <ul>
-          ${report.topCategories.map(cat => `
-            <li><strong>${cat.category}:</strong> ${formatCurrency(cat.amount)}</li>
-          `).join('')}
-        </ul>
+        <div class="top-categories-grid">
+          ${report.topCategories.map((cat, index) => {
+            const colors = ['#4A90E2', '#E74C3C', '#F39C12', '#27AE60', '#9B59B6'];
+            const color = colors[index % colors.length];
+            return `
+              <div class="category-card">
+                <div class="category-card-icon" style="background: ${color}20; color: ${color};">
+                  ${getCategoryIcon(cat.category)}
+                </div>
+                <div class="category-card-name">${cat.category}</div>
+                <div class="category-card-amount">${formatCurrency(cat.amount)}</div>
+              </div>
+            `;
+          }).join('')}
+        </div>
       </div>
     </div>
 
@@ -460,6 +470,28 @@ function createEmptyState(icon, title, description) {
       <div class="empty-desc">${description}</div>
     </div>
   `;
+}
+
+function getCategoryIcon(category) {
+  const icons = {
+    'Food': '🍔',
+    'Transport': '🚗',
+    'Shopping': '🛍️',
+    'Entertainment': '🎬',
+    'Healthcare': '🏥',
+    'Education': '📚',
+    'Bills': '📄',
+    'Utilities': '💡',
+    'Rent': '🏠',
+    'Groceries': '🛒',
+    'Travel': '✈️',
+    'Fuel': '⛽',
+    'Insurance': '🛡️',
+    'Investment': '💰',
+    'Savings': '💵',
+    'Other': '📦'
+  };
+  return icons[category] || '📊';
 }
 
 function animateNumber(elementId, value) {
