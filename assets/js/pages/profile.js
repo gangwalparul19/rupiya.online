@@ -719,10 +719,10 @@ let cardNumberInput, cardTypeSelect, cardBankNameInput;
 let upiIdInput, upiProviderSelect;
 let walletProviderSelect, walletNumberInput;
 let bankAccountNumberInput, bankNameInput, ifscCodeInput, accountTypeSelect;
-let addPaymentMethodForm, addPaymentMethodBtn, addPaymentMethodBtnText, addPaymentMethodBtnSpinner;
+let addPaymentMethodForm, addPaymentMethodBtn;
 let paymentMethodsList;
 let deletePaymentMethodModal, closeDeletePaymentMethodModalBtn, cancelDeletePaymentMethodBtn, confirmDeletePaymentMethodBtn;
-let deletePaymentMethodName, deletePaymentMethodBtnText, deletePaymentMethodBtnSpinner;
+let deletePaymentMethodName;
 
 // Initialize Payment Methods DOM Elements
 function initPaymentMethodsDOM() {
@@ -751,8 +751,6 @@ function initPaymentMethodsDOM() {
   
   addPaymentMethodForm = document.getElementById('addPaymentMethodForm');
   addPaymentMethodBtn = document.getElementById('addPaymentMethodBtn');
-  addPaymentMethodBtnText = document.getElementById('addPaymentMethodBtnText');
-  addPaymentMethodBtnSpinner = document.getElementById('addPaymentMethodBtnSpinner');
   
   paymentMethodsList = document.getElementById('paymentMethodsList');
   
@@ -761,8 +759,6 @@ function initPaymentMethodsDOM() {
   cancelDeletePaymentMethodBtn = document.getElementById('cancelDeletePaymentMethodBtn');
   confirmDeletePaymentMethodBtn = document.getElementById('confirmDeletePaymentMethodBtn');
   deletePaymentMethodName = document.getElementById('deletePaymentMethodName');
-  deletePaymentMethodBtnText = document.getElementById('deletePaymentMethodBtnText');
-  deletePaymentMethodBtnSpinner = document.getElementById('deletePaymentMethodBtnSpinner');
 }
 
 // Setup Payment Methods Event Listeners
@@ -939,10 +935,9 @@ async function handleAddPaymentMethod(e) {
     return;
   }
   
-  // Show loading state
+  // Show loading state - just disable and change text
   addPaymentMethodBtn.disabled = true;
-  if (addPaymentMethodBtnText) addPaymentMethodBtnText.style.display = 'none';
-  if (addPaymentMethodBtnSpinner) addPaymentMethodBtnSpinner.style.display = 'inline-block';
+  addPaymentMethodBtn.textContent = 'Adding...';
   
   try {
     const methodData = {
@@ -987,16 +982,9 @@ async function handleAddPaymentMethod(e) {
     console.error('Error adding payment method:', error);
     showToast('Failed to add payment method', 'error');
   } finally {
-    // Reset button state - ensure elements exist before modifying
-    if (addPaymentMethodBtn) {
-      addPaymentMethodBtn.disabled = false;
-    }
-    if (addPaymentMethodBtnText) {
-      addPaymentMethodBtnText.style.display = 'inline';
-    }
-    if (addPaymentMethodBtnSpinner) {
-      addPaymentMethodBtnSpinner.style.display = 'none';
-    }
+    // Reset button state
+    addPaymentMethodBtn.disabled = false;
+    addPaymentMethodBtn.textContent = 'Add Payment Method';
   }
 }
 
@@ -1036,16 +1024,9 @@ function hideDeletePaymentMethodModal() {
 async function handleDeletePaymentMethod() {
   if (!deletePaymentMethodId) return;
   
-  // Show loading state
-  if (confirmDeletePaymentMethodBtn) {
-    confirmDeletePaymentMethodBtn.disabled = true;
-  }
-  if (deletePaymentMethodBtnText) {
-    deletePaymentMethodBtnText.style.display = 'none';
-  }
-  if (deletePaymentMethodBtnSpinner) {
-    deletePaymentMethodBtnSpinner.style.display = 'inline-block';
-  }
+  // Show loading state - just disable and change text
+  confirmDeletePaymentMethodBtn.disabled = true;
+  confirmDeletePaymentMethodBtn.textContent = 'Deleting...';
   
   try {
     const result = await paymentMethodsService.deletePaymentMethod(deletePaymentMethodId);
@@ -1061,16 +1042,9 @@ async function handleDeletePaymentMethod() {
     console.error('Error deleting payment method:', error);
     showToast('Failed to delete payment method', 'error');
   } finally {
-    // Reset button state - ensure elements exist before modifying
-    if (confirmDeletePaymentMethodBtn) {
-      confirmDeletePaymentMethodBtn.disabled = false;
-    }
-    if (deletePaymentMethodBtnText) {
-      deletePaymentMethodBtnText.style.display = 'inline';
-    }
-    if (deletePaymentMethodBtnSpinner) {
-      deletePaymentMethodBtnSpinner.style.display = 'none';
-    }
+    // Reset button state
+    confirmDeletePaymentMethodBtn.disabled = false;
+    confirmDeletePaymentMethodBtn.textContent = 'Delete';
   }
 }
 
