@@ -207,7 +207,8 @@ class EncryptionService {
       throw new Error('Encryption not initialized');
     }
 
-    if (value === null || value === undefined) {
+    // Skip null, undefined, and empty strings
+    if (value === null || value === undefined || value === '') {
       return value;
     }
 
@@ -244,7 +245,8 @@ class EncryptionService {
       throw new Error('Encryption not initialized');
     }
 
-    if (encryptedValue === null || encryptedValue === undefined) {
+    // Return null, undefined, and empty strings as-is
+    if (encryptedValue === null || encryptedValue === undefined || encryptedValue === '') {
       return encryptedValue;
     }
 
@@ -252,7 +254,6 @@ class EncryptionService {
     // Encrypted values should be at least 12 bytes IV + some data
     if (typeof encryptedValue !== 'string' || encryptedValue.length < 20) {
       // Value doesn't look encrypted, return as-is
-      console.warn('[Encryption] Value does not appear to be encrypted, returning as-is');
       return encryptedValue;
     }
 
@@ -327,20 +328,21 @@ class EncryptionService {
       const sensitiveFields = privacyConfig.sensitiveFields[collectionName] || [];
       const encryptedFields = {};
 
-      // Encrypt each sensitive field
+      // Encrypt each sensitive field (skip null, undefined, and empty strings)
       for (const field of sensitiveFields) {
-        if (data[field] !== undefined && data[field] !== null) {
+        if (data[field] !== undefined && data[field] !== null && data[field] !== '') {
           encryptedFields[field] = await this.encryptValue(data[field]);
           delete encryptedData[field];
         }
       }
 
-      // Also encrypt any field not in unencryptedFields list
+      // Also encrypt any field not in unencryptedFields list (skip null, undefined, and empty strings)
       for (const [key, value] of Object.entries(data)) {
         if (!privacyConfig.unencryptedFields.includes(key) && 
             !sensitiveFields.includes(key) &&
             value !== undefined && 
             value !== null &&
+            value !== '' &&
             typeof value !== 'object') {
           encryptedFields[key] = await this.encryptValue(value);
           delete encryptedData[key];

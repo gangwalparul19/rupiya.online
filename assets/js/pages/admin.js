@@ -1,4 +1,5 @@
 // Admin Dashboard - Optimized with pagination
+import '../services/services-init.js'; // Initialize services first
 import authService from '../services/auth-service.js';
 import adminService from '../services/admin-service.js';
 import { formatCurrency, formatCurrencyCompact } from '../utils/helpers.js';

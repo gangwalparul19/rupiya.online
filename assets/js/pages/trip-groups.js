@@ -1,4 +1,5 @@
 // Trip Groups Page
+import '../services/services-init.js'; // Initialize services first
 import tripGroupsService from '../services/trip-groups-service.js';
 import authService from '../services/auth-service.js';
 

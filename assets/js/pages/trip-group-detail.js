@@ -1,4 +1,5 @@
 // Trip Group Detail Page
+import '../services/services-init.js'; // Initialize services first
 import tripGroupsService from '../services/trip-groups-service.js';
 import authService from '../services/auth-service.js';
 
@@ -881,7 +882,7 @@ class TripGroupDetailPage {
       `;
     } else {
       btn.disabled = false;
-      btn.innerHTML = 'Save Expense';
+      btn.innerHTML = 'Add Expense';
     }
   }
 

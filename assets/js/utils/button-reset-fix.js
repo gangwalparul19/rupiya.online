@@ -44,9 +44,14 @@
                            btnText.includes('adding') ||
                            btnText.includes('deleting') ||
                            btnText.includes('processing') ||
+                           btnText.includes('updating') ||
                            btnText.includes('...');
       
-      if (hasVisibleSpinner || isLoadingText) {
+      // Also check if button innerHTML contains spinner class
+      const hasSpinnerInHTML = btn.innerHTML.includes('class="spinner"') || 
+                               btn.innerHTML.includes("class='spinner'");
+      
+      if (hasVisibleSpinner || isLoadingText || hasSpinnerInHTML) {
         console.log('[Button Fix] Resetting stuck button:', btn.id || btn.className);
         btn.disabled = false;
         
@@ -82,7 +87,18 @@
           'saveTripGroupBtn': 'Save Group',
           'addTripGroupBtn': 'Add Group',
           'saveSplitExpenseBtn': 'Save Split',
-          'addSplitExpenseBtn': 'Add Split'
+          'addSplitExpenseBtn': 'Add Split',
+          'saveFormBtn': 'Save',
+          'saveFuelLogBtn': 'Save Fuel Log',
+          'savePaymentBtn': 'Record Payment',
+          'saveContributionBtn': 'Add Contribution',
+          'saveExpenseBtn': 'Add Expense',
+          'saveSettlementBtn': 'Record Settlement',
+          'saveMemberBtn': 'Add Member',
+          'inlineSaveGroupBtn': 'Create Group',
+          'createFamilySubmit': 'Create Group',
+          'inviteMemberSubmit': 'Send Invitation',
+          'submitFeedbackBtn': 'Submit Feedback'
         };
 
         if (btnId && commonButtons[btnId]) {
@@ -157,9 +173,14 @@
                            btnText.includes('adding') ||
                            btnText.includes('deleting') ||
                            btnText.includes('processing') ||
+                           btnText.includes('updating') ||
                            btnText.includes('...');
       
-      if (hasVisibleSpinner || isLoadingText) {
+      // Also check if button innerHTML contains spinner class
+      const hasSpinnerInHTML = btn.innerHTML.includes('class="spinner"') || 
+                               btn.innerHTML.includes("class='spinner'");
+      
+      if (hasVisibleSpinner || isLoadingText || hasSpinnerInHTML) {
         // Check if button has been disabled for more than 10 seconds
         const disabledTime = btn.dataset.disabledTime;
         if (!disabledTime) {
@@ -323,7 +344,17 @@
             'saveTripGroupBtn': 'Save Group',
             'addTripGroupBtn': 'Add Group',
             'saveSplitExpenseBtn': 'Save Split',
-            'addSplitExpenseBtn': 'Add Split'
+            'addSplitExpenseBtn': 'Add Split',
+            'saveFormBtn': 'Save',
+            'saveFuelLogBtn': 'Save Fuel Log',
+            'savePaymentBtn': 'Record Payment',
+            'saveContributionBtn': 'Add Contribution',
+            'saveSettlementBtn': 'Record Settlement',
+            'saveMemberBtn': 'Add Member',
+            'inlineSaveGroupBtn': 'Create Group',
+            'createFamilySubmit': 'Create Group',
+            'inviteMemberSubmit': 'Send Invitation',
+            'submitFeedbackBtn': 'Submit Feedback'
           };
           
           if (btnId && commonButtons[btnId]) {

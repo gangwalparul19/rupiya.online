@@ -1,4 +1,5 @@
 // Vehicles Page Logic
+import '../services/services-init.js'; // Initialize services first
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
 import crossFeatureIntegrationService from '../services/cross-feature-integration-service.js';
@@ -182,6 +183,9 @@ function hideForm() {
   addVehicleSection.classList.remove('show');
   vehicleForm.reset();
   editingVehicleId = null;
+  // Reset button state
+  saveFormBtn.disabled = false;
+  saveFormBtn.textContent = 'Save Vehicle';
 }
 
 function showEditForm(vehicle) {
@@ -217,13 +221,10 @@ async function handleSubmit(e) {
     notes: document.getElementById('notes').value.trim()
   };
 
-  // Show loading with text
+  // Show loading
   const originalText = saveFormBtn.textContent;
   saveFormBtn.disabled = true;
-  saveFormBtn.innerHTML = `
-    <span class="spinner"></span>
-    <span style="margin-left: 8px;">${editingVehicleId ? 'Updating...' : 'Saving...'}</span>
-  `;
+  saveFormBtn.textContent = editingVehicleId ? 'Updating...' : 'Saving...';
 
   try {
     let result;
@@ -247,7 +248,7 @@ async function handleSubmit(e) {
   } finally {
     // Reset button
     saveFormBtn.disabled = false;
-    saveFormBtn.innerHTML = originalText;
+    saveFormBtn.textContent = originalText;
   }
 }
 
@@ -561,10 +562,7 @@ async function handleSaveFuelLog() {
   }
 
   saveFuelLogBtn.disabled = true;
-  saveFuelLogBtn.innerHTML = `
-    <span class="spinner"></span>
-    <span style="margin-left: 8px;">Saving...</span>
-  `;
+  saveFuelLogBtn.textContent = 'Saving...';
 
   try {
     const fuelLogData = {
@@ -617,7 +615,7 @@ async function handleSaveFuelLog() {
   } finally {
     // Reset button
     saveFuelLogBtn.disabled = false;
-    saveFuelLogBtn.innerHTML = 'Save Fuel Entry';
+    saveFuelLogBtn.textContent = 'Save Fuel Entry';
   }
 }
 
@@ -783,12 +781,10 @@ async function handleSaveMaintenance() {
   }
 
   const saveBtn = document.getElementById('saveMaintenanceBtn');
+  const originalText = saveBtn.textContent;
 
   saveBtn.disabled = true;
-  saveBtn.innerHTML = `
-    <span class="spinner"></span>
-    <span style="margin-left: 8px;">Saving...</span>
-  `;
+  saveBtn.textContent = 'Saving...';
 
   try {
     const vehicle = vehicles.find(v => v.id === vehicleId);
@@ -818,7 +814,7 @@ async function handleSaveMaintenance() {
   } finally {
     // Reset button
     saveBtn.disabled = false;
-    saveBtn.innerHTML = 'Save Maintenance';
+    saveBtn.textContent = originalText;
   }
 }
 
@@ -850,12 +846,10 @@ async function handleSaveVehicleIncome() {
   }
 
   const saveBtn = document.getElementById('saveVehicleIncomeBtn');
+  const originalText = saveBtn.textContent;
 
   saveBtn.disabled = true;
-  saveBtn.innerHTML = `
-    <span class="spinner"></span>
-    <span style="margin-left: 8px;">Saving...</span>
-  `;
+  saveBtn.textContent = 'Saving...';
 
   try {
     const vehicle = vehicles.find(v => v.id === vehicleId);
@@ -885,7 +879,7 @@ async function handleSaveVehicleIncome() {
   } finally {
     // Reset button
     saveBtn.disabled = false;
-    saveBtn.innerHTML = 'Save Income';
+    saveBtn.textContent = originalText;
   }
 }
 

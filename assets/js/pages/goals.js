@@ -1,4 +1,5 @@
 // Goals Page Logic
+import '../services/services-init.js'; // Initialize services first
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
 import familySwitcher from '../components/family-switcher.js';
