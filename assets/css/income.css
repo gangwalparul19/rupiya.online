@@ -748,27 +748,49 @@
   }
 
   .filters-row {
-    grid-template-columns: 1fr;
-    gap: var(--spacing-sm);
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem !important;
   }
 
   .filter-group {
-    margin-bottom: var(--spacing-xs);
+    margin-bottom: 0 !important;
+  }
+
+  .filter-group label {
+    font-size: 0.6875rem !important;
+    margin-bottom: 0.25rem !important;
+  }
+
+  .filter-select,
+  .filter-input {
+    padding: 0.5rem 0.625rem !important;
+    font-size: 0.875rem !important;
+  }
+
+  /* Clear filters button - full width */
+  .filter-group:has(#clearFiltersBtn),
+  .filter-group:last-child {
+    grid-column: 1 / -1 !important;
   }
 
   .search-row {
     flex-direction: column;
     align-items: stretch;
-    gap: var(--spacing-sm);
+    gap: 0.5rem !important;
   }
 
   .search-box {
     min-width: 100%;
   }
 
+  .search-box input {
+    padding: 0.5rem 0.625rem 0.5rem 2.25rem !important;
+    font-size: 0.875rem !important;
+  }
+
   .results-count {
     text-align: center;
-    font-size: var(--font-size-sm);
+    font-size: 0.6875rem !important;
   }
 
   .income-grid {

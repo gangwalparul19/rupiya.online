@@ -112,14 +112,14 @@
 @media (max-width: 480px) {
   /* Compact 2-column grid for mobile */
   .form-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem !important;
+    margin-bottom: 0.5rem !important;
   }
 
   .form-group {
-    margin-bottom: 0;
+    margin-bottom: 0 !important;
   }
 
   /* Full width for textarea and specific fields */
@@ -130,16 +130,16 @@
   .form-group:has(#notes),
   .form-group:has(#address),
   .form-group:has(#details) {
-    grid-column: 1 / -1;
+    grid-column: 1 / -1 !important;
   }
 
   /* Compact labels */
   .form-group label {
     display: block;
-    font-size: 0.6875rem;
+    font-size: 0.6875rem !important;
     font-weight: 600;
     color: var(--text-primary);
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.25rem !important;
     line-height: 1.2;
   }
 
@@ -147,8 +147,8 @@
   .form-group input,
   .form-group select {
     width: 100%;
-    padding: 0.5rem 0.625rem;
-    font-size: 0.875rem;
+    padding: 0.5rem 0.625rem !important;
+    font-size: 0.875rem !important;
     border: 1px solid var(--border-color);
     border-radius: 0.375rem;
     line-height: 1.4;
@@ -158,8 +158,8 @@
   /* Textarea with reduced height */
   .form-group textarea {
     width: 100%;
-    padding: 0.5rem 0.625rem;
-    font-size: 0.875rem;
+    padding: 0.5rem 0.625rem !important;
+    font-size: 0.875rem !important;
     border: 1px solid var(--border-color);
     border-radius: 0.375rem;
     line-height: 1.4;
@@ -179,9 +179,9 @@
 
   /* Compact error messages */
   .error-message {
-    font-size: 0.625rem;
-    margin-top: 0.125rem;
-    min-height: 0;
+    font-size: 0.625rem !important;
+    margin-top: 0.125rem !important;
+    min-height: 0 !important;
     line-height: 1.2;
   }
 
@@ -189,16 +189,16 @@
   .form-actions {
     display: flex;
     flex-direction: column-reverse;
-    gap: 0.5rem;
-    padding-top: 0.625rem;
+    gap: 0.5rem !important;
+    padding-top: 0.625rem !important;
     border-top: 1px solid var(--border-color);
-    margin-top: 0.625rem;
+    margin-top: 0.625rem !important;
   }
 
   .form-actions .btn {
     width: 100%;
-    padding: 0.625rem 0.75rem;
-    font-size: 0.875rem;
+    padding: 0.625rem 0.75rem !important;
+    font-size: 0.875rem !important;
     min-width: 0;
   }
 
@@ -213,8 +213,8 @@
   .add-vehicle-section,
   .add-document-section,
   .add-note-section {
-    padding: 0.625rem;
-    margin-bottom: 0.75rem;
+    padding: 0.625rem !important;
+    margin-bottom: 0.75rem !important;
   }
 
   .add-income-header,
@@ -227,8 +227,8 @@
   .add-vehicle-header,
   .add-document-header,
   .add-note-header {
-    margin-bottom: 0.625rem;
-    padding-bottom: 0.5rem;
+    margin-bottom: 0.625rem !important;
+    padding-bottom: 0.5rem !important;
   }
 
   .add-income-title,
@@ -241,46 +241,46 @@
   .add-vehicle-title,
   .add-document-title,
   .add-note-title {
-    font-size: 1rem;
+    font-size: 1rem !important;
   }
 
   /* Radio groups - keep vertical but compact */
   .radio-group {
     display: flex;
     flex-direction: column;
-    gap: 0.375rem;
-    margin-top: 0.375rem;
+    gap: 0.375rem !important;
+    margin-top: 0.375rem !important;
   }
 
   .radio-option {
-    padding: 0.375rem 0.625rem;
-    font-size: 0.8125rem;
+    padding: 0.375rem 0.625rem !important;
+    font-size: 0.8125rem !important;
   }
 
   .radio-option span {
-    font-size: 0.8125rem;
+    font-size: 0.8125rem !important;
   }
 
   /* Form help text */
   .form-help,
   small.form-help {
-    font-size: 0.625rem;
+    font-size: 0.625rem !important;
     line-height: 1.3;
-    margin-top: 0.25rem;
+    margin-top: 0.25rem !important;
   }
 
   /* Select dropdowns */
   .form-group select {
     background-size: 14px 10px;
     background-position: right 0.5rem center;
-    padding-right: 2rem;
+    padding-right: 2rem !important;
   }
 
   /* Date inputs */
   .form-group input[type="date"],
   .form-group input[type="time"],
   .form-group input[type="datetime-local"] {
-    padding: 0.5rem 0.5rem;
+    padding: 0.5rem 0.5rem !important;
   }
 
   /* Number inputs */
@@ -358,8 +358,61 @@
    SPECIFIC FIELD OPTIMIZATIONS
    ============================================ */
 
-/* Payment method specific fields */
+/* Filters - 2 column layout on mobile */
 @media (max-width: 480px) {
+  .filters-row {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem !important;
+    margin-bottom: 0.75rem !important;
+  }
+
+  .filter-group {
+    margin-bottom: 0 !important;
+  }
+
+  .filter-group label {
+    font-size: 0.6875rem !important;
+    margin-bottom: 0.25rem !important;
+    font-weight: 600;
+  }
+
+  .filter-select,
+  .filter-input {
+    padding: 0.5rem 0.625rem !important;
+    font-size: 0.875rem !important;
+    min-height: 38px;
+  }
+
+  /* Clear filters button - full width */
+  .filter-group:has(#clearFiltersBtn),
+  .filter-group:last-child {
+    grid-column: 1 / -1 !important;
+  }
+
+  /* Search box - full width */
+  .search-row {
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+    margin-top: 0.5rem !important;
+  }
+
+  .search-box {
+    width: 100% !important;
+    min-width: 100% !important;
+  }
+
+  .search-box input {
+    padding: 0.5rem 0.625rem 0.5rem 2.25rem !important;
+    font-size: 0.875rem !important;
+  }
+
+  .results-count {
+    font-size: 0.6875rem !important;
+    text-align: center;
+  }
+
+  /* Payment method specific fields */
   #specificPaymentMethodGroup {
     grid-column: 1 / -1;
   }
