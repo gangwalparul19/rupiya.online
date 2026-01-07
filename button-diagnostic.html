@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Button Fix Diagnostic</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .diagnostic-box {
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 1rem 0;
+      background: #f9f9f9;
+    }
+    .status {
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      margin: 0.5rem 0;
+      font-weight: bold;
+    }
+    .success { background: #d4edda; color: #155724; }
+    .error { background: #f8d7da; color: #721c24; }
+    .warning { background: #fff3cd; color: #856404; }
+    .info { background: #d1ecf1; color: #0c5460; }
+    pre {
+      background: #2d2d2d;
+      color: #f8f8f2;
+      padding: 1rem;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+    button {
+      padding: 0.5rem 1rem;
+      margin: 0.5rem;
+      cursor: pointer;
+      border: none;
+      border-radius: 4px;
+      background: #007bff;
+      color: white;
+      font-size: 14px;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔍 Button Fix Diagnostic Tool</h1>
+  <p>This tool checks if the button fix is properly loaded and working.</p>
+
+  <div class="diagnostic-box">
+    <h2>Step 1: Check Script Loading</h2>
+    <div id="scriptCheck"></div>
+    <button onclick="checkScriptLoading()">Run Check</button>
+  </div>
+
+  <div class="diagnostic-box">
+    <h2>Step 2: Check Exclusion List</h2>
+    <div id="exclusionCheck"></div>
+    <button onclick="checkExclusionList()">Run Check</button>
+  </div>
+
+  <div class="diagnostic-box">
+    <h2>Step 3: Check All Buttons</h2>
+    <div id="buttonCheck"></div>
+    <button onclick="checkAllButtons()">Run Check</button>
+  </div>
+
+  <div class="diagnostic-box">
+    <h2>Step 4: Test Button Reset</h2>
+    <p>This creates a stuck button and checks if it gets reset:</p>
+    <button id="testBtn" class="btn">Test Button</button>
+    <button onclick="makeButtonStuck()">Make Button Stuck</button>
+    <button onclick="checkIfReset()">Check If Reset</button>
+    <div id="testResult"></div>
+  </div>
+
+  <div class="diagnostic-box">
+    <h2>Step 5: Cache Check</h2>
+    <div id="cacheCheck"></div>
+    <button onclick="checkCache()">Run Check</button>
+  </div>
+
+  <div class="diagnostic-box">
+    <h2>Console Messages</h2>
+    <p>Check your browser console (F12) for these messages:</p>
+    <pre id="consoleMessages">Waiting for checks...</pre>
+  </div>
+
+  <script>
+    let consoleLog = [];
+    
+    // Intercept console messages
+    const originalLog = console.log;
+    const originalWarn = console.warn;
+    
+    console.log = function(...args) {
+      consoleLog.push('[LOG] ' + args.join(' '));
+      updateConsoleDisplay();
+      originalLog.apply(console, args);
+    };
+    
+    console.warn = function(...args) {
+      consoleLog.push('[WARN] ' + args.join(' '));
+      updateConsoleDisplay();
+      originalWarn.apply(console, args);
+    };
+    
+    function updateConsoleDisplay() {
+      document.getElementById('consoleMessages').textContent = consoleLog.join('\n') || 'No messages yet';
+    }
+
+    function checkScriptLoading() {
+      const result = document.getElementById('scriptCheck');
+      let html = '<h3>Results:</h3>';
+      
+      // Check if button-reset-fix.js is loaded
+      fetch('assets/js/utils/button-reset-fix.js')
+        .then(response => {
+          if (response.ok) {
+            html += '<div class="status success">✓ button-reset-fix.js file exists</div>';
+            return response.text();
+          } else {
+            html += '<div class="status error">✗ button-reset-fix.js file NOT found (404)</div>';
+            throw new Error('File not found');
+          }
+        })
+        .then(content => {
+          // Check for exclusion list
+          if (content.includes('excludedButtons')) {
+            html += '<div class="status success">✓ Exclusion list found in script</div>';
+          } else {
+            html += '<div class="status error">✗ Exclusion list NOT found in script</div>';
+          }
+          
+          // Check for confirmDeleteAccountBtn
+          if (content.includes('confirmDeleteAccountBtn')) {
+            html += '<div class="status success">✓ confirmDeleteAccountBtn in exclusion list</div>';
+          } else {
+            html += '<div class="status error">✗ confirmDeleteAccountBtn NOT in exclusion list</div>';
+          }
+          
+          // Check script size
+          const lines = content.split('\n').length;
+          html += `<div class="status info">ℹ Script has ${lines} lines</div>`;
+          
+          result.innerHTML = html;
+        })
+        .catch(error => {
+          html += '<div class="status error">✗ Error loading script: ' + error.message + '</div>';
+          result.innerHTML = html;
+        });
+    }
+
+    function checkExclusionList() {
+      const result = document.getElementById('exclusionCheck');
+      let html = '<h3>Results:</h3>';
+      
+      // Try to access the exclusion list (it's in a closure, so we can't directly access it)
+      // Instead, we'll check the behavior
+      
+      html += '<div class="status info">ℹ Exclusion list is in a closure (private)</div>';
+      html += '<div class="status info">ℹ Expected excluded buttons:</div>';
+      html += '<ul>';
+      html += '<li>confirmDeleteAccountBtn</li>';
+      html += '<li>confirmDeletePaymentMethodBtn</li>';
+      html += '<li>confirmDeleteBtn</li>';
+      html += '<li>deleteAccountBtn</li>';
+      html += '</ul>';
+      
+      result.innerHTML = html;
+    }
+
+    function checkAllButtons() {
+      const result = document.getElementById('buttonCheck');
+      let html = '<h3>Results:</h3>';
+      
+      const buttons = document.querySelectorAll('.btn, button');
+      html += `<div class="status info">ℹ Found ${buttons.length} buttons on this page</div>`;
+      
+      let disabledCount = 0;
+      let withSpinnerCount = 0;
+      
+      buttons.forEach(btn => {
+        if (btn.disabled) disabledCount++;
+        if (btn.querySelector('.spinner')) withSpinnerCount++;
+      });
+      
+      html += `<div class="status info">ℹ ${disabledCount} buttons are disabled</div>`;
+      html += `<div class="status info">ℹ ${withSpinnerCount} buttons have spinners</div>`;
+      
+      result.innerHTML = html;
+    }
+
+    function makeButtonStuck() {
+      const btn = document.getElementById('testBtn');
+      const result = document.getElementById('testResult');
+      
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner" style="display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: white; animation: spin 0.8s linear infinite;"></span> Loading...';
+      
+      result.innerHTML = '<div class="status warning">⚠ Button is now stuck. Wait 10 seconds or click "Check If Reset"</div>';
+      
+      console.log('[Diagnostic] Made button stuck at ' + new Date().toLocaleTimeString());
+    }
+
+    function checkIfReset() {
+      const btn = document.getElementById('testBtn');
+      const result = document.getElementById('testResult');
+      
+      if (btn.disabled) {
+        result.innerHTML = '<div class="status error">✗ Button is still stuck (disabled)</div>';
+      } else {
+        result.innerHTML = '<div class="status success">✓ Button has been reset!</div>';
+      }
+    }
+
+    function checkCache() {
+      const result = document.getElementById('cacheCheck');
+      let html = '<h3>Results:</h3>';
+      
+      // Check if page was loaded from cache
+      if (performance.navigation.type === 1) {
+        html += '<div class="status warning">⚠ Page was RELOADED (but might be from cache)</div>';
+      } else if (performance.navigation.type === 2) {
+        html += '<div class="status info">ℹ Page was loaded from BACK/FORWARD cache</div>';
+      } else {
+        html += '<div class="status info">ℹ Page was loaded normally</div>';
+      }
+      
+      // Check cache control headers
+      html += '<div class="status info">ℹ To clear cache:</div>';
+      html += '<ul>';
+      html += '<li><strong>Windows:</strong> Ctrl + Shift + R</li>';
+      html += '<li><strong>Mac:</strong> Cmd + Shift + R</li>';
+      html += '<li><strong>Or:</strong> Open DevTools (F12) > Network tab > Check "Disable cache"</li>';
+      html += '</ul>';
+      
+      result.innerHTML = html;
+    }
+
+    // Auto-run checks on load
+    window.addEventListener('load', () => {
+      console.log('[Diagnostic] Page loaded at ' + new Date().toLocaleTimeString());
+      setTimeout(() => {
+        checkScriptLoading();
+        checkCache();
+      }, 500);
+    });
+  </script>
+
+  <style>
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</body>
+</html>
