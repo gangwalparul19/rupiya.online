@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encryption Test - Google Sign In</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        button:disabled { background: #6c757d; cursor: not-allowed; }
+        .test-data {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .user-info {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Encryption Test - Google Sign In</h1>
+        <p>This page tests that encryption/decryption works properly for Google Sign In users.</p>
+        
+        <div id="authStatus" class="status info">Checking authentication...</div>
+        
+        <div id="userInfo" class="user-info" style="display: none;">
+            <h3>User Information</h3>
+            <div id="userDetails"></div>
+        </div>
+        
+        <div id="encryptionStatus" class="status info">Checking encryption status...</div>
+        
+        <div id="testControls" style="display: none;">
+            <h3>Test Encryption</h3>
+            <button id="testEncryption">Test Encrypt/Decrypt</button>
+            <button id="testExpenseStorage">Test Expense Storage</button>
+            <button id="clearTests">Clear Results</button>
+        </div>
+        
+        <div id="testResults"></div>
+        
+        <div id="authControls">
+            <h3>Authentication</h3>
+            <button id="googleSignIn">Sign In with Google</button>
+            <button id="signOut" style="display: none;">Sign Out</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import './assets/js/services/services-init.js';
+        import authService from './assets/js/services/auth-service.js';
+        import encryptionService from './assets/js/services/encryption-service.js';
+        import authEncryptionHelper from './assets/js/utils/auth-encryption-helper.js';
+        import firestoreService from './assets/js/services/firestore-service.js';
+
+        const authStatus = document.getElementById('authStatus');
+        const userInfo = document.getElementById('userInfo');
+        const userDetails = document.getElementById('userDetails');
+        const encryptionStatus = document.getElementById('encryptionStatus');
+        const testControls = document.getElementById('testControls');
+        const testResults = document.getElementById('testResults');
+        const googleSignInBtn = document.getElementById('googleSignIn');
+        const signOutBtn = document.getElementById('signOut');
+        const testEncryptionBtn = document.getElementById('testEncryption');
+        const testExpenseStorageBtn = document.getElementById('testExpenseStorage');
+        const clearTestsBtn = document.getElementById('clearTests');
+
+        function addResult(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.textContent = message;
+            testResults.appendChild(div);
+        }
+
+        function addTestData(title, data) {
+            const div = document.createElement('div');
+            div.innerHTML = `<strong>${title}:</strong>`;
+            const pre = document.createElement('div');
+            pre.className = 'test-data';
+            pre.textContent = JSON.stringify(data, null, 2);
+            div.appendChild(pre);
+            testResults.appendChild(div);
+        }
+
+        async function updateStatus() {
+            const user = authService.getCurrentUser();
+            
+            if (user) {
+                authStatus.textContent = '✅ User is authenticated';
+                authStatus.className = 'status success';
+                
+                const isGoogle = authEncryptionHelper.isGoogleUser();
+                userDetails.innerHTML = `
+                    <strong>Email:</strong> ${user.email}<br>
+                    <strong>Display Name:</strong> ${user.displayName || 'Not set'}<br>
+                    <strong>UID:</strong> ${user.uid}<br>
+                    <strong>Provider:</strong> ${isGoogle ? 'Google' : 'Email/Password'}
+                `;
+                userInfo.style.display = 'block';
+                
+                googleSignInBtn.style.display = 'none';
+                signOutBtn.style.display = 'inline-block';
+                
+                // Check encryption status
+                await encryptionService.waitForRestore();
+                const status = encryptionService.getStatus();
+                
+                if (status.ready) {
+                    encryptionStatus.textContent = `✅ Encryption is ready (${isGoogle ? 'Google user' : 'Email/Password user'})`;
+                    encryptionStatus.className = 'status success';
+                    testControls.style.display = 'block';
+                } else {
+                    encryptionStatus.textContent = '⚠️ Encryption not ready';
+                    encryptionStatus.className = 'status warning';
+                    testControls.style.display = 'none';
+                }
+            } else {
+                authStatus.textContent = '❌ User not authenticated';
+                authStatus.className = 'status error';
+                userInfo.style.display = 'none';
+                googleSignInBtn.style.display = 'inline-block';
+                signOutBtn.style.display = 'none';
+                testControls.style.display = 'none';
+                
+                encryptionStatus.textContent = 'Not applicable - user not signed in';
+                encryptionStatus.className = 'status info';
+            }
+        }
+
+        // Test basic encryption/decryption
+        testEncryptionBtn.addEventListener('click', async () => {
+            try {
+                addResult('🧪 Testing basic encryption/decryption...', 'info');
+                
+                const testData = {
+                    amount: 1234.56,
+                    description: 'Test expense for Google user',
+                    category: 'Testing',
+                    sensitive: 'This should be encrypted'
+                };
+                
+                addTestData('Original Data', testData);
+                
+                // Test encryption
+                const encrypted = await encryptionService.encryptObject(testData, 'expenses');
+                addTestData('Encrypted Data', encrypted);
+                addResult('✅ Encryption successful', 'success');
+                
+                // Test decryption
+                const decrypted = await encryptionService.decryptObject(encrypted, 'expenses');
+                addTestData('Decrypted Data', decrypted);
+                
+                // Verify data integrity
+                if (JSON.stringify(testData) === JSON.stringify(decrypted)) {
+                    addResult('✅ Decryption successful - data matches original', 'success');
+                } else {
+                    addResult('❌ Decryption failed - data does not match', 'error');
+                }
+                
+            } catch (error) {
+                addResult(`❌ Test failed: ${error.message}`, 'error');
+                console.error('Encryption test error:', error);
+            }
+        });
+
+        // Test actual expense storage
+        testExpenseStorageBtn.addEventListener('click', async () => {
+            try {
+                addResult('🧪 Testing expense storage with encryption...', 'info');
+                
+                const testExpense = {
+                    amount: 99.99,
+                    description: 'Google Sign-In Encryption Test',
+                    category: 'Testing',
+                    paymentMethod: 'Test Card',
+                    date: new Date(),
+                    userId: authService.getCurrentUser().uid
+                };
+                
+                addTestData('Test Expense Data', testExpense);
+                
+                // Store expense (should be encrypted)
+                const docRef = await firestoreService.add('expenses', testExpense);
+                addResult(`✅ Expense stored with ID: ${docRef.id}`, 'success');
+                
+                // Retrieve expense (should be decrypted)
+                const retrieved = await firestoreService.get('expenses', docRef.id);
+                addTestData('Retrieved Expense Data', retrieved);
+                
+                // Verify data integrity
+                if (retrieved.amount === testExpense.amount && 
+                    retrieved.description === testExpense.description) {
+                    addResult('✅ Storage/retrieval successful - data matches', 'success');
+                } else {
+                    addResult('❌ Storage/retrieval failed - data corrupted', 'error');
+                }
+                
+                // Clean up - delete test expense
+                await firestoreService.delete('expenses', docRef.id);
+                addResult('🧹 Test expense cleaned up', 'info');
+                
+            } catch (error) {
+                addResult(`❌ Storage test failed: ${error.message}`, 'error');
+                console.error('Storage test error:', error);
+            }
+        });
+
+        // Google Sign In
+        googleSignInBtn.addEventListener('click', async () => {
+            try {
+                googleSignInBtn.disabled = true;
+                const result = await authService.signInWithGoogle();
+                
+                if (result.success) {
+                    addResult('✅ Google Sign In successful', 'success');
+                    // Wait a moment for encryption to initialize
+                    setTimeout(updateStatus, 1000);
+                } else {
+                    addResult(`❌ Google Sign In failed: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                addResult(`❌ Google Sign In error: ${error.message}`, 'error');
+            } finally {
+                googleSignInBtn.disabled = false;
+            }
+        });
+
+        // Sign Out
+        signOutBtn.addEventListener('click', async () => {
+            try {
+                await authService.signOut();
+                addResult('✅ Signed out successfully', 'success');
+                updateStatus();
+            } catch (error) {
+                addResult(`❌ Sign out error: ${error.message}`, 'error');
+            }
+        });
+
+        // Clear test results
+        clearTestsBtn.addEventListener('click', () => {
+            testResults.innerHTML = '';
+        });
+
+        // Initialize
+        authService.onAuthStateChanged(() => {
+            updateStatus();
+        });
+
+        // Initial status check
+        updateStatus();
+    </script>
+</body>
+</html>

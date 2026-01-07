@@ -72,8 +72,8 @@ class EncryptionService {
 
   // Initialize encryption with user's password
   async initialize(password, userId) {
-    if (!password || !userId) {
-      console.warn('[Encryption] Cannot initialize without password and userId');
+    if (!userId) {
+      console.warn('[Encryption] Cannot initialize without userId');
       return false;
     }
 
@@ -81,8 +81,15 @@ class EncryptionService {
       // Get or create salt for this user
       this.salt = await this.getOrCreateSalt(userId);
       
-      // Derive encryption key from password
-      this.encryptionKey = await this.deriveKey(password, this.salt);
+      // Derive encryption key from password or generate for Google users
+      if (password) {
+        // Email/password login - use password for key derivation
+        this.encryptionKey = await this.deriveKey(password, this.salt);
+      } else {
+        // Google login - generate key from user data
+        this.encryptionKey = await this.generateKeyForGoogleUser(userId, this.salt);
+      }
+      
       this.isInitialized = true;
       
       // Save to session storage for persistence across page loads
@@ -95,6 +102,37 @@ class EncryptionService {
       this.isInitialized = false;
       return false;
     }
+  }
+
+  // Generate encryption key for Google users (no password available)
+  async generateKeyForGoogleUser(userId, salt) {
+    // Use a combination of userId and a stored secret to generate a consistent key
+    // This ensures the same key is generated each time for the same user
+    
+    const keyMaterial = userId + 'rupiya_google_encryption_v1';
+    
+    // Import the key material
+    const importedKey = await crypto.subtle.importKey(
+      'raw',
+      new TextEncoder().encode(keyMaterial),
+      'PBKDF2',
+      false,
+      ['deriveKey']
+    );
+
+    // Derive AES-GCM key (exportable so we can save to session)
+    return await crypto.subtle.deriveKey(
+      {
+        name: 'PBKDF2',
+        salt: salt,
+        iterations: this.PBKDF2_ITERATIONS,
+        hash: 'SHA-256'
+      },
+      importedKey,
+      { name: 'AES-GCM', length: this.KEY_LENGTH },
+      true, // extractable - needed to save to session
+      ['encrypt', 'decrypt']
+    );
   }
 
   // Get or create salt for user

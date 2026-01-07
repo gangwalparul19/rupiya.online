@@ -7,6 +7,7 @@
 import authService from './auth-service.js';
 import userService from './user-service.js';
 import encryptionService from './encryption-service.js';
+import authEncryptionHelper from '../utils/auth-encryption-helper.js';
 
 // Connect auth service with user service (avoid circular dependency)
 authService.setUserService(userService);
@@ -31,10 +32,34 @@ authService.onAuthStateChanged(async (user) => {
         }
       }
       
-      // Check encryption status
-      const encryptionStatus = encryptionService.getStatus();
-      if (encryptionStatus.enabled && !encryptionStatus.ready) {
-        console.log('🔐 Encryption enabled but not initialized - waiting for session restore or re-auth');
+      // Initialize encryption for Google users automatically
+      // For email/password users, encryption is initialized during login
+      if (authEncryptionHelper.isGoogleUser()) {
+        const encryptionStatus = encryptionService.getStatus();
+        if (encryptionStatus.enabled && !encryptionStatus.ready) {
+          console.log('🔐 Initializing encryption for Google user...');
+          const success = await authEncryptionHelper.initializeForGoogleUser(user.uid);
+          if (success) {
+            console.log('✅ Encryption initialized for Google user');
+          } else {
+            console.warn('⚠️ Failed to initialize encryption for Google user');
+          }
+        } else if (encryptionStatus.ready) {
+          console.log('✅ Encryption already ready for Google user');
+        }
+      } else {
+        // Email/password user - check if encryption needs re-initialization
+        const needsReauth = await authEncryptionHelper.needsReinitialization();
+        if (needsReauth) {
+          console.log('🔐 Email/password user needs to re-enter password for encryption');
+          // The UI will handle showing the re-auth prompt when needed
+        }
+      }
+      
+      // Check final encryption status
+      const finalStatus = encryptionService.getStatus();
+      if (finalStatus.enabled && !finalStatus.ready) {
+        console.log('🔐 Encryption enabled but not ready - user may need to re-authenticate');
       }
     } catch (error) {
       console.error('❌ Error initializing user profile:', error);
@@ -44,18 +69,19 @@ authService.onAuthStateChanged(async (user) => {
     // This prevents clearing on initial page load before auth state is restored
     if (hasSeenLoggedInUser) {
       console.log('🔐 User signed out - clearing encryption');
-      encryptionService.clear();
+      authEncryptionHelper.clearEncryption();
       hasSeenLoggedInUser = false;
     }
   }
 });
 
 // Export services for convenience
-export { authService, userService, encryptionService };
+export { authService, userService, encryptionService, authEncryptionHelper };
 
 // Export default object with all services
 export default {
   auth: authService,
   user: userService,
-  encryption: encryptionService
+  encryption: encryptionService,
+  authEncryption: authEncryptionHelper
 };

@@ -12,22 +12,26 @@ class AuthEncryptionHelper {
 
   // Initialize encryption after login with email/password
   async initializeAfterLogin(password, userId) {
-    if (!password || !userId) {
-      console.warn('[AuthEncryption] Cannot initialize without password and userId');
+    if (!userId) {
+      console.warn('[AuthEncryption] Cannot initialize without userId');
       return false;
     }
 
     try {
+      // For Google users, password will be null/undefined
       const success = await encryptionService.initialize(password, userId);
       
       if (success) {
-        // Store a hash to verify password on page refresh
-        // Note: This is NOT the encryption key, just a verification hash
-        const verificationHash = await this.createVerificationHash(password, userId);
-        sessionStorage.setItem(this.PASSWORD_HASH_KEY, verificationHash);
+        if (password) {
+          // Store a hash to verify password on page refresh (email/password users only)
+          const verificationHash = await this.createVerificationHash(password, userId);
+          sessionStorage.setItem(this.PASSWORD_HASH_KEY, verificationHash);
+        }
+        
         sessionStorage.setItem(this.ENCRYPTION_READY_KEY, 'true');
         
-        console.log('[AuthEncryption] Encryption initialized successfully');
+        const userType = password ? 'email/password' : 'Google';
+        console.log(`[AuthEncryption] Encryption initialized successfully for ${userType} user`);
       }
       
       return success;
@@ -35,6 +39,11 @@ class AuthEncryptionHelper {
       console.error('[AuthEncryption] Failed to initialize encryption:', error);
       return false;
     }
+  }
+
+  // Initialize encryption for Google users (no password)
+  async initializeForGoogleUser(userId) {
+    return await this.initializeAfterLogin(null, userId);
   }
 
   // Create a verification hash (not the encryption key)

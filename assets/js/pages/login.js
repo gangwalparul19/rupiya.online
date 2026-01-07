@@ -131,9 +131,8 @@ googleSignInBtn.addEventListener('click', async () => {
     const result = await authService.signInWithGoogle();
     
     if (result.success) {
-      // Note: Google sign-in doesn't provide a password, so encryption won't be initialized
-      // Users who sign in with Google will need to set an encryption password separately
-      console.warn('[Login] Google sign-in: Encryption not available without password');
+      // Encryption for Google users is automatically initialized in services-init.js
+      // No need to initialize here as it doesn't require a password
       
       toast.success('Login successful! Redirecting...');
       const redirectUrl = getRedirectUrl();
