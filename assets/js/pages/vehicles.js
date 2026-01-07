@@ -17,17 +17,16 @@ let editingVehicleId = null;
 
 // DOM Elements
 let addVehicleBtn, addVehicleSection, closeFormBtn, cancelFormBtn;
-let vehicleForm, formTitle, saveFormBtn, saveFormBtnText, saveFormBtnSpinner;
+let vehicleForm, formTitle, saveFormBtn;
 let vehiclesList, emptyState, loadingState;
 let totalVehiclesEl, avgMileageEl;
 let deleteModal, closeDeleteModalBtn, cancelDeleteBtn, confirmDeleteBtn;
-let deleteBtnText, deleteBtnSpinner, deleteVehicleName, deleteVehicleDetails;
+let deleteVehicleName, deleteVehicleDetails;
 let deleteVehicleId = null;
 
 // Fuel Log Modal Elements
 let fuelLogModal, closeFuelLogModalBtn, cancelFuelLogBtn, saveFuelLogBtn;
 let fuelLogForm, fuelLogVehicleId, fuelLogVehicleName;
-let saveFuelLogBtnText, saveFuelLogBtnSpinner;
 
 // Mileage History Modal Elements
 let mileageHistoryModal, closeMileageHistoryBtn, closeMileageHistoryFooterBtn;
@@ -67,8 +66,6 @@ function initDOMElements() {
   vehicleForm = document.getElementById('vehicleForm');
   formTitle = document.getElementById('formTitle');
   saveFormBtn = document.getElementById('saveFormBtn');
-  saveFormBtnText = document.getElementById('saveFormBtnText');
-  saveFormBtnSpinner = document.getElementById('saveFormBtnSpinner');
   vehiclesList = document.getElementById('vehiclesList');
   emptyState = document.getElementById('emptyState');
   loadingState = document.getElementById('loadingState');
@@ -78,8 +75,6 @@ function initDOMElements() {
   closeDeleteModalBtn = document.getElementById('closeDeleteModalBtn');
   cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
   confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-  deleteBtnText = document.getElementById('deleteBtnText');
-  deleteBtnSpinner = document.getElementById('deleteBtnSpinner');
   deleteVehicleName = document.getElementById('deleteVehicleName');
   deleteVehicleDetails = document.getElementById('deleteVehicleDetails');
   
@@ -91,8 +86,6 @@ function initDOMElements() {
   fuelLogForm = document.getElementById('fuelLogForm');
   fuelLogVehicleId = document.getElementById('fuelLogVehicleId');
   fuelLogVehicleName = document.getElementById('fuelLogVehicleName');
-  saveFuelLogBtnText = document.getElementById('saveFuelLogBtnText');
-  saveFuelLogBtnSpinner = document.getElementById('saveFuelLogBtnSpinner');
   
   // Mileage History Modal Elements
   mileageHistoryModal = document.getElementById('mileageHistoryModal');
@@ -175,13 +168,11 @@ function loadUserProfile(user) {
 function showAddForm() {
   editingVehicleId = null;
   formTitle.textContent = 'Add Vehicle';
-  saveFormBtnText.textContent = 'Save Vehicle';
+  saveFormBtn.textContent = 'Save Vehicle';
   vehicleForm.reset();
   
   // Reset button state
   saveFormBtn.disabled = false;
-  saveFormBtnText.style.display = 'inline';
-  saveFormBtnSpinner.style.display = 'none';
   
   addVehicleSection.classList.add('show');
   addVehicleSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -196,12 +187,10 @@ function hideForm() {
 function showEditForm(vehicle) {
   editingVehicleId = vehicle.id;
   formTitle.textContent = 'Edit Vehicle';
-  saveFormBtnText.textContent = 'Update Vehicle';
+  saveFormBtn.textContent = 'Update Vehicle';
 
   // Reset button state
   saveFormBtn.disabled = false;
-  saveFormBtnText.style.display = 'inline';
-  saveFormBtnSpinner.style.display = 'none';
 
   document.getElementById('name').value = vehicle.name;
   document.getElementById('type').value = vehicle.type;
@@ -229,7 +218,7 @@ async function handleSubmit(e) {
   };
 
   // Show loading with text
-  const originalText = saveFormBtnText.textContent;
+  const originalText = saveFormBtn.textContent;
   saveFormBtn.disabled = true;
   saveFormBtn.innerHTML = `
     <span class="spinner"></span>

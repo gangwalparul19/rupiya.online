@@ -224,11 +224,11 @@ class TripGroupsPage {
     const form = document.getElementById('inlineGroupForm');
     const membersList = document.getElementById('inlineMembersList');
     const title = document.getElementById('inlineGroupTitle');
-    const btnText = document.getElementById('inlineSaveGroupBtnText');
+    const saveBtn = document.getElementById('inlineSaveGroupBtn');
 
     form?.reset();
     if (title) title.textContent = 'Create Trip Group';
-    if (btnText) btnText.textContent = 'Create Group';
+    if (saveBtn) saveBtn.textContent = 'Create Group';
 
     // Show creator in members list
     const user = authService.getCurrentUser();
@@ -476,12 +476,13 @@ class TripGroupsPage {
 
   setInlineLoading(loading) {
     const btn = document.getElementById('inlineSaveGroupBtn');
-    const text = document.getElementById('inlineSaveGroupBtnText');
-    const spinner = document.getElementById('inlineSaveGroupBtnSpinner');
 
     if (btn) btn.disabled = loading;
-    if (text) text.style.display = loading ? 'none' : 'inline';
-    if (spinner) spinner.style.display = loading ? 'inline-block' : 'none';
+    if (loading) {
+      btn.textContent = 'Creating...';
+    } else {
+      btn.textContent = 'Create Group';
+    }
   }
 
   openDeleteModal(groupId, groupName) {
@@ -519,12 +520,13 @@ class TripGroupsPage {
 
   setLoading(loading) {
     const btn = document.getElementById('inlineSaveGroupBtn');
-    const text = document.getElementById('inlineSaveGroupBtnText');
-    const spinner = document.getElementById('inlineSaveGroupBtnSpinner');
 
     if (btn) btn.disabled = loading;
-    if (text) text.style.display = loading ? 'none' : 'inline';
-    if (spinner) spinner.style.display = loading ? 'inline-block' : 'none';
+    if (loading) {
+      btn.textContent = 'Creating...';
+    } else {
+      btn.textContent = 'Create Group';
+    }
   }
 
   formatDate(date) {

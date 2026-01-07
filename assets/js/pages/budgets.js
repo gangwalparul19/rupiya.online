@@ -70,8 +70,6 @@ const budgetForm = document.getElementById('budgetForm');
 const closeFormBtn = document.getElementById('closeFormBtn');
 const cancelFormBtn = document.getElementById('cancelFormBtn');
 const saveFormBtn = document.getElementById('saveFormBtn');
-const saveFormBtnText = document.getElementById('saveFormBtnText');
-const saveFormBtnSpinner = document.getElementById('saveFormBtnSpinner');
 
 // Form fields
 const categoryInput = document.getElementById('category');
@@ -85,8 +83,6 @@ const deleteModal = document.getElementById('deleteModal');
 const closeDeleteModalBtn = document.getElementById('closeDeleteModalBtn');
 const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
 const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-const deleteBtnText = document.getElementById('deleteBtnText');
-const deleteBtnSpinner = document.getElementById('deleteBtnSpinner');
 const deleteCategory = document.getElementById('deleteCategory');
 const deleteMonth = document.getElementById('deleteMonth');
 
@@ -434,12 +430,10 @@ function setupEventListeners() {
 function openAddForm() {
   state.editingBudgetId = null;
   formTitle.textContent = 'Add Budget';
-  saveFormBtnText.textContent = 'Save Budget';
+  saveFormBtn.textContent = 'Save Budget';
   
   // Reset button state
   saveFormBtn.disabled = false;
-  saveFormBtnText.style.display = 'inline';
-  saveFormBtnSpinner.style.display = 'none';
   
   // Reset form
   budgetForm.reset();
@@ -463,12 +457,10 @@ function openEditForm(id) {
   
   state.editingBudgetId = id;
   formTitle.textContent = 'Edit Budget';
-  saveFormBtnText.textContent = 'Update Budget';
+  saveFormBtn.textContent = 'Update Budget';
   
   // Reset button state
   saveFormBtn.disabled = false;
-  saveFormBtnText.style.display = 'inline';
-  saveFormBtnSpinner.style.display = 'none';
   
   // Populate form
   categoryInput.value = budget.category;
@@ -545,9 +537,9 @@ async function handleFormSubmit(e) {
   }
   
   // Show loading state
+  const originalText = saveFormBtn.textContent;
   saveFormBtn.disabled = true;
-  saveFormBtnText.style.display = 'none';
-  saveFormBtnSpinner.style.display = 'inline-block';
+  saveFormBtn.textContent = 'Saving...';
   
   try {
     const budgetData = {
@@ -588,8 +580,7 @@ async function handleFormSubmit(e) {
     toast.error('Failed to save budget');
   } finally {
     saveFormBtn.disabled = false;
-    saveFormBtnText.style.display = 'inline';
-    saveFormBtnSpinner.style.display = 'none';
+    saveFormBtn.textContent = originalText;
   }
 }
 
@@ -620,9 +611,9 @@ async function handleDelete() {
   if (!deleteBudgetId) return;
   
   // Show loading state
+  const originalText = confirmDeleteBtn.textContent;
   confirmDeleteBtn.disabled = true;
-  deleteBtnText.style.display = 'none';
-  deleteBtnSpinner.style.display = 'inline-block';
+  confirmDeleteBtn.textContent = 'Deleting...';
   
   try {
     const result = await firestoreService.deleteBudget(deleteBudgetId);
@@ -640,7 +631,6 @@ async function handleDelete() {
     toast.error('Failed to delete budget');
   } finally {
     confirmDeleteBtn.disabled = false;
-    deleteBtnText.style.display = 'inline';
-    deleteBtnSpinner.style.display = 'none';
+    confirmDeleteBtn.textContent = originalText;
   }
 }

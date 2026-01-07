@@ -17,14 +17,14 @@ let editingDocumentId = null;
 let uploadedFile = null;
 
 let addDocumentBtn, addDocumentSection, closeFormBtn, cancelFormBtn;
-let documentForm, formTitle, saveFormBtn, saveFormBtnText, saveFormBtnSpinner;
+let documentForm, formTitle, saveFormBtn;
 let documentsList, emptyState, loadingState;
 let totalDocumentsEl, totalCategoriesEl, storageUsedEl;
 let searchInput, categoryFilter;
 let fileInput, uploadProgress, progressFill, progressText;
 let currentFileGroup, currentFileName, currentFileLink;
 let deleteModal, closeDeleteModalBtn, cancelDeleteBtn, confirmDeleteBtn;
-let deleteBtnText, deleteBtnSpinner, deleteDocumentName;
+let deleteDocumentName;
 let deleteDocumentId = null;
 
 // Smart document elements
@@ -63,8 +63,6 @@ function initDOMElements() {
   documentForm = document.getElementById('documentForm');
   formTitle = document.getElementById('formTitle');
   saveFormBtn = document.getElementById('saveFormBtn');
-  saveFormBtnText = document.getElementById('saveFormBtnText');
-  saveFormBtnSpinner = document.getElementById('saveFormBtnSpinner');
   documentsList = document.getElementById('documentsList');
   emptyState = document.getElementById('emptyState');
   loadingState = document.getElementById('loadingState');
@@ -84,8 +82,6 @@ function initDOMElements() {
   closeDeleteModalBtn = document.getElementById('closeDeleteModalBtn');
   cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
   confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-  deleteBtnText = document.getElementById('deleteBtnText');
-  deleteBtnSpinner = document.getElementById('deleteBtnSpinner');
   deleteDocumentName = document.getElementById('deleteDocumentName');
   
   // Smart document elements
@@ -195,13 +191,11 @@ function showAddForm() {
   editingDocumentId = null;
   uploadedFile = null;
   formTitle.textContent = 'Add Document';
-  saveFormBtnText.textContent = 'Save Document';
+  saveFormBtn.textContent = 'Save Document';
   documentForm.reset();
   
   // Reset button state
   saveFormBtn.disabled = false;
-  saveFormBtnText.style.display = 'inline';
-  saveFormBtnSpinner.style.display = 'none';
   
   // Set default date if element exists
   const documentDateInput = document.getElementById('documentDate');
@@ -229,12 +223,10 @@ function showEditForm(doc) {
   editingDocumentId = doc.id;
   uploadedFile = null;
   formTitle.textContent = 'Edit Document';
-  saveFormBtnText.textContent = 'Update Document';
+  saveFormBtn.textContent = 'Update Document';
 
   // Reset button state
   saveFormBtn.disabled = false;
-  saveFormBtnText.style.display = 'inline';
-  saveFormBtnSpinner.style.display = 'none';
 
   document.getElementById('name').value = doc.name;
   document.getElementById('category').value = doc.category;
@@ -286,9 +278,9 @@ async function handleSubmit(e) {
     return;
   }
 
+  const originalText = saveFormBtn.textContent;
   saveFormBtn.disabled = true;
-  saveFormBtnText.style.display = 'none';
-  saveFormBtnSpinner.style.display = 'inline-block';
+  saveFormBtn.textContent = 'Saving...';
 
   try {
     let fileUrl = null;
@@ -387,8 +379,7 @@ async function handleSubmit(e) {
     showToast('Failed to save document', 'error');
   } finally {
     saveFormBtn.disabled = false;
-    saveFormBtnText.style.display = 'inline';
-    saveFormBtnSpinner.style.display = 'none';
+    saveFormBtn.textContent = originalText;
     uploadProgress.style.display = 'none';
     progressFill.style.width = '0%';
     progressText.textContent = '0%';
@@ -574,9 +565,9 @@ function hideDeleteModal() {
 async function handleDelete() {
   if (!deleteDocumentId) return;
 
+  const originalText = confirmDeleteBtn.textContent;
   confirmDeleteBtn.disabled = true;
-  deleteBtnText.style.display = 'none';
-  deleteBtnSpinner.style.display = 'inline-block';
+  confirmDeleteBtn.textContent = 'Deleting...';
 
   try {
     // Get document to delete file from storage
@@ -602,8 +593,7 @@ async function handleDelete() {
     showToast('Failed to delete document', 'error');
   } finally {
     confirmDeleteBtn.disabled = false;
-    deleteBtnText.style.display = 'inline';
-    deleteBtnSpinner.style.display = 'none';
+    confirmDeleteBtn.textContent = originalText;
   }
 }
 

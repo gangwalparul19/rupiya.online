@@ -474,13 +474,13 @@ function showAddForm(loanId = null) {
   const addLoanSection = document.getElementById('addLoanSection');
   const title = document.getElementById('formTitle');
   const form = document.getElementById('loanForm');
+  const saveFormBtn = document.getElementById('saveFormBtn');
   
   editingLoanId = loanId;
   
   // Reset button state
   saveFormBtn.disabled = false;
-  saveFormBtnText.style.display = 'inline';
-  saveFormBtnSpinner.style.display = 'none';
+  saveFormBtn.textContent = loanId ? 'Update Loan' : 'Save Loan';
   
   if (loanId) {
     const loan = loans.find(l => l.id === loanId);
@@ -535,13 +535,11 @@ async function saveLoan(e) {
   e.preventDefault();
   
   const saveFormBtn = document.getElementById('saveFormBtn');
-  const saveFormBtnText = document.getElementById('saveFormBtnText');
-  const saveFormBtnSpinner = document.getElementById('saveFormBtnSpinner');
   
   // Show loading state
+  const originalText = saveFormBtn.textContent;
   saveFormBtn.disabled = true;
-  saveFormBtnText.style.display = 'none';
-  saveFormBtnSpinner.style.display = 'inline-block';
+  saveFormBtn.textContent = 'Saving...';
   
   const loanData = {
     loanName: document.getElementById('loanName').value.trim(),
@@ -590,8 +588,7 @@ async function saveLoan(e) {
   } finally {
     // Reset loading state
     saveFormBtn.disabled = false;
-    saveFormBtnText.style.display = 'inline';
-    saveFormBtnSpinner.style.display = 'none';
+    saveFormBtn.textContent = originalText;
   }
 }
 

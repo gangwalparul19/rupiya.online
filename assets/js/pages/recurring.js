@@ -20,12 +20,12 @@ let userPaymentMethods = [];
 
 // DOM Elements
 let addRecurringBtn, addRecurringSection, closeFormBtn, cancelFormBtn;
-let recurringForm, formTitle, saveFormBtn, saveFormBtnText, saveFormBtnSpinner;
+let recurringForm, formTitle, saveFormBtn;
 let recurringList, emptyState, loadingState;
 let processNowBtn;
 let monthlyExpensesEl, monthlyIncomeEl, activeCountEl;
 let deleteModal, closeDeleteModalBtn, cancelDeleteBtn, confirmDeleteBtn;
-let deleteBtnText, deleteBtnSpinner, deleteRecurringDescription, deleteRecurringAmount;
+let deleteRecurringDescription, deleteRecurringAmount;
 let deleteRecurringId = null;
 let paymentMethodInput, specificPaymentMethodGroup, specificPaymentMethodInput;
 
@@ -213,8 +213,6 @@ function initDOMElements() {
   recurringForm = document.getElementById('recurringForm');
   formTitle = document.getElementById('formTitle');
   saveFormBtn = document.getElementById('saveFormBtn');
-  saveFormBtnText = document.getElementById('saveFormBtnText');
-  saveFormBtnSpinner = document.getElementById('saveFormBtnSpinner');
   recurringList = document.getElementById('recurringList');
   emptyState = document.getElementById('emptyState');
   loadingState = document.getElementById('loadingState');
@@ -225,8 +223,6 @@ function initDOMElements() {
   closeDeleteModalBtn = document.getElementById('closeDeleteModalBtn');
   cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
   confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-  deleteBtnText = document.getElementById('deleteBtnText');
-  deleteBtnSpinner = document.getElementById('deleteBtnSpinner');
   deleteRecurringDescription = document.getElementById('deleteRecurringDescription');
   deleteRecurringAmount = document.getElementById('deleteRecurringAmount');
   
@@ -339,13 +335,11 @@ function loadUserProfile(user) {
 function showAddForm() {
   editingRecurringId = null;
   formTitle.textContent = 'Add Recurring Transaction';
-  saveFormBtnText.textContent = 'Save Recurring';
+  saveFormBtn.textContent = 'Save Recurring';
   recurringForm.reset();
   
   // Reset button state
   saveFormBtn.disabled = false;
-  saveFormBtnText.style.display = 'inline';
-  saveFormBtnSpinner.style.display = 'none';
   
   // Set default date if element exists
   const startDateInput = document.getElementById('startDate');
@@ -381,12 +375,10 @@ function hideForm() {
 function showEditForm(recurring) {
   editingRecurringId = recurring.id;
   formTitle.textContent = 'Edit Recurring Transaction';
-  saveFormBtnText.textContent = 'Update Recurring';
+  saveFormBtn.textContent = 'Update Recurring';
 
   // Reset button state
   saveFormBtn.disabled = false;
-  saveFormBtnText.style.display = 'inline';
-  saveFormBtnSpinner.style.display = 'none';
 
   // Fill form
   document.getElementById('type').value = recurring.type;
@@ -435,9 +427,9 @@ async function handleSubmit(e) {
   };
 
   // Show loading
+  const originalText = saveFormBtn.textContent;
   saveFormBtn.disabled = true;
-  saveFormBtnText.style.display = 'none';
-  saveFormBtnSpinner.style.display = 'inline-block';
+  saveFormBtn.textContent = 'Saving...';
 
   try {
     let result;
@@ -476,8 +468,7 @@ async function handleSubmit(e) {
     showToast('An error occurred. Please try again.', 'error');
   } finally {
     saveFormBtn.disabled = false;
-    saveFormBtnText.style.display = 'inline';
-    saveFormBtnSpinner.style.display = 'none';
+    saveFormBtn.textContent = originalText;
   }
 }
 
@@ -691,9 +682,9 @@ function hideDeleteModal() {
 async function handleDelete() {
   if (!deleteRecurringId) return;
 
+  const originalText = confirmDeleteBtn.textContent;
   confirmDeleteBtn.disabled = true;
-  deleteBtnText.style.display = 'none';
-  deleteBtnSpinner.style.display = 'inline-block';
+  confirmDeleteBtn.textContent = 'Deleting...';
 
   try {
     const result = await firestoreService.delete('recurringTransactions', deleteRecurringId);
@@ -710,8 +701,7 @@ async function handleDelete() {
     showToast('An error occurred. Please try again.', 'error');
   } finally {
     confirmDeleteBtn.disabled = false;
-    deleteBtnText.style.display = 'inline';
-    deleteBtnSpinner.style.display = 'none';
+    confirmDeleteBtn.textContent = originalText;
   }
 }
 

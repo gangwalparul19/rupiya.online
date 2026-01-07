@@ -28,8 +28,6 @@ function setupCreateFamilyModal() {
       e.preventDefault();
       
       const submitBtn = document.getElementById('createFamilySubmit');
-      const btnText = document.getElementById('createFamilyBtnText');
-      const btnSpinner = document.getElementById('createFamilyBtnSpinner');
       const groupName = document.getElementById('familyGroupName').value.trim();
       
       if (!groupName) {
@@ -38,9 +36,9 @@ function setupCreateFamilyModal() {
       }
       
       // Show loading
+      const originalText = submitBtn.textContent;
       submitBtn.disabled = true;
-      btnText.style.display = 'none';
-      btnSpinner.style.display = 'inline-block';
+      submitBtn.textContent = 'Creating...';
       
       try {
         const result = await familyService.createFamilyGroup(groupName);
@@ -60,8 +58,7 @@ function setupCreateFamilyModal() {
         toast.error('Failed to create family group');
       } finally {
         submitBtn.disabled = false;
-        btnText.style.display = 'inline';
-        btnSpinner.style.display = 'none';
+        submitBtn.textContent = originalText;
       }
     });
   }
@@ -76,8 +73,6 @@ function setupInviteMemberModal() {
       e.preventDefault();
       
       const submitBtn = document.getElementById('inviteMemberSubmit');
-      const btnText = document.getElementById('inviteMemberBtnText');
-      const btnSpinner = document.getElementById('inviteMemberBtnSpinner');
       const groupId = document.getElementById('inviteGroupId').value;
       const email = document.getElementById('inviteEmail').value.trim();
       const role = document.getElementById('inviteRole').value;
@@ -88,9 +83,9 @@ function setupInviteMemberModal() {
       }
       
       // Show loading
+      const originalText = submitBtn.textContent;
       submitBtn.disabled = true;
-      btnText.style.display = 'none';
-      btnSpinner.style.display = 'inline-block';
+      submitBtn.textContent = 'Sending...';
       
       try {
         const result = await familyService.inviteMember(groupId, email, role);
@@ -107,8 +102,7 @@ function setupInviteMemberModal() {
         toast.error('Failed to send invitation');
       } finally {
         submitBtn.disabled = false;
-        btnText.style.display = 'inline';
-        btnSpinner.style.display = 'none';
+        submitBtn.textContent = originalText;
       }
     });
   }
@@ -120,15 +114,13 @@ function setupRemoveMemberModal() {
   
   if (confirmRemoveBtn) {
     confirmRemoveBtn.addEventListener('click', async () => {
-      const btnText = document.getElementById('removeMemberBtnText');
-      const btnSpinner = document.getElementById('removeMemberBtnSpinner');
       const groupId = document.getElementById('removeGroupId').value;
       const memberId = document.getElementById('removeMemberId').value;
       
       // Show loading
+      const originalText = confirmRemoveBtn.textContent;
       confirmRemoveBtn.disabled = true;
-      btnText.style.display = 'none';
-      btnSpinner.style.display = 'inline-block';
+      confirmRemoveBtn.textContent = 'Removing...';
       
       try {
         const result = await familyService.removeMember(groupId, memberId);
@@ -147,8 +139,7 @@ function setupRemoveMemberModal() {
         toast.error('Failed to remove member');
       } finally {
         confirmRemoveBtn.disabled = false;
-        btnText.style.display = 'inline';
-        btnSpinner.style.display = 'none';
+        confirmRemoveBtn.textContent = originalText;
       }
     });
   }
@@ -160,14 +151,12 @@ function setupDeleteGroupModal() {
   
   if (confirmDeleteBtn) {
     confirmDeleteBtn.addEventListener('click', async () => {
-      const btnText = document.getElementById('deleteGroupBtnText');
-      const btnSpinner = document.getElementById('deleteGroupBtnSpinner');
       const groupId = document.getElementById('deleteGroupId').value;
       
       // Show loading
+      const originalText = confirmDeleteBtn.textContent;
       confirmDeleteBtn.disabled = true;
-      btnText.style.display = 'none';
-      btnSpinner.style.display = 'inline-block';
+      confirmDeleteBtn.textContent = 'Deleting...';
       
       try {
         const result = await familyService.deleteFamilyGroup(groupId);
@@ -186,8 +175,7 @@ function setupDeleteGroupModal() {
         toast.error('Failed to delete group');
       } finally {
         confirmDeleteBtn.disabled = false;
-        btnText.style.display = 'inline';
-        btnSpinner.style.display = 'none';
+        confirmDeleteBtn.textContent = originalText;
       }
     });
   }

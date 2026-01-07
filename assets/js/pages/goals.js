@@ -69,8 +69,6 @@ const goalForm = document.getElementById('goalForm');
 const closeFormBtn = document.getElementById('closeFormBtn');
 const cancelFormBtn = document.getElementById('cancelFormBtn');
 const saveFormBtn = document.getElementById('saveFormBtn');
-const saveFormBtnText = document.getElementById('saveFormBtnText');
-const saveFormBtnSpinner = document.getElementById('saveFormBtnSpinner');
 
 // Form fields
 const nameInput = document.getElementById('name');
@@ -85,8 +83,6 @@ const closeContributionModalBtn = document.getElementById('closeContributionModa
 const cancelContributionBtn = document.getElementById('cancelContributionBtn');
 const contributionForm = document.getElementById('contributionForm');
 const saveContributionBtn = document.getElementById('saveContributionBtn');
-const saveContributionBtnText = document.getElementById('saveContributionBtnText');
-const saveContributionBtnSpinner = document.getElementById('saveContributionBtnSpinner');
 const contributionGoalName = document.getElementById('contributionGoalName');
 const contributionGoalProgress = document.getElementById('contributionGoalProgress');
 const contributionAmountInput = document.getElementById('contributionAmount');
@@ -98,8 +94,6 @@ const deleteModal = document.getElementById('deleteModal');
 const closeDeleteModalBtn = document.getElementById('closeDeleteModalBtn');
 const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
 const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-const deleteBtnText = document.getElementById('deleteBtnText');
-const deleteBtnSpinner = document.getElementById('deleteBtnSpinner');
 const deleteGoalName = document.getElementById('deleteGoalName');
 const deleteGoalTarget = document.getElementById('deleteGoalTarget');
 
@@ -442,12 +436,10 @@ function setupEventListeners() {
 function openAddForm() {
   state.editingGoalId = null;
   formTitle.textContent = 'Add Goal';
-  saveFormBtnText.textContent = 'Save Goal';
+  saveFormBtn.textContent = 'Save Goal';
   
   // Reset button state
   saveFormBtn.disabled = false;
-  saveFormBtnText.style.display = 'inline';
-  saveFormBtnSpinner.style.display = 'none';
   
   // Reset form
   goalForm.reset();
@@ -471,12 +463,10 @@ function openEditForm(id) {
   
   state.editingGoalId = id;
   formTitle.textContent = 'Edit Goal';
-  saveFormBtnText.textContent = 'Update Goal';
+  saveFormBtn.textContent = 'Update Goal';
   
   // Reset button state
   saveFormBtn.disabled = false;
-  saveFormBtnText.style.display = 'inline';
-  saveFormBtnSpinner.style.display = 'none';
   
   // Populate form
   nameInput.value = goal.name;
@@ -568,9 +558,9 @@ async function handleFormSubmit(e) {
   }
   
   // Show loading state
+  const originalText = saveFormBtn.textContent;
   saveFormBtn.disabled = true;
-  saveFormBtnText.style.display = 'none';
-  saveFormBtnSpinner.style.display = 'inline-block';
+  saveFormBtn.textContent = 'Saving...';
   
   try {
     const goalData = {
@@ -611,8 +601,7 @@ async function handleFormSubmit(e) {
     toast.error('Failed to save goal');
   } finally {
     saveFormBtn.disabled = false;
-    saveFormBtnText.style.display = 'inline';
-    saveFormBtnSpinner.style.display = 'none';
+    saveFormBtn.textContent = originalText;
   }
 }
 
@@ -661,9 +650,9 @@ async function handleContributionSubmit(e) {
   }
   
   // Show loading state
+  const originalText = saveContributionBtn.textContent;
   saveContributionBtn.disabled = true;
-  saveContributionBtnText.style.display = 'none';
-  saveContributionBtnSpinner.style.display = 'inline-block';
+  saveContributionBtn.textContent = 'Saving...';
   
   try {
     const goal = state.goals.find(g => g.id === state.contributingGoalId);
@@ -688,8 +677,7 @@ async function handleContributionSubmit(e) {
     toast.error('Failed to add contribution');
   } finally {
     saveContributionBtn.disabled = false;
-    saveContributionBtnText.style.display = 'inline';
-    saveContributionBtnSpinner.style.display = 'none';
+    saveContributionBtn.textContent = originalText;
   }
 }
 
@@ -716,9 +704,9 @@ async function handleDelete() {
   if (!deleteGoalId) return;
   
   // Show loading state
+  const originalText = confirmDeleteBtn.textContent;
   confirmDeleteBtn.disabled = true;
-  deleteBtnText.style.display = 'none';
-  deleteBtnSpinner.style.display = 'inline-block';
+  confirmDeleteBtn.textContent = 'Deleting...';
   
   try {
     const result = await firestoreService.deleteGoal(deleteGoalId);
@@ -736,7 +724,6 @@ async function handleDelete() {
     toast.error('Failed to delete goal');
   } finally {
     confirmDeleteBtn.disabled = false;
-    deleteBtnText.style.display = 'inline';
-    deleteBtnSpinner.style.display = 'none';
+    confirmDeleteBtn.textContent = originalText;
   }
 }

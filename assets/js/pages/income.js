@@ -122,8 +122,6 @@ const incomeForm = document.getElementById('incomeForm');
 const closeFormBtn = document.getElementById('closeFormBtn');
 const cancelFormBtn = document.getElementById('cancelFormBtn');
 const saveFormBtn = document.getElementById('saveFormBtn');
-const saveFormBtnText = document.getElementById('saveFormBtnText');
-const saveFormBtnSpinner = document.getElementById('saveFormBtnSpinner');
 
 // Form fields
 const amountInput = document.getElementById('amount');
@@ -142,8 +140,6 @@ const deleteModal = document.getElementById('deleteModal');
 const closeDeleteModalBtn = document.getElementById('closeDeleteModalBtn');
 const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
 const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-const deleteBtnText = document.getElementById('deleteBtnText');
-const deleteBtnSpinner = document.getElementById('deleteBtnSpinner');
 const deleteAmount = document.getElementById('deleteAmount');
 const deleteDescription = document.getElementById('deleteDescription');
 
@@ -951,12 +947,10 @@ function clearFilters() {
 function openAddForm() {
   state.editingIncomeId = null;
   formTitle.textContent = 'Add Income';
-  saveFormBtnText.textContent = 'Save Income';
+  saveFormBtn.textContent = 'Save Income';
   
   // Reset button state
   saveFormBtn.disabled = false;
-  saveFormBtnText.style.display = 'inline';
-  saveFormBtnSpinner.style.display = 'none';
   
   // Reset form
   incomeForm.reset();
@@ -977,12 +971,10 @@ function openEditForm(id) {
   
   state.editingIncomeId = id;
   formTitle.textContent = 'Edit Income';
-  saveFormBtnText.textContent = 'Update Income';
+  saveFormBtn.textContent = 'Update Income';
   
   // Reset button state
   saveFormBtn.disabled = false;
-  saveFormBtnText.style.display = 'inline';
-  saveFormBtnSpinner.style.display = 'none';
   
   // Populate form
   amountInput.value = income.amount;
@@ -1067,9 +1059,9 @@ async function handleFormSubmit(e) {
   }
   
   // Show loading state
+  const originalText = saveFormBtn.textContent;
   saveFormBtn.disabled = true;
-  saveFormBtnText.style.display = 'none';
-  saveFormBtnSpinner.style.display = 'inline-block';
+  saveFormBtn.textContent = 'Saving...';
   
   try {
     const incomeData = {
@@ -1154,8 +1146,7 @@ async function handleFormSubmit(e) {
     toast.error('Failed to save income');
   } finally {
     saveFormBtn.disabled = false;
-    saveFormBtnText.style.display = 'inline';
-    saveFormBtnSpinner.style.display = 'none';
+    saveFormBtn.textContent = originalText;
   }
 }
 
@@ -1182,9 +1173,9 @@ async function handleDelete() {
   if (!deleteIncomeId) return;
   
   // Show loading state
+  const originalText = confirmDeleteBtn.textContent;
   confirmDeleteBtn.disabled = true;
-  deleteBtnText.style.display = 'none';
-  deleteBtnSpinner.style.display = 'inline-block';
+  confirmDeleteBtn.textContent = 'Deleting...';
   
   try {
     const result = await firestoreService.deleteIncome(deleteIncomeId);
@@ -1202,8 +1193,7 @@ async function handleDelete() {
     toast.error('Failed to delete income');
   } finally {
     confirmDeleteBtn.disabled = false;
-    deleteBtnText.style.display = 'inline';
-    deleteBtnSpinner.style.display = 'none';
+    confirmDeleteBtn.textContent = originalText;
   }
 }
 

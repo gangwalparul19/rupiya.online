@@ -27,11 +27,11 @@ let searchDebounceTimer = null;
 
 // DOM Elements
 let addInvestmentBtn, addInvestmentSection, closeFormBtn, cancelFormBtn;
-let investmentForm, formTitle, saveFormBtn, saveFormBtnText, saveFormBtnSpinner;
+let investmentForm, formTitle, saveFormBtn;
 let investmentsList, emptyState, loadingState;
 let totalInvestedEl, currentValueEl, totalReturnsEl, returnsPercentageEl;
 let deleteModal, closeDeleteModalBtn, cancelDeleteBtn, confirmDeleteBtn;
-let deleteBtnText, deleteBtnSpinner, deleteInvestmentName, deleteInvestmentType;
+let deleteInvestmentName, deleteInvestmentType;
 let deleteInvestmentId = null;
 
 // Initialize page
@@ -94,8 +94,6 @@ function initDOMElements() {
   investmentForm = document.getElementById('investmentForm');
   formTitle = document.getElementById('formTitle');
   saveFormBtn = document.getElementById('saveFormBtn');
-  saveFormBtnText = document.getElementById('saveFormBtnText');
-  saveFormBtnSpinner = document.getElementById('saveFormBtnSpinner');
   investmentsList = document.getElementById('investmentsList');
   emptyState = document.getElementById('emptyState');
   loadingState = document.getElementById('loadingState');
@@ -107,8 +105,6 @@ function initDOMElements() {
   closeDeleteModalBtn = document.getElementById('closeDeleteModalBtn');
   cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
   confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-  deleteBtnText = document.getElementById('deleteBtnText');
-  deleteBtnSpinner = document.getElementById('deleteBtnSpinner');
   deleteInvestmentName = document.getElementById('deleteInvestmentName');
   deleteInvestmentType = document.getElementById('deleteInvestmentType');
 }
@@ -209,13 +205,11 @@ function loadUserProfile(user) {
 function showAddForm() {
   editingInvestmentId = null;
   formTitle.textContent = 'Add Investment';
-  saveFormBtnText.textContent = 'Save Investment';
+  saveFormBtn.textContent = 'Save Investment';
   investmentForm.reset();
 
   // Reset button state
   saveFormBtn.disabled = false;
-  saveFormBtnText.style.display = 'inline';
-  saveFormBtnSpinner.style.display = 'none';
 
   // Set default date if element exists
   const purchaseDateInput = document.getElementById('purchaseDate');
@@ -238,12 +232,10 @@ function hideForm() {
 function showEditForm(investment) {
   editingInvestmentId = investment.id;
   formTitle.textContent = 'Edit Investment';
-  saveFormBtnText.textContent = 'Update Investment';
+  saveFormBtn.textContent = 'Update Investment';
 
   // Reset button state
   saveFormBtn.disabled = false;
-  saveFormBtnText.style.display = 'inline';
-  saveFormBtnSpinner.style.display = 'none';
 
   // Fill form
   document.getElementById('name').value = investment.name;
@@ -284,9 +276,9 @@ async function handleSubmit(e) {
   }
 
   // Show loading
+  const originalText = saveFormBtn.textContent;
   saveFormBtn.disabled = true;
-  saveFormBtnText.style.display = 'none';
-  saveFormBtnSpinner.style.display = 'inline-block';
+  saveFormBtn.textContent = 'Saving...';
 
   try {
     // Try to fetch live price and convert to INR
@@ -345,8 +337,7 @@ async function handleSubmit(e) {
     showToast('Failed to save investment', 'error');
   } finally {
     saveFormBtn.disabled = false;
-    saveFormBtnText.style.display = 'inline';
-    saveFormBtnSpinner.style.display = 'none';
+    saveFormBtn.textContent = originalText;
   }
 }
 
@@ -662,9 +653,9 @@ function hideDeleteModal() {
 async function handleDelete() {
   if (!deleteInvestmentId) return;
 
+  const originalText = confirmDeleteBtn.textContent;
   confirmDeleteBtn.disabled = true;
-  deleteBtnText.style.display = 'none';
-  deleteBtnSpinner.style.display = 'inline-block';
+  confirmDeleteBtn.textContent = 'Deleting...';
 
   try {
     const result = await firestoreService.deleteInvestment(deleteInvestmentId);
@@ -681,8 +672,7 @@ async function handleDelete() {
     showToast('Failed to delete investment', 'error');
   } finally {
     confirmDeleteBtn.disabled = false;
-    deleteBtnText.style.display = 'inline';
-    deleteBtnSpinner.style.display = 'none';
+    confirmDeleteBtn.textContent = originalText;
   }
 }
 

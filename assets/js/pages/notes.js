@@ -19,12 +19,12 @@ let currentLastDoc = null;
 let allLoadedNotes = []; // Cache for client-side filtering
 
 let addNoteBtn, addNoteSection, closeFormBtn, cancelFormBtn;
-let noteForm, formTitle, saveFormBtn, saveFormBtnText, saveFormBtnSpinner;
+let noteForm, formTitle, saveFormBtn;
 let notesList, emptyState, loadingState;
 let totalNotesEl, pinnedNotesEl, totalCategoriesEl;
 let searchInput, categoryFilter;
 let deleteModal, closeDeleteModalBtn, cancelDeleteBtn, confirmDeleteBtn;
-let deleteBtnText, deleteBtnSpinner, deleteNoteTitle;
+let deleteNoteTitle;
 let deleteNoteId = null;
 
 async function init() {
@@ -53,8 +53,6 @@ function initDOMElements() {
   noteForm = document.getElementById('noteForm');
   formTitle = document.getElementById('formTitle');
   saveFormBtn = document.getElementById('saveFormBtn');
-  saveFormBtnText = document.getElementById('saveFormBtnText');
-  saveFormBtnSpinner = document.getElementById('saveFormBtnSpinner');
   notesList = document.getElementById('notesList');
   emptyState = document.getElementById('emptyState');
   loadingState = document.getElementById('loadingState');
@@ -67,8 +65,6 @@ function initDOMElements() {
   closeDeleteModalBtn = document.getElementById('closeDeleteModalBtn');
   cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
   confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-  deleteBtnText = document.getElementById('deleteBtnText');
-  deleteBtnSpinner = document.getElementById('deleteBtnSpinner');
   deleteNoteTitle = document.getElementById('deleteNoteTitle');
 }
 
@@ -120,13 +116,11 @@ function loadUserProfile(user) {
 function showAddForm() {
   editingNoteId = null;
   formTitle.textContent = 'Add Note';
-  saveFormBtnText.textContent = 'Save Note';
+  saveFormBtn.textContent = 'Save Note';
   noteForm.reset();
   
   // Reset button state
   saveFormBtn.disabled = false;
-  saveFormBtnText.style.display = 'inline';
-  saveFormBtnSpinner.style.display = 'none';
   
   addNoteSection.classList.add('show');
   addNoteSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -141,12 +135,10 @@ function hideForm() {
 function showEditForm(note) {
   editingNoteId = note.id;
   formTitle.textContent = 'Edit Note';
-  saveFormBtnText.textContent = 'Update Note';
+  saveFormBtn.textContent = 'Update Note';
 
   // Reset button state
   saveFormBtn.disabled = false;
-  saveFormBtnText.style.display = 'inline';
-  saveFormBtnSpinner.style.display = 'none';
 
   document.getElementById('title').value = note.title;
   document.getElementById('category').value = note.category;
@@ -167,9 +159,9 @@ async function handleSubmit(e) {
     content: document.getElementById('content').value.trim()
   };
 
+  const originalText = saveFormBtn.textContent;
   saveFormBtn.disabled = true;
-  saveFormBtnText.style.display = 'none';
-  saveFormBtnSpinner.style.display = 'inline-block';
+  saveFormBtn.textContent = 'Saving...';
 
   try {
     let result;
@@ -192,8 +184,7 @@ async function handleSubmit(e) {
     showToast('Failed to save note', 'error');
   } finally {
     saveFormBtn.disabled = false;
-    saveFormBtnText.style.display = 'inline';
-    saveFormBtnSpinner.style.display = 'none';
+    saveFormBtn.textContent = originalText;
   }
 }
 
@@ -392,9 +383,9 @@ function hideDeleteModal() {
 async function handleDelete() {
   if (!deleteNoteId) return;
 
+  const originalText = confirmDeleteBtn.textContent;
   confirmDeleteBtn.disabled = true;
-  deleteBtnText.style.display = 'none';
-  deleteBtnSpinner.style.display = 'inline-block';
+  confirmDeleteBtn.textContent = 'Deleting...';
 
   try {
     const result = await firestoreService.delete('notes', deleteNoteId);
@@ -411,8 +402,7 @@ async function handleDelete() {
     showToast('Failed to delete note', 'error');
   } finally {
     confirmDeleteBtn.disabled = false;
-    deleteBtnText.style.display = 'inline';
-    deleteBtnSpinner.style.display = 'none';
+    confirmDeleteBtn.textContent = originalText;
   }
 }
 

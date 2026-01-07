@@ -61,8 +61,6 @@ const splitForm = document.getElementById('splitForm');
 const closeSplitFormBtn = document.getElementById('closeSplitFormBtn');
 const cancelSplitBtn = document.getElementById('cancelSplitBtn');
 const saveSplitBtn = document.getElementById('saveSplitBtn');
-const saveSplitBtnText = document.getElementById('saveSplitBtnText');
-const saveSplitBtnSpinner = document.getElementById('saveSplitBtnSpinner');
 
 // Form fields
 const splitDescription = document.getElementById('splitDescription');
@@ -82,8 +80,6 @@ const settleModal = document.getElementById('settleModal');
 const closeSettleModalBtn = document.getElementById('closeSettleModalBtn');
 const cancelSettleBtn = document.getElementById('cancelSettleBtn');
 const confirmSettleBtn = document.getElementById('confirmSettleBtn');
-const settleBtnText = document.getElementById('settleBtnText');
-const settleBtnSpinner = document.getElementById('settleBtnSpinner');
 const settleDescription = document.getElementById('settleDescription');
 const settleAmount = document.getElementById('settleAmount');
 const settleDate = document.getElementById('settleDate');
@@ -487,9 +483,9 @@ async function submitSplitForm(e) {
   }
   
   // Show loading
+  const originalText = saveSplitBtn.textContent;
   saveSplitBtn.disabled = true;
-  saveSplitBtnText.style.display = 'none';
-  saveSplitBtnSpinner.style.display = 'inline-block';
+  saveSplitBtn.textContent = 'Creating...';
   
   try {
     const splitData = {
@@ -523,8 +519,7 @@ async function submitSplitForm(e) {
     toast.error('Failed to create split');
   } finally {
     saveSplitBtn.disabled = false;
-    saveSplitBtnText.style.display = 'inline';
-    saveSplitBtnSpinner.style.display = 'none';
+    saveSplitBtn.textContent = originalText;
   }
 }
 
@@ -553,9 +548,9 @@ async function confirmSettle() {
   if (!currentSettleSplitId) return;
   
   // Show loading
+  const originalText = confirmSettleBtn.textContent;
   confirmSettleBtn.disabled = true;
-  settleBtnText.style.display = 'none';
-  settleBtnSpinner.style.display = 'inline-block';
+  confirmSettleBtn.textContent = 'Settling...';
   
   try {
     const result = await splitService.settleSplit(currentSettleSplitId, {
@@ -576,8 +571,7 @@ async function confirmSettle() {
     toast.error('Failed to settle split');
   } finally {
     confirmSettleBtn.disabled = false;
-    settleBtnText.style.display = 'inline';
-    settleBtnSpinner.style.display = 'none';
+    confirmSettleBtn.textContent = originalText;
   }
 }
 

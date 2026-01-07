@@ -182,8 +182,6 @@ async function handleFeedbackSubmit(e) {
   e.preventDefault();
   
   const submitBtn = document.getElementById('submitFeedbackBtn');
-  const submitBtnText = document.getElementById('submitBtnText');
-  const submitBtnSpinner = document.getElementById('submitBtnSpinner');
   
   // Get form values
   const feedbackType = document.getElementById('feedbackType').value;
@@ -198,9 +196,9 @@ async function handleFeedbackSubmit(e) {
   }
   
   // Show loading
+  const originalText = submitBtn.textContent;
   submitBtn.disabled = true;
-  submitBtnText.style.display = 'none';
-  submitBtnSpinner.style.display = 'inline-block';
+  submitBtn.textContent = 'Sending...';
   
   try {
     // Prepare feedback data
@@ -243,8 +241,7 @@ async function handleFeedbackSubmit(e) {
     showToast('Failed to send feedback. Please try again.', 'error');
   } finally {
     submitBtn.disabled = false;
-    submitBtnText.style.display = 'inline';
-    submitBtnSpinner.style.display = 'none';
+    submitBtn.textContent = originalText;
   }
 }
 

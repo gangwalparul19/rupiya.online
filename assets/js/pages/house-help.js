@@ -14,16 +14,15 @@ let staffPayments = {}; // Store payments by staff ID
 let editingHelpId = null;
 
 let addHelpBtn, addHelpSection, closeFormBtn, cancelFormBtn;
-let helpForm, formTitle, saveFormBtn, saveFormBtnText, saveFormBtnSpinner;
+let helpForm, formTitle, saveFormBtn;
 let helpList, emptyState, loadingState;
 let totalStaffEl, monthlySalaryEl, monthlyPaidEl;
 let deleteModal, closeDeleteModalBtn, cancelDeleteBtn, confirmDeleteBtn;
-let deleteBtnText, deleteBtnSpinner, deleteHelpName, deleteHelpRole;
+let deleteHelpName, deleteHelpRole;
 let deleteHelpId = null;
 
 // Payment modal elements
 let paymentModal, closePaymentModalBtn, cancelPaymentBtn, savePaymentBtn;
-let savePaymentBtnText, savePaymentBtnSpinner;
 let paymentStaffName, paymentStaffRole, paymentMonthlySalary;
 let paymentPaidThisMonth, paymentRemaining;
 let paymentForm, paymentAmount, paymentDate, paymentNote;
@@ -32,7 +31,7 @@ let currentPaymentStaffId = null;
 
 // Delete payment modal elements
 let deletePaymentModal, closeDeletePaymentModalBtn, cancelDeletePaymentBtn, confirmDeletePaymentBtn;
-let deletePaymentBtnText, deletePaymentBtnSpinner, deletePaymentAmount, deletePaymentDate;
+let deletePaymentAmount, deletePaymentDate;
 let deletePaymentId = null;
 
 async function init() {
@@ -67,8 +66,6 @@ function initDOMElements() {
   helpForm = document.getElementById('helpForm');
   formTitle = document.getElementById('formTitle');
   saveFormBtn = document.getElementById('saveFormBtn');
-  saveFormBtnText = document.getElementById('saveFormBtnText');
-  saveFormBtnSpinner = document.getElementById('saveFormBtnSpinner');
   helpList = document.getElementById('helpList');
   emptyState = document.getElementById('emptyState');
   loadingState = document.getElementById('loadingState');
@@ -79,8 +76,6 @@ function initDOMElements() {
   closeDeleteModalBtn = document.getElementById('closeDeleteModalBtn');
   cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
   confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-  deleteBtnText = document.getElementById('deleteBtnText');
-  deleteBtnSpinner = document.getElementById('deleteBtnSpinner');
   deleteHelpName = document.getElementById('deleteHelpName');
   deleteHelpRole = document.getElementById('deleteHelpRole');
 
@@ -89,8 +84,6 @@ function initDOMElements() {
   closePaymentModalBtn = document.getElementById('closePaymentModalBtn');
   cancelPaymentBtn = document.getElementById('cancelPaymentBtn');
   savePaymentBtn = document.getElementById('savePaymentBtn');
-  savePaymentBtnText = document.getElementById('savePaymentBtnText');
-  savePaymentBtnSpinner = document.getElementById('savePaymentBtnSpinner');
   paymentStaffName = document.getElementById('paymentStaffName');
   paymentStaffRole = document.getElementById('paymentStaffRole');
   paymentMonthlySalary = document.getElementById('paymentMonthlySalary');
@@ -108,8 +101,6 @@ function initDOMElements() {
   closeDeletePaymentModalBtn = document.getElementById('closeDeletePaymentModalBtn');
   cancelDeletePaymentBtn = document.getElementById('cancelDeletePaymentBtn');
   confirmDeletePaymentBtn = document.getElementById('confirmDeletePaymentBtn');
-  deletePaymentBtnText = document.getElementById('deletePaymentBtnText');
-  deletePaymentBtnSpinner = document.getElementById('deletePaymentBtnSpinner');
   deletePaymentAmount = document.getElementById('deletePaymentAmount');
   deletePaymentDate = document.getElementById('deletePaymentDate');
 }
@@ -170,13 +161,11 @@ function loadUserProfile(user) {
 function showAddForm() {
   editingHelpId = null;
   formTitle.textContent = 'Add Staff';
-  saveFormBtnText.textContent = 'Save Staff';
+  saveFormBtn.textContent = 'Save Staff';
   helpForm.reset();
   
   // Reset button state
   saveFormBtn.disabled = false;
-  saveFormBtnText.style.display = 'inline';
-  saveFormBtnSpinner.style.display = 'none';
   
   // Set default date if element exists
   const joinDateInput = document.querySelector('#helpForm #joinDate');
@@ -198,12 +187,10 @@ function hideForm() {
 function showEditForm(help) {
   editingHelpId = help.id;
   formTitle.textContent = 'Edit Staff';
-  saveFormBtnText.textContent = 'Update Staff';
+  saveFormBtn.textContent = 'Update Staff';
 
   // Reset button state
   saveFormBtn.disabled = false;
-  saveFormBtnText.style.display = 'inline';
-  saveFormBtnSpinner.style.display = 'none';
 
   const nameInput = document.querySelector('#helpForm #name');
   const roleInput = document.querySelector('#helpForm #role');
@@ -261,9 +248,9 @@ async function handleSubmit(e) {
     notes: notesInput ? notesInput.value.trim() : ''
   };
 
+  const originalText = saveFormBtn.textContent;
   saveFormBtn.disabled = true;
-  saveFormBtnText.style.display = 'none';
-  saveFormBtnSpinner.style.display = 'inline-block';
+  saveFormBtn.textContent = 'Saving...';
 
   try {
     let result;
@@ -286,8 +273,7 @@ async function handleSubmit(e) {
     showToast('Failed to save staff', 'error');
   } finally {
     saveFormBtn.disabled = false;
-    saveFormBtnText.style.display = 'inline';
-    saveFormBtnSpinner.style.display = 'none';
+    saveFormBtn.textContent = originalText;
   }
 }
 
@@ -560,9 +546,9 @@ async function handleSavePayment() {
     return;
   }
   
+  const originalText = savePaymentBtn.textContent;
   savePaymentBtn.disabled = true;
-  savePaymentBtnText.style.display = 'none';
-  savePaymentBtnSpinner.style.display = 'inline-block';
+  savePaymentBtn.textContent = 'Saving...';
   
   try {
     // Get staff details for expense description
@@ -627,8 +613,7 @@ async function handleSavePayment() {
     showToast('Failed to record payment', 'error');
   } finally {
     savePaymentBtn.disabled = false;
-    savePaymentBtnText.style.display = 'inline';
-    savePaymentBtnSpinner.style.display = 'none';
+    savePaymentBtn.textContent = originalText;
   }
 }
 
@@ -660,9 +645,9 @@ function hideDeletePaymentModal() {
 async function handleDeletePayment() {
   if (!deletePaymentId) return;
   
+  const originalText = confirmDeletePaymentBtn.textContent;
   confirmDeletePaymentBtn.disabled = true;
-  deletePaymentBtnText.style.display = 'none';
-  deletePaymentBtnSpinner.style.display = 'inline-block';
+  confirmDeletePaymentBtn.textContent = 'Deleting...';
   
   try {
     // First, find and delete the corresponding expense
@@ -710,8 +695,7 @@ async function handleDeletePayment() {
     showToast('Failed to delete payment', 'error');
   } finally {
     confirmDeletePaymentBtn.disabled = false;
-    deletePaymentBtnText.style.display = 'inline';
-    deletePaymentBtnSpinner.style.display = 'none';
+    confirmDeletePaymentBtn.textContent = originalText;
   }
 }
 
@@ -748,9 +732,9 @@ function hideDeleteModal() {
 async function handleDelete() {
   if (!deleteHelpId) return;
 
+  const originalText = confirmDeleteBtn.textContent;
   confirmDeleteBtn.disabled = true;
-  deleteBtnText.style.display = 'none';
-  deleteBtnSpinner.style.display = 'inline-block';
+  confirmDeleteBtn.textContent = 'Deleting...';
 
   try {
     const result = await firestoreService.delete('houseHelps', deleteHelpId);
@@ -767,8 +751,7 @@ async function handleDelete() {
     showToast('Failed to delete staff', 'error');
   } finally {
     confirmDeleteBtn.disabled = false;
-    deleteBtnText.style.display = 'inline';
-    deleteBtnSpinner.style.display = 'none';
+    confirmDeleteBtn.textContent = originalText;
   }
 }
 

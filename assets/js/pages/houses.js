@@ -15,11 +15,11 @@ let editingHouseId = null;
 
 // DOM Elements
 let addHouseBtn, addHouseSection, closeFormBtn, cancelFormBtn;
-let houseForm, formTitle, saveFormBtn, saveFormBtnText, saveFormBtnSpinner;
+let houseForm, formTitle, saveFormBtn;
 let housesList, emptyState, loadingState;
 let totalHousesEl, totalValueEl, monthlyExpensesEl;
 let deleteModal, closeDeleteModalBtn, cancelDeleteBtn, confirmDeleteBtn;
-let deleteBtnText, deleteBtnSpinner, deleteHouseName, deleteHouseAddress;
+let deleteHouseName, deleteHouseAddress;
 let deleteHouseId = null;
 
 // Initialize page
@@ -64,8 +64,6 @@ function initDOMElements() {
   houseForm = document.getElementById('houseForm');
   formTitle = document.getElementById('formTitle');
   saveFormBtn = document.getElementById('saveFormBtn');
-  saveFormBtnText = document.getElementById('saveFormBtnText');
-  saveFormBtnSpinner = document.getElementById('saveFormBtnSpinner');
   housesList = document.getElementById('housesList');
   emptyState = document.getElementById('emptyState');
   loadingState = document.getElementById('loadingState');
@@ -76,8 +74,6 @@ function initDOMElements() {
   closeDeleteModalBtn = document.getElementById('closeDeleteModalBtn');
   cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
   confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-  deleteBtnText = document.getElementById('deleteBtnText');
-  deleteBtnSpinner = document.getElementById('deleteBtnSpinner');
   deleteHouseName = document.getElementById('deleteHouseName');
   deleteHouseAddress = document.getElementById('deleteHouseAddress');
 }
@@ -137,13 +133,11 @@ function loadUserProfile(user) {
 function showAddForm() {
   editingHouseId = null;
   formTitle.textContent = 'Add House';
-  saveFormBtnText.textContent = 'Save House';
+  saveFormBtn.textContent = 'Save House';
   houseForm.reset();
   
   // Reset button state
   saveFormBtn.disabled = false;
-  saveFormBtnText.style.display = 'inline';
-  saveFormBtnSpinner.style.display = 'none';
   
   addHouseSection.classList.add('show');
   addHouseSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -160,12 +154,10 @@ function hideForm() {
 function showEditForm(house) {
   editingHouseId = house.id;
   formTitle.textContent = 'Edit House';
-  saveFormBtnText.textContent = 'Update House';
+  saveFormBtn.textContent = 'Update House';
 
   // Reset button state
   saveFormBtn.disabled = false;
-  saveFormBtnText.style.display = 'inline';
-  saveFormBtnSpinner.style.display = 'none';
 
   // Fill form
   document.getElementById('name').value = house.name;
@@ -192,9 +184,9 @@ async function handleSubmit(e) {
   };
 
   // Show loading
+  const originalText = saveFormBtn.textContent;
   saveFormBtn.disabled = true;
-  saveFormBtnText.style.display = 'none';
-  saveFormBtnSpinner.style.display = 'inline-block';
+  saveFormBtn.textContent = 'Saving...';
 
   try {
     let result;
@@ -223,8 +215,7 @@ async function handleSubmit(e) {
     showToast('Failed to save property', 'error');
   } finally {
     saveFormBtn.disabled = false;
-    saveFormBtnText.style.display = 'inline';
-    saveFormBtnSpinner.style.display = 'none';
+    saveFormBtn.textContent = originalText;
   }
 }
 
@@ -351,9 +342,9 @@ function hideDeleteModal() {
 async function handleDelete() {
   if (!deleteHouseId) return;
 
+  const originalText = confirmDeleteBtn.textContent;
   confirmDeleteBtn.disabled = true;
-  deleteBtnText.style.display = 'none';
-  deleteBtnSpinner.style.display = 'inline-block';
+  confirmDeleteBtn.textContent = 'Deleting...';
 
   try {
     const result = await firestoreService.delete('houses', deleteHouseId);
@@ -370,8 +361,7 @@ async function handleDelete() {
     showToast('Failed to delete property', 'error');
   } finally {
     confirmDeleteBtn.disabled = false;
-    deleteBtnText.style.display = 'inline';
-    deleteBtnSpinner.style.display = 'none';
+    confirmDeleteBtn.textContent = originalText;
   }
 }
 

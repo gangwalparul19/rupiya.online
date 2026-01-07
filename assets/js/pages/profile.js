@@ -186,14 +186,12 @@ function setupSecuritySection() {
 // Handle sending password reset email
 async function handleSendResetEmail() {
   const btn = sendResetEmailBtn;
-  const btnText = document.getElementById('sendResetEmailBtnText');
-  const btnSpinner = document.getElementById('sendResetEmailBtnSpinner');
 
-  if (!btn || !btnText || !btnSpinner) return;
+  if (!btn) return;
 
+  const originalText = btn.textContent;
   btn.disabled = true;
-  btnText.style.display = 'none';
-  btnSpinner.style.display = 'inline-block';
+  btn.textContent = 'Sending...';
 
   try {
     // Configure action code settings for password reset
@@ -213,8 +211,7 @@ async function handleSendResetEmail() {
     }
   } finally {
     btn.disabled = false;
-    btnText.style.display = 'inline';
-    btnSpinner.style.display = 'none';
+    btn.textContent = originalText;
   }
 }
 
@@ -290,12 +287,10 @@ async function handleProfileUpdate(e) {
   e.preventDefault();
 
   const saveBtn = document.getElementById('saveProfileBtn');
-  const saveBtnText = document.getElementById('saveProfileBtnText');
-  const saveBtnSpinner = document.getElementById('saveProfileBtnSpinner');
+  const originalText = saveBtn.textContent;
 
   saveBtn.disabled = true;
-  saveBtnText.style.display = 'none';
-  saveBtnSpinner.style.display = 'inline-block';
+  saveBtn.textContent = 'Saving...';
 
   try {
     const displayName = displayNameInput.value.trim();
@@ -331,8 +326,7 @@ async function handleProfileUpdate(e) {
     showToast('Failed to update profile', 'error');
   } finally {
     saveBtn.disabled = false;
-    saveBtnText.style.display = 'inline';
-    saveBtnSpinner.style.display = 'none';
+    saveBtn.textContent = originalText;
   }
 }
 
@@ -355,12 +349,10 @@ async function handlePasswordChange(e) {
   }
 
   const changeBtn = document.getElementById('changePasswordBtn');
-  const changeBtnText = document.getElementById('changePasswordBtnText');
-  const changeBtnSpinner = document.getElementById('changePasswordBtnSpinner');
+  const originalText = changeBtn.textContent;
 
   changeBtn.disabled = true;
-  changeBtnText.style.display = 'none';
-  changeBtnSpinner.style.display = 'inline-block';
+  changeBtn.textContent = 'Changing...';
 
   try {
     // Re-authenticate user
@@ -381,8 +373,7 @@ async function handlePasswordChange(e) {
     }
   } finally {
     changeBtn.disabled = false;
-    changeBtnText.style.display = 'inline';
-    changeBtnSpinner.style.display = 'none';
+    changeBtn.textContent = originalText;
   }
 }
 
@@ -390,17 +381,15 @@ async function handlePreferencesUpdate(e) {
   e.preventDefault();
 
   const saveBtn = document.getElementById('savePreferencesBtn');
-  const saveBtnText = document.getElementById('savePreferencesBtnText');
-  const saveBtnSpinner = document.getElementById('savePreferencesBtnSpinner');
 
-  if (!saveBtn || !saveBtnText || !saveBtnSpinner) {
+  if (!saveBtn) {
     showToast('UI elements not found', 'error');
     return;
   }
 
+  const originalText = saveBtn.textContent;
   saveBtn.disabled = true;
-  saveBtnText.style.display = 'none';
-  saveBtnSpinner.style.display = 'inline-block';
+  saveBtn.textContent = 'Saving...';
 
   try {
     const preferences = {
@@ -421,8 +410,7 @@ async function handlePreferencesUpdate(e) {
     showToast('Failed to save preferences: ' + error.message, 'error');
   } finally {
     saveBtn.disabled = false;
-    saveBtnText.style.display = 'inline';
-    saveBtnSpinner.style.display = 'none';
+    saveBtn.textContent = originalText;
   }
 }
 
@@ -492,12 +480,10 @@ function hideDeleteAccountModal() {
 
 async function handleDeleteAccount() {
   const deleteBtn = confirmDeleteAccountBtn;
-  const deleteBtnText = document.getElementById('deleteAccountBtnText');
-  const deleteBtnSpinner = document.getElementById('deleteAccountBtnSpinner');
+  const originalText = deleteBtn.textContent;
 
   deleteBtn.disabled = true;
-  deleteBtnText.style.display = 'none';
-  deleteBtnSpinner.style.display = 'inline-block';
+  deleteBtn.textContent = 'Deleting...';
 
   try {
     // Delete all user data from Firestore
@@ -523,8 +509,7 @@ async function handleDeleteAccount() {
     showToast('Failed to delete account. You may need to re-login and try again.', 'error');
   } finally {
     deleteBtn.disabled = false;
-    deleteBtnText.style.display = 'inline';
-    deleteBtnSpinner.style.display = 'none';
+    deleteBtn.textContent = originalText;
   }
 }
 
