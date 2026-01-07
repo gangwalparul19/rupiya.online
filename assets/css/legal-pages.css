@@ -346,3 +346,40 @@ html, body {
     padding-bottom: 0.75rem;
   }
 }
+/* Security Highlight Box */
+.security-highlight {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 25px;
+  border-radius: 15px;
+  margin: 25px 0;
+  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+}
+
+.security-highlight h4 {
+  margin: 0 0 10px 0;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.security-highlight p {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.6;
+  opacity: 0.95;
+}
+
+@media (max-width: 768px) {
+  .security-highlight {
+    padding: 20px;
+    margin: 20px 0;
+  }
+  
+  .security-highlight h4 {
+    font-size: 16px;
+  }
+  
+  .security-highlight p {
+    font-size: 14px;
+  }
+}

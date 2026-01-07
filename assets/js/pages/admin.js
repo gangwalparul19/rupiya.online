@@ -9,9 +9,9 @@ let hasMoreUsers = true;
 let totalUsers = 0;
 
 // Chart instances
-let expenseCategoryChart = null;
-let incomeSourceChart = null;
-let monthlyTrendChart = null;
+let featureUsageChart = null;
+let collectionActivityChart = null;
+let registrationTrendChart = null;
 
 // DOM Elements
 const loadingState = document.getElementById('loadingState');
@@ -78,9 +78,8 @@ async function loadAllData() {
     loadPlatformStats(),
     loadActivityStats(),
     loadLocationStats(),
-    loadExpensesByCategory(),
-    loadIncomeBySource(),
-    loadMonthlyTrends(),
+    loadPlatformUsage(),
+    loadUserRegistrationTrends(),
     loadUsers(true)
   ]);
 }
@@ -89,9 +88,9 @@ async function loadPlatformStats() {
   try {
     const stats = await adminService.getPlatformStats();
     document.getElementById('totalUsers').textContent = stats.totalUsers.toLocaleString();
-    document.getElementById('totalIncome').textContent = formatCurrencyCompact(stats.totalIncome);
-    document.getElementById('totalExpenses').textContent = formatCurrencyCompact(stats.totalExpenses);
-    document.getElementById('netSavings').textContent = formatCurrencyCompact(stats.netSavings);
+    document.getElementById('totalTransactions').textContent = stats.totalTransactions.toLocaleString();
+    document.getElementById('totalFamilyGroups').textContent = stats.totalFamilyGroups.toLocaleString();
+    document.getElementById('totalTripGroups').textContent = stats.totalTripGroups.toLocaleString();
     totalUsers = stats.totalUsers;
   } catch (error) {
     console.error('Error loading platform stats:', error);
@@ -151,105 +150,125 @@ async function loadLocationStats() {
   }
 }
 
-async function loadExpensesByCategory() {
+async function loadPlatformUsage() {
   try {
-    const data = await adminService.getExpensesByCategory();
-    const ctx = document.getElementById('expenseCategoryChart')?.getContext('2d');
-    if (!ctx) return;
+    const data = await adminService.getPlatformUsageStats();
+    
+    // Feature Usage Chart (doughnut)
+    const featureCtx = document.getElementById('featureUsageChart')?.getContext('2d');
+    if (featureCtx) {
+      if (featureUsageChart) featureUsageChart.destroy();
 
-    if (expenseCategoryChart) expenseCategoryChart.destroy();
+      const featureData = [
+        { label: 'Expenses', value: data.expenses },
+        { label: 'Income', value: data.income },
+        { label: 'Budgets', value: data.budgets },
+        { label: 'Goals', value: data.goals },
+        { label: 'Investments', value: data.investments },
+        { label: 'Notes', value: data.notes }
+      ].filter(item => item.value > 0);
 
-    const colors = ['#e74c3c','#3498db','#2ecc71','#f39c12','#9b59b6','#1abc9c','#e67e22','#34495e','#16a085','#c0392b'];
+      const colors = ['#e74c3c','#2ecc71','#3498db','#f39c12','#9b59b6','#1abc9c'];
 
-    expenseCategoryChart = new Chart(ctx, {
-      type: 'doughnut',
-      data: {
-        labels: data.map(d => d.category),
-        datasets: [{ data: data.map(d => d.total), backgroundColor: colors, borderWidth: 0 }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { position: 'right', labels: { boxWidth: 12, padding: 8, font: { size: 11 } } },
-          tooltip: {
-            callbacks: {
-              label: ctx => `${ctx.label}: ${formatCurrency(ctx.raw)}`
+      featureUsageChart = new Chart(featureCtx, {
+        type: 'doughnut',
+        data: {
+          labels: featureData.map(d => d.label),
+          datasets: [{ 
+            data: featureData.map(d => d.value), 
+            backgroundColor: colors.slice(0, featureData.length), 
+            borderWidth: 0 
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'right', labels: { boxWidth: 12, padding: 8, font: { size: 11 } } },
+            tooltip: {
+              callbacks: {
+                label: ctx => `${ctx.label}: ${ctx.raw.toLocaleString()} records`
+              }
             }
           }
         }
-      }
-    });
-  } catch (error) {
-    console.error('Error loading expenses by category:', error);
-  }
-}
+      });
+    }
 
-async function loadIncomeBySource() {
-  try {
-    const data = await adminService.getIncomeBySource();
-    const ctx = document.getElementById('incomeSourceChart')?.getContext('2d');
-    if (!ctx) return;
+    // Collection Activity Chart (bar)
+    const collectionCtx = document.getElementById('collectionActivityChart')?.getContext('2d');
+    if (collectionCtx) {
+      if (collectionActivityChart) collectionActivityChart.destroy();
 
-    if (incomeSourceChart) incomeSourceChart.destroy();
+      const collectionData = [
+        { label: 'Documents', value: data.documents },
+        { label: 'Vehicles', value: data.vehicles },
+        { label: 'Houses', value: data.houses },
+        { label: 'Splits', value: data.splits },
+        { label: 'Family Groups', value: data.familyGroups },
+        { label: 'Trip Groups', value: data.tripGroups }
+      ];
 
-    const colors = ['#2ecc71','#27ae60','#1abc9c','#16a085','#3498db','#2980b9','#9b59b6','#8e44ad','#f39c12','#e67e22'];
-
-    incomeSourceChart = new Chart(ctx, {
-      type: 'doughnut',
-      data: {
-        labels: data.map(d => d.source),
-        datasets: [{ data: data.map(d => d.total), backgroundColor: colors, borderWidth: 0 }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { position: 'right', labels: { boxWidth: 12, padding: 8, font: { size: 11 } } },
-          tooltip: {
-            callbacks: {
-              label: ctx => `${ctx.label}: ${formatCurrency(ctx.raw)}`
+      collectionActivityChart = new Chart(collectionCtx, {
+        type: 'bar',
+        data: {
+          labels: collectionData.map(d => d.label),
+          datasets: [{
+            label: 'Records',
+            data: collectionData.map(d => d.value),
+            backgroundColor: '#3498db',
+            borderColor: '#2980b9',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: ctx => `${ctx.raw.toLocaleString()} records`
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { callback: v => v.toLocaleString() }
             }
           }
         }
-      }
-    });
+      });
+    }
   } catch (error) {
-    console.error('Error loading income by source:', error);
+    console.error('Error loading platform usage:', error);
   }
 }
 
-async function loadMonthlyTrends() {
+async function loadUserRegistrationTrends() {
   try {
-    const data = await adminService.getMonthlyTrends();
-    const ctx = document.getElementById('monthlyTrendChart')?.getContext('2d');
+    const data = await adminService.getUserRegistrationTrends();
+    const ctx = document.getElementById('registrationTrendChart')?.getContext('2d');
     if (!ctx || data.length === 0) return;
 
-    if (monthlyTrendChart) monthlyTrendChart.destroy();
+    if (registrationTrendChart) registrationTrendChart.destroy();
 
     const labels = data.map(d => {
       const [year, month] = d.month.split('-');
       return new Date(year, month - 1).toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
     });
 
-    monthlyTrendChart = new Chart(ctx, {
+    registrationTrendChart = new Chart(ctx, {
       type: 'line',
       data: {
         labels,
         datasets: [
           {
-            label: 'Income',
-            data: data.map(d => d.income),
-            borderColor: '#2ecc71',
-            backgroundColor: 'rgba(46,204,113,0.1)',
-            fill: true,
-            tension: 0.4
-          },
-          {
-            label: 'Expenses',
-            data: data.map(d => d.expenses),
-            borderColor: '#e74c3c',
-            backgroundColor: 'rgba(231,76,60,0.1)',
+            label: 'New Users',
+            data: data.map(d => d.registrations),
+            borderColor: '#3498db',
+            backgroundColor: 'rgba(52,152,219,0.1)',
             fill: true,
             tension: 0.4
           }
@@ -263,20 +282,20 @@ async function loadMonthlyTrends() {
           legend: { labels: { boxWidth: 12, padding: 15 } },
           tooltip: {
             callbacks: {
-              label: ctx => `${ctx.dataset.label}: ${formatCurrency(ctx.raw)}`
+              label: ctx => `${ctx.dataset.label}: ${ctx.raw.toLocaleString()} users`
             }
           }
         },
         scales: {
           y: {
             beginAtZero: true,
-            ticks: { callback: v => formatCurrencyCompact(v) }
+            ticks: { callback: v => v.toLocaleString() }
           }
         }
       }
     });
   } catch (error) {
-    console.error('Error loading monthly trends:', error);
+    console.error('Error loading user registration trends:', error);
   }
 }
 

@@ -61,47 +61,33 @@ class AdminService {
   }
 
   // Get platform stats using COUNT queries (memory efficient)
+  // Note: Financial data is encrypted, so we only show user and collection counts
   async getPlatformStats() {
     const cacheKey = 'platformStats';
     const cached = this.getFromCache(cacheKey);
     if (cached) return cached;
 
     try {
-      // Use count queries instead of fetching all documents
-      const [usersCount, expensesCount, incomeCount, familyCount, tripCount] = await Promise.all([
+      // Use count queries for collections (encrypted data cannot be aggregated)
+      const [usersCount, expensesCount, incomeCount, familyCount, tripCount, budgetsCount, goalsCount] = await Promise.all([
         getCountFromServer(collection(db, 'users')),
         getCountFromServer(collection(db, 'expenses')),
         getCountFromServer(collection(db, 'income')),
         getCountFromServer(collection(db, 'familyGroups')),
-        getCountFromServer(collection(db, 'tripGroups'))
+        getCountFromServer(collection(db, 'tripGroups')),
+        getCountFromServer(collection(db, 'budgets')),
+        getCountFromServer(collection(db, 'goals'))
       ]);
-
-      // For totals, we need to fetch but limit the data
-      // Only fetch amounts, not full documents
-      const [expensesSnap, incomeSnap] = await Promise.all([
-        getDocs(query(collection(db, 'expenses'), limit(1000))),
-        getDocs(query(collection(db, 'income'), limit(1000)))
-      ]);
-
-      let totalExpenses = 0;
-      expensesSnap.forEach(doc => {
-        totalExpenses += doc.data().amount || 0;
-      });
-
-      let totalIncome = 0;
-      incomeSnap.forEach(doc => {
-        totalIncome += doc.data().amount || 0;
-      });
 
       const stats = {
         totalUsers: usersCount.data().count,
-        totalExpenses,
-        totalIncome,
-        expenseCount: expensesCount.data().count,
-        incomeCount: incomeCount.data().count,
+        totalTransactions: expensesCount.data().count + incomeCount.data().count,
+        totalExpenseRecords: expensesCount.data().count,
+        totalIncomeRecords: incomeCount.data().count,
         totalFamilyGroups: familyCount.data().count,
         totalTripGroups: tripCount.data().count,
-        netSavings: totalIncome - totalExpenses
+        totalBudgets: budgetsCount.data().count,
+        totalGoals: goalsCount.data().count
       };
 
       this.setCache(cacheKey, stats);
@@ -203,73 +189,9 @@ class AdminService {
     }
   }
 
-  // Get expenses by category (limited, aggregated)
-  async getExpensesByCategory() {
-    const cacheKey = 'expensesByCategory';
-    const cached = this.getFromCache(cacheKey);
-    if (cached) return cached;
-
-    try {
-      // Limit to recent 1000 expenses
-      const snap = await getDocs(query(collection(db, 'expenses'), limit(1000)));
-      const categoryData = {};
-
-      snap.forEach(doc => {
-        const data = doc.data();
-        const category = data.category || 'Other';
-        if (!categoryData[category]) categoryData[category] = { total: 0, count: 0 };
-        categoryData[category].total += data.amount || 0;
-        categoryData[category].count++;
-      });
-
-      const sorted = Object.entries(categoryData)
-        .sort((a, b) => b[1].total - a[1].total)
-        .slice(0, 10)
-        .map(([category, data]) => ({ category, ...data }));
-
-      this.setCache(cacheKey, sorted);
-      return sorted;
-    } catch (error) {
-      console.error('Error getting expenses by category:', error);
-      throw error;
-    }
-  }
-
-  // Get income by source (limited, aggregated)
-  async getIncomeBySource() {
-    const cacheKey = 'incomeBySource';
-    const cached = this.getFromCache(cacheKey);
-    if (cached) return cached;
-
-    try {
-      const snap = await getDocs(query(collection(db, 'income'), limit(1000)));
-      const sourceData = {};
-
-      snap.forEach(doc => {
-        const data = doc.data();
-        // Income uses 'source' field, not 'category'
-        const source = data.source || 'Other';
-        if (!sourceData[source]) sourceData[source] = { total: 0, count: 0 };
-        sourceData[source].total += data.amount || 0;
-        sourceData[source].count++;
-      });
-
-      const sorted = Object.entries(sourceData)
-        .sort((a, b) => b[1].total - a[1].total)
-        .slice(0, 10)
-        .map(([source, data]) => ({ source, ...data }));
-
-      this.setCache(cacheKey, sorted);
-      return sorted;
-    } catch (error) {
-      console.error('Error getting income by source:', error);
-      throw error;
-    }
-  }
-
-  // Get monthly trends (last 6 months only)
-  async getMonthlyTrends() {
-    const cacheKey = 'monthlyTrends';
+  // Get user registration trends (last 6 months)
+  async getUserRegistrationTrends() {
+    const cacheKey = 'userRegistrationTrends';
     const cached = this.getFromCache(cacheKey);
     if (cached) return cached;
 
@@ -278,39 +200,89 @@ class AdminService {
       sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
       const startTimestamp = Timestamp.fromDate(sixMonthsAgo);
 
-      const [expensesSnap, incomeSnap] = await Promise.all([
-        getDocs(query(collection(db, 'expenses'), where('date', '>=', startTimestamp), limit(500))),
-        getDocs(query(collection(db, 'income'), where('date', '>=', startTimestamp), limit(500)))
-      ]);
+      const usersSnap = await getDocs(
+        query(
+          collection(db, 'users'), 
+          where('createdAt', '>=', startTimestamp),
+          orderBy('createdAt', 'asc'),
+          limit(1000)
+        )
+      );
 
       const monthlyData = {};
 
-      const processDoc = (doc, type) => {
+      usersSnap.forEach(doc => {
         const data = doc.data();
-        const date = data.date?.toDate ? data.date.toDate() : new Date(data.date);
+        const date = data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt);
         const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
         
         if (!monthlyData[monthKey]) {
-          monthlyData[monthKey] = { expenses: 0, income: 0 };
+          monthlyData[monthKey] = { registrations: 0 };
         }
-        monthlyData[monthKey][type] += data.amount || 0;
-      };
-
-      expensesSnap.forEach(doc => processDoc(doc, 'expenses'));
-      incomeSnap.forEach(doc => processDoc(doc, 'income'));
+        monthlyData[monthKey].registrations++;
+      });
 
       const trends = Object.entries(monthlyData)
         .sort((a, b) => a[0].localeCompare(b[0]))
         .map(([month, data]) => ({
           month,
-          ...data,
-          savings: data.income - data.expenses
+          ...data
         }));
 
       this.setCache(cacheKey, trends);
       return trends;
     } catch (error) {
-      console.error('Error getting monthly trends:', error);
+      console.error('Error getting user registration trends:', error);
+      throw error;
+    }
+  }
+
+  // Get platform usage stats (collection activity)
+  async getPlatformUsageStats() {
+    const cacheKey = 'platformUsageStats';
+    const cached = this.getFromCache(cacheKey);
+    if (cached) return cached;
+
+    try {
+      // Count documents in various collections to show platform usage
+      const [
+        expensesCount, incomeCount, budgetsCount, goalsCount, 
+        investmentsCount, notesCount, documentsCount, vehiclesCount,
+        housesCount, splitsCount, familyGroupsCount, tripGroupsCount
+      ] = await Promise.all([
+        getCountFromServer(collection(db, 'expenses')),
+        getCountFromServer(collection(db, 'income')),
+        getCountFromServer(collection(db, 'budgets')),
+        getCountFromServer(collection(db, 'goals')),
+        getCountFromServer(collection(db, 'investments')),
+        getCountFromServer(collection(db, 'notes')),
+        getCountFromServer(collection(db, 'documents')),
+        getCountFromServer(collection(db, 'vehicles')),
+        getCountFromServer(collection(db, 'houses')),
+        getCountFromServer(collection(db, 'splits')),
+        getCountFromServer(collection(db, 'familyGroups')),
+        getCountFromServer(collection(db, 'tripGroups'))
+      ]);
+
+      const stats = {
+        expenses: expensesCount.data().count,
+        income: incomeCount.data().count,
+        budgets: budgetsCount.data().count,
+        goals: goalsCount.data().count,
+        investments: investmentsCount.data().count,
+        notes: notesCount.data().count,
+        documents: documentsCount.data().count,
+        vehicles: vehiclesCount.data().count,
+        houses: housesCount.data().count,
+        splits: splitsCount.data().count,
+        familyGroups: familyGroupsCount.data().count,
+        tripGroups: tripGroupsCount.data().count
+      };
+
+      this.setCache(cacheKey, stats);
+      return stats;
+    } catch (error) {
+      console.error('Error getting platform usage stats:', error);
       throw error;
     }
   }

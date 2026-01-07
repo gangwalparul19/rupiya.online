@@ -54,42 +54,42 @@ const navigationConfig = {
   sections: [
     {
       id: 'main',
-      title: 'Main',
+      title: 'Dashboard',
       icon: '📊',
       expanded: true,
       items: [
         { href: 'dashboard.html', icon: '📊', label: 'Dashboard' },
-        { href: 'expenses.html', icon: '💸', label: 'Expenses' },
-        { href: 'income.html', icon: '💰', label: 'Income' },
-        { href: 'budgets.html', icon: '💳', label: 'Budgets' }
+        { href: 'analytics.html', icon: '📉', label: 'Analytics' },
+        { href: 'ai-insights.html', icon: '🤖', label: 'AI Insights' }
       ]
     },
     {
-      id: 'tracking',
-      title: 'Tracking',
-      icon: '📈',
+      id: 'transactions',
+      title: 'Transactions',
+      icon: '💰',
       expanded: false,
       items: [
-        { href: 'investments.html', icon: '📈', label: 'Investments' },
-        { href: 'loans.html', icon: '🏦', label: 'Loans & EMI' },
-        { href: 'goals.html', icon: '🎯', label: 'Goals' },
+        { href: 'expenses.html', icon: '💸', label: 'Expenses' },
+        { href: 'income.html', icon: '💰', label: 'Income' },
+        { href: 'split-expense.html', icon: '🤝', label: 'Split Expenses' },
         { href: 'recurring.html', icon: '🔄', label: 'Recurring' }
       ]
     },
     {
-      id: 'intelligence',
-      title: 'Intelligence',
-      icon: '🤖',
+      id: 'planning',
+      title: 'Planning',
+      icon: '🎯',
       expanded: false,
       items: [
-        { href: 'ai-insights.html', icon: '🤖', label: 'AI Insights' },
-        { href: 'split-expense.html', icon: '🤝', label: 'Split Expense' },
-        { href: 'trip-groups.html', icon: '✈️', label: 'Trip Groups' }
+        { href: 'budgets.html', icon: '💳', label: 'Budgets' },
+        { href: 'goals.html', icon: '🎯', label: 'Goals' },
+        { href: 'investments.html', icon: '📈', label: 'Investments' },
+        { href: 'loans.html', icon: '🏦', label: 'Loans & EMI' }
       ]
     },
     {
       id: 'assets',
-      title: 'Assets',
+      title: 'Assets & Property',
       icon: '🏠',
       expanded: false,
       items: [
@@ -99,34 +99,34 @@ const navigationConfig = {
       ]
     },
     {
-      id: 'more',
-      title: 'More',
-      icon: '📝',
+      id: 'social',
+      title: 'Social & Groups',
+      icon: '👥',
+      expanded: false,
+      items: [
+        { href: 'family.html', icon: '👨‍👩‍👧‍👦', label: 'Family Groups' },
+        { href: 'trip-groups.html', icon: '✈️', label: 'Trip Groups' }
+      ]
+    },
+    {
+      id: 'organize',
+      title: 'Organization',
+      icon: '📁',
       expanded: false,
       items: [
         { href: 'notes.html', icon: '📝', label: 'Notes' },
-        { href: 'documents.html', icon: '📄', label: 'Documents' },
-        { href: 'analytics.html', icon: '📉', label: 'Analytics' },
-        { href: 'feedback.html', icon: '💬', label: 'Feedback' },
-        { href: 'profile.html', icon: '⚙️', label: 'Settings' }
+        { href: 'documents.html', icon: '📄', label: 'Documents' }
       ]
     },
     {
-      id: 'help',
-      title: 'Help',
-      icon: '📖',
+      id: 'account',
+      title: 'Account & Support',
+      icon: '⚙️',
       expanded: false,
       items: [
-        { href: 'user-guide.html', icon: '📖', label: 'User Guide' }
-      ]
-    },
-    {
-      id: 'family',
-      title: 'Family',
-      icon: '👨‍👩‍👧‍👦',
-      expanded: false,
-      items: [
-        { href: 'family.html', icon: '👨‍👩‍👧‍👦', label: 'Family Groups' }
+        { href: 'profile.html', icon: '⚙️', label: 'Settings' },
+        { href: 'user-guide.html', icon: '📖', label: 'User Guide' },
+        { href: 'feedback.html', icon: '💬', label: 'Feedback' }
       ]
     },
     {

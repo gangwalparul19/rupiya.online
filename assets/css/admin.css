@@ -596,3 +596,53 @@
 [data-theme="dark"] .admin-table th {
   background: #0f3460;
 }
+/* Encryption Notice */
+.encryption-notice {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 25px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 15px;
+  color: white;
+  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+}
+
+.encryption-notice-icon {
+  font-size: 48px;
+  flex-shrink: 0;
+}
+
+.encryption-notice-content h3 {
+  margin: 0 0 10px 0;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.encryption-notice-content p {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.6;
+  opacity: 0.95;
+}
+
+@media (max-width: 768px) {
+  .encryption-notice {
+    flex-direction: column;
+    text-align: center;
+    padding: 20px;
+    gap: 15px;
+  }
+  
+  .encryption-notice-icon {
+    font-size: 40px;
+  }
+  
+  .encryption-notice-content h3 {
+    font-size: 18px;
+  }
+  
+  .encryption-notice-content p {
+    font-size: 14px;
+  }
+}

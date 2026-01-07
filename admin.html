@@ -60,7 +60,7 @@
     <div class="admin-page-header">
       <div>
         <h1 class="admin-title">Platform Analytics</h1>
-        <p class="admin-subtitle">Real-time insights across all users</p>
+        <p class="admin-subtitle">User analytics and platform usage insights (financial data is encrypted)</p>
       </div>
       <button class="refresh-btn" id="refreshBtn">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -81,25 +81,36 @@
           </div>
         </div>
         <div class="admin-stat-card">
-          <div class="stat-icon">💰</div>
+          <div class="stat-icon">📊</div>
           <div class="stat-content">
-            <div class="stat-value" id="totalIncome">-</div>
-            <div class="stat-label">Total Income</div>
+            <div class="stat-value" id="totalTransactions">-</div>
+            <div class="stat-label">Total Records</div>
           </div>
         </div>
         <div class="admin-stat-card">
-          <div class="stat-icon">💸</div>
+          <div class="stat-icon">👨‍👩‍👧‍👦</div>
           <div class="stat-content">
-            <div class="stat-value" id="totalExpenses">-</div>
-            <div class="stat-label">Total Expenses</div>
+            <div class="stat-value" id="totalFamilyGroups">-</div>
+            <div class="stat-label">Family Groups</div>
           </div>
         </div>
         <div class="admin-stat-card">
-          <div class="stat-icon">💵</div>
+          <div class="stat-icon">✈️</div>
           <div class="stat-content">
-            <div class="stat-value" id="netSavings">-</div>
-            <div class="stat-label">Net Savings</div>
+            <div class="stat-value" id="totalTripGroups">-</div>
+            <div class="stat-label">Trip Groups</div>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Encryption Notice -->
+    <section class="admin-section">
+      <div class="encryption-notice">
+        <div class="encryption-notice-icon">🔐</div>
+        <div class="encryption-notice-content">
+          <h3>Data Privacy & Security</h3>
+          <p>Financial data (amounts, transactions, investments) is end-to-end encrypted and cannot be accessed by administrators. This dashboard shows only user analytics and platform usage statistics to respect user privacy.</p>
         </div>
       </div>
     </section>
@@ -153,29 +164,29 @@
 
     <!-- Charts -->
     <section class="admin-section">
-      <h2 class="section-title">📊 Financial Overview</h2>
+      <h2 class="section-title">📊 Platform Usage</h2>
       <div class="admin-charts-grid">
         <div class="admin-chart-card">
-          <h3 class="chart-title">Expenses by Category</h3>
+          <h3 class="chart-title">Feature Usage</h3>
           <div class="chart-container">
-            <canvas id="expenseCategoryChart"></canvas>
+            <canvas id="featureUsageChart"></canvas>
           </div>
         </div>
         <div class="admin-chart-card">
-          <h3 class="chart-title">Income by Source</h3>
+          <h3 class="chart-title">Collection Activity</h3>
           <div class="chart-container">
-            <canvas id="incomeSourceChart"></canvas>
+            <canvas id="collectionActivityChart"></canvas>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Monthly Trends -->
+    <!-- User Registration Trends -->
     <section class="admin-section">
-      <h2 class="section-title">📈 Monthly Trends</h2>
+      <h2 class="section-title">📈 User Registration Trends</h2>
       <div class="admin-chart-card full-width">
         <div class="chart-container chart-container-lg">
-          <canvas id="monthlyTrendChart"></canvas>
+          <canvas id="registrationTrendChart"></canvas>
         </div>
       </div>
     </section>

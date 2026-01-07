@@ -131,31 +131,54 @@
       <section>
         <h2>1. Our Commitment to Data Protection</h2>
         <p>
-          At Rupiya, protecting your financial data is our highest priority. We implement industry-leading security measures to ensure your information remains confidential, secure, and protected from unauthorized access.
+          At Rupiya, protecting your financial data is our highest priority. We implement military-grade security measures that exceed industry standards to ensure your information remains confidential, secure, and protected from unauthorized access.
         </p>
+        <div class="security-highlight">
+          <h4>🔐 Zero-Knowledge Architecture</h4>
+          <p>We have designed our system so that we cannot access your sensitive financial data even if we wanted to. Your data is encrypted with keys that only you possess, ensuring complete privacy.</p>
+        </div>
       </section>
 
       <section>
-        <h2>2. Data Encryption</h2>
+        <h2>2. End-to-End Encryption</h2>
         
-        <h3>2.1 In-Transit Encryption</h3>
+        <h3>2.1 Military-Grade AES-256 Encryption</h3>
+        <p>
+          <strong>Your financial data is protected with the same encryption used by banks and government agencies.</strong> We implement AES-256 encryption, which is virtually unbreakable and would take billions of years to crack with current technology.
+        </p>
         <ul>
-          <li>All data transmitted between your device and our servers is encrypted using TLS 1.2 or higher</li>
-          <li>HTTPS protocol is enforced on all connections</li>
+          <li><strong>Client-Side Encryption:</strong> Data is encrypted on your device before being sent to our servers</li>
+          <li><strong>Unique Encryption Keys:</strong> Each user has unique encryption keys derived from their credentials</li>
+          <li><strong>PBKDF2 Key Derivation:</strong> 100,000+ iterations make brute force attacks impractical</li>
+          <li><strong>Automatic Encryption:</strong> All sensitive data is encrypted automatically without user intervention</li>
+        </ul>
+
+        <h3>2.2 What Gets Encrypted</h3>
+        <p>The following sensitive information is encrypted end-to-end:</p>
+        <ul>
+          <li>All financial transactions (expenses, income, investments)</li>
+          <li>Personal financial details (account numbers, card information)</li>
+          <li>Investment portfolio data and holdings</li>
+          <li>Budget information and financial goals</li>
+          <li>Family financial data and shared expenses</li>
+          <li>Notes and descriptions containing sensitive information</li>
+          <li>Payment method details and banking information</li>
+        </ul>
+
+        <h3>2.3 In-Transit Encryption</h3>
+        <ul>
+          <li>All data transmitted between your device and our servers uses TLS 1.3 encryption</li>
+          <li>HTTPS protocol is enforced on all connections with HSTS headers</li>
           <li>Certificate pinning prevents man-in-the-middle attacks</li>
+          <li>Perfect Forward Secrecy ensures past communications remain secure</li>
         </ul>
 
-        <h3>2.2 At-Rest Encryption</h3>
+        <h3>2.4 At-Rest Encryption</h3>
         <ul>
-          <li>All data stored in our databases is encrypted using AES-256 encryption</li>
-          <li>Encryption keys are managed securely and rotated regularly</li>
-          <li>Sensitive financial data receives additional encryption layers</li>
-        </ul>
-
-        <h3>2.3 End-to-End Encryption</h3>
-        <ul>
-          <li>Highly sensitive information is encrypted on your device before transmission</li>
-          <li>Only you and authorized family members can decrypt shared data</li>
+          <li>All data stored in our databases uses AES-256 encryption</li>
+          <li>Encryption keys are managed securely using Google Cloud KMS</li>
+          <li>Database-level encryption with automatic key rotation</li>
+          <li>Encrypted backups stored in geographically distributed locations</li>
         </ul>
       </section>
 
