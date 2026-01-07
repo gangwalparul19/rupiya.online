@@ -544,6 +544,7 @@
   .income-header,
   .expense-header {
     gap: 0.5rem;
+    align-items: center;
   }
 
   .income-amount,
@@ -551,10 +552,14 @@
     font-size: 1.125rem;
   }
 
+  /* Source/Category badge on its own line */
   .income-source,
   .expense-category {
     font-size: 0.6875rem;
-    padding: 0.125rem 0.5rem;
+    padding: 0.25rem 0.625rem;
+    display: inline-block;
+    width: fit-content;
+    margin-bottom: 0.25rem;
   }
 
   .income-description,
@@ -593,8 +598,8 @@
   .form-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
-    margin-bottom: 0.75rem;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
   }
 
   .form-group {
@@ -606,7 +611,7 @@
   }
 
   .form-group label {
-    font-size: 0.75rem;
+    font-size: 0.6875rem;
     margin-bottom: 0.25rem;
   }
 
@@ -620,7 +625,7 @@
   .form-actions {
     flex-direction: column-reverse;
     gap: 0.5rem;
-    padding-top: 0.75rem;
+    padding-top: 0.625rem;
   }
 
   .form-actions .btn {
@@ -631,19 +636,19 @@
   /* Add Income/Expense Section Mobile */
   .add-income-section,
   .add-expense-section {
-    padding: 0.75rem;
-    margin-bottom: 1rem;
+    padding: 0.625rem;
+    margin-bottom: 0.75rem;
   }
 
   .add-income-header,
   .add-expense-header {
-    margin-bottom: 0.75rem;
-    padding-bottom: 0.75rem;
+    margin-bottom: 0.625rem;
+    padding-bottom: 0.625rem;
   }
 
   .add-income-title,
   .add-expense-title {
-    font-size: 1.125rem;
+    font-size: 1rem;
   }
 
   /* Empty State Mobile */
