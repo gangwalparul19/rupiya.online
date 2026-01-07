@@ -4,6 +4,10 @@
  */
 
 import authService from '../services/auth-service.js';
+import logoutModal from '../components/logout-modal.js';
+
+// Track if logout is in progress to prevent double-clicks
+let isLoggingOut = false;
 
 // Initialize logout handler
 export function initLogoutHandler() {
@@ -12,15 +16,18 @@ export function initLogoutHandler() {
     // Check if clicked element or its parent is the logout button
     const logoutBtn = e.target.closest('#logoutBtn');
     
-    if (logoutBtn) {
+    if (logoutBtn && !isLoggingOut) {
       e.preventDefault();
       e.stopPropagation();
       
-      // Confirm logout
-      const confirmed = confirm('Are you sure you want to logout?');
+      // Show beautiful logout modal
+      const confirmed = await logoutModal.show();
       if (!confirmed) return;
       
       try {
+        // Set flag to prevent double-clicks
+        isLoggingOut = true;
+        
         // Disable button to prevent double clicks
         logoutBtn.disabled = true;
         logoutBtn.style.opacity = '0.6';
@@ -32,7 +39,7 @@ export function initLogoutHandler() {
         if (result.success) {
           // Show success message if toast is available
           if (window.toast) {
-            window.toast.success('Logged out successfully');
+            window.toast.success('Logged out successfully. See you soon!');
           }
           
           // Clear any cached data
@@ -49,6 +56,7 @@ export function initLogoutHandler() {
           }, 500);
         } else {
           // Re-enable button on failure
+          isLoggingOut = false;
           logoutBtn.disabled = false;
           logoutBtn.style.opacity = '1';
           logoutBtn.style.cursor = 'pointer';
@@ -63,6 +71,7 @@ export function initLogoutHandler() {
         console.error('Logout error:', error);
         
         // Re-enable button on error
+        isLoggingOut = false;
         logoutBtn.disabled = false;
         logoutBtn.style.opacity = '1';
         logoutBtn.style.cursor = 'pointer';

@@ -565,3 +565,304 @@
   color: var(--text-secondary);
   margin-bottom: var(--spacing-lg);
 }
+
+
+/* ============================================
+   LOGOUT MODAL STYLES
+   ============================================ */
+
+.logout-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  padding: 1rem;
+}
+
+.logout-modal-overlay.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.logout-modal-container {
+  background: var(--white);
+  border-radius: 20px;
+  padding: 2.5rem;
+  max-width: 480px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  transform: scale(0.9) translateY(20px);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  text-align: center;
+}
+
+.logout-modal-overlay.show .logout-modal-container {
+  transform: scale(1) translateY(0);
+}
+
+.logout-modal-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--white);
+  animation: logoutIconPulse 2s ease-in-out infinite;
+}
+
+@keyframes logoutIconPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.4);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 10px rgba(102, 126, 234, 0);
+  }
+}
+
+.logout-modal-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 1rem 0;
+  line-height: 1.2;
+}
+
+.logout-modal-message {
+  font-size: 1.125rem;
+  color: var(--text-secondary);
+  margin: 0 0 0.75rem 0;
+  line-height: 1.6;
+  font-weight: 500;
+}
+
+.logout-modal-submessage {
+  font-size: 0.9375rem;
+  color: var(--text-light);
+  margin: 0 0 2rem 0;
+  line-height: 1.5;
+}
+
+.logout-modal-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.logout-modal-btn {
+  flex: 1;
+  min-width: 160px;
+  padding: 0.875rem 1.5rem;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.logout-modal-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease;
+}
+
+.logout-modal-btn:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.logout-modal-btn svg {
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.logout-modal-btn-cancel,
+.logout-modal-btn-confirm {
+  position: relative;
+  z-index: 1;
+}
+
+.logout-modal-btn-cancel {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 2px solid var(--border-color);
+}
+
+.logout-modal-btn-cancel:hover {
+  background: var(--bg-hover);
+  border-color: var(--text-secondary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.logout-modal-btn-cancel:active {
+  transform: translateY(0);
+}
+
+.logout-modal-btn-confirm {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: var(--white);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.logout-modal-btn-confirm:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+.logout-modal-btn-confirm:active {
+  transform: translateY(0);
+}
+
+.logout-modal-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.logout-modal-btn:focus-visible {
+  outline: 3px solid var(--primary-blue);
+  outline-offset: 2px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .logout-modal-container {
+    padding: 2rem;
+    max-width: 400px;
+  }
+
+  .logout-modal-icon {
+    width: 70px;
+    height: 70px;
+  }
+
+  .logout-modal-icon svg {
+    width: 56px;
+    height: 56px;
+  }
+
+  .logout-modal-title {
+    font-size: 1.5rem;
+  }
+
+  .logout-modal-message {
+    font-size: 1rem;
+  }
+
+  .logout-modal-submessage {
+    font-size: 0.875rem;
+  }
+
+  .logout-modal-actions {
+    flex-direction: column;
+  }
+
+  .logout-modal-btn {
+    width: 100%;
+    min-width: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .logout-modal-overlay {
+    padding: 0.5rem;
+  }
+
+  .logout-modal-container {
+    padding: 1.5rem;
+    border-radius: 16px;
+  }
+
+  .logout-modal-icon {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 1rem;
+  }
+
+  .logout-modal-icon svg {
+    width: 48px;
+    height: 48px;
+  }
+
+  .logout-modal-title {
+    font-size: 1.25rem;
+  }
+
+  .logout-modal-message {
+    font-size: 0.9375rem;
+  }
+
+  .logout-modal-submessage {
+    font-size: 0.8125rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .logout-modal-btn {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.9375rem;
+  }
+}
+
+/* Dark Mode */
+[data-theme="dark"] .logout-modal-container {
+  background: var(--card-bg);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="dark"] .logout-modal-title {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .logout-modal-message {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .logout-modal-submessage {
+  color: var(--text-light);
+}
+
+[data-theme="dark"] .logout-modal-btn-cancel {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .logout-modal-btn-cancel:hover {
+  background: var(--bg-hover);
+  border-color: var(--text-secondary);
+}
+
+[data-theme="dark"] .logout-modal-btn:focus-visible {
+  outline-color: var(--accent-cyan);
+}
