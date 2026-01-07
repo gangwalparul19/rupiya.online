@@ -461,6 +461,70 @@
 }
 
 /* ============================================
+   BUTTON FIXES - ENSURE ALWAYS CLICKABLE
+   ============================================ */
+@media (max-width: 480px) {
+  /* Ensure buttons are always on top and clickable */
+  .form-actions {
+    position: relative;
+    z-index: 10;
+  }
+
+  .form-actions .btn {
+    position: relative;
+    z-index: 10;
+    pointer-events: auto;
+  }
+
+  /* Fix for loading spinner in buttons */
+  .btn .spinner,
+  .btn #saveFormBtnSpinner,
+  .btn #deleteBtnSpinner,
+  .btn #saveBtnSpinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: var(--white);
+    animation: spin 0.8s linear infinite;
+    margin-left: 0.5rem;
+    vertical-align: middle;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Ensure button text is visible */
+  .btn span {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Disabled state should still be visible */
+  .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  /* Fix for buttons being covered by other elements */
+  .modal-footer,
+  .form-actions,
+  .add-income-section .form-actions,
+  .add-expense-section .form-actions,
+  .add-budget-section .form-actions,
+  .add-goal-section .form-actions {
+    position: relative;
+    z-index: 100;
+    background: var(--white);
+    padding-top: 0.625rem;
+    padding-bottom: 0.625rem;
+  }
+}
+
+/* ============================================
    ACCESSIBILITY
    ============================================ */
 @media (max-width: 480px) {

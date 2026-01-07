@@ -1,0 +1,207 @@
+/* ============================================
+   BUTTON FIX - ENSURE BUTTONS ALWAYS WORK
+   Critical fixes for button visibility and clickability
+   ============================================ */
+
+/* Ensure all buttons have proper z-index and are clickable */
+.btn,
+button,
+input[type="submit"],
+input[type="button"] {
+  position: relative;
+  z-index: 10;
+  pointer-events: auto !important;
+}
+
+/* Form actions should always be on top */
+.form-actions,
+.modal-footer {
+  position: relative;
+  z-index: 100 !important;
+  background: var(--white);
+}
+
+/* Ensure buttons in form actions are clickable */
+.form-actions .btn,
+.modal-footer .btn {
+  position: relative;
+  z-index: 101 !important;
+  pointer-events: auto !important;
+}
+
+/* Disabled buttons should not be clickable but should be visible */
+.btn:disabled,
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none !important;
+}
+
+/* Loading spinner in buttons */
+.btn .spinner,
+.spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: currentColor;
+  animation: spin 0.8s linear infinite;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Ensure button content is visible */
+.btn span,
+button span {
+  position: relative;
+  z-index: 1;
+}
+
+/* Fix for buttons being covered by other elements */
+.add-income-section,
+.add-expense-section,
+.add-budget-section,
+.add-goal-section,
+.add-investment-section,
+.add-loan-section,
+.add-house-section,
+.add-vehicle-section,
+.add-document-section,
+.add-note-section,
+.payment-method-form,
+.profile-section {
+  position: relative;
+  z-index: 1;
+}
+
+/* Ensure form actions are at the bottom and visible */
+.add-income-section .form-actions,
+.add-expense-section .form-actions,
+.add-budget-section .form-actions,
+.add-goal-section .form-actions,
+.add-investment-section .form-actions,
+.add-loan-section .form-actions,
+.add-house-section .form-actions,
+.add-vehicle-section .form-actions,
+.add-document-section .form-actions,
+.add-note-section .form-actions,
+.payment-method-form .form-actions,
+.profile-section .form-actions {
+  position: relative;
+  z-index: 100 !important;
+  background: var(--white);
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  margin-top: 1rem;
+  border-top: 1px solid var(--border-color);
+}
+
+/* Mobile specific fixes */
+@media (max-width: 768px) {
+  .form-actions,
+  .modal-footer {
+    position: relative;
+    z-index: 100 !important;
+    background: var(--white);
+    padding: 0.75rem;
+  }
+
+  .form-actions .btn,
+  .modal-footer .btn {
+    z-index: 101 !important;
+    width: 100%;
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+
+  /* Ensure buttons are not covered by FAB or other floating elements */
+  .fab-container {
+    z-index: 50;
+  }
+
+  .bulk-actions-bar {
+    z-index: 60;
+  }
+
+  /* Ensure modal buttons are always on top */
+  .modal-overlay {
+    z-index: 2000;
+  }
+
+  .modal-container {
+    z-index: 2001;
+  }
+
+  .modal-footer {
+    z-index: 2002 !important;
+  }
+
+  .modal-footer .btn {
+    z-index: 2003 !important;
+  }
+}
+
+/* Fix for specific payment method button */
+#addPaymentMethodBtn,
+#saveProfileBtn,
+#changePasswordBtn,
+#savePreferencesBtn,
+#saveIncomeBtn,
+#saveExpenseBtn,
+#saveBudgetBtn,
+#saveGoalBtn {
+  position: relative !important;
+  z-index: 101 !important;
+  pointer-events: auto !important;
+}
+
+/* Ensure button is visible even when loading */
+#addPaymentMethodBtn:disabled,
+#saveProfileBtn:disabled,
+#changePasswordBtn:disabled,
+#savePreferencesBtn:disabled {
+  opacity: 0.7 !important;
+  cursor: wait !important;
+  pointer-events: none !important;
+}
+
+/* Fix for button text being hidden */
+.btn-text,
+#addPaymentMethodBtnText,
+#saveProfileBtnText,
+#changePasswordBtnText,
+#savePreferencesBtnText {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* Fix for spinner being too large */
+.btn .spinner,
+#addPaymentMethodBtnSpinner,
+#saveProfileBtnSpinner,
+#changePasswordBtnSpinner,
+#savePreferencesBtnSpinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+}
+
+/* Dark mode support */
+[data-theme="dark"] .form-actions,
+[data-theme="dark"] .modal-footer {
+  background: var(--bg-card);
+}
+
+/* Print - hide buttons */
+@media print {
+  .form-actions,
+  .modal-footer {
+    display: none;
+  }
+}
