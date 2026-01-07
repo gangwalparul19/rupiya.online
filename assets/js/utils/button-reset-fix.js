@@ -17,6 +17,12 @@
 
   // Reset stuck buttons on page load
   function resetStuckButtons() {
+    // First, remove btn-loading from ALL buttons (even non-disabled ones)
+    document.querySelectorAll('.btn-loading').forEach(btn => {
+      console.log('[Button Fix] Removing btn-loading class from:', btn.id || btn.className);
+      btn.classList.remove('btn-loading');
+    });
+    
     document.querySelectorAll('.btn, button').forEach(btn => {
       // Check if button is disabled
       if (!btn.disabled) return;
@@ -51,9 +57,13 @@
       const hasSpinnerInHTML = btn.innerHTML.includes('class="spinner"') || 
                                btn.innerHTML.includes("class='spinner'");
       
-      if (hasVisibleSpinner || isLoadingText || hasSpinnerInHTML) {
+      // Check if button has btn-loading class
+      const hasBtnLoading = btn.classList.contains('btn-loading');
+      
+      if (hasVisibleSpinner || isLoadingText || hasSpinnerInHTML || hasBtnLoading) {
         console.log('[Button Fix] Resetting stuck button:', btn.id || btn.className);
         btn.disabled = false;
+        btn.classList.remove('btn-loading');
         
         // Try to restore original button content
         const btnId = btn.id;
@@ -180,7 +190,10 @@
       const hasSpinnerInHTML = btn.innerHTML.includes('class="spinner"') || 
                                btn.innerHTML.includes("class='spinner'");
       
-      if (hasVisibleSpinner || isLoadingText || hasSpinnerInHTML) {
+      // Check if button has btn-loading class
+      const hasBtnLoading = btn.classList.contains('btn-loading');
+      
+      if (hasVisibleSpinner || isLoadingText || hasSpinnerInHTML || hasBtnLoading) {
         // Check if button has been disabled for more than 10 seconds
         const disabledTime = btn.dataset.disabledTime;
         if (!disabledTime) {
@@ -190,6 +203,7 @@
           if (elapsed > 10000) {
             console.warn('[Button Fix] Auto-resetting button after 10s:', btn.id || btn.className);
             btn.disabled = false;
+            btn.classList.remove('btn-loading');
             
             // Remove visible spinners
             spinners.forEach(spinner => {

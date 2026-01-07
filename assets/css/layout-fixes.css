@@ -560,6 +560,7 @@
   .income-header,
   .expense-header {
     gap: 0.5rem;
+    row-gap: 0.25rem;
     align-items: center;
   }
 
@@ -568,14 +569,11 @@
     font-size: 1.125rem;
   }
 
-  /* Source/Category badge on its own line */
-  .income-source,
-  .expense-category {
-    font-size: 0.6875rem;
-    padding: 0.25rem 0.625rem;
-    display: inline-block;
-    width: fit-content;
-    margin-bottom: 0.25rem;
+  /* Source/Category with icon on its own line */
+  .income-source-with-icon,
+  .expense-category-with-icon {
+    font-size: 0.75rem;
+    padding-left: 1.5rem;
   }
 
   .income-description,

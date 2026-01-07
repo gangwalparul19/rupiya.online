@@ -98,15 +98,9 @@ class UXEnhancements {
 
   // Form enhancements
   initFormEnhancements() {
-    // Auto-focus first input in forms
-    document.querySelectorAll('form').forEach(form => {
-      form.addEventListener('submit', () => {
-        const submitBtn = form.querySelector('[type="submit"]');
-        if (submitBtn) {
-          submitBtn.classList.add('btn-loading');
-        }
-      });
-    });
+    // Note: btn-loading is NOT auto-added here anymore
+    // Each page handles its own button loading states in the form submit handlers
+    // This prevents double-spinner issues and ensures proper cleanup
 
     // Clear search on escape
     document.querySelectorAll('input[type="search"], #searchInput').forEach(input => {

@@ -630,12 +630,27 @@
 }
 
 /* ============================================
-   16. INCOME SOURCE WITH ICON
+   16. INCOME SOURCE WITH ICON (Base styles)
    ============================================ */
-.income-source-with-icon {
+.income-source-with-icon,
+.expense-category-with-icon {
   display: flex;
   align-items: center;
   gap: 6px;
+}
+
+/* Recurring badge styling */
+.income-source-with-icon .recurring-badge,
+.expense-category-with-icon .recurring-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--primary-blue);
+  background: rgba(74, 144, 226, 0.1);
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-left: 4px;
 }
 
 /* ============================================
@@ -726,7 +741,7 @@
 }
 
 /* ============================================
-   21. CARD HEADER WITH CHECKBOX
+   21. CARD HEADER WITH CHECKBOX - CLEAN TWO-ROW LAYOUT
    ============================================ */
 .expense-header,
 .income-header {
@@ -734,23 +749,36 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 8px;
+  row-gap: 4px;
 }
 
 .expense-header .expense-amount,
 .income-header .income-amount {
   flex: 0 0 auto;
+  margin-right: auto;
 }
 
 .expense-header .expense-category-with-icon,
 .income-header .income-source-with-icon {
-  flex: 1;
-  min-width: 0;
+  flex: 0 0 100%;
+  order: 10;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  padding-left: 28px;
+  margin-top: 2px;
+}
+
+.expense-header .expense-category-with-icon .category-icon,
+.income-header .income-source-with-icon .category-icon {
+  font-size: 14px;
 }
 
 .expense-header .expense-actions,
 .income-header .income-actions {
   flex: 0 0 auto;
-  margin-left: auto;
 }
 
 /* ============================================
@@ -769,5 +797,10 @@
   .expense-checkbox,
   .income-checkbox {
     order: -1;
+  }
+  
+  .expense-header .expense-category-with-icon,
+  .income-header .income-source-with-icon {
+    padding-left: 24px;
   }
 }
