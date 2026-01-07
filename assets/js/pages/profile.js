@@ -933,12 +933,10 @@ async function handleAddPaymentMethod(e) {
     return;
   }
   
-  // Show loading with text
+  // FIX: Use visibility toggling instead of innerHTML replacement
   addPaymentMethodBtn.disabled = true;
-  addPaymentMethodBtn.innerHTML = `
-    <span class="spinner"></span>
-    <span style="margin-left: 8px;">Adding...</span>
-  `;
+  if (addPaymentMethodBtnText) addPaymentMethodBtnText.style.display = 'none';
+  if (addPaymentMethodBtnSpinner) addPaymentMethodBtnSpinner.style.display = 'inline-block';
   
   try {
     const methodData = {
@@ -983,9 +981,10 @@ async function handleAddPaymentMethod(e) {
     console.error('Error adding payment method:', error);
     showToast('Failed to add payment method', 'error');
   } finally {
-    // Reset button
+    // FIX: Restore visibility instead of overwriting innerHTML
     addPaymentMethodBtn.disabled = false;
-    addPaymentMethodBtn.innerHTML = 'Add Payment Method';
+    if (addPaymentMethodBtnText) addPaymentMethodBtnText.style.display = 'inline';
+    if (addPaymentMethodBtnSpinner) addPaymentMethodBtnSpinner.style.display = 'none';
   }
 }
 
@@ -1025,12 +1024,10 @@ function hideDeletePaymentMethodModal() {
 async function handleDeletePaymentMethod() {
   if (!deletePaymentMethodId) return;
   
-  // Show loading with text
+  // FIX: Use visibility toggling
   confirmDeletePaymentMethodBtn.disabled = true;
-  confirmDeletePaymentMethodBtn.innerHTML = `
-    <span class="spinner"></span>
-    <span style="margin-left: 8px;">Deleting...</span>
-  `;
+  if (deletePaymentMethodBtnText) deletePaymentMethodBtnText.style.display = 'none';
+  if (deletePaymentMethodBtnSpinner) deletePaymentMethodBtnSpinner.style.display = 'inline-block';
   
   try {
     const result = await paymentMethodsService.deletePaymentMethod(deletePaymentMethodId);
@@ -1046,9 +1043,10 @@ async function handleDeletePaymentMethod() {
     console.error('Error deleting payment method:', error);
     showToast('Failed to delete payment method', 'error');
   } finally {
-    // Reset button
+    // FIX: Restore visibility
     confirmDeletePaymentMethodBtn.disabled = false;
-    confirmDeletePaymentMethodBtn.innerHTML = 'Delete';
+    if (deletePaymentMethodBtnText) deletePaymentMethodBtnText.style.display = 'inline';
+    if (deletePaymentMethodBtnSpinner) deletePaymentMethodBtnSpinner.style.display = 'none';
   }
 }
 
