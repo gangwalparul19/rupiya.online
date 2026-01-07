@@ -1,15 +1,12 @@
 // Signup Page Logic
 import '../services/services-init.js'; // Initialize services
 import authService from '../services/auth-service.js';
-import authEncryptionHelper from '../utils/auth-encryption-helper.js';
 import toast from '../components/toast.js';
 import { validateForm, setupRealtimeValidation } from '../utils/validation.js';
 
 // Get form elements
 const signupForm = document.getElementById('signupForm');
 const signupBtn = document.getElementById('signupBtn');
-const signupBtnText = document.getElementById('signupBtnText');
-const signupBtnSpinner = document.getElementById('signupBtnSpinner');
 const googleSignUpBtn = document.getElementById('googleSignUpBtn');
 const togglePasswordBtn = document.getElementById('togglePassword');
 const toggleConfirmPasswordBtn = document.getElementById('toggleConfirmPassword');
@@ -101,44 +98,52 @@ signupForm.addEventListener('submit', async (e) => {
   }
   
   // Show loading state
+  const originalText = signupBtn.textContent;
   signupBtn.disabled = true;
-  signupBtnText.style.display = 'none';
-  signupBtnSpinner.style.display = 'inline-block';
+  signupBtn.textContent = 'Creating Account...';
   
   try {
     const { email, password, displayName } = validation.data;
     const result = await authService.signUp(email, password, displayName);
     
     if (result.success) {
-      // Initialize encryption with user's password
-      const encryptionInitialized = await authEncryptionHelper.initializeAfterLogin(
-        password, 
-        result.user.uid
-      );
-      
-      if (!encryptionInitialized) {
-        console.warn('[Signup] Encryption initialization failed, data will not be encrypted');
-      }
-      
-      toast.success('Account created successfully! Redirecting...');
-      const redirectUrl = getRedirectUrl();
-      setTimeout(() => {
-        window.location.href = redirectUrl;
-      }, 1000);
+      // Show verification message
+      showVerificationMessage(email);
     } else {
       toast.error(result.error);
       signupBtn.disabled = false;
-      signupBtnText.style.display = 'inline';
-      signupBtnSpinner.style.display = 'none';
+      signupBtn.textContent = originalText;
     }
   } catch (error) {
     console.error('Signup error:', error);
     toast.error('An unexpected error occurred. Please try again.');
     signupBtn.disabled = false;
-    signupBtnText.style.display = 'inline';
-    signupBtnSpinner.style.display = 'none';
+    signupBtn.textContent = originalText;
   }
 });
+
+// Show verification pending message
+function showVerificationMessage(email) {
+  const formContainer = document.querySelector('.auth-form');
+  if (formContainer) {
+    formContainer.innerHTML = `
+      <div class="verification-message">
+        <div class="verification-icon">📧</div>
+        <h2>Verify Your Email</h2>
+        <p>We've sent a verification link to:</p>
+        <p class="verification-email"><strong>${email}</strong></p>
+        <p>Please check your inbox and click the verification link to activate your account.</p>
+        <div class="verification-actions">
+          <a href="login.html" class="btn btn-primary">Go to Login</a>
+        </div>
+        <p class="verification-help">
+          Didn't receive the email? Check your spam folder or 
+          <a href="login.html">try signing in</a> to resend the verification email.
+        </p>
+      </div>
+    `;
+  }
+}
 
 // Handle Google Sign Up
 googleSignUpBtn.addEventListener('click', async () => {

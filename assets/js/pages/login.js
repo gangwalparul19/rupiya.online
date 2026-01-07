@@ -8,12 +8,13 @@ import { validateForm, setupRealtimeValidation } from '../utils/validation.js';
 // Get form elements
 const loginForm = document.getElementById('loginForm');
 const loginBtn = document.getElementById('loginBtn');
-const loginBtnText = document.getElementById('loginBtnText');
-const loginBtnSpinner = document.getElementById('loginBtnSpinner');
 const googleSignInBtn = document.getElementById('googleSignInBtn');
 const togglePasswordBtn = document.getElementById('togglePassword');
 const passwordInput = document.getElementById('password');
 const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+
+// Track if user needs verification (for resend functionality)
+let pendingVerificationEmail = null;
 
 // Validation rules
 const validationRules = {
@@ -84,9 +85,12 @@ loginForm.addEventListener('submit', async (e) => {
   }
   
   // Show loading state
+  const originalText = loginBtn.textContent;
   loginBtn.disabled = true;
-  loginBtnText.style.display = 'none';
-  loginBtnSpinner.style.display = 'inline-block';
+  loginBtn.textContent = 'Signing In...';
+  
+  // Hide any existing verification banner
+  hideVerificationBanner();
   
   try {
     const { email, password } = validation.data;
@@ -109,19 +113,75 @@ loginForm.addEventListener('submit', async (e) => {
         window.location.href = redirectUrl;
       }, 1000);
     } else {
+      // Check if user needs to verify email
+      if (result.needsVerification) {
+        pendingVerificationEmail = result.email;
+        showVerificationBanner(email, password);
+      }
       toast.error(result.error);
       loginBtn.disabled = false;
-      loginBtnText.style.display = 'inline';
-      loginBtnSpinner.style.display = 'none';
+      loginBtn.textContent = originalText;
     }
   } catch (error) {
     console.error('Login error:', error);
     toast.error('An unexpected error occurred. Please try again.');
     loginBtn.disabled = false;
-    loginBtnText.style.display = 'inline';
-    loginBtnSpinner.style.display = 'none';
+    loginBtn.textContent = originalText;
   }
 });
+
+// Show verification required banner
+function showVerificationBanner(email, password) {
+  // Remove existing banner if any
+  hideVerificationBanner();
+  
+  const banner = document.createElement('div');
+  banner.id = 'verificationBanner';
+  banner.className = 'verification-banner';
+  banner.innerHTML = `
+    <div class="verification-banner-content">
+      <span class="verification-banner-icon">📧</span>
+      <div class="verification-banner-text">
+        <strong>Email not verified</strong>
+        <p>Please check your inbox for the verification link.</p>
+      </div>
+      <button type="button" class="btn btn-sm btn-outline" id="resendVerificationBtn">Resend Email</button>
+    </div>
+  `;
+  
+  // Insert before the form
+  loginForm.parentNode.insertBefore(banner, loginForm);
+  
+  // Add resend handler
+  document.getElementById('resendVerificationBtn').addEventListener('click', async () => {
+    const btn = document.getElementById('resendVerificationBtn');
+    btn.disabled = true;
+    btn.textContent = 'Sending...';
+    
+    const result = await authService.resendVerificationEmail(email, password);
+    
+    if (result.success) {
+      toast.success(result.message);
+      btn.textContent = 'Email Sent!';
+      setTimeout(() => {
+        btn.textContent = 'Resend Email';
+        btn.disabled = false;
+      }, 30000); // Allow resend after 30 seconds
+    } else {
+      toast.error(result.error);
+      btn.textContent = 'Resend Email';
+      btn.disabled = false;
+    }
+  });
+}
+
+// Hide verification banner
+function hideVerificationBanner() {
+  const existingBanner = document.getElementById('verificationBanner');
+  if (existingBanner) {
+    existingBanner.remove();
+  }
+}
 
 // Handle Google Sign In
 googleSignInBtn.addEventListener('click', async () => {
@@ -186,6 +246,13 @@ forgotPasswordLink.addEventListener('click', async (e) => {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('passwordReset') === 'success') {
       toast.success('Password reset successful! Please sign in with your new password.');
+      // Clean up the URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+    
+    // Check for email verification success
+    if (urlParams.get('verified') === 'true') {
+      toast.success('Email verified successfully! You can now sign in.');
       // Clean up the URL
       window.history.replaceState({}, document.title, window.location.pathname);
     }

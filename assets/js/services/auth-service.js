@@ -8,6 +8,7 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   sendPasswordResetEmail,
+  sendEmailVerification,
   updateProfile
 } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
 
@@ -99,6 +100,18 @@ class AuthService {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       log('Email sign-in successful');
       
+      // Check if email is verified (only for email/password users)
+      if (!userCredential.user.emailVerified) {
+        // Sign out the user since they haven't verified their email
+        await signOut(auth);
+        return { 
+          success: false, 
+          error: 'Please verify your email before signing in. Check your inbox for the verification link.',
+          needsVerification: true,
+          email: email
+        };
+      }
+      
       // Set auth flag for quick check
       localStorage.setItem('rupiya_user_logged_in', 'true');
       
@@ -123,16 +136,27 @@ class AuthService {
         await userCredential.user.reload();
       }
       
-      // Set auth flag for quick check
-      localStorage.setItem('rupiya_user_logged_in', 'true');
+      // Send email verification
+      const actionCodeSettings = {
+        url: `${window.location.origin}/login.html?verified=true`,
+        handleCodeInApp: false
+      };
       
-      if (this.userService) {
-        await this.userService.getOrCreateUserProfile(
-          displayName ? auth.currentUser : userCredential.user
-        );
-      }
+      await sendEmailVerification(userCredential.user, actionCodeSettings);
+      log('Verification email sent');
       
-      return { success: true, user: userCredential.user };
+      // Sign out the user - they need to verify email first
+      await signOut(auth);
+      
+      // Don't set auth flag since user needs to verify email
+      // localStorage.setItem('rupiya_user_logged_in', 'true');
+      
+      return { 
+        success: true, 
+        user: userCredential.user,
+        needsVerification: true,
+        message: 'Account created! Please check your email to verify your account before signing in.'
+      };
     } catch (error) {
       logError('Sign-up error:', error.code);
       return { success: false, error: this.getErrorMessage(error.code) };
@@ -199,6 +223,38 @@ class AuthService {
       return { success: true };
     } catch (error) {
       logError('Password reset error:', error.code);
+      return { success: false, error: this.getErrorMessage(error.code) };
+    }
+  }
+
+  // Resend verification email
+  async resendVerificationEmail(email, password) {
+    try {
+      // Sign in temporarily to get the user object
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      
+      if (userCredential.user.emailVerified) {
+        await signOut(auth);
+        return { success: false, error: 'Email is already verified. Please sign in.' };
+      }
+      
+      // Send verification email
+      const actionCodeSettings = {
+        url: `${window.location.origin}/login.html?verified=true`,
+        handleCodeInApp: false
+      };
+      
+      await sendEmailVerification(userCredential.user, actionCodeSettings);
+      
+      // Sign out again
+      await signOut(auth);
+      
+      return { success: true, message: 'Verification email sent! Please check your inbox.' };
+    } catch (error) {
+      logError('Resend verification error:', error.code);
+      if (error.code === 'auth/too-many-requests') {
+        return { success: false, error: 'Too many requests. Please wait a few minutes before trying again.' };
+      }
       return { success: false, error: this.getErrorMessage(error.code) };
     }
   }

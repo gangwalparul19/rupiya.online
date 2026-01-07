@@ -804,3 +804,156 @@
     transform: translateY(0);
   }
 }
+
+
+/* ============================================
+   EMAIL VERIFICATION STYLES
+   ============================================ */
+
+/* Verification Message (shown after signup) */
+.verification-message {
+  text-align: center;
+  padding: 2rem;
+}
+
+.verification-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-10px); }
+  60% { transform: translateY(-5px); }
+}
+
+.verification-message h2 {
+  color: var(--text-primary, #1a1a2e);
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.verification-message p {
+  color: var(--text-secondary, #666);
+  margin-bottom: 0.5rem;
+  line-height: 1.6;
+}
+
+.verification-email {
+  background: var(--bg-secondary, #f5f5f5);
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+  word-break: break-all;
+}
+
+.verification-actions {
+  margin-top: 2rem;
+}
+
+.verification-actions .btn {
+  min-width: 200px;
+}
+
+.verification-help {
+  margin-top: 1.5rem;
+  font-size: 0.875rem;
+  color: var(--text-muted, #888);
+}
+
+.verification-help a {
+  color: var(--primary-color, #667eea);
+  text-decoration: none;
+}
+
+.verification-help a:hover {
+  text-decoration: underline;
+}
+
+/* Verification Banner (shown on login page) */
+.verification-banner {
+  background: linear-gradient(135deg, #fff3cd 0%, #ffeeba 100%);
+  border: 1px solid #ffc107;
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.verification-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.verification-banner-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.verification-banner-text {
+  flex: 1;
+  min-width: 200px;
+}
+
+.verification-banner-text strong {
+  display: block;
+  color: #856404;
+  margin-bottom: 0.25rem;
+}
+
+.verification-banner-text p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #856404;
+}
+
+.verification-banner .btn-sm {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+/* Dark mode support */
+[data-theme="dark"] .verification-message h2 {
+  color: var(--text-primary, #fff);
+}
+
+[data-theme="dark"] .verification-email {
+  background: var(--bg-secondary, #2a2a3e);
+}
+
+[data-theme="dark"] .verification-banner {
+  background: linear-gradient(135deg, #3d3d00 0%, #4a4a00 100%);
+  border-color: #6b6b00;
+}
+
+[data-theme="dark"] .verification-banner-text strong,
+[data-theme="dark"] .verification-banner-text p {
+  color: #ffc107;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 480px) {
+  .verification-banner-content {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .verification-banner .btn-sm {
+    width: 100%;
+  }
+}
