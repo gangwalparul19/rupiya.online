@@ -66,6 +66,8 @@
   
   <!-- Auth Guard - Must be loaded early to prevent flash of protected content -->
   <script src="assets/js/utils/auth-guard.js"></script>
+  <!-- Button Reset Fix - Prevents buttons from getting stuck -->
+  <script src="assets/js/utils/button-reset-fix.js"></script>
   <!-- Structured Data - WebPage -->
   <script type="application/ld+json">
   {
@@ -722,5 +724,63 @@
   <script type="module" src="assets/js/components/sidebar.js"></script>
   <script type="module" src="assets/js/pages/profile.js"></script>
   <script type="module" src="assets/js/pwa-setup.js"></script>
+  
+  <!-- Button Reset Fix - Ensures buttons never get stuck -->
+  <script>
+    // Reset any stuck buttons on page load
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.querySelectorAll('.btn').forEach(btn => {
+          const spinner = btn.querySelector('.spinner');
+          if (spinner && btn.disabled) {
+            console.log('Resetting stuck button:', btn.id);
+            btn.disabled = false;
+            // Try to restore original text
+            const btnId = btn.id;
+            if (btnId === 'addPaymentMethodBtn') {
+              btn.innerHTML = 'Add Payment Method';
+            } else if (btnId === 'saveProfileBtn') {
+              btn.innerHTML = '<span id="saveProfileBtnText">Save Changes</span><span id="saveProfileBtnSpinner" class="spinner" style="display: none;"></span>';
+            } else if (btnId === 'changePasswordBtn') {
+              btn.innerHTML = '<span id="changePasswordBtnText">Change Password</span><span id="changePasswordBtnSpinner" class="spinner" style="display: none;"></span>';
+            } else if (btnId === 'savePreferencesBtn') {
+              btn.innerHTML = '<span id="savePreferencesBtnText">Save Preferences</span><span id="savePreferencesBtnSpinner" class="spinner" style="display: none;"></span>';
+            } else {
+              // Generic reset
+              spinner.remove();
+            }
+          }
+        });
+      }, 100);
+    });
+
+    // Auto-reset buttons after 10 seconds
+    document.addEventListener('DOMContentLoaded', () => {
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          mutation.addedNodes.forEach((node) => {
+            if (node.classList && node.classList.contains('spinner')) {
+              const btn = node.closest('.btn');
+              if (btn) {
+                setTimeout(() => {
+                  if (btn.disabled && btn.querySelector('.spinner')) {
+                    console.warn('Auto-resetting button after timeout:', btn.id);
+                    btn.disabled = false;
+                    const spinner = btn.querySelector('.spinner');
+                    if (spinner) spinner.remove();
+                  }
+                }, 10000);
+              }
+            }
+          });
+        });
+      });
+
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true
+      });
+    });
+  </script>
 </body>
 </html>
