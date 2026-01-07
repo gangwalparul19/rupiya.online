@@ -7,11 +7,24 @@
 (function() {
   'use strict';
 
+  // Buttons that should remain disabled (intentionally disabled by design)
+  const excludedButtons = [
+    'confirmDeleteAccountBtn',  // Disabled until user types confirmation
+    'confirmDeletePaymentMethodBtn',  // Disabled until confirmed
+    'confirmDeleteBtn',  // Generic delete confirmation buttons
+    'deleteAccountBtn'  // Account deletion buttons
+  ];
+
   // Reset stuck buttons on page load
   function resetStuckButtons() {
     document.querySelectorAll('.btn, button').forEach(btn => {
       // Check if button is disabled
       if (!btn.disabled) return;
+      
+      // Skip buttons that are intentionally disabled
+      if (excludedButtons.includes(btn.id)) {
+        return;
+      }
       
       // Check for visible spinners (not hidden ones)
       const spinners = btn.querySelectorAll('.spinner');
@@ -121,6 +134,11 @@
   // Monitor for buttons that stay disabled too long
   setInterval(() => {
     document.querySelectorAll('.btn:disabled, button:disabled').forEach(btn => {
+      // Skip buttons that are intentionally disabled
+      if (excludedButtons.includes(btn.id)) {
+        return;
+      }
+      
       // Check for visible spinners
       const spinners = btn.querySelectorAll('.spinner');
       let hasVisibleSpinner = false;
@@ -250,6 +268,11 @@
   document.addEventListener('click', (e) => {
     const btn = e.target.closest('.btn, button');
     if (btn && btn.type === 'submit') {
+      // Skip buttons that are intentionally disabled
+      if (excludedButtons.includes(btn.id)) {
+        return;
+      }
+      
       // Mark the button as clicked
       btn.dataset.clickedAt = Date.now();
       

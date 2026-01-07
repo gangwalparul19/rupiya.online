@@ -727,27 +727,44 @@
   
   <!-- Button Reset Fix - Ensures buttons never get stuck -->
   <script>
+    // Buttons that should remain disabled (intentionally disabled by design)
+    const excludedButtons = [
+      'confirmDeleteAccountBtn',  // Disabled until user types confirmation
+      'confirmDeletePaymentMethodBtn',  // Disabled until confirmed
+      'confirmDeleteBtn',  // Generic delete confirmation buttons
+      'deleteAccountBtn'  // Account deletion buttons
+    ];
+
     // Reset any stuck buttons on page load
     window.addEventListener('load', () => {
       setTimeout(() => {
         document.querySelectorAll('.btn').forEach(btn => {
+          // Skip buttons that are intentionally disabled
+          if (excludedButtons.includes(btn.id)) {
+            return;
+          }
+          
           const spinner = btn.querySelector('.spinner');
           if (spinner && btn.disabled) {
-            console.log('Resetting stuck button:', btn.id);
-            btn.disabled = false;
-            // Try to restore original text
-            const btnId = btn.id;
-            if (btnId === 'addPaymentMethodBtn') {
-              btn.innerHTML = 'Add Payment Method';
-            } else if (btnId === 'saveProfileBtn') {
-              btn.innerHTML = '<span id="saveProfileBtnText">Save Changes</span><span id="saveProfileBtnSpinner" class="spinner" style="display: none;"></span>';
-            } else if (btnId === 'changePasswordBtn') {
-              btn.innerHTML = '<span id="changePasswordBtnText">Change Password</span><span id="changePasswordBtnSpinner" class="spinner" style="display: none;"></span>';
-            } else if (btnId === 'savePreferencesBtn') {
-              btn.innerHTML = '<span id="savePreferencesBtnText">Save Preferences</span><span id="savePreferencesBtnSpinner" class="spinner" style="display: none;"></span>';
-            } else {
-              // Generic reset
-              spinner.remove();
+            // Check if spinner is visible
+            const style = window.getComputedStyle(spinner);
+            if (style.display !== 'none' && style.visibility !== 'hidden') {
+              console.log('Resetting stuck button:', btn.id);
+              btn.disabled = false;
+              // Try to restore original text
+              const btnId = btn.id;
+              if (btnId === 'addPaymentMethodBtn') {
+                btn.innerHTML = 'Add Payment Method';
+              } else if (btnId === 'saveProfileBtn') {
+                btn.innerHTML = '<span id="saveProfileBtnText">Save Changes</span><span id="saveProfileBtnSpinner" class="spinner" style="display: none;"></span>';
+              } else if (btnId === 'changePasswordBtn') {
+                btn.innerHTML = '<span id="changePasswordBtnText">Change Password</span><span id="changePasswordBtnSpinner" class="spinner" style="display: none;"></span>';
+              } else if (btnId === 'savePreferencesBtn') {
+                btn.innerHTML = '<span id="savePreferencesBtnText">Save Preferences</span><span id="savePreferencesBtnSpinner" class="spinner" style="display: none;"></span>';
+              } else {
+                // Generic reset
+                spinner.remove();
+              }
             }
           }
         });
@@ -762,12 +779,22 @@
             if (node.classList && node.classList.contains('spinner')) {
               const btn = node.closest('.btn');
               if (btn) {
+                // Skip buttons that are intentionally disabled
+                if (excludedButtons.includes(btn.id)) {
+                  return;
+                }
+                
                 setTimeout(() => {
                   if (btn.disabled && btn.querySelector('.spinner')) {
-                    console.warn('Auto-resetting button after timeout:', btn.id);
-                    btn.disabled = false;
                     const spinner = btn.querySelector('.spinner');
-                    if (spinner) spinner.remove();
+                    if (spinner) {
+                      const style = window.getComputedStyle(spinner);
+                      if (style.display !== 'none' && style.visibility !== 'hidden') {
+                        console.warn('Auto-resetting button after timeout:', btn.id);
+                        btn.disabled = false;
+                        spinner.remove();
+                      }
+                    }
                   }
                 }, 10000);
               }
