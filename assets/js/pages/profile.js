@@ -933,7 +933,13 @@ async function handleAddPaymentMethod(e) {
     return;
   }
   
-  // FIX: Use visibility toggling instead of innerHTML replacement
+  const name = paymentMethodNameInput.value.trim();
+  if (!name) {
+    showToast('Please enter a name for the payment method', 'error');
+    return;
+  }
+  
+  // Show loading state
   addPaymentMethodBtn.disabled = true;
   if (addPaymentMethodBtnText) addPaymentMethodBtnText.style.display = 'none';
   if (addPaymentMethodBtnSpinner) addPaymentMethodBtnSpinner.style.display = 'inline-block';
@@ -941,7 +947,7 @@ async function handleAddPaymentMethod(e) {
   try {
     const methodData = {
       type: type,
-      name: paymentMethodNameInput.value.trim()
+      name: name
     };
     
     // Add type-specific fields
@@ -981,10 +987,16 @@ async function handleAddPaymentMethod(e) {
     console.error('Error adding payment method:', error);
     showToast('Failed to add payment method', 'error');
   } finally {
-    // FIX: Restore visibility instead of overwriting innerHTML
-    addPaymentMethodBtn.disabled = false;
-    if (addPaymentMethodBtnText) addPaymentMethodBtnText.style.display = 'inline';
-    if (addPaymentMethodBtnSpinner) addPaymentMethodBtnSpinner.style.display = 'none';
+    // Reset button state - ensure elements exist before modifying
+    if (addPaymentMethodBtn) {
+      addPaymentMethodBtn.disabled = false;
+    }
+    if (addPaymentMethodBtnText) {
+      addPaymentMethodBtnText.style.display = 'inline';
+    }
+    if (addPaymentMethodBtnSpinner) {
+      addPaymentMethodBtnSpinner.style.display = 'none';
+    }
   }
 }
 
@@ -1024,10 +1036,16 @@ function hideDeletePaymentMethodModal() {
 async function handleDeletePaymentMethod() {
   if (!deletePaymentMethodId) return;
   
-  // FIX: Use visibility toggling
-  confirmDeletePaymentMethodBtn.disabled = true;
-  if (deletePaymentMethodBtnText) deletePaymentMethodBtnText.style.display = 'none';
-  if (deletePaymentMethodBtnSpinner) deletePaymentMethodBtnSpinner.style.display = 'inline-block';
+  // Show loading state
+  if (confirmDeletePaymentMethodBtn) {
+    confirmDeletePaymentMethodBtn.disabled = true;
+  }
+  if (deletePaymentMethodBtnText) {
+    deletePaymentMethodBtnText.style.display = 'none';
+  }
+  if (deletePaymentMethodBtnSpinner) {
+    deletePaymentMethodBtnSpinner.style.display = 'inline-block';
+  }
   
   try {
     const result = await paymentMethodsService.deletePaymentMethod(deletePaymentMethodId);
@@ -1043,10 +1061,16 @@ async function handleDeletePaymentMethod() {
     console.error('Error deleting payment method:', error);
     showToast('Failed to delete payment method', 'error');
   } finally {
-    // FIX: Restore visibility
-    confirmDeletePaymentMethodBtn.disabled = false;
-    if (deletePaymentMethodBtnText) deletePaymentMethodBtnText.style.display = 'inline';
-    if (deletePaymentMethodBtnSpinner) deletePaymentMethodBtnSpinner.style.display = 'none';
+    // Reset button state - ensure elements exist before modifying
+    if (confirmDeletePaymentMethodBtn) {
+      confirmDeletePaymentMethodBtn.disabled = false;
+    }
+    if (deletePaymentMethodBtnText) {
+      deletePaymentMethodBtnText.style.display = 'inline';
+    }
+    if (deletePaymentMethodBtnSpinner) {
+      deletePaymentMethodBtnSpinner.style.display = 'none';
+    }
   }
 }
 

@@ -57,7 +57,11 @@ class PaymentMethodsService {
       const methods = [];
       
       querySnapshot.forEach((doc) => {
-        methods.push({ id: doc.id, ...doc.data() });
+        const data = doc.data();
+        // Only include active payment methods (filter out soft-deleted ones)
+        if (data.isActive !== false) {
+          methods.push({ id: doc.id, ...data });
+        }
       });
       
       // If no methods exist, create default cash method
