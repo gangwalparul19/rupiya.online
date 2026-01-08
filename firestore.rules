@@ -489,6 +489,17 @@ service cloud.firestore {
     }
     
     // ============================================
+    // USER ENCRYPTION (Salt storage for cross-device sync)
+    // ============================================
+    match /userEncryption/{userId} {
+      // Users can only access their own encryption salt
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId);
+    }
+    
+    // ============================================
     // DENY ALL OTHER COLLECTIONS
     // ============================================
     // Explicitly deny access to any other collections

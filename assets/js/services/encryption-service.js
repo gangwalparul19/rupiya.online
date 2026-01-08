@@ -139,6 +139,8 @@ class EncryptionService {
   }
 
   // Get or create salt for user
+  // IMPORTANT: Salt must be consistent across all devices for the same user
+  // We store it in Firestore to ensure cross-device consistency
   async getOrCreateSalt(userId) {
     const saltKey = `${this.SALT_KEY}_${userId}`;
     let saltBase64 = localStorage.getItem(saltKey);
@@ -148,14 +150,67 @@ class EncryptionService {
       return Uint8Array.from(atob(saltBase64), c => c.charCodeAt(0));
     }
     
-    // Generate new salt
-    const salt = crypto.getRandomValues(new Uint8Array(16));
-    
-    // Store as base64
-    saltBase64 = btoa(String.fromCharCode(...salt));
-    localStorage.setItem(saltKey, saltBase64);
-    
-    return salt;
+    // No local salt - try to get from Firestore (for cross-device sync)
+    try {
+      const { getFirestore, doc, getDoc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js');
+      const { getApp } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js');
+      
+      const db = getFirestore(getApp());
+      const userSaltRef = doc(db, 'userEncryption', userId);
+      const saltDoc = await getDoc(userSaltRef);
+      
+      if (saltDoc.exists() && saltDoc.data().salt) {
+        // Salt exists in Firestore - use it
+        saltBase64 = saltDoc.data().salt;
+        const salt = Uint8Array.from(atob(saltBase64), c => c.charCodeAt(0));
+        
+        // Cache locally
+        localStorage.setItem(saltKey, saltBase64);
+        log.log('Retrieved salt from Firestore for cross-device sync');
+        
+        return salt;
+      }
+      
+      // No salt in Firestore - generate deterministic salt from userId
+      // This ensures consistency even if Firestore save fails
+      const saltSource = `rupiya_salt_v2_${userId}`;
+      const saltData = new TextEncoder().encode(saltSource);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', saltData);
+      const salt = new Uint8Array(hashBuffer).slice(0, 16);
+      
+      saltBase64 = btoa(String.fromCharCode(...salt));
+      
+      // Save to Firestore for other devices
+      try {
+        await setDoc(userSaltRef, { 
+          salt: saltBase64, 
+          createdAt: new Date().toISOString(),
+          version: 2
+        });
+        log.log('Saved new salt to Firestore');
+      } catch (saveError) {
+        log.warn('Could not save salt to Firestore:', saveError);
+      }
+      
+      // Cache locally
+      localStorage.setItem(saltKey, saltBase64);
+      
+      return salt;
+      
+    } catch (error) {
+      log.warn('Firestore salt sync failed, using deterministic salt:', error);
+      
+      // Fallback: generate deterministic salt from userId
+      const saltSource = `rupiya_salt_v2_${userId}`;
+      const saltData = new TextEncoder().encode(saltSource);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', saltData);
+      const salt = new Uint8Array(hashBuffer).slice(0, 16);
+      
+      saltBase64 = btoa(String.fromCharCode(...salt));
+      localStorage.setItem(saltKey, saltBase64);
+      
+      return salt;
+    }
   }
 
   // Derive encryption key from password using PBKDF2
