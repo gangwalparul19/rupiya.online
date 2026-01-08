@@ -16,6 +16,7 @@ const showToast = (message, type) => toast.show(message, type);
 let documents = [];
 let filteredDocuments = [];
 let editingDocumentId = null;
+let uploadedFile = null;
 
 // Pagination state
 let pagination = null;

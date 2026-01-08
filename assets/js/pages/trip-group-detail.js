@@ -63,7 +63,6 @@ class TripGroupDetailPage {
     });
 
     // Add expense button
-    // Add expense button
     document.getElementById('addExpenseBtn')?.addEventListener('click', () => this.toggleExpenseSection());
     document.getElementById('closeExpenseFormBtn')?.addEventListener('click', () => this.closeExpenseModal());
     document.getElementById('cancelExpenseBtn')?.addEventListener('click', () => this.closeExpenseModal());
@@ -728,6 +727,7 @@ class TripGroupDetailPage {
 
   async handleExpenseSubmit(e) {
     e.preventDefault();
+    console.log('=== Form submitted ===');
 
     const amount = parseFloat(document.getElementById('expenseAmount').value);
     const category = document.getElementById('expenseCategory').value;
@@ -736,17 +736,31 @@ class TripGroupDetailPage {
     const paidBy = document.getElementById('expensePaidBy').value;
     const splitType = document.querySelector('input[name="splitType"]:checked')?.value || 'equal';
 
+    console.log('Form values:', { amount, category, description, date, paidBy, splitType });
+
     // Get selected members and their splits
     const checkedMembers = document.querySelectorAll('#splitMembers input[type="checkbox"]:checked');
+    console.log('Checked members:', checkedMembers.length);
     const splits = [];
 
     if (splitType === 'equal') {
       const splitAmount = amount / checkedMembers.length;
-      checkedMembers.forEach(cb => {
-        splits.push({
-          memberId: cb.value,
-          amount: Math.round(splitAmount * 100) / 100
-        });
+      const roundedSplitAmount = Math.round(splitAmount * 100) / 100;
+      
+      checkedMembers.forEach((cb, index) => {
+        if (index === checkedMembers.length - 1) {
+          // Last member gets the remainder to avoid rounding errors
+          const sumSoFar = splits.reduce((sum, s) => sum + s.amount, 0);
+          splits.push({
+            memberId: cb.value,
+            amount: Math.round((amount - sumSoFar) * 100) / 100
+          });
+        } else {
+          splits.push({
+            memberId: cb.value,
+            amount: roundedSplitAmount
+          });
+        }
       });
     } else {
       checkedMembers.forEach(cb => {
@@ -762,13 +776,19 @@ class TripGroupDetailPage {
       });
     }
 
+    console.log('Splits:', splits);
+
     // Validate splits sum
     const splitSum = splits.reduce((sum, s) => sum + s.amount, 0);
+    console.log('Split sum:', splitSum, 'Amount:', amount, 'Difference:', Math.abs(splitSum - amount));
+    
     if (Math.abs(splitSum - amount) > 0.01) {
+      console.error('Split validation failed');
       this.showToast('Split amounts must equal total expense', 'error');
       return;
     }
 
+    console.log('Validation passed, calling service...');
     this.setExpenseLoading(true);
 
     try {
@@ -781,6 +801,8 @@ class TripGroupDetailPage {
         splitType,
         splits
       });
+
+      console.log('Service result:', result);
 
       if (!result.success) {
         throw new Error(result.error);

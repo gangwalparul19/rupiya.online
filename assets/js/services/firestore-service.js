@@ -7,6 +7,7 @@ import {
   getDoc,
   getDocs,
   updateDoc,
+  setDoc,
   deleteDoc,
   query,
   where,
@@ -173,8 +174,15 @@ class FirestoreService {
       // Decrypt all documents
       const decryptedData = await encryptionService.decryptArray(data, collectionName);
       
-      this.setCache(cacheKey, decryptedData);
-      return decryptedData;
+      // IMPORTANT: Filter out family group expenses/income from personal queries
+      // Only applies to expenses and income collections
+      let filteredData = decryptedData;
+      if (collectionName === this.collections.expenses || collectionName === this.collections.income) {
+        filteredData = decryptedData.filter(item => !item.familyGroupId);
+      }
+      
+      this.setCache(cacheKey, filteredData);
+      return filteredData;
     } catch (error) {
       console.error(`Error getting all from ${collectionName}:`, error);
       return [];
@@ -221,7 +229,14 @@ class FirestoreService {
       // Decrypt all documents
       const decryptedData = await encryptionService.decryptArray(data, collectionName);
       
-      return { data: decryptedData, lastDoc: lastVisible, hasMore: data.length === pageSize };
+      // IMPORTANT: Filter out family group expenses/income from personal queries
+      // Only applies to expenses and income collections
+      let filteredData = decryptedData;
+      if (collectionName === this.collections.expenses || collectionName === this.collections.income) {
+        filteredData = decryptedData.filter(item => !item.familyGroupId);
+      }
+      
+      return { data: filteredData, lastDoc: lastVisible, hasMore: data.length === pageSize };
     } catch (error) {
       console.error(`Error getting paginated from ${collectionName}:`, error);
       return { data: [], lastDoc: null, hasMore: false };
@@ -791,10 +806,9 @@ class FirestoreService {
         this.getSplitsByDateRange(startDate, endDate)
       ]);
       
-      // Calculate split expenses and income
-      // Your share of splits where you paid = expense (you spent money)
-      // Your share of splits where someone else paid = expense (you owe money)
-      // When you're owed money (you paid, others owe you) = potential income when settled
+      // Calculate split expenses and income for REFERENCE ONLY
+      // These are tracked separately and should NOT be included in main totals
+      // until the user explicitly settles and adds their share
       let splitExpenses = 0;
       let splitIncome = 0;
       
@@ -818,9 +832,11 @@ class FirestoreService {
         }
       });
       
+      // NOTE: Split expenses/income are kept separate from main totals
+      // They are provided for reference but NOT included in totalExpenses/totalIncome
       const summary = {
-        totalExpenses: expenses.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0) + splitExpenses,
-        totalIncome: income.reduce((sum, i) => sum + (parseFloat(i.amount) || 0), 0) + splitIncome,
+        totalExpenses: expenses.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0),
+        totalIncome: income.reduce((sum, i) => sum + (parseFloat(i.amount) || 0), 0),
         netSavings: 0,
         expenseCount: expenses.length,
         incomeCount: income.length,
@@ -910,7 +926,12 @@ class FirestoreService {
       // Decrypt all documents
       const decryptedData = await encryptionService.decryptArray(data, collectionName);
       
-      return decryptedData;
+      // IMPORTANT: Filter out family group expenses/income from personal queries
+      // Family expenses should only appear in family dashboard, not personal dashboard
+      // This ensures accurate personal income/expense tracking
+      const personalData = decryptedData.filter(item => !item.familyGroupId);
+      
+      return personalData;
     } catch (error) {
       console.error(`Error querying ${collectionName} by date range:`, error);
       return [];
@@ -1101,6 +1122,57 @@ class FirestoreService {
     } catch (error) {
       console.error(`Error getting income by linked type ${linkedType}:`, error);
       return [];
+    }
+  }
+  // ============================================
+  // USER SETTINGS
+  // ============================================
+  
+  async getUserSettings() {
+    try {
+      const userId = this.getUserId();
+      const docRef = doc(db, 'userSettings', userId);
+      const docSnap = await getDoc(docRef);
+      
+      if (docSnap.exists()) {
+        return docSnap.data();
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('Error getting user settings:', error);
+      throw error;
+    }
+  }
+  
+  async updateUserSettings(settings) {
+    try {
+      const userId = this.getUserId();
+      const docRef = doc(db, 'userSettings', userId);
+      
+      // Check if document exists
+      const docSnap = await getDoc(docRef);
+      
+      if (docSnap.exists()) {
+        // Update existing
+        await updateDoc(docRef, {
+          ...settings,
+          updatedAt: Timestamp.now()
+        });
+      } else {
+        // Create new
+        await setDoc(docRef, {
+          ...settings,
+          userId,
+          createdAt: Timestamp.now(),
+          updatedAt: Timestamp.now()
+        });
+      }
+      
+      return { success: true };
+    } catch (error) {
+      console.error('Error updating user settings:', error);
+      return { success: false, error: error.message };
     }
   }
 }

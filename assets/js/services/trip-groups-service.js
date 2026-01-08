@@ -574,33 +574,13 @@ class TripGroupsService {
       const expenseRef = await addDoc(collection(db, this.expensesCollection), encryptedExpense);
       const expenseId = expenseRef.id;
 
-      // Create linked personal expense if current user paid
-      const paidByMember = await this.getMember(expenseData.paidBy);
-      if (paidByMember.success && paidByMember.data.userId === userId) {
-        const personalExpense = {
-          userId: userId,
-          amount: expenseData.amount,
-          description: `[Trip: ${groupResult.data.name}] ${expenseData.description.trim()}`,
-          category: expenseData.category || 'Other',
-          date: expenseData.date ? Timestamp.fromDate(new Date(expenseData.date)) : now,
-          paymentMethod: 'Cash',
-          tripGroupId: groupId,
-          tripGroupExpenseId: expenseId,
-          createdAt: now,
-          updatedAt: now
-        };
-
-        // Encrypt personal expense before saving
-        const encryptedPersonalExpense = await encryptionService.encryptObject(personalExpense, this.personalExpensesCollection);
-        const personalExpenseRef = await addDoc(collection(db, this.personalExpensesCollection), encryptedPersonalExpense);
-        
-        // Update group expense with linked expense ID
-        await updateDoc(doc(db, this.expensesCollection, expenseId), {
-          linkedExpenseId: personalExpenseRef.id
-        });
-
-        expense.linkedExpenseId = personalExpenseRef.id;
-      }
+      // NOTE: Trip expenses are kept separate from personal expenses
+      // They will NOT be automatically added to the main expenses tracker
+      // Users can manually add them later if needed (e.g., after trip is complete)
+      
+      // REMOVED: Automatic personal expense creation
+      // This was causing trip expenses to appear in main income/expenses tracking
+      // which made it difficult to see accurate personal finances during the trip
 
       // Update group total expenses
       const groupRef = doc(db, this.groupsCollection, groupId);
@@ -681,14 +661,8 @@ class TripGroupsService {
         return { success: false, error: 'Only the person who added the expense can delete it' };
       }
 
-      // Delete linked personal expense if exists
-      if (expense.linkedExpenseId) {
-        try {
-          await deleteDoc(doc(db, this.personalExpensesCollection, expense.linkedExpenseId));
-        } catch (e) {
-          console.warn('Could not delete linked personal expense:', e);
-        }
-      }
+      // NOTE: Since we no longer auto-create linked personal expenses,
+      // we don't need to delete them here
 
       // Delete group expense
       await deleteDoc(expenseRef);

@@ -194,6 +194,12 @@
           </svg>
           <span>Categories</span>
         </button>
+        <button class="tab-btn" data-tab="family-members">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+          </svg>
+          <span>Family Members</span>
+        </button>
         <button class="tab-btn" data-tab="payment-methods">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
@@ -460,6 +466,50 @@
                 </svg>
                 Reset to Defaults
               </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Family Members Tab -->
+        <div class="tab-content" id="family-members-tab">
+          <div class="settings-card">
+            <div class="settings-card-header">
+              <h2 class="settings-card-title">Family Members</h2>
+              <p class="settings-card-subtitle">Customize family member names for expense splitting</p>
+            </div>
+            <div class="settings-card-body">
+              <div class="info-banner">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <div>
+                  <strong>About Family Members</strong>
+                  <p>These predefined family member roles help you track individual spending within shared expenses. Customize the names to match your family, and enable/disable members as needed.</p>
+                </div>
+              </div>
+
+              <div id="familyMembersList" class="family-members-list">
+                <!-- Family members will be loaded here -->
+                <div class="loading-state">
+                  <div class="spinner"></div>
+                  <p>Loading family members...</p>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button class="btn btn-outline" id="resetFamilyMembersBtn">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                  </svg>
+                  Reset to Defaults
+                </button>
+                <button class="btn btn-primary" id="saveFamilyMembersBtn">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                  Save Changes
+                </button>
+              </div>
             </div>
           </div>
         </div>

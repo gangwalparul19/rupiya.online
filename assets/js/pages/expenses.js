@@ -6,6 +6,7 @@ import categoriesService from '../services/categories-service.js';
 import paymentMethodsService from '../services/payment-methods-service.js';
 import smartCategorizationService from '../services/smart-categorization-service.js';
 import familySwitcher from '../components/family-switcher.js';
+import familyMembersService from '../services/family-members-service.js';
 import toast from '../components/toast.js';
 import confirmationModal from '../components/confirmation-modal.js';
 import themeManager from '../utils/theme-manager.js';
@@ -36,6 +37,9 @@ const state = {
   hasMore: true,
   loadingMore: false
 };
+
+// Current user reference
+let currentUser = null;
 
 // Pagination instance
 let pagination = null;
@@ -164,6 +168,7 @@ let deleteExpenseId = null;
 // Initialize page
 async function initPage() {
   const user = authService.getCurrentUser();
+  currentUser = user; // Store for later use
   
   if (user) {
     // Update user profile
@@ -205,20 +210,11 @@ async function initPage() {
 function updatePageContext() {
   const context = familySwitcher.getCurrentContext();
   const subtitle = document.getElementById('expensesSubtitle');
-  const expenseTypeGroup = document.getElementById('expenseTypeGroup');
   
   if (context.context === 'family' && context.group) {
-    subtitle.textContent = `Tracking expenses for ${context.group.name}`;
-    // Show personal/shared option in form
-    if (expenseTypeGroup) {
-      expenseTypeGroup.style.display = 'block';
-    }
+    subtitle.textContent = `Viewing combined expenses for ${context.group.name}`;
   } else {
     subtitle.textContent = 'Track and manage your spending';
-    // Hide personal/shared option
-    if (expenseTypeGroup) {
-      expenseTypeGroup.style.display = 'none';
-    }
   }
 }
 
@@ -513,6 +509,25 @@ function createExpenseCard(expense) {
   const isRecurring = expense.isRecurring || expense.recurringId;
   const isSelected = state.selectedExpenses.has(expense.id);
   const isTripExpense = expense.tripGroupId && expense.tripGroupExpenseId;
+  const hasSplit = expense.hasSplit && expense.splitDetails && expense.splitDetails.length > 0;
+  
+  // Build split details HTML if available
+  let splitDetailsHTML = '';
+  if (hasSplit) {
+    splitDetailsHTML = `
+      <div class="expense-split-details">
+        <div class="expense-split-header">💰 Split by member:</div>
+        <div class="expense-split-list">
+          ${expense.splitDetails.map(split => `
+            <div class="expense-split-item">
+              <span class="split-member">${escapeHtml(split.memberName)}</span>
+              <span class="split-amount">${formatCurrency(split.amount)}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
   
   return `
     <div class="expense-card swipeable-card ${isSelected ? 'selected' : ''}" data-id="${expense.id}">
@@ -525,6 +540,7 @@ function createExpenseCard(expense) {
             <span>${expense.category}</span>
             ${isRecurring ? '<span class="recurring-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Recurring</span>' : ''}
             ${isTripExpense ? `<a href="trip-group-detail.html?id=${expense.tripGroupId}" class="trip-badge" title="View Trip Group">✈️ Trip</a>` : ''}
+            ${hasSplit ? '<span class="split-badge" title="Split by member">💰 Split</span>' : ''}
           </div>
           <div class="expense-actions">
             <button class="btn-icon btn-duplicate" data-id="${expense.id}" title="Duplicate">
@@ -545,6 +561,7 @@ function createExpenseCard(expense) {
           </div>
         </div>
         ${expense.description ? `<div class="expense-description">${escapeHtml(expense.description)}</div>` : ''}
+        ${splitDetailsHTML}
         <div class="expense-meta">
           <div class="expense-meta-item">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -810,6 +827,187 @@ function getPaymentTypeLabel(type) {
   return labels[type] || type;
 }
 
+// ============================================
+// SPLIT BY MEMBER FUNCTIONALITY
+// ============================================
+
+// Load family members for split
+async function loadFamilyMembersForSplit() {
+  const splitMembersList = document.getElementById('splitMembersList');
+  if (!splitMembersList) return;
+  
+  try {
+    // Get family members from service
+    const members = await familyMembersService.getActiveFamilyMembers();
+    
+    if (members.length === 0) {
+      splitMembersList.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">No family members configured. Go to Settings to add family members.</p>';
+      return;
+    }
+    
+    // Create input for each member
+    splitMembersList.innerHTML = members.map(member => {
+      return `
+        <div class="split-member-item" data-member-id="${member.id}">
+          <div class="split-member-avatar">${member.icon}</div>
+          <div class="split-member-info">
+            <div class="split-member-name">${escapeHtml(member.name)}</div>
+            <div class="split-member-role">${member.role}</div>
+          </div>
+          <div class="split-member-input-wrapper">
+            <span>₹</span>
+            <input 
+              type="number" 
+              class="split-amount-input" 
+              data-member-id="${member.id}"
+              data-member-name="${escapeHtml(member.name)}"
+              placeholder="0.00" 
+              step="0.01" 
+              min="0"
+              value="0"
+            >
+          </div>
+        </div>
+      `;
+    }).join('');
+    
+    // Add event listeners to split inputs
+    document.querySelectorAll('.split-amount-input').forEach(input => {
+      input.addEventListener('input', updateSplitSummary);
+    });
+    
+    // Initialize summary
+    updateSplitSummary();
+  } catch (error) {
+    console.error('Error loading family members:', error);
+    splitMembersList.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Error loading family members</p>';
+  }
+}
+
+// Update split summary
+function updateSplitSummary() {
+  const totalAmount = parseFloat(amountInput.value) || 0;
+  const splitInputs = document.querySelectorAll('.split-amount-input');
+  
+  let allocatedAmount = 0;
+  splitInputs.forEach(input => {
+    allocatedAmount += parseFloat(input.value) || 0;
+  });
+  
+  const remainingAmount = totalAmount - allocatedAmount;
+  
+  // Update UI
+  document.getElementById('splitTotalAmount').textContent = formatCurrency(totalAmount);
+  document.getElementById('splitAllocatedAmount').textContent = formatCurrency(allocatedAmount);
+  document.getElementById('splitRemainingAmount').textContent = formatCurrency(Math.abs(remainingAmount));
+  
+  // Update remaining item styling
+  const remainingItem = document.getElementById('splitRemainingItem');
+  remainingItem.classList.remove('positive', 'negative', 'zero');
+  
+  if (remainingAmount > 0.01) {
+    remainingItem.classList.add('positive');
+  } else if (remainingAmount < -0.01) {
+    remainingItem.classList.add('negative');
+  } else {
+    remainingItem.classList.add('zero');
+  }
+}
+
+// Auto-distribute split equally
+function autoDistributeSplit() {
+  const totalAmount = parseFloat(amountInput.value) || 0;
+  const splitInputs = document.querySelectorAll('.split-amount-input');
+  
+  if (totalAmount <= 0) {
+    toast.warning('Please enter a total amount first');
+    return;
+  }
+  
+  if (splitInputs.length === 0) {
+    toast.warning('No family members to split with');
+    return;
+  }
+  
+  const amountPerMember = (totalAmount / splitInputs.length).toFixed(2);
+  
+  splitInputs.forEach((input, index) => {
+    // For the last member, adjust to account for rounding
+    if (index === splitInputs.length - 1) {
+      const currentTotal = Array.from(splitInputs).slice(0, -1).reduce((sum, inp) => sum + parseFloat(inp.value || 0), 0);
+      input.value = (totalAmount - currentTotal).toFixed(2);
+    } else {
+      input.value = amountPerMember;
+    }
+  });
+  
+  updateSplitSummary();
+  toast.success('Amount distributed equally among members');
+}
+
+// Validate split details
+function validateSplitDetails() {
+  const enableSplitCheckbox = document.getElementById('enableSplitByMember');
+  
+  if (!enableSplitCheckbox || !enableSplitCheckbox.checked) {
+    return true; // Split not enabled, no validation needed
+  }
+  
+  const totalAmount = parseFloat(amountInput.value) || 0;
+  const splitInputs = document.querySelectorAll('.split-amount-input');
+  
+  let allocatedAmount = 0;
+  let hasNonZero = false;
+  
+  splitInputs.forEach(input => {
+    const value = parseFloat(input.value) || 0;
+    allocatedAmount += value;
+    if (value > 0) hasNonZero = true;
+  });
+  
+  const splitDetailsError = document.getElementById('splitDetailsError');
+  
+  if (!hasNonZero) {
+    splitDetailsError.textContent = 'Please allocate amounts to at least one family member';
+    return false;
+  }
+  
+  const difference = Math.abs(totalAmount - allocatedAmount);
+  
+  if (difference > 0.01) {
+    splitDetailsError.textContent = `Split amounts must equal total amount. Difference: ${formatCurrency(difference)}`;
+    return false;
+  }
+  
+  splitDetailsError.textContent = '';
+  return true;
+}
+
+// Get split details data
+function getSplitDetailsData() {
+  const enableSplitCheckbox = document.getElementById('enableSplitByMember');
+  
+  if (!enableSplitCheckbox || !enableSplitCheckbox.checked) {
+    return null;
+  }
+  
+  const splitInputs = document.querySelectorAll('.split-amount-input');
+  const splitDetails = [];
+  
+  splitInputs.forEach(input => {
+    const amount = parseFloat(input.value) || 0;
+    if (amount > 0) {
+      splitDetails.push({
+        memberId: input.dataset.memberId,
+        memberName: input.dataset.memberName,
+        amount: amount
+      });
+    }
+  });
+  
+  return splitDetails.length > 0 ? splitDetails : null;
+}
+
 // Setup event listeners
 function setupEventListeners() {
   // Sidebar toggle
@@ -873,6 +1071,29 @@ function setupEventListeners() {
   
   // Payment method cascading selection
   paymentMethodInput.addEventListener('change', handlePaymentMethodChange);
+  
+  // Split by member functionality
+  const enableSplitCheckbox = document.getElementById('enableSplitByMember');
+  const splitDetailsContainer = document.getElementById('splitDetailsContainer');
+  const autoDistributeBtn = document.getElementById('autoDistributeBtn');
+  
+  if (enableSplitCheckbox) {
+    enableSplitCheckbox.addEventListener('change', (e) => {
+      if (e.target.checked) {
+        splitDetailsContainer.style.display = 'block';
+        loadFamilyMembersForSplit();
+      } else {
+        splitDetailsContainer.style.display = 'none';
+      }
+    });
+  }
+  
+  if (autoDistributeBtn) {
+    autoDistributeBtn.addEventListener('click', autoDistributeSplit);
+  }
+  
+  // Update split summary when amount changes
+  amountInput.addEventListener('input', updateSplitSummary);
   
   // Filters
   categoryFilter.addEventListener('change', () => {
@@ -1067,6 +1288,34 @@ function openEditForm(id) {
   dateInput.value = timezoneService.formatDateForInput(date);
   paymentMethodInput.value = expense.paymentMethod;
   
+  // Populate split details if available
+  const enableSplitCheckbox = document.getElementById('enableSplitByMember');
+  const splitDetailsContainer = document.getElementById('splitDetailsContainer');
+  
+  if (expense.hasSplit && expense.splitDetails && expense.splitDetails.length > 0) {
+    if (enableSplitCheckbox) {
+      enableSplitCheckbox.checked = true;
+      splitDetailsContainer.style.display = 'block';
+      
+      // Load family members first
+      loadFamilyMembersForSplit().then(() => {
+        // Then populate the split amounts
+        expense.splitDetails.forEach(split => {
+          const input = document.querySelector(`.split-amount-input[data-member-id="${split.memberId}"]`);
+          if (input) {
+            input.value = split.amount;
+          }
+        });
+        updateSplitSummary();
+      });
+    }
+  } else {
+    if (enableSplitCheckbox) {
+      enableSplitCheckbox.checked = false;
+      splitDetailsContainer.style.display = 'none';
+    }
+  }
+  
   // Clear errors
   clearFormErrors();
   
@@ -1081,6 +1330,16 @@ function closeExpenseForm() {
   expenseForm.reset();
   clearFormErrors();
   state.editingExpenseId = null;
+  
+  // Reset split details
+  const enableSplitCheckbox = document.getElementById('enableSplitByMember');
+  const splitDetailsContainer = document.getElementById('splitDetailsContainer');
+  if (enableSplitCheckbox) {
+    enableSplitCheckbox.checked = false;
+  }
+  if (splitDetailsContainer) {
+    splitDetailsContainer.style.display = 'none';
+  }
 }
 
 // Clear form errors
@@ -1130,6 +1389,11 @@ function validateExpenseForm() {
     isValid = false;
   }
   
+  // Split details validation
+  if (!validateSplitDetails()) {
+    isValid = false;
+  }
+  
   return isValid;
 }
 
@@ -1158,20 +1422,17 @@ async function handleFormSubmit(e) {
         specificPaymentMethodInput.options[specificPaymentMethodInput.selectedIndex].text : null
     };
     
-    // Add family context if in family mode
+    // Add family context if in family mode (for viewing only)
     const context = familySwitcher.getCurrentContext();
     if (context.context === 'family' && context.groupId) {
       expenseData.familyGroupId = context.groupId;
-      
-      // Check if expense is personal or shared
-      const expenseTypeRadio = document.querySelector('input[name="expenseType"]:checked');
-      if (expenseTypeRadio) {
-        expenseData.expenseType = expenseTypeRadio.value; // 'personal' or 'shared'
-        expenseData.isShared = expenseTypeRadio.value === 'shared';
-      } else {
-        expenseData.expenseType = 'personal';
-        expenseData.isShared = false;
-      }
+    }
+    
+    // Add split details if enabled
+    const splitDetails = getSplitDetailsData();
+    if (splitDetails) {
+      expenseData.splitDetails = splitDetails;
+      expenseData.hasSplit = true;
     }
     
     // Add linked data if present

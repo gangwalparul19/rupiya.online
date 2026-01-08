@@ -147,6 +147,8 @@
   margin-left: 260px;
   padding: var(--spacing-xl);
   transition: margin-left var(--transition-base);
+  overflow-x: hidden;
+  position: relative;
 }
 
 .dashboard-header {

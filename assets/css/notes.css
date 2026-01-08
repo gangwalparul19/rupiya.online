@@ -303,12 +303,14 @@
 
 .note-content {
   font-size: 0.875rem;
-  color: #7F8C8D;
+  color: #2C3E50;
   line-height: 1.6;
   margin-bottom: 1rem;
   max-height: 150px;
   overflow: hidden;
   position: relative;
+  word-wrap: break-word;
+  white-space: pre-wrap;
 }
 
 .note-content::after {

@@ -367,20 +367,45 @@
               <span class="error-message" id="descriptionError"></span>
             </div>
 
-            <!-- Family Context: Personal/Shared Option -->
-            <div class="form-group form-group-full" id="expenseTypeGroup" style="display: none;">
-              <label>Expense Type</label>
-              <div class="radio-group">
-                <label class="radio-option">
-                  <input type="radio" name="expenseType" value="personal" checked>
-                  <span>👤 Personal (Only you can see)</span>
+            <!-- Split by Member Section -->
+            <div class="form-group form-group-full" id="splitByMemberGroup">
+              <div class="split-header">
+                <label class="split-toggle-label">
+                  <input type="checkbox" id="enableSplitByMember">
+                  <span>💰 Split this expense by family member</span>
                 </label>
-                <label class="radio-option">
-                  <input type="radio" name="expenseType" value="shared">
-                  <span>👨‍👩‍👧‍👦 Shared (Visible to family)</span>
-                </label>
+                <small class="form-help">Track how much each family member spent within this transaction</small>
               </div>
-              <small class="form-help">Choose whether this expense is personal or shared with your family group</small>
+              
+              <div id="splitDetailsContainer" style="display: none;">
+                <div class="split-summary">
+                  <div class="split-summary-item">
+                    <span>Total Amount:</span>
+                    <strong id="splitTotalAmount">₹0</strong>
+                  </div>
+                  <div class="split-summary-item">
+                    <span>Allocated:</span>
+                    <strong id="splitAllocatedAmount">₹0</strong>
+                  </div>
+                  <div class="split-summary-item" id="splitRemainingItem">
+                    <span>Remaining:</span>
+                    <strong id="splitRemainingAmount">₹0</strong>
+                  </div>
+                </div>
+                
+                <div id="splitMembersList" class="split-members-list">
+                  <!-- Member split inputs will be dynamically added here -->
+                </div>
+                
+                <button type="button" class="btn btn-sm btn-outline" id="autoDistributeBtn">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                  </svg>
+                  Auto-distribute Equally
+                </button>
+                
+                <span class="error-message" id="splitDetailsError"></span>
+              </div>
             </div>
           </div>
 

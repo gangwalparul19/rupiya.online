@@ -50,6 +50,16 @@ if (document.readyState === 'loading') {
 async function checkAuth() {
   console.log('[Family Page] Checking authentication...');
   
+  // Check for invitation parameter BEFORE auth check
+  const urlParams = new URLSearchParams(window.location.search);
+  const invitationId = urlParams.get('invitation');
+  
+  // Save invitation to localStorage so it persists through login
+  if (invitationId) {
+    console.log('[Family] Saving invitation to localStorage:', invitationId);
+    localStorage.setItem('rupiya_pending_invitation', invitationId);
+  }
+  
   try {
     // Wait for auth to initialize
     const user = await authService.waitForAuth();

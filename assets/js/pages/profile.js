@@ -4,6 +4,7 @@ import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
 import categoriesService from '../services/categories-service.js';
 import familySwitcher from '../components/family-switcher.js';
+import familyMembersService from '../services/family-members-service.js';
 import toast from '../components/toast.js';
 import confirmationModal from '../components/confirmation-modal.js';
 import themeManager from '../utils/theme-manager.js';
@@ -55,6 +56,7 @@ async function init() {
   await encryptionReauthModal.checkAndPrompt(async () => {
     await loadUserPreferences();
     await loadCategories();
+    await loadFamilyMembers();
   });
 }
 
@@ -144,6 +146,10 @@ function setupEventListeners() {
   document.getElementById('addExpenseCategoryBtn')?.addEventListener('click', handleAddExpenseCategory);
   document.getElementById('addIncomeCategoryBtn')?.addEventListener('click', handleAddIncomeCategory);
   document.getElementById('resetCategoriesBtn')?.addEventListener('click', handleResetCategories);
+  
+  // Family Members
+  document.getElementById('saveFamilyMembersBtn')?.addEventListener('click', handleSaveFamilyMembers);
+  document.getElementById('resetFamilyMembersBtn')?.addEventListener('click', handleResetFamilyMembers);
   
   // Allow Enter key to add categories
   document.getElementById('newExpenseCategory')?.addEventListener('keypress', (e) => {
@@ -686,6 +692,136 @@ async function handleResetCategories() {
     await loadCategories();
   } else {
     showToast('Failed to reset categories', 'error');
+  }
+}
+
+// ============================================
+// FAMILY MEMBERS MANAGEMENT
+// ============================================
+
+async function loadFamilyMembers() {
+  const familyMembersList = document.getElementById('familyMembersList');
+  if (!familyMembersList) return;
+  
+  try {
+    console.log('[Profile] Loading family members...');
+    const members = await familyMembersService.getFamilyMembers();
+    console.log('[Profile] Loaded family members:', members);
+    
+    renderFamilyMembers(members);
+  } catch (error) {
+    console.error('Error loading family members:', error);
+    familyMembersList.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Failed to load family members</p>';
+    showToast('Failed to load family members', 'error');
+  }
+}
+
+function renderFamilyMembers(members) {
+  const familyMembersList = document.getElementById('familyMembersList');
+  if (!familyMembersList) return;
+  
+  familyMembersList.innerHTML = members.map(member => {
+    const isEnabled = member.enabled !== false;
+    
+    return `
+      <div class="family-member-item" data-member-id="${member.id}">
+        <div class="family-member-icon">${member.icon}</div>
+        <div class="family-member-details">
+          <div class="family-member-role">${escapeHtml(member.role)}</div>
+          <input 
+            type="text" 
+            class="family-member-name-input" 
+            data-member-id="${member.id}"
+            value="${escapeHtml(member.name)}"
+            placeholder="Enter name"
+            maxlength="50"
+          >
+        </div>
+        <div class="family-member-toggle">
+          <label>
+            <input 
+              type="checkbox" 
+              class="family-member-enabled-checkbox"
+              data-member-id="${member.id}"
+              ${isEnabled ? 'checked' : ''}
+            >
+            <span>Enabled</span>
+          </label>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function handleSaveFamilyMembers() {
+  const saveBtn = document.getElementById('saveFamilyMembersBtn');
+  const originalText = saveBtn.textContent;
+  
+  try {
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Saving...';
+    
+    // Get all family member items
+    const memberItems = document.querySelectorAll('.family-member-item');
+    const updatedMembers = [];
+    
+    memberItems.forEach((item, index) => {
+      const memberId = item.dataset.memberId;
+      const nameInput = item.querySelector('.family-member-name-input');
+      const enabledCheckbox = item.querySelector('.family-member-enabled-checkbox');
+      const roleElement = item.querySelector('.family-member-role');
+      const iconElement = item.querySelector('.family-member-icon');
+      
+      updatedMembers.push({
+        id: memberId,
+        role: roleElement.textContent,
+        name: nameInput.value.trim() || roleElement.textContent,
+        icon: iconElement.textContent,
+        enabled: enabledCheckbox.checked,
+        order: index + 1
+      });
+    });
+    
+    // Validate at least one member is enabled
+    const hasEnabledMember = updatedMembers.some(m => m.enabled);
+    if (!hasEnabledMember) {
+      showToast('At least one family member must be enabled', 'warning');
+      return;
+    }
+    
+    const result = await familyMembersService.updateFamilyMembers(updatedMembers);
+    
+    if (result.success) {
+      showToast('Family members updated successfully', 'success');
+      await loadFamilyMembers();
+    } else {
+      showToast(result.error || 'Failed to update family members', 'error');
+    }
+  } catch (error) {
+    console.error('Error saving family members:', error);
+    showToast('Failed to save family members', 'error');
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.textContent = originalText;
+  }
+}
+
+async function handleResetFamilyMembers() {
+  const confirmed = await confirmationModal.confirmReset('Reset family members to defaults? Your custom names will be lost.');
+  if (!confirmed) return;
+  
+  try {
+    const result = await familyMembersService.resetToDefaults();
+    
+    if (result.success) {
+      showToast('Family members reset successfully', 'success');
+      await loadFamilyMembers();
+    } else {
+      showToast('Failed to reset family members', 'error');
+    }
+  } catch (error) {
+    console.error('Error resetting family members:', error);
+    showToast('Failed to reset family members', 'error');
   }
 }
 
