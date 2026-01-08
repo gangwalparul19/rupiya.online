@@ -211,8 +211,12 @@ class FamilyService {
 
       const snapshot = await getDocs(q);
       if (!snapshot.empty) {
-        const doc = snapshot.docs[0];
-        return { id: doc.id, ...doc.data() };
+        const docSnap = snapshot.docs[0];
+        const data = { id: docSnap.id, ...docSnap.data() };
+        
+        // Decrypt invitation data
+        const decryptedData = await encryptionService.decryptObject(data, this.invitationsCollection);
+        return decryptedData;
       }
       return null;
     } catch (error) {

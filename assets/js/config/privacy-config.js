@@ -117,7 +117,7 @@ export const privacyConfig = {
     tripGroupSettlements: ['amount', 'notes'],
     tripGroupMembers: ['name', 'email', 'phone'],  // Member personal information
     familyGroups: ['name', 'members', 'settings'],  // Family group sensitive data
-    familyInvitations: ['groupName', 'invitedByName', 'invitedEmail']  // Invitation sensitive data
+    familyInvitations: ['groupName', 'invitedByName']  // Invitation sensitive data (invitedEmail must stay unencrypted for queries)
   }
 };
 
