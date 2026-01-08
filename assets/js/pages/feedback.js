@@ -2,6 +2,7 @@
 import '../services/services-init.js'; // Initialize services first
 import authService from '../services/auth-service.js';
 import toast from '../components/toast.js';
+import confirmationModal from '../components/confirmation-modal.js';
 
 // Helper function for toast
 const showToast = (message, type) => toast.show(message, type);
@@ -248,13 +249,24 @@ async function handleFeedbackSubmit(e) {
 
 // Logout
 async function handleLogout() {
+  const confirmed = await confirmationModal.show({
+    title: 'Logout',
+    message: 'Are you sure you want to logout?',
+    confirmText: 'Logout',
+    cancelText: 'Cancel',
+    type: 'warning'
+  });
+
+  if (!confirmed) return;
+
   const result = await authService.signOut();
   if (result.success) {
     window.location.href = 'login.html';
   } else {
-    showToast('Failed to logout', 'error');
+    toast.error('Failed to logout');
   }
 }
+
 
 // Start initialization when DOM is ready
 if (document.readyState === 'loading') {

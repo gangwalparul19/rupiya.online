@@ -6,6 +6,7 @@ import crossFeatureIntegrationService from '../services/cross-feature-integratio
 import toast from '../components/toast.js';
 import { formatCurrency, formatDate, escapeHtml } from '../utils/helpers.js';
 import encryptionReauthModal from '../components/encryption-reauth-modal.js';
+import confirmationModal from '../components/confirmation-modal.js';
 
 // Helper function for toast
 const showToast = (message, type) => toast.show(message, type);
@@ -376,13 +377,24 @@ function editHouse(id) {
 
 // Handle logout
 async function handleLogout() {
+  const confirmed = await confirmationModal.show({
+    title: 'Logout',
+    message: 'Are you sure you want to logout?',
+    confirmText: 'Logout',
+    cancelText: 'Cancel',
+    type: 'warning'
+  });
+
+  if (!confirmed) return;
+
   const result = await authService.signOut();
   if (result.success) {
     window.location.href = 'login.html';
   } else {
-    showToast('Failed to logout', 'error');
+    toast.error('Failed to logout');
   }
 }
+
 
 // Format date for input
 function formatDateForInput(date) {

@@ -114,10 +114,18 @@ function setupEventListeners() {
   
   // Logout
   document.getElementById('logoutBtn')?.addEventListener('click', async () => {
-    if (confirm('Are you sure you want to logout?')) {
-      await authService.signOut();
-      window.location.href = 'index.html';
-    }
+    const confirmed = await confirmationModal.show({
+      title: 'Logout',
+      message: 'Are you sure you want to logout?',
+      confirmText: 'Logout',
+      cancelText: 'Cancel',
+      type: 'warning'
+    });
+
+    if (!confirmed) return;
+
+    await authService.signOut();
+    window.location.href = 'index.html';
   });
   
   // Add loan buttons - now opens inline form
@@ -172,6 +180,26 @@ function setupEventListeners() {
     document.getElementById('upcomingEmiAlert').style.display = 'none';
   });
 }
+
+async function handleLogout() {
+  const confirmed = await confirmationModal.show({
+    title: 'Logout',
+    message: 'Are you sure you want to logout?',
+    confirmText: 'Logout',
+    cancelText: 'Cancel',
+    type: 'warning'
+  });
+
+  if (!confirmed) return;
+
+  const result = await authService.signOut();
+  if (result.success) {
+    window.location.href = 'login.html';
+  } else {
+    toast.error('Failed to logout');
+  }
+}
+
 
 // Load loans from Firestore
 async function loadLoans() {

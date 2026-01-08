@@ -5,8 +5,10 @@ import firestoreService from '../services/firestore-service.js';
 import AIInsightsEngine from '../utils/ai-insights-engine.js';
 import familySwitcher from '../components/family-switcher.js';
 import toast from '../components/toast.js';
+import confirmationModal from '../components/confirmation-modal.js';
 import { formatCurrency, formatCurrencyCompact } from '../utils/helpers.js';
 import encryptionReauthModal from '../components/encryption-reauth-modal.js';
+
 
 const aiEngine = new AIInsightsEngine();
 
@@ -80,7 +82,17 @@ function setupEventListeners() {
 
   // Logout
   logoutBtn?.addEventListener('click', async () => {
-    await authService.logout();
+    const confirmed = await confirmationModal.show({
+      title: 'Logout',
+      message: 'Are you sure you want to logout?',
+      confirmText: 'Logout',
+      cancelText: 'Cancel',
+      type: 'warning'
+    });
+
+    if (!confirmed) return;
+
+    await authService.signOut();
     window.location.href = 'login.html';
   });
 

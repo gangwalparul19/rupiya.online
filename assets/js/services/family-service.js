@@ -231,8 +231,12 @@ class FamilyService {
       for (const docSnap of snapshot.docs) {
         const data = { id: docSnap.id, ...docSnap.data() };
         
+        console.log('[FamilyService] Raw invitation data:', data);
+        
         // Decrypt invitation data
         const decryptedData = await encryptionService.decryptObject(data, this.invitationsCollection);
+        
+        console.log('[FamilyService] Decrypted invitation data:', decryptedData);
         
         // Check if not expired (with null safety)
         const expiresAt = decryptedData.expiresAt?.toDate ? decryptedData.expiresAt.toDate() : null;
@@ -295,8 +299,14 @@ class FamilyService {
       const groupData = { id: groupSnap.id, ...groupSnap.data() };
       const decryptedGroup = await encryptionService.decryptObject(groupData, this.familyGroupsCollection);
 
+      // Ensure members is an array
+      if (!Array.isArray(decryptedGroup.members)) {
+        console.error('Members is not an array:', decryptedGroup.members);
+        decryptedGroup.members = [];
+      }
+
       // Check if user is already a member
-      const isAlreadyMember = decryptedGroup.members?.some(m => m.userId === userId);
+      const isAlreadyMember = decryptedGroup.members.some(m => m.userId === userId);
       if (isAlreadyMember) {
         return { success: false, error: 'You are already a member of this group' };
       }

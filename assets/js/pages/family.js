@@ -238,6 +238,9 @@ function renderFamilyGroups() {
     const role = userMember ? userMember.role : 'member';
     const isAdmin = role === 'admin';
     const isCreator = group.createdBy === currentUser.uid;
+    
+    // Escape group name for use in onclick handlers
+    const escapedGroupName = (group.name || '').replace(/'/g, "\\'").replace(/"/g, '\\"');
 
     return `
       <div class="family-group-card">
@@ -252,13 +255,13 @@ function renderFamilyGroups() {
               </button>
             ` : ''}
             ${isCreator ? `
-              <button class="btn-icon btn-danger" onclick="showDeleteGroupModal('${group.id}', '${group.name}')" title="Delete group">
+              <button class="btn-icon btn-danger" onclick="showDeleteGroupModal('${group.id}', '${escapedGroupName}')" title="Delete group">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                 </svg>
               </button>
             ` : `
-              <button class="btn-icon btn-danger" onclick="leaveGroup('${group.id}', '${group.name}')" title="Leave group">
+              <button class="btn-icon btn-danger" onclick="leaveGroup('${group.id}', '${escapedGroupName}')" title="Leave group">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
                 </svg>
@@ -282,27 +285,32 @@ function renderFamilyGroups() {
         </div>
         
         <div class="members-list mt-3">
-          ${group.members.map(member => `
-            <div class="member-item">
-              <div class="member-info">
-                <div class="member-avatar">${getInitials(member.name)}</div>
-                <div class="member-details">
-                  <div class="member-name">${member.name}${member.userId === currentUser.uid ? ' (You)' : ''}</div>
-                  <div class="member-email">${member.email}</div>
+          ${group.members.map(member => {
+            // Escape member name for use in onclick handlers
+            const escapedMemberName = (member.name || '').replace(/'/g, "\\'").replace(/"/g, '\\"');
+            
+            return `
+              <div class="member-item">
+                <div class="member-info">
+                  <div class="member-avatar">${getInitials(member.name)}</div>
+                  <div class="member-details">
+                    <div class="member-name">${member.name}${member.userId === currentUser.uid ? ' (You)' : ''}</div>
+                    <div class="member-email">${member.email}</div>
+                  </div>
+                </div>
+                <div class="member-actions">
+                  <span class="member-role-badge">${member.role}</span>
+                  ${isAdmin && member.userId !== currentUser.uid ? `
+                    <button class="btn-icon btn-sm btn-danger" onclick="showRemoveMemberModal('${group.id}', '${member.userId}', '${escapedMemberName}')" title="Remove member">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                      </svg>
+                    </button>
+                  ` : ''}
                 </div>
               </div>
-              <div class="member-actions">
-                <span class="member-role-badge">${member.role}</span>
-                ${isAdmin && member.userId !== currentUser.uid ? `
-                  <button class="btn-icon btn-sm btn-danger" onclick="showRemoveMemberModal('${group.id}', '${member.userId}', '${member.name}')" title="Remove member">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
-                  </button>
-                ` : ''}
-              </div>
-            </div>
-          `).join('')}
+            `;
+          }).join('')}
         </div>
       </div>
     `;
@@ -472,6 +480,16 @@ async function checkInvitationLink() {
 
 // Logout
 async function handleLogout() {
+  const confirmed = await confirmationModal.show({
+    title: 'Logout',
+    message: 'Are you sure you want to logout?',
+    confirmText: 'Logout',
+    cancelText: 'Cancel',
+    type: 'warning'
+  });
+
+  if (!confirmed) return;
+
   const result = await authService.signOut();
   if (result.success) {
     window.location.href = 'login.html';

@@ -4,6 +4,7 @@ import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
 import familyService from '../services/family-service.js';
 import toast from '../components/toast.js';
+import confirmationModal from '../components/confirmation-modal.js';
 import { formatCurrency, formatDate, exportToCSV, escapeHtml } from '../utils/helpers.js';
 import timezoneService from '../utils/timezone.js';
 
@@ -103,6 +104,16 @@ function setupEventListeners() {
 
   // Logout
   document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+    const confirmed = await confirmationModal.show({
+      title: 'Logout',
+      message: 'Are you sure you want to logout?',
+      confirmText: 'Logout',
+      cancelText: 'Cancel',
+      type: 'warning'
+    });
+
+    if (!confirmed) return;
+
     const result = await authService.signOut();
     if (result.success) {
       window.location.href = 'index.html';

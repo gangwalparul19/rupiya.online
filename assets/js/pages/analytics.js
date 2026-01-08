@@ -7,6 +7,7 @@ import toast from '../components/toast.js';
 import themeManager from '../utils/theme-manager.js';
 import { formatCurrency } from '../utils/helpers.js';
 import encryptionReauthModal from '../components/encryption-reauth-modal.js';
+import confirmationModal from '../components/confirmation-modal.js';
 
 // Helper function for toast
 const showToast = (message, type) => toast.show(message, type);
@@ -508,13 +509,24 @@ function generateColors(count) {
 
 // Handle logout
 async function handleLogout() {
+  const confirmed = await confirmationModal.show({
+    title: 'Logout',
+    message: 'Are you sure you want to logout?',
+    confirmText: 'Logout',
+    cancelText: 'Cancel',
+    type: 'warning'
+  });
+
+  if (!confirmed) return;
+
   const result = await authService.signOut();
   if (result.success) {
     window.location.href = 'login.html';
   } else {
-    showToast('Failed to logout', 'error');
+    toast.error('Failed to logout');
   }
 }
+
 
 // Initialize when DOM is ready
 if (document.readyState === 'loading') {

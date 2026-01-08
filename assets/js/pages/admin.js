@@ -3,6 +3,7 @@ import '../services/services-init.js'; // Initialize services first
 import authService from '../services/auth-service.js';
 import adminService from '../services/admin-service.js';
 import { formatCurrency, formatCurrencyCompact } from '../utils/helpers.js';
+import confirmationModal from '../components/confirmation-modal.js';
 
 // State
 let currentPage = 1;
@@ -46,6 +47,16 @@ async function init() {
 
 function setupEventListeners() {
   document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+    const confirmed = await confirmationModal.show({
+      title: 'Logout',
+      message: 'Are you sure you want to logout?',
+      confirmText: 'Logout',
+      cancelText: 'Cancel',
+      type: 'warning'
+    });
+
+    if (!confirmed) return;
+
     await authService.signOut();
     window.location.href = 'login.html';
   });

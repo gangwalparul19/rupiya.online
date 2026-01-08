@@ -936,13 +936,24 @@ function editVehicle(id) {
 }
 
 async function handleLogout() {
+  const confirmed = await confirmationModal.show({
+    title: 'Logout',
+    message: 'Are you sure you want to logout?',
+    confirmText: 'Logout',
+    cancelText: 'Cancel',
+    type: 'warning'
+  });
+
+  if (!confirmed) return;
+
   const result = await authService.signOut();
   if (result.success) {
     window.location.href = 'login.html';
   } else {
-    showToast('Failed to logout', 'error');
+    toast.error('Failed to logout');
   }
 }
+
 
 window.editVehicle = editVehicle;
 window.showDeleteConfirmation = showDeleteConfirmation;
