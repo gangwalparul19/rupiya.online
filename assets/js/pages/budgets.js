@@ -397,27 +397,7 @@ function setupEventListeners() {
     sidebarOverlay.classList.remove('show');
   });
   
-  // Logout
-  logoutBtn.addEventListener('click', async () => {
-    const confirmed = await confirmationModal.show({
-      title: 'Logout',
-      message: 'Are you sure you want to logout?',
-      confirmText: 'Logout',
-      type: 'warning',
-      icon: '👋'
-    });
-    if (!confirmed) return;
-    
-    const result = await authService.signOut();
-    if (result.success) {
-      toast.success('Logged out successfully');
-      setTimeout(() => {
-        window.location.href = 'index.html';
-      }, 1000);
-    } else {
-      toast.error('Failed to logout');
-    }
-  });
+  // Logout handled by global logout-handler.js
   
   // Add budget button
   addBudgetBtn.addEventListener('click', openAddForm);

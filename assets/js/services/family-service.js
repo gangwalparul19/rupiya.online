@@ -58,8 +58,7 @@ class FamilyService {
         }
       };
 
-      // NOTE: Family groups are NOT encrypted because they are shared across users
-      // encryptObject will return data as-is since familyGroups is not in encryptedCollections
+      // Encrypt family group data before saving
       const groupDataToSave = await encryptionService.encryptObject(groupData, this.familyGroupsCollection);
 
       const docRef = await addDoc(collection(db, this.familyGroupsCollection), groupDataToSave);
@@ -88,11 +87,12 @@ class FamilyService {
       for (const docSnap of groupsSnapshot.docs) {
         const data = { id: docSnap.id, ...docSnap.data() };
         
-        console.log('[FamilyService] Group data:', data);
+        console.log('[FamilyService] Encrypted group data:', data);
         
-        // Family groups are not encrypted (shared data)
-        // Just use the data as-is
-        const groupData = data;
+        // Decrypt family group data
+        const groupData = await encryptionService.decryptObject(data, this.familyGroupsCollection);
+        
+        console.log('[FamilyService] Decrypted group data:', groupData);
         
         // Ensure members is an array
         if (!Array.isArray(groupData.members)) {
@@ -123,8 +123,10 @@ class FamilyService {
       if (docSnap.exists()) {
         const data = { id: docSnap.id, ...docSnap.data() };
         
-        // Family groups are not encrypted (shared data)
-        return { success: true, data: data };
+        // Decrypt family group data
+        const decryptedData = await encryptionService.decryptObject(data, this.familyGroupsCollection);
+        
+        return { success: true, data: decryptedData };
       } else {
         return { success: false, error: 'Group not found' };
       }
@@ -179,8 +181,7 @@ class FamilyService {
         expiresAt: Timestamp.fromDate(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)) // 7 days
       };
 
-      // NOTE: Invitations are NOT encrypted because they need to be queryable and shared
-      // encryptObject will return data as-is since familyInvitations is not in encryptedCollections
+      // Encrypt invitation data before saving
       const invitationDataToSave = await encryptionService.encryptObject(invitationData, this.invitationsCollection);
 
       const docRef = await addDoc(collection(db, this.invitationsCollection), invitationDataToSave);
@@ -238,13 +239,17 @@ class FamilyService {
       for (const docSnap of snapshot.docs) {
         const data = { id: docSnap.id, ...docSnap.data() };
         
-        console.log('[FamilyService] Invitation data:', data);
+        console.log('[FamilyService] Encrypted invitation data:', data);
         
-        // Invitations are not encrypted (shared data)
+        // Decrypt invitation data
+        const decryptedData = await encryptionService.decryptObject(data, this.invitationsCollection);
+        
+        console.log('[FamilyService] Decrypted invitation data:', decryptedData);
+        
         // Check if not expired (with null safety)
-        const expiresAt = data.expiresAt?.toDate ? data.expiresAt.toDate() : null;
+        const expiresAt = decryptedData.expiresAt?.toDate ? decryptedData.expiresAt.toDate() : null;
         if (!expiresAt || expiresAt > new Date()) {
-          invitations.push(data);
+          invitations.push(decryptedData);
         }
       }
 
@@ -273,9 +278,10 @@ class FamilyService {
         return { success: false, error: 'Invitation not found' };
       }
 
-      const invitation = { id: inviteSnap.id, ...inviteSnap.data() };
+      const invitationData = { id: inviteSnap.id, ...inviteSnap.data() };
       
-      // Invitations are not encrypted (shared data)
+      // Decrypt invitation data
+      const invitation = await encryptionService.decryptObject(invitationData, this.invitationsCollection);
 
       // Check if invitation is for this user
       if (!invitation.invitedEmail || invitation.invitedEmail.toLowerCase() !== user.email.toLowerCase()) {
@@ -297,8 +303,9 @@ class FamilyService {
         return { success: false, error: 'Family group not found' };
       }
 
-      // Get group data (not encrypted)
-      const groupData = { id: groupSnap.id, ...groupSnap.data() };
+      // Get and decrypt group data
+      const encryptedGroupData = { id: groupSnap.id, ...groupSnap.data() };
+      const groupData = await encryptionService.decryptObject(encryptedGroupData, this.familyGroupsCollection);
 
       // Ensure members is an array
       if (!Array.isArray(groupData.members)) {
@@ -323,15 +330,16 @@ class FamilyService {
 
       const updatedMembers = [...(groupData.members || []), memberData];
 
-      // Update group with new member (no encryption needed)
+      // Update group with new member
       const updatedGroupData = {
         ...groupData,
         members: updatedMembers,
         updatedAt: Timestamp.now()
       };
 
-      // Update the group document
-      await updateDoc(groupRef, updatedGroupData);
+      // Encrypt and update the group document
+      const encryptedUpdate = await encryptionService.encryptObject(updatedGroupData, this.familyGroupsCollection);
+      await updateDoc(groupRef, encryptedUpdate);
 
       // Update invitation status
       await updateDoc(inviteRef, {
@@ -399,12 +407,17 @@ class FamilyService {
       // Remove member from the members array
       const updatedMembers = group.members.filter(m => m.userId !== memberUserId);
 
-      // Update group with removed member (no encryption needed - family groups are shared data)
-      const groupRef = doc(db, this.familyGroupsCollection, groupId);
-      await updateDoc(groupRef, {
+      // Update group with removed member
+      const updatedGroupData = {
+        ...group,
         members: updatedMembers,
         updatedAt: Timestamp.now()
-      });
+      };
+
+      // Encrypt and update the group document
+      const groupRef = doc(db, this.familyGroupsCollection, groupId);
+      const encryptedUpdate = await encryptionService.encryptObject(updatedGroupData, this.familyGroupsCollection);
+      await updateDoc(groupRef, encryptedUpdate);
 
       // Update user's familyGroups array
       await this.updateUserFamilyGroups(memberUserId, groupId, 'remove');
@@ -522,11 +535,17 @@ class FamilyService {
         return { success: false, error: 'Only admins can update settings' };
       }
 
-      const groupRef = doc(db, this.familyGroupsCollection, groupId);
-      await updateDoc(groupRef, {
+      // Update group settings
+      const updatedGroupData = {
+        ...group,
         settings: { ...group.settings, ...settings },
         updatedAt: Timestamp.now()
-      });
+      };
+
+      // Encrypt and update the group document
+      const groupRef = doc(db, this.familyGroupsCollection, groupId);
+      const encryptedUpdate = await encryptionService.encryptObject(updatedGroupData, this.familyGroupsCollection);
+      await updateDoc(groupRef, encryptedUpdate);
 
       return { success: true };
     } catch (error) {
