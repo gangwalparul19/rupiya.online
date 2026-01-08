@@ -112,7 +112,14 @@ class TripGroupsService {
         inviteStatus: 'accepted'
       };
 
-      await setDoc(doc(db, this.membersCollection, memberId), memberData);
+      // Encrypt sensitive member data before saving
+      const encryptedMemberData = {
+        ...memberData,
+        name: await encryptionService.encryptValue(memberData.name),
+        email: await encryptionService.encryptValue(memberData.email)
+      };
+
+      await setDoc(doc(db, this.membersCollection, memberId), encryptedMemberData);
 
       return { success: true, groupId: groupId, data: { id: groupId, ...tripGroup } };
     } catch (error) {
@@ -341,7 +348,15 @@ class TripGroupsService {
         inviteStatus: memberData.userId ? 'pending' : 'accepted'
       };
 
-      await setDoc(doc(db, this.membersCollection, memberId), member);
+      // Encrypt sensitive member data before saving
+      const encryptedMember = {
+        ...member,
+        name: await encryptionService.encryptValue(member.name),
+        email: member.email ? await encryptionService.encryptValue(member.email) : null,
+        phone: member.phone ? await encryptionService.encryptValue(member.phone) : null
+      };
+
+      await setDoc(doc(db, this.membersCollection, memberId), encryptedMember);
 
       // Update group member count
       const groupRef = doc(db, this.groupsCollection, groupId);
@@ -442,9 +457,29 @@ class TripGroupsService {
       const snapshot = await getDocs(membersQuery);
 
       const members = [];
-      snapshot.forEach((doc) => {
-        members.push({ id: doc.id, ...doc.data() });
-      });
+      
+      // Decrypt member data
+      for (const docSnap of snapshot.docs) {
+        const memberData = { id: docSnap.id, ...docSnap.data() };
+        
+        // Decrypt sensitive fields
+        try {
+          if (memberData.name) {
+            memberData.name = await encryptionService.decryptValue(memberData.name);
+          }
+          if (memberData.email) {
+            memberData.email = await encryptionService.decryptValue(memberData.email);
+          }
+          if (memberData.phone) {
+            memberData.phone = await encryptionService.decryptValue(memberData.phone);
+          }
+        } catch (decryptError) {
+          console.warn('Error decrypting member data, might be unencrypted legacy data:', decryptError);
+          // Keep original data if decryption fails (legacy unencrypted data)
+        }
+        
+        members.push(memberData);
+      }
 
       // If no members found and we have retries left, wait and retry
       // This handles the case where a group was just created
@@ -497,7 +532,25 @@ class TripGroupsService {
       const memberSnap = await getDoc(memberRef);
 
       if (memberSnap.exists()) {
-        return { success: true, data: { id: memberSnap.id, ...memberSnap.data() } };
+        const memberData = { id: memberSnap.id, ...memberSnap.data() };
+        
+        // Decrypt sensitive fields
+        try {
+          if (memberData.name) {
+            memberData.name = await encryptionService.decryptValue(memberData.name);
+          }
+          if (memberData.email) {
+            memberData.email = await encryptionService.decryptValue(memberData.email);
+          }
+          if (memberData.phone) {
+            memberData.phone = await encryptionService.decryptValue(memberData.phone);
+          }
+        } catch (decryptError) {
+          console.warn('Error decrypting member data, might be unencrypted legacy data:', decryptError);
+          // Keep original data if decryption fails (legacy unencrypted data)
+        }
+        
+        return { success: true, data: memberData };
       }
       return { success: false, error: 'Member not found' };
     } catch (error) {

@@ -17,6 +17,7 @@ import {
   arrayRemove
 } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
 import authService from './auth-service.js';
+import encryptionService from './encryption-service.js';
 
 class FamilyService {
   constructor() {
@@ -57,7 +58,10 @@ class FamilyService {
         }
       };
 
-      const docRef = await addDoc(collection(db, this.familyGroupsCollection), groupData);
+      // Encrypt sensitive data before saving
+      const encryptedGroupData = await encryptionService.encryptObject(groupData, this.familyGroupsCollection);
+
+      const docRef = await addDoc(collection(db, this.familyGroupsCollection), encryptedGroupData);
 
       // Update user's familyGroups array
       await this.updateUserFamilyGroups(userId, docRef.id, 'add');
@@ -83,13 +87,17 @@ class FamilyService {
       const groupsSnapshot = await getDocs(collection(db, this.familyGroupsCollection));
       const groups = [];
 
-      groupsSnapshot.forEach((doc) => {
-        const data = doc.data();
-        const isMember = data.members.some(member => member.userId === userId);
+      for (const docSnap of groupsSnapshot.docs) {
+        const data = { id: docSnap.id, ...docSnap.data() };
+        
+        // Decrypt group data
+        const decryptedData = await encryptionService.decryptObject(data, this.familyGroupsCollection);
+        
+        const isMember = decryptedData.members.some(member => member.userId === userId);
         if (isMember) {
-          groups.push({ id: doc.id, ...data });
+          groups.push(decryptedData);
         }
-      });
+      }
 
       return groups;
     } catch (error) {
@@ -105,7 +113,12 @@ class FamilyService {
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
-        return { success: true, data: { id: docSnap.id, ...docSnap.data() } };
+        const data = { id: docSnap.id, ...docSnap.data() };
+        
+        // Decrypt group data
+        const decryptedData = await encryptionService.decryptObject(data, this.familyGroupsCollection);
+        
+        return { success: true, data: decryptedData };
       } else {
         return { success: false, error: 'Group not found' };
       }
@@ -160,7 +173,10 @@ class FamilyService {
         expiresAt: Timestamp.fromDate(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)) // 7 days
       };
 
-      const docRef = await addDoc(collection(db, this.invitationsCollection), invitationData);
+      // Encrypt sensitive invitation data before saving
+      const encryptedInvitationData = await encryptionService.encryptObject(invitationData, this.invitationsCollection);
+
+      const docRef = await addDoc(collection(db, this.invitationsCollection), encryptedInvitationData);
 
       // Send email notification
       await this.sendInvitationEmail({
@@ -212,14 +228,18 @@ class FamilyService {
       const snapshot = await getDocs(q);
       const invitations = [];
 
-      snapshot.forEach((doc) => {
-        const data = doc.data();
+      for (const docSnap of snapshot.docs) {
+        const data = { id: docSnap.id, ...docSnap.data() };
+        
+        // Decrypt invitation data
+        const decryptedData = await encryptionService.decryptObject(data, this.invitationsCollection);
+        
         // Check if not expired (with null safety)
-        const expiresAt = data.expiresAt?.toDate ? data.expiresAt.toDate() : null;
+        const expiresAt = decryptedData.expiresAt?.toDate ? decryptedData.expiresAt.toDate() : null;
         if (!expiresAt || expiresAt > new Date()) {
-          invitations.push({ id: doc.id, ...data });
+          invitations.push(decryptedData);
         }
-      });
+      }
 
       return invitations;
     } catch (error) {
@@ -246,7 +266,10 @@ class FamilyService {
         return { success: false, error: 'Invitation not found' };
       }
 
-      const invitation = inviteSnap.data();
+      const inviteData = { id: inviteSnap.id, ...inviteSnap.data() };
+      
+      // Decrypt invitation data
+      const invitation = await encryptionService.decryptObject(inviteData, this.invitationsCollection);
 
       // Check if invitation is for this user
       if (!invitation.invitedEmail || invitation.invitedEmail.toLowerCase() !== user.email.toLowerCase()) {

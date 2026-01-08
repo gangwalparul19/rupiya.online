@@ -261,11 +261,26 @@
               <label for="paymentMethodFilter">Payment Method</label>
               <select id="paymentMethodFilter" class="filter-select">
                 <option value="">All Methods</option>
-                <option value="Cash">Cash</option>
-                <option value="Card">Card</option>
-                <option value="UPI">UPI</option>
-                <option value="Bank Transfer">Bank Transfer</option>
-                <option value="Wallet">Wallet</option>
+                <option value="cash">💵 Cash</option>
+                <option value="card">💳 Card</option>
+                <option value="upi">📱 UPI</option>
+                <option value="wallet">👛 Wallet</option>
+                <option value="bank">🏦 Bank Account</option>
+              </select>
+            </div>
+
+            <div class="filter-group" id="specificPaymentMethodFilterGroup" style="display: none;">
+              <label for="specificPaymentMethodFilter">Specific Method</label>
+              <select id="specificPaymentMethodFilter" class="filter-select">
+                <option value="">Select...</option>
+              </select>
+            </div>
+
+            <div class="filter-group">
+              <label for="familyMemberFilter">Family Member</label>
+              <select id="familyMemberFilter" class="filter-select">
+                <option value="">All Members</option>
+                <!-- Options will be populated dynamically -->
               </select>
             </div>
 

@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="assets/js/config/env-local.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Encrypt All Data - Rupiya</title>
+  <link rel="stylesheet" href="assets/css/common.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/dark-mode.css">
+  <style>
+    body {
+      padding: 2rem;
+      max-width: 900px;
+      margin: 0 auto;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+    
+    .container {
+      background: white;
+      border: 2px solid #4A90E2;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    h1 {
+      color: #2C3E50;
+      margin-bottom: 1rem;
+    }
+    
+    .warning {
+      background: #FFF3CD;
+      border: 2px solid #FFC107;
+      border-radius: 8px;
+      padding: 1rem;
+      margin: 1rem 0;
+      color: #856404;
+    }
+    
+    .info {
+      background: #E3F2FD;
+      border: 2px solid #4A90E2;
+      border-radius: 8px;
+      padding: 1rem;
+      margin: 1rem 0;
+      color: #1565C0;
+    }
+    
+    .btn-group {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.5rem;
+      flex-wrap: wrap;
+    }
+    
+    button {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-primary {
+      background: #4A90E2;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #357ABD;
+    }
+    
+    .btn-secondary {
+      background: #27AE60;
+      color: white;
+    }
+    
+    .btn-secondary:hover {
+      background: #1E8449;
+    }
+    
+    .btn-danger {
+      background: #E74C3C;
+      color: white;
+    }
+    
+    .btn-danger:hover {
+      background: #C0392B;
+    }
+    
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    #console {
+      background: #1E1E1E;
+      color: #D4D4D4;
+      padding: 1rem;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.875rem;
+      max-height: 500px;
+      overflow-y: auto;
+      margin-top: 1rem;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+    
+    .status {
+      margin: 1rem 0;
+      padding: 0.75rem;
+      border-radius: 8px;
+      background: #F5F5F5;
+      display: none;
+    }
+    
+    .status.show {
+      display: block;
+    }
+    
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #f3f3f3;
+      border-top: 2px solid #4A90E2;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-right: 0.5rem;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    ul {
+      margin: 0.5rem 0;
+      padding-left: 1.5rem;
+    }
+    
+    li {
+      margin: 0.25rem 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔐 Encrypt All Data</h1>
+    
+    <div class="info">
+      <strong>ℹ️ Information:</strong>
+      <p>This tool will encrypt sensitive data in all collections:</p>
+      <ul>
+        <li><strong>Trip Members:</strong> names, emails, phone numbers</li>
+        <li><strong>Trip Expenses:</strong> amounts, descriptions, notes, splits</li>
+        <li><strong>Trip Settlements:</strong> amounts, notes</li>
+        <li><strong>Family Groups:</strong> group names, member names/emails</li>
+        <li><strong>Family Invitations:</strong> invited emails, names, group names</li>
+      </ul>
+      <p>This is a one-time operation to secure existing data. New data will be automatically encrypted.</p>
+    </div>
+    
+    <div class="warning">
+      <strong>⚠️ Important:</strong>
+      <ul>
+        <li>Make sure you're logged in before running this script</li>
+        <li>Ensure you have set up your encryption key in Profile settings</li>
+        <li>This process cannot be undone</li>
+        <li>Already encrypted data will be skipped automatically</li>
+        <li>This may take a few minutes depending on data volume</li>
+      </ul>
+    </div>
+    
+    <div id="status" class="status">
+      <div class="spinner"></div>
+      <span id="statusText">Processing...</span>
+    </div>
+    
+    <div class="btn-group">
+      <button id="encryptBtn" class="btn-primary">
+        🔐 Encrypt All Data
+      </button>
+      <button id="verifyBtn" class="btn-secondary" disabled>
+        ✓ Verify Encryption
+      </button>
+      <button id="clearBtn" class="btn-danger">
+        🗑️ Clear Console
+      </button>
+    </div>
+    
+    <div id="console"></div>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module">
+    import authService from './assets/js/services/auth-service.js';
+    import encryptionService from './assets/js/services/encryption-service.js';
+    import tripDataEncryptor from './assets/js/utils/encrypt-trip-data.js';
+
+    const encryptBtn = document.getElementById('encryptBtn');
+    const verifyBtn = document.getElementById('verifyBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const consoleDiv = document.getElementById('console');
+    const statusDiv = document.getElementById('status');
+    const statusText = document.getElementById('statusText');
+
+    // Redirect console.log to our console div
+    const originalLog = console.log;
+    const originalError = console.error;
+    const originalWarn = console.warn;
+
+    function appendToConsole(message, type = 'log') {
+      const timestamp = new Date().toLocaleTimeString();
+      const prefix = type === 'error' ? '❌' : type === 'warn' ? '⚠️' : '📝';
+      const color = type === 'error' ? '#FF6B6B' : type === 'warn' ? '#FFA500' : '#D4D4D4';
+      
+      const line = document.createElement('div');
+      line.style.color = color;
+      line.textContent = `[${timestamp}] ${prefix} ${message}`;
+      consoleDiv.appendChild(line);
+      consoleDiv.scrollTop = consoleDiv.scrollHeight;
+    }
+
+    console.log = (...args) => {
+      originalLog(...args);
+      appendToConsole(args.join(' '), 'log');
+    };
+
+    console.error = (...args) => {
+      originalError(...args);
+      appendToConsole(args.join(' '), 'error');
+    };
+
+    console.warn = (...args) => {
+      originalWarn(...args);
+      appendToConsole(args.join(' '), 'warn');
+    };
+
+    // Show status
+    function showStatus(text) {
+      statusText.textContent = text;
+      statusDiv.classList.add('show');
+    }
+
+    function hideStatus() {
+      statusDiv.classList.remove('show');
+    }
+
+    // Check prerequisites
+    async function checkPrerequisites() {
+      console.log('Checking prerequisites...');
+      
+      // Check authentication
+      await authService.waitForAuth();
+      if (!authService.isAuthenticated()) {
+        console.error('Not authenticated. Please log in first.');
+        alert('Please log in first!');
+        window.location.href = 'login.html';
+        return false;
+      }
+      
+      const user = authService.getCurrentUser();
+      console.log(`✓ Authenticated as: ${user.email}`);
+      
+      // Check encryption key
+      const hasKey = await encryptionService.hasEncryptionKey();
+      if (!hasKey) {
+        console.error('No encryption key found. Please set up encryption in Profile settings.');
+        alert('Please set up your encryption key in Profile settings first!');
+        return false;
+      }
+      
+      console.log('✓ Encryption key found');
+      return true;
+    }
+
+    // Encrypt button handler
+    encryptBtn.addEventListener('click', async () => {
+      if (!await checkPrerequisites()) return;
+      
+      const confirmed = confirm(
+        'This will encrypt all data:\n' +
+        '- Trip Members (names, emails, phones)\n' +
+        '- Trip Expenses (amounts, descriptions, notes)\n' +
+        '- Trip Settlements (amounts, notes)\n' +
+        '- Family Groups (names, member info)\n' +
+        '- Family Invitations (emails, names)\n\n' +
+        'Already encrypted data will be skipped.\n\n' +
+        'This may take a few minutes.\n\n' +
+        'Continue?'
+      );
+      
+      if (!confirmed) return;
+      
+      try {
+        encryptBtn.disabled = true;
+        verifyBtn.disabled = true;
+        showStatus('Encrypting all data... This may take a few minutes...');
+        
+        await tripDataEncryptor.encryptAllTripData();
+        
+        hideStatus();
+        verifyBtn.disabled = false;
+        alert('Encryption completed! Check the console for details.');
+      } catch (error) {
+        console.error('Encryption failed:', error);
+        alert('Encryption failed! Check the console for details.');
+      } finally {
+        encryptBtn.disabled = false;
+        hideStatus();
+      }
+    });
+
+    // Verify button handler
+    verifyBtn.addEventListener('click', async () => {
+      if (!await checkPrerequisites()) return;
+      
+      try {
+        verifyBtn.disabled = true;
+        showStatus('Verifying encryption...');
+        
+        await tripDataEncryptor.verifyEncryption();
+        
+        hideStatus();
+        alert('Verification completed! Check the console for details.');
+      } catch (error) {
+        console.error('Verification failed:', error);
+        alert('Verification failed! Check the console for details.');
+      } finally {
+        verifyBtn.disabled = false;
+        hideStatus();
+      }
+    });
+
+    // Clear console button handler
+    clearBtn.addEventListener('click', () => {
+      consoleDiv.innerHTML = '';
+      console.log('Console cleared');
+    });
+
+    // Initial check
+    checkPrerequisites().then(ready => {
+      if (ready) {
+        console.log('✅ Ready to encrypt all data');
+        console.log('Click "Encrypt All Data" button to start');
+      }
+    });
+  </script>
+</body>
+</html>

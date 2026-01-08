@@ -59,7 +59,10 @@ export const privacyConfig = {
     'wallets',
     'paymentMethods',
     'tripGroupExpenses',
-    'tripGroupSettlements'
+    'tripGroupSettlements',
+    'tripGroupMembers',      // Member info (name, email, phone)
+    'familyGroups',          // Family group data (name, member names/emails)
+    'familyInvitations'      // Invitation data (emails, names)
   ],
   
   // Collections that should NOT be encrypted
@@ -67,10 +70,7 @@ export const privacyConfig = {
   unencryptedCollections: [
     'users',              // User profile - needed for tracking location/name
     'userPreferences',    // App preferences
-    'familyGroups',       // Family group metadata
-    'familyInvitations',  // Invitation data
-    'tripGroups',         // Trip group metadata
-    'tripGroupMembers'    // Member info
+    'tripGroups'          // Trip group metadata
   ],
   
   // Sensitive fields that MUST be encrypted in each collection
@@ -111,7 +111,10 @@ export const privacyConfig = {
       'notes'
     ],
     tripGroupExpenses: ['amount', 'description', 'notes', 'splits'],
-    tripGroupSettlements: ['amount', 'notes']
+    tripGroupSettlements: ['amount', 'notes'],
+    tripGroupMembers: ['name', 'email', 'phone'],  // Member personal information
+    familyGroups: ['name'],  // Group name and member info (members array contains names/emails)
+    familyInvitations: ['invitedEmail', 'invitedByName', 'groupName']  // Invitation details
   }
 };
 

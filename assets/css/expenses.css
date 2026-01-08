@@ -216,6 +216,42 @@
   box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
 }
 
+/* Highlight active filters */
+.filter-select:not([value=""]),
+.filter-select option:checked,
+.filter-input:not([value=""]) {
+  border-color: var(--primary-blue);
+  background: rgba(74, 144, 226, 0.05);
+  font-weight: 500;
+}
+
+/* Cascading filter styling */
+#specificPaymentMethodFilterGroup {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+#specificPaymentMethodFilterGroup .filter-select {
+  border-left: 3px solid var(--primary-blue);
+  background: rgba(74, 144, 226, 0.03);
+}
+
+/* Family member filter special styling */
+#familyMemberFilter option {
+  padding: 8px;
+  font-size: var(--font-size-base);
+}
+
 .search-row {
   display: flex;
   align-items: center;

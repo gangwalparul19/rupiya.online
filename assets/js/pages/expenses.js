@@ -26,6 +26,8 @@ const state = {
   filters: {
     category: '',
     paymentMethod: '',
+    specificPaymentMethod: '',
+    familyMember: '',
     dateFrom: '',
     dateTo: '',
     search: ''
@@ -122,6 +124,8 @@ const filtersToggle = document.getElementById('filtersToggle');
 const filtersContent = document.getElementById('filtersContent');
 const categoryFilter = document.getElementById('categoryFilter');
 const paymentMethodFilter = document.getElementById('paymentMethodFilter');
+const specificPaymentMethodFilter = document.getElementById('specificPaymentMethodFilter');
+const familyMemberFilter = document.getElementById('familyMemberFilter');
 const dateFromFilter = document.getElementById('dateFromFilter');
 const dateToFilter = document.getElementById('dateToFilter');
 const clearFiltersBtn = document.getElementById('clearFiltersBtn');
@@ -193,6 +197,9 @@ async function initPage() {
     // Load categories into dropdowns
     await loadCategoryDropdowns();
     
+    // Load family members into filter
+    await loadFamilyMemberFilter();
+    
     // Load user's payment methods
     await loadUserPaymentMethods();
     
@@ -234,6 +241,57 @@ async function loadCategoryDropdowns() {
   } catch (error) {
     console.error('Error loading categories:', error);
   }
+}
+
+// Load family members into filter dropdown
+async function loadFamilyMemberFilter() {
+  try {
+    const members = await familyMembersService.getActiveFamilyMembers();
+    
+    // Populate family member filter dropdown
+    familyMemberFilter.innerHTML = '<option value="">All Members</option>' +
+      members.map(member => `<option value="${member.id}">${member.icon} ${escapeHtml(member.name)}</option>`).join('');
+  } catch (error) {
+    console.error('Error loading family members for filter:', error);
+  }
+}
+
+// Handle payment method filter change (cascading filter)
+function handlePaymentMethodFilterChange() {
+  const selectedType = paymentMethodFilter.value;
+  const specificPaymentMethodGroup = document.getElementById('specificPaymentMethodFilterGroup');
+  
+  if (!selectedType || selectedType === 'cash') {
+    // Hide specific payment method dropdown for cash or no selection
+    specificPaymentMethodGroup.style.display = 'none';
+    specificPaymentMethodFilter.value = '';
+    state.filters.specificPaymentMethod = '';
+    applyFilters();
+    return;
+  }
+  
+  // Filter payment methods by selected type
+  const methodsOfType = userPaymentMethods.filter(method => method.type === selectedType);
+  
+  if (methodsOfType.length === 0) {
+    // No saved methods of this type
+    specificPaymentMethodGroup.style.display = 'none';
+    specificPaymentMethodFilter.value = '';
+    state.filters.specificPaymentMethod = '';
+    applyFilters();
+    return;
+  }
+  
+  // Populate specific payment method dropdown
+  specificPaymentMethodFilter.innerHTML = '<option value="">All ' + getPaymentTypeLabel(selectedType) + '</option>' +
+    methodsOfType.map(method => {
+      const displayName = getPaymentMethodDisplayName(method);
+      const icon = getPaymentMethodIcon(method.type);
+      return `<option value="${method.id}">${icon} ${displayName}</option>`;
+    }).join('');
+  
+  // Show the dropdown
+  specificPaymentMethodGroup.style.display = 'block';
 }
 
 // Check URL parameters for pre-filled data
@@ -418,9 +476,26 @@ function applyFilters() {
     filtered = filtered.filter(e => e.category === state.filters.category);
   }
   
-  // Payment method filter
+  // Payment method type filter
   if (state.filters.paymentMethod) {
     filtered = filtered.filter(e => e.paymentMethod === state.filters.paymentMethod);
+  }
+  
+  // Specific payment method filter (e.g., specific card, UPI ID)
+  if (state.filters.specificPaymentMethod) {
+    filtered = filtered.filter(e => e.specificPaymentMethodId === state.filters.specificPaymentMethod);
+  }
+  
+  // Family member filter
+  if (state.filters.familyMember) {
+    filtered = filtered.filter(e => {
+      // Check if expense has split details
+      if (e.hasSplit && e.splitDetails && e.splitDetails.length > 0) {
+        // Check if the selected member has any amount in this expense
+        return e.splitDetails.some(split => split.memberId === state.filters.familyMember && split.amount > 0);
+      }
+      return false; // If no split details, exclude from family member filter
+    });
   }
   
   // Date range filter
@@ -1120,6 +1195,16 @@ function setupEventListeners() {
   
   paymentMethodFilter.addEventListener('change', () => {
     state.filters.paymentMethod = paymentMethodFilter.value;
+    handlePaymentMethodFilterChange();
+  });
+  
+  specificPaymentMethodFilter.addEventListener('change', () => {
+    state.filters.specificPaymentMethod = specificPaymentMethodFilter.value;
+    applyFilters();
+  });
+  
+  familyMemberFilter.addEventListener('change', () => {
+    state.filters.familyMember = familyMemberFilter.value;
     applyFilters();
   });
   
@@ -1250,6 +1335,8 @@ function clearFilters() {
   state.filters = {
     category: '',
     paymentMethod: '',
+    specificPaymentMethod: '',
+    familyMember: '',
     dateFrom: '',
     dateTo: '',
     search: ''
@@ -1257,9 +1344,17 @@ function clearFilters() {
   
   categoryFilter.value = '';
   paymentMethodFilter.value = '';
+  specificPaymentMethodFilter.value = '';
+  familyMemberFilter.value = '';
   dateFromFilter.value = '';
   dateToFilter.value = '';
   searchInput.value = '';
+  
+  // Hide specific payment method filter
+  const specificPaymentMethodGroup = document.getElementById('specificPaymentMethodFilterGroup');
+  if (specificPaymentMethodGroup) {
+    specificPaymentMethodGroup.style.display = 'none';
+  }
   
   applyFilters();
 }
