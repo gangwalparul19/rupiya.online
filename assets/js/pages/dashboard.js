@@ -989,12 +989,14 @@ function createCategoryChart(expenses, period = 'current', splits = []) {
 // Chart period change handlers
 trendPeriod.addEventListener('change', async () => {
   try {
+    const months = parseInt(trendPeriod.value);
+    // Use optimized query that only fetches data for the selected period
     const [expenses, income, splits] = await Promise.all([
-      firestoreService.getExpenses(),
-      firestoreService.getIncome(),
+      firestoreService.getExpensesForLastMonths(months),
+      firestoreService.getIncomeForLastMonths(months),
       firestoreService.getSplits ? firestoreService.getSplits() : Promise.resolve([])
     ]);
-    createTrendChart(expenses, income, parseInt(trendPeriod.value), splits);
+    createTrendChart(expenses, income, months, splits);
   } catch (error) {
     log.error('Error updating trend chart:', error);
   }
@@ -1002,11 +1004,31 @@ trendPeriod.addEventListener('change', async () => {
 
 categoryPeriod.addEventListener('change', async () => {
   try {
-    const [expenses, splits] = await Promise.all([
-      firestoreService.getExpenses(),
-      firestoreService.getSplits ? firestoreService.getSplits() : Promise.resolve([])
-    ]);
-    createCategoryChart(expenses, categoryPeriod.value, splits);
+    // For category chart, we only need current or last month data
+    const now = new Date();
+    const period = categoryPeriod.value;
+    let expenses, splits;
+    
+    if (period === 'current') {
+      [expenses, splits] = await Promise.all([
+        firestoreService.getExpensesByMonth(now.getFullYear(), now.getMonth()),
+        firestoreService.getSplits ? firestoreService.getSplits() : Promise.resolve([])
+      ]);
+    } else if (period === 'last') {
+      const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      [expenses, splits] = await Promise.all([
+        firestoreService.getExpensesByMonth(lastMonth.getFullYear(), lastMonth.getMonth()),
+        firestoreService.getSplits ? firestoreService.getSplits() : Promise.resolve([])
+      ]);
+    } else {
+      // For 'all', use limited data
+      [expenses, splits] = await Promise.all([
+        firestoreService.getExpenses(500),
+        firestoreService.getSplits ? firestoreService.getSplits() : Promise.resolve([])
+      ]);
+    }
+    
+    createCategoryChart(expenses, period, splits);
   } catch (error) {
     log.error('Error updating category chart:', error);
   }

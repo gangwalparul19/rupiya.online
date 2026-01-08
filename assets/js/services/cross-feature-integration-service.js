@@ -388,8 +388,8 @@ class CrossFeatureIntegrationService {
     if (linkedId) {
       expenses = await this.getLinkedExpenses(linkedType, linkedId);
     } else {
-      const allExpenses = await firestoreService.getExpenses();
-      expenses = allExpenses.filter(e => e.linkedType === linkedType);
+      // Use optimized query instead of loading all expenses
+      expenses = await firestoreService.getExpensesByLinkedType(linkedType);
     }
 
     const breakdown = {};
@@ -413,8 +413,8 @@ class CrossFeatureIntegrationService {
     if (linkedId) {
       income = await this.getLinkedIncome(linkedType, linkedId);
     } else {
-      const allIncome = await firestoreService.getIncome();
-      income = allIncome.filter(i => i.linkedType === linkedType);
+      // Use optimized query instead of loading all income
+      income = await firestoreService.getIncomeByLinkedType(linkedType);
     }
 
     const breakdown = {};

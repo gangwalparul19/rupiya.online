@@ -30,7 +30,10 @@ const state = {
   editingIncomeId: null,
   selectedIncome: new Set(),
   bulkMode: false,
-  totalCount: 0
+  totalCount: 0,
+  lastDoc: null,
+  hasMore: true,
+  loadingMore: false
 };
 
 // Pagination instance
@@ -269,8 +272,12 @@ async function loadIncome() {
     emptyState.style.display = 'none';
     incomeList.style.display = 'none';
     
-    // Get total count for pagination
-    state.totalCount = await firestoreService.getIncomeCount();
+    // Get KPI summary (optimized - only fetches current/last month data)
+    const kpiSummary = await firestoreService.getIncomeKPISummary();
+    state.totalCount = kpiSummary.totalCount;
+    
+    // Update KPI cards with pre-calculated values
+    updateIncomeKPIsFromSummary(kpiSummary);
     
     // Initialize pagination if not already done
     if (!pagination) {
@@ -283,12 +290,12 @@ async function loadIncome() {
     
     pagination.setTotal(state.totalCount);
     
-    // Load all income for filtering and KPIs (cached by firestore service)
-    state.income = await firestoreService.getIncome();
+    // Load paginated income for display (not all data)
+    const result = await firestoreService.getIncomePaginated({ 
+      pageSize: state.itemsPerPage * 5 // Load 5 pages worth for filtering
+    });
+    state.income = result.data;
     state.filteredIncome = [...state.income];
-    
-    // Update KPI cards
-    updateIncomeKPIs();
     
     applyFilters();
     
@@ -297,6 +304,50 @@ async function loadIncome() {
     toast.error('Failed to load income');
     loadingState.style.display = 'none';
   }
+}
+
+// Load more income when user scrolls or filters require more data
+async function loadMoreIncome() {
+  if (state.loadingMore) return;
+  
+  try {
+    state.loadingMore = true;
+    const result = await firestoreService.getIncomePaginated({
+      pageSize: state.itemsPerPage * 3,
+      lastDoc: state.lastDoc
+    });
+    
+    if (result.data.length > 0) {
+      state.income = [...state.income, ...result.data];
+      state.lastDoc = result.lastDoc;
+      state.hasMore = result.hasMore;
+      applyFilters();
+    }
+  } catch (error) {
+    console.error('Error loading more income:', error);
+  } finally {
+    state.loadingMore = false;
+  }
+}
+
+// Update KPIs from pre-calculated summary
+function updateIncomeKPIsFromSummary(summary) {
+  const thisMonthEl = document.getElementById('thisMonthIncome');
+  const lastMonthEl = document.getElementById('lastMonthIncome');
+  const totalEl = document.getElementById('totalIncome');
+  
+  if (thisMonthEl) thisMonthEl.textContent = formatCurrencyCompact(summary.thisMonth);
+  if (lastMonthEl) lastMonthEl.textContent = formatCurrencyCompact(summary.lastMonth);
+  if (totalEl) totalEl.textContent = summary.totalCount.toLocaleString();
+  
+  // Update tooltips with full amounts
+  const thisMonthKpi = document.getElementById('thisMonthKpi');
+  const lastMonthKpi = document.getElementById('lastMonthKpi');
+  const totalKpi = document.getElementById('totalKpi');
+  
+  if (thisMonthKpi) thisMonthKpi.setAttribute('data-tooltip', formatCurrency(summary.thisMonth));
+  if (lastMonthKpi) lastMonthKpi.setAttribute('data-tooltip', formatCurrency(summary.lastMonth));
+  if (totalKpi) totalKpi.setAttribute('data-tooltip', `${summary.totalCount} income entries`);
 }
 
 // Handle page change from pagination component

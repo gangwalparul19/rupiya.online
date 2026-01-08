@@ -30,7 +30,10 @@ const state = {
   editingExpenseId: null,
   selectedExpenses: new Set(),
   bulkMode: false,
-  totalCount: 0
+  totalCount: 0,
+  lastDoc: null,
+  hasMore: true,
+  loadingMore: false
 };
 
 // Pagination instance
@@ -280,8 +283,12 @@ async function loadExpenses() {
     emptyState.style.display = 'none';
     expensesList.style.display = 'none';
     
-    // Get total count for pagination
-    state.totalCount = await firestoreService.getExpensesCount();
+    // Get KPI summary (optimized - only fetches current/last month data)
+    const kpiSummary = await firestoreService.getExpenseKPISummary();
+    state.totalCount = kpiSummary.totalCount;
+    
+    // Update KPI cards with pre-calculated values
+    updateExpenseKPIsFromSummary(kpiSummary);
     
     // Initialize pagination if not already done
     if (!pagination) {
@@ -294,12 +301,12 @@ async function loadExpenses() {
     
     pagination.setTotal(state.totalCount);
     
-    // Load all expenses for filtering and KPIs (cached by firestore service)
-    state.expenses = await firestoreService.getExpenses();
+    // Load paginated expenses for display (not all data)
+    const result = await firestoreService.getExpensesPaginated({ 
+      pageSize: state.itemsPerPage * 5 // Load 5 pages worth for filtering
+    });
+    state.expenses = result.data;
     state.filteredExpenses = [...state.expenses];
-    
-    // Update KPI cards
-    updateExpenseKPIs();
     
     applyFilters();
     
@@ -308,6 +315,50 @@ async function loadExpenses() {
     toast.error('Failed to load expenses');
     loadingState.style.display = 'none';
   }
+}
+
+// Load more expenses when user scrolls or filters require more data
+async function loadMoreExpenses() {
+  if (state.loadingMore) return;
+  
+  try {
+    state.loadingMore = true;
+    const result = await firestoreService.getExpensesPaginated({
+      pageSize: state.itemsPerPage * 3,
+      lastDoc: state.lastDoc
+    });
+    
+    if (result.data.length > 0) {
+      state.expenses = [...state.expenses, ...result.data];
+      state.lastDoc = result.lastDoc;
+      state.hasMore = result.hasMore;
+      applyFilters();
+    }
+  } catch (error) {
+    console.error('Error loading more expenses:', error);
+  } finally {
+    state.loadingMore = false;
+  }
+}
+
+// Update KPIs from pre-calculated summary
+function updateExpenseKPIsFromSummary(summary) {
+  const thisMonthEl = document.getElementById('thisMonthExpenses');
+  const lastMonthEl = document.getElementById('lastMonthExpenses');
+  const totalEl = document.getElementById('totalExpenses');
+  
+  if (thisMonthEl) thisMonthEl.textContent = formatCurrencyCompact(summary.thisMonth);
+  if (lastMonthEl) lastMonthEl.textContent = formatCurrencyCompact(summary.lastMonth);
+  if (totalEl) totalEl.textContent = summary.totalCount.toLocaleString();
+  
+  // Update tooltips with full amounts
+  const thisMonthKpi = document.getElementById('thisMonthKpi');
+  const lastMonthKpi = document.getElementById('lastMonthKpi');
+  const totalKpi = document.getElementById('totalKpi');
+  
+  if (thisMonthKpi) thisMonthKpi.setAttribute('data-tooltip', formatCurrency(summary.thisMonth));
+  if (lastMonthKpi) lastMonthKpi.setAttribute('data-tooltip', formatCurrency(summary.lastMonth));
+  if (totalKpi) totalKpi.setAttribute('data-tooltip', `${summary.totalCount} expenses`);
 }
 
 // Handle page change from pagination component

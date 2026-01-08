@@ -99,10 +99,10 @@ async function loadInsights(forceRefresh = false) {
   showLoadingStates();
   
   try {
-    // Fetch all data
+    // Optimize: Load only last 6 months of data for insights (sufficient for analysis)
     const [expenses, income, budgets, goals] = await Promise.all([
-      firestoreService.getExpenses(),
-      firestoreService.getIncome(),
+      firestoreService.getExpensesForLastMonths(6),
+      firestoreService.getIncomeForLastMonths(6),
       firestoreService.getBudgets(),
       firestoreService.getGoals()
     ]);

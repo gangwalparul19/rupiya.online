@@ -46,7 +46,7 @@ class FirestoreService {
     
     // Cache configuration
     this.cache = new Map();
-    this.cacheExpiry = 2 * 60 * 1000; // 2 minutes cache
+    this.cacheExpiry = 5 * 60 * 1000; // 5 minutes cache (increased for better performance)
     this.lastCursors = new Map();
     this.defaultPageSize = 10;
   }
@@ -610,6 +610,172 @@ class FirestoreService {
     }
   }
 
+  // Optimized: Get expenses for a specific month only (for KPIs)
+  async getExpensesByMonth(year, month) {
+    try {
+      const cacheKey = this.getCacheKey('expensesByMonth', { year, month });
+      const cached = this.getFromCache(cacheKey);
+      if (cached) return cached;
+      
+      const startDate = new Date(year, month, 1);
+      const endDate = new Date(year, month + 1, 0, 23, 59, 59);
+      
+      const data = await this.queryByDateRange(this.collections.expenses, startDate, endDate);
+      this.setCache(cacheKey, data);
+      return data;
+    } catch (error) {
+      console.error('Error getting expenses by month:', error);
+      return [];
+    }
+  }
+
+  // Optimized: Get income for a specific month only (for KPIs)
+  async getIncomeByMonth(year, month) {
+    try {
+      const cacheKey = this.getCacheKey('incomeByMonth', { year, month });
+      const cached = this.getFromCache(cacheKey);
+      if (cached) return cached;
+      
+      const startDate = new Date(year, month, 1);
+      const endDate = new Date(year, month + 1, 0, 23, 59, 59);
+      
+      const data = await this.queryByDateRange(this.collections.income, startDate, endDate);
+      this.setCache(cacheKey, data);
+      return data;
+    } catch (error) {
+      console.error('Error getting income by month:', error);
+      return [];
+    }
+  }
+
+  // Optimized: Get expenses for last N months (for charts)
+  async getExpensesForLastMonths(months = 6) {
+    try {
+      const cacheKey = this.getCacheKey('expensesLastMonths', { months });
+      const cached = this.getFromCache(cacheKey);
+      if (cached) return cached;
+      
+      const now = new Date();
+      const startDate = new Date(now.getFullYear(), now.getMonth() - months + 1, 1);
+      const endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+      
+      const data = await this.queryByDateRange(this.collections.expenses, startDate, endDate);
+      this.setCache(cacheKey, data);
+      return data;
+    } catch (error) {
+      console.error('Error getting expenses for last months:', error);
+      return [];
+    }
+  }
+
+  // Optimized: Get income for last N months (for charts)
+  async getIncomeForLastMonths(months = 6) {
+    try {
+      const cacheKey = this.getCacheKey('incomeLastMonths', { months });
+      const cached = this.getFromCache(cacheKey);
+      if (cached) return cached;
+      
+      const now = new Date();
+      const startDate = new Date(now.getFullYear(), now.getMonth() - months + 1, 1);
+      const endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+      
+      const data = await this.queryByDateRange(this.collections.income, startDate, endDate);
+      this.setCache(cacheKey, data);
+      return data;
+    } catch (error) {
+      console.error('Error getting income for last months:', error);
+      return [];
+    }
+  }
+
+  // Optimized: Get KPI summary for expenses page (current month, last month, total count)
+  async getExpenseKPISummary() {
+    try {
+      const cacheKey = this.getCacheKey('expenseKPISummary', {});
+      const cached = this.getFromCache(cacheKey);
+      if (cached) return cached;
+      
+      const now = new Date();
+      const currentYear = now.getFullYear();
+      const currentMonth = now.getMonth();
+      
+      // Get current and last month data in parallel
+      const [currentMonthExpenses, lastMonthExpenses, totalCount] = await Promise.all([
+        this.getExpensesByMonth(currentYear, currentMonth),
+        this.getExpensesByMonth(currentYear, currentMonth - 1),
+        this.getExpensesCount()
+      ]);
+      
+      const summary = {
+        thisMonth: currentMonthExpenses.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0),
+        lastMonth: lastMonthExpenses.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0),
+        totalCount
+      };
+      
+      this.setCache(cacheKey, summary);
+      return summary;
+    } catch (error) {
+      console.error('Error getting expense KPI summary:', error);
+      return { thisMonth: 0, lastMonth: 0, totalCount: 0 };
+    }
+  }
+
+  // Optimized: Get KPI summary for income page
+  async getIncomeKPISummary() {
+    try {
+      const cacheKey = this.getCacheKey('incomeKPISummary', {});
+      const cached = this.getFromCache(cacheKey);
+      if (cached) return cached;
+      
+      const now = new Date();
+      const currentYear = now.getFullYear();
+      const currentMonth = now.getMonth();
+      
+      // Get current and last month data in parallel
+      const [currentMonthIncome, lastMonthIncome, totalCount] = await Promise.all([
+        this.getIncomeByMonth(currentYear, currentMonth),
+        this.getIncomeByMonth(currentYear, currentMonth - 1),
+        this.getIncomeCount()
+      ]);
+      
+      const summary = {
+        thisMonth: currentMonthIncome.reduce((sum, i) => sum + (parseFloat(i.amount) || 0), 0),
+        lastMonth: lastMonthIncome.reduce((sum, i) => sum + (parseFloat(i.amount) || 0), 0),
+        totalCount
+      };
+      
+      this.setCache(cacheKey, summary);
+      return summary;
+    } catch (error) {
+      console.error('Error getting income KPI summary:', error);
+      return { thisMonth: 0, lastMonth: 0, totalCount: 0 };
+    }
+  }
+
+  // Optimized: Get category totals for current month (for budgets)
+  async getCurrentMonthCategoryTotals() {
+    try {
+      const cacheKey = this.getCacheKey('currentMonthCategoryTotals', {});
+      const cached = this.getFromCache(cacheKey);
+      if (cached) return cached;
+      
+      const now = new Date();
+      const expenses = await this.getExpensesByMonth(now.getFullYear(), now.getMonth());
+      
+      const totals = {};
+      expenses.forEach(e => {
+        const cat = e.category || 'Other';
+        totals[cat] = (totals[cat] || 0) + (parseFloat(e.amount) || 0);
+      });
+      
+      this.setCache(cacheKey, totals);
+      return totals;
+    } catch (error) {
+      console.error('Error getting category totals:', error);
+      return {};
+    }
+  }
+
   async getMonthlySummary(year, month) {
     try {
       const cacheKey = this.getCacheKey('monthlySummary', { year, month });
@@ -847,6 +1013,93 @@ class FirestoreService {
       return decryptedData;
     } catch (error) {
       console.error(`Error getting income for ${linkedType} ${linkedId}:`, error);
+      return [];
+    }
+  }
+
+  // Find expense by custom field (e.g., houseHelpPaymentId)
+  async findExpenseByField(fieldName, fieldValue) {
+    try {
+      const userId = this.getUserId();
+      const q = query(
+        collection(db, this.collections.expenses),
+        where('userId', '==', userId),
+        where(fieldName, '==', fieldValue),
+        limit(1)
+      );
+      
+      const querySnapshot = await getDocs(q);
+      if (querySnapshot.empty) return null;
+      
+      const doc = querySnapshot.docs[0];
+      let data = { id: doc.id, ...doc.data() };
+      
+      // Decrypt the document
+      data = await encryptionService.decryptObject(data, this.collections.expenses);
+      
+      return data;
+    } catch (error) {
+      console.error(`Error finding expense by ${fieldName}:`, error);
+      return null;
+    }
+  }
+
+  // Get all expenses by linked type (optimized query)
+  async getExpensesByLinkedType(linkedType) {
+    try {
+      const userId = this.getUserId();
+      const cacheKey = this.getCacheKey('expensesByLinkedType', { linkedType });
+      const cached = this.getFromCache(cacheKey);
+      if (cached) return cached;
+      
+      const q = query(
+        collection(db, this.collections.expenses),
+        where('userId', '==', userId),
+        where('linkedType', '==', linkedType),
+        orderBy('date', 'desc')
+      );
+      
+      const querySnapshot = await getDocs(q);
+      const data = [];
+      querySnapshot.forEach((doc) => data.push({ id: doc.id, ...doc.data() }));
+      
+      // Decrypt all documents
+      const decryptedData = await encryptionService.decryptArray(data, this.collections.expenses);
+      
+      this.setCache(cacheKey, decryptedData);
+      return decryptedData;
+    } catch (error) {
+      console.error(`Error getting expenses by linked type ${linkedType}:`, error);
+      return [];
+    }
+  }
+
+  // Get all income by linked type (optimized query)
+  async getIncomeByLinkedType(linkedType) {
+    try {
+      const userId = this.getUserId();
+      const cacheKey = this.getCacheKey('incomeByLinkedType', { linkedType });
+      const cached = this.getFromCache(cacheKey);
+      if (cached) return cached;
+      
+      const q = query(
+        collection(db, this.collections.income),
+        where('userId', '==', userId),
+        where('linkedType', '==', linkedType),
+        orderBy('date', 'desc')
+      );
+      
+      const querySnapshot = await getDocs(q);
+      const data = [];
+      querySnapshot.forEach((doc) => data.push({ id: doc.id, ...doc.data() }));
+      
+      // Decrypt all documents
+      const decryptedData = await encryptionService.decryptArray(data, this.collections.income);
+      
+      this.setCache(cacheKey, decryptedData);
+      return decryptedData;
+    } catch (error) {
+      console.error(`Error getting income by linked type ${linkedType}:`, error);
       return [];
     }
   }

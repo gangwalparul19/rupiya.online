@@ -124,14 +124,41 @@ async function loadData() {
   loadingState.style.display = 'flex';
 
   try {
-    // Load expenses and income
-    expenses = await firestoreService.getExpenses();
-    income = await firestoreService.getIncome();
-
-    // Filter by period
     const period = periodFilter.value;
-    expenses = filterByPeriod(expenses, period);
-    income = filterByPeriod(income, period);
+    
+    // Optimize: Load only the data needed for the selected period
+    if (period === 'month') {
+      const now = new Date();
+      [expenses, income] = await Promise.all([
+        firestoreService.getExpensesByMonth(now.getFullYear(), now.getMonth()),
+        firestoreService.getIncomeByMonth(now.getFullYear(), now.getMonth())
+      ]);
+    } else if (period === 'quarter') {
+      const now = new Date();
+      const quarter = Math.floor(now.getMonth() / 3);
+      const startMonth = quarter * 3;
+      // Load 3 months of data for quarter
+      const monthPromises = [];
+      for (let i = 0; i < 3; i++) {
+        monthPromises.push(firestoreService.getExpensesByMonth(now.getFullYear(), startMonth + i));
+        monthPromises.push(firestoreService.getIncomeByMonth(now.getFullYear(), startMonth + i));
+      }
+      const results = await Promise.all(monthPromises);
+      expenses = results.filter((_, i) => i % 2 === 0).flat();
+      income = results.filter((_, i) => i % 2 === 1).flat();
+    } else if (period === 'year') {
+      // Load last 12 months
+      [expenses, income] = await Promise.all([
+        firestoreService.getExpensesForLastMonths(12),
+        firestoreService.getIncomeForLastMonths(12)
+      ]);
+    } else {
+      // 'all' - load with reasonable limit
+      [expenses, income] = await Promise.all([
+        firestoreService.getExpenses(1000),
+        firestoreService.getIncome(1000)
+      ]);
+    }
 
     // Update summary
     updateSummary();
@@ -149,7 +176,7 @@ async function loadData() {
   }
 }
 
-// Filter data by period
+// Filter data by period (kept for compatibility but data is now pre-filtered)
 function filterByPeriod(data, period) {
   const now = new Date();
   let startDate;

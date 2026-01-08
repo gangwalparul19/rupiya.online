@@ -160,14 +160,17 @@ async function loadData() {
     emptyState.style.display = 'none';
     budgetsList.style.display = 'none';
     
-    // Load budgets and expenses in parallel
-    const [budgets, expenses] = await Promise.all([
+    // Load budgets and current month category totals in parallel (optimized)
+    const now = new Date();
+    const [budgets, categoryTotals, currentMonthExpenses] = await Promise.all([
       firestoreService.getBudgets(),
-      firestoreService.getExpenses()
+      firestoreService.getCurrentMonthCategoryTotals(),
+      firestoreService.getExpensesByMonth(now.getFullYear(), now.getMonth())
     ]);
     
     state.budgets = budgets;
-    state.expenses = expenses;
+    state.expenses = currentMonthExpenses; // Only current month expenses needed
+    state.categoryTotals = categoryTotals; // Pre-calculated totals
     
     updateSummary();
     renderBudgets();

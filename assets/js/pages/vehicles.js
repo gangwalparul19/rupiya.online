@@ -394,12 +394,8 @@ function updateSummary() {
 // Load all vehicle KPI data
 async function loadVehicleKPIData() {
   try {
-    // Get all expenses linked to vehicles
-    const allExpenses = await firestoreService.getExpenses();
-    const vehicleExpenses = allExpenses.filter(e => e.linkedType === 'vehicle');
-    
-    // Calculate totals
-    const totalExpenses = vehicleExpenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
+    // Get total expenses linked to vehicles (optimized - uses server-side aggregation)
+    const totalExpenses = await firestoreService.getTotalExpensesByLinkedType('vehicle');
     
     // Update UI with compact format
     document.getElementById('totalVehicleExpenses').textContent = formatCurrencyCompact(totalExpenses);

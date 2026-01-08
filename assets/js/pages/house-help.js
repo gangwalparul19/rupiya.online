@@ -651,9 +651,8 @@ async function handleDeletePayment() {
   confirmDeletePaymentBtn.textContent = 'Deleting...';
   
   try {
-    // First, find and delete the corresponding expense
-    const expenses = await firestoreService.getExpenses();
-    const linkedExpense = expenses.find(e => e.houseHelpPaymentId === deletePaymentId);
+    // Find and delete the corresponding expense (optimized - single query)
+    const linkedExpense = await firestoreService.findExpenseByField('houseHelpPaymentId', deletePaymentId);
     
     if (linkedExpense) {
       await firestoreService.deleteExpense(linkedExpense.id);

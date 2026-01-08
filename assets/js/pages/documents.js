@@ -5,6 +5,7 @@ import firestoreService from '../services/firestore-service.js';
 import storageService from '../services/storage-service.js';
 import smartDocumentService from '../services/smart-document-service.js';
 import toast from '../components/toast.js';
+import Pagination from '../components/pagination.js';
 import { formatDate, escapeHtml, formatDateForInput } from '../utils/helpers.js';
 import timezoneService from '../utils/timezone.js';
 import encryptionReauthModal from '../components/encryption-reauth-modal.js';
@@ -15,7 +16,10 @@ const showToast = (message, type) => toast.show(message, type);
 let documents = [];
 let filteredDocuments = [];
 let editingDocumentId = null;
-let uploadedFile = null;
+
+// Pagination state
+let pagination = null;
+let allLoadedDocuments = []; // Cache for client-side filtering
 
 let addDocumentBtn, addDocumentSection, closeFormBtn, cancelFormBtn;
 let documentForm, formTitle, saveFormBtn;
@@ -29,7 +33,7 @@ let deleteDocumentName;
 let deleteDocumentId = null;
 
 // Smart document elements
-let expiryDateInput, reminderDaysInput, linkedAssetSelect, categorySuggestionEl;
+let expiryDateInput, reminderDaysInput, linkedAssetSelect;
 let expiringDocumentsEl, expiredDocumentsEl;
 
 async function init() {
@@ -93,7 +97,6 @@ function initDOMElements() {
   expiryDateInput = document.getElementById('expiryDate');
   reminderDaysInput = document.getElementById('reminderDays');
   linkedAssetSelect = document.getElementById('linkedAsset');
-  categorySuggestionEl = document.getElementById('categorySuggestion');
   expiringDocumentsEl = document.getElementById('expiringDocuments');
   expiredDocumentsEl = document.getElementById('expiredDocuments');
 }
@@ -375,6 +378,7 @@ async function handleSubmit(e) {
 
     if (result.success) {
       hideForm();
+      allLoadedDocuments = []; // Clear cache to reload fresh data
       await loadDocuments();
     } else {
       showToast(result.error || 'Failed to save document', 'error');
@@ -397,7 +401,26 @@ async function loadDocuments() {
   emptyState.style.display = 'none';
 
   try {
-    documents = await firestoreService.getAll('documents', 'createdAt', 'desc');
+    // Get total count for pagination
+    const totalCount = await firestoreService.getCount('documents');
+    
+    // Initialize pagination if not already done
+    if (!pagination) {
+      pagination = new Pagination({
+        pageSize: 12, // 12 documents per page for grid layout
+        containerId: 'paginationContainer',
+        onPageChange: handlePageChange
+      });
+    }
+    
+    pagination.setTotal(totalCount);
+    
+    // Load documents (with caching)
+    if (allLoadedDocuments.length === 0) {
+      allLoadedDocuments = await firestoreService.getAll('documents', 'createdAt', 'desc');
+    }
+    
+    documents = allLoadedDocuments;
     filteredDocuments = [...documents];
     
     if (documents.length === 0) {
@@ -408,6 +431,7 @@ async function loadDocuments() {
     }
 
     updateSummary();
+    pagination.render();
     
     // Load expiring documents alert
     await loadExpiringDocumentsAlert();
@@ -417,6 +441,11 @@ async function loadDocuments() {
   } finally {
     loadingState.style.display = 'none';
   }
+}
+
+function handlePageChange(page) {
+  renderDocuments();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function handleSearch() {
@@ -430,7 +459,14 @@ function handleSearch() {
     return matchesSearch && matchesCategory;
   });
 
+  // Update pagination total based on filtered results
+  if (pagination) {
+    pagination.setTotal(filteredDocuments.length);
+    pagination.currentPage = 1;
+  }
+
   renderDocuments();
+  if (pagination) pagination.render();
 }
 
 function handleFilter() {
@@ -452,12 +488,23 @@ function getDocumentIcon(category) {
 function renderDocuments() {
   if (filteredDocuments.length === 0) {
     documentsList.innerHTML = '<div class="empty-state"><p>No documents found</p></div>';
+    if (pagination) {
+      const container = document.getElementById('paginationContainer');
+      if (container) container.style.display = 'none';
+    }
     return;
   }
 
   const now = new Date();
 
-  documentsList.innerHTML = filteredDocuments.map(doc => {
+  // Apply pagination
+  const pageSize = pagination ? pagination.pageSize : 12;
+  const currentPage = pagination ? pagination.currentPage : 1;
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+  const pageDocuments = filteredDocuments.slice(startIndex, endIndex);
+
+  documentsList.innerHTML = pageDocuments.map(doc => {
     const icon = doc.fileName ? storageService.getFileIcon(doc.fileName) : getDocumentIcon(doc.category);
     const fileSize = doc.fileSize ? ` (${storageService.formatFileSize(doc.fileSize)})` : '';
     const escapedName = escapeHtml(doc.name);
@@ -589,6 +636,7 @@ async function handleDelete() {
       
       showToast('Document deleted successfully', 'success');
       hideDeleteModal();
+      allLoadedDocuments = []; // Clear cache to reload fresh data
       await loadDocuments();
     } else {
       showToast(result.error || 'Failed to delete document', 'error');
