@@ -720,11 +720,17 @@ function renderFamilyMembers(members) {
   const familyMembersList = document.getElementById('familyMembersList');
   if (!familyMembersList) return;
   
-  familyMembersList.innerHTML = members.map(member => {
+  const membersHTML = members.map(member => {
     const isEnabled = member.enabled !== false;
+    const isCustom = member.isCustom === true;
     
     return `
       <div class="family-member-item" data-member-id="${member.id}">
+        ${isCustom ? `
+          <button class="family-member-remove" onclick="handleRemoveFamilyMember('${member.id}')" title="Remove">
+            ×
+          </button>
+        ` : ''}
         <div class="family-member-icon">${member.icon}</div>
         <div class="family-member-details">
           <div class="family-member-role">${escapeHtml(member.role)}</div>
@@ -751,7 +757,90 @@ function renderFamilyMembers(members) {
       </div>
     `;
   }).join('');
+  
+  // Add "Add Family Member" card
+  const addCardHTML = `
+    <div class="add-family-member-card" onclick="handleAddFamilyMember()">
+      <div class="add-family-member-icon">+</div>
+      <div class="add-family-member-text">Add Family Member</div>
+    </div>
+  `;
+  
+  familyMembersList.innerHTML = membersHTML + addCardHTML;
 }
+
+async function handleAddFamilyMember() {
+  const name = prompt('Enter family member name:', 'New Member');
+  if (!name || !name.trim()) return;
+  
+  const role = prompt('Enter role (e.g., Uncle, Aunt, Grandparent):', 'Family Member');
+  if (!role || !role.trim()) return;
+  
+  // Icon selection (simple for now)
+  const icons = ['👤', '👨', '👩', '👦', '👧', '👴', '👵', '👶'];
+  const iconChoice = prompt(`Choose icon number (1-${icons.length}):\n${icons.map((icon, i) => `${i+1}. ${icon}`).join('\n')}`, '1');
+  const iconIndex = parseInt(iconChoice) - 1;
+  const icon = icons[iconIndex] || '👤';
+  
+  const saveBtn = document.getElementById('saveFamilyMembersBtn');
+  const originalText = saveBtn.textContent;
+  
+  try {
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Adding...';
+    
+    const result = await familyMembersService.addFamilyMember({
+      name: name.trim(),
+      role: role.trim(),
+      icon: icon
+    });
+    
+    if (result.success) {
+      showToast('Family member added successfully', 'success');
+      await loadFamilyMembers();
+    } else {
+      showToast(result.error || 'Failed to add family member', 'error');
+    }
+  } catch (error) {
+    console.error('Error adding family member:', error);
+    showToast('Failed to add family member', 'error');
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.textContent = originalText;
+  }
+}
+
+async function handleRemoveFamilyMember(memberId) {
+  const confirmed = await confirmationModal.confirmDelete('Remove this family member? This action cannot be undone.');
+  if (!confirmed) return;
+  
+  const saveBtn = document.getElementById('saveFamilyMembersBtn');
+  const originalText = saveBtn.textContent;
+  
+  try {
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Removing...';
+    
+    const result = await familyMembersService.removeFamilyMember(memberId);
+    
+    if (result.success) {
+      showToast('Family member removed successfully', 'success');
+      await loadFamilyMembers();
+    } else {
+      showToast(result.error || 'Failed to remove family member', 'error');
+    }
+  } catch (error) {
+    console.error('Error removing family member:', error);
+    showToast('Failed to remove family member', 'error');
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.textContent = originalText;
+  }
+}
+
+// Expose to window for onclick handlers
+window.handleAddFamilyMember = handleAddFamilyMember;
+window.handleRemoveFamilyMember = handleRemoveFamilyMember;
 
 async function handleSaveFamilyMembers() {
   const saveBtn = document.getElementById('saveFamilyMembersBtn');

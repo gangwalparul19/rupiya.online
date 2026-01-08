@@ -240,6 +240,18 @@ service cloud.firestore {
     }
     
     // ============================================
+    // USER SETTINGS (Family Members, etc.)
+    // ============================================
+    match /userSettings/{userId} {
+      // User settings document ID is the userId itself
+      // Users can only access their own settings
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId);
+    }
+    
+    // ============================================
     // PAYMENT METHODS
     // ============================================
     match /paymentMethods/{methodId} {

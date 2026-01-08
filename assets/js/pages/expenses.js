@@ -7,6 +7,7 @@ import paymentMethodsService from '../services/payment-methods-service.js';
 import smartCategorizationService from '../services/smart-categorization-service.js';
 import familySwitcher from '../components/family-switcher.js';
 import familyMembersService from '../services/family-members-service.js';
+import encryptionService from '../services/encryption-service.js';
 import toast from '../components/toast.js';
 import confirmationModal from '../components/confirmation-modal.js';
 import themeManager from '../utils/theme-manager.js';
@@ -469,7 +470,7 @@ function updateCounts() {
 }
 
 // Render expenses
-function renderExpenses() {
+async function renderExpenses() {
   loadingState.style.display = 'none';
   
   if (state.filteredExpenses.length === 0) {
@@ -490,8 +491,9 @@ function renderExpenses() {
   const endIndex = startIndex + state.itemsPerPage;
   const pageExpenses = state.filteredExpenses.slice(startIndex, endIndex);
   
-  // Render expense cards
-  expensesList.innerHTML = pageExpenses.map(expense => createExpenseCard(expense)).join('');
+  // Render expense cards (async to handle decryption)
+  const cardsHTML = await Promise.all(pageExpenses.map(expense => createExpenseCard(expense)));
+  expensesList.innerHTML = cardsHTML.join('');
   
   // Render pagination using the component
   if (pagination) {
@@ -503,7 +505,7 @@ function renderExpenses() {
 }
 
 // Create expense card HTML
-function createExpenseCard(expense) {
+async function createExpenseCard(expense) {
   const date = timezoneService.toLocalDate(expense.date);
   const categoryIcon = categoryIcons[expense.category] || '📦';
   const isRecurring = expense.isRecurring || expense.recurringId;
@@ -511,22 +513,37 @@ function createExpenseCard(expense) {
   const isTripExpense = expense.tripGroupId && expense.tripGroupExpenseId;
   const hasSplit = expense.hasSplit && expense.splitDetails && expense.splitDetails.length > 0;
   
-  // Build split details HTML if available
+  // Build split details HTML if available (decrypt member names)
   let splitDetailsHTML = '';
   if (hasSplit) {
-    splitDetailsHTML = `
-      <div class="expense-split-details">
-        <div class="expense-split-header">💰 Split by member:</div>
-        <div class="expense-split-list">
-          ${expense.splitDetails.map(split => `
-            <div class="expense-split-item">
-              <span class="split-member">${escapeHtml(split.memberName)}</span>
-              <span class="split-amount">${formatCurrency(split.amount)}</span>
-            </div>
-          `).join('')}
+    try {
+      const decryptedSplits = await Promise.all(expense.splitDetails.map(async (split) => {
+        const memberName = await encryptionService.decrypt(split.memberName);
+        return { ...split, memberName };
+      }));
+      
+      splitDetailsHTML = `
+        <div class="expense-split-details">
+          <div class="expense-split-header">💰 Split by member:</div>
+          <div class="expense-split-list">
+            ${decryptedSplits.map(split => `
+              <div class="expense-split-item">
+                <span class="split-member">${escapeHtml(split.memberName)}</span>
+                <span class="split-amount">${formatCurrency(split.amount)}</span>
+              </div>
+            `).join('')}
+          </div>
         </div>
-      </div>
-    `;
+      `;
+    } catch (error) {
+      console.error('Error decrypting split details:', error);
+      // Fallback to showing without decryption
+      splitDetailsHTML = `
+        <div class="expense-split-details">
+          <div class="expense-split-header">💰 Split by member</div>
+        </div>
+      `;
+    }
   }
   
   return `
@@ -1428,10 +1445,18 @@ async function handleFormSubmit(e) {
       expenseData.familyGroupId = context.groupId;
     }
     
-    // Add split details if enabled
+    // Add split details if enabled (encrypt member names)
     const splitDetails = getSplitDetailsData();
     if (splitDetails) {
-      expenseData.splitDetails = splitDetails;
+      // Encrypt member names in split details
+      const encryptedSplitDetails = await Promise.all(splitDetails.map(async (split) => {
+        return {
+          ...split,
+          memberName: await encryptionService.encrypt(split.memberName)
+        };
+      }));
+      
+      expenseData.splitDetails = encryptedSplitDetails;
       expenseData.hasSplit = true;
     }
     

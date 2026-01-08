@@ -1456,22 +1456,23 @@ ul li {
 }
 
 .family-members-list {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
   margin-bottom: 1.5rem;
 }
 
 .family-member-item {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
   padding: 1rem;
   background: var(--bg-secondary);
   border: 2px solid var(--border-color);
   border-radius: var(--border-radius);
   transition: all 0.3s ease;
+  position: relative;
 }
 
 .family-member-item:hover {
@@ -1479,16 +1480,45 @@ ul li {
   box-shadow: 0 2px 8px rgba(74, 144, 226, 0.1);
 }
 
+.family-member-remove {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--accent-red);
+  color: var(--white);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  line-height: 1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.family-member-item:hover .family-member-remove {
+  opacity: 1;
+}
+
+.family-member-remove:hover {
+  background: #c0392b;
+  transform: scale(1.1);
+}
+
 .family-member-icon {
-  width: 50px;
-  height: 50px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--primary-blue) 0%, var(--accent-cyan) 100%);
   color: var(--white);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
+  font-size: 1.75rem;
   flex-shrink: 0;
 }
 
@@ -1496,11 +1526,12 @@ ul li {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  min-width: 0;
+  width: 100%;
+  text-align: center;
 }
 
 .family-member-role {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 600;
   color: var(--text-secondary);
   text-transform: uppercase;
@@ -1509,12 +1540,12 @@ ul li {
 
 .family-member-name-input {
   width: 100%;
-  max-width: 300px;
   padding: 0.5rem 0.75rem;
   border: 2px solid var(--border-color);
   border-radius: var(--border-radius);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 500;
+  text-align: center;
   transition: all 0.3s ease;
 }
 
@@ -1527,7 +1558,9 @@ ul li {
 .family-member-toggle {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
+  width: 100%;
 }
 
 .family-member-toggle label {
@@ -1535,14 +1568,14 @@ ul li {
   align-items: center;
   gap: 0.5rem;
   cursor: pointer;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: var(--text-secondary);
   user-select: none;
 }
 
 .family-member-toggle input[type="checkbox"] {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   cursor: pointer;
   margin: 0;
 }
@@ -1550,6 +1583,50 @@ ul li {
 .family-member-toggle input[type="checkbox"]:checked + span {
   color: var(--primary-blue);
   font-weight: 600;
+}
+
+.add-family-member-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: var(--bg-secondary);
+  border: 2px dashed var(--border-color);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-height: 200px;
+}
+
+.add-family-member-card:hover {
+  border-color: var(--primary-blue);
+  background: rgba(74, 144, 226, 0.05);
+}
+
+.add-family-member-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--primary-blue);
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  transition: all 0.3s ease;
+}
+
+.add-family-member-card:hover .add-family-member-icon {
+  transform: scale(1.1);
+}
+
+.add-family-member-text {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: center;
 }
 
 /* Dark mode support */
@@ -1600,27 +1677,50 @@ ul li {
 
 /* Mobile responsive */
 @media (max-width: 768px) {
-  .family-member-item {
-    grid-template-columns: auto 1fr;
+  .family-members-list {
+    grid-template-columns: repeat(2, 1fr);
     gap: 0.75rem;
+  }
+  
+  .family-member-item {
     padding: 0.75rem;
   }
   
   .family-member-icon {
-    width: 40px;
-    height: 40px;
-    font-size: 1.25rem;
-  }
-  
-  .family-member-toggle {
-    grid-column: 1 / -1;
-    justify-content: flex-start;
-    padding-top: 0.5rem;
-    border-top: 1px solid var(--border-color);
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
   }
   
   .family-member-name-input {
-    max-width: 100%;
+    font-size: 0.8rem;
+    padding: 0.4rem 0.6rem;
+  }
+  
+  .family-member-role {
+    font-size: 0.65rem;
+  }
+  
+  .family-member-toggle label {
+    font-size: 0.75rem;
+  }
+  
+  .family-member-toggle input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .add-family-member-card {
+    min-height: 180px;
+  }
+  
+  .add-family-member-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 1.75rem;
+  }
+  
+  .add-family-member-text {
     font-size: 0.85rem;
   }
   
@@ -1636,22 +1736,41 @@ ul li {
 }
 
 @media (max-width: 480px) {
+  .family-members-list {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+  
   .family-member-item {
     padding: 0.5rem;
   }
   
   .family-member-icon {
-    width: 36px;
-    height: 36px;
-    font-size: 1.1rem;
+    width: 45px;
+    height: 45px;
+    font-size: 1.3rem;
   }
   
   .family-member-role {
-    font-size: 0.7rem;
+    font-size: 0.6rem;
   }
   
   .family-member-name-input {
-    padding: 0.4rem 0.6rem;
+    padding: 0.35rem 0.5rem;
+    font-size: 0.75rem;
+  }
+  
+  .add-family-member-card {
+    min-height: 160px;
+  }
+  
+  .add-family-member-icon {
+    width: 45px;
+    height: 45px;
+    font-size: 1.5rem;
+  }
+  
+  .add-family-member-text {
     font-size: 0.8rem;
   }
 }
