@@ -269,7 +269,7 @@ If you didn't expect this invitation, you can safely ignore this email.
     const info = await transporter.sendMail({
       from: `"Rupiya" <${gmailUser}>`,
       to: invitedEmail,
-      subject: `You're invited to join ${safeGroupName} on Rupiya`,
+      subject: `You're invited to join ${groupName} on Rupiya`,
       text: textContent,
       html: htmlContent
     });

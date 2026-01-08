@@ -15,6 +15,7 @@ export const privacyConfig = {
     'userId',
     'createdBy',
     'invitedBy',
+    'invitedEmail',
     'createdAt',
     'updatedAt',
     'date',
@@ -116,7 +117,7 @@ export const privacyConfig = {
     tripGroupSettlements: ['amount', 'notes'],
     tripGroupMembers: ['name', 'email', 'phone'],  // Member personal information
     familyGroups: ['name', 'members', 'settings'],  // Group name, member info (names/emails), and settings
-    familyInvitations: ['invitedEmail', 'invitedByName', 'groupName']  // Invitation details
+    familyInvitations: ['invitedByName', 'groupName']  // Invitation details (invitedEmail kept unencrypted for queries)
   }
 };
 
