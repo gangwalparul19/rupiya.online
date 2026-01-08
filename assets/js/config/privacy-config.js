@@ -90,7 +90,7 @@ export const privacyConfig = {
     houseHelps: ['name', 'phone', 'monthlySalary', 'notes', 'address'],
     houseHelpPayments: ['amount', 'notes'],
     fuelLogs: ['fuelPrice', 'totalCost', 'fuelStation', 'notes', 'odometer', 'quantity'],
-    splits: ['amount', 'description', 'notes'],
+    splits: ['amount', 'description', 'notes', 'participants', 'paidBy', 'paidByName'],
     categories: ['name', 'description'],
     wallets: ['name', 'balance', 'notes'],
     paymentMethods: [

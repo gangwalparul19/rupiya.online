@@ -2,6 +2,7 @@
 import { db, auth } from '../config/firebase-config.js';
 import { collection, getDocs, query, where, orderBy, Timestamp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
 import firestoreService from './firestore-service.js';
+import encryptionService from './encryption-service.js';
 
 class SplitService {
   constructor() {
@@ -60,8 +61,8 @@ class SplitService {
       
       for (const docSnap of querySnapshot.docs) {
         const data = docSnap.data();
-        // Decrypt the data using firestoreService
-        const decryptedData = await firestoreService.decryptData(data, this.collectionName);
+        // Decrypt the data using encryptionService
+        const decryptedData = await encryptionService.decryptObject(data, this.collectionName);
         splits.push({ id: docSnap.id, ...decryptedData });
       }
 

@@ -340,7 +340,11 @@ class EncryptionService {
       for (const field of sensitiveFields) {
         if (data[field] !== undefined && data[field] !== null && data[field] !== '') {
           try {
-            encryptedFields[field] = await this.encryptValue(data[field]);
+            // Handle objects and arrays by converting to JSON string first
+            const valueToEncrypt = typeof data[field] === 'object' 
+              ? JSON.stringify(data[field]) 
+              : data[field];
+            encryptedFields[field] = await this.encryptValue(valueToEncrypt);
             delete encryptedData[field];
           } catch (fieldError) {
             log.error(`Failed to encrypt field ${field}:`, fieldError);
