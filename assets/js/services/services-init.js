@@ -2,6 +2,10 @@
  * Services Initialization
  * This file initializes all services and sets up their dependencies
  * Import this file in your main app files to ensure proper initialization
+ * 
+ * ENCRYPTION CROSS-DEVICE SYNC:
+ * - Google users: Fully automatic - deterministic key derived from userId
+ * - Email/password users: Encrypted key stored in Firestore, decrypted on login
  */
 
 import authService from './auth-service.js';
@@ -35,34 +39,46 @@ authService.onAuthStateChanged(async (user) => {
         }
       }
       
-      // Initialize encryption for Google users automatically
-      // For email/password users, encryption is initialized during login
-      if (authEncryptionHelper.isGoogleUser()) {
-        const encryptionStatus = encryptionService.getStatus();
-        if (encryptionStatus.enabled && !encryptionStatus.ready) {
-          log.log('🔐 Initializing encryption for Google user...');
+      // Wait for any session restoration to complete first
+      await encryptionService.waitForRestore();
+      
+      // Check current encryption status
+      const encryptionStatus = encryptionService.getStatus();
+      
+      if (encryptionStatus.enabled && !encryptionStatus.ready) {
+        // Encryption not ready - initialize based on user type
+        if (authEncryptionHelper.isGoogleUser()) {
+          // Google users: Fully automatic initialization
+          log.log('🔐 Initializing encryption for Google user (automatic cross-device sync)...');
           const success = await authEncryptionHelper.initializeForGoogleUser(user.uid);
           if (success) {
-            log.log('✅ Encryption initialized for Google user');
+            log.log('✅ Encryption initialized for Google user - same key on all devices');
           } else {
             log.warn('⚠️ Failed to initialize encryption for Google user');
           }
-        } else if (encryptionStatus.ready) {
-          log.log('✅ Encryption already ready for Google user');
+        } else {
+          // Email/password user - check if we need re-authentication
+          // On fresh login, encryption is initialized in auth-service with the password
+          // On page refresh, we try to restore from session first
+          const needsReauth = await authEncryptionHelper.needsReinitialization();
+          if (needsReauth) {
+            log.log('🔐 Email/password user session expired - password needed for encryption');
+            // Dispatch event for UI to show re-auth prompt
+            authEncryptionHelper.showReauthPrompt();
+          }
         }
-      } else {
-        // Email/password user - check if encryption needs re-initialization
-        const needsReauth = await authEncryptionHelper.needsReinitialization();
-        if (needsReauth) {
-          log.log('🔐 Email/password user needs to re-enter password for encryption');
-          // The UI will handle showing the re-auth prompt when needed
-        }
+      } else if (encryptionStatus.ready) {
+        log.log('✅ Encryption already ready (restored from session)');
       }
       
-      // Check final encryption status
+      // Log final encryption status
       const finalStatus = encryptionService.getStatus();
-      if (finalStatus.enabled && !finalStatus.ready) {
-        log.log('🔐 Encryption enabled but not ready - user may need to re-authenticate');
+      if (finalStatus.enabled) {
+        if (finalStatus.ready) {
+          log.log('🔐 Encryption: READY - data is encrypted/decrypted automatically');
+        } else {
+          log.log('🔐 Encryption: PENDING - waiting for user authentication');
+        }
       }
     } catch (error) {
       log.error('❌ Error initializing user profile:', error);

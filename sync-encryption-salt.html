@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sync Encryption Salt - Rupiya</title>
+    <title>Encryption Status - Rupiya</title>
     <!-- Inject Firebase config directly for this utility page -->
     <script>
         window.__ENV__ = {
@@ -28,6 +28,7 @@
         .btn-success { background: #27ae60; color: white; }
         .btn-warning { background: #f39c12; color: white; }
         .btn-info { background: #17a2b8; color: white; }
+        .btn-danger { background: #e74c3c; color: white; }
         .alert { padding: 15px; border-radius: 8px; margin-bottom: 15px; }
         .alert-info { background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; }
         .alert-success { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
@@ -39,52 +40,102 @@
         .log-entry.info { background: #e3f2fd; color: #1565c0; }
         .log-entry.warn { background: #fff3e0; color: #e65100; }
         #logContainer { max-height: 300px; overflow-y: auto; background: white; border: 1px solid #ddd; border-radius: 8px; }
-        .salt-display { font-family: monospace; background: #f5f5f5; padding: 10px; border-radius: 6px; word-break: break-all; font-size: 12px; margin-top: 10px; }
+        .status-item { display: flex; align-items: center; padding: 10px; border-bottom: 1px solid #eee; }
+        .status-item:last-child { border-bottom: none; }
+        .status-icon { font-size: 20px; margin-right: 12px; }
+        .status-label { flex: 1; }
+        .status-value { font-weight: 600; }
+        .status-value.ready { color: #27ae60; }
+        .status-value.pending { color: #f39c12; }
+        .status-value.error { color: #e74c3c; }
         .text-muted { color: #7f8c8d; font-size: 13px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 500; }
+        .form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🔐 Sync Encryption Salt</h1>
+        <h1>🔐 Encryption Status & Migration</h1>
         
         <div class="alert alert-info">
-            <strong>What this does:</strong> This tool syncs your encryption salt to Firestore so all your devices 
-            can decrypt your data. Run this on the device where your data is currently readable (your laptop).
+            <strong>New Automatic Cross-Device Encryption!</strong><br>
+            Rupiya now automatically syncs encryption across all your devices. No manual sync needed!
+            <ul style="margin: 10px 0 0 0; padding-left: 20px;">
+                <li><strong>Google users:</strong> Encryption works automatically on any device</li>
+                <li><strong>Email/password users:</strong> Just login with your password - encryption syncs automatically</li>
+            </ul>
         </div>
 
         <div id="envError" class="alert alert-error" style="display:none;">
-            <strong>⚠️ Configuration Error:</strong> Firebase environment variables not found. 
-            Please make sure the app is properly deployed.
+            <strong>⚠️ Configuration Error:</strong> Firebase environment variables not found.
         </div>
 
         <div class="card">
-            <div class="card-header">Step 1: Login</div>
+            <div class="card-header">Authentication Status</div>
             <p id="authStatus">Checking authentication...</p>
             <button id="loginBtn" class="btn btn-primary" style="display:none;">Login with Google</button>
         </div>
 
         <div class="card">
-            <div class="card-header">Step 2: Check Local Salt</div>
-            <button id="checkLocalBtn" class="btn btn-info" disabled>Check Local Salt</button>
-            <div id="localSaltInfo"></div>
+            <div class="card-header">Encryption Status</div>
+            <div id="encryptionStatus">
+                <div class="status-item">
+                    <span class="status-icon">🔒</span>
+                    <span class="status-label">Encryption Enabled</span>
+                    <span class="status-value" id="statusEnabled">Checking...</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-icon">✅</span>
+                    <span class="status-label">Encryption Ready</span>
+                    <span class="status-value" id="statusReady">Checking...</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-icon">👤</span>
+                    <span class="status-label">User Type</span>
+                    <span class="status-value" id="statusUserType">Checking...</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-icon">🌐</span>
+                    <span class="status-label">Cross-Device Sync</span>
+                    <span class="status-value" id="statusCrossDevice">Checking...</span>
+                </div>
+            </div>
+            <button id="refreshStatusBtn" class="btn btn-info" disabled>Refresh Status</button>
+        </div>
+
+        <div class="card" id="passwordReauthCard" style="display:none;">
+            <div class="card-header">Re-authenticate for Encryption</div>
+            <p class="text-muted">Your session has expired. Please enter your password to restore encryption.</p>
+            <div class="form-group">
+                <label for="reauthPassword">Password</label>
+                <input type="password" id="reauthPassword" placeholder="Enter your password">
+            </div>
+            <button id="reauthBtn" class="btn btn-primary">Restore Encryption</button>
+        </div>
+
+        <div class="card" id="migrationCard" style="display:none;">
+            <div class="card-header">⚠️ Legacy Data Migration</div>
+            <div class="alert alert-warning">
+                <strong>Migration Required:</strong> Your account has data encrypted with an older system.
+                This data needs to be migrated to the new cross-device encryption system.
+            </div>
+            <p class="text-muted">
+                The migration process will:
+                <ol>
+                    <li>Decrypt your existing data with the old key</li>
+                    <li>Re-encrypt it with the new cross-device compatible key</li>
+                </ol>
+                <strong>Note:</strong> This is a one-time process and may take a few minutes depending on how much data you have.
+            </p>
+            <button id="startMigrationBtn" class="btn btn-warning">Start Migration</button>
         </div>
 
         <div class="card">
-            <div class="card-header">Step 3: Check Firestore Salt</div>
-            <button id="checkFirestoreBtn" class="btn btn-info" disabled>Check Firestore Salt</button>
-            <div id="firestoreSaltInfo"></div>
-        </div>
-
-        <div class="card">
-            <div class="card-header">Step 4: Sync Salt to Firestore</div>
-            <button id="syncBtn" class="btn btn-success" disabled>Upload Local Salt to Firestore</button>
-            <p class="text-muted">This will upload your local salt to Firestore so other devices can use it.</p>
-        </div>
-
-        <div class="card">
-            <div class="card-header">Step 5: Pull Salt from Firestore (for other devices)</div>
-            <button id="pullBtn" class="btn btn-warning" disabled>Pull Salt from Firestore</button>
-            <p class="text-muted">Run this on devices that can't decrypt data. It will replace local salt with Firestore salt.</p>
+            <div class="card-header">Test Encryption</div>
+            <p class="text-muted">Test that encryption is working correctly.</p>
+            <button id="testEncryptionBtn" class="btn btn-success" disabled>Run Encryption Test</button>
+            <div id="testResult" style="margin-top: 15px;"></div>
         </div>
 
         <div class="card">
@@ -96,12 +147,11 @@
     <script type="module">
         import { auth, db } from './assets/js/config/firebase-config.js';
         import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
-        import { doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+        import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+        import encryptionService from './assets/js/services/encryption-service.js';
+        import authEncryptionHelper from './assets/js/utils/auth-encryption-helper.js';
 
-        const SALT_KEY = 'rupiya_encryption_salt';
         let currentUser = null;
-        let localSalt = null;
-        let firestoreSalt = null;
 
         function log(message, type = 'info') {
             const container = document.getElementById('logContainer');
@@ -112,28 +162,75 @@
             container.scrollTop = container.scrollHeight;
         }
 
-        // Check if Firebase is properly configured
-        if (!window.__ENV__ || !window.__ENV__.VITE_FIREBASE_API_KEY) {
-            document.getElementById('envError').style.display = 'block';
-            log('Firebase configuration not found!', 'error');
+        function updateStatus(id, value, className) {
+            const el = document.getElementById(id);
+            el.textContent = value;
+            el.className = `status-value ${className}`;
+        }
+
+        async function refreshEncryptionStatus() {
+            if (!currentUser) return;
+            
+            log('Refreshing encryption status...', 'info');
+            
+            // Wait for any pending restoration
+            await encryptionService.waitForRestore();
+            
+            const status = encryptionService.getStatus();
+            const isGoogle = authEncryptionHelper.isGoogleUser();
+            
+            updateStatus('statusEnabled', status.enabled ? 'Yes' : 'No', status.enabled ? 'ready' : 'error');
+            updateStatus('statusReady', status.ready ? 'Yes' : 'No', status.ready ? 'ready' : 'pending');
+            updateStatus('statusUserType', isGoogle ? 'Google' : 'Email/Password', 'ready');
+            updateStatus('statusCrossDevice', 'Enabled (Automatic)', 'ready');
+            
+            // Show password re-auth card if needed for email/password users
+            if (!status.ready && !isGoogle) {
+                document.getElementById('passwordReauthCard').style.display = 'block';
+                log('Password required to restore encryption', 'warn');
+            } else {
+                document.getElementById('passwordReauthCard').style.display = 'none';
+            }
+            
+            // Check for legacy migration
+            const migrationStatus = await encryptionService.migrateFromLegacyEncryption(currentUser.uid);
+            if (migrationStatus.needsMigration) {
+                document.getElementById('migrationCard').style.display = 'block';
+                log('Legacy encryption data detected - migration available', 'warn');
+            }
+            
+            document.getElementById('testEncryptionBtn').disabled = !status.ready;
+            
+            if (status.ready) {
+                log('Encryption is ready!', 'success');
+            }
         }
 
         // Auth state
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
             currentUser = user;
             if (user) {
                 document.getElementById('authStatus').innerHTML = `✅ Logged in as: <strong>${user.email}</strong><br><small>UID: ${user.uid}</small>`;
                 document.getElementById('loginBtn').style.display = 'none';
-                document.getElementById('checkLocalBtn').disabled = false;
-                document.getElementById('checkFirestoreBtn').disabled = false;
+                document.getElementById('refreshStatusBtn').disabled = false;
                 log(`Authenticated as ${user.email}`, 'success');
+                
+                // Initialize encryption for Google users automatically
+                if (authEncryptionHelper.isGoogleUser()) {
+                    log('Google user detected - initializing encryption...', 'info');
+                    await authEncryptionHelper.initializeForGoogleUser(user.uid);
+                }
+                
+                await refreshEncryptionStatus();
             } else {
                 document.getElementById('authStatus').textContent = '❌ Not logged in';
                 document.getElementById('loginBtn').style.display = 'inline-block';
-                document.getElementById('checkLocalBtn').disabled = true;
-                document.getElementById('checkFirestoreBtn').disabled = true;
-                document.getElementById('syncBtn').disabled = true;
-                document.getElementById('pullBtn').disabled = true;
+                document.getElementById('refreshStatusBtn').disabled = true;
+                document.getElementById('testEncryptionBtn').disabled = true;
+                updateStatus('statusEnabled', 'N/A', 'pending');
+                updateStatus('statusReady', 'N/A', 'pending');
+                updateStatus('statusUserType', 'N/A', 'pending');
+                updateStatus('statusCrossDevice', 'N/A', 'pending');
             }
         });
 
@@ -147,138 +244,73 @@
             }
         });
 
-        // Check local salt
-        document.getElementById('checkLocalBtn').addEventListener('click', () => {
-            const saltKey = `${SALT_KEY}_${currentUser.uid}`;
-            localSalt = localStorage.getItem(saltKey);
+        // Refresh status
+        document.getElementById('refreshStatusBtn').addEventListener('click', refreshEncryptionStatus);
+
+        // Re-authenticate with password
+        document.getElementById('reauthBtn').addEventListener('click', async () => {
+            const password = document.getElementById('reauthPassword').value;
+            if (!password) {
+                log('Please enter your password', 'error');
+                return;
+            }
             
-            const infoDiv = document.getElementById('localSaltInfo');
-            if (localSalt) {
-                infoDiv.innerHTML = `
-                    <div class="alert alert-success">
-                        <strong>✅ Local salt found:</strong>
-                        <div class="salt-display">${localSalt}</div>
-                    </div>
-                `;
-                document.getElementById('syncBtn').disabled = false;
-                log('Local salt found', 'success');
+            log('Initializing encryption with password...', 'info');
+            const success = await authEncryptionHelper.initializeAfterLogin(password, currentUser.uid);
+            
+            if (success) {
+                log('Encryption restored successfully!', 'success');
+                document.getElementById('reauthPassword').value = '';
+                await refreshEncryptionStatus();
             } else {
-                infoDiv.innerHTML = `
-                    <div class="alert alert-warning">
-                        <strong>⚠️ No local salt found</strong><br>
-                        This device doesn't have an encryption salt. You may need to pull from Firestore.
-                    </div>
-                `;
-                log('No local salt found', 'warn');
+                log('Failed to restore encryption - check your password', 'error');
             }
         });
 
-        // Check Firestore salt
-        document.getElementById('checkFirestoreBtn').addEventListener('click', async () => {
+        // Test encryption
+        document.getElementById('testEncryptionBtn').addEventListener('click', async () => {
+            const resultDiv = document.getElementById('testResult');
+            resultDiv.innerHTML = '<p>Testing encryption...</p>';
+            
             try {
-                log('Checking Firestore for salt...', 'info');
-                const saltRef = doc(db, 'userEncryption', currentUser.uid);
-                const saltDoc = await getDoc(saltRef);
+                const testData = 'Hello, this is a test message! 🔐 ' + new Date().toISOString();
+                log(`Original: ${testData}`, 'info');
                 
-                const infoDiv = document.getElementById('firestoreSaltInfo');
-                if (saltDoc.exists() && saltDoc.data().salt) {
-                    firestoreSalt = saltDoc.data().salt;
-                    infoDiv.innerHTML = `
+                const encrypted = await encryptionService.encryptValue(testData);
+                log(`Encrypted: ${encrypted.substring(0, 50)}...`, 'info');
+                
+                const decrypted = await encryptionService.decryptValue(encrypted);
+                log(`Decrypted: ${decrypted}`, 'info');
+                
+                if (decrypted === testData) {
+                    resultDiv.innerHTML = `
                         <div class="alert alert-success">
-                            <strong>✅ Firestore salt found:</strong>
-                            <div class="salt-display">${firestoreSalt}</div>
-                            <small class="text-muted">Created: ${saltDoc.data().createdAt || 'Unknown'}</small>
+                            <strong>✅ Encryption Test Passed!</strong><br>
+                            Data was successfully encrypted and decrypted.
                         </div>
                     `;
-                    document.getElementById('pullBtn').disabled = false;
-                    log('Firestore salt found', 'success');
-                    
-                    // Check if they match
-                    if (localSalt && localSalt === firestoreSalt) {
-                        log('✅ Local and Firestore salts match!', 'success');
-                    } else if (localSalt) {
-                        log('⚠️ Local and Firestore salts are DIFFERENT!', 'warn');
-                    }
+                    log('Encryption test PASSED!', 'success');
                 } else {
-                    infoDiv.innerHTML = `
-                        <div class="alert alert-warning">
-                            <strong>⚠️ No Firestore salt found</strong><br>
-                            You need to upload your local salt to Firestore first.
-                        </div>
-                    `;
-                    log('No Firestore salt found', 'warn');
+                    throw new Error('Decrypted data does not match original');
                 }
             } catch (error) {
-                log(`Error checking Firestore: ${error.message}`, 'error');
-                console.error(error);
-            }
-        });
-
-        // Sync local salt to Firestore
-        document.getElementById('syncBtn').addEventListener('click', async () => {
-            if (!localSalt) {
-                log('No local salt to sync', 'error');
-                return;
-            }
-            
-            try {
-                log('Uploading salt to Firestore...', 'info');
-                const saltRef = doc(db, 'userEncryption', currentUser.uid);
-                await setDoc(saltRef, {
-                    salt: localSalt,
-                    createdAt: new Date().toISOString(),
-                    updatedAt: new Date().toISOString(),
-                    version: 1,
-                    source: 'manual_sync'
-                });
-                
-                log('✅ Salt uploaded to Firestore successfully!', 'success');
-                log('Now run "Pull Salt from Firestore" on your other devices', 'info');
-                
-                // Refresh Firestore check
-                document.getElementById('checkFirestoreBtn').click();
-            } catch (error) {
-                log(`Error syncing to Firestore: ${error.message}`, 'error');
-                console.error(error);
-            }
-        });
-
-        // Pull salt from Firestore
-        document.getElementById('pullBtn').addEventListener('click', async () => {
-            if (!firestoreSalt) {
-                log('No Firestore salt to pull. Check Firestore first.', 'error');
-                return;
-            }
-            
-            if (!confirm('This will replace your local salt with the Firestore salt. Continue?')) {
-                return;
-            }
-            
-            try {
-                const saltKey = `${SALT_KEY}_${currentUser.uid}`;
-                localStorage.setItem(saltKey, firestoreSalt);
-                
-                // Also clear session storage to force re-initialization
-                sessionStorage.removeItem('rupiya_session_key');
-                
-                log('✅ Salt pulled from Firestore and saved locally!', 'success');
-                log('Please refresh the page and try accessing your data again.', 'info');
-                
-                // Update local salt display
-                localSalt = firestoreSalt;
-                document.getElementById('localSaltInfo').innerHTML = `
-                    <div class="alert alert-success">
-                        <strong>✅ Local salt updated:</strong>
-                        <div class="salt-display">${localSalt}</div>
+                resultDiv.innerHTML = `
+                    <div class="alert alert-error">
+                        <strong>❌ Encryption Test Failed</strong><br>
+                        ${error.message}
                     </div>
                 `;
-            } catch (error) {
-                log(`Error pulling salt: ${error.message}`, 'error');
-                console.error(error);
+                log(`Encryption test FAILED: ${error.message}`, 'error');
             }
         });
 
-        log('Page loaded. Please login to continue.', 'info');
+        // Migration (placeholder - actual migration would need more work)
+        document.getElementById('startMigrationBtn').addEventListener('click', async () => {
+            log('Migration feature coming soon...', 'warn');
+            alert('Migration feature is coming soon. For now, you may need to re-enter your data if you have issues with old encrypted data.');
+        });
+
+        log('Page loaded. Please login to check encryption status.', 'info');
     </script>
 </body>
 </html>

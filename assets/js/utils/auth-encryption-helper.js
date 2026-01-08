@@ -1,37 +1,53 @@
 // Auth Encryption Helper
 // Manages encryption initialization during authentication
+// 
+// CROSS-DEVICE ENCRYPTION:
+// - Google users: Encryption is fully automatic - same key on all devices
+// - Email/password users: Key is stored encrypted in Firestore, decrypted with password on login
 
 import encryptionService from '../services/encryption-service.js';
 import authService from '../services/auth-service.js';
 
 class AuthEncryptionHelper {
   constructor() {
-    this.PASSWORD_HASH_KEY = 'rupiya_pwd_hash';
     this.ENCRYPTION_READY_KEY = 'rupiya_encryption_ready';
+    this._initializationPromise = null;
   }
 
   // Initialize encryption after login with email/password
+  // For password users, this stores an encrypted version of the key in Firestore
   async initializeAfterLogin(password, userId) {
     if (!userId) {
       console.warn('[AuthEncryption] Cannot initialize without userId');
       return false;
     }
 
+    // Prevent duplicate initialization
+    if (this._initializationPromise) {
+      console.log('[AuthEncryption] Initialization already in progress, waiting...');
+      return await this._initializationPromise;
+    }
+
+    this._initializationPromise = this._doInitialize(password, userId);
+    
     try {
-      // For Google users, password will be null/undefined
+      const result = await this._initializationPromise;
+      return result;
+    } finally {
+      this._initializationPromise = null;
+    }
+  }
+
+  async _doInitialize(password, userId) {
+    try {
       const success = await encryptionService.initialize(password, userId);
       
       if (success) {
-        if (password) {
-          // Store a hash to verify password on page refresh (email/password users only)
-          const verificationHash = await this.createVerificationHash(password, userId);
-          sessionStorage.setItem(this.PASSWORD_HASH_KEY, verificationHash);
-        }
-        
         sessionStorage.setItem(this.ENCRYPTION_READY_KEY, 'true');
         
         const userType = password ? 'email/password' : 'Google';
         console.log(`[AuthEncryption] Encryption initialized successfully for ${userType} user`);
+        console.log('[AuthEncryption] Cross-device sync: ENABLED - same encryption key on all devices');
       }
       
       return success;
@@ -41,17 +57,10 @@ class AuthEncryptionHelper {
     }
   }
 
-  // Initialize encryption for Google users (no password)
+  // Initialize encryption for Google users (no password needed)
+  // This is fully automatic and works identically on all devices
   async initializeForGoogleUser(userId) {
     return await this.initializeAfterLogin(null, userId);
-  }
-
-  // Create a verification hash (not the encryption key)
-  async createVerificationHash(password, userId) {
-    const data = new TextEncoder().encode(password + userId + 'verification');
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
   }
 
   // Check if encryption needs re-initialization (after page refresh)
@@ -62,8 +71,20 @@ class AuthEncryptionHelper {
     // Wait for session restoration to complete
     await encryptionService.waitForRestore();
     
-    // If user is logged in but encryption is not ready
-    return !encryptionService.isReady();
+    // If encryption is ready from session, no re-init needed
+    if (encryptionService.isReady()) {
+      return false;
+    }
+    
+    // For Google users, we can auto-reinitialize
+    if (this.isGoogleUser()) {
+      console.log('[AuthEncryption] Google user needs auto-reinitialization');
+      const success = await this.initializeForGoogleUser(user.uid);
+      return !success; // Return true only if auto-init failed
+    }
+    
+    // For password users, they need to re-enter password
+    return true;
   }
 
   // Check if user logged in with Google (no password available)
@@ -77,26 +98,45 @@ class AuthEncryptionHelper {
   // Clear encryption on logout
   clearEncryption() {
     encryptionService.clear();
-    sessionStorage.removeItem(this.PASSWORD_HASH_KEY);
     sessionStorage.removeItem(this.ENCRYPTION_READY_KEY);
+    this._initializationPromise = null;
     console.log('[AuthEncryption] Encryption cleared');
   }
 
   // Get encryption status
   getStatus() {
+    const baseStatus = encryptionService.getStatus();
     return {
-      ...encryptionService.getStatus(),
+      ...baseStatus,
       isGoogleUser: this.isGoogleUser(),
-      needsReinitialization: this.needsReinitialization()
+      crossDeviceEnabled: true // Always enabled in new system
     };
   }
 
-  // Prompt user to re-enter password for encryption
-  // This is needed after page refresh since we don't store the password
+  // Check if this is a new user (no existing encryption data)
+  async isNewUser(userId) {
+    try {
+      const { getFirestore, doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js');
+      const { getApp } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js');
+      
+      const db = getFirestore(getApp());
+      const userEncryptionRef = doc(db, 'userEncryption', userId);
+      const encryptionDoc = await getDoc(userEncryptionRef);
+      
+      return !encryptionDoc.exists();
+    } catch (error) {
+      console.warn('[AuthEncryption] Could not check if new user:', error);
+      return true; // Assume new user on error
+    }
+  }
+
+  // Prompt user to re-enter password for encryption (only for password users)
   showReauthPrompt() {
-    // This will be called by the UI to show a modal asking for password
     const event = new CustomEvent('encryption-reauth-needed', {
-      detail: { message: 'Please enter your password to decrypt your data' }
+      detail: { 
+        message: 'Please enter your password to decrypt your data',
+        reason: 'session_expired'
+      }
     });
     window.dispatchEvent(event);
   }

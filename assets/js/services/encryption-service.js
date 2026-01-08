@@ -1,5 +1,10 @@
 // Encryption Service - Client-side encryption using Web Crypto API
 // Uses AES-GCM for encryption with PBKDF2 for key derivation
+// 
+// CROSS-DEVICE ENCRYPTION STRATEGY:
+// - Google users: Deterministic key derived from userId (no salt needed, works everywhere)
+// - Email/password users: Key derived from password, with encrypted key backup in Firestore
+//   so the same key can be restored on any device after login
 
 import privacyConfig from '../config/privacy-config.js';
 import logger from '../utils/logger.js';
@@ -9,13 +14,12 @@ const log = logger.create('Encryption');
 class EncryptionService {
   constructor() {
     this.encryptionKey = null;
-    this.salt = null;
     this.isInitialized = false;
-    this.SALT_KEY = 'rupiya_encryption_salt';
     this.SESSION_KEY_STORAGE = 'rupiya_session_key';
     this.PBKDF2_ITERATIONS = 100000;
     this.KEY_LENGTH = 256;
     this._restorePromise = null;
+    this._initializingUserId = null;
     
     // Try to restore encryption key from session storage on construction
     this._restorePromise = this._restoreFromSession();
@@ -33,7 +37,7 @@ class EncryptionService {
     try {
       const sessionData = sessionStorage.getItem(this.SESSION_KEY_STORAGE);
       if (sessionData) {
-        const { keyData, saltBase64, userId } = JSON.parse(sessionData);
+        const { keyData, userId } = JSON.parse(sessionData);
         
         // Import the raw key back
         this.encryptionKey = await crypto.subtle.importKey(
@@ -44,9 +48,8 @@ class EncryptionService {
           ['encrypt', 'decrypt']
         );
         
-        this.salt = Uint8Array.from(atob(saltBase64), c => c.charCodeAt(0));
         this.isInitialized = true;
-        log.log('Restored from session storage');
+        log.log('Restored encryption key from session storage');
       }
     } catch (error) {
       log.warn('Could not restore from session:', error);
@@ -60,59 +63,126 @@ class EncryptionService {
       // Export the key to raw format
       const keyData = await crypto.subtle.exportKey('raw', this.encryptionKey);
       const keyBase64 = btoa(String.fromCharCode(...new Uint8Array(keyData)));
-      const saltBase64 = btoa(String.fromCharCode(...this.salt));
       
       sessionStorage.setItem(this.SESSION_KEY_STORAGE, JSON.stringify({
         keyData: keyBase64,
-        saltBase64,
         userId
       }));
-      log.log('Saved to session storage');
+      log.log('Saved encryption key to session storage');
     } catch (error) {
       log.warn('Could not save to session:', error);
     }
   }
 
-  // Initialize encryption with user's password
+  // Initialize encryption with user's password (or null for Google users)
   async initialize(password, userId) {
     if (!userId) {
       log.warn('Cannot initialize without userId');
       return false;
     }
 
+    // Prevent concurrent initialization for the same user
+    if (this._initializingUserId === userId) {
+      log.log('Already initializing for this user, waiting...');
+      await this.waitForRestore();
+      return this.isReady();
+    }
+
+    this._initializingUserId = userId;
+
     try {
-      // Get or create salt for this user
-      this.salt = await this.getOrCreateSalt(userId);
-      
-      // Derive encryption key from password or generate for Google users
       if (password) {
-        // Email/password login - use password for key derivation
-        this.encryptionKey = await this.deriveKey(password, this.salt);
+        // Email/password login - derive key from password and sync to Firestore
+        this.encryptionKey = await this._initializeForPasswordUser(password, userId);
       } else {
-        // Google login - generate key from user data
-        this.encryptionKey = await this.generateKeyForGoogleUser(userId, this.salt);
+        // Google login - use deterministic key derivation (no sync needed)
+        this.encryptionKey = await this._generateDeterministicKey(userId);
       }
       
       this.isInitialized = true;
+      this._initializingUserId = null;
       
       // Save to session storage for persistence across page loads
       await this._saveToSession(userId);
       
-      log.log('Initialized successfully');
+      log.log('Encryption initialized successfully');
       return true;
     } catch (error) {
-      log.error('Initialization failed:', error);
+      log.error('Encryption initialization failed:', error);
       this.isInitialized = false;
+      this._initializingUserId = null;
       return false;
     }
   }
 
-  // Generate encryption key for Google users (no password available)
-  async generateKeyForGoogleUser(userId, salt) {
-    // Use a combination of userId and a stored secret to generate a consistent key
-    // This ensures the same key is generated each time for the same user
+  // Initialize encryption for email/password users
+  // Strategy: Generate a random master key, encrypt it with password-derived key, store in Firestore
+  // On new device: retrieve encrypted key from Firestore, decrypt with password
+  async _initializeForPasswordUser(password, userId) {
+    try {
+      const { getFirestore, doc, getDoc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js');
+      const { getApp } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js');
+      
+      const db = getFirestore(getApp());
+      const userEncryptionRef = doc(db, 'userEncryption', userId);
+      const encryptionDoc = await getDoc(userEncryptionRef);
+      
+      // Derive a key-encryption-key (KEK) from the password
+      // This KEK is used to encrypt/decrypt the actual data encryption key
+      const kek = await this._deriveKeyFromPassword(password, userId);
+      
+      if (encryptionDoc.exists() && encryptionDoc.data().encryptedKey) {
+        // Existing user - decrypt the stored key
+        log.log('Found encrypted key in Firestore, decrypting...');
+        const { encryptedKey, iv } = encryptionDoc.data();
+        
+        try {
+          const masterKey = await this._decryptMasterKey(encryptedKey, iv, kek);
+          log.log('Successfully decrypted master key from Firestore');
+          return masterKey;
+        } catch (decryptError) {
+          // Decryption failed - this could mean wrong password or corrupted data
+          // For password users, we should fail here so they know something is wrong
+          log.error('Failed to decrypt master key - password may be incorrect or data corrupted');
+          throw new Error('Failed to decrypt encryption key. If you recently changed your password, your encrypted data may need to be re-encrypted.');
+        }
+      } else {
+        // New user - generate a new master key and store encrypted version
+        log.log('No existing encryption key found, generating new one...');
+        const masterKey = await this._generateRandomMasterKey();
+        
+        // Encrypt the master key with the KEK
+        const { encryptedKey, iv } = await this._encryptMasterKey(masterKey, kek);
+        
+        // Store in Firestore
+        await setDoc(userEncryptionRef, {
+          encryptedKey,
+          iv,
+          createdAt: new Date().toISOString(),
+          version: 3,
+          keyType: 'password'
+        });
+        
+        log.log('Generated and stored new encrypted master key in Firestore');
+        return masterKey;
+      }
+    } catch (error) {
+      log.error('Password user encryption initialization failed:', error);
+      throw error;
+    }
+  }
+
+  // Generate a deterministic encryption key for Google users
+  // This key is the same on every device because it's derived from the userId
+  async _generateDeterministicKey(userId) {
+    // Use a deterministic salt derived from userId (not random)
+    const saltSource = `rupiya_deterministic_salt_v3_${userId}`;
+    const saltData = new TextEncoder().encode(saltSource);
+    const saltHash = await crypto.subtle.digest('SHA-256', saltData);
+    const salt = new Uint8Array(saltHash).slice(0, 16);
     
-    const keyMaterial = userId + 'rupiya_google_encryption_v1';
+    // Key material is also deterministic
+    const keyMaterial = `rupiya_google_encryption_v3_${userId}`;
     
     // Import the key material
     const importedKey = await crypto.subtle.importKey(
@@ -123,8 +193,8 @@ class EncryptionService {
       ['deriveKey']
     );
 
-    // Derive AES-GCM key (exportable so we can save to session)
-    return await crypto.subtle.deriveKey(
+    // Derive AES-GCM key
+    const key = await crypto.subtle.deriveKey(
       {
         name: 'PBKDF2',
         salt: salt,
@@ -133,89 +203,22 @@ class EncryptionService {
       },
       importedKey,
       { name: 'AES-GCM', length: this.KEY_LENGTH },
-      true, // extractable - needed to save to session
+      true,
       ['encrypt', 'decrypt']
     );
+    
+    log.log('Generated deterministic key for Google user');
+    return key;
   }
 
-  // Get or create salt for user
-  // IMPORTANT: Salt must be consistent across all devices for the same user
-  // We store it in Firestore to ensure cross-device consistency
-  async getOrCreateSalt(userId) {
-    const saltKey = `${this.SALT_KEY}_${userId}`;
-    let saltBase64 = localStorage.getItem(saltKey);
+  // Derive a key-encryption-key from password
+  async _deriveKeyFromPassword(password, userId) {
+    // Use userId as part of the salt for additional security
+    const saltSource = `rupiya_kek_salt_v3_${userId}`;
+    const saltData = new TextEncoder().encode(saltSource);
+    const saltHash = await crypto.subtle.digest('SHA-256', saltData);
+    const salt = new Uint8Array(saltHash).slice(0, 16);
     
-    if (saltBase64) {
-      // Convert base64 back to Uint8Array
-      return Uint8Array.from(atob(saltBase64), c => c.charCodeAt(0));
-    }
-    
-    // No local salt - try to get from Firestore (for cross-device sync)
-    try {
-      const { getFirestore, doc, getDoc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js');
-      const { getApp } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js');
-      
-      const db = getFirestore(getApp());
-      const userSaltRef = doc(db, 'userEncryption', userId);
-      const saltDoc = await getDoc(userSaltRef);
-      
-      if (saltDoc.exists() && saltDoc.data().salt) {
-        // Salt exists in Firestore - use it
-        saltBase64 = saltDoc.data().salt;
-        const salt = Uint8Array.from(atob(saltBase64), c => c.charCodeAt(0));
-        
-        // Cache locally
-        localStorage.setItem(saltKey, saltBase64);
-        log.log('Retrieved salt from Firestore for cross-device sync');
-        
-        return salt;
-      }
-      
-      // No salt in Firestore - generate deterministic salt from userId
-      // This ensures consistency even if Firestore save fails
-      const saltSource = `rupiya_salt_v2_${userId}`;
-      const saltData = new TextEncoder().encode(saltSource);
-      const hashBuffer = await crypto.subtle.digest('SHA-256', saltData);
-      const salt = new Uint8Array(hashBuffer).slice(0, 16);
-      
-      saltBase64 = btoa(String.fromCharCode(...salt));
-      
-      // Save to Firestore for other devices
-      try {
-        await setDoc(userSaltRef, { 
-          salt: saltBase64, 
-          createdAt: new Date().toISOString(),
-          version: 2
-        });
-        log.log('Saved new salt to Firestore');
-      } catch (saveError) {
-        log.warn('Could not save salt to Firestore:', saveError);
-      }
-      
-      // Cache locally
-      localStorage.setItem(saltKey, saltBase64);
-      
-      return salt;
-      
-    } catch (error) {
-      log.warn('Firestore salt sync failed, using deterministic salt:', error);
-      
-      // Fallback: generate deterministic salt from userId
-      const saltSource = `rupiya_salt_v2_${userId}`;
-      const saltData = new TextEncoder().encode(saltSource);
-      const hashBuffer = await crypto.subtle.digest('SHA-256', saltData);
-      const salt = new Uint8Array(hashBuffer).slice(0, 16);
-      
-      saltBase64 = btoa(String.fromCharCode(...salt));
-      localStorage.setItem(saltKey, saltBase64);
-      
-      return salt;
-    }
-  }
-
-  // Derive encryption key from password using PBKDF2
-  async deriveKey(password, salt) {
-    // Import password as key material
     const keyMaterial = await crypto.subtle.importKey(
       'raw',
       new TextEncoder().encode(password),
@@ -224,7 +227,6 @@ class EncryptionService {
       ['deriveKey']
     );
 
-    // Derive AES-GCM key (exportable so we can save to session)
     return await crypto.subtle.deriveKey(
       {
         name: 'PBKDF2',
@@ -234,7 +236,87 @@ class EncryptionService {
       },
       keyMaterial,
       { name: 'AES-GCM', length: this.KEY_LENGTH },
-      true, // extractable - needed to save to session
+      false, // not extractable - only used for encryption/decryption
+      ['encrypt', 'decrypt', 'wrapKey', 'unwrapKey']
+    );
+  }
+
+  // Generate a random master key for data encryption
+  async _generateRandomMasterKey() {
+    return await crypto.subtle.generateKey(
+      { name: 'AES-GCM', length: this.KEY_LENGTH },
+      true, // extractable - needed to encrypt and store
+      ['encrypt', 'decrypt']
+    );
+  }
+
+  // Encrypt the master key with the KEK for storage
+  async _encryptMasterKey(masterKey, kek) {
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    
+    // Export the master key to raw format
+    const rawKey = await crypto.subtle.exportKey('raw', masterKey);
+    
+    // Encrypt with KEK
+    const encryptedData = await crypto.subtle.encrypt(
+      { name: 'AES-GCM', iv: iv },
+      kek,
+      rawKey
+    );
+    
+    return {
+      encryptedKey: btoa(String.fromCharCode(...new Uint8Array(encryptedData))),
+      iv: btoa(String.fromCharCode(...iv))
+    };
+  }
+
+  // Decrypt the master key using the KEK
+  async _decryptMasterKey(encryptedKeyBase64, ivBase64, kek) {
+    const encryptedData = Uint8Array.from(atob(encryptedKeyBase64), c => c.charCodeAt(0));
+    const iv = Uint8Array.from(atob(ivBase64), c => c.charCodeAt(0));
+    
+    // Decrypt with KEK
+    const rawKey = await crypto.subtle.decrypt(
+      { name: 'AES-GCM', iv: iv },
+      kek,
+      encryptedData
+    );
+    
+    // Import as AES-GCM key
+    return await crypto.subtle.importKey(
+      'raw',
+      rawKey,
+      { name: 'AES-GCM', length: this.KEY_LENGTH },
+      true,
+      ['encrypt', 'decrypt']
+    );
+  }
+
+  // Legacy method for backward compatibility - now just calls _generateDeterministicKey
+  async generateKeyForGoogleUser(userId) {
+    return await this._generateDeterministicKey(userId);
+  }
+
+  // Legacy method - kept for backward compatibility but no longer used
+  async deriveKey(password, salt) {
+    const keyMaterial = await crypto.subtle.importKey(
+      'raw',
+      new TextEncoder().encode(password),
+      'PBKDF2',
+      false,
+      ['deriveKey']
+    );
+
+    return await crypto.subtle.deriveKey(
+      {
+        name: 'PBKDF2',
+        salt: salt,
+        iterations: this.PBKDF2_ITERATIONS,
+        hash: 'SHA-256'
+      },
+      keyMaterial,
+      { name: 'AES-GCM', length: this.KEY_LENGTH },
+      true,
       ['encrypt', 'decrypt']
     );
   }
@@ -247,15 +329,47 @@ class EncryptionService {
   // Clear encryption keys (on logout)
   clear() {
     this.encryptionKey = null;
-    this.salt = null;
     this.isInitialized = false;
     this._restorePromise = null;
+    this._initializingUserId = null;
     try {
       sessionStorage.removeItem(this.SESSION_KEY_STORAGE);
     } catch (e) {
       log.warn('Could not clear session storage:', e);
     }
-    log.log('Keys cleared');
+    log.log('Encryption keys cleared');
+  }
+
+  // Migrate existing user data to new encryption system
+  // Call this for users who have data encrypted with the old system
+  async migrateFromLegacyEncryption(userId, legacyPassword = null) {
+    log.log('Checking if migration from legacy encryption is needed...');
+    
+    try {
+      const { getFirestore, doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js');
+      const { getApp } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js');
+      
+      const db = getFirestore(getApp());
+      const userEncryptionRef = doc(db, 'userEncryption', userId);
+      const encryptionDoc = await getDoc(userEncryptionRef);
+      
+      if (encryptionDoc.exists()) {
+        const data = encryptionDoc.data();
+        // Check if this is old format (has 'salt' but not 'encryptedKey')
+        if (data.salt && !data.encryptedKey) {
+          log.log('Legacy encryption format detected - migration may be needed');
+          // For now, just log - actual migration would require re-encrypting all data
+          return { needsMigration: true, hasLegacySalt: true };
+        }
+        // New format already
+        return { needsMigration: false };
+      }
+      
+      return { needsMigration: false };
+    } catch (error) {
+      log.warn('Could not check migration status:', error);
+      return { needsMigration: false, error: error.message };
+    }
   }
 
 
@@ -375,8 +489,7 @@ class EncryptionService {
       log.warn(`[${collectionName}] Encryption not ready, storing data unencrypted`);
       log.warn('Encryption status:', {
         isInitialized: this.isInitialized,
-        hasKey: !!this.encryptionKey,
-        hasSalt: !!this.salt
+        hasKey: !!this.encryptionKey
       });
       return data;
     }
