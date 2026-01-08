@@ -14,9 +14,12 @@ class RecurringProcessor {
 
   /**
    * Check if we should process recurring transactions
-   * Only process once per day to avoid duplicates
+   * Returns true if:
+   * 1. Never processed before, OR
+   * 2. Last process was on a different day, OR
+   * 3. There are past due transactions that need processing
    */
-  shouldProcess() {
+  async shouldProcess() {
     const lastProcess = localStorage.getItem(this.processingKey);
     if (!lastProcess) return true;
     
@@ -28,7 +31,39 @@ class RecurringProcessor {
     const todayNormalized = new Date(today.getFullYear(), today.getMonth(), today.getDate());
     
     // Process if last process was on a different day
-    return lastDateNormalized.getTime() !== todayNormalized.getTime();
+    if (lastDateNormalized.getTime() !== todayNormalized.getTime()) {
+      return true;
+    }
+    
+    // Even if processed today, check if there are past due transactions
+    // This handles cases where recurring transactions were added with past start dates
+    try {
+      const user = authService.getCurrentUser();
+      if (!user) return false;
+      
+      const recurringTransactions = await firestoreService.getAll('recurringTransactions', 'startDate', 'asc');
+      
+      for (const recurring of recurringTransactions) {
+        if (recurring.status === 'paused' || recurring.status === 'inactive') {
+          continue;
+        }
+        
+        const startDate = recurring.startDate?.toDate ? recurring.startDate.toDate() : new Date(recurring.startDate);
+        const lastProcessed = recurring.lastProcessedDate?.toDate ? recurring.lastProcessedDate.toDate() : null;
+        const endDate = recurring.endDate?.toDate ? recurring.endDate.toDate() : null;
+        
+        const dueDates = this.getDueDates(startDate, recurring.frequency, lastProcessed, endDate);
+        
+        if (dueDates.length > 0) {
+          console.log(`[RecurringProcessor] Found ${dueDates.length} past due transactions for ${recurring.description}`);
+          return true;
+        }
+      }
+    } catch (error) {
+      console.error('[RecurringProcessor] Error checking for past due transactions:', error);
+    }
+    
+    return false;
   }
 
   /**
@@ -122,10 +157,12 @@ class RecurringProcessor {
   async processRecurring(forceProcess = false) {
     // Check if we should process
     console.log('[RecurringProcessor] processRecurring called with forceProcess:', forceProcess);
-    console.log('[RecurringProcessor] shouldProcess() returns:', this.shouldProcess());
     
-    if (!forceProcess && !this.shouldProcess()) {
-      console.log('[RecurringProcessor] Already processed today, skipping');
+    const shouldProc = forceProcess || await this.shouldProcess();
+    console.log('[RecurringProcessor] shouldProcess() returns:', shouldProc);
+    
+    if (!shouldProc) {
+      console.log('[RecurringProcessor] Already processed today and no past due transactions, skipping');
       return { processed: 0, skipped: true };
     }
 

@@ -155,6 +155,11 @@ async function loadCategoryDropdown() {
 }
 
 // Load budgets and expenses
+async function loadBudgets() {
+  await loadData();
+}
+
+// Load budgets and expenses
 async function loadData() {
   try {
     loadingState.style.display = 'flex';

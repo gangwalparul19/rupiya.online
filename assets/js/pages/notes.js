@@ -35,12 +35,14 @@ async function init() {
     return;
   }
 
+  // Initialize DOM elements FIRST (before any function that uses them)
+  initDOMElements();
+
   // Check if encryption reauth is needed
   await encryptionReauthModal.checkAndPrompt(async () => {
     await loadNotes();
   });
 
-  initDOMElements();
   setupEventListeners();
   loadUserProfile(user);
   await loadNotes();

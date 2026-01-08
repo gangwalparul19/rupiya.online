@@ -1,8 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script src="assets/js/config/env-local.js"></script>
-
+<script>
+  // Firebase environment variables injected at build time
+  window.__ENV__ = {
+    VITE_FIREBASE_API_KEY: 'AIzaSyDdoA4BKaWbJIzmI9P4Se8Rkxsih6LdFvk',
+    VITE_FIREBASE_AUTH_DOMAIN: 'rupiya-abd13.firebaseapp.com',
+    VITE_FIREBASE_PROJECT_ID: 'rupiya-abd13',
+    VITE_FIREBASE_STORAGE_BUCKET: 'rupiya-abd13.firebasestorage.app',
+    VITE_FIREBASE_MESSAGING_SENDER_ID: '999011154370',
+    VITE_FIREBASE_APP_ID: '1:999011154370:web:40faebc7a935cdbf51be5b'
+  };
+  console.log('[Build] Firebase config injected successfully');
+</script>
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -373,7 +383,7 @@
 
             <!-- Row 2: Symbol (with autocomplete) -->
             <div class="form-group form-group-full">
-              <label for="symbol">Symbol (Yahoo Finance) *</label>
+              <label for="symbol">Symbol (Ticker) *</label>
               <div class="symbol-input-wrapper">
                 <input type="text" id="symbol" class="symbol-input" required maxlength="20"
                   placeholder="e.g., AAPL, BTC-USD, RELIANCE.NS">
