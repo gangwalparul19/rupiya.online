@@ -105,6 +105,8 @@ class ConfirmationModal {
     } = options;
 
     try {
+      console.log('[ConfirmationModal] Showing modal with options:', { title, message, type });
+      
       // Set content
       const titleEl = document.getElementById('confirmationModalTitle');
       const messageEl = document.getElementById('confirmationModalMessage');
@@ -114,51 +116,62 @@ class ConfirmationModal {
       if (!titleEl || !messageEl || !confirmBtnEl || !cancelBtnEl) {
         console.error('[ConfirmationModal] Modal elements not found, recreating modal...');
         this.createModal();
+        // Try again after recreation
+        return this.show(options);
       }
 
-      document.getElementById('confirmationModalTitle').textContent = title;
-      document.getElementById('confirmationModalMessage').textContent = message;
-      document.getElementById('confirmationModalConfirm').textContent = confirmText;
-      document.getElementById('confirmationModalCancel').textContent = cancelText;
+      console.log('[ConfirmationModal] Setting title...');
+      titleEl.textContent = title;
+      
+      console.log('[ConfirmationModal] Setting message...');
+      messageEl.textContent = message;
+      
+      console.log('[ConfirmationModal] Setting button text...');
+      confirmBtnEl.textContent = confirmText;
+      cancelBtnEl.textContent = cancelText;
 
-    // Set icon based on type
-    const iconEl = document.getElementById('confirmationModalIcon');
-    const defaultIcons = {
-      danger: '🗑️',
-      warning: '⚠️',
-      info: 'ℹ️',
-      success: '✅'
-    };
-    if (iconEl) {
-      iconEl.textContent = icon || defaultIcons[type] || defaultIcons.warning;
-      iconEl.className = `confirmation-icon confirmation-icon-${type}`;
-    }
+      // Set icon based on type
+      console.log('[ConfirmationModal] Setting icon...');
+      const iconEl = document.getElementById('confirmationModalIcon');
+      const defaultIcons = {
+        danger: '🗑️',
+        warning: '⚠️',
+        info: 'ℹ️',
+        success: '✅'
+      };
+      if (iconEl) {
+        iconEl.textContent = icon || defaultIcons[type] || defaultIcons.warning;
+        iconEl.className = `confirmation-icon confirmation-icon-${type}`;
+      }
 
-    // Set confirm button style based on type
-    const confirmBtn = document.getElementById('confirmationModalConfirm');
-    if (confirmBtn) {
-      confirmBtn.className = 'btn';
-      if (type === 'danger') {
-        confirmBtn.classList.add('btn-danger');
-      } else if (type === 'warning') {
-        confirmBtn.classList.add('btn-warning');
+      // Set confirm button style based on type
+      console.log('[ConfirmationModal] Setting button style...');
+      const confirmBtn = document.getElementById('confirmationModalConfirm');
+      if (confirmBtn) {
+        confirmBtn.className = 'btn';
+        if (type === 'danger') {
+          confirmBtn.classList.add('btn-danger');
+        } else if (type === 'warning') {
+          confirmBtn.classList.add('btn-warning');
+        } else {
+          confirmBtn.classList.add('btn-primary');
+        }
+      }
+
+      // Show modal
+      console.log('[ConfirmationModal] Displaying modal...');
+      if (this.modal) {
+        this.modal.style.display = 'flex';
+        console.log('[ConfirmationModal] Modal displayed successfully');
       } else {
-        confirmBtn.classList.add('btn-primary');
+        console.error('[ConfirmationModal] Modal element not found!');
+        return Promise.resolve(false);
       }
-    }
 
-    // Show modal
-    if (this.modal) {
-      this.modal.style.display = 'flex';
-    } else {
-      console.error('[ConfirmationModal] Modal element not found!');
-      return Promise.resolve(false);
-    }
-
-    // Return promise
-    return new Promise((resolve) => {
-      this.resolveCallback = resolve;
-    });
+      // Return promise
+      return new Promise((resolve) => {
+        this.resolveCallback = resolve;
+      });
     } catch (error) {
       console.error('[ConfirmationModal] Error showing modal:', error);
       return Promise.resolve(false);
