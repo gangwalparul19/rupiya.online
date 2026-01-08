@@ -283,8 +283,25 @@ class FamilyService {
         return { success: false, error: 'Invitation expired' };
       }
 
-      // Add user to family group
+      // Get current group data
       const groupRef = doc(db, this.familyGroupsCollection, invitation.groupId);
+      const groupSnap = await getDoc(groupRef);
+      
+      if (!groupSnap.exists()) {
+        return { success: false, error: 'Family group not found' };
+      }
+
+      // Decrypt group data
+      const groupData = { id: groupSnap.id, ...groupSnap.data() };
+      const decryptedGroup = await encryptionService.decryptObject(groupData, this.familyGroupsCollection);
+
+      // Check if user is already a member
+      const isAlreadyMember = decryptedGroup.members?.some(m => m.userId === userId);
+      if (isAlreadyMember) {
+        return { success: false, error: 'You are already a member of this group' };
+      }
+
+      // Add new member to the members array
       const memberData = {
         userId: userId,
         email: user.email,
@@ -293,10 +310,20 @@ class FamilyService {
         joinedAt: Timestamp.now()
       };
 
-      await updateDoc(groupRef, {
-        members: arrayUnion(memberData),
+      const updatedMembers = [...(decryptedGroup.members || []), memberData];
+
+      // Update group with new member (encrypt the data)
+      const updatedGroupData = {
+        ...decryptedGroup,
+        members: updatedMembers,
         updatedAt: Timestamp.now()
-      });
+      };
+
+      // Encrypt the updated group data
+      const encryptedGroupData = await encryptionService.encryptObject(updatedGroupData, this.familyGroupsCollection);
+
+      // Update the group document
+      await updateDoc(groupRef, encryptedGroupData);
 
       // Update invitation status
       await updateDoc(inviteRef, {
@@ -361,11 +388,22 @@ class FamilyService {
         return { success: false, error: 'Member not found' };
       }
 
-      const groupRef = doc(db, this.familyGroupsCollection, groupId);
-      await updateDoc(groupRef, {
-        members: arrayRemove(memberToRemove),
+      // Remove member from the members array
+      const updatedMembers = group.members.filter(m => m.userId !== memberUserId);
+
+      // Update group with removed member (encrypt the data)
+      const updatedGroupData = {
+        ...group,
+        members: updatedMembers,
         updatedAt: Timestamp.now()
-      });
+      };
+
+      // Encrypt the updated group data
+      const encryptedGroupData = await encryptionService.encryptObject(updatedGroupData, this.familyGroupsCollection);
+
+      // Update the group document
+      const groupRef = doc(db, this.familyGroupsCollection, groupId);
+      await updateDoc(groupRef, encryptedGroupData);
 
       // Update user's familyGroups array
       await this.updateUserFamilyGroups(memberUserId, groupId, 'remove');
