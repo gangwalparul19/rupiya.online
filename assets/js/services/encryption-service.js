@@ -317,7 +317,12 @@ class EncryptionService {
     await this.waitForRestore();
 
     if (!this.isReady()) {
-      log.warn('Not initialized, storing data unencrypted');
+      log.warn(`[${collectionName}] Encryption not ready, storing data unencrypted`);
+      log.warn('Encryption status:', {
+        isInitialized: this.isInitialized,
+        hasKey: !!this.encryptionKey,
+        hasSalt: !!this.salt
+      });
       return data;
     }
 
@@ -334,8 +339,14 @@ class EncryptionService {
       // Encrypt each sensitive field (skip null, undefined, and empty strings)
       for (const field of sensitiveFields) {
         if (data[field] !== undefined && data[field] !== null && data[field] !== '') {
-          encryptedFields[field] = await this.encryptValue(data[field]);
-          delete encryptedData[field];
+          try {
+            encryptedFields[field] = await this.encryptValue(data[field]);
+            delete encryptedData[field];
+          } catch (fieldError) {
+            log.error(`Failed to encrypt field ${field}:`, fieldError);
+            // Keep original value if encryption fails
+            encryptedData[field] = data[field];
+          }
         }
       }
 
@@ -347,8 +358,14 @@ class EncryptionService {
             value !== null &&
             value !== '' &&
             typeof value !== 'object') {
-          encryptedFields[key] = await this.encryptValue(value);
-          delete encryptedData[key];
+          try {
+            encryptedFields[key] = await this.encryptValue(value);
+            delete encryptedData[key];
+          } catch (fieldError) {
+            log.error(`Failed to encrypt field ${key}:`, fieldError);
+            // Keep original value if encryption fails
+            encryptedData[key] = value;
+          }
         }
       }
 
@@ -358,9 +375,10 @@ class EncryptionService {
         encryptedData._encryptionVersion = privacyConfig.encryptionVersion;
       }
 
+      log.log(`[${collectionName}] Encrypted ${Object.keys(encryptedFields).length} fields`);
       return encryptedData;
     } catch (error) {
-      log.error('Object encryption failed:', error);
+      log.error(`[${collectionName}] Object encryption failed:`, error);
       // Return original data if encryption fails
       return data;
     }

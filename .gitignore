@@ -1,7 +1,11 @@
 # Environment variables
 .env
+.env.*
 .env.local
 .env.*.local
+
+# Local development environment config (generated from .env)
+assets/js/config/env-local.js
 
 # Node modules
 node_modules/
