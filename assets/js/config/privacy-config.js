@@ -63,9 +63,8 @@ export const privacyConfig = {
     'paymentMethods',
     'tripGroupExpenses',
     'tripGroupSettlements',
-    'tripGroupMembers',      // Member info (name, email, phone)
-    'familyGroups',          // Family group data (name, member names/emails)
-    'familyInvitations'      // Invitation data (emails, names)
+    'tripGroupMembers'      // Member info (name, email, phone)
+    // NOTE: familyGroups and familyInvitations are NOT encrypted because they are shared across users
   ],
   
   // Collections that should NOT be encrypted
@@ -115,9 +114,8 @@ export const privacyConfig = {
     ],
     tripGroupExpenses: ['amount', 'description', 'notes', 'splits'],
     tripGroupSettlements: ['amount', 'notes'],
-    tripGroupMembers: ['name', 'email', 'phone'],  // Member personal information
-    familyGroups: ['name', 'members', 'settings'],  // Group name, member info (names/emails), and settings
-    familyInvitations: ['invitedByName', 'groupName']  // Invitation details (invitedEmail kept unencrypted for queries)
+    tripGroupMembers: ['name', 'email', 'phone']  // Member personal information
+    // NOTE: familyGroups and familyInvitations are NOT in sensitiveFields because they are not encrypted (shared data)
   }
 };
 
