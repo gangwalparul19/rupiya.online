@@ -32,7 +32,7 @@ class SplitService {
       };
 
       // Use firestoreService to handle encryption
-      const result = await firestoreService.addDocument(this.collectionName, data);
+      const result = await firestoreService.add(this.collectionName, data);
 
       // Invalidate caches so dashboard reflects new split
       this.invalidateSplitCaches();
@@ -80,7 +80,7 @@ class SplitService {
       };
 
       // Use firestoreService to handle encryption
-      const result = await firestoreService.updateDocument(this.collectionName, id, updateData);
+      const result = await firestoreService.update(this.collectionName, id, updateData);
 
       // Invalidate caches so dashboard reflects updated split
       this.invalidateSplitCaches();
@@ -102,7 +102,7 @@ class SplitService {
       };
 
       // Use firestoreService to handle encryption
-      const result = await firestoreService.updateDocument(this.collectionName, id, updateData);
+      const result = await firestoreService.update(this.collectionName, id, updateData);
 
       // Invalidate caches so dashboard reflects settled split (affects income)
       this.invalidateSplitCaches();
@@ -117,7 +117,7 @@ class SplitService {
   async deleteSplit(id) {
     try {
       // Use firestoreService to handle encryption
-      const result = await firestoreService.deleteDocument(this.collectionName, id);
+      const result = await firestoreService.delete(this.collectionName, id);
       
       // Invalidate caches so dashboard reflects deleted split
       this.invalidateSplitCaches();

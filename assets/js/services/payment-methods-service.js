@@ -92,7 +92,7 @@ class PaymentMethodsService {
         };
         
         // Use firestoreService to handle encryption
-        await firestoreService.addDocument(this.collectionName, data);
+        await firestoreService.add(this.collectionName, data);
       }
       
       return { success: true };
@@ -170,7 +170,7 @@ class PaymentMethodsService {
       }
       
       // Use firestoreService to handle encryption
-      const result = await firestoreService.addDocument(this.collectionName, data);
+      const result = await firestoreService.add(this.collectionName, data);
       
       return result;
     } catch (error) {
@@ -190,7 +190,7 @@ class PaymentMethodsService {
       };
       
       // Use firestoreService to handle encryption
-      const result = await firestoreService.updateDocument(this.collectionName, methodId, updateData);
+      const result = await firestoreService.update(this.collectionName, methodId, updateData);
       
       return result;
     } catch (error) {
@@ -205,7 +205,7 @@ class PaymentMethodsService {
   async deletePaymentMethod(methodId) {
     try {
       // Soft delete - mark as inactive
-      const result = await firestoreService.updateDocument(this.collectionName, methodId, {
+      const result = await firestoreService.update(this.collectionName, methodId, {
         isActive: false,
         updatedAt: Timestamp.now()
       });
@@ -222,7 +222,7 @@ class PaymentMethodsService {
    */
   async permanentlyDeletePaymentMethod(methodId) {
     try {
-      const result = await firestoreService.deleteDocument(this.collectionName, methodId);
+      const result = await firestoreService.delete(this.collectionName, methodId);
       return result;
     } catch (error) {
       console.error('Error permanently deleting payment method:', error);

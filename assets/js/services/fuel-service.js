@@ -42,7 +42,7 @@ class FuelService {
       };
 
       // Use firestoreService to handle encryption
-      const result = await firestoreService.addDocument(this.collectionName, data);
+      const result = await firestoreService.add(this.collectionName, data);
 
       return result;
     } catch (error) {
@@ -168,7 +168,7 @@ class FuelService {
       };
 
       // Use firestoreService to handle encryption
-      const result = await firestoreService.updateDocument(this.collectionName, id, updateData);
+      const result = await firestoreService.update(this.collectionName, id, updateData);
 
       return result;
     } catch (error) {
@@ -183,7 +183,7 @@ class FuelService {
   async deleteFillup(id) {
     try {
       // Use firestoreService to handle encryption
-      const result = await firestoreService.deleteDocument(this.collectionName, id);
+      const result = await firestoreService.delete(this.collectionName, id);
       return result;
     } catch (error) {
       console.error('Error deleting fill-up:', error);
