@@ -42,7 +42,9 @@ const htmlFiles = [
   'offline.html',
   'trip-groups.html',
   'trip-group-detail.html',
-  'admin.html'
+  'admin.html',
+  'sync-encryption-salt.html',
+  'clear-encrypted-family-data.html'
 ];
 
 // Pages that have the dashboard layout with sidebar
