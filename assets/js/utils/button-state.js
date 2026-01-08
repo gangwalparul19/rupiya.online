@@ -4,9 +4,9 @@
 /**
  * Set button to loading state
  * @param {HTMLElement} button - The button element
- * @param {string} loadingText - Text to show during loading (default: original text)
+ * @param {string} loadingText - Text to show during loading (default: 'Saving...')
  */
-export function setButtonLoading(button, loadingText = null) {
+export function setButtonLoading(button, loadingText = 'Saving...') {
   if (!button) return;
   
   // Store original state
@@ -18,12 +18,8 @@ export function setButtonLoading(button, loadingText = null) {
   button.disabled = true;
   button.classList.add('loading');
   
-  // Set loading content
-  const text = loadingText || button.dataset.originalText;
-  button.innerHTML = `
-    <span class="spinner"></span>
-    <span style="margin-left: 8px;">${text}</span>
-  `;
+  // Set loading text
+  button.textContent = loadingText;
 }
 
 /**
@@ -39,8 +35,7 @@ export function resetButton(button, text = null) {
   button.classList.remove('loading');
   
   // Restore original or custom text
-  const buttonText = text || button.dataset.originalText || 'Submit';
-  button.innerHTML = buttonText;
+  button.textContent = text || button.dataset.originalText || 'Submit';
 }
 
 /**
@@ -49,15 +44,12 @@ export function resetButton(button, text = null) {
  * @param {string} successText - Success message (default: "Success!")
  * @param {number} duration - Duration in ms before reset (default: 2000)
  */
-export function setButtonSuccess(button, successText = 'Success!', duration = 2000) {
+export function setButtonSuccess(button, successText = '✓ Success!', duration = 2000) {
   if (!button) return;
   
   button.disabled = true;
   button.classList.add('success');
-  button.innerHTML = `
-    <span>✓</span>
-    <span style="margin-left: 8px;">${successText}</span>
-  `;
+  button.textContent = successText;
   
   setTimeout(() => {
     resetButton(button);
@@ -70,15 +62,12 @@ export function setButtonSuccess(button, successText = 'Success!', duration = 20
  * @param {string} errorText - Error message (default: "Error")
  * @param {number} duration - Duration in ms before reset (default: 2000)
  */
-export function setButtonError(button, errorText = 'Error', duration = 2000) {
+export function setButtonError(button, errorText = '✗ Error', duration = 2000) {
   if (!button) return;
   
   button.disabled = true;
   button.classList.add('error');
-  button.innerHTML = `
-    <span>✗</span>
-    <span style="margin-left: 8px;">${errorText}</span>
-  `;
+  button.textContent = errorText;
   
   setTimeout(() => {
     resetButton(button);

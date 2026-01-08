@@ -8,28 +8,31 @@ import themeManager from '../utils/theme-manager.js';
 import setupWizard from '../components/setup-wizard.js';
 import recurringProcessor from '../services/recurring-processor.js';
 import encryptionReauthModal from '../components/encryption-reauth-modal.js';
-import { formatCurrency, formatCurrencyCompact, formatDate, getRelativeTime, escapeHtml } from '../utils/helpers.js';
+import { formatCurrency, formatCurrencyCompact, getRelativeTime, escapeHtml } from '../utils/helpers.js';
 import timezoneService from '../utils/timezone.js';
+import logger from '../utils/logger.js';
+
+const log = logger.create('Dashboard');
 
 // Check authentication
 async function checkAuth() {
-  console.log('[Dashboard] Checking authentication...');
+  log.log('Checking authentication...');
   
   try {
     // Wait for auth to initialize - this waits for Firebase to restore session
     const user = await authService.waitForAuth();
-    console.log('[Dashboard] waitForAuth returned:', user ? user.email : 'null');
+    log.log('waitForAuth returned:', user ? user.email : 'null');
     
     if (!user) {
-      console.log('[Dashboard] No user found, redirecting to login...');
+      log.log('No user found, redirecting to login...');
       window.location.href = 'login.html';
       return false;
     }
     
-    console.log('[Dashboard] User authenticated:', user.email);
+    log.log('User authenticated:', user.email);
     return true;
   } catch (error) {
-    console.error('[Dashboard] Auth check error:', error);
+    log.error('Auth check error:', error);
     window.location.href = 'login.html';
     return false;
   }
@@ -40,17 +43,17 @@ async function checkFirstTimeSetup() {
   try {
     const needsSetup = await setupWizard.needsSetup();
     if (needsSetup) {
-      console.log('[Dashboard] First-time user detected, showing setup wizard');
+      log.log('First-time user detected, showing setup wizard');
       setupWizard.show();
     }
   } catch (error) {
-    console.error('[Dashboard] Error checking setup status:', error);
+    log.error('Error checking setup status:', error);
   }
 }
 
 // Initialize dashboard only after auth check
 async function init() {
-  console.log('[Dashboard] Initializing...');
+  log.log('Initializing...');
   const isAuthenticated = await checkAuth();
   if (isAuthenticated) {
     // Check if encryption reauth is needed (after page refresh)
@@ -97,12 +100,10 @@ const savingsChange = document.getElementById('savingsChange');
 // Transactions list
 const transactionsList = document.getElementById('transactionsList');
 
-// Chart elements
 const trendChart = document.getElementById('trendChart');
 const categoryChart = document.getElementById('categoryChart');
 const trendPeriod = document.getElementById('trendPeriod');
 const categoryPeriod = document.getElementById('categoryPeriod');
-const generateDataBtn = document.getElementById('generateDataBtn');
 
 // Chart instances
 let trendChartInstance = null;
@@ -113,29 +114,34 @@ async function initDashboard() {
   const user = authService.getCurrentUser();
   
   if (user) {
-    // Update user profile
-    const initials = user.displayName 
-      ? user.displayName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
-      : user.email[0].toUpperCase();
-    
-    userAvatar.textContent = initials;
-    userName.textContent = user.displayName || 'User';
-    userEmail.textContent = user.email;
-    
-    // Initialize family switcher
-    await familySwitcher.init();
-    
-    // Update subtitle based on context
-    updatePageContext();
-    
-    // Initialize PWA install banner
-    initPWAInstallBanner();
-    
-    // Process recurring transactions (runs once per day)
-    await processRecurringTransactions();
-    
-    // Load dashboard data
-    await loadDashboardData();
+    try {
+      // Update user profile
+      const initials = user.displayName 
+        ? user.displayName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
+        : user.email[0].toUpperCase();
+      
+      userAvatar.textContent = initials;
+      userName.textContent = user.displayName || 'User';
+      userEmail.textContent = user.email;
+      
+      // Initialize family switcher
+      await familySwitcher.init();
+      
+      // Update subtitle based on context
+      updatePageContext();
+      
+      // Initialize PWA install banner
+      initPWAInstallBanner();
+      
+      // Process recurring transactions (runs once per day)
+      await processRecurringTransactions();
+      
+      // Load dashboard data
+      await loadDashboardData();
+    } catch (error) {
+      console.error('[Dashboard] Error initializing dashboard:', error);
+      toast.error('Failed to load dashboard. Please refresh the page.');
+    }
   }
 }
 
@@ -145,19 +151,19 @@ async function processRecurringTransactions() {
     const result = await recurringProcessor.processRecurring();
     
     if (result.processed > 0) {
-      console.log(`[Dashboard] Processed ${result.processed} recurring transactions`);
+      log.log(`Processed ${result.processed} recurring transactions`);
       toast.success(`${result.processed} recurring transaction(s) added automatically`);
       
       // Refresh dashboard data to show new transactions
-      console.log('[Dashboard] Refreshing dashboard data after processing recurring transactions');
+      log.log('Refreshing dashboard data after processing recurring transactions');
       await loadDashboardData();
     } else if (result.skipped) {
-      console.log('[Dashboard] Recurring transactions already processed today');
+      log.log('Recurring transactions already processed today');
     } else if (result.error) {
-      console.error('[Dashboard] Error processing recurring:', result.error);
+      log.error('Error processing recurring:', result.error);
     }
   } catch (error) {
-    console.error('[Dashboard] Error in recurring processor:', error);
+    log.error('Error in recurring processor:', error);
   }
 }
 
@@ -176,7 +182,7 @@ function updatePageContext() {
 // Load dashboard data
 async function loadDashboardData() {
   try {
-    console.log('Loading dashboard data...');
+    log.log('Loading dashboard data...');
     
     // Get current month data
     const now = new Date();
@@ -184,7 +190,7 @@ async function loadDashboardData() {
     const currentMonth = now.getMonth();
     
     // Use optimized monthly summary queries (cached)
-    console.log('Fetching monthly summaries...');
+    log.log('Fetching monthly summaries...');
     const [currentSummary, lastSummary, goals, recurring] = await Promise.all([
       firestoreService.getMonthlySummary(currentYear, currentMonth),
       firestoreService.getMonthlySummary(currentYear, currentMonth - 1),
@@ -193,14 +199,13 @@ async function loadDashboardData() {
     ]);
     
     // Get limited expenses/income/splits for charts (last 6 months only)
-    const sixMonthsAgo = new Date(currentYear, currentMonth - 5, 1);
     const [expenses, income, splits] = await Promise.all([
       firestoreService.getExpenses(200), // Limit to 200 for charts
       firestoreService.getIncome(200),
       firestoreService.getSplits ? firestoreService.getSplits() : Promise.resolve([])
     ]);
     
-    console.log('Current month summary:', currentSummary);
+    log.log('Current month summary:', currentSummary);
     
     // Define date range for current month (used by widgets)
     const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
@@ -265,11 +270,11 @@ async function loadDashboardData() {
     createTrendChart(expenses, income, 6, splits);
     createCategoryChart(expenses, 'current', splits);
     
-    console.log('Dashboard data loaded successfully');
+    log.log('Dashboard data loaded successfully');
     
   } catch (error) {
-    console.error('Error loading dashboard data:', error);
-    console.error('Error details:', error.message, error.code);
+    log.error('Error loading dashboard data:', error);
+    log.error('Error details:', error.message, error.code);
     toast.error('Failed to load dashboard data: ' + error.message);
   }
 }
@@ -991,7 +996,7 @@ trendPeriod.addEventListener('change', async () => {
     ]);
     createTrendChart(expenses, income, parseInt(trendPeriod.value), splits);
   } catch (error) {
-    console.error('Error updating trend chart:', error);
+    log.error('Error updating trend chart:', error);
   }
 });
 
@@ -1003,7 +1008,7 @@ categoryPeriod.addEventListener('change', async () => {
     ]);
     createCategoryChart(expenses, categoryPeriod.value, splits);
   } catch (error) {
-    console.error('Error updating category chart:', error);
+    log.error('Error updating category chart:', error);
   }
 });
 
@@ -1061,10 +1066,10 @@ function initPWAInstallBanner() {
     const { outcome } = await deferredPrompt.userChoice;
     
     if (outcome === 'accepted') {
-      console.log('User accepted the install prompt');
+      log.log('User accepted the install prompt');
       toast.success('App installed successfully!');
     } else {
-      console.log('User dismissed the install prompt');
+      log.log('User dismissed the install prompt');
     }
     
     // Clear the deferredPrompt
@@ -1103,7 +1108,7 @@ function initPWAInstallBanner() {
   
   // Listen for app installed event
   window.addEventListener('appinstalled', () => {
-    console.log('PWA was installed');
+    log.log('PWA was installed');
     toast.success('App installed! You can now use Rupiya offline.');
     
     // Hide the banner

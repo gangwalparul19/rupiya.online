@@ -2,6 +2,9 @@
 // Uses AES-GCM for encryption with PBKDF2 for key derivation
 
 import privacyConfig from '../config/privacy-config.js';
+import logger from '../utils/logger.js';
+
+const log = logger.create('Encryption');
 
 class EncryptionService {
   constructor() {
@@ -43,10 +46,10 @@ class EncryptionService {
         
         this.salt = Uint8Array.from(atob(saltBase64), c => c.charCodeAt(0));
         this.isInitialized = true;
-        console.log('[Encryption] Restored from session storage');
+        log.log('Restored from session storage');
       }
     } catch (error) {
-      console.warn('[Encryption] Could not restore from session:', error);
+      log.warn('Could not restore from session:', error);
       this.clear();
     }
   }
@@ -64,16 +67,16 @@ class EncryptionService {
         saltBase64,
         userId
       }));
-      console.log('[Encryption] Saved to session storage');
+      log.log('Saved to session storage');
     } catch (error) {
-      console.warn('[Encryption] Could not save to session:', error);
+      log.warn('Could not save to session:', error);
     }
   }
 
   // Initialize encryption with user's password
   async initialize(password, userId) {
     if (!userId) {
-      console.warn('[Encryption] Cannot initialize without userId');
+      log.warn('Cannot initialize without userId');
       return false;
     }
 
@@ -95,10 +98,10 @@ class EncryptionService {
       // Save to session storage for persistence across page loads
       await this._saveToSession(userId);
       
-      console.log('[Encryption] Initialized successfully');
+      log.log('Initialized successfully');
       return true;
     } catch (error) {
-      console.error('[Encryption] Initialization failed:', error);
+      log.error('Initialization failed:', error);
       this.isInitialized = false;
       return false;
     }
@@ -195,9 +198,9 @@ class EncryptionService {
     try {
       sessionStorage.removeItem(this.SESSION_KEY_STORAGE);
     } catch (e) {
-      console.warn('[Encryption] Could not clear session storage:', e);
+      log.warn('Could not clear session storage:', e);
     }
-    console.log('[Encryption] Keys cleared');
+    log.log('Keys cleared');
   }
 
 
@@ -234,7 +237,7 @@ class EncryptionService {
       
       return btoa(String.fromCharCode(...combined));
     } catch (error) {
-      console.error('[Encryption] Encrypt error:', error);
+      log.error('Encrypt error:', error);
       throw error;
     }
   }
@@ -264,13 +267,13 @@ class EncryptionService {
         combined = Uint8Array.from(atob(encryptedValue), c => c.charCodeAt(0));
       } catch (base64Error) {
         // Not valid base64, return original value
-        console.warn('[Encryption] Value is not valid base64, returning as-is');
+        log.warn('Value is not valid base64, returning as-is');
         return encryptedValue;
       }
       
       // Check minimum length (12 bytes IV + at least 1 byte data + 16 bytes auth tag)
       if (combined.length < 29) {
-        console.warn('[Encryption] Encrypted data too short, returning as-is');
+        log.warn('Encrypted data too short, returning as-is');
         return encryptedValue;
       }
       
@@ -299,7 +302,7 @@ class EncryptionService {
         return decryptedString;
       }
     } catch (error) {
-      console.error('[Encryption] Decrypt error:', error);
+      log.error('Decrypt error:', error);
       throw error;
     }
   }
@@ -314,7 +317,7 @@ class EncryptionService {
     await this.waitForRestore();
 
     if (!this.isReady()) {
-      console.warn('[Encryption] Not initialized, storing data unencrypted');
+      log.warn('Not initialized, storing data unencrypted');
       return data;
     }
 
@@ -357,7 +360,7 @@ class EncryptionService {
 
       return encryptedData;
     } catch (error) {
-      console.error('[Encryption] Object encryption failed:', error);
+      log.error('Object encryption failed:', error);
       // Return original data if encryption fails
       return data;
     }
@@ -378,7 +381,7 @@ class EncryptionService {
     await this.waitForRestore();
 
     if (!this.isReady()) {
-      console.warn('[Encryption] Not initialized, returning data with encrypted fields visible');
+      log.warn('Not initialized, returning data with encrypted fields visible');
       // Return data but try to show something useful
       const partialData = { ...data };
       // Copy encrypted fields as-is so UI doesn't break completely
@@ -403,7 +406,7 @@ class EncryptionService {
           const decrypted = await this.decryptValue(encryptedValue);
           decryptedData[field] = decrypted;
         } catch (fieldError) {
-          console.warn(`[Encryption] Failed to decrypt field ${field}:`, fieldError);
+          log.warn(`Failed to decrypt field ${field}:`, fieldError);
           // If decryption fails, try to use the encrypted value as-is
           // (it might be unencrypted data that was stored in _encrypted by mistake)
           if (typeof encryptedValue === 'string' && encryptedValue.length < 100) {
@@ -421,7 +424,7 @@ class EncryptionService {
 
       return decryptedData;
     } catch (error) {
-      console.error('[Encryption] Object decryption failed:', error);
+      log.error('Object decryption failed:', error);
       return data;
     }
   }

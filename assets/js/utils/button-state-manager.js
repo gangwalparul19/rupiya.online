@@ -19,21 +19,18 @@ class ButtonStateManager {
     if (!btn) return;
 
     // Store original state
-    const originalHTML = btn.innerHTML;
+    const originalText = btn.textContent;
     const originalDisabled = btn.disabled;
 
     this.activeButtons.set(btn, {
-      originalHTML,
+      originalText,
       originalDisabled,
       timestamp: Date.now()
     });
 
     // Set loading state
     btn.disabled = true;
-    btn.innerHTML = `
-      <span class="spinner"></span>
-      <span style="margin-left: 8px;">${loadingText}</span>
-    `;
+    btn.textContent = loadingText;
 
     // Auto-reset after timeout
     setTimeout(() => {
@@ -54,17 +51,13 @@ class ButtonStateManager {
 
     const state = this.activeButtons.get(btn);
     if (state) {
-      btn.innerHTML = state.originalHTML;
+      btn.textContent = state.originalText;
       btn.disabled = state.originalDisabled;
       this.activeButtons.delete(btn);
     } else {
       // Fallback reset
       btn.disabled = false;
-      // Try to find and remove spinner
-      const spinner = btn.querySelector('.spinner');
-      if (spinner) {
-        spinner.remove();
-      }
+      btn.classList.remove('btn-loading');
     }
   }
 
@@ -109,13 +102,9 @@ document.addEventListener('visibilitychange', () => {
 // Reset all buttons on page load
 window.addEventListener('load', () => {
   // Reset any buttons that might be stuck from previous session
-  document.querySelectorAll('.btn:disabled').forEach(btn => {
-    const spinner = btn.querySelector('.spinner');
-    if (spinner) {
-      console.log('Resetting stuck button on page load:', btn.id || btn);
-      btn.disabled = false;
-      spinner.remove();
-    }
+  document.querySelectorAll('.btn:disabled, .btn-loading').forEach(btn => {
+    btn.disabled = false;
+    btn.classList.remove('btn-loading');
   });
 });
 

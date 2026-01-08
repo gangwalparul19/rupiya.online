@@ -930,9 +930,15 @@ function initPullToRefresh() {
   
   document.addEventListener('touchend', async () => {
     if (pullIndicator.classList.contains('visible')) {
-      await loadExpenses();
-      pullIndicator.classList.remove('visible');
-      toast.success('Refreshed');
+      try {
+        await loadExpenses();
+        toast.success('Refreshed');
+      } catch (error) {
+        console.error('Error refreshing expenses:', error);
+        toast.error('Failed to refresh');
+      } finally {
+        pullIndicator.classList.remove('visible');
+      }
     }
     pulling = false;
   });

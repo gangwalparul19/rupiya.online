@@ -873,46 +873,43 @@ class TripGroupDetailPage {
 
   setExpenseLoading(loading) {
     const btn = document.getElementById('saveExpenseBtn');
+    if (!btn) return;
 
     if (loading) {
+      btn.dataset.originalText = btn.textContent;
       btn.disabled = true;
-      btn.innerHTML = `
-        <span class="spinner"></span>
-        <span style="margin-left: 8px;">Saving...</span>
-      `;
+      btn.textContent = 'Saving...';
     } else {
       btn.disabled = false;
-      btn.innerHTML = 'Add Expense';
+      btn.textContent = btn.dataset.originalText || 'Add Expense';
     }
   }
 
   setSettlementLoading(loading) {
     const btn = document.getElementById('saveSettlementBtn');
+    if (!btn) return;
 
     if (loading) {
+      btn.dataset.originalText = btn.textContent;
       btn.disabled = true;
-      btn.innerHTML = `
-        <span class="spinner"></span>
-        <span style="margin-left: 8px;">Recording...</span>
-      `;
+      btn.textContent = 'Recording...';
     } else {
       btn.disabled = false;
-      btn.innerHTML = 'Record Settlement';
+      btn.textContent = btn.dataset.originalText || 'Record Settlement';
     }
   }
 
   setMemberLoading(loading) {
     const btn = document.getElementById('saveMemberBtn');
+    if (!btn) return;
 
     if (loading) {
+      btn.dataset.originalText = btn.textContent;
       btn.disabled = true;
-      btn.innerHTML = `
-        <span class="spinner"></span>
-        <span style="margin-left: 8px;">Adding...</span>
-      `;
+      btn.textContent = 'Adding...';
     } else {
       btn.disabled = false;
-      btn.innerHTML = 'Add Member';
+      btn.textContent = btn.dataset.originalText || 'Add Member';
     }
   }
 

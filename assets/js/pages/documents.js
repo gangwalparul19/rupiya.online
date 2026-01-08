@@ -33,26 +33,30 @@ let expiryDateInput, reminderDaysInput, linkedAssetSelect, categorySuggestionEl;
 let expiringDocumentsEl, expiredDocumentsEl;
 
 async function init() {
-  const user = await authService.waitForAuth();
-  if (!user) {
-    window.location.href = 'login.html';
-    return;
-  }
+  try {
+    const user = await authService.waitForAuth();
+    if (!user) {
+      window.location.href = 'login.html';
+      return;
+    }
 
-  // Check if encryption reauth is needed
-  await encryptionReauthModal.checkAndPrompt(async () => {
+    // Check if encryption reauth is needed
+    await encryptionReauthModal.checkAndPrompt(async () => {
+      await loadDocuments();
+    });
+
+    initDOMElements();
+    setupEventListeners();
+    loadUserProfile(user);
     await loadDocuments();
-  });
-
-  initDOMElements();
-  setupEventListeners();
-  loadUserProfile(user);
-  await loadDocuments();
-  
-  // Set default date if element exists
-  const documentDateInput = document.getElementById('documentDate');
-  if (documentDateInput) {
-    documentDateInput.valueAsDate = new Date();
+    
+    // Set default date if element exists
+    const documentDateInput = document.getElementById('documentDate');
+    if (documentDateInput) {
+      documentDateInput.valueAsDate = new Date();
+    }
+  } catch (error) {
+    console.error('[Documents] Error initializing page:', error);
   }
 }
 

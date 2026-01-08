@@ -901,11 +901,9 @@ function hideDeleteModal() {
 async function handleDelete() {
   if (!deleteVehicleId) return;
 
+  const originalText = confirmDeleteBtn.textContent;
   confirmDeleteBtn.disabled = true;
-  confirmDeleteBtn.innerHTML = `
-    <span class="spinner"></span>
-    <span style="margin-left: 8px;">Deleting...</span>
-  `;
+  confirmDeleteBtn.textContent = 'Deleting...';
 
   try {
     const result = await firestoreService.delete('vehicles', deleteVehicleId);
@@ -923,7 +921,7 @@ async function handleDelete() {
   } finally {
     // Reset button
     confirmDeleteBtn.disabled = false;
-    confirmDeleteBtn.innerHTML = 'Delete Vehicle';
+    confirmDeleteBtn.textContent = originalText;
   }
 }
 

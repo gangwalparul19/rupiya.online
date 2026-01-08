@@ -8,6 +8,9 @@ import authService from './auth-service.js';
 import userService from './user-service.js';
 import encryptionService from './encryption-service.js';
 import authEncryptionHelper from '../utils/auth-encryption-helper.js';
+import logger from '../utils/logger.js';
+
+const log = logger.create('Services');
 
 // Connect auth service with user service (avoid circular dependency)
 authService.setUserService(userService);
@@ -24,11 +27,11 @@ authService.onAuthStateChanged(async (user) => {
       const result = await userService.getOrCreateUserProfile(user);
       if (result.success) {
         if (result.isNewUser) {
-          console.log('✅ New user profile created');
+          log.log('✅ New user profile created');
         } else if (result.fromCache) {
-          console.log('✅ User profile loaded from cache');
+          log.log('✅ User profile loaded from cache');
         } else {
-          console.log('✅ User profile loaded from Firestore');
+          log.log('✅ User profile loaded from Firestore');
         }
       }
       
@@ -37,21 +40,21 @@ authService.onAuthStateChanged(async (user) => {
       if (authEncryptionHelper.isGoogleUser()) {
         const encryptionStatus = encryptionService.getStatus();
         if (encryptionStatus.enabled && !encryptionStatus.ready) {
-          console.log('🔐 Initializing encryption for Google user...');
+          log.log('🔐 Initializing encryption for Google user...');
           const success = await authEncryptionHelper.initializeForGoogleUser(user.uid);
           if (success) {
-            console.log('✅ Encryption initialized for Google user');
+            log.log('✅ Encryption initialized for Google user');
           } else {
-            console.warn('⚠️ Failed to initialize encryption for Google user');
+            log.warn('⚠️ Failed to initialize encryption for Google user');
           }
         } else if (encryptionStatus.ready) {
-          console.log('✅ Encryption already ready for Google user');
+          log.log('✅ Encryption already ready for Google user');
         }
       } else {
         // Email/password user - check if encryption needs re-initialization
         const needsReauth = await authEncryptionHelper.needsReinitialization();
         if (needsReauth) {
-          console.log('🔐 Email/password user needs to re-enter password for encryption');
+          log.log('🔐 Email/password user needs to re-enter password for encryption');
           // The UI will handle showing the re-auth prompt when needed
         }
       }
@@ -59,16 +62,16 @@ authService.onAuthStateChanged(async (user) => {
       // Check final encryption status
       const finalStatus = encryptionService.getStatus();
       if (finalStatus.enabled && !finalStatus.ready) {
-        console.log('🔐 Encryption enabled but not ready - user may need to re-authenticate');
+        log.log('🔐 Encryption enabled but not ready - user may need to re-authenticate');
       }
     } catch (error) {
-      console.error('❌ Error initializing user profile:', error);
+      log.error('❌ Error initializing user profile:', error);
     }
   } else {
     // Only clear encryption if we've previously seen a logged-in user
     // This prevents clearing on initial page load before auth state is restored
     if (hasSeenLoggedInUser) {
-      console.log('🔐 User signed out - clearing encryption');
+      log.log('🔐 User signed out - clearing encryption');
       authEncryptionHelper.clearEncryption();
       hasSeenLoggedInUser = false;
     }

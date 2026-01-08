@@ -132,7 +132,7 @@ async function loadInsights(forceRefresh = false) {
       toast.success('Insights refreshed!');
     }
   } catch (error) {
-    console.error('Error loading insights:', error);
+    // Error already shown to user via toast
     toast.error('Failed to load insights');
   }
 }
