@@ -320,12 +320,12 @@ function renderVehicles() {
             ${insuranceStatus}
           </div>
           <div class="vehicle-actions">
-            <button class="btn-icon" onclick="window.editVehicle('${vehicle.id}')" title="Edit">
+            <button type="button" class="btn-icon" onclick="window.editVehicle('${vehicle.id}')" title="Edit">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
               </svg>
             </button>
-            <button class="btn-icon btn-danger" onclick="window.showDeleteConfirmation('${vehicle.id}')" title="Delete">
+            <button type="button" class="btn-icon btn-danger" onclick="window.showDeleteConfirmation('${vehicle.id}')" title="Delete">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
               </svg>
@@ -355,16 +355,16 @@ function renderVehicles() {
         </div>
 
         <div class="vehicle-card-actions">
-          <button class="btn btn-sm btn-primary" onclick="window.showFuelLogModal('${vehicle.id}', '${safeNameForJs}', ${vehicle.currentMileage || 0})">
+          <button type="button" class="btn btn-sm btn-primary" onclick="window.showFuelLogModal('${vehicle.id}', '${safeNameForJs}', ${vehicle.currentMileage || 0})">
             ⛽ Add Fuel
           </button>
-          <button class="btn btn-sm btn-outline" onclick="window.showMaintenanceModal('${vehicle.id}', '${safeNameForJs}')">
+          <button type="button" class="btn btn-sm btn-outline" onclick="window.showMaintenanceModal('${vehicle.id}', '${safeNameForJs}')">
             🔧 Maintenance
           </button>
-          <button class="btn btn-sm btn-success" onclick="window.showVehicleIncomeModal('${vehicle.id}', '${safeNameForJs}')">
+          <button type="button" class="btn btn-sm btn-success" onclick="window.showVehicleIncomeModal('${vehicle.id}', '${safeNameForJs}')">
             💰 Income
           </button>
-          <button class="btn btn-sm btn-secondary" onclick="window.showMileageHistory('${vehicle.id}', '${safeNameForJs}')">
+          <button type="button" class="btn btn-sm btn-secondary" onclick="window.showMileageHistory('${vehicle.id}', '${safeNameForJs}')">
             📊 History
           </button>
         </div>
@@ -700,7 +700,7 @@ async function showMileageHistory(vehicleId, vehicleName) {
                 <td>₹${totalCst.toFixed(2)}</td>
                 <td class="${mileage !== '--' ? 'text-success' : ''}">${mileage}</td>
                 <td>
-                  <button class="btn-icon btn-danger btn-sm" onclick="window.deleteFuelLog('${log.id}')" title="Delete">
+                  <button type="button" class="btn-icon btn-danger btn-sm" onclick="window.deleteFuelLog('${log.id}')" title="Delete">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                     </svg>

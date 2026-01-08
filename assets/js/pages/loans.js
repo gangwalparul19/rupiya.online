@@ -279,13 +279,13 @@ function renderLoans() {
         </div>
         
         <div class="loan-card-footer">
-          <button class="btn btn-sm btn-outline" onclick="window.loansPage.recordPayment('${loan.id}')">
+          <button type="button" class="btn btn-sm btn-outline" onclick="window.loansPage.recordPayment('${loan.id}')">
             💰 Pay EMI
           </button>
-          <button class="btn btn-sm btn-outline" onclick="window.loansPage.editLoan('${loan.id}')">
+          <button type="button" class="btn btn-sm btn-outline" onclick="window.loansPage.editLoan('${loan.id}')">
             ✏️ Edit
           </button>
-          <button class="btn btn-sm btn-outline" onclick="window.loansPage.deleteLoan('${loan.id}')">
+          <button type="button" class="btn btn-sm btn-outline" onclick="window.loansPage.deleteLoan('${loan.id}')">
             🗑️
           </button>
         </div>

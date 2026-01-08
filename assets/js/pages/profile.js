@@ -567,7 +567,7 @@ function renderExpenseCategories() {
           ${isProtected ? '<span class="category-badge">System</span>' : ''}
         </span>
         ${!isProtected ? `
-          <button class="category-delete" onclick="window.deleteExpenseCategory('${safeCategoryForJs}')">
+          <button type="button" class="category-delete" onclick="window.deleteExpenseCategory('${safeCategoryForJs}')">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
             </svg>
@@ -596,7 +596,7 @@ function renderIncomeCategories() {
           ${isProtected ? '<span class="category-badge">System</span>' : ''}
         </span>
         ${!isProtected ? `
-          <button class="category-delete" onclick="window.deleteIncomeCategory('${safeCategoryForJs}')">
+          <button type="button" class="category-delete" onclick="window.deleteIncomeCategory('${safeCategoryForJs}')">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
             </svg>
@@ -877,8 +877,8 @@ function renderPaymentMethods() {
                   <div class="payment-method-header">
                     <div class="payment-method-icon">${icon}</div>
                     <div class="payment-method-actions">
-                      ${!method.isDefault ? `<button class="btn-icon" onclick="setDefaultPaymentMethod('${method.id}')" title="Set as default">⭐</button>` : ''}
-                      <button class="btn-icon" onclick="showDeletePaymentMethodModal('${method.id}')" title="Delete">🗑️</button>
+                      ${!method.isDefault ? `<button type="button" class="btn-icon" onclick="setDefaultPaymentMethod('${method.id}')" title="Set as default">⭐</button>` : ''}
+                      <button type="button" class="btn-icon" onclick="showDeletePaymentMethodModal('${method.id}')" title="Delete">🗑️</button>
                     </div>
                   </div>
                   <div class="payment-method-info">
