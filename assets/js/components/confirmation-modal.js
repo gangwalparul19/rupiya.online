@@ -173,6 +173,16 @@ class ConfirmationModal {
         console.log('[ConfirmationModal] Modal in DOM:', document.body.contains(this.modal));
         console.log('[ConfirmationModal] Modal bounding rect:', this.modal.getBoundingClientRect());
         
+        // Check modal container
+        const container = this.modal.querySelector('.modal-container');
+        if (container) {
+          const containerStyle = window.getComputedStyle(container);
+          console.log('[ConfirmationModal] Container computed display:', containerStyle.display);
+          console.log('[ConfirmationModal] Container computed opacity:', containerStyle.opacity);
+          console.log('[ConfirmationModal] Container computed transform:', containerStyle.transform);
+          console.log('[ConfirmationModal] Container bounding rect:', container.getBoundingClientRect());
+        }
+        
         console.log('[ConfirmationModal] Modal displayed successfully');
       } else {
         console.error('[ConfirmationModal] Modal element not found!');

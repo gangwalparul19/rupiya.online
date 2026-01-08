@@ -20,8 +20,10 @@
   opacity: 1 !important;
 }
 
-.modal-container {
+#confirmationModal .modal-container {
   z-index: 10000 !important;
+  opacity: 1 !important;
+  transform: none !important;
 }
 
 .confirmation-modal-container {
@@ -29,6 +31,8 @@
   text-align: center;
   position: relative;
   z-index: 10001 !important;
+  opacity: 1 !important;
+  transform: none !important;
 }
 
 .confirmation-icon {
