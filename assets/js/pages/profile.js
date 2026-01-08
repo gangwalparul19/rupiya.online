@@ -1135,7 +1135,7 @@ function renderPaymentMethods() {
           <h3 class="payment-category-title">${categoryLabels[type]}</h3>
           <div class="payment-methods-grid">
             ${grouped[type].map(method => {
-              const icon = paymentMethodsService.getPaymentMethodIcon(method.type);
+              const icon = paymentMethodsService.getPaymentMethodBrandIcon(method);
               const defaultBadge = method.isDefault ? '<span class="badge badge-primary">Default</span>' : '';
               const escapedName = escapeHtml(method.name);
               const escapedDetails = escapeHtml(getPaymentMethodDetails(method));
@@ -1299,7 +1299,7 @@ window.showPaymentMethodDetails = function(methodId) {
   const method = paymentMethods.find(m => m.id === methodId);
   if (!method) return;
   
-  const icon = paymentMethodsService.getPaymentMethodIcon(method.type);
+  const icon = paymentMethodsService.getPaymentMethodBrandIcon(method);
   const typeLabel = {
     cash: 'Cash',
     card: 'Card',
@@ -1310,7 +1310,7 @@ window.showPaymentMethodDetails = function(methodId) {
   
   let detailsHTML = `
     <div style="text-align: center; margin-bottom: 20px;">
-      <div style="font-size: 48px; margin-bottom: 10px;">${icon}</div>
+      <div style="margin-bottom: 10px; display: flex; justify-content: center;">${icon}</div>
       <h3 style="margin: 0 0 5px 0;">${escapeHtml(method.name)}</h3>
       <p style="color: var(--text-secondary); margin: 0;">${typeLabel}</p>
       ${method.isDefault ? '<span class="badge badge-primary" style="margin-top: 10px; display: inline-block;">Default</span>' : ''}

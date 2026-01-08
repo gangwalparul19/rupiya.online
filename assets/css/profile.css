@@ -1002,6 +1002,12 @@ ul li {
   border: 2px solid #e9ecef;
 }
 
+.payment-method-icon svg {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
 .payment-method-info {
   flex: 1;
 }
