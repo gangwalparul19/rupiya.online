@@ -1327,13 +1327,56 @@ window.showPaymentMethodDetails = function(methodId) {
   
   detailsHTML += `</div>`;
   
-  confirmationModal.showCustom({
-    title: 'Payment Method Details',
-    message: detailsHTML,
-    confirmText: 'Close',
-    showCancel: false
-  });
+  // Create and show a simple modal
+  showPaymentDetailsModal('Payment Method Details', detailsHTML);
 };
+
+// Helper function to show payment details modal
+function showPaymentDetailsModal(title, content) {
+  // Create modal if it doesn't exist
+  let modal = document.getElementById('paymentDetailsModal');
+  if (!modal) {
+    const modalHTML = `
+      <div id="paymentDetailsModal" class="modal-overlay">
+        <div class="modal-container modal-sm">
+          <div class="modal-header">
+            <h2 class="modal-title" id="paymentDetailsModalTitle"></h2>
+            <button class="modal-close" id="paymentDetailsModalClose">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+          <div class="modal-body" id="paymentDetailsModalBody"></div>
+          <div class="modal-footer">
+            <button class="btn btn-primary" id="paymentDetailsModalOk">Close</button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    modal = document.getElementById('paymentDetailsModal');
+    
+    // Setup event listeners
+    document.getElementById('paymentDetailsModalClose').addEventListener('click', hidePaymentDetailsModal);
+    document.getElementById('paymentDetailsModalOk').addEventListener('click', hidePaymentDetailsModal);
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) hidePaymentDetailsModal();
+    });
+  }
+  
+  // Set content and show
+  document.getElementById('paymentDetailsModalTitle').textContent = title;
+  document.getElementById('paymentDetailsModalBody').innerHTML = content;
+  modal.classList.add('show');
+}
+
+function hidePaymentDetailsModal() {
+  const modal = document.getElementById('paymentDetailsModal');
+  if (modal) {
+    modal.classList.remove('show');
+  }
+}
 
 // Show edit payment method modal
 window.showEditPaymentMethodModal = function(methodId) {
