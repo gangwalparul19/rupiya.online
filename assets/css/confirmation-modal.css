@@ -12,10 +12,12 @@
   z-index: 9999 !important;
   align-items: center;
   justify-content: center;
+  opacity: 1 !important;
 }
 
 #confirmationModal.modal-overlay[style*="display: flex"] {
   display: flex !important;
+  opacity: 1 !important;
 }
 
 .modal-container {
