@@ -959,6 +959,8 @@ ul li {
   border: 2px solid #4A90E2;
   border-radius: 12px;
   transition: all 0.2s ease;
+  cursor: pointer;
+  position: relative;
 }
 
 .payment-method-card:hover {
@@ -966,6 +968,20 @@ ul li {
   border-color: #00CED1;
   box-shadow: 0 4px 12px rgba(74, 144, 226, 0.15);
   transform: translateY(-2px);
+}
+
+.payment-method-card::after {
+  content: '👁️';
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 14px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.payment-method-card:hover::after {
+  opacity: 0.5;
 }
 
 .payment-method-header {
@@ -997,7 +1013,7 @@ ul li {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.9375rem;
+  font-size: 1rem;
 }
 
 .payment-method-details {

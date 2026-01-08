@@ -985,11 +985,21 @@ function initPaymentMethodsDOM() {
 // Setup Payment Methods Event Listeners
 function setupPaymentMethodsListeners() {
   if (paymentTypeSelect) {
-    paymentTypeSelect.addEventListener('change', handlePaymentTypeChange);
+    paymentTypeSelect.addEventListener('change', () => {
+      handlePaymentTypeChange();
+      // If editing and type changed, cancel edit mode
+      if (editingPaymentMethodId !== null) {
+        const method = paymentMethods.find(m => m.id === editingPaymentMethodId);
+        if (method && method.type !== paymentTypeSelect.value) {
+          cancelEditPaymentMethod();
+        }
+      }
+    });
   }
   
   if (addPaymentMethodForm) {
     addPaymentMethodForm.addEventListener('submit', handleAddPaymentMethod);
+    addPaymentMethodForm.addEventListener('reset', cancelEditPaymentMethod);
   }
   
   if (closeDeletePaymentMethodModalBtn) {
@@ -1003,6 +1013,14 @@ function setupPaymentMethodsListeners() {
   if (confirmDeletePaymentMethodBtn) {
     confirmDeletePaymentMethodBtn.addEventListener('click', handleDeletePaymentMethod);
   }
+}
+
+// Cancel edit payment method
+function cancelEditPaymentMethod() {
+  editingPaymentMethodId = null;
+  addPaymentMethodBtn.textContent = 'Add Payment Method';
+  addPaymentMethodForm.reset();
+  handlePaymentTypeChange();
 }
 
 // Handle payment type change
@@ -1092,17 +1110,17 @@ function renderPaymentMethods() {
           <div class="payment-methods-grid">
             ${grouped[type].map(method => {
               const icon = paymentMethodsService.getPaymentMethodIcon(method.type);
-              const displayName = paymentMethodsService.getPaymentMethodDisplayName(method);
               const defaultBadge = method.isDefault ? '<span class="badge badge-primary">Default</span>' : '';
               const escapedName = escapeHtml(method.name);
               const escapedDetails = escapeHtml(getPaymentMethodDetails(method));
               
               return `
-                <div class="payment-method-card">
+                <div class="payment-method-card" onclick="showPaymentMethodDetails('${method.id}')" style="cursor: pointer;">
                   <div class="payment-method-header">
                     <div class="payment-method-icon">${icon}</div>
-                    <div class="payment-method-actions">
+                    <div class="payment-method-actions" onclick="event.stopPropagation();">
                       ${!method.isDefault ? `<button type="button" class="btn-icon" onclick="setDefaultPaymentMethod('${method.id}')" title="Set as default">⭐</button>` : ''}
+                      <button type="button" class="btn-icon" onclick="showEditPaymentMethodModal('${method.id}')" title="Edit">✏️</button>
                       <button type="button" class="btn-icon" onclick="showDeletePaymentMethodModal('${method.id}')" title="Delete">🗑️</button>
                     </div>
                   </div>
@@ -1126,13 +1144,27 @@ function renderPaymentMethods() {
 function getPaymentMethodDetails(method) {
   switch (method.type) {
     case 'card':
-      return `${method.cardType === 'credit' ? 'Credit' : 'Debit'} • ${method.bankName || ''} • **** ${method.cardNumber || ''}`;
+      const cardTypeLabel = method.cardType === 'credit' ? 'Credit' : 'Debit';
+      const cardParts = [cardTypeLabel];
+      if (method.bankName) cardParts.push(method.bankName);
+      if (method.cardNumber) cardParts.push(`•• ${method.cardNumber}`);
+      return cardParts.join(' • ');
     case 'upi':
-      return `${method.upiId || ''} • ${method.provider || ''}`;
+      const upiParts = [];
+      if (method.upiId) upiParts.push(method.upiId);
+      if (method.provider) upiParts.push(method.provider);
+      return upiParts.join(' • ');
     case 'wallet':
-      return `${method.walletProvider || ''} • ${method.walletNumber || ''}`;
+      const walletParts = [];
+      if (method.walletProvider) walletParts.push(method.walletProvider);
+      if (method.walletNumber) walletParts.push(`•• ${method.walletNumber}`);
+      return walletParts.join(' • ');
     case 'bank':
-      return `${method.bankName || ''} • ${method.accountType || ''} • **** ${method.accountNumber || ''}`;
+      const bankParts = [];
+      if (method.bankName) bankParts.push(method.bankName);
+      if (method.accountType) bankParts.push(method.accountType);
+      if (method.bankAccountNumber) bankParts.push(`•• ${method.bankAccountNumber}`);
+      return bankParts.join(' • ');
     case 'cash':
       return 'Cash payments';
     default:
@@ -1156,9 +1188,11 @@ async function handleAddPaymentMethod(e) {
     return;
   }
   
+  const isEditing = editingPaymentMethodId !== null;
+  
   // Show loading state - just disable and change text
   addPaymentMethodBtn.disabled = true;
-  addPaymentMethodBtn.textContent = 'Adding...';
+  addPaymentMethodBtn.textContent = isEditing ? 'Updating...' : 'Adding...';
   
   try {
     const methodData = {
@@ -1189,23 +1223,32 @@ async function handleAddPaymentMethod(e) {
         break;
     }
     
-    const result = await paymentMethodsService.addPaymentMethod(methodData);
+    let result;
+    if (isEditing) {
+      result = await paymentMethodsService.updatePaymentMethod(editingPaymentMethodId, methodData);
+    } else {
+      result = await paymentMethodsService.addPaymentMethod(methodData);
+    }
     
     if (result.success) {
-      showToast('Payment method added successfully', 'success');
+      showToast(isEditing ? 'Payment method updated successfully' : 'Payment method added successfully', 'success');
       addPaymentMethodForm.reset();
       handlePaymentTypeChange(); // Hide all fields
+      editingPaymentMethodId = null;
+      addPaymentMethodBtn.textContent = 'Add Payment Method';
       await loadPaymentMethods();
     } else {
-      showToast(result.error || 'Failed to add payment method', 'error');
+      showToast(result.error || (isEditing ? 'Failed to update payment method' : 'Failed to add payment method'), 'error');
     }
   } catch (error) {
-    console.error('Error adding payment method:', error);
-    showToast('Failed to add payment method', 'error');
+    console.error('Error saving payment method:', error);
+    showToast('Failed to save payment method', 'error');
   } finally {
     // Reset button state
     addPaymentMethodBtn.disabled = false;
-    addPaymentMethodBtn.textContent = 'Add Payment Method';
+    if (!editingPaymentMethodId) {
+      addPaymentMethodBtn.textContent = 'Add Payment Method';
+    }
   }
 }
 
@@ -1223,6 +1266,118 @@ window.setDefaultPaymentMethod = async function(methodId) {
     console.error('Error setting default payment method:', error);
     showToast('Failed to set default payment method', 'error');
   }
+};
+
+// Show payment method details modal
+window.showPaymentMethodDetails = function(methodId) {
+  const method = paymentMethods.find(m => m.id === methodId);
+  if (!method) return;
+  
+  const icon = paymentMethodsService.getPaymentMethodIcon(method.type);
+  const typeLabel = {
+    cash: 'Cash',
+    card: 'Card',
+    upi: 'UPI',
+    wallet: 'Digital Wallet',
+    bank: 'Bank Account'
+  }[method.type] || method.type;
+  
+  let detailsHTML = `
+    <div style="text-align: center; margin-bottom: 20px;">
+      <div style="font-size: 48px; margin-bottom: 10px;">${icon}</div>
+      <h3 style="margin: 0 0 5px 0;">${escapeHtml(method.name)}</h3>
+      <p style="color: var(--text-secondary); margin: 0;">${typeLabel}</p>
+      ${method.isDefault ? '<span class="badge badge-primary" style="margin-top: 10px; display: inline-block;">Default</span>' : ''}
+    </div>
+    <div style="background: var(--bg-secondary); padding: 15px; border-radius: 8px;">
+  `;
+  
+  switch (method.type) {
+    case 'card':
+      detailsHTML += `
+        <div style="margin-bottom: 10px;"><strong>Type:</strong> ${method.cardType === 'credit' ? 'Credit Card' : 'Debit Card'}</div>
+        ${method.bankName ? `<div style="margin-bottom: 10px;"><strong>Bank:</strong> ${escapeHtml(method.bankName)}</div>` : ''}
+        ${method.cardNumber ? `<div style="margin-bottom: 10px;"><strong>Card Number:</strong> •••• •••• •••• ${escapeHtml(method.cardNumber)}</div>` : ''}
+      `;
+      break;
+    case 'upi':
+      detailsHTML += `
+        ${method.upiId ? `<div style="margin-bottom: 10px;"><strong>UPI ID:</strong> ${escapeHtml(method.upiId)}</div>` : ''}
+        ${method.provider ? `<div style="margin-bottom: 10px;"><strong>Provider:</strong> ${escapeHtml(method.provider)}</div>` : ''}
+      `;
+      break;
+    case 'wallet':
+      detailsHTML += `
+        ${method.walletProvider ? `<div style="margin-bottom: 10px;"><strong>Provider:</strong> ${escapeHtml(method.walletProvider)}</div>` : ''}
+        ${method.walletNumber ? `<div style="margin-bottom: 10px;"><strong>Mobile:</strong> ••••••${escapeHtml(method.walletNumber)}</div>` : ''}
+      `;
+      break;
+    case 'bank':
+      detailsHTML += `
+        ${method.bankName ? `<div style="margin-bottom: 10px;"><strong>Bank:</strong> ${escapeHtml(method.bankName)}</div>` : ''}
+        ${method.accountType ? `<div style="margin-bottom: 10px;"><strong>Account Type:</strong> ${escapeHtml(method.accountType)}</div>` : ''}
+        ${method.bankAccountNumber ? `<div style="margin-bottom: 10px;"><strong>Account Number:</strong> ••••${escapeHtml(method.bankAccountNumber)}</div>` : ''}
+        ${method.ifscCode ? `<div style="margin-bottom: 10px;"><strong>IFSC Code:</strong> ${escapeHtml(method.ifscCode)}</div>` : ''}
+      `;
+      break;
+    case 'cash':
+      detailsHTML += `<div>Cash payment method for tracking cash transactions.</div>`;
+      break;
+  }
+  
+  detailsHTML += `</div>`;
+  
+  confirmationModal.showCustom({
+    title: 'Payment Method Details',
+    message: detailsHTML,
+    confirmText: 'Close',
+    showCancel: false
+  });
+};
+
+// Show edit payment method modal
+window.showEditPaymentMethodModal = function(methodId) {
+  const method = paymentMethods.find(m => m.id === methodId);
+  if (!method) return;
+  
+  editingPaymentMethodId = methodId;
+  
+  // Populate form with current values
+  paymentTypeSelect.value = method.type;
+  paymentMethodNameInput.value = method.name;
+  
+  // Show relevant fields and populate them
+  handlePaymentTypeChange();
+  
+  switch (method.type) {
+    case 'card':
+      if (cardNumberInput) cardNumberInput.value = method.cardNumber || '';
+      if (cardTypeSelect) cardTypeSelect.value = method.cardType || 'credit';
+      if (cardBankNameInput) cardBankNameInput.value = method.bankName || '';
+      break;
+    case 'upi':
+      if (upiIdInput) upiIdInput.value = method.upiId || '';
+      if (upiProviderSelect) upiProviderSelect.value = method.provider || '';
+      break;
+    case 'wallet':
+      if (walletProviderSelect) walletProviderSelect.value = method.walletProvider || '';
+      if (walletNumberInput) walletNumberInput.value = method.walletNumber || '';
+      break;
+    case 'bank':
+      if (bankAccountNumberInput) bankAccountNumberInput.value = method.bankAccountNumber || '';
+      if (bankNameInput) bankNameInput.value = method.bankName || '';
+      if (ifscCodeInput) ifscCodeInput.value = method.ifscCode || '';
+      if (accountTypeSelect) accountTypeSelect.value = method.accountType || 'savings';
+      break;
+  }
+  
+  // Change button text to indicate editing
+  addPaymentMethodBtn.textContent = 'Update Payment Method';
+  
+  // Scroll to form
+  addPaymentMethodForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  
+  showToast('Editing payment method. Update the details and click "Update Payment Method".', 'info');
 };
 
 // Show delete payment method modal
