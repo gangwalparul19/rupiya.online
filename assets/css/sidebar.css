@@ -121,7 +121,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 1rem;
   cursor: pointer;
   user-select: none;
   transition: background 0.15s ease;
@@ -135,7 +135,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -181,7 +181,7 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.625rem 1rem 0.625rem 2.5rem;
+  padding: 0.5rem 1rem 0.5rem 2.5rem;
   color: var(--text-secondary, #4b5563);
   text-decoration: none;
   font-size: 0.875rem;
@@ -354,14 +354,14 @@
 }
 /* Enhanced Section Styling */
 .nav-section {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
 }
 
 .nav-section-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 1rem;
   cursor: pointer;
   transition: all 0.2s ease;
   border-radius: 8px;
@@ -377,8 +377,9 @@
   align-items: center;
   gap: 0.75rem;
   font-weight: 600;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   color: var(--text-primary, #1f2937);
+  white-space: nowrap;
 }
 
 .nav-section-icon {
@@ -409,7 +410,7 @@
 .nav-section.expanded .nav-section-items {
   max-height: 500px;
   opacity: 1;
-  padding-bottom: 0.5rem;
+  padding-bottom: 0.25rem;
 }
 
 /* Enhanced Nav Items */
@@ -417,8 +418,8 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.625rem 1rem;
-  margin: 0.125rem 0;
+  padding: 0.5rem 1rem;
+  margin: 0.0625rem 0;
   text-decoration: none;
   color: var(--text-secondary, #6b7280);
   border-radius: 6px;
@@ -455,8 +456,8 @@
 /* Section Dividers */
 .nav-section + .nav-section {
   border-top: 1px solid var(--border-light, rgba(229, 231, 235, 0.5));
-  padding-top: 0.5rem;
-  margin-top: 0.5rem;
+  padding-top: 0.25rem;
+  margin-top: 0.25rem;
 }
 
 /* Mobile Enhancements */
