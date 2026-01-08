@@ -1,8 +1,19 @@
 /* Confirmation Modal Styles */
 
+/* Ensure modal appears above all other elements */
+.modal-overlay {
+  z-index: 9999 !important;
+}
+
+.modal-container {
+  z-index: 10000 !important;
+}
+
 .confirmation-modal-container {
   max-width: 450px;
   text-align: center;
+  position: relative;
+  z-index: 10001 !important;
 }
 
 .confirmation-icon {
@@ -40,10 +51,15 @@
   gap: 0.75rem;
   justify-content: center;
   padding: 1.5rem;
+  position: relative;
+  z-index: 10002 !important;
 }
 
 .confirmation-modal-container .modal-footer .btn {
   min-width: 120px;
+  position: relative;
+  z-index: 10003 !important;
+  pointer-events: auto !important;
 }
 
 /* Animation */
