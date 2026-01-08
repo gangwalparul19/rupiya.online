@@ -5,6 +5,7 @@ import firestoreService from '../services/firestore-service.js';
 import categoriesService from '../services/categories-service.js';
 import familySwitcher from '../components/family-switcher.js';
 import toast from '../components/toast.js';
+import confirmationModal from '../components/confirmation-modal.js';
 import themeManager from '../utils/theme-manager.js';
 import { Validator } from '../utils/validation.js';
 import { formatCurrency, formatDate } from '../utils/helpers.js';
@@ -393,7 +394,13 @@ function setupEventListeners() {
   
   // Logout
   logoutBtn.addEventListener('click', async () => {
-    const confirmed = confirm('Are you sure you want to logout?');
+    const confirmed = await confirmationModal.show({
+      title: 'Logout',
+      message: 'Are you sure you want to logout?',
+      confirmText: 'Logout',
+      type: 'warning',
+      icon: '👋'
+    });
     if (!confirmed) return;
     
     const result = await authService.signOut();

@@ -7,6 +7,7 @@ import paymentMethodsService from '../services/payment-methods-service.js';
 import smartCategorizationService from '../services/smart-categorization-service.js';
 import familySwitcher from '../components/family-switcher.js';
 import toast from '../components/toast.js';
+import confirmationModal from '../components/confirmation-modal.js';
 import themeManager from '../utils/theme-manager.js';
 import Pagination from '../components/pagination.js';
 import { Validator } from '../utils/validation.js';
@@ -629,7 +630,12 @@ function updateBulkActionsBar() {
 async function bulkDeleteIncome() {
   if (state.selectedIncome.size === 0) return;
   
-  const confirmed = confirm(`Delete ${state.selectedIncome.size} selected income entries?`);
+  const confirmed = await confirmationModal.show({
+    title: 'Delete Income',
+    message: `Delete ${state.selectedIncome.size} selected income entries? This action cannot be undone.`,
+    confirmText: 'Delete',
+    type: 'danger'
+  });
   if (!confirmed) return;
   
   try {
@@ -826,7 +832,13 @@ function setupEventListeners() {
   
   // Logout
   logoutBtn.addEventListener('click', async () => {
-    const confirmed = confirm('Are you sure you want to logout?');
+    const confirmed = await confirmationModal.show({
+      title: 'Logout',
+      message: 'Are you sure you want to logout?',
+      confirmText: 'Logout',
+      type: 'warning',
+      icon: '👋'
+    });
     if (!confirmed) return;
     
     const result = await authService.signOut();

@@ -102,10 +102,14 @@ class CategoriesService {
   async initializeCategories() {
     try {
       const userId = this.getUserId();
+      console.log('[CategoriesService] Initializing categories for user:', userId);
+      
       const docRef = doc(db, this.collectionName, userId);
       const docSnap = await getDoc(docRef);
 
       if (!docSnap.exists()) {
+        console.log('[CategoriesService] No categories found, creating defaults...');
+        
         // Create default categories for new user
         await setDoc(docRef, {
           expenseCategories: this.defaultExpenseCategories,
@@ -113,6 +117,8 @@ class CategoriesService {
           createdAt: Timestamp.now(),
           updatedAt: Timestamp.now()
         });
+        
+        console.log('[CategoriesService] Default categories created successfully');
         
         return {
           success: true,
@@ -123,12 +129,13 @@ class CategoriesService {
         };
       }
 
+      console.log('[CategoriesService] Categories already exist');
       return {
         success: true,
         data: docSnap.data()
       };
     } catch (error) {
-      console.error('Error initializing categories:', error);
+      console.error('[CategoriesService] Error initializing categories:', error);
       return { success: false, error: error.message };
     }
   }
@@ -175,10 +182,11 @@ class CategoriesService {
       const userId = this.getUserId();
       const docRef = doc(db, this.collectionName, userId);
       
-      await updateDoc(docRef, {
+      // Use setDoc with merge to create document if it doesn't exist
+      await setDoc(docRef, {
         expenseCategories: categories,
         updatedAt: Timestamp.now()
-      });
+      }, { merge: true });
 
       return { success: true };
     } catch (error) {
@@ -193,10 +201,11 @@ class CategoriesService {
       const userId = this.getUserId();
       const docRef = doc(db, this.collectionName, userId);
       
-      await updateDoc(docRef, {
+      // Use setDoc with merge to create document if it doesn't exist
+      await setDoc(docRef, {
         incomeCategories: categories,
         updatedAt: Timestamp.now()
-      });
+      }, { merge: true });
 
       return { success: true };
     } catch (error) {

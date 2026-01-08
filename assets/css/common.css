@@ -3,6 +3,9 @@
    Global styles, variables, and utilities
    ============================================ */
 
+/* Import confirmation modal styles */
+@import url('confirmation-modal.css');
+
 /* CSS Variables */
 :root {
   /* Primary Colors */

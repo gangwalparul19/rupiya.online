@@ -3,6 +3,7 @@ import '../services/services-init.js'; // Initialize services
 import authService from '../services/auth-service.js';
 import authEncryptionHelper from '../utils/auth-encryption-helper.js';
 import toast from '../components/toast.js';
+import confirmationModal from '../components/confirmation-modal.js';
 import { validateForm, setupRealtimeValidation } from '../utils/validation.js';
 
 // Get form elements
@@ -222,7 +223,13 @@ forgotPasswordLink.addEventListener('click', async (e) => {
     return;
   }
   
-  const confirmed = confirm(`Send password reset email to ${email}?`);
+  const confirmed = await confirmationModal.show({
+    title: 'Reset Password',
+    message: `Send password reset email to ${email}?`,
+    confirmText: 'Send Email',
+    type: 'info',
+    icon: '📧'
+  });
   if (!confirmed) return;
   
   try {

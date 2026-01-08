@@ -1,6 +1,7 @@
 // Sample Data Generator for Testing
 import firestoreService from '../services/firestore-service.js';
 import toast from '../components/toast.js';
+import confirmationModal from '../components/confirmation-modal.js';
 
 // Sample expense categories
 const expenseCategories = [
@@ -113,7 +114,13 @@ export async function generateAllSampleData() {
 
 // Clear all data
 export async function clearAllData() {
-  const confirmed = confirm('Are you sure you want to delete ALL expenses and income? This cannot be undone!');
+  const confirmed = await confirmationModal.show({
+    title: 'Delete All Data',
+    message: 'Are you sure you want to delete ALL expenses and income? This cannot be undone!',
+    confirmText: 'Delete All',
+    type: 'danger',
+    icon: '⚠️'
+  });
   if (!confirmed) return { success: false, cancelled: true };
   
   try {

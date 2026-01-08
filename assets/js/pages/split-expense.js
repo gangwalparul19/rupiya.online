@@ -3,6 +3,7 @@ import '../services/services-init.js'; // Initialize services first
 import authService from '../services/auth-service.js';
 import splitService from '../services/split-service.js';
 import toast from '../components/toast.js';
+import confirmationModal from '../components/confirmation-modal.js';
 import { formatCurrency, formatDate, formatDateForInput, escapeHtml } from '../utils/helpers.js';
 
 // State management
@@ -614,7 +615,13 @@ function setupEventListeners() {
   
   // Logout
   logoutBtn.addEventListener('click', async () => {
-    const confirmed = confirm('Are you sure you want to logout?');
+    const confirmed = await confirmationModal.show({
+      title: 'Logout',
+      message: 'Are you sure you want to logout?',
+      confirmText: 'Logout',
+      type: 'warning',
+      icon: '👋'
+    });
     if (!confirmed) return;
     
     const result = await authService.signOut();

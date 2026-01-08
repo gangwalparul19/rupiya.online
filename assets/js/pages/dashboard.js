@@ -4,6 +4,7 @@ import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
 import familySwitcher from '../components/family-switcher.js';
 import toast from '../components/toast.js';
+import confirmationModal from '../components/confirmation-modal.js';
 import themeManager from '../utils/theme-manager.js';
 import setupWizard from '../components/setup-wizard.js';
 import recurringProcessor from '../services/recurring-processor.js';
@@ -688,7 +689,13 @@ if (themeToggleBtn) {
 
 // Logout
 logoutBtn.addEventListener('click', async () => {
-  const confirmed = confirm('Are you sure you want to logout?');
+  const confirmed = await confirmationModal.show({
+    title: 'Logout',
+    message: 'Are you sure you want to logout?',
+    confirmText: 'Logout',
+    type: 'warning',
+    icon: '👋'
+  });
   if (!confirmed) return;
   
   const result = await authService.signOut();

@@ -2,6 +2,7 @@
 import '../services/services-init.js'; // Initialize services first
 import tripGroupsService from '../services/trip-groups-service.js';
 import authService from '../services/auth-service.js';
+import confirmationModal from '../components/confirmation-modal.js';
 
 class TripGroupDetailPage {
   constructor() {
@@ -955,7 +956,13 @@ class TripGroupDetailPage {
       return;
     }
 
-    const confirmed = confirm(`Are you sure you want to archive "${this.group.name}"?\n\nArchived groups cannot have new expenses added, but you can still view history and record settlements.`);
+    const confirmed = await confirmationModal.show({
+      title: 'Archive Group',
+      message: `Are you sure you want to archive "${this.group.name}"?\n\nArchived groups cannot have new expenses added, but you can still view history and record settlements.`,
+      confirmText: 'Archive',
+      type: 'warning',
+      icon: '📦'
+    });
     if (!confirmed) return;
 
     try {

@@ -5,6 +5,7 @@ import firestoreService from '../services/firestore-service.js';
 import categoriesService from '../services/categories-service.js';
 import familySwitcher from '../components/family-switcher.js';
 import toast from '../components/toast.js';
+import confirmationModal from '../components/confirmation-modal.js';
 import themeManager from '../utils/theme-manager.js';
 import { updateProfile, updatePassword, EmailAuthProvider, reauthenticateWithCredential, deleteUser, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
 import { doc, setDoc, Timestamp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
@@ -526,18 +527,24 @@ async function handleLogout() {
 // Categories Management
 async function loadCategories() {
   try {
+    console.log('[Profile] Loading categories...');
+    
     // Initialize categories if needed
-    await categoriesService.initializeCategories();
+    const initResult = await categoriesService.initializeCategories();
+    console.log('[Profile] Initialize result:', initResult);
     
     // Load categories
     expenseCategories = await categoriesService.getExpenseCategories();
     incomeCategories = await categoriesService.getIncomeCategories();
     
+    console.log('[Profile] Loaded expense categories:', expenseCategories);
+    console.log('[Profile] Loaded income categories:', incomeCategories);
+    
     // Render categories
     renderExpenseCategories();
     renderIncomeCategories();
   } catch (error) {
-    console.error('Error loading categories:', error);
+    console.error('[Profile] Error loading categories:', error);
     showToast('Failed to load categories', 'error');
   }
 }
@@ -641,7 +648,8 @@ async function handleAddIncomeCategory() {
 }
 
 async function deleteExpenseCategory(category) {
-  if (!confirm(`Delete category "${category}"?`)) return;
+  const confirmed = await confirmationModal.confirmDelete(category);
+  if (!confirmed) return;
   
   const result = await categoriesService.deleteExpenseCategory(category);
   
@@ -654,7 +662,8 @@ async function deleteExpenseCategory(category) {
 }
 
 async function deleteIncomeCategory(category) {
-  if (!confirm(`Delete category "${category}"?`)) return;
+  const confirmed = await confirmationModal.confirmDelete(category);
+  if (!confirmed) return;
   
   const result = await categoriesService.deleteIncomeCategory(category);
   
@@ -667,7 +676,8 @@ async function deleteIncomeCategory(category) {
 }
 
 async function handleResetCategories() {
-  if (!confirm('Reset all categories to defaults? Your custom categories will be removed.')) return;
+  const confirmed = await confirmationModal.confirmReset('Reset all categories to defaults? Your custom categories will be removed.');
+  if (!confirmed) return;
   
   const result = await categoriesService.resetToDefaults();
   

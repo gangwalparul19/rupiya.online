@@ -4,6 +4,7 @@ import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
 import crossFeatureIntegrationService from '../services/cross-feature-integration-service.js';
 import toast from '../components/toast.js';
+import confirmationModal from '../components/confirmation-modal.js';
 import { formatCurrency, formatCurrencyCompact, formatDate, escapeHtml, formatDateForInput } from '../utils/helpers.js';
 import timezoneService from '../utils/timezone.js';
 import encryptionReauthModal from '../components/encryption-reauth-modal.js';
@@ -721,7 +722,13 @@ function hideMileageHistoryModal() {
 
 // Delete Fuel Log
 async function deleteFuelLog(logId) {
-  if (!confirm('Are you sure you want to delete this fuel entry?')) return;
+  const confirmed = await confirmationModal.show({
+    title: 'Delete Fuel Entry',
+    message: 'Are you sure you want to delete this fuel entry?',
+    confirmText: 'Delete',
+    type: 'danger'
+  });
+  if (!confirmed) return;
   
   try {
     // Find the log before deleting to get vehicleId

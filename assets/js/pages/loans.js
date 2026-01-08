@@ -4,6 +4,7 @@ import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
 import crossFeatureIntegrationService from '../services/cross-feature-integration-service.js';
 import toast from '../components/toast.js';
+import confirmationModal from '../components/confirmation-modal.js';
 import themeManager from '../utils/theme-manager.js';
 import { formatCurrency, formatDate, escapeHtml, formatDateForInput } from '../utils/helpers.js';
 import timezoneService from '../utils/timezone.js';
@@ -694,7 +695,11 @@ function editLoan(loanId) {
 
 // Delete loan
 async function deleteLoan(loanId) {
-  if (!confirm('Are you sure you want to delete this loan?')) return;
+  const loan = loans.find(l => l.id === loanId);
+  const loanName = loan ? loan.loanName : 'this loan';
+  
+  const confirmed = await confirmationModal.confirmDelete(loanName);
+  if (!confirmed) return;
   
   try {
     await firestoreService.deleteLoan(loanId);

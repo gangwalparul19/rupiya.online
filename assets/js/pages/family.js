@@ -3,6 +3,7 @@ import '../services/services-init.js'; // Initialize services first
 import authService from '../services/auth-service.js';
 import familyService from '../services/family-service.js';
 import toast from '../components/toast.js';
+import confirmationModal from '../components/confirmation-modal.js';
 
 let currentUser = null;
 let familyGroups = [];
@@ -393,7 +394,14 @@ window.declineInvitation = declineInvitation;
 
 // Leave group
 async function leaveGroup(groupId, groupName) {
-  if (!confirm(`Are you sure you want to leave "${groupName}"?`)) {
+  const confirmed = await confirmationModal.show({
+    title: 'Leave Family Group',
+    message: `Are you sure you want to leave "${groupName}"?`,
+    confirmText: 'Leave Group',
+    type: 'warning',
+    icon: '👋'
+  });
+  if (!confirmed) {
     return;
   }
 
