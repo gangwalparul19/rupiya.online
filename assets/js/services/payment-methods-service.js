@@ -3,17 +3,15 @@ import { db } from '../config/firebase-config.js';
 import {
   collection,
   doc,
-  addDoc,
   getDoc,
   getDocs,
-  updateDoc,
-  deleteDoc,
   query,
   where,
   orderBy,
   Timestamp
 } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
 import authService from './auth-service.js';
+import firestoreService from './firestore-service.js';
 
 class PaymentMethodsService {
   constructor() {
@@ -85,13 +83,16 @@ class PaymentMethodsService {
       const userId = this.getUserId();
       
       for (const method of this.defaultMethods) {
-        await addDoc(collection(db, this.collectionName), {
+        const data = {
           ...method,
           userId,
           isActive: true,
           createdAt: Timestamp.now(),
           updatedAt: Timestamp.now()
-        });
+        };
+        
+        // Use firestoreService to handle encryption
+        await firestoreService.addDocument(this.collectionName, data);
       }
       
       return { success: true };
@@ -168,9 +169,10 @@ class PaymentMethodsService {
           break;
       }
       
-      const docRef = await addDoc(collection(db, this.collectionName), data);
+      // Use firestoreService to handle encryption
+      const result = await firestoreService.addDocument(this.collectionName, data);
       
-      return { success: true, id: docRef.id };
+      return result;
     } catch (error) {
       console.error('Error adding payment method:', error);
       return { success: false, error: error.message };
@@ -182,14 +184,15 @@ class PaymentMethodsService {
    */
   async updatePaymentMethod(methodId, updates) {
     try {
-      const docRef = doc(db, this.collectionName, methodId);
-      
-      await updateDoc(docRef, {
+      const updateData = {
         ...updates,
         updatedAt: Timestamp.now()
-      });
+      };
       
-      return { success: true };
+      // Use firestoreService to handle encryption
+      const result = await firestoreService.updateDocument(this.collectionName, methodId, updateData);
+      
+      return result;
     } catch (error) {
       console.error('Error updating payment method:', error);
       return { success: false, error: error.message };
@@ -201,15 +204,13 @@ class PaymentMethodsService {
    */
   async deletePaymentMethod(methodId) {
     try {
-      const docRef = doc(db, this.collectionName, methodId);
-      
       // Soft delete - mark as inactive
-      await updateDoc(docRef, {
+      const result = await firestoreService.updateDocument(this.collectionName, methodId, {
         isActive: false,
         updatedAt: Timestamp.now()
       });
       
-      return { success: true };
+      return result;
     } catch (error) {
       console.error('Error deleting payment method:', error);
       return { success: false, error: error.message };
@@ -221,8 +222,8 @@ class PaymentMethodsService {
    */
   async permanentlyDeletePaymentMethod(methodId) {
     try {
-      await deleteDoc(doc(db, this.collectionName, methodId));
-      return { success: true };
+      const result = await firestoreService.deleteDocument(this.collectionName, methodId);
+      return result;
     } catch (error) {
       console.error('Error permanently deleting payment method:', error);
       return { success: false, error: error.message };

@@ -1,10 +1,11 @@
 // Fuel Fill-up Service - Track vehicle fuel fill-ups and calculate mileage
 import { db, auth } from '../config/firebase-config.js';
-import { collection, addDoc, updateDoc, deleteDoc, doc, getDocs, query, where, orderBy, Timestamp, limit } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+import { collection, getDocs, query, where, orderBy, Timestamp, limit } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+import firestoreService from './firestore-service.js';
 
 class FuelService {
   constructor() {
-    this.collectionName = 'fuelFillups';
+    this.collectionName = 'fuelLogs'; // Changed from fuelFillups to match the rest of the codebase
   }
 
   /**
@@ -30,7 +31,7 @@ class FuelService {
         costPerKm = distanceTraveled > 0 ? fillupData.totalAmount / distanceTraveled : 0;
       }
 
-      const docRef = await addDoc(collection(db, this.collectionName), {
+      const data = {
         ...fillupData,
         userId: user.uid,
         distanceTraveled: Math.round(distanceTraveled * 100) / 100,
@@ -38,9 +39,12 @@ class FuelService {
         costPerKm: Math.round(costPerKm * 100) / 100,
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now()
-      });
+      };
 
-      return { success: true, id: docRef.id };
+      // Use firestoreService to handle encryption
+      const result = await firestoreService.addDocument(this.collectionName, data);
+
+      return result;
     } catch (error) {
       console.error('Error adding fuel fill-up:', error);
       return { success: false, error: error.message };
@@ -64,14 +68,17 @@ class FuelService {
 
       const querySnapshot = await getDocs(q);
       const fillups = [];
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
+      
+      for (const docSnap of querySnapshot.docs) {
+        const data = docSnap.data();
+        // Decrypt the data using firestoreService
+        const decryptedData = await firestoreService.decryptData(data, this.collectionName);
         fillups.push({
-          id: doc.id,
-          ...data,
-          date: data.date?.toDate ? data.date.toDate() : data.date
+          id: docSnap.id,
+          ...decryptedData,
+          date: decryptedData.date?.toDate ? decryptedData.date.toDate() : decryptedData.date
         });
-      });
+      }
 
       return fillups;
     } catch (error) {
@@ -96,14 +103,17 @@ class FuelService {
 
       const querySnapshot = await getDocs(q);
       const fillups = [];
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
+      
+      for (const docSnap of querySnapshot.docs) {
+        const data = docSnap.data();
+        // Decrypt the data using firestoreService
+        const decryptedData = await firestoreService.decryptData(data, this.collectionName);
         fillups.push({
-          id: doc.id,
-          ...data,
-          date: data.date?.toDate ? data.date.toDate() : data.date
+          id: docSnap.id,
+          ...decryptedData,
+          date: decryptedData.date?.toDate ? decryptedData.date.toDate() : decryptedData.date
         });
-      });
+      }
 
       return fillups;
     } catch (error) {
@@ -131,12 +141,15 @@ class FuelService {
       const querySnapshot = await getDocs(q);
       if (querySnapshot.empty) return null;
 
-      const doc = querySnapshot.docs[0];
-      const data = doc.data();
+      const docSnap = querySnapshot.docs[0];
+      const data = docSnap.data();
+      // Decrypt the data using firestoreService
+      const decryptedData = await firestoreService.decryptData(data, this.collectionName);
+      
       return {
-        id: doc.id,
-        ...data,
-        date: data.date?.toDate ? data.date.toDate() : data.date
+        id: docSnap.id,
+        ...decryptedData,
+        date: decryptedData.date?.toDate ? decryptedData.date.toDate() : decryptedData.date
       };
     } catch (error) {
       console.error('Error getting last fill-up:', error);
@@ -149,13 +162,15 @@ class FuelService {
    */
   async updateFillup(id, fillupData) {
     try {
-      const docRef = doc(db, this.collectionName, id);
-      await updateDoc(docRef, {
+      const updateData = {
         ...fillupData,
         updatedAt: Timestamp.now()
-      });
+      };
 
-      return { success: true };
+      // Use firestoreService to handle encryption
+      const result = await firestoreService.updateDocument(this.collectionName, id, updateData);
+
+      return result;
     } catch (error) {
       console.error('Error updating fill-up:', error);
       return { success: false, error: error.message };
@@ -167,8 +182,9 @@ class FuelService {
    */
   async deleteFillup(id) {
     try {
-      await deleteDoc(doc(db, this.collectionName, id));
-      return { success: true };
+      // Use firestoreService to handle encryption
+      const result = await firestoreService.deleteDocument(this.collectionName, id);
+      return result;
     } catch (error) {
       console.error('Error deleting fill-up:', error);
       return { success: false, error: error.message };

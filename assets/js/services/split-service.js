@@ -1,6 +1,6 @@
 // Split Service - Manage split expenses in Firestore
 import { db, auth } from '../config/firebase-config.js';
-import { collection, addDoc, updateDoc, deleteDoc, doc, getDocs, query, where, orderBy, Timestamp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+import { collection, getDocs, query, where, orderBy, Timestamp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
 import firestoreService from './firestore-service.js';
 
 class SplitService {
@@ -24,17 +24,20 @@ class SplitService {
       const user = auth.currentUser;
       if (!user) throw new Error('User not authenticated');
 
-      const docRef = await addDoc(collection(db, this.collectionName), {
+      const data = {
         ...splitData,
         userId: user.uid,
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now()
-      });
+      };
+
+      // Use firestoreService to handle encryption
+      const result = await firestoreService.addDocument(this.collectionName, data);
 
       // Invalidate caches so dashboard reflects new split
       this.invalidateSplitCaches();
 
-      return { success: true, id: docRef.id };
+      return result;
     } catch (error) {
       console.error('Error adding split:', error);
       return { success: false, error: error.message };
@@ -54,9 +57,13 @@ class SplitService {
 
       const querySnapshot = await getDocs(q);
       const splits = [];
-      querySnapshot.forEach((doc) => {
-        splits.push({ id: doc.id, ...doc.data() });
-      });
+      
+      for (const docSnap of querySnapshot.docs) {
+        const data = docSnap.data();
+        // Decrypt the data using firestoreService
+        const decryptedData = await firestoreService.decryptData(data, this.collectionName);
+        splits.push({ id: docSnap.id, ...decryptedData });
+      }
 
       return splits;
     } catch (error) {
@@ -67,16 +74,18 @@ class SplitService {
 
   async updateSplit(id, splitData) {
     try {
-      const docRef = doc(db, this.collectionName, id);
-      await updateDoc(docRef, {
+      const updateData = {
         ...splitData,
         updatedAt: Timestamp.now()
-      });
+      };
+
+      // Use firestoreService to handle encryption
+      const result = await firestoreService.updateDocument(this.collectionName, id, updateData);
 
       // Invalidate caches so dashboard reflects updated split
       this.invalidateSplitCaches();
 
-      return { success: true };
+      return result;
     } catch (error) {
       console.error('Error updating split:', error);
       return { success: false, error: error.message };
@@ -85,18 +94,20 @@ class SplitService {
 
   async settleSplit(id, settleData) {
     try {
-      const docRef = doc(db, this.collectionName, id);
-      await updateDoc(docRef, {
+      const updateData = {
         status: 'settled',
         settledDate: settleData.settledDate || Timestamp.now(),
         settleNotes: settleData.settleNotes || '',
         updatedAt: Timestamp.now()
-      });
+      };
+
+      // Use firestoreService to handle encryption
+      const result = await firestoreService.updateDocument(this.collectionName, id, updateData);
 
       // Invalidate caches so dashboard reflects settled split (affects income)
       this.invalidateSplitCaches();
 
-      return { success: true };
+      return result;
     } catch (error) {
       console.error('Error settling split:', error);
       return { success: false, error: error.message };
@@ -105,12 +116,13 @@ class SplitService {
 
   async deleteSplit(id) {
     try {
-      await deleteDoc(doc(db, this.collectionName, id));
+      // Use firestoreService to handle encryption
+      const result = await firestoreService.deleteDocument(this.collectionName, id);
       
       // Invalidate caches so dashboard reflects deleted split
       this.invalidateSplitCaches();
       
-      return { success: true };
+      return result;
     } catch (error) {
       console.error('Error deleting split:', error);
       return { success: false, error: error.message };
