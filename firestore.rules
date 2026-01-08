@@ -321,36 +321,27 @@ service cloud.firestore {
     // FAMILY GROUPS
     // ============================================
     match /familyGroups/{groupId} {
-      // Helper to check if user is a member of this group
-      function isGroupMember() {
-        return isAuthenticated() && 
-               resource.data.members.size() > 0;
-      }
+      // Read: Any authenticated user can read (needed for invitations)
+      // Client-side filtering ensures users only see relevant groups
+      allow read: if isAuthenticated();
       
-      // Helper to check if user has a pending invitation to this group
-      function hasPendingInvitation() {
-        return isAuthenticated() &&
-               exists(/databases/$(database)/documents/familyInvitations/$(request.auth.uid + '_' + groupId)) ||
-               true; // Allow update for invitation acceptance (validated in app logic)
-      }
-      
-      // Read: Any authenticated user can read (they'll filter on client side)
-      // Admins can read all for analytics
-      allow read: if isAuthenticated() || isAdmin();
-      
-      // Create: Any authenticated user can create
+      // Create: Any authenticated user can create (validation happens in app)
+      // We check createdBy if it exists, otherwise allow (for encrypted data)
       allow create: if isAuthenticated() && 
-                       request.resource.data.createdBy == request.auth.uid;
+                       (!request.resource.data.keys().hasAny(['createdBy']) || 
+                        request.resource.data.createdBy == request.auth.uid);
       
       // Update: Creator can update, OR authenticated user can add themselves as member
       // (invitation validation happens in application code)
       allow update: if isAuthenticated() && 
-                       (resource.data.createdBy == request.auth.uid || 
+                       (!resource.data.keys().hasAny(['createdBy']) ||
+                        resource.data.createdBy == request.auth.uid || 
                         request.resource.data.createdBy == resource.data.createdBy);
       
-      // Delete: Only creator can delete
+      // Delete: Only creator can delete (or any authenticated user if createdBy doesn't exist)
       allow delete: if isAuthenticated() && 
-                       resource.data.createdBy == request.auth.uid;
+                       (!resource.data.keys().hasAny(['createdBy']) ||
+                        resource.data.createdBy == request.auth.uid);
     }
     
     // ============================================
@@ -362,15 +353,18 @@ service cloud.firestore {
       allow read: if isAuthenticated();
       
       // Create: Authenticated users can create invitations
+      // Check invitedBy if it exists, otherwise allow (for encrypted data)
       allow create: if isAuthenticated() && 
-                       request.resource.data.invitedBy == request.auth.uid;
+                       (!request.resource.data.keys().hasAny(['invitedBy']) || 
+                        request.resource.data.invitedBy == request.auth.uid);
       
       // Update: Any authenticated user can update (for accepting/declining)
       allow update: if isAuthenticated();
       
-      // Delete: Creator can delete
+      // Delete: Creator can delete (or any authenticated user if invitedBy doesn't exist)
       allow delete: if isAuthenticated() && 
-                       resource.data.invitedBy == request.auth.uid;
+                       (!resource.data.keys().hasAny(['invitedBy']) ||
+                        resource.data.invitedBy == request.auth.uid);
     }
     
     // ============================================

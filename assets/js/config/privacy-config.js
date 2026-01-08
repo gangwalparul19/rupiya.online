@@ -13,6 +13,8 @@ export const privacyConfig = {
   unencryptedFields: [
     'id',
     'userId',
+    'createdBy',
+    'invitedBy',
     'createdAt',
     'updatedAt',
     'date',
@@ -113,7 +115,7 @@ export const privacyConfig = {
     tripGroupExpenses: ['amount', 'description', 'notes', 'splits'],
     tripGroupSettlements: ['amount', 'notes'],
     tripGroupMembers: ['name', 'email', 'phone'],  // Member personal information
-    familyGroups: ['name'],  // Group name and member info (members array contains names/emails)
+    familyGroups: ['name', 'members', 'settings'],  // Group name, member info (names/emails), and settings
     familyInvitations: ['invitedEmail', 'invitedByName', 'groupName']  // Invitation details
   }
 };
