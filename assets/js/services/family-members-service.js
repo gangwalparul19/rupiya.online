@@ -21,8 +21,8 @@ class FamilyMembersService {
       const encryptedMembers = await Promise.all(members.map(async (member) => {
         return {
           ...member,
-          name: await encryptionService.encrypt(member.name),
-          role: await encryptionService.encrypt(member.role)
+          name: await encryptionService.encryptValue(member.name),
+          role: await encryptionService.encryptValue(member.role)
         };
       }));
       return encryptedMembers;
@@ -38,8 +38,8 @@ class FamilyMembersService {
       const decryptedMembers = await Promise.all(members.map(async (member) => {
         return {
           ...member,
-          name: await encryptionService.decrypt(member.name),
-          role: await encryptionService.decrypt(member.role)
+          name: await encryptionService.decryptValue(member.name),
+          role: await encryptionService.decryptValue(member.role)
         };
       }));
       return decryptedMembers;

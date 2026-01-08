@@ -518,7 +518,7 @@ async function createExpenseCard(expense) {
   if (hasSplit) {
     try {
       const decryptedSplits = await Promise.all(expense.splitDetails.map(async (split) => {
-        const memberName = await encryptionService.decrypt(split.memberName);
+        const memberName = await encryptionService.decryptValue(split.memberName);
         return { ...split, memberName };
       }));
       
@@ -1452,7 +1452,7 @@ async function handleFormSubmit(e) {
       const encryptedSplitDetails = await Promise.all(splitDetails.map(async (split) => {
         return {
           ...split,
-          memberName: await encryptionService.encrypt(split.memberName)
+          memberName: await encryptionService.encryptValue(split.memberName)
         };
       }));
       
