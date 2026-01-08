@@ -190,6 +190,8 @@ class ConfirmationModal {
   }
 
   hide(confirmed) {
+    console.log('[ConfirmationModal] hide() called with confirmed:', confirmed);
+    console.trace('[ConfirmationModal] hide() stack trace');
     if (this.modal) {
       this.modal.style.display = 'none';
     }
