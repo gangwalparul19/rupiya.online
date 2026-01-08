@@ -1053,7 +1053,22 @@ function handlePaymentTypeChange() {
 // Load payment methods
 async function loadPaymentMethods() {
   try {
+    console.log('[Profile] Loading payment methods...');
     paymentMethods = await paymentMethodsService.getPaymentMethods();
+    console.log('[Profile] Loaded payment methods:', paymentMethods);
+    
+    // Log first method details for debugging
+    if (paymentMethods.length > 0) {
+      console.log('[Profile] First payment method details:', {
+        id: paymentMethods[0].id,
+        name: paymentMethods[0].name,
+        type: paymentMethods[0].type,
+        cardType: paymentMethods[0].cardType,
+        cardNumber: paymentMethods[0].cardNumber,
+        bankName: paymentMethods[0].bankName
+      });
+    }
+    
     renderPaymentMethods();
   } catch (error) {
     console.error('Error loading payment methods:', error);

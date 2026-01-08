@@ -45,25 +45,39 @@ class PaymentMethodsService {
   async getPaymentMethods() {
     try {
       const userId = this.getUserId();
-      const q = query(
-        collection(db, this.collectionName),
-        where('userId', '==', userId),
-        orderBy('createdAt', 'asc')
+      console.log('[PaymentMethodsService] Getting payment methods for user:', userId);
+      
+      // Use firestoreService to get all payment methods (handles decryption)
+      const allMethods = await firestoreService.getAll(this.collectionName);
+      console.log('[PaymentMethodsService] Retrieved all methods:', allMethods.length);
+      
+      // Filter by userId and active status
+      const methods = allMethods.filter(method => 
+        method.userId === userId && method.isActive !== false
       );
+      console.log('[PaymentMethodsService] Filtered methods for user:', methods.length);
       
-      const querySnapshot = await getDocs(q);
-      const methods = [];
+      // Log first method for debugging
+      if (methods.length > 0) {
+        console.log('[PaymentMethodsService] First method sample:', {
+          id: methods[0].id,
+          name: methods[0].name,
+          type: methods[0].type,
+          hasEncrypted: !!methods[0]._encrypted,
+          hasEncryptionVersion: !!methods[0]._encryptionVersion
+        });
+      }
       
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        // Only include active payment methods (filter out soft-deleted ones)
-        if (data.isActive !== false) {
-          methods.push({ id: doc.id, ...data });
-        }
+      // Sort by createdAt
+      methods.sort((a, b) => {
+        const aTime = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
+        const bTime = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
+        return aTime - bTime;
       });
       
       // If no methods exist, create default cash method
       if (methods.length === 0) {
+        console.log('[PaymentMethodsService] No methods found, initializing defaults...');
         await this.initializeDefaultMethods();
         return await this.getPaymentMethods();
       }
@@ -273,14 +287,9 @@ class PaymentMethodsService {
    */
   async getPaymentMethod(methodId) {
     try {
-      const docRef = doc(db, this.collectionName, methodId);
-      const docSnap = await getDoc(docRef);
-      
-      if (docSnap.exists()) {
-        return { success: true, data: { id: docSnap.id, ...docSnap.data() } };
-      } else {
-        return { success: false, error: 'Payment method not found' };
-      }
+      // Use firestoreService to get payment method (handles decryption)
+      const result = await firestoreService.get(this.collectionName, methodId);
+      return result;
     } catch (error) {
       console.error('Error getting payment method:', error);
       return { success: false, error: error.message };
