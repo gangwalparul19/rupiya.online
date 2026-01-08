@@ -162,6 +162,17 @@ class ConfirmationModal {
       console.log('[ConfirmationModal] Displaying modal...');
       if (this.modal) {
         this.modal.style.display = 'flex';
+        
+        // Debug: Check if modal is actually visible
+        const computedStyle = window.getComputedStyle(this.modal);
+        console.log('[ConfirmationModal] Modal computed display:', computedStyle.display);
+        console.log('[ConfirmationModal] Modal computed visibility:', computedStyle.visibility);
+        console.log('[ConfirmationModal] Modal computed opacity:', computedStyle.opacity);
+        console.log('[ConfirmationModal] Modal computed z-index:', computedStyle.zIndex);
+        console.log('[ConfirmationModal] Modal inline style:', this.modal.style.cssText);
+        console.log('[ConfirmationModal] Modal in DOM:', document.body.contains(this.modal));
+        console.log('[ConfirmationModal] Modal bounding rect:', this.modal.getBoundingClientRect());
+        
         console.log('[ConfirmationModal] Modal displayed successfully');
       } else {
         console.error('[ConfirmationModal] Modal element not found!');
