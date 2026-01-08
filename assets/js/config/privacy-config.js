@@ -41,6 +41,7 @@ export const privacyConfig = {
   
   // Collections that should be encrypted
   // User collection is NOT encrypted - it stores profile info for tracking
+  // Family/shared collections are NOT encrypted - they use shared data across users
   encryptedCollections: [
     'expenses',
     'income',
@@ -63,9 +64,11 @@ export const privacyConfig = {
     'paymentMethods',
     'tripGroupExpenses',
     'tripGroupSettlements',
-    'tripGroupMembers',      // Member info (name, email, phone)
-    'familyGroups',          // Family group data (encrypted for privacy)
-    'familyInvitations'      // Family invitation data (encrypted for privacy)
+    'tripGroupMembers'       // Member info (name, email, phone)
+    // NOTE: familyGroups and familyInvitations are NOT encrypted because:
+    // - They are shared across multiple users
+    // - Each user has a different encryption key (derived from their userId)
+    // - Encrypting shared data with one user's key makes it unreadable by others
   ],
   
   // Collections that should NOT be encrypted
@@ -73,7 +76,9 @@ export const privacyConfig = {
   unencryptedCollections: [
     'users',              // User profile - needed for tracking location/name
     'userPreferences',    // App preferences
-    'tripGroups'          // Trip group metadata
+    'tripGroups',         // Trip group metadata
+    'familyGroups',       // Family groups - shared across users, cannot use per-user encryption
+    'familyInvitations'   // Family invitations - shared data, must be readable by invitee
   ],
   
   // Sensitive fields that MUST be encrypted in each collection
@@ -115,9 +120,9 @@ export const privacyConfig = {
     ],
     tripGroupExpenses: ['amount', 'description', 'notes', 'splits'],
     tripGroupSettlements: ['amount', 'notes'],
-    tripGroupMembers: ['name', 'email', 'phone'],  // Member personal information
-    familyGroups: ['name', 'members', 'settings'],  // Family group sensitive data
-    familyInvitations: ['groupName', 'invitedByName']  // Invitation sensitive data (invitedEmail must stay unencrypted for queries)
+    tripGroupMembers: ['name', 'email', 'phone']  // Member personal information
+    // NOTE: familyGroups and familyInvitations are NOT in sensitiveFields
+    // because they are shared across users and cannot use per-user encryption
   }
 };
 
