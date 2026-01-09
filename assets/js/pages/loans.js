@@ -3,6 +3,8 @@ import '../services/services-init.js';
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
 import crossFeatureIntegrationService from '../services/cross-feature-integration-service.js';
+import transfersService from '../services/transfers-service.js';
+import emiSchedulerService from '../services/emi-scheduler-service.js';
 import toast from '../components/toast.js';
 import confirmationModal from '../components/confirmation-modal.js';
 import themeManager from '../utils/theme-manager.js';
@@ -75,6 +77,16 @@ async function initLoansPage() {
     
     // Setup event listeners
     setupEventListeners();
+    
+    // Initialize EMI scheduler - checks for auto EMI processing
+    try {
+      const result = await emiSchedulerService.initialize();
+      if (result && result.processed > 0) {
+        toast.success(`Auto-processed ${result.processed} EMI payment(s)`);
+      }
+    } catch (error) {
+      console.warn('EMI scheduler initialization:', error);
+    }
     
     // Load loans data
     await loadLoans();
@@ -722,6 +734,25 @@ async function savePayment(e) {
         interestPaid: breakdown.interestPaid
       }
     );
+    
+    // Also create a transfer record for net worth tracking
+    try {
+      const transferType = paymentType === 'prepayment' ? 'loan_prepayment' : 'loan_emi';
+      await transfersService.createTransfer({
+        type: transferType,
+        amount: paymentAmount,
+        date: timezoneService.parseInputDate(paymentDate),
+        description: `${loan.loanName} - ${paymentType === 'emi' ? 'EMI Payment' : 'Prepayment'}`,
+        principalAmount: breakdown.principalPaid,
+        interestAmount: breakdown.interestPaid,
+        linkedType: 'loan',
+        linkedId: loanId,
+        linkedName: loan.loanName
+      });
+    } catch (transferError) {
+      console.warn('Could not create transfer record:', transferError);
+      // Don't fail the whole operation if transfer creation fails
+    }
     
     toast.success('Payment recorded successfully');
     closePaymentModal();

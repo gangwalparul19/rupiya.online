@@ -66,7 +66,8 @@ export const privacyConfig = {
     'tripGroupSettlements',
     'tripGroupMembers',      // Member info (name, email, phone)
     'transfers',             // Money transfers between accounts
-    'netWorthSnapshots'      // Net worth history snapshots
+    'netWorthSnapshots',     // Net worth history snapshots
+    'notifications'          // EMI reminders and alerts
     // NOTE: familyGroups and familyInvitations are NOT encrypted because:
     // - They are shared across multiple users
     // - Each user has a different encryption key (derived from their userId)
@@ -122,7 +123,8 @@ export const privacyConfig = {
     ],
     tripGroupExpenses: ['amount', 'description', 'notes', 'splits'],
     tripGroupSettlements: ['amount', 'notes'],
-    tripGroupMembers: ['name', 'email', 'phone']  // Member personal information
+    tripGroupMembers: ['name', 'email', 'phone'],  // Member personal information
+    notifications: ['title', 'message', 'data']   // EMI reminders contain loan amounts
     // NOTE: familyGroups and familyInvitations are NOT in sensitiveFields
     // because they are shared across users and cannot use per-user encryption
   }

@@ -500,6 +500,17 @@ service cloud.firestore {
     }
     
     // ============================================
+    // NOTIFICATIONS (EMI Reminders, Alerts, etc.)
+    // ============================================
+    match /notifications/{notificationId} {
+      // Users can only access their own notifications
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && hasValidUserId();
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
+    }
+    
+    // ============================================
     // TRANSFERS (Money movements between accounts)
     // ============================================
     match /transfers/{transferId} {
