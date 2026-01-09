@@ -1,17 +1,22 @@
 // Auth Encryption Helper
 // Manages encryption initialization during authentication
 // 
-// CROSS-DEVICE ENCRYPTION:
-// - Google users: Encryption is fully automatic - same key on all devices
-// - Email/password users: Key is stored encrypted in Firestore, decrypted with password on login
+// SEAMLESS CROSS-DEVICE ENCRYPTION (V5 - SIMPLIFIED):
+// - Both email and Google users: Same deterministic key derivation
+// - Keys automatically generated on EVERY page load from userId
+// - NO password re-entry EVER - completely automatic
+// - NO Firestore lookups needed - faster and more reliable
+// - Works identically across ALL devices instantly
+// - User experience: Encryption is completely invisible
 
 import encryptionService from '../services/encryption-service.js';
 import authService from '../services/auth-service.js';
 
 class AuthEncryptionHelper {
   constructor() {
-    this.ENCRYPTION_READY_KEY = 'rupiya_encryption_ready';
     this._initializationPromise = null;
+    this._reauthAttempts = 0;
+    this.MAX_REAUTH_ATTEMPTS = 3;
   }
 
   // Initialize encryption after login with email/password
@@ -43,11 +48,17 @@ class AuthEncryptionHelper {
       const success = await encryptionService.initialize(password, userId);
       
       if (success) {
-        sessionStorage.setItem(this.ENCRYPTION_READY_KEY, 'true');
+        // Validate that encryption is working correctly
+        const isValid = await encryptionService.validateKeyIntegrity();
+        if (!isValid) {
+          console.error('[AuthEncryption] Encryption validation failed!');
+          return false;
+        }
         
-        const userType = password ? 'email/password' : 'Google';
-        console.log(`[AuthEncryption] Encryption initialized successfully for ${userType} user`);
-        console.log('[AuthEncryption] Cross-device sync: ENABLED - same encryption key on all devices');
+        console.log(`[AuthEncryption] ✅ Encryption initialized automatically`);
+        console.log('[AuthEncryption] ✅ Cross-device sync: ENABLED');
+        console.log('[AuthEncryption] ✅ No password re-entry required - ever!');
+        console.log('[AuthEncryption] 🚀 Works seamlessly across all devices');
       }
       
       return success;
@@ -68,23 +79,25 @@ class AuthEncryptionHelper {
     const user = authService.getCurrentUser();
     if (!user) return false;
     
-    // Wait for session restoration to complete
-    await encryptionService.waitForRestore();
+    // Wait for any ongoing initialization to complete
+    await encryptionService.waitForInitialization();
     
-    // If encryption is ready from session, no re-init needed
+    // If encryption is ready, validate and we're done
     if (encryptionService.isReady()) {
-      return false;
+      const isValid = await encryptionService.validateKeyIntegrity();
+      if (isValid) {
+        return false; // All good, no reauth needed
+      }
     }
     
-    // For Google users, we can auto-reinitialize
-    if (this.isGoogleUser()) {
-      console.log('[AuthEncryption] Google user needs auto-reinitialization');
-      const success = await this.initializeForGoogleUser(user.uid);
-      return !success; // Return true only if auto-init failed
-    }
+    // For BOTH Google and email users, we can auto-reinitialize
+    // No password needed - deterministic key from userId
+    console.log('[AuthEncryption] Auto-reinitializing encryption from userId');
+    const success = await this.initializeAfterLogin(null, user.uid);
     
-    // For password users, they need to re-enter password
-    return true;
+    // Return false if successful (no manual reauth needed)
+    // Return true only if auto-init completely failed (rare)
+    return !success;
   }
 
   // Check if user logged in with Google (no password available)
@@ -98,9 +111,9 @@ class AuthEncryptionHelper {
   // Clear encryption on logout
   clearEncryption() {
     encryptionService.clear();
-    sessionStorage.removeItem(this.ENCRYPTION_READY_KEY);
     this._initializationPromise = null;
-    console.log('[AuthEncryption] Encryption cleared');
+    this._reauthAttempts = 0;
+    console.log('[AuthEncryption] ✅ Encryption cleared securely');
   }
 
   // Get encryption status
@@ -132,13 +145,33 @@ class AuthEncryptionHelper {
 
   // Prompt user to re-enter password for encryption (only for password users)
   showReauthPrompt() {
+    if (this._reauthAttempts >= this.MAX_REAUTH_ATTEMPTS) {
+      console.error('[AuthEncryption] Max reauth attempts reached');
+      const event = new CustomEvent('encryption-reauth-failed', {
+        detail: { 
+          message: 'Too many failed attempts. Please sign in again.',
+          reason: 'max_attempts_exceeded'
+        }
+      });
+      window.dispatchEvent(event);
+      return;
+    }
+    
+    this._reauthAttempts++;
     const event = new CustomEvent('encryption-reauth-needed', {
       detail: { 
         message: 'Please enter your password to decrypt your data',
-        reason: 'session_expired'
+        reason: 'session_expired',
+        attempt: this._reauthAttempts,
+        maxAttempts: this.MAX_REAUTH_ATTEMPTS
       }
     });
     window.dispatchEvent(event);
+  }
+
+  // Reset reauth attempts after successful authentication
+  resetReauthAttempts() {
+    this._reauthAttempts = 0;
   }
 }
 
