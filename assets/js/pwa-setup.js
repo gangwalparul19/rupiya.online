@@ -8,7 +8,6 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/service-worker.js')
       .then(registration => {
-        console.log('[PWA] Service Worker registered:', registration.scope);
 
         // Check for updates periodically
         setInterval(() => {
@@ -18,12 +17,9 @@ if ('serviceWorker' in navigator) {
         // Check for updates
         registration.addEventListener('updatefound', () => {
           const newWorker = registration.installing;
-          console.log('[PWA] New Service Worker found, installing...');
 
           newWorker.addEventListener('statechange', () => {
             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              console.log('[PWA] New content available');
-
               // Show update notification and let user decide when to reload
               showUpdateNotification(() => {
                 // Tell the new service worker to skip waiting
@@ -48,7 +44,6 @@ async function clearOldCaches() {
     for (const cacheName of cacheNames) {
       // Delete caches that don't match current version
       if (!cacheName.includes(currentVersion)) {
-        console.log('[PWA] Deleting old cache:', cacheName);
         await caches.delete(cacheName);
       }
     }
@@ -62,7 +57,6 @@ clearOldCaches();
 let deferredPrompt = null;
 
 window.addEventListener('beforeinstallprompt', (e) => {
-  console.log('[PWA] Install prompt available');
   e.preventDefault();
   deferredPrompt = e;
 
@@ -71,7 +65,6 @@ window.addEventListener('beforeinstallprompt', (e) => {
 });
 
 window.addEventListener('appinstalled', () => {
-  console.log('[PWA] App installed successfully');
   deferredPrompt = null;
   hideInstallUI();
 
@@ -83,7 +76,6 @@ window.addEventListener('appinstalled', () => {
 
 // Check if running as PWA
 if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
-  console.log('[PWA] Running as installed app');
   hideInstallUI();
 }
 
@@ -122,14 +114,12 @@ document.addEventListener('DOMContentLoaded', () => {
   if (installBtn) {
     installBtn.addEventListener('click', async () => {
       if (!deferredPrompt) {
-        console.log('[PWA] Install prompt not available');
         showManualInstructions();
         return;
       }
 
       deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
-      console.log(`[PWA] User response: ${outcome}`);
 
       if (outcome === 'accepted') {
         hideInstallUI();
@@ -144,14 +134,12 @@ document.addEventListener('DOMContentLoaded', () => {
   if (dashboardInstallBtn) {
     dashboardInstallBtn.addEventListener('click', async () => {
       if (!deferredPrompt) {
-        console.log('[PWA] Install prompt not available');
         showManualInstructions();
         return;
       }
 
       deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
-      console.log(`[PWA] User response: ${outcome}`);
 
       if (outcome === 'accepted') {
         hideInstallUI();

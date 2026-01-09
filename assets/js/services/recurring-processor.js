@@ -117,13 +117,6 @@ class RecurringProcessor {
     // Normalize to start of day to avoid timezone issues
     currentDate.setHours(0, 0, 0, 0);
     
-    console.log('[RecurringProcessor] getDueDates called:', {
-      startDate: currentDate.toISOString(),
-      frequency,
-      lastProcessedDate: lastProcessedDate ? new Date(lastProcessedDate).toISOString() : null,
-      today: today.toISOString()
-    });
-    
     // If we have a last processed date, start from the next occurrence after that
     if (lastProcessedDate) {
       const lastProcessed = new Date(lastProcessedDate);
@@ -145,9 +138,7 @@ class RecurringProcessor {
       dueDates.push(new Date(currentDate));
       currentDate = this.calculateNextDate(currentDate, frequency);
     }
-    
-    console.log('[RecurringProcessor] Due dates found:', dueDates.length, dueDates.map(d => d.toISOString()));
-    
+     
     return dueDates;
   }
 
@@ -155,30 +146,21 @@ class RecurringProcessor {
    * Process all recurring transactions
    */
   async processRecurring(forceProcess = false) {
-    // Check if we should process
-    console.log('[RecurringProcessor] processRecurring called with forceProcess:', forceProcess);
-    
+    // Check if we should process    
     const shouldProc = forceProcess || await this.shouldProcess();
-    console.log('[RecurringProcessor] shouldProcess() returns:', shouldProc);
-    
+
     if (!shouldProc) {
-      console.log('[RecurringProcessor] Already processed today and no past due transactions, skipping');
       return { processed: 0, skipped: true };
     }
 
     const user = authService.getCurrentUser();
     if (!user) {
-      console.log('[RecurringProcessor] No user logged in');
       return { processed: 0, error: 'Not authenticated' };
     }
 
     try {
-      console.log('[RecurringProcessor] Starting recurring transaction processing...');
-      
       // Get all recurring transactions
       const recurringTransactions = await firestoreService.getAll('recurringTransactions', 'startDate', 'asc');
-      
-      console.log(`[RecurringProcessor] Found ${recurringTransactions.length} recurring transactions`);
       
       let processedCount = 0;
       let createdTransactions = [];
@@ -186,21 +168,12 @@ class RecurringProcessor {
       for (const recurring of recurringTransactions) {
         // Skip paused or inactive recurring transactions
         if (recurring.status === 'paused' || recurring.status === 'inactive') {
-          console.log(`[RecurringProcessor] Skipping ${recurring.description} - status: ${recurring.status}`);
-          continue;
+           continue;
         }
 
         const startDate = recurring.startDate?.toDate ? recurring.startDate.toDate() : new Date(recurring.startDate);
         const endDate = recurring.endDate?.toDate ? recurring.endDate.toDate() : null;
         const lastProcessed = recurring.lastProcessedDate?.toDate ? recurring.lastProcessedDate.toDate() : null;
-        
-        console.log(`[RecurringProcessor] Checking ${recurring.description}:`, {
-          status: recurring.status,
-          frequency: recurring.frequency,
-          startDate: startDate.toISOString(),
-          lastProcessed: lastProcessed ? lastProcessed.toISOString() : null,
-          endDate: endDate ? endDate.toISOString() : null
-        });
         
         // Get all due dates that need processing
         const dueDates = this.getDueDates(startDate, recurring.frequency, lastProcessed, endDate);
@@ -209,8 +182,6 @@ class RecurringProcessor {
           console.log(`[RecurringProcessor] No due dates for ${recurring.description}`);
           continue;
         }
-
-        console.log(`[RecurringProcessor] Processing ${recurring.description}: ${dueDates.length} transactions due`);
 
         // Create transactions for each due date
         for (const dueDate of dueDates) {
@@ -229,16 +200,12 @@ class RecurringProcessor {
 
           let result;
           if (recurring.type === 'expense') {
-            console.log(`[RecurringProcessor] Creating expense for ${recurring.description} on ${dueDate.toISOString()}`);
             result = await firestoreService.addExpense(transactionData);
           } else if (recurring.type === 'income') {
-            console.log(`[RecurringProcessor] Creating income for ${recurring.description} on ${dueDate.toISOString()}`);
             result = await firestoreService.addIncome(transactionData);
           } else {
             console.log(`[RecurringProcessor] Unknown type: ${recurring.type} for ${recurring.description}`);
           }
-
-          console.log(`[RecurringProcessor] Result:`, result);
 
           if (result?.success) {
             processedCount++;
@@ -262,8 +229,6 @@ class RecurringProcessor {
       // Mark as processed for today
       this.markProcessed();
 
-      console.log(`[RecurringProcessor] Completed. Created ${processedCount} transactions.`);
-      
       return { 
         processed: processedCount, 
         transactions: createdTransactions,
@@ -331,10 +296,7 @@ class RecurringProcessor {
    * Reset processing flag (for testing or manual re-processing)
    */
   resetProcessingFlag() {
-    console.log('[RecurringProcessor] Resetting processing flag');
-    console.log('[RecurringProcessor] Before reset - localStorage key:', localStorage.getItem(this.processingKey));
     localStorage.removeItem(this.processingKey);
-    console.log('[RecurringProcessor] After reset - localStorage key:', localStorage.getItem(this.processingKey));
   }
 }
 

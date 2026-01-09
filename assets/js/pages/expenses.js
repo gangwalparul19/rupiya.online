@@ -1509,6 +1509,14 @@ function openEditForm(id) {
   dateInput.value = timezoneService.formatDateForInput(date);
   paymentMethodInput.value = expense.paymentMethod;
   
+  // Trigger payment method change to populate saved methods dropdown
+  handlePaymentMethodChange();
+  
+  // Set specific payment method if available
+  if (expense.specificPaymentMethodId && specificPaymentMethodInput) {
+    specificPaymentMethodInput.value = expense.specificPaymentMethodId;
+  }
+  
   // Populate split details if available
   const enableSplitCheckbox = document.getElementById('enableSplitByMember');
   const splitDetailsContainer = document.getElementById('splitDetailsContainer');

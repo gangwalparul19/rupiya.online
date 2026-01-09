@@ -29,7 +29,6 @@ class AuthEncryptionHelper {
 
     // Prevent duplicate initialization
     if (this._initializationPromise) {
-      console.log('[AuthEncryption] Initialization already in progress, waiting...');
       return await this._initializationPromise;
     }
 
@@ -54,11 +53,6 @@ class AuthEncryptionHelper {
           console.error('[AuthEncryption] Encryption validation failed!');
           return false;
         }
-        
-        console.log(`[AuthEncryption] ✅ Encryption initialized automatically`);
-        console.log('[AuthEncryption] ✅ Cross-device sync: ENABLED');
-        console.log('[AuthEncryption] ✅ No password re-entry required - ever!');
-        console.log('[AuthEncryption] 🚀 Works seamlessly across all devices');
       }
       
       return success;
@@ -92,7 +86,6 @@ class AuthEncryptionHelper {
     
     // For BOTH Google and email users, we can auto-reinitialize
     // No password needed - deterministic key from userId
-    console.log('[AuthEncryption] Auto-reinitializing encryption from userId');
     const success = await this.initializeAfterLogin(null, user.uid);
     
     // Return false if successful (no manual reauth needed)
@@ -113,7 +106,6 @@ class AuthEncryptionHelper {
     encryptionService.clear();
     this._initializationPromise = null;
     this._reauthAttempts = 0;
-    console.log('[AuthEncryption] ✅ Encryption cleared securely');
   }
 
   // Get encryption status
@@ -146,7 +138,6 @@ class AuthEncryptionHelper {
   // Prompt user to re-enter password for encryption (only for password users)
   showReauthPrompt() {
     if (this._reauthAttempts >= this.MAX_REAUTH_ATTEMPTS) {
-      console.error('[AuthEncryption] Max reauth attempts reached');
       const event = new CustomEvent('encryption-reauth-failed', {
         detail: { 
           message: 'Too many failed attempts. Please sign in again.',

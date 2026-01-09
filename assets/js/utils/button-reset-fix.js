@@ -379,5 +379,4 @@
     }
   }, true); // Use capture phase to catch it early
 
-  console.log('[Button Fix] Button reset failsafe initialized');
 })();
