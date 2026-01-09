@@ -21,6 +21,7 @@ class EncryptionService {
     this.KEY_LENGTH = 256;
     this._initializingUserId = null;
     this._initializationLock = null;
+    this._initializationQueue = [];
     this.currentUserId = null;
     
     // XSS Protection: Never store keys in storage - keep in memory only
@@ -41,17 +42,22 @@ class EncryptionService {
       return false;
     }
 
-    // Prevent concurrent initialization - use lock mechanism
-    if (this._initializationLock) {
-      log.log('Initialization already in progress, waiting...');
-      await this._initializationLock;
-      return this.isReady();
-    }
-
     // If already initialized for this user, skip
     if (this.isInitialized && this.currentUserId === userId) {
       log.log('Already initialized for this user');
       return true;
+    }
+
+    // Prevent concurrent initialization - use lock mechanism with queue
+    if (this._initializationLock) {
+      log.log('Initialization already in progress, waiting...');
+      
+      // Add to queue and wait
+      return new Promise((resolve) => {
+        this._initializationQueue.push(() => {
+          resolve(this.isReady());
+        });
+      });
     }
 
     // Create initialization lock
@@ -59,7 +65,34 @@ class EncryptionService {
     
     try {
       const result = await this._initializationLock;
+      
+      // Process queued initialization requests
+      const queue = this._initializationQueue;
+      this._initializationQueue = [];
+      queue.forEach(callback => {
+        try {
+          callback();
+        } catch (error) {
+          log.error('Error processing queued initialization:', error);
+        }
+      });
+      
       return result;
+    } catch (error) {
+      log.error('Initialization error:', error);
+      
+      // Process queued requests even on error
+      const queue = this._initializationQueue;
+      this._initializationQueue = [];
+      queue.forEach(callback => {
+        try {
+          callback();
+        } catch (err) {
+          log.error('Error processing queued initialization:', err);
+        }
+      });
+      
+      return false;
     } finally {
       this._initializationLock = null;
     }

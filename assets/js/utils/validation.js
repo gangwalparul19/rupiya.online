@@ -71,6 +71,15 @@ export class Validator {
     return true;
   }
 
+  // Validate non-negative number
+  nonNegativeNumber(value, fieldName = 'Amount') {
+    if (isNaN(value) || parseFloat(value) < 0) {
+      this.errors[fieldName] = 'Please enter a non-negative number';
+      return false;
+    }
+    return true;
+  }
+
   // Validate min value
   min(value, minValue, fieldName = 'Value') {
     if (parseFloat(value) < minValue) {
@@ -143,6 +152,18 @@ export class Validator {
     return true;
   }
 
+  // Validate date range
+  dateRange(startDate, endDate, fieldName = 'Date Range') {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    
+    if (start > end) {
+      this.errors[fieldName] = 'Start date must be before end date';
+      return false;
+    }
+    return true;
+  }
+
   // Validate URL
   url(value, fieldName = 'URL') {
     try {
@@ -152,6 +173,52 @@ export class Validator {
       this.errors[fieldName] = 'Please enter a valid URL';
       return false;
     }
+  }
+
+  // Validate credit card number (basic Luhn algorithm)
+  creditCard(value, fieldName = 'Card Number') {
+    const cleaned = value.replace(/\D/g, '');
+    if (cleaned.length < 13 || cleaned.length > 19) {
+      this.errors[fieldName] = 'Please enter a valid card number';
+      return false;
+    }
+    
+    // Basic Luhn check
+    let sum = 0;
+    let isEven = false;
+    for (let i = cleaned.length - 1; i >= 0; i--) {
+      let digit = parseInt(cleaned[i], 10);
+      if (isEven) {
+        digit *= 2;
+        if (digit > 9) digit -= 9;
+      }
+      sum += digit;
+      isEven = !isEven;
+    }
+    
+    if (sum % 10 !== 0) {
+      this.errors[fieldName] = 'Please enter a valid card number';
+      return false;
+    }
+    return true;
+  }
+
+  // Validate currency amount
+  currencyAmount(value, fieldName = 'Amount') {
+    const amount = parseFloat(value);
+    if (isNaN(amount) || amount < 0 || amount > 999999999) {
+      this.errors[fieldName] = 'Please enter a valid amount';
+      return false;
+    }
+    return true;
+  }
+
+  // Sanitize input to prevent XSS
+  sanitize(value) {
+    if (typeof value !== 'string') return value;
+    const div = document.createElement('div');
+    div.textContent = value;
+    return div.innerHTML;
   }
 
   // Get all errors

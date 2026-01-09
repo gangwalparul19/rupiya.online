@@ -13,8 +13,12 @@ import timezoneService from '../utils/timezone.js';
 import logger from '../utils/logger.js';
 import kpiEnhancer from '../utils/kpi-enhancements.js';
 import TransactionListEnhancer from '../utils/transaction-list-enhancements.js';
+import { setupAutoCacheClear } from '../utils/cache-buster.js';
 
 const log = logger.create('Dashboard');
+
+// Setup automatic cache clearing on version change
+setupAutoCacheClear();
 
 // Check authentication
 async function checkAuth() {
