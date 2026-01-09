@@ -59,7 +59,6 @@ const navigationConfig = {
       expanded: true,
       items: [
         { href: 'dashboard.html', icon: '📊', label: 'Dashboard' },
-        { href: 'analytics.html', icon: '📉', label: 'Analytics' },
         { href: 'predictive-analytics.html', icon: '🔮', label: 'Predictive Analytics' },
         { href: 'ai-insights.html', icon: '🤖', label: 'AI Insights' }
       ]

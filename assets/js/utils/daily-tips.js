@@ -32,8 +32,8 @@ const DAILY_TIPS = [
   },
   {
     tip: "Track your net worth monthly. It's the best measure of financial progress!",
-    action: "View analytics",
-    link: "analytics.html"
+    action: "View insights",
+    link: "ai-insights.html"
   },
   {
     tip: "Meal planning can save ₹3,000-5,000/month. Try planning your week's meals!",

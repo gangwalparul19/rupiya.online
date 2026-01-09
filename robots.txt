@@ -50,7 +50,6 @@ Allow: /expenses.html
 Allow: /income.html
 Allow: /budgets.html
 Allow: /goals.html
-Allow: /analytics.html
 Allow: /ai-insights.html
 Allow: /login.html
 Allow: /signup.html

@@ -23,11 +23,21 @@
    KPI GRID - ALL SCREEN SIZES
    ============================================ */
 
-/* Desktop: 4 columns */
-@media (min-width: 1025px) {
+/* Large Desktop: 4 columns (1440px+) */
+@media (min-width: 1440px) {
   .kpi-grid {
     display: grid !important;
     grid-template-columns: repeat(4, 1fr) !important;
+    gap: var(--spacing-lg) !important;
+    margin-bottom: var(--spacing-xl) !important;
+  }
+}
+
+/* Desktop: 3 columns (1025px - 1439px) */
+@media (min-width: 1025px) and (max-width: 1439px) {
+  .kpi-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
     gap: var(--spacing-lg) !important;
     margin-bottom: var(--spacing-xl) !important;
   }
@@ -209,30 +219,62 @@
 }
 
 /* ============================================
-   WIDGETS ROW - 2 COLUMNS ALL SIZES
+   WIDGETS ROW - RESPONSIVE LAYOUT
    ============================================ */
 
-.widgets-row {
-  display: grid !important;
-  grid-template-columns: repeat(2, 1fr) !important;
-  gap: var(--spacing-lg) !important;
-  margin-bottom: var(--spacing-xl) !important;
-}
-
-/* Tablet: 2 columns */
-@media (min-width: 769px) and (max-width: 1024px) {
+/* Large Desktop: 4 columns (1440px+) */
+@media (min-width: 1440px) {
   .widgets-row {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: var(--spacing-md) !important;
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: var(--spacing-lg) !important;
+    margin-bottom: var(--spacing-xl) !important;
   }
 }
 
-/* Mobile: 2 columns */
+/* Desktop: 2 columns (1025px - 1439px) */
+@media (min-width: 1025px) and (max-width: 1439px) {
+  .widgets-row {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: var(--spacing-lg) !important;
+    margin-bottom: var(--spacing-xl) !important;
+  }
+}
+
+/* Tablet: 2 columns (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .widgets-row {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: var(--spacing-md) !important;
+    margin-bottom: var(--spacing-lg) !important;
+  }
+}
+
+/* Mobile: Custom layout (max-width: 768px) */
 @media (max-width: 768px) {
   .widgets-row {
-    grid-template-columns: repeat(2, 1fr) !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
     gap: 12px !important;
     margin-bottom: 16px !important;
+  }
+
+  /* Savings Rate - Full width */
+  .savings-rate-widget {
+    grid-column: 1 / -1 !important;
+  }
+
+  /* Top Categories - Full width */
+  .top-categories-widget {
+    grid-column: 1 / -1 !important;
+  }
+
+  /* Goal Progress and Upcoming Bills - 2 per row (default) */
+  .goal-progress-widget,
+  .upcoming-bills-widget {
+    grid-column: auto !important;
   }
 }
 
@@ -243,7 +285,8 @@
 .savings-rate-widget,
 .goal-progress-widget,
 .top-categories-widget,
-.upcoming-bills-widget {
+.upcoming-bills-widget,
+.chart-card {
   display: flex !important;
   flex-direction: column !important;
   background: var(--white) !important;
@@ -258,15 +301,79 @@
 .savings-rate-widget:hover,
 .goal-progress-widget:hover,
 .top-categories-widget:hover,
-.upcoming-bills-widget:hover {
+.upcoming-bills-widget:hover,
+.chart-card:hover {
   box-shadow: var(--shadow-md) !important;
   transform: translateY(-2px) !important;
   border-color: var(--accent-cyan) !important;
 }
 
 /* ============================================
-   MOBILE RESPONSIVE - SMALLER SIZES
+   CHARTS GRID - RESPONSIVE LAYOUT
    ============================================ */
+
+/* Large Desktop: 2 columns (1440px+) */
+@media (min-width: 1440px) {
+  .charts-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: var(--spacing-lg) !important;
+    margin-bottom: var(--spacing-xl) !important;
+  }
+}
+
+/* Desktop: 2 columns (1025px - 1439px) */
+@media (min-width: 1025px) and (max-width: 1439px) {
+  .charts-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: var(--spacing-lg) !important;
+    margin-bottom: var(--spacing-xl) !important;
+  }
+}
+
+/* Tablet: 1 column (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .charts-grid {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: var(--spacing-md) !important;
+    margin-bottom: var(--spacing-lg) !important;
+  }
+}
+
+/* Mobile: 1 column (max-width: 768px) */
+@media (max-width: 768px) {
+  .charts-grid {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+    margin-bottom: 16px !important;
+  }
+}
+
+/* ============================================
+   TRANSACTIONS CARD - FULL WIDTH
+   ============================================ */
+
+.transactions-card {
+  display: block !important;
+  width: 100% !important;
+  grid-column: 1 / -1 !important;
+  background: var(--white) !important;
+  border: 2px solid var(--primary-blue) !important;
+  border-radius: var(--border-radius-lg) !important;
+  padding: var(--spacing-lg) !important;
+  overflow: hidden !important;
+  min-width: 0 !important;
+  margin-bottom: var(--spacing-xl) !important;
+}
+
+.transactions-card:hover {
+  box-shadow: var(--shadow-md) !important;
+  transform: translateY(-2px) !important;
+  border-color: var(--accent-cyan) !important;
+}
 
 @media (max-width: 480px) {
   .kpi-card {
@@ -309,6 +416,20 @@
   .top-categories-widget,
   .upcoming-bills-widget {
     padding: 12px !important;
+  }
+
+  .charts-grid {
+    gap: 10px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .chart-card {
+    padding: 12px !important;
+  }
+
+  .transactions-card {
+    padding: 12px !important;
+    margin-bottom: 12px !important;
   }
 }
 

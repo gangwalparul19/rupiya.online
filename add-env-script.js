@@ -24,7 +24,6 @@ const htmlFiles = [
   'investments.html',
   'loans.html',
   'goals.html',
-  'analytics.html',
   'profile.html',
   'houses.html',
   'vehicles.html',

@@ -75,16 +75,6 @@
       "priority": "0.8",
       "changefreq": "weekly"
     },
-    "analytics.html": {
-      "title": "Investment Analytics - Portfolio Performance & ROI Analysis | Rupiya",
-      "description": "Advanced investment analytics: portfolio performance charts, ROI calculator, XIRR, CAGR, asset allocation analysis, sector distribution. Data-driven investment insights for smart investors.",
-      "keywords": "investment analytics, portfolio analysis, ROI calculator, XIRR calculator, CAGR calculator, portfolio performance tracker, investment performance analysis, wealth analytics India",
-      "ogTitle": "Investment Analytics - Portfolio Performance Insights",
-      "ogDescription": "Advanced analytics, performance charts, ROI calculator, and investment insights",
-      "canonical": "https://rupiya.online/analytics.html",
-      "priority": "0.8",
-      "changefreq": "weekly"
-    },
     "ai-insights.html": {
       "title": "AI Investment Insights - Smart Portfolio Recommendations | Rupiya",
       "description": "Get AI-powered investment recommendations, portfolio optimization suggestions, spending analysis, and personalized financial advice. Smart AI insights for better investment decisions.",
