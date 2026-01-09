@@ -240,7 +240,7 @@ function renderLoans() {
     emptyState.style.display = 'block';
     
     // Re-attach event listener for add first loan button
-    document.getElementById('addFirstLoanBtn')?.addEventListener('click', openAddModal);
+    document.getElementById('addFirstLoanBtn')?.addEventListener('click', () => showAddForm());
     return;
   }
   

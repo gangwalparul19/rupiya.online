@@ -52,7 +52,23 @@ const investmentTypeIcons = {
   'Other': '💰'
 };
 
-// Check authentication
+// Helper function to safely format currency and prevent NaN
+function safeFormatCurrency(value) {
+  const num = parseFloat(value) || 0;
+  return isNaN(num) ? '₹0' : formatCurrency(num);
+}
+
+// Helper function to safely format compact currency
+function safeFormatCurrencyCompact(value) {
+  const num = parseFloat(value) || 0;
+  return isNaN(num) ? '₹0' : formatCurrencyCompact(num);
+}
+
+// Helper function to safely format percentage
+function safeFormatPercent(value) {
+  const num = parseFloat(value) || 0;
+  return isNaN(num) ? '0%' : `${num.toFixed(1)}%`;
+}
 async function checkAuth() {
   try {
     const user = await authService.waitForAuth();
@@ -186,22 +202,22 @@ async function loadNetWorth() {
     currentNetWorth = await netWorthService.calculateNetWorth();
     
     // Update main net worth display
-    document.getElementById('netWorthValue').textContent = formatCurrency(currentNetWorth.netWorth);
-    document.getElementById('totalAssets').textContent = formatCurrency(currentNetWorth.totalAssets);
-    document.getElementById('totalLiabilities').textContent = formatCurrency(currentNetWorth.totalLiabilities);
-    document.getElementById('assetsSectionTotal').textContent = formatCurrency(currentNetWorth.totalAssets);
-    document.getElementById('liabilitiesSectionTotal').textContent = formatCurrency(currentNetWorth.totalLiabilities);
+    document.getElementById('netWorthValue').textContent = safeFormatCurrency(currentNetWorth.netWorth);
+    document.getElementById('totalAssets').textContent = safeFormatCurrency(currentNetWorth.totalAssets);
+    document.getElementById('totalLiabilities').textContent = safeFormatCurrency(currentNetWorth.totalLiabilities);
+    document.getElementById('assetsSectionTotal').textContent = safeFormatCurrency(currentNetWorth.totalAssets);
+    document.getElementById('liabilitiesSectionTotal').textContent = safeFormatCurrency(currentNetWorth.totalLiabilities);
     
     // Update debt ratio
     const debtRatio = await netWorthService.getDebtToAssetRatio();
-    document.getElementById('debtRatio').textContent = `${debtRatio.toFixed(1)}%`;
+    document.getElementById('debtRatio').textContent = safeFormatPercent(debtRatio);
     
     // Update net worth change
     const change = await netWorthService.getNetWorthChange(30);
     const changeEl = document.getElementById('netWorthChange');
     const changeValueEl = changeEl.querySelector('.change-value');
-    changeValueEl.textContent = `${change.change >= 0 ? '+' : ''}${formatCurrency(change.change)}`;
-    changeValueEl.className = `change-value ${change.change >= 0 ? 'positive' : 'negative'}`;
+    changeValueEl.textContent = `${(change.change || 0) >= 0 ? '+' : ''}${safeFormatCurrency(change.change)}`;
+    changeValueEl.className = `change-value ${(change.change || 0) >= 0 ? 'positive' : 'negative'}`;
     
     // Render breakdowns
     renderAssetsBreakdown(currentNetWorth);
@@ -234,8 +250,8 @@ function renderAssetsBreakdown(data) {
         <div class="breakdown-detail">
           <span class="detail-icon">${icon}</span>
           <span class="detail-name">${escapeHtml(type)}</span>
-          <span class="detail-value">${formatCurrencyCompact(info.value)}</span>
-          <span class="detail-change ${gainLossClass}">${gainLoss >= 0 ? '+' : ''}${formatCurrencyCompact(gainLoss)}</span>
+          <span class="detail-value">${safeFormatCurrencyCompact(info.value)}</span>
+          <span class="detail-change ${gainLossClass}">${gainLoss >= 0 ? '+' : ''}${safeFormatCurrencyCompact(gainLoss)}</span>
         </div>
       `;
     });
@@ -245,7 +261,7 @@ function renderAssetsBreakdown(data) {
         <div class="breakdown-header">
           <span class="breakdown-icon">${assetIcons.investments}</span>
           <span class="breakdown-title">Investments</span>
-          <span class="breakdown-value">${formatCurrency(data.assets.investments)}</span>
+          <span class="breakdown-value">${safeFormatCurrency(data.assets.investments)}</span>
         </div>
         <div class="breakdown-details">${detailsHtml}</div>
         <a href="investments.html" class="breakdown-link">View All →</a>
@@ -260,7 +276,7 @@ function renderAssetsBreakdown(data) {
       <div class="breakdown-detail">
         <span class="detail-icon">🏠</span>
         <span class="detail-name">${escapeHtml(house.name)}</span>
-        <span class="detail-value">${formatCurrencyCompact(house.currentValue)}</span>
+        <span class="detail-value">${safeFormatCurrencyCompact(house.currentValue)}</span>
       </div>
     `).join('');
     
@@ -269,7 +285,7 @@ function renderAssetsBreakdown(data) {
         <div class="breakdown-header">
           <span class="breakdown-icon">${assetIcons.realEstate}</span>
           <span class="breakdown-title">Real Estate</span>
-          <span class="breakdown-value">${formatCurrency(data.assets.realEstate)}</span>
+          <span class="breakdown-value">${safeFormatCurrency(data.assets.realEstate)}</span>
         </div>
         <div class="breakdown-details">${detailsHtml}</div>
         <a href="houses.html" class="breakdown-link">View All →</a>
@@ -284,7 +300,7 @@ function renderAssetsBreakdown(data) {
         <div class="breakdown-header">
           <span class="breakdown-icon">${assetIcons.vehicles}</span>
           <span class="breakdown-title">Vehicles</span>
-          <span class="breakdown-value">${formatCurrency(data.assets.vehicles)}</span>
+          <span class="breakdown-value">${safeFormatCurrency(data.assets.vehicles)}</span>
         </div>
         <a href="vehicles.html" class="breakdown-link">View All →</a>
       </div>
@@ -298,7 +314,7 @@ function renderAssetsBreakdown(data) {
         <div class="breakdown-header">
           <span class="breakdown-icon">${assetIcons.savings}</span>
           <span class="breakdown-title">Savings Goals</span>
-          <span class="breakdown-value">${formatCurrency(data.assets.savings)}</span>
+          <span class="breakdown-value">${safeFormatCurrency(data.assets.savings)}</span>
         </div>
         <a href="goals.html" class="breakdown-link">View All →</a>
       </div>
@@ -336,8 +352,8 @@ function renderLiabilitiesBreakdown(data) {
         <div class="breakdown-detail">
           <span class="detail-icon">${icon}</span>
           <span class="detail-name">${escapeHtml(type.charAt(0).toUpperCase() + type.slice(1))} Loan</span>
-          <span class="detail-value">${formatCurrencyCompact(info.outstanding)}</span>
-          <span class="detail-progress">${paidPercent.toFixed(0)}% paid</span>
+          <span class="detail-value">${safeFormatCurrencyCompact(info.outstanding)}</span>
+          <span class="detail-progress">${(paidPercent || 0).toFixed(0)}% paid</span>
         </div>
       `;
     });
@@ -347,7 +363,7 @@ function renderLiabilitiesBreakdown(data) {
         <div class="breakdown-header">
           <span class="breakdown-icon">${liabilityIcons.loans}</span>
           <span class="breakdown-title">Loans</span>
-          <span class="breakdown-value text-danger">${formatCurrency(data.liabilities.loans)}</span>
+          <span class="breakdown-value text-danger">${safeFormatCurrency(data.liabilities.loans)}</span>
         </div>
         <div class="breakdown-details">${detailsHtml}</div>
         <a href="loans.html" class="breakdown-link">View All →</a>
@@ -412,7 +428,7 @@ function renderAllocationChart(data) {
         <div class="legend-item">
           <span class="legend-color" style="background: ${colors[key]}"></span>
           <span class="legend-label">${labels[key]}</span>
-          <span class="legend-value">${percent.toFixed(1)}%</span>
+          <span class="legend-value">${isNaN(percent) ? '0%' : percent.toFixed(1) + '%'}</span>
         </div>
       `);
     }
@@ -430,14 +446,14 @@ async function loadCashFlow() {
   try {
     const cashFlow = await netWorthService.getMonthlyCashFlow(currentYear, currentMonth);
     
-    document.getElementById('monthlyIncome').textContent = formatCurrency(cashFlow.income);
-    document.getElementById('monthlyExpenses').textContent = formatCurrency(cashFlow.expenses);
-    document.getElementById('monthlyAvailable').textContent = formatCurrency(cashFlow.availableForSavings);
+    document.getElementById('monthlyIncome').textContent = safeFormatCurrency(cashFlow.income);
+    document.getElementById('monthlyExpenses').textContent = safeFormatCurrency(cashFlow.expenses);
+    document.getElementById('monthlyAvailable').textContent = safeFormatCurrency(cashFlow.availableForSavings);
     
     // Update allocation
-    document.getElementById('allocInvestments').textContent = formatCurrency(cashFlow.transfers.totalInvestmentPurchases);
-    document.getElementById('allocLoanPrincipal').textContent = formatCurrency(cashFlow.transfers.totalPrincipalPaid);
-    document.getElementById('allocInterest').textContent = formatCurrency(cashFlow.transfers.totalInterestPaid);
+    document.getElementById('allocInvestments').textContent = safeFormatCurrency(cashFlow.transfers.totalInvestmentPurchases);
+    document.getElementById('allocLoanPrincipal').textContent = safeFormatCurrency(cashFlow.transfers.totalPrincipalPaid);
+    document.getElementById('allocInterest').textContent = safeFormatCurrency(cashFlow.transfers.totalInterestPaid);
     
   } catch (error) {
     console.error('[NetWorth] Error loading cash flow:', error);
@@ -470,8 +486,8 @@ async function loadHistory() {
       return `
         <div class="history-item">
           <div class="history-date">${date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
-          <div class="history-value">${formatCurrency(snapshot.netWorth)}</div>
-          ${prevSnapshot ? `<div class="history-change ${changeClass}">${change >= 0 ? '+' : ''}${formatCurrencyCompact(change)}</div>` : ''}
+          <div class="history-value">${safeFormatCurrency(snapshot.netWorth)}</div>
+          ${prevSnapshot ? `<div class="history-change ${changeClass}">${change >= 0 ? '+' : ''}${safeFormatCurrencyCompact(change)}</div>` : ''}
         </div>
       `;
     }).join('');

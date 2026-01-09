@@ -1158,25 +1158,33 @@ function setupEventListeners() {
     handlePaymentMethodFilterChange();
   });
   
-  specificPaymentMethodFilter.addEventListener('change', () => {
-    state.filters.specificPaymentMethod = specificPaymentMethodFilter.value;
-    applyFilters();
-  });
+  if (specificPaymentMethodFilter) {
+    specificPaymentMethodFilter.addEventListener('change', () => {
+      state.filters.specificPaymentMethod = specificPaymentMethodFilter.value;
+      applyFilters();
+    });
+  }
   
-  familyMemberFilter.addEventListener('change', () => {
-    state.filters.familyMember = familyMemberFilter.value;
-    applyFilters();
-  });
+  if (familyMemberFilter) {
+    familyMemberFilter.addEventListener('change', () => {
+      state.filters.familyMember = familyMemberFilter.value;
+      applyFilters();
+    });
+  }
   
-  dateFromFilter.addEventListener('change', () => {
-    state.filters.dateFrom = dateFromFilter.value;
-    applyFilters();
-  });
+  if (dateFromFilter) {
+    dateFromFilter.addEventListener('change', () => {
+      state.filters.dateFrom = dateFromFilter.value;
+      applyFilters();
+    });
+  }
   
-  dateToFilter.addEventListener('change', () => {
-    state.filters.dateTo = dateToFilter.value;
-    applyFilters();
-  });
+  if (dateToFilter) {
+    dateToFilter.addEventListener('change', () => {
+      state.filters.dateTo = dateToFilter.value;
+      applyFilters();
+    });
+  }
   
   clearFiltersBtn.addEventListener('click', clearFilters);
   
@@ -1302,13 +1310,13 @@ function clearFilters() {
     search: ''
   };
   
-  categoryFilter.value = '';
-  paymentMethodFilter.value = '';
-  specificPaymentMethodFilter.value = '';
-  familyMemberFilter.value = '';
-  dateFromFilter.value = '';
-  dateToFilter.value = '';
-  searchInput.value = '';
+  if (categoryFilter) categoryFilter.value = '';
+  if (paymentMethodFilter) paymentMethodFilter.value = '';
+  if (specificPaymentMethodFilter) specificPaymentMethodFilter.value = '';
+  if (familyMemberFilter) familyMemberFilter.value = '';
+  if (dateFromFilter) dateFromFilter.value = '';
+  if (dateToFilter) dateToFilter.value = '';
+  if (searchInput) searchInput.value = '';
   
   // Hide specific payment method filter
   const specificPaymentMethodGroup = document.getElementById('specificPaymentMethodFilterGroup');

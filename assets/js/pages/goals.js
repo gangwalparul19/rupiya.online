@@ -3,7 +3,6 @@ import '../services/services-init.js'; // Initialize services first
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
 import toast from '../components/toast.js';
-import confirmationModal from '../components/confirmation-modal.js';
 import themeManager from '../utils/theme-manager.js';
 import { Validator } from '../utils/validation.js';
 import { formatCurrency, formatDate, formatDateForInput } from '../utils/helpers.js';
@@ -113,9 +112,6 @@ async function initPage() {
     userAvatar.textContent = initials;
     userName.textContent = user.displayName || 'User';
     userEmail.textContent = user.email;
-    
-    // Update subtitle based on context
-    updatePageContext();
     
     // Set default target date to 1 year from now
     const oneYearFromNow = new Date();
