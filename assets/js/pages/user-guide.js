@@ -507,11 +507,9 @@ const guideContent = {
       <div class="guide-tip">
         <div class="guide-tip-icon">💡</div>
         <div class="guide-tip-content">
-          <strong>Privacy:</strong> Personal expenses remain private. Only expenses marked as "Shared" are visible to family members.
+          <strong>Privacy:</strong> All expenses are personal and private to your account.
         </div>
       </div>
-      
-      <a href="family.html" class="guide-cta-btn">Manage Family →</a>
     `
   },
 

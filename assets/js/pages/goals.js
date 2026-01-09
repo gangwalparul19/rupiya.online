@@ -114,9 +114,6 @@ async function initPage() {
     userName.textContent = user.displayName || 'User';
     userEmail.textContent = user.email;
     
-    // Initialize family switcher
-    await familySwitcher.init();
-    
     // Update subtitle based on context
     updatePageContext();
     

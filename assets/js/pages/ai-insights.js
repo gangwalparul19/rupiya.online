@@ -51,7 +51,6 @@ async function initPage() {
     userAvatar.textContent = initials;
     userName.textContent = user.displayName || 'User';
     userEmail.textContent = user.email;
-    await familySwitcher.init();
     setupEventListeners();
     setupTabs();
     await loadInsights();

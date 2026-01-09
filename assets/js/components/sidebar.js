@@ -106,7 +106,6 @@ const navigationConfig = {
       icon: '👥',
       expanded: false,
       items: [
-        { href: 'family.html', icon: '👨‍👩‍👧‍👦', label: 'Family Groups' },
         { href: 'trip-groups.html', icon: '✈️', label: 'Trip Groups' }
       ]
     },

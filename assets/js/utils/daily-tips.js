@@ -96,9 +96,9 @@ const DAILY_TIPS = [
     link: "budgets.html"
   },
   {
-    tip: "Share financial goals with family. Teamwork makes saving easier and more fun!",
-    action: "Family groups",
-    link: "family.html"
+    tip: "Set financial goals and track your progress towards wealth building!",
+    action: "Set goals",
+    link: "goals.html"
   }
 ];
 

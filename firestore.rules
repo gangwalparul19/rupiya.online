@@ -57,20 +57,9 @@ service cloud.firestore {
     // EXPENSES
     // ============================================
     match /expenses/{expenseId} {
-      // Helper function to check if user is in same family as expense owner
-      function isInSameFamilyGroup() {
-        let ownerDoc = get(/databases/$(database)/documents/users/$(resource.data.userId));
-        let currentUserDoc = get(/databases/$(database)/documents/users/$(request.auth.uid));
-        
-        return isAuthenticated() && 
-               ownerDoc.data.familyGroups != null &&
-               currentUserDoc.data.familyGroups != null &&
-               ownerDoc.data.familyGroups.hasAny(currentUserDoc.data.familyGroups);
-      }
-      
-      // Users can read their own expenses OR expenses from family members
+      // Users can read their own expenses
       // Admins can read all expenses for analytics
-      allow read: if belongsToUser() || isInSameFamilyGroup() || isAdmin();
+      allow read: if belongsToUser() || isAdmin();
       allow create: if isAuthenticated() && hasValidUserId();
       allow update: if belongsToUser() && userIdNotChanged();
       allow delete: if belongsToUser();
@@ -80,20 +69,9 @@ service cloud.firestore {
     // INCOME
     // ============================================
     match /income/{incomeId} {
-      // Helper function to check if user is in same family as income owner
-      function isInSameFamilyGroup() {
-        let ownerDoc = get(/databases/$(database)/documents/users/$(resource.data.userId));
-        let currentUserDoc = get(/databases/$(database)/documents/users/$(request.auth.uid));
-        
-        return isAuthenticated() && 
-               ownerDoc.data.familyGroups != null &&
-               currentUserDoc.data.familyGroups != null &&
-               ownerDoc.data.familyGroups.hasAny(currentUserDoc.data.familyGroups);
-      }
-      
-      // Users can read their own income OR income from family members
+      // Users can read their own income
       // Admins can read all income for analytics
-      allow read: if belongsToUser() || isInSameFamilyGroup() || isAdmin();
+      allow read: if belongsToUser() || isAdmin();
       allow create: if isAuthenticated() && hasValidUserId();
       allow update: if belongsToUser() && userIdNotChanged();
       allow delete: if belongsToUser();

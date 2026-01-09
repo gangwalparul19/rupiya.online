@@ -103,9 +103,6 @@ async function initPage() {
     userName.textContent = user.displayName || 'User';
     userEmail.textContent = user.email;
     
-    // Initialize family switcher
-    await familySwitcher.init();
-    
     // Update subtitle based on context
     updatePageContext();
     
@@ -130,14 +127,8 @@ async function initPage() {
 
 // Update page context based on family switcher
 function updatePageContext() {
-  const context = familySwitcher.getCurrentContext();
   const subtitle = document.getElementById('budgetsSubtitle');
-  
-  if (context.context === 'family' && context.group) {
-    subtitle.textContent = `Managing budgets for ${context.group.name}`;
-  } else {
-    subtitle.textContent = 'Set spending limits and track your budget';
-  }
+  subtitle.textContent = 'Set spending limits and track your budget';
 }
 
 // Load categories into dropdown

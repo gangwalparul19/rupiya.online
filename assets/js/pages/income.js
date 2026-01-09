@@ -163,9 +163,6 @@ async function initPage() {
     userName.textContent = user.displayName || 'User';
     userEmail.textContent = user.email;
     
-    // Initialize family switcher
-    await familySwitcher.init();
-    
     // Update subtitle based on context
     updatePageContext();
     
@@ -191,22 +188,13 @@ async function initPage() {
 
 // Update page context based on family switcher
 function updatePageContext() {
-  const context = familySwitcher.getCurrentContext();
   const subtitle = document.getElementById('incomeSubtitle');
   const incomeTypeGroup = document.getElementById('incomeTypeGroup');
   
-  if (context.context === 'family' && context.group) {
-    subtitle.textContent = `Tracking income for ${context.group.name}`;
-    // Show personal/shared option in form
-    if (incomeTypeGroup) {
-      incomeTypeGroup.style.display = 'block';
-    }
-  } else {
-    subtitle.textContent = 'Track and manage your earnings';
-    // Hide personal/shared option
-    if (incomeTypeGroup) {
-      incomeTypeGroup.style.display = 'none';
-    }
+  subtitle.textContent = 'Track and manage your earnings';
+  // Hide personal/shared option
+  if (incomeTypeGroup) {
+    incomeTypeGroup.style.display = 'none';
   }
 }
 
@@ -272,35 +260,18 @@ async function loadIncome() {
     emptyState.style.display = 'none';
     incomeList.style.display = 'none';
     
-    // Check if we're in family mode
-    const context = familySwitcher.getCurrentContext();
-    const isFamilyMode = context.context === 'family' && context.groupId && context.group;
+    // Personal mode only - family mode has been removed
+    const isFamilyMode = false;
     
-    let kpiSummary;
-    let income;
+    // Fetch user's income
+    const kpiSummary = await firestoreService.getIncomeKPISummary();
+    state.totalCount = kpiSummary.totalCount;
     
-    if (isFamilyMode) {
-      // Family mode - fetch from all family members
-      const memberUserIds = context.group.members.map(m => m.userId);
-      
-      // Get family KPI summary
-      kpiSummary = await firestoreService.getFamilyIncomeKPISummary(context.groupId, memberUserIds);
-      state.totalCount = kpiSummary.totalCount;
-      
-      // Get family income
-      income = await firestoreService.getFamilyIncome(context.groupId, memberUserIds);
-      state.income = income;
-    } else {
-      // Personal mode - fetch only user's income
-      kpiSummary = await firestoreService.getIncomeKPISummary();
-      state.totalCount = kpiSummary.totalCount;
-      
-      // Load paginated income for display
-      const result = await firestoreService.getIncomePaginated({ 
-        pageSize: state.itemsPerPage * 5 // Load 5 pages worth for filtering
-      });
-      state.income = result.data;
-    }
+    // Load paginated income for display
+    const result = await firestoreService.getIncomePaginated({ 
+      pageSize: state.itemsPerPage * 5 // Load 5 pages worth for filtering
+    });
+    state.income = result.data;
     
     // Update KPI cards
     updateIncomeKPIsFromSummary(kpiSummary);
@@ -1139,21 +1110,7 @@ async function handleFormSubmit(e) {
         specificPaymentMethodInput.options[specificPaymentMethodInput.selectedIndex].text : null
     };
     
-    // Add family context if in family mode
-    const context = familySwitcher.getCurrentContext();
-    if (context.context === 'family' && context.groupId) {
-      incomeData.familyGroupId = context.groupId;
-      
-      // Check if income is personal or shared
-      const incomeTypeRadio = document.querySelector('input[name="incomeType"]:checked');
-      if (incomeTypeRadio) {
-        incomeData.incomeType = incomeTypeRadio.value; // 'personal' or 'shared'
-        incomeData.isShared = incomeTypeRadio.value === 'shared';
-      } else {
-        incomeData.incomeType = 'personal';
-        incomeData.isShared = false;
-      }
-    }
+    // Family group feature removed
     
     // Add linked data if present
     if (incomeForm.dataset.linkedType) {

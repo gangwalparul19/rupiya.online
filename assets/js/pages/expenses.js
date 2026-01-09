@@ -183,9 +183,6 @@ async function initPage() {
     userName.textContent = user.displayName || 'User';
     userEmail.textContent = user.email;
     
-    // Initialize family switcher
-    await familySwitcher.init();
-    
     // Update subtitle based on context
     updatePageContext();
     
@@ -214,14 +211,8 @@ async function initPage() {
 
 // Update page context based on family switcher
 function updatePageContext() {
-  const context = familySwitcher.getCurrentContext();
   const subtitle = document.getElementById('expensesSubtitle');
-  
-  if (context.context === 'family' && context.group) {
-    subtitle.textContent = `Viewing combined expenses for ${context.group.name}`;
-  } else {
-    subtitle.textContent = 'Track and manage your spending';
-  }
+  subtitle.textContent = 'Track and manage your spending';
 }
 
 // Load categories into dropdowns
@@ -243,15 +234,7 @@ async function loadCategoryDropdowns() {
 
 // Load family members into filter dropdown
 async function loadFamilyMemberFilter() {
-  try {
-    const members = await familyMembersService.getActiveFamilyMembers();
-    
-    // Populate family member filter dropdown
-    familyMemberFilter.innerHTML = '<option value="">All Members</option>' +
-      members.map(member => `<option value="${member.id}">${member.icon} ${escapeHtml(member.name)}</option>`).join('');
-  } catch (error) {
-    console.error('Error loading family members for filter:', error);
-  }
+  // Family member filtering has been removed
 }
 
 // Handle payment method filter change (cascading filter)
@@ -337,35 +320,15 @@ async function loadExpenses() {
     emptyState.style.display = 'none';
     expensesList.style.display = 'none';
     
-    // Check if we're in family mode
-    const context = familySwitcher.getCurrentContext();
-    const isFamilyMode = context.context === 'family' && context.groupId && context.group;
+    // Family group feature removed - fetch only user's expenses
+    const kpiSummary = await firestoreService.getExpenseKPISummary();
+    state.totalCount = kpiSummary.totalCount;
     
-    let kpiSummary;
-    let expenses;
-    
-    if (isFamilyMode) {
-      // Family mode - fetch from all family members
-      const memberUserIds = context.group.members.map(m => m.userId);
-      
-      // Get family KPI summary
-      kpiSummary = await firestoreService.getFamilyExpenseKPISummary(context.groupId, memberUserIds);
-      state.totalCount = kpiSummary.totalCount;
-      
-      // Get family expenses
-      expenses = await firestoreService.getFamilyExpenses(context.groupId, memberUserIds);
-      state.expenses = expenses;
-    } else {
-      // Personal mode - fetch only user's expenses
-      kpiSummary = await firestoreService.getExpenseKPISummary();
-      state.totalCount = kpiSummary.totalCount;
-      
-      // Load paginated expenses for display
-      const result = await firestoreService.getExpensesPaginated({ 
-        pageSize: state.itemsPerPage * 5 // Load 5 pages worth for filtering
-      });
-      state.expenses = result.data;
-    }
+    // Load paginated expenses for display
+    const result = await firestoreService.getExpensesPaginated({ 
+      pageSize: state.itemsPerPage * 5 // Load 5 pages worth for filtering
+    });
+    state.expenses = result.data;
     
     // Update KPI cards
     updateExpenseKPIsFromSummary(kpiSummary);
@@ -948,13 +911,9 @@ async function loadFamilyMembersForSplit() {
   if (!splitMembersList) return;
   
   try {
-    // Get family members from service
-    const members = await familyMembersService.getActiveFamilyMembers();
-    
-    if (members.length === 0) {
-      splitMembersList.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">No family members configured. Go to Settings to add family members.</p>';
-      return;
-    }
+    // Family member splitting has been removed
+    splitMembersList.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Expense splitting feature is not available.</p>';
+    return;
     
     // Create input for each member
     splitMembersList.innerHTML = members.map(member => {
@@ -1533,11 +1492,7 @@ async function handleFormSubmit(e) {
         specificPaymentMethodInput.options[specificPaymentMethodInput.selectedIndex].text : null
     };
     
-    // Add family context if in family mode (for viewing only)
-    const context = familySwitcher.getCurrentContext();
-    if (context.context === 'family' && context.groupId) {
-      expenseData.familyGroupId = context.groupId;
-    }
+    // Family context removed - personal expenses only
     
     // Add split details if enabled (encrypt member names)
     const splitDetails = getSplitDetailsData();
