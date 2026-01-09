@@ -3,69 +3,85 @@
    ============================================ */
 
 /* ============================================
-   1. TOOLTIPS ON KPI CARDS
+   1. TOOLTIPS ON KPI CARDS - IMPROVED
    ============================================ */
+
+/* KPI Card with tooltip support */
 .kpi-card[data-tooltip],
 .kpi-summary .kpi-card[data-tooltip],
 .summary-card[data-tooltip] {
   position: relative;
-  cursor: pointer;
 }
 
-/* Info icon indicator for tooltips */
-.kpi-card[data-tooltip]::before,
-.summary-card[data-tooltip]::before {
-  content: 'i';
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 18px;
-  height: 18px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 50%;
-  opacity: 0.7;
-  z-index: 5;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
-  display: flex;
+/* Info icon button - positioned in header */
+.kpi-card .kpi-info-btn,
+.summary-card .kpi-info-btn {
+  display: none;
+}
+
+/* Show info button when tooltip exists */
+.kpi-card[data-tooltip] .kpi-info-btn,
+.summary-card[data-tooltip] .kpi-info-btn {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: white;
-  font-size: 11px;
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  min-height: 24px;
+  background: rgba(102, 126, 234, 0.15);
+  border: 1.5px solid rgba(102, 126, 234, 0.4);
+  border-radius: 50%;
+  color: #667eea;
+  font-size: 13px;
   font-weight: 700;
-  font-style: italic;
-  font-family: Georgia, serif;
-  line-height: 1;
-  text-align: center;
+  cursor: help;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  margin-left: auto;
+  position: relative;
+  z-index: 10;
+  padding: 0;
 }
 
-.kpi-card[data-tooltip]:hover::before,
-.summary-card[data-tooltip]:hover::before {
-  opacity: 1;
+.kpi-card[data-tooltip] .kpi-info-btn:hover,
+.summary-card[data-tooltip] .kpi-info-btn:hover {
+  background: rgba(102, 126, 234, 0.25);
+  border-color: rgba(102, 126, 234, 0.6);
   transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
 }
 
-/* Modern tooltip bubble */
-.kpi-card[data-tooltip]::after,
-.summary-card[data-tooltip]::after {
-  content: attr(data-tooltip);
+.kpi-card[data-tooltip] .kpi-info-btn:active,
+.summary-card[data-tooltip] .kpi-info-btn:active {
+  transform: scale(0.95);
+}
+
+/* Ensure header is flex for proper alignment */
+.kpi-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+  flex-wrap: nowrap !important;
+  width: 100% !important;
+}
+
+/* Tooltip container - positioned relative to info button */
+.kpi-info-tooltip {
   position: absolute;
-  bottom: calc(100% + 12px);
-  left: 50%;
-  transform: translateX(-50%) translateY(8px);
   background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
   color: #334155;
-  padding: 12px 18px;
-  border-radius: 12px;
+  padding: 12px 16px;
+  border-radius: 10px;
   font-size: 13px;
   font-weight: 500;
   line-height: 1.5;
-  white-space: nowrap;
+  white-space: normal;
   opacity: 0;
   visibility: hidden;
   transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  z-index: 1000;
+  z-index: 1001;
   pointer-events: none;
   box-shadow: 
     0 10px 40px rgba(0, 0, 0, 0.12),
@@ -74,41 +90,94 @@
   border: 1px solid rgba(102, 126, 234, 0.15);
   max-width: 280px;
   text-align: center;
+  bottom: auto;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(-8px);
 }
 
-/* Tooltip arrow */
-.kpi-card[data-tooltip]::after,
-.summary-card[data-tooltip]::after {
-  --arrow-size: 8px;
-}
-
-.kpi-card[data-tooltip]:hover::after,
-.summary-card[data-tooltip]:hover::after {
+/* Show tooltip on hover or focus */
+.kpi-card[data-tooltip] .kpi-info-btn:hover ~ .kpi-info-tooltip,
+.summary-card[data-tooltip] .kpi-info-btn:hover ~ .kpi-info-tooltip,
+.kpi-info-tooltip.show {
   opacity: 1;
   visibility: visible;
   transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
 }
 
-/* Tooltip arrow using box-shadow trick */
-.kpi-card[data-tooltip]:hover,
-.summary-card[data-tooltip]:hover {
-  z-index: 10;
+/* Tooltip arrow */
+.kpi-info-tooltip::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-bottom: 6px solid rgba(102, 126, 234, 0.15);
 }
 
-/* Always show tooltip on mobile (tap to see) */
+/* Adjust tooltip position for bottom placement on mobile */
 @media (max-width: 768px) {
-  .kpi-card[data-tooltip]:active::after,
-  .summary-card[data-tooltip]:active::after {
-    opacity: 1;
-    visibility: visible;
-    transform: translateX(-50%) translateY(0);
+  .kpi-info-tooltip {
+    max-width: 240px;
+    font-size: 12px;
+    padding: 10px 14px;
   }
   
-  .kpi-card[data-tooltip]::after,
-  .summary-card[data-tooltip]::after {
-    white-space: normal;
-    max-width: 200px;
+  /* Position tooltip below on mobile to avoid viewport cutoff */
+  .kpi-card[data-tooltip] .kpi-info-tooltip,
+  .summary-card[data-tooltip] .kpi-info-tooltip {
+    top: calc(100% + 12px);
+    bottom: auto;
   }
+  
+  .kpi-info-tooltip::before {
+    bottom: auto;
+    top: -6px;
+    border-bottom: none;
+    border-top: 6px solid rgba(102, 126, 234, 0.15);
+  }
+}
+
+/* Extra small mobile */
+@media (max-width: 480px) {
+  .kpi-card[data-tooltip] .kpi-info-btn,
+  .summary-card[data-tooltip] .kpi-info-btn {
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
+    min-height: 22px;
+    font-size: 12px;
+  }
+  
+  .kpi-info-tooltip {
+    max-width: 200px;
+    font-size: 11px;
+    padding: 8px 12px;
+  }
+}
+
+/* Dark mode support */
+:root.dark-mode .kpi-info-tooltip {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  color: #e2e8f0;
+  border-color: rgba(102, 126, 234, 0.25);
+  box-shadow: 
+    0 10px 40px rgba(0, 0, 0, 0.4),
+    0 4px 12px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(102, 126, 234, 0.2);
+}
+
+:root.dark-mode .kpi-info-tooltip::before {
+  border-bottom-color: rgba(102, 126, 234, 0.25);
+}
+
+:root.dark-mode .kpi-info-tooltip.show::before {
+  border-top-color: rgba(102, 126, 234, 0.25);
 }
 
 /* ============================================
