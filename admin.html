@@ -3,7 +3,6 @@
 <head>
   <script src="assets/js/config/env-local.js"></script>
 
-
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Rupiya Admin - Platform Analytics and Insights">
@@ -33,22 +32,38 @@
     <div class="admin-header-left">
       <a href="dashboard.html" class="admin-logo">
         <img src="assets/images/logo.png" alt="Rupiya">
+        <span class="logo-text">Rupiya</span>
       </a>
       <span class="admin-badge">Admin</span>
     </div>
     <div class="admin-header-right">
-      <span class="admin-user" id="adminUserEmail">Loading...</span>
-      <a href="dashboard.html" class="btn btn-sm btn-outline">← Back to App</a>
-      <button class="btn btn-sm btn-outline" id="logoutBtn">Logout</button>
+      <div class="admin-user-info">
+        <span class="admin-user-avatar" id="adminUserAvatar">A</span>
+        <span class="admin-user-email" id="adminUserEmail">Loading...</span>
+      </div>
+      <a href="dashboard.html" class="btn btn-sm btn-outline">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+        </svg>
+        Back to App
+      </a>
+      <button class="btn btn-sm btn-danger-outline" id="logoutBtn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+        </svg>
+        Logout
+      </button>
     </div>
   </header>
 
   <!-- Access Denied State -->
   <div class="admin-access-denied" id="accessDenied" style="display: none;">
-    <div class="access-denied-icon">🔒</div>
-    <h2 class="access-denied-title">Access Denied</h2>
-    <p class="access-denied-message">You don't have permission to access the admin dashboard.</p>
-    <a href="dashboard.html" class="btn btn-primary">Go to Dashboard</a>
+    <div class="access-denied-card">
+      <div class="access-denied-icon">🔒</div>
+      <h2 class="access-denied-title">Access Denied</h2>
+      <p class="access-denied-message">You don't have permission to access the admin dashboard.</p>
+      <a href="dashboard.html" class="btn btn-primary">Go to Dashboard</a>
+    </div>
   </div>
 
   <!-- Loading State -->
@@ -61,44 +76,56 @@
   <main class="admin-main" id="adminContent" style="display: none;">
     <!-- Page Header -->
     <div class="admin-page-header">
-      <div>
-        <h1 class="admin-title">Platform Analytics</h1>
-        <p class="admin-subtitle">User analytics and platform usage insights (financial data is encrypted)</p>
+      <div class="page-header-content">
+        <h1 class="admin-title">📊 Platform Analytics</h1>
+        <p class="admin-subtitle">User analytics and platform usage insights</p>
       </div>
-      <button class="refresh-btn" id="refreshBtn">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-        </svg>
-        Refresh
-      </button>
+      <div class="page-header-actions">
+        <span class="last-updated" id="lastUpdated">Last updated: --</span>
+        <button class="refresh-btn" id="refreshBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+          </svg>
+          Refresh
+        </button>
+      </div>
     </div>
 
     <!-- Platform Stats -->
     <section class="admin-section">
       <div class="admin-stats-grid">
         <div class="admin-stat-card highlight">
-          <div class="stat-icon">👥</div>
+          <div class="stat-icon-wrapper">
+            <span class="stat-icon">👥</span>
+          </div>
           <div class="stat-content">
             <div class="stat-value" id="totalUsers">-</div>
             <div class="stat-label">Total Users</div>
+            <div class="stat-trend positive" id="usersTrend">--</div>
           </div>
         </div>
         <div class="admin-stat-card">
-          <div class="stat-icon">📊</div>
+          <div class="stat-icon-wrapper blue">
+            <span class="stat-icon">📊</span>
+          </div>
           <div class="stat-content">
             <div class="stat-value" id="totalTransactions">-</div>
             <div class="stat-label">Total Records</div>
           </div>
         </div>
         <div class="admin-stat-card">
-          <div class="stat-icon">👨‍👩‍👧‍👦</div>
+          <div class="stat-icon-wrapper green">
+            <span class="stat-icon">👨‍👩‍👧‍👦</span>
+          </div>
           <div class="stat-content">
             <div class="stat-value" id="totalFamilyGroups">-</div>
             <div class="stat-label">Family Groups</div>
           </div>
         </div>
         <div class="admin-stat-card">
-          <div class="stat-icon">✈️</div>
+          <div class="stat-icon-wrapper orange">
+            <span class="stat-icon">✈️</span>
+          </div>
           <div class="stat-content">
             <div class="stat-value" id="totalTripGroups">-</div>
             <div class="stat-label">Trip Groups</div>
@@ -113,70 +140,64 @@
         <div class="encryption-notice-icon">🔐</div>
         <div class="encryption-notice-content">
           <h3>Data Privacy & Security</h3>
-          <p>Financial data (amounts, transactions, investments) is end-to-end encrypted and cannot be accessed by administrators. This dashboard shows only user analytics and platform usage statistics to respect user privacy.</p>
+          <p>Financial data (amounts, transactions, investments) is end-to-end encrypted and cannot be accessed by administrators. This dashboard shows only user analytics and platform usage statistics.</p>
         </div>
       </div>
     </section>
 
     <!-- User Activity -->
     <section class="admin-section">
-      <h2 class="section-title">👤 User Activity</h2>
+      <div class="section-header-enhanced">
+        <h2 class="section-title">👤 User Activity</h2>
+        <span class="section-badge">Real-time</span>
+      </div>
       <div class="activity-grid">
-        <div class="activity-card">
-          <div class="activity-icon">🟢</div>
+        <div class="activity-card active-today">
+          <div class="activity-ring">
+            <div class="activity-icon">🟢</div>
+          </div>
           <div class="activity-value" id="activeToday">-</div>
           <div class="activity-label">Active Today</div>
         </div>
-        <div class="activity-card">
-          <div class="activity-icon">📅</div>
+        <div class="activity-card active-week">
+          <div class="activity-ring">
+            <div class="activity-icon">📅</div>
+          </div>
           <div class="activity-value" id="activeThisWeek">-</div>
           <div class="activity-label">This Week</div>
         </div>
-        <div class="activity-card">
-          <div class="activity-icon">📆</div>
+        <div class="activity-card active-month">
+          <div class="activity-ring">
+            <div class="activity-icon">📆</div>
+          </div>
           <div class="activity-value" id="activeThisMonth">-</div>
           <div class="activity-label">This Month</div>
         </div>
-        <div class="activity-card">
-          <div class="activity-icon">😴</div>
+        <div class="activity-card inactive">
+          <div class="activity-ring">
+            <div class="activity-icon">😴</div>
+          </div>
           <div class="activity-value" id="inactiveUsers">-</div>
-          <div class="activity-label">Inactive</div>
+          <div class="activity-label">Inactive (30d+)</div>
         </div>
       </div>
     </section>
 
-    <!-- Location Stats -->
+    <!-- Charts Row -->
     <section class="admin-section">
-      <h2 class="section-title">🌍 Users by Location</h2>
-      <p class="text-muted location-info" id="unknownLocationCount" style="display:none; margin-bottom: 1rem; font-size: 0.875rem;"></p>
-      <div class="location-grid">
-        <div class="location-card">
-          <h3 class="location-card-title">By Country</h3>
-          <div class="location-list" id="countryList">
-            <p class="text-muted">Loading...</p>
-          </div>
-        </div>
-        <div class="location-card">
-          <h3 class="location-card-title">By City</h3>
-          <div class="location-list" id="cityList">
-            <p class="text-muted">Loading...</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Charts -->
-    <section class="admin-section">
-      <h2 class="section-title">📊 Platform Usage</h2>
       <div class="admin-charts-grid">
         <div class="admin-chart-card">
-          <h3 class="chart-title">Feature Usage</h3>
+          <div class="chart-header">
+            <h3 class="chart-title">📈 Feature Usage</h3>
+          </div>
           <div class="chart-container">
             <canvas id="featureUsageChart"></canvas>
           </div>
         </div>
         <div class="admin-chart-card">
-          <h3 class="chart-title">Collection Activity</h3>
+          <div class="chart-header">
+            <h3 class="chart-title">📊 Collection Activity</h3>
+          </div>
           <div class="chart-container">
             <canvas id="collectionActivityChart"></canvas>
           </div>
@@ -186,7 +207,10 @@
 
     <!-- User Registration Trends -->
     <section class="admin-section">
-      <h2 class="section-title">📈 User Registration Trends</h2>
+      <div class="section-header-enhanced">
+        <h2 class="section-title">📈 User Registration Trends</h2>
+        <span class="section-badge">Last 6 months</span>
+      </div>
       <div class="admin-chart-card full-width">
         <div class="chart-container chart-container-lg">
           <canvas id="registrationTrendChart"></canvas>
@@ -194,32 +218,108 @@
       </div>
     </section>
 
-    <!-- Users Table with Pagination -->
+    <!-- Location Stats -->
     <section class="admin-section">
-      <div class="section-header">
-        <h2 class="section-title">👥 Recent Users</h2>
-        <div class="pagination-info" id="paginationInfo">Showing 0 users</div>
+      <div class="section-header-enhanced">
+        <h2 class="section-title">🌍 Users by Location</h2>
+        <p class="text-muted location-info" id="unknownLocationCount" style="display:none;"></p>
       </div>
+      <div class="location-grid">
+        <div class="location-card">
+          <div class="location-card-header">
+            <span class="location-card-icon">🌐</span>
+            <h3 class="location-card-title">By Country</h3>
+          </div>
+          <div class="location-list" id="countryList">
+            <div class="location-loading">Loading...</div>
+          </div>
+        </div>
+        <div class="location-card">
+          <div class="location-card-header">
+            <span class="location-card-icon">🏙️</span>
+            <h3 class="location-card-title">By City</h3>
+          </div>
+          <div class="location-list" id="cityList">
+            <div class="location-loading">Loading...</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Users Table -->
+    <section class="admin-section">
+      <div class="section-header-enhanced">
+        <h2 class="section-title">👥 User Directory</h2>
+        <div class="section-actions">
+          <div class="search-box">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+            <input type="text" id="userSearch" placeholder="Search users..." class="search-input">
+          </div>
+          <div class="pagination-info" id="paginationInfo">Showing 0 users</div>
+        </div>
+      </div>
+      
       <div class="admin-table-wrapper">
         <table class="admin-table">
           <thead>
             <tr>
-              <th>User</th>
-              <th>Location</th>
-              <th>Joined</th>
-              <th>Last Active</th>
-              <th>Status</th>
+              <th class="th-user">User</th>
+              <th class="th-location">Location</th>
+              <th class="th-joined">Joined</th>
+              <th class="th-active">Last Active</th>
+              <th class="th-status">Status</th>
             </tr>
           </thead>
           <tbody id="usersTableBody">
-            <tr><td colspan="5" class="text-center">Loading...</td></tr>
+            <tr><td colspan="5" class="text-center loading-row">
+              <div class="table-loading">
+                <div class="spinner-sm"></div>
+                <span>Loading users...</span>
+              </div>
+            </td></tr>
           </tbody>
         </table>
       </div>
-      <div class="pagination" id="pagination">
-        <button class="pagination-btn" id="prevPageBtn" disabled>← Previous</button>
-        <span class="pagination-current" id="currentPage">Page 1</span>
-        <button class="pagination-btn" id="nextPageBtn">Next →</button>
+      
+      <div class="pagination-wrapper">
+        <div class="pagination-controls">
+          <button class="pagination-btn" id="firstPageBtn" disabled title="First Page">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
+            </svg>
+          </button>
+          <button class="pagination-btn" id="prevPageBtn" disabled>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+            Previous
+          </button>
+          <div class="pagination-pages" id="paginationPages">
+            <span class="page-number active">1</span>
+          </div>
+          <button class="pagination-btn" id="nextPageBtn">
+            Next
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+          </button>
+          <button class="pagination-btn" id="lastPageBtn" title="Last Page">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"/>
+            </svg>
+          </button>
+        </div>
+        <div class="pagination-size">
+          <label>Show:</label>
+          <select id="pageSizeSelect">
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+          </select>
+          <span>per page</span>
+        </div>
       </div>
     </section>
   </main>

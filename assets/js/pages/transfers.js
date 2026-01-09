@@ -4,9 +4,7 @@ import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
 import transfersService from '../services/transfers-service.js';
 import toast from '../components/toast.js';
-import confirmationModal from '../components/confirmation-modal.js';
 import { formatCurrency, formatDate, formatDateForInput, escapeHtml } from '../utils/helpers.js';
-import timezoneService from '../utils/timezone.js';
 import encryptionReauthModal from '../components/encryption-reauth-modal.js';
 
 // State
@@ -349,7 +347,6 @@ function handleTypeChange() {
   const type = document.getElementById('transferType').value;
   const emiSplitGroup = document.getElementById('emiSplitGroup');
   const interestGroup = document.getElementById('interestGroup');
-  const linkedTypeGroup = document.getElementById('linkedTypeGroup');
   
   // Show EMI split for loan payments
   if (type === 'loan_emi' || type === 'loan_prepayment') {

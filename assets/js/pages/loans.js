@@ -234,7 +234,7 @@ function updateSummary() {
 function renderLoans() {
   const container = document.getElementById('loansGrid');
   const filter = document.getElementById('loanFilter')?.value || 'all';
-  const emptyState = document.getElementById('emptyState');
+  let emptyState = document.getElementById('emptyState');
   
   let filteredLoans = loans;
   if (filter === 'active') {
@@ -244,13 +244,30 @@ function renderLoans() {
   }
   
   if (filteredLoans.length === 0) {
+    // Create empty state if it doesn't exist
+    if (!emptyState) {
+      emptyState = document.createElement('div');
+      emptyState.className = 'empty-state';
+      emptyState.id = 'emptyState';
+      emptyState.innerHTML = `
+        <div class="empty-state-icon">🏦</div>
+        <h3 class="empty-state-title">No loans added yet</h3>
+        <p class="empty-state-text">Start tracking your loans and EMI payments to stay on top of your finances.</p>
+        <button class="btn btn-primary" id="addFirstLoanBtn">Add Your First Loan</button>
+      `;
+    }
     container.innerHTML = '';
     container.appendChild(emptyState);
     emptyState.style.display = 'block';
+    
+    // Re-attach event listener for add first loan button
+    document.getElementById('addFirstLoanBtn')?.addEventListener('click', openAddModal);
     return;
   }
   
-  emptyState.style.display = 'none';
+  if (emptyState) {
+    emptyState.style.display = 'none';
+  }
   
   container.innerHTML = filteredLoans.map(loan => {
     const icon = loanTypeIcons[loan.loanType] || '📋';
