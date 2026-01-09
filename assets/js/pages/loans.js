@@ -124,21 +124,7 @@ function setupEventListeners() {
     themeManager.toggleTheme();
   });
   
-  // Logout
-  document.getElementById('logoutBtn')?.addEventListener('click', async () => {
-    const confirmed = await confirmationModal.show({
-      title: 'Logout',
-      message: 'Are you sure you want to logout?',
-      confirmText: 'Logout',
-      cancelText: 'Cancel',
-      type: 'warning'
-    });
-
-    if (!confirmed) return;
-
-    await authService.signOut();
-    window.location.href = 'index.html';
-  });
+  // Logout handled by global logout-handler.js via sidebar.js
   
   // Add loan buttons - now opens inline form
   document.getElementById('addLoanBtn')?.addEventListener('click', () => showAddForm());
@@ -191,25 +177,6 @@ function setupEventListeners() {
   document.getElementById('closeEmiAlert')?.addEventListener('click', () => {
     document.getElementById('upcomingEmiAlert').style.display = 'none';
   });
-}
-
-async function handleLogout() {
-  const confirmed = await confirmationModal.show({
-    title: 'Logout',
-    message: 'Are you sure you want to logout?',
-    confirmText: 'Logout',
-    cancelText: 'Cancel',
-    type: 'warning'
-  });
-
-  if (!confirmed) return;
-
-  const result = await authService.signOut();
-  if (result.success) {
-    window.location.href = 'login.html';
-  } else {
-    toast.error('Failed to logout');
-  }
 }
 
 

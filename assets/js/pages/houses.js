@@ -103,8 +103,7 @@ function setupEventListeners() {
     sidebarOverlay.classList.remove('show');
   });
 
-  // Logout
-  document.getElementById('logoutBtn')?.addEventListener('click', handleLogout);
+  // Logout handled by global logout-handler.js via sidebar.js
 
   // Add house
   addHouseBtn?.addEventListener('click', showAddForm);
@@ -372,26 +371,6 @@ function editHouse(id) {
   const house = houses.find(h => h.id === id);
   if (house) {
     showEditForm(house);
-  }
-}
-
-// Handle logout
-async function handleLogout() {
-  const confirmed = await confirmationModal.show({
-    title: 'Logout',
-    message: 'Are you sure you want to logout?',
-    confirmText: 'Logout',
-    cancelText: 'Cancel',
-    type: 'warning'
-  });
-
-  if (!confirmed) return;
-
-  const result = await authService.signOut();
-  if (result.success) {
-    window.location.href = 'login.html';
-  } else {
-    toast.error('Failed to logout');
   }
 }
 

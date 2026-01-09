@@ -127,11 +127,7 @@ function setupEventListeners() {
     sidebarOverlay.classList.remove('show');
   });
   
-  // Logout
-  document.getElementById('logoutBtn')?.addEventListener('click', async () => {
-    await authService.logout();
-    window.location.href = 'login.html';
-  });
+  // Logout handled by global logout-handler.js via sidebar.js
   
   // Refresh button
   document.getElementById('refreshBtn')?.addEventListener('click', async () => {

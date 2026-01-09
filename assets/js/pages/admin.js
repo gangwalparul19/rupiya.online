@@ -59,18 +59,7 @@ async function init() {
 }
 
 function setupEventListeners() {
-  document.getElementById('logoutBtn')?.addEventListener('click', async () => {
-    const confirmed = await confirmationModal.show({
-      title: 'Logout',
-      message: 'Are you sure you want to logout?',
-      confirmText: 'Logout',
-      cancelText: 'Cancel',
-      type: 'warning'
-    });
-    if (!confirmed) return;
-    await authService.signOut();
-    window.location.href = 'login.html';
-  });
+  // Logout handled by global logout-handler.js via sidebar.js
 
   document.getElementById('refreshBtn')?.addEventListener('click', async () => {
     const btn = document.getElementById('refreshBtn');

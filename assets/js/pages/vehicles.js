@@ -124,7 +124,7 @@ function setupEventListeners() {
     sidebarOverlay.classList.remove('show');
   });
 
-  document.getElementById('logoutBtn')?.addEventListener('click', handleLogout);
+  // Logout handled by global logout-handler.js via sidebar.js
   addVehicleBtn?.addEventListener('click', showAddForm);
   closeFormBtn?.addEventListener('click', hideForm);
   cancelFormBtn?.addEventListener('click', hideForm);
@@ -933,25 +933,6 @@ async function handleDelete() {
 function editVehicle(id) {
   const vehicle = vehicles.find(v => v.id === id);
   if (vehicle) showEditForm(vehicle);
-}
-
-async function handleLogout() {
-  const confirmed = await confirmationModal.show({
-    title: 'Logout',
-    message: 'Are you sure you want to logout?',
-    confirmText: 'Logout',
-    cancelText: 'Cancel',
-    type: 'warning'
-  });
-
-  if (!confirmed) return;
-
-  const result = await authService.signOut();
-  if (result.success) {
-    window.location.href = 'login.html';
-  } else {
-    toast.error('Failed to logout');
-  }
 }
 
 

@@ -102,11 +102,7 @@ function setupEventListeners() {
     sidebarOverlay.classList.remove('show');
   });
   
-  // Logout
-  document.getElementById('logoutBtn')?.addEventListener('click', async () => {
-    await authService.logout();
-    window.location.href = 'login.html';
-  });
+  // Logout handled by global logout-handler.js via sidebar.js
   
   // Add transfer button
   document.getElementById('addTransferBtn')?.addEventListener('click', openForm);

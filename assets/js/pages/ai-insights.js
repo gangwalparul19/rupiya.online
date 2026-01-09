@@ -80,21 +80,7 @@ function setupEventListeners() {
   sidebarClose?.addEventListener('click', closeSidebar);
   sidebarOverlay?.addEventListener('click', closeSidebar);
 
-  // Logout
-  logoutBtn?.addEventListener('click', async () => {
-    const confirmed = await confirmationModal.show({
-      title: 'Logout',
-      message: 'Are you sure you want to logout?',
-      confirmText: 'Logout',
-      cancelText: 'Cancel',
-      type: 'warning'
-    });
-
-    if (!confirmed) return;
-
-    await authService.signOut();
-    window.location.href = 'login.html';
-  });
+  // Logout handled by global logout-handler.js via sidebar.js
 
   // Refresh insights
   refreshInsightsBtn?.addEventListener('click', () => {

@@ -93,7 +93,7 @@ function setupEventListeners() {
     sidebarOverlay.classList.remove('show');
   });
 
-  document.getElementById('logoutBtn')?.addEventListener('click', handleLogout);
+  // Logout handled by global logout-handler.js via sidebar.js
   addNoteBtn.addEventListener('click', showAddForm);
   closeFormBtn.addEventListener('click', hideForm);
   cancelFormBtn.addEventListener('click', hideForm);
@@ -407,25 +407,6 @@ async function handleDelete() {
   } finally {
     confirmDeleteBtn.disabled = false;
     confirmDeleteBtn.textContent = originalText;
-  }
-}
-
-async function handleLogout() {
-  const confirmed = await confirmationModal.show({
-    title: 'Logout',
-    message: 'Are you sure you want to logout?',
-    confirmText: 'Logout',
-    cancelText: 'Cancel',
-    type: 'warning'
-  });
-
-  if (!confirmed) return;
-
-  const result = await authService.signOut();
-  if (result.success) {
-    window.location.href = 'login.html';
-  } else {
-    toast.error('Failed to logout');
   }
 }
 

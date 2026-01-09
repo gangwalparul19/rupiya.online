@@ -102,23 +102,7 @@ function setupEventListeners() {
     sidebarOverlay.classList.remove('show');
   });
 
-  // Logout
-  document.getElementById('logoutBtn')?.addEventListener('click', async () => {
-    const confirmed = await confirmationModal.show({
-      title: 'Logout',
-      message: 'Are you sure you want to logout?',
-      confirmText: 'Logout',
-      cancelText: 'Cancel',
-      type: 'warning'
-    });
-
-    if (!confirmed) return;
-
-    const result = await authService.signOut();
-    if (result.success) {
-      window.location.href = 'index.html';
-    }
-  });
+  // Logout handled by global logout-handler.js via sidebar.js
   
   // Month filter
   document.getElementById('monthFilter')?.addEventListener('change', async (e) => {
