@@ -282,23 +282,43 @@ class TransactionListEnhancer {
    * Format date
    */
   formatDate(date) {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
+    try {
+      // Handle Firestore Timestamp objects
+      let dateObj = date;
+      if (date && typeof date.toDate === 'function') {
+        dateObj = date.toDate();
+      } else if (typeof date === 'string') {
+        dateObj = new Date(date);
+      } else if (!(date instanceof Date)) {
+        dateObj = new Date(date);
+      }
 
-    const transDate = new Date(date);
-    transDate.setHours(0, 0, 0, 0);
+      // Validate date
+      if (isNaN(dateObj.getTime())) {
+        return 'Invalid Date';
+      }
 
-    if (transDate.getTime() === today.getTime()) {
-      return 'Today';
-    } else if (transDate.getTime() === yesterday.getTime()) {
-      return 'Yesterday';
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+
+      const transDate = new Date(dateObj);
+      transDate.setHours(0, 0, 0, 0);
+
+      if (transDate.getTime() === today.getTime()) {
+        return 'Today';
+      } else if (transDate.getTime() === yesterday.getTime()) {
+        return 'Yesterday';
+      }
+
+      const options = { month: 'short', day: 'numeric' };
+      return transDate.toLocaleDateString('en-IN', options);
+    } catch (error) {
+      console.error('Error formatting date:', error, date);
+      return 'Invalid Date';
     }
-
-    const options = { month: 'short', day: 'numeric' };
-    return transDate.toLocaleDateString('en-IN', options);
   }
 
   /**

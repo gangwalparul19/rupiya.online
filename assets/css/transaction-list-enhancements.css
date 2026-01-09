@@ -106,13 +106,19 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .transaction-meta-item {
   display: flex;
   align-items: center;
   gap: var(--spacing-xs);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .transaction-meta-badge {
@@ -369,18 +375,57 @@
 @media (max-width: 768px) {
   .transaction-item {
     position: relative;
+    flex-wrap: nowrap;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .transaction-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .transaction-details {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .transaction-title {
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+
+  .transaction-meta {
+    font-size: 11px;
+    gap: 4px;
+  }
+
+  .transaction-meta-item {
+    gap: 2px;
+  }
+
+  .transaction-amount {
+    min-width: auto;
+    font-size: 14px;
+    text-align: right;
+    flex-shrink: 0;
+    padding-left: 8px;
   }
 
   .transaction-actions {
     opacity: 1;
-    position: absolute;
-    right: var(--spacing-md);
-    top: 50%;
-    transform: translateY(-50%);
+    position: static;
+    transform: none;
+    gap: 4px;
+    flex-shrink: 0;
   }
 
-  .transaction-amount {
-    min-width: 80px;
+  .transaction-action-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
   }
 }
 
@@ -434,29 +479,54 @@
 /* Responsive */
 @media (max-width: 640px) {
   .transaction-item {
-    flex-wrap: wrap;
-    gap: var(--spacing-sm);
-  }
-
-  .transaction-details {
-    flex-basis: 100%;
-    order: 2;
-  }
-
-  .transaction-amount {
-    flex-basis: 100%;
-    order: 3;
-    text-align: left;
+    flex-wrap: nowrap;
+    gap: 8px;
+    padding: 10px;
   }
 
   .transaction-icon {
-    order: 1;
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .transaction-details {
+    flex: 1;
+    min-width: 0;
+    order: 0;
+  }
+
+  .transaction-title {
+    font-size: 13px;
+    margin-bottom: 3px;
+  }
+
+  .transaction-meta {
+    font-size: 10px;
+    gap: 3px;
+  }
+
+  .transaction-amount {
+    flex-basis: auto;
+    order: 0;
+    text-align: right;
+    font-size: 13px;
+    min-width: 60px;
+    flex-shrink: 0;
   }
 
   .transaction-actions {
-    order: 4;
-    flex-basis: 100%;
+    order: 0;
+    flex-basis: auto;
     justify-content: flex-end;
-    margin-top: var(--spacing-sm);
+    margin-top: 0;
+    gap: 3px;
+  }
+
+  .transaction-action-btn {
+    width: 24px;
+    height: 24px;
+    font-size: 12px;
   }
 }
