@@ -17,10 +17,7 @@ import {
   arrayRemove
 } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
 import authService from './auth-service.js';
-// NOTE: encryptionService is NOT used for family data because:
-// - Family groups and invitations are shared across multiple users
-// - Each user has a different encryption key (derived from their userId)
-// - Encrypting shared data with one user's key makes it unreadable by others
+import familyEncryptionService from './family-encryption-service.js';
 
 class FamilyService {
   constructor() {
@@ -61,9 +58,17 @@ class FamilyService {
         }
       };
 
-      // Family groups are NOT encrypted because they are shared across users
-      // Each user has a different encryption key, so shared data cannot be encrypted
+      // Create the family group
       const docRef = await addDoc(collection(db, this.familyGroupsCollection), groupData);
+
+      // Create shared encryption key for the family group
+      try {
+        await familyEncryptionService.createFamilyKey(docRef.id);
+        console.log('[FamilyService] Created shared encryption key for family group');
+      } catch (keyError) {
+        console.error('[FamilyService] Failed to create family encryption key:', keyError);
+        // Continue anyway - key can be created later
+      }
 
       // Update user's familyGroups array
       await this.updateUserFamilyGroups(userId, docRef.id, 'add');
@@ -337,6 +342,15 @@ class FamilyService {
 
       // Update user's familyGroups array
       await this.updateUserFamilyGroups(userId, invitation.groupId, 'add');
+
+      // Add user's encrypted family key
+      try {
+        await familyEncryptionService.addMemberToFamilyKey(invitation.groupId, userId);
+        console.log('[FamilyService] Added family encryption key for new member');
+      } catch (keyError) {
+        console.error('[FamilyService] Failed to add family encryption key:', keyError);
+        // Continue anyway - key can be added later
+      }
 
       return { success: true, groupId: invitation.groupId };
     } catch (error) {

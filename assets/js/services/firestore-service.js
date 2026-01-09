@@ -20,6 +20,7 @@ import {
 } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
 import authService from './auth-service.js';
 import encryptionService from './encryption-service.js';
+import familyEncryptionService from './family-encryption-service.js';
 import privacyConfig from '../config/privacy-config.js';
 
 class FirestoreService {
@@ -1129,6 +1130,310 @@ class FirestoreService {
   // ============================================
   // USER SETTINGS
   // ============================================
+
+  // ============================================
+  // FAMILY MODE DATA FETCHING
+  // Uses shared family encryption key for cross-member data access
+  // ============================================
+
+  async getFamilyExpenses(familyGroupId, memberUserIds = []) {
+    try {
+      const cacheKey = this.getCacheKey('familyExpenses', { familyGroupId });
+      const cached = this.getFromCache(cacheKey);
+      if (cached) return cached;
+
+      const allExpenses = [];
+      
+      // Split memberUserIds into chunks of 10 (Firestore limit)
+      const chunks = [];
+      for (let i = 0; i < memberUserIds.length; i += 10) {
+        chunks.push(memberUserIds.slice(i, i + 10));
+      }
+
+      for (const chunk of chunks) {
+        const q = query(
+          collection(db, this.collections.expenses),
+          where('userId', 'in', chunk),
+          orderBy('date', 'desc')
+        );
+        
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach((doc) => {
+          allExpenses.push({ id: doc.id, ...doc.data() });
+        });
+      }
+
+      // Decrypt expenses using appropriate key
+      const currentUserId = this.getUserId();
+      const decryptedExpenses = [];
+      
+      for (const expense of allExpenses) {
+        try {
+          let decrypted;
+          
+          if (expense._familyEncrypted) {
+            // Family-encrypted data - use shared family key
+            decrypted = await familyEncryptionService.decryptFamilyObject(expense);
+          } else if (expense.userId === currentUserId && expense._encrypted) {
+            // Our own personal data - use personal key
+            decrypted = await encryptionService.decryptObject(expense, this.collections.expenses);
+          } else if (expense._encrypted) {
+            // Other user's personal data - cannot decrypt
+            decrypted = {
+              ...expense,
+              amount: '[Personal - Not Shared]',
+              description: '[Personal - Not Shared]',
+              _isPersonalData: true
+            };
+            delete decrypted._encrypted;
+          } else {
+            // Unencrypted data
+            decrypted = expense;
+          }
+          
+          decryptedExpenses.push(decrypted);
+        } catch (e) {
+          console.warn('Failed to decrypt expense:', e);
+          decryptedExpenses.push({
+            ...expense,
+            amount: '[Decryption Failed]',
+            description: '[Decryption Failed]'
+          });
+        }
+      }
+
+      // Sort by date
+      decryptedExpenses.sort((a, b) => {
+        const dateA = a.date?.toDate ? a.date.toDate() : new Date(a.date);
+        const dateB = b.date?.toDate ? b.date.toDate() : new Date(b.date);
+        return dateB - dateA;
+      });
+
+      this.setCache(cacheKey, decryptedExpenses);
+      return decryptedExpenses;
+    } catch (error) {
+      console.error('Error getting family expenses:', error);
+      return [];
+    }
+  }
+
+  async getFamilyIncome(familyGroupId, memberUserIds = []) {
+    try {
+      const cacheKey = this.getCacheKey('familyIncome', { familyGroupId });
+      const cached = this.getFromCache(cacheKey);
+      if (cached) return cached;
+
+      const allIncome = [];
+      
+      const chunks = [];
+      for (let i = 0; i < memberUserIds.length; i += 10) {
+        chunks.push(memberUserIds.slice(i, i + 10));
+      }
+
+      for (const chunk of chunks) {
+        const q = query(
+          collection(db, this.collections.income),
+          where('userId', 'in', chunk),
+          orderBy('date', 'desc')
+        );
+        
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach((doc) => {
+          allIncome.push({ id: doc.id, ...doc.data() });
+        });
+      }
+
+      const currentUserId = this.getUserId();
+      const decryptedIncome = [];
+      
+      for (const income of allIncome) {
+        try {
+          let decrypted;
+          
+          if (income._familyEncrypted) {
+            decrypted = await familyEncryptionService.decryptFamilyObject(income);
+          } else if (income.userId === currentUserId && income._encrypted) {
+            decrypted = await encryptionService.decryptObject(income, this.collections.income);
+          } else if (income._encrypted) {
+            decrypted = {
+              ...income,
+              amount: '[Personal - Not Shared]',
+              description: '[Personal - Not Shared]',
+              _isPersonalData: true
+            };
+            delete decrypted._encrypted;
+          } else {
+            decrypted = income;
+          }
+          
+          decryptedIncome.push(decrypted);
+        } catch (e) {
+          console.warn('Failed to decrypt income:', e);
+          decryptedIncome.push({
+            ...income,
+            amount: '[Decryption Failed]',
+            description: '[Decryption Failed]'
+          });
+        }
+      }
+
+      decryptedIncome.sort((a, b) => {
+        const dateA = a.date?.toDate ? a.date.toDate() : new Date(a.date);
+        const dateB = b.date?.toDate ? b.date.toDate() : new Date(b.date);
+        return dateB - dateA;
+      });
+
+      this.setCache(cacheKey, decryptedIncome);
+      return decryptedIncome;
+    } catch (error) {
+      console.error('Error getting family income:', error);
+      return [];
+    }
+  }
+
+  async getFamilyExpenseKPISummary(familyGroupId, memberUserIds = []) {
+    try {
+      const cacheKey = this.getCacheKey('familyExpenseKPISummary', { familyGroupId });
+      const cached = this.getFromCache(cacheKey);
+      if (cached) return cached;
+
+      const now = new Date();
+      const currentYear = now.getFullYear();
+      const currentMonth = now.getMonth();
+
+      const allExpenses = await this.getFamilyExpenses(familyGroupId, memberUserIds);
+
+      let thisMonth = 0;
+      let lastMonth = 0;
+      
+      const thisMonthStart = new Date(currentYear, currentMonth, 1);
+      const lastMonthStart = new Date(currentYear, currentMonth - 1, 1);
+      const lastMonthEnd = new Date(currentYear, currentMonth, 0, 23, 59, 59);
+
+      allExpenses.forEach(expense => {
+        const amount = parseFloat(expense.amount) || 0;
+        if (amount === 0 || expense._isPersonalData) return;
+        
+        const expenseDate = expense.date?.toDate ? expense.date.toDate() : new Date(expense.date);
+        
+        if (expenseDate >= thisMonthStart) {
+          thisMonth += amount;
+        } else if (expenseDate >= lastMonthStart && expenseDate <= lastMonthEnd) {
+          lastMonth += amount;
+        }
+      });
+
+      const summary = {
+        thisMonth,
+        lastMonth,
+        totalCount: allExpenses.filter(e => !e._isPersonalData).length
+      };
+
+      this.setCache(cacheKey, summary);
+      return summary;
+    } catch (error) {
+      console.error('Error getting family expense KPI summary:', error);
+      return { thisMonth: 0, lastMonth: 0, totalCount: 0 };
+    }
+  }
+
+  async getFamilyIncomeKPISummary(familyGroupId, memberUserIds = []) {
+    try {
+      const cacheKey = this.getCacheKey('familyIncomeKPISummary', { familyGroupId });
+      const cached = this.getFromCache(cacheKey);
+      if (cached) return cached;
+
+      const now = new Date();
+      const currentYear = now.getFullYear();
+      const currentMonth = now.getMonth();
+
+      const allIncome = await this.getFamilyIncome(familyGroupId, memberUserIds);
+
+      let thisMonth = 0;
+      let lastMonth = 0;
+      
+      const thisMonthStart = new Date(currentYear, currentMonth, 1);
+      const lastMonthStart = new Date(currentYear, currentMonth - 1, 1);
+      const lastMonthEnd = new Date(currentYear, currentMonth, 0, 23, 59, 59);
+
+      allIncome.forEach(income => {
+        const amount = parseFloat(income.amount) || 0;
+        if (amount === 0 || income._isPersonalData) return;
+        
+        const incomeDate = income.date?.toDate ? income.date.toDate() : new Date(income.date);
+        
+        if (incomeDate >= thisMonthStart) {
+          thisMonth += amount;
+        } else if (incomeDate >= lastMonthStart && incomeDate <= lastMonthEnd) {
+          lastMonth += amount;
+        }
+      });
+
+      const summary = {
+        thisMonth,
+        lastMonth,
+        totalCount: allIncome.filter(i => !i._isPersonalData).length
+      };
+
+      this.setCache(cacheKey, summary);
+      return summary;
+    } catch (error) {
+      console.error('Error getting family income KPI summary:', error);
+      return { thisMonth: 0, lastMonth: 0, totalCount: 0 };
+    }
+  }
+
+  // Add expense with family encryption (when in family mode)
+  async addFamilyExpense(expense, familyGroupId) {
+    try {
+      const userId = this.getUserId();
+      
+      // Encrypt with family key
+      const encryptedData = await familyEncryptionService.encryptFamilyObject(expense, familyGroupId);
+      
+      const docRef = await addDoc(collection(db, this.collections.expenses), {
+        ...encryptedData,
+        userId,
+        familyGroupId,
+        date: expense.date instanceof Date ? Timestamp.fromDate(expense.date) : Timestamp.now(),
+        createdAt: Timestamp.now(),
+        updatedAt: Timestamp.now()
+      });
+      
+      this.invalidateCache(this.collections.expenses);
+      this.invalidateCache('familyExpenses');
+      return { success: true, id: docRef.id };
+    } catch (error) {
+      console.error('Error adding family expense:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  // Add income with family encryption (when in family mode)
+  async addFamilyIncome(income, familyGroupId) {
+    try {
+      const userId = this.getUserId();
+      
+      // Encrypt with family key
+      const encryptedData = await familyEncryptionService.encryptFamilyObject(income, familyGroupId);
+      
+      const docRef = await addDoc(collection(db, this.collections.income), {
+        ...encryptedData,
+        userId,
+        familyGroupId,
+        date: income.date instanceof Date ? Timestamp.fromDate(income.date) : Timestamp.now(),
+        createdAt: Timestamp.now(),
+        updatedAt: Timestamp.now()
+      });
+      
+      this.invalidateCache(this.collections.income);
+      this.invalidateCache('familyIncome');
+      return { success: true, id: docRef.id };
+    } catch (error) {
+      console.error('Error adding family income:', error);
+      return { success: false, error: error.message };
+    }
+  }
   
   async getUserSettings() {
     try {

@@ -57,17 +57,20 @@ service cloud.firestore {
     // EXPENSES
     // ============================================
     match /expenses/{expenseId} {
-      // Helper function to check if user is in the same family group
-      function isFamilyMember() {
+      // Helper function to check if user is in same family as expense owner
+      function isInSameFamilyGroup() {
+        let ownerDoc = get(/databases/$(database)/documents/users/$(resource.data.userId));
+        let currentUserDoc = get(/databases/$(database)/documents/users/$(request.auth.uid));
+        
         return isAuthenticated() && 
-               resource.data.familyGroupId != null &&
-               exists(/databases/$(database)/documents/familyGroups/$(resource.data.familyGroupId)) &&
-               request.auth.uid in get(/databases/$(database)/documents/familyGroups/$(resource.data.familyGroupId)).data.members;
+               ownerDoc.data.familyGroups != null &&
+               currentUserDoc.data.familyGroups != null &&
+               ownerDoc.data.familyGroups.hasAny(currentUserDoc.data.familyGroups);
       }
       
-      // Users can read their own expenses OR family members' expenses
+      // Users can read their own expenses OR expenses from family members
       // Admins can read all expenses for analytics
-      allow read: if belongsToUser() || isFamilyMember() || isAdmin();
+      allow read: if belongsToUser() || isInSameFamilyGroup() || isAdmin();
       allow create: if isAuthenticated() && hasValidUserId();
       allow update: if belongsToUser() && userIdNotChanged();
       allow delete: if belongsToUser();
@@ -77,17 +80,20 @@ service cloud.firestore {
     // INCOME
     // ============================================
     match /income/{incomeId} {
-      // Helper function to check if user is in the same family group
-      function isFamilyMember() {
+      // Helper function to check if user is in same family as income owner
+      function isInSameFamilyGroup() {
+        let ownerDoc = get(/databases/$(database)/documents/users/$(resource.data.userId));
+        let currentUserDoc = get(/databases/$(database)/documents/users/$(request.auth.uid));
+        
         return isAuthenticated() && 
-               resource.data.familyGroupId != null &&
-               exists(/databases/$(database)/documents/familyGroups/$(resource.data.familyGroupId)) &&
-               request.auth.uid in get(/databases/$(database)/documents/familyGroups/$(resource.data.familyGroupId)).data.members;
+               ownerDoc.data.familyGroups != null &&
+               currentUserDoc.data.familyGroups != null &&
+               ownerDoc.data.familyGroups.hasAny(currentUserDoc.data.familyGroups);
       }
       
-      // Users can read their own income OR family members' income
+      // Users can read their own income OR income from family members
       // Admins can read all income for analytics
-      allow read: if belongsToUser() || isFamilyMember() || isAdmin();
+      allow read: if belongsToUser() || isInSameFamilyGroup() || isAdmin();
       allow create: if isAuthenticated() && hasValidUserId();
       allow update: if belongsToUser() && userIdNotChanged();
       allow delete: if belongsToUser();
@@ -315,6 +321,30 @@ service cloud.firestore {
       allow create: if isAuthenticated() && hasValidUserId();
       allow update: if belongsToUser() && userIdNotChanged();
       allow delete: if belongsToUser();
+    }
+    
+    // ============================================
+    // FAMILY KEYS (Shared encryption keys for family groups)
+    // ============================================
+    match /familyKeys/{groupId} {
+      // Helper function to check if user is a member of the family group
+      function isFamilyGroupMember() {
+        return isAuthenticated() && 
+               exists(/databases/$(database)/documents/familyGroups/$(groupId)) &&
+               request.auth.uid in get(/databases/$(database)/documents/familyGroups/$(groupId)).data.members[*].userId;
+      }
+      
+      // Members can read their encrypted key
+      allow read: if isAuthenticated();
+      
+      // Creator can create the key document
+      allow create: if isAuthenticated() && request.resource.data.createdBy == request.auth.uid;
+      
+      // Members can update to add their own encrypted key
+      allow update: if isAuthenticated();
+      
+      // Only creator can delete
+      allow delete: if isAuthenticated() && resource.data.createdBy == request.auth.uid;
     }
     
     // ============================================

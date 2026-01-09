@@ -339,11 +339,37 @@ async function loadExpenses() {
     emptyState.style.display = 'none';
     expensesList.style.display = 'none';
     
-    // Get KPI summary (optimized - only fetches current/last month data)
-    const kpiSummary = await firestoreService.getExpenseKPISummary();
-    state.totalCount = kpiSummary.totalCount;
+    // Check if we're in family mode
+    const context = familySwitcher.getCurrentContext();
+    const isFamilyMode = context.context === 'family' && context.groupId && context.group;
     
-    // Update KPI cards with pre-calculated values
+    let kpiSummary;
+    let expenses;
+    
+    if (isFamilyMode) {
+      // Family mode - fetch from all family members
+      const memberUserIds = context.group.members.map(m => m.userId);
+      
+      // Get family KPI summary
+      kpiSummary = await firestoreService.getFamilyExpenseKPISummary(context.groupId, memberUserIds);
+      state.totalCount = kpiSummary.totalCount;
+      
+      // Get family expenses
+      expenses = await firestoreService.getFamilyExpenses(context.groupId, memberUserIds);
+      state.expenses = expenses;
+    } else {
+      // Personal mode - fetch only user's expenses
+      kpiSummary = await firestoreService.getExpenseKPISummary();
+      state.totalCount = kpiSummary.totalCount;
+      
+      // Load paginated expenses for display
+      const result = await firestoreService.getExpensesPaginated({ 
+        pageSize: state.itemsPerPage * 5 // Load 5 pages worth for filtering
+      });
+      state.expenses = result.data;
+    }
+    
+    // Update KPI cards
     updateExpenseKPIsFromSummary(kpiSummary);
     
     // Initialize pagination if not already done
@@ -357,11 +383,6 @@ async function loadExpenses() {
     
     pagination.setTotal(state.totalCount);
     
-    // Load paginated expenses for display (not all data)
-    const result = await firestoreService.getExpensesPaginated({ 
-      pageSize: state.itemsPerPage * 5 // Load 5 pages worth for filtering
-    });
-    state.expenses = result.data;
     state.filteredExpenses = [...state.expenses];
     
     applyFilters();

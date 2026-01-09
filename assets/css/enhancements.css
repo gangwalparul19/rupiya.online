@@ -12,6 +12,23 @@
   cursor: pointer;
 }
 
+/* Info icon indicator for tooltips */
+.kpi-card[data-tooltip]::before,
+.summary-card[data-tooltip]::before {
+  content: 'ℹ️';
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 14px;
+  opacity: 0.6;
+  z-index: 5;
+}
+
+.kpi-card[data-tooltip]:hover::before,
+.summary-card[data-tooltip]:hover::before {
+  opacity: 1;
+}
+
 .kpi-card[data-tooltip]::after,
 .summary-card[data-tooltip]::after {
   content: attr(data-tooltip);
@@ -21,22 +38,40 @@
   transform: translateX(-50%);
   background: #2C3E50;
   color: white;
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 12px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
   white-space: nowrap;
   opacity: 0;
   visibility: hidden;
   transition: all 0.2s ease;
   z-index: 1000;
   pointer-events: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Arrow for tooltip */
+.kpi-card[data-tooltip]::after,
+.summary-card[data-tooltip]::after {
+  margin-bottom: 8px;
 }
 
 .kpi-card[data-tooltip]:hover::after,
 .summary-card[data-tooltip]:hover::after {
   opacity: 1;
   visibility: visible;
-  bottom: calc(100% + 8px);
+  bottom: calc(100% + 4px);
+}
+
+/* Always show tooltip on mobile (tap to see) */
+@media (max-width: 768px) {
+  .kpi-card[data-tooltip]:active::after,
+  .summary-card[data-tooltip]:active::after {
+    opacity: 1;
+    visibility: visible;
+    bottom: calc(100% + 4px);
+  }
 }
 
 /* ============================================
@@ -584,6 +619,19 @@
   padding: 0.5rem 1rem;
 }
 
+/* Cancel button in bulk actions - ensure visibility */
+.bulk-actions-buttons .btn-outline {
+  background: transparent;
+  border: 1px solid #fff;
+  color: #fff;
+}
+
+.bulk-actions-buttons .btn-outline:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #fff;
+  color: #fff;
+}
+
 /* Checkbox for selection */
 .expense-checkbox {
   width: 20px;
@@ -704,6 +752,15 @@
   background: #1e1e1e;
 }
 
+[data-theme="dark"] .bulk-actions-buttons .btn-outline {
+  border-color: #fff;
+  color: #fff;
+}
+
+[data-theme="dark"] .bulk-actions-buttons .btn-outline:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
 [data-theme="dark"] .expense-card.selected,
 [data-theme="dark"] .income-card.selected {
   background: linear-gradient(135deg, #1a2a3a 0%, #1e3040 100%);
@@ -713,6 +770,13 @@
 [data-theme="dark"] .summary-card[data-tooltip]::after {
   background: #f0f0f0;
   color: #1e1e1e;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .kpi-card[data-tooltip]::before,
+[data-theme="dark"] .summary-card[data-tooltip]::before {
+  filter: grayscale(1) brightness(1.5);
+}
 }
 
 /* ============================================

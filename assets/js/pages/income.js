@@ -273,11 +273,37 @@ async function loadIncome() {
     emptyState.style.display = 'none';
     incomeList.style.display = 'none';
     
-    // Get KPI summary (optimized - only fetches current/last month data)
-    const kpiSummary = await firestoreService.getIncomeKPISummary();
-    state.totalCount = kpiSummary.totalCount;
+    // Check if we're in family mode
+    const context = familySwitcher.getCurrentContext();
+    const isFamilyMode = context.context === 'family' && context.groupId && context.group;
     
-    // Update KPI cards with pre-calculated values
+    let kpiSummary;
+    let income;
+    
+    if (isFamilyMode) {
+      // Family mode - fetch from all family members
+      const memberUserIds = context.group.members.map(m => m.userId);
+      
+      // Get family KPI summary
+      kpiSummary = await firestoreService.getFamilyIncomeKPISummary(context.groupId, memberUserIds);
+      state.totalCount = kpiSummary.totalCount;
+      
+      // Get family income
+      income = await firestoreService.getFamilyIncome(context.groupId, memberUserIds);
+      state.income = income;
+    } else {
+      // Personal mode - fetch only user's income
+      kpiSummary = await firestoreService.getIncomeKPISummary();
+      state.totalCount = kpiSummary.totalCount;
+      
+      // Load paginated income for display
+      const result = await firestoreService.getIncomePaginated({ 
+        pageSize: state.itemsPerPage * 5 // Load 5 pages worth for filtering
+      });
+      state.income = result.data;
+    }
+    
+    // Update KPI cards
     updateIncomeKPIsFromSummary(kpiSummary);
     
     // Initialize pagination if not already done
@@ -291,11 +317,6 @@ async function loadIncome() {
     
     pagination.setTotal(state.totalCount);
     
-    // Load paginated income for display (not all data)
-    const result = await firestoreService.getIncomePaginated({ 
-      pageSize: state.itemsPerPage * 5 // Load 5 pages worth for filtering
-    });
-    state.income = result.data;
     state.filteredIncome = [...state.income];
     
     applyFilters();
