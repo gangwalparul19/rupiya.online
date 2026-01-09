@@ -106,7 +106,7 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  flex-wrap: nowrap;
+  flex-wrap: nowrap !important;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

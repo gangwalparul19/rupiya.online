@@ -247,7 +247,7 @@
   margin-bottom: var(--spacing-md);
   gap: var(--spacing-sm);
   min-width: 0;
-  flex-wrap: nowrap;
+  flex-wrap: nowrap !important;
 }
 
 .kpi-header > div:first-child {
@@ -449,6 +449,7 @@
   margin-bottom: var(--spacing-md);
   gap: var(--spacing-sm);
   min-width: 0;
+  flex-wrap: nowrap !important;
 }
 
 .savings-rate-title {
@@ -586,6 +587,7 @@
   margin-bottom: var(--spacing-md);
   gap: var(--spacing-sm);
   min-width: 0;
+  flex-wrap: nowrap !important;
 }
 
 .goal-progress-title {
@@ -1360,7 +1362,7 @@
   
   .kpi-header {
     margin-bottom: 10px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap !important;
     gap: 8px;
   }
   
@@ -1397,7 +1399,7 @@
   .kpi-change {
     font-size: 11px;
     font-weight: 600;
-    flex-wrap: wrap;
+    flex-wrap: nowrap !important;
     gap: 2px;
   }
   
