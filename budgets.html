@@ -58,7 +58,6 @@
   <link rel="stylesheet" href="assets/css/enhancements.css">
   <link rel="stylesheet" href="assets/css/animations.css">
   <link rel="stylesheet" href="assets/css/mobile-enhancements.css">
-  <link rel="stylesheet" href="assets/css/family.css">
   <link rel="stylesheet" href="assets/css/ux-enhancements.css">
   <link rel="stylesheet" href="assets/css/sidebar.css">
   <link rel="stylesheet" href="assets/css/setup-wizard.css">
@@ -155,7 +154,6 @@
           
         </a>
         <div class="mobile-header-actions">
-          <div id="familySwitcherContainer"></div>
           <button class="sidebar-toggle" id="sidebarOpen">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
@@ -171,8 +169,6 @@
           <p class="page-subtitle" id="budgetsSubtitle">Set spending limits and track your budget</p>
         </div>
         <div class="page-actions">
-          <!-- Desktop Family Switcher -->
-          <div id="familySwitcherContainerDesktop"></div>
           <button class="btn btn-primary" id="addBudgetBtn">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -328,17 +324,6 @@
     </div>
   </div>
 
-  <!-- Family Modals -->
-  <script>
-    // Load family modals
-    fetch('family-modals.html')
-      .then(response => response.text())
-      .then(html => {
-        const div = document.createElement('div');
-        div.innerHTML = html;
-        document.body.appendChild(div);
-      });
-  </script>
 
   <!-- Scripts -->
   <script type="module" src="assets/js/utils/ux-enhancements.js"></script>

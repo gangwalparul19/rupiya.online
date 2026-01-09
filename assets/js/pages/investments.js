@@ -7,7 +7,6 @@ import googleSheetsPriceService from '../services/google-sheets-price-service.js
 import symbolSearchService from '../services/symbol-search-service.js';
 import crossFeatureIntegrationService from '../services/cross-feature-integration-service.js';
 import investmentAnalyticsService from '../services/investment-analytics-service.js';
-import familySwitcher from '../components/family-switcher.js';
 import toast from '../components/toast.js';
 import { formatCurrency, formatDate, escapeHtml, formatDateForInput } from '../utils/helpers.js';
 import timezoneService from '../utils/timezone.js';
@@ -56,12 +55,6 @@ async function init() {
     await loadInvestments();
   });
 
-  // Initialize family switcher
-  await familySwitcher.init();
-
-  // Update subtitle based on context
-  updatePageContext();
-
   // Set up event listeners
   setupEventListeners();
 
@@ -75,18 +68,6 @@ async function init() {
   const purchaseDateInput = document.getElementById('purchaseDate');
   if (purchaseDateInput) {
     purchaseDateInput.valueAsDate = new Date();
-  }
-}
-
-// Update page context based on family switcher
-function updatePageContext() {
-  const context = familySwitcher.getCurrentContext();
-  const subtitle = document.getElementById('investmentsSubtitle');
-
-  if (subtitle && context.context === 'family' && context.group) {
-    subtitle.textContent = `Tracking investments for ${context.group.name}`;
-  } else if (subtitle) {
-    subtitle.textContent = 'Track your investment portfolio';
   }
 }
 

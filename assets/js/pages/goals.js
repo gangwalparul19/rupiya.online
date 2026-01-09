@@ -2,7 +2,6 @@
 import '../services/services-init.js'; // Initialize services first
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
-import familySwitcher from '../components/family-switcher.js';
 import toast from '../components/toast.js';
 import confirmationModal from '../components/confirmation-modal.js';
 import themeManager from '../utils/theme-manager.js';
@@ -137,17 +136,6 @@ async function initPage() {
   }
 }
 
-// Update page context based on family switcher
-function updatePageContext() {
-  const context = familySwitcher.getCurrentContext();
-  const subtitle = document.getElementById('goalsSubtitle');
-  
-  if (subtitle && context.context === 'family' && context.group) {
-    subtitle.textContent = `Tracking goals for ${context.group.name}`;
-  } else if (subtitle) {
-    subtitle.textContent = 'Set and track your financial goals';
-  }
-}
 
 // Load goals
 async function loadGoals() {

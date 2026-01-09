@@ -58,7 +58,7 @@
   <link rel="stylesheet" href="assets/css/enhancements.css">
   <link rel="stylesheet" href="assets/css/animations.css">
   <link rel="stylesheet" href="assets/css/mobile-enhancements.css">
-  <link rel="stylesheet" href="assets/css/family.css">
+
   <link rel="stylesheet" href="assets/css/ux-enhancements.css">
   <link rel="stylesheet" href="assets/css/sidebar.css">
   <link rel="stylesheet" href="assets/css/setup-wizard.css">
@@ -155,8 +155,6 @@
           
         </a>
         <div class="mobile-header-actions">
-          <!-- Family Switcher -->
-          <div id="familySwitcherContainer"></div>
           <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle theme">
             <svg class="theme-icon-light" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <circle cx="12" cy="12" r="5"/>
@@ -188,8 +186,6 @@
           <p class="page-subtitle" id="incomeSubtitle">Track and manage your earnings</p>
         </div>
         <div class="page-actions">
-          <!-- Desktop Family Switcher -->
-          <div id="familySwitcherContainerDesktop"></div>
           <button class="btn btn-outline" id="exportBtn">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
@@ -366,21 +362,7 @@
               <span class="error-message" id="descriptionError"></span>
             </div>
 
-            <!-- Family Context: Personal/Shared Option -->
-            <div class="form-group form-group-full" id="incomeTypeGroup" style="display: none;">
-              <label>Income Type</label>
-              <div class="radio-group">
-                <label class="radio-option">
-                  <input type="radio" name="incomeType" value="personal" checked>
-                  <span>👤 Personal (Only you can see)</span>
-                </label>
-                <label class="radio-option">
-                  <input type="radio" name="incomeType" value="shared">
-                  <span>👨‍👩‍👧‍👦 Shared (Visible to family)</span>
-                </label>
-              </div>
-              <small class="form-help">Choose whether this income is personal or shared with your family group</small>
-            </div>
+
           </div>
 
           <div class="form-actions">
@@ -494,17 +476,7 @@
     <span>Refreshing...</span>
   </div>
 
-  <!-- Family Modals -->
-  <script>
-    // Load family modals
-    fetch('family-modals.html')
-      .then(response => response.text())
-      .then(html => {
-        const div = document.createElement('div');
-        div.innerHTML = html;
-        document.body.appendChild(div);
-      });
-  </script>
+
 
   <!-- Scripts -->
   <script type="module" src="assets/js/utils/ux-enhancements.js"></script>

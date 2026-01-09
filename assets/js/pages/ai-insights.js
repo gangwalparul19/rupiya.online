@@ -3,7 +3,6 @@ import '../services/services-init.js'; // Initialize services first
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
 import AIInsightsEngine from '../utils/ai-insights-engine.js';
-import familySwitcher from '../components/family-switcher.js';
 import toast from '../components/toast.js';
 import confirmationModal from '../components/confirmation-modal.js';
 import { formatCurrency, formatCurrencyCompact } from '../utils/helpers.js';

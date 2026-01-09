@@ -2,7 +2,6 @@
 import '../services/services-init.js'; // Initialize services first
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
-import familySwitcher from '../components/family-switcher.js';
 import toast from '../components/toast.js';
 import confirmationModal from '../components/confirmation-modal.js';
 import themeManager from '../utils/theme-manager.js';
@@ -125,12 +124,6 @@ async function initDashboard() {
       userName.textContent = user.displayName || 'User';
       userEmail.textContent = user.email;
       
-      // Initialize family switcher
-      await familySwitcher.init();
-      
-      // Update subtitle based on context
-      updatePageContext();
-      
       // Initialize PWA install banner
       initPWAInstallBanner();
       
@@ -165,18 +158,6 @@ async function processRecurringTransactions() {
     }
   } catch (error) {
     log.error('Error in recurring processor:', error);
-  }
-}
-
-// Update page context based on family switcher
-function updatePageContext() {
-  const context = familySwitcher.getCurrentContext();
-  const subtitle = document.getElementById('dashboardSubtitle');
-  
-  if (context.context === 'family' && context.group) {
-    subtitle.textContent = `Financial overview for ${context.group.name}`;
-  } else {
-    subtitle.textContent = "Welcome back! Here's your financial overview.";
   }
 }
 

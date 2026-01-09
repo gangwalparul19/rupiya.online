@@ -5,7 +5,6 @@ import firestoreService from '../services/firestore-service.js';
 import categoriesService from '../services/categories-service.js';
 import paymentMethodsService from '../services/payment-methods-service.js';
 import smartCategorizationService from '../services/smart-categorization-service.js';
-import familySwitcher from '../components/family-switcher.js';
 import toast from '../components/toast.js';
 import confirmationModal from '../components/confirmation-modal.js';
 import themeManager from '../utils/theme-manager.js';

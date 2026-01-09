@@ -3,8 +3,6 @@ import '../services/services-init.js'; // Initialize services first
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
 import categoriesService from '../services/categories-service.js';
-import familySwitcher from '../components/family-switcher.js';
-import familyMembersService from '../services/family-members-service.js';
 import toast from '../components/toast.js';
 import confirmationModal from '../components/confirmation-modal.js';
 import themeManager from '../utils/theme-manager.js';
@@ -45,9 +43,6 @@ async function init() {
 
   initDOMElements();
   
-  // Initialize family switcher
-  await familySwitcher.init();
-  
   setupEventListeners();
   loadUserProfile(currentUser);
   setupSecuritySection();
@@ -56,7 +51,6 @@ async function init() {
   await encryptionReauthModal.checkAndPrompt(async () => {
     await loadUserPreferences();
     await loadCategories();
-    await loadFamilyMembers();
   });
 }
 
@@ -693,217 +687,6 @@ async function handleResetCategories() {
 async function loadFamilyMembers() {
   const familyMembersList = document.getElementById('familyMembersList');
   if (!familyMembersList) return;
-  
-  try {
-    console.log('[Profile] Loading family members...');
-    const members = await familyMembersService.getFamilyMembers();
-    console.log('[Profile] Loaded family members:', members);
-    
-    renderFamilyMembers(members);
-  } catch (error) {
-    console.error('Error loading family members:', error);
-    familyMembersList.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Failed to load family members</p>';
-    showToast('Failed to load family members', 'error');
-  }
-}
-
-function renderFamilyMembers(members) {
-  const familyMembersList = document.getElementById('familyMembersList');
-  if (!familyMembersList) return;
-  
-  const membersHTML = members.map(member => {
-    const isEnabled = member.enabled !== false;
-    const isCustom = member.isCustom === true;
-    
-    return `
-      <div class="family-member-item" data-member-id="${member.id}">
-        ${isCustom ? `
-          <button class="family-member-remove" onclick="handleRemoveFamilyMember('${member.id}')" title="Remove">
-            ×
-          </button>
-        ` : ''}
-        <div class="family-member-icon">${member.icon}</div>
-        <div class="family-member-details">
-          <div class="family-member-role">${escapeHtml(member.role)}</div>
-          <input 
-            type="text" 
-            class="family-member-name-input" 
-            data-member-id="${member.id}"
-            value="${escapeHtml(member.name)}"
-            placeholder="Enter name"
-            maxlength="50"
-          >
-        </div>
-        <div class="family-member-toggle">
-          <label>
-            <input 
-              type="checkbox" 
-              class="family-member-enabled-checkbox"
-              data-member-id="${member.id}"
-              ${isEnabled ? 'checked' : ''}
-            >
-            <span>Enabled</span>
-          </label>
-        </div>
-      </div>
-    `;
-  }).join('');
-  
-  // Add "Add Family Member" card
-  const addCardHTML = `
-    <div class="add-family-member-card" onclick="handleAddFamilyMember()">
-      <div class="add-family-member-icon">+</div>
-      <div class="add-family-member-text">Add Family Member</div>
-    </div>
-  `;
-  
-  familyMembersList.innerHTML = membersHTML + addCardHTML;
-}
-
-async function handleAddFamilyMember() {
-  const name = prompt('Enter family member name:', 'New Member');
-  if (!name || !name.trim()) return;
-  
-  const role = prompt('Enter role (e.g., Uncle, Aunt, Grandparent):', 'Family Member');
-  if (!role || !role.trim()) return;
-  
-  // Icon selection (simple for now)
-  const icons = ['👤', '👨', '👩', '👦', '👧', '👴', '👵', '👶'];
-  const iconChoice = prompt(`Choose icon number (1-${icons.length}):\n${icons.map((icon, i) => `${i+1}. ${icon}`).join('\n')}`, '1');
-  const iconIndex = parseInt(iconChoice) - 1;
-  const icon = icons[iconIndex] || '👤';
-  
-  const saveBtn = document.getElementById('saveFamilyMembersBtn');
-  const originalText = saveBtn.textContent;
-  
-  try {
-    saveBtn.disabled = true;
-    saveBtn.textContent = 'Adding...';
-    
-    const result = await familyMembersService.addFamilyMember({
-      name: name.trim(),
-      role: role.trim(),
-      icon: icon
-    });
-    
-    if (result.success) {
-      showToast('Family member added successfully', 'success');
-      await loadFamilyMembers();
-    } else {
-      showToast(result.error || 'Failed to add family member', 'error');
-    }
-  } catch (error) {
-    console.error('Error adding family member:', error);
-    showToast('Failed to add family member', 'error');
-  } finally {
-    saveBtn.disabled = false;
-    saveBtn.textContent = originalText;
-  }
-}
-
-async function handleRemoveFamilyMember(memberId) {
-  const confirmed = await confirmationModal.confirmDelete('Remove this family member? This action cannot be undone.');
-  if (!confirmed) return;
-  
-  const saveBtn = document.getElementById('saveFamilyMembersBtn');
-  const originalText = saveBtn.textContent;
-  
-  try {
-    saveBtn.disabled = true;
-    saveBtn.textContent = 'Removing...';
-    
-    const result = await familyMembersService.removeFamilyMember(memberId);
-    
-    if (result.success) {
-      showToast('Family member removed successfully', 'success');
-      await loadFamilyMembers();
-    } else {
-      showToast(result.error || 'Failed to remove family member', 'error');
-    }
-  } catch (error) {
-    console.error('Error removing family member:', error);
-    showToast('Failed to remove family member', 'error');
-  } finally {
-    saveBtn.disabled = false;
-    saveBtn.textContent = originalText;
-  }
-}
-
-// Expose to window for onclick handlers
-window.handleAddFamilyMember = handleAddFamilyMember;
-window.handleRemoveFamilyMember = handleRemoveFamilyMember;
-
-async function handleSaveFamilyMembers() {
-  const saveBtn = document.getElementById('saveFamilyMembersBtn');
-  const originalText = saveBtn.textContent;
-  
-  try {
-    saveBtn.disabled = true;
-    saveBtn.textContent = 'Saving...';
-    
-    // Get all family member items
-    const memberItems = document.querySelectorAll('.family-member-item');
-    const updatedMembers = [];
-    
-    memberItems.forEach((item, index) => {
-      const memberId = item.dataset.memberId;
-      const nameInput = item.querySelector('.family-member-name-input');
-      const enabledCheckbox = item.querySelector('.family-member-enabled-checkbox');
-      const roleElement = item.querySelector('.family-member-role');
-      const iconElement = item.querySelector('.family-member-icon');
-      
-      updatedMembers.push({
-        id: memberId,
-        role: roleElement.textContent,
-        name: nameInput.value.trim() || roleElement.textContent,
-        icon: iconElement.textContent,
-        enabled: enabledCheckbox.checked,
-        order: index + 1
-      });
-    });
-    
-    // Validate at least one member is enabled
-    const hasEnabledMember = updatedMembers.some(m => m.enabled);
-    if (!hasEnabledMember) {
-      showToast('At least one family member must be enabled', 'warning');
-      return;
-    }
-    
-    const result = await familyMembersService.updateFamilyMembers(updatedMembers);
-    
-    if (result.success) {
-      showToast('Family members updated successfully', 'success');
-      await loadFamilyMembers();
-    } else {
-      showToast(result.error || 'Failed to update family members', 'error');
-    }
-  } catch (error) {
-    console.error('Error saving family members:', error);
-    showToast('Failed to save family members', 'error');
-  } finally {
-    saveBtn.disabled = false;
-    saveBtn.textContent = originalText;
-  }
-}
-
-async function handleResetFamilyMembers() {
-  const confirmed = await confirmationModal.confirmReset('Reset family members to defaults? Your custom names will be lost.');
-  if (!confirmed) return;
-  
-  try {
-    const result = await familyMembersService.resetToDefaults();
-    
-    if (result.success) {
-      showToast('Family members reset successfully', 'success');
-      await loadFamilyMembers();
-    } else {
-      showToast('Failed to reset family members', 'error');
-    }
-  } catch (error) {
-    console.error('Error resetting family members:', error);
-    showToast('Failed to reset family members', 'error');
-  }
-}
 
 // Expose functions to window
 window.deleteExpenseCategory = deleteExpenseCategory;

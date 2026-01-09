@@ -20,7 +20,6 @@ import {
 } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
 import authService from './auth-service.js';
 import encryptionService from './encryption-service.js';
-import familyEncryptionService from './family-encryption-service.js';
 import privacyConfig from '../config/privacy-config.js';
 
 class FirestoreService {
@@ -1131,33 +1130,7 @@ class FirestoreService {
   // USER SETTINGS
   // ============================================
 
-  // ============================================
-  // FAMILY MODE DATA FETCHING
-  // Uses shared family encryption key for cross-member data access
-  // ============================================
 
-  async getFamilyExpenses(familyGroupId, memberUserIds = []) {
-    try {
-      const cacheKey = this.getCacheKey('familyExpenses', { familyGroupId });
-      const cached = this.getFromCache(cacheKey);
-      if (cached) return cached;
-
-      const allExpenses = [];
-      
-      // Split memberUserIds into chunks of 10 (Firestore limit)
-      const chunks = [];
-      for (let i = 0; i < memberUserIds.length; i += 10) {
-        chunks.push(memberUserIds.slice(i, i + 10));
-      }
-
-      for (const chunk of chunks) {
-        const q = query(
-          collection(db, this.collections.expenses),
-          where('userId', 'in', chunk),
-          orderBy('date', 'desc')
-        );
-        
-        const querySnapshot = await getDocs(q);
         querySnapshot.forEach((doc) => {
           allExpenses.push({ id: doc.id, ...doc.data() });
         });
@@ -1171,11 +1144,7 @@ class FirestoreService {
         try {
           let decrypted;
           
-          if (expense._familyEncrypted) {
-            // Family-encrypted data - use shared family key
-            decrypted = await familyEncryptionService.decryptFamilyObject(expense);
-          } else if (expense.userId === currentUserId && expense._encrypted) {
-            // Our own personal data - use personal key
+          // Personal data - use personal key
             decrypted = await encryptionService.decryptObject(expense, this.collections.expenses);
           } else if (expense._encrypted) {
             // Other user's personal data - cannot decrypt
@@ -1250,9 +1219,7 @@ class FirestoreService {
         try {
           let decrypted;
           
-          if (income._familyEncrypted) {
-            decrypted = await familyEncryptionService.decryptFamilyObject(income);
-          } else if (income.userId === currentUserId && income._encrypted) {
+          if (income.userId === currentUserId && income._encrypted) {
             decrypted = await encryptionService.decryptObject(income, this.collections.income);
           } else if (income._encrypted) {
             decrypted = {
@@ -1388,8 +1355,8 @@ class FirestoreService {
     try {
       const userId = this.getUserId();
       
-      // Encrypt with family key
-      const encryptedData = await familyEncryptionService.encryptFamilyObject(expense, familyGroupId);
+      // Encrypt with personal key
+      const encryptedData = await encryptionService.encryptObject(expense, this.collections.expenses);
       
       const docRef = await addDoc(collection(db, this.collections.expenses), {
         ...encryptedData,
@@ -1414,8 +1381,8 @@ class FirestoreService {
     try {
       const userId = this.getUserId();
       
-      // Encrypt with family key
-      const encryptedData = await familyEncryptionService.encryptFamilyObject(income, familyGroupId);
+      // Encrypt with personal key
+      const encryptedData = await encryptionService.encryptObject(income, this.collections.income);
       
       const docRef = await addDoc(collection(db, this.collections.income), {
         ...encryptedData,

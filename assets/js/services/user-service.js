@@ -477,22 +477,7 @@ class UserService {
   }
 
   /**
-   * Set current context (personal or family)
-   */
-  async setCurrentContext(context, groupId = null) {
-    if (!['personal', 'family'].includes(context)) {
-      return { success: false, error: 'Invalid context' };
-    }
 
-    const updates = {
-      currentContext: context,
-      currentGroupId: context === 'family' ? groupId : null
-    };
-
-    return await this.updateUserPreferences(updates);
-  }
-
-  /**
    * Get current context
    */
   async getCurrentContext() {
