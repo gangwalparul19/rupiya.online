@@ -31,7 +31,7 @@ function getRedirectUrl() {
     if (pendingInvitation) {
       localStorage.removeItem('rupiya_pending_invitation');
       localStorage.removeItem('rupiya_redirect_url');
-      return `family.html?invitation=${pendingInvitation}`;
+      return 'dashboard.html';
     }
     
     // Check for stored redirect URL

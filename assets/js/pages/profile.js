@@ -684,9 +684,7 @@ async function handleResetCategories() {
 // FAMILY MEMBERS MANAGEMENT
 // ============================================
 
-async function loadFamilyMembers() {
-  const familyMembersList = document.getElementById('familyMembersList');
-  if (!familyMembersList) return;
+// Family members management removed
 
 // Expose functions to window
 window.deleteExpenseCategory = deleteExpenseCategory;
