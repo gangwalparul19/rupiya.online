@@ -195,8 +195,7 @@ class TransactionListEnhancer {
    * Render single transaction item
    */
   renderTransaction(transaction) {
-    const date = new Date(transaction.date);
-    const dateStr = this.formatDate(date);
+    const dateStr = this.formatDate(transaction.date);
     const amountClass = transaction.type === 'income' ? 'income' : 'expense';
     const amountPrefix = transaction.type === 'income' ? '+' : '-';
     const icon = this.getTransactionIcon(transaction.type);
@@ -283,18 +282,39 @@ class TransactionListEnhancer {
    */
   formatDate(date) {
     try {
+      // Handle null/undefined
+      if (!date) {
+        console.warn('formatDate: date is null or undefined');
+        return 'No date';
+      }
+
       // Handle Firestore Timestamp objects
       let dateObj = date;
+      
+      // Check if it's a Firestore Timestamp
       if (date && typeof date.toDate === 'function') {
         dateObj = date.toDate();
-      } else if (typeof date === 'string') {
+      } 
+      // Check if it's a string
+      else if (typeof date === 'string') {
         dateObj = new Date(date);
-      } else if (!(date instanceof Date)) {
+      } 
+      // Check if it's already a Date
+      else if (date instanceof Date) {
+        dateObj = date;
+      }
+      // Try to convert to Date
+      else if (typeof date === 'number') {
+        dateObj = new Date(date);
+      }
+      // Last resort - try to create a Date
+      else {
         dateObj = new Date(date);
       }
 
       // Validate date
       if (isNaN(dateObj.getTime())) {
+        console.warn('formatDate: Invalid date after conversion', date, dateObj);
         return 'Invalid Date';
       }
 
@@ -313,8 +333,18 @@ class TransactionListEnhancer {
         return 'Yesterday';
       }
 
+      // Format as "Jan 15"
       const options = { month: 'short', day: 'numeric' };
-      return transDate.toLocaleDateString('en-IN', options);
+      const formatted = transDate.toLocaleDateString('en-IN', options);
+      
+      if (!formatted || formatted === 'Invalid Date') {
+        console.warn('formatDate: toLocaleDateString returned invalid', formatted);
+        // Fallback to manual formatting
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        return `${months[transDate.getMonth()]} ${transDate.getDate()}`;
+      }
+      
+      return formatted;
     } catch (error) {
       console.error('Error formatting date:', error, date);
       return 'Invalid Date';

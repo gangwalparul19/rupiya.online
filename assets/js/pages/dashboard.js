@@ -626,7 +626,9 @@ function loadRecentTransactions(expenses, income, splits) {
       message: `Are you sure you want to delete this ${transaction.type}?`,
       confirmText: 'Delete',
       cancelText: 'Cancel',
-      onConfirm: async () => {
+      type: 'danger'
+    }).then(async (confirmed) => {
+      if (confirmed) {
         try {
           if (transaction.type === 'split') {
             await firestoreService.deleteSplit(transactionId);

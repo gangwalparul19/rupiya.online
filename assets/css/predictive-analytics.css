@@ -1,5 +1,92 @@
 /* Predictive Analytics Page Styles */
 
+/* Main Container Layout */
+.main-container {
+  margin-left: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.header {
+  background: var(--white);
+  border-bottom: 2px solid var(--primary-blue);
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.page-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.page-content {
+  padding: 1.5rem;
+  background: var(--bg-secondary);
+  min-height: calc(100vh - 80px);
+}
+
+/* Desktop Layout */
+@media (min-width: 769px) {
+  .main-container {
+    margin-left: 260px;
+    width: calc(100% - 260px);
+  }
+
+  .header {
+    margin-left: 0;
+  }
+
+  .page-content {
+    margin-left: 0;
+  }
+}
+
+/* Mobile Layout */
+@media (max-width: 768px) {
+  .main-container {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .header {
+    padding: 0.75rem 1rem;
+  }
+
+  .page-title {
+    font-size: 1.25rem;
+  }
+
+  .page-content {
+    padding: 1rem;
+  }
+}
+
 /* Predictive Analytics Container */
 .predictive-analytics-container {
   display: flex;
