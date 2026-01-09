@@ -1,0 +1,379 @@
+/* ============================================
+   DASHBOARD KPI OVERRIDE - FINAL FIX
+   This file overrides all conflicting CSS rules
+   to ensure proper KPI and widget layout
+   ============================================ */
+
+/* ============================================
+   RESET CONFLICTING RULES FROM layout-fixes.css
+   ============================================ */
+
+/* Desktop: Override layout-fixes.css horizontal layout */
+@media (min-width: 769px) {
+  .kpi-card {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0 !important;
+    padding: var(--spacing-lg) !important;
+  }
+}
+
+/* ============================================
+   KPI GRID - ALL SCREEN SIZES
+   ============================================ */
+
+/* Desktop: 4 columns */
+@media (min-width: 1025px) {
+  .kpi-grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: var(--spacing-lg) !important;
+    margin-bottom: var(--spacing-xl) !important;
+  }
+}
+
+/* Tablet: 2 columns */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .kpi-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: var(--spacing-md) !important;
+    margin-bottom: var(--spacing-lg) !important;
+  }
+}
+
+/* Mobile: 2 columns */
+@media (max-width: 768px) {
+  .kpi-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+    margin-bottom: 16px !important;
+  }
+  
+  .kpi-card {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0 !important;
+  }
+}
+
+/* ============================================
+   KPI CARD - LAYOUT FIX
+   ============================================ */
+
+.kpi-card {
+  display: flex !important;
+  flex-direction: column !important;
+  background: var(--white) !important;
+  border: 2px solid var(--primary-blue) !important;
+  border-radius: var(--border-radius-lg) !important;
+  padding: var(--spacing-lg) !important;
+  transition: all var(--transition-base) !important;
+  overflow: hidden !important;
+  min-width: 0 !important;
+  gap: 0 !important;
+  align-items: flex-start !important;
+}
+
+.kpi-card:hover {
+  box-shadow: var(--shadow-md) !important;
+  transform: translateY(-2px) !important;
+  border-color: var(--accent-cyan) !important;
+}
+
+/* Remove nth-child override from responsive.css */
+.kpi-card:nth-child(3) {
+  grid-column: auto !important;
+}
+
+/* ============================================
+   KPI HEADER - HORIZONTAL LAYOUT
+   ============================================ */
+
+.kpi-header {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  margin-bottom: var(--spacing-md) !important;
+  gap: var(--spacing-sm) !important;
+  min-width: 0 !important;
+  flex-wrap: nowrap !important;
+  width: 100% !important;
+}
+
+.kpi-header > div:first-child {
+  min-width: 0 !important;
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+/* ============================================
+   KPI TITLE - TEXT TRUNCATION
+   ============================================ */
+
+.kpi-title {
+  font-size: var(--font-size-sm) !important;
+  font-weight: 600 !important;
+  color: var(--text-secondary) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1.2 !important;
+}
+
+/* ============================================
+   KPI ICON - FIXED SIZE
+   ============================================ */
+
+.kpi-icon {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: var(--border-radius) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 20px !important;
+  flex-shrink: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.kpi-icon.income {
+  background: rgba(39, 174, 96, 0.1) !important;
+  color: var(--accent-green) !important;
+}
+
+.kpi-icon.expense {
+  background: rgba(231, 76, 60, 0.1) !important;
+  color: var(--accent-red) !important;
+}
+
+.kpi-icon.cashflow {
+  background: rgba(74, 144, 226, 0.1) !important;
+  color: var(--primary-blue) !important;
+}
+
+.kpi-icon.networth {
+  background: rgba(155, 89, 182, 0.1) !important;
+  color: var(--accent-purple) !important;
+}
+
+/* ============================================
+   KPI VALUE - LARGE DISPLAY
+   ============================================ */
+
+.kpi-value {
+  font-size: var(--font-size-3xl) !important;
+  font-weight: 700 !important;
+  color: var(--text-primary) !important;
+  margin-bottom: var(--spacing-xs) !important;
+  word-break: break-word !important;
+  overflow-wrap: break-word !important;
+  margin-top: 0 !important;
+  padding: 0 !important;
+  line-height: 1.2 !important;
+  width: 100% !important;
+}
+
+/* ============================================
+   KPI CHANGE - INDICATOR
+   ============================================ */
+
+.kpi-change {
+  font-size: var(--font-size-sm) !important;
+  font-weight: 600 !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 4px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  flex-wrap: nowrap !important;
+}
+
+.kpi-change.positive {
+  color: var(--accent-green) !important;
+}
+
+.kpi-change.negative {
+  color: var(--accent-red) !important;
+}
+
+/* ============================================
+   WIDGETS ROW - 2 COLUMNS ALL SIZES
+   ============================================ */
+
+.widgets-row {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: var(--spacing-lg) !important;
+  margin-bottom: var(--spacing-xl) !important;
+}
+
+/* Tablet: 2 columns */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .widgets-row {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: var(--spacing-md) !important;
+  }
+}
+
+/* Mobile: 2 columns */
+@media (max-width: 768px) {
+  .widgets-row {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+    margin-bottom: 16px !important;
+  }
+}
+
+/* ============================================
+   WIDGET CARDS - CONSISTENT STYLING
+   ============================================ */
+
+.savings-rate-widget,
+.goal-progress-widget,
+.top-categories-widget,
+.upcoming-bills-widget {
+  display: flex !important;
+  flex-direction: column !important;
+  background: var(--white) !important;
+  border: 2px solid var(--primary-blue) !important;
+  border-radius: var(--border-radius-lg) !important;
+  padding: var(--spacing-lg) !important;
+  transition: all var(--transition-base) !important;
+  overflow: hidden !important;
+  min-width: 0 !important;
+}
+
+.savings-rate-widget:hover,
+.goal-progress-widget:hover,
+.top-categories-widget:hover,
+.upcoming-bills-widget:hover {
+  box-shadow: var(--shadow-md) !important;
+  transform: translateY(-2px) !important;
+  border-color: var(--accent-cyan) !important;
+}
+
+/* ============================================
+   MOBILE RESPONSIVE - SMALLER SIZES
+   ============================================ */
+
+@media (max-width: 480px) {
+  .kpi-card {
+    padding: 12px !important;
+  }
+
+  .kpi-header {
+    margin-bottom: 8px !important;
+    gap: 6px !important;
+  }
+
+  .kpi-title {
+    font-size: 10px !important;
+    letter-spacing: 0.2px !important;
+  }
+
+  .kpi-value {
+    font-size: 18px !important;
+    margin-bottom: 4px !important;
+  }
+
+  .kpi-icon {
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 16px !important;
+  }
+
+  .kpi-change {
+    font-size: 10px !important;
+    gap: 2px !important;
+  }
+
+  .widgets-row {
+    gap: 10px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .savings-rate-widget,
+  .goal-progress-widget,
+  .top-categories-widget,
+  .upcoming-bills-widget {
+    padding: 12px !important;
+  }
+}
+
+/* ============================================
+   EXTRA SMALL MOBILE (< 375px)
+   ============================================ */
+
+@media (max-width: 374px) {
+  .kpi-card {
+    padding: 10px !important;
+  }
+
+  .kpi-header {
+    margin-bottom: 6px !important;
+    gap: 4px !important;
+  }
+
+  .kpi-title {
+    font-size: 9px !important;
+  }
+
+  .kpi-value {
+    font-size: 16px !important;
+    margin-bottom: 3px !important;
+  }
+
+  .kpi-icon {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 14px !important;
+  }
+
+  .kpi-change {
+    font-size: 9px !important;
+  }
+
+  .widgets-row {
+    gap: 8px !important;
+  }
+
+  .savings-rate-widget,
+  .goal-progress-widget,
+  .top-categories-widget,
+  .upcoming-bills-widget {
+    padding: 10px !important;
+  }
+}
+
+/* ============================================
+   REMOVE CONFLICTING FLEX LAYOUTS
+   ============================================ */
+
+/* Override layout-fixes.css flex layout */
+.kpi-content {
+  display: none !important;
+}
+
+/* ============================================
+   ENSURE PROPER TEXT ALIGNMENT
+   ============================================ */
+
+.kpi-header span,
+.kpi-title span,
+.kpi-value span,
+.kpi-change span {
+  margin: 0 !important;
+  padding: 0 !important;
+}
