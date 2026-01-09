@@ -2,7 +2,7 @@
 // Provides offline support and caching
 
 // CACHE_VERSION is injected by build.js during deployment
-const CACHE_VERSION = '1.2.71';
+const CACHE_VERSION = '1.2.72';
 const CACHE_NAME = `rupiya-v${CACHE_VERSION}`;
 const RUNTIME_CACHE = `rupiya-runtime-v${CACHE_VERSION}`;
 
@@ -23,8 +23,6 @@ const STATIC_ASSETS = [
   '/disclaimer.html',
   '/documents.html',
   '/expenses.html',
-  '/family.html',
-  '/family-modals.html',
   '/feedback.html',
   '/goals.html',
   '/house-help.html',
@@ -62,7 +60,6 @@ const STATIC_ASSETS = [
   '/assets/css/documents.css',
   '/assets/css/enhancements.css',
   '/assets/css/expenses.css',
-  '/assets/css/family.css',
   '/assets/css/feedback.css',
   '/assets/css/form-mobile-optimization.css',
   '/assets/css/goals.css',
@@ -108,7 +105,6 @@ const STATIC_ASSETS = [
   '/assets/js/services/cross-feature-integration-service.js',
   '/assets/js/services/encryption-service.js',
   '/assets/js/services/expense-templates-service.js',
-  '/assets/js/services/family-service.js',
   '/assets/js/services/firestore-service.js',
   '/assets/js/services/fuel-service.js',
   '/assets/js/services/google-sheets-price-service.js',
@@ -133,7 +129,6 @@ const STATIC_ASSETS = [
   
   // Components JS
   '/assets/js/components/encryption-reauth-modal.js',
-  '/assets/js/components/family-switcher.js',
   '/assets/js/components/loading.js',
   '/assets/js/components/logout-modal.js',
   '/assets/js/components/onboarding-ui.js',
@@ -171,8 +166,6 @@ const STATIC_ASSETS = [
   '/assets/js/pages/dashboard.js',
   '/assets/js/pages/documents.js',
   '/assets/js/pages/expenses.js',
-  '/assets/js/pages/family.js',
-  '/assets/js/pages/family-modals.js',
   '/assets/js/pages/feedback.js',
   '/assets/js/pages/goals.js',
   '/assets/js/pages/house-help.js',

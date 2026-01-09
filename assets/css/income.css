@@ -436,6 +436,52 @@
   border-color: var(--accent-cyan);
 }
 
+/* Personal/Private Data Card - Family Mode */
+.income-card.personal-data {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 2px dashed #94a3b8;
+  opacity: 0.75;
+}
+
+.income-card.personal-data:hover {
+  transform: none;
+  box-shadow: none;
+  border-color: #94a3b8;
+}
+
+.income-card.personal-data .income-amount.private-amount {
+  color: #64748b;
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.income-card.personal-data .income-description {
+  color: #94a3b8;
+  font-style: italic;
+  font-size: 13px;
+}
+
+.income-card.personal-data .income-meta {
+  color: #94a3b8;
+}
+
+/* Dark mode for personal data cards */
+[data-theme="dark"] .income-card.personal-data {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border-color: #475569;
+}
+
+[data-theme="dark"] .income-card.personal-data .income-amount.private-amount {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .income-card.personal-data .income-description {
+  color: #64748b;
+}
+
 .income-header {
   display: flex;
   justify-content: space-between;
