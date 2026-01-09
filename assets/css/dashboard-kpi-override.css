@@ -5,6 +5,17 @@
    ============================================ */
 
 /* ============================================
+   MAIN CONTENT WIDTH CONSTRAINT
+   ============================================ */
+
+.main-content {
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* ============================================
    RESET CONFLICTING RULES FROM layout-fixes.css
    ============================================ */
 
@@ -30,6 +41,8 @@
     grid-template-columns: repeat(4, 1fr) !important;
     gap: var(--spacing-lg) !important;
     margin-bottom: var(--spacing-xl) !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
 }
 
@@ -40,6 +53,8 @@
     grid-template-columns: repeat(3, 1fr) !important;
     gap: var(--spacing-lg) !important;
     margin-bottom: var(--spacing-xl) !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
 }
 
@@ -50,6 +65,8 @@
     grid-template-columns: repeat(2, 1fr) !important;
     gap: var(--spacing-md) !important;
     margin-bottom: var(--spacing-lg) !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
 }
 
@@ -60,6 +77,8 @@
     grid-template-columns: repeat(2, 1fr) !important;
     gap: 12px !important;
     margin-bottom: 16px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
   
   .kpi-card {
@@ -228,6 +247,8 @@
   grid-template-columns: 1fr 1fr !important;
   gap: var(--spacing-lg) !important;
   margin-bottom: var(--spacing-xl) !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
 }
 
 /* Savings Rate - Full width on all screens */
@@ -311,6 +332,8 @@
     grid-template-columns: 1fr !important;
     gap: 12px !important;
     margin-bottom: 16px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
 }
 
@@ -321,6 +344,8 @@
     grid-template-columns: repeat(2, 1fr) !important;
     gap: var(--spacing-lg) !important;
     margin-bottom: var(--spacing-xl) !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
 }
 
@@ -347,6 +372,7 @@
   overflow: hidden !important;
   min-width: 0 !important;
   margin-bottom: var(--spacing-xl) !important;
+  box-sizing: border-box !important;
 }
 
 .transactions-card:hover {

@@ -208,7 +208,6 @@
 /* Extra Small Mobile */
 @media (max-width: 480px) {
   .summary-cards-row {
-    grid-template-columns: 1fr;
     gap: 0.5rem;
   }
 
