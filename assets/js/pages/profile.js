@@ -51,6 +51,7 @@ async function init() {
   await encryptionReauthModal.checkAndPrompt(async () => {
     await loadUserPreferences();
     await loadCategories();
+    await loadFamilyMembersUI();
   });
 }
 
@@ -143,6 +144,7 @@ function setupEventListeners() {
   // Family Members
   document.getElementById('saveFamilyMembersBtn')?.addEventListener('click', handleSaveFamilyMembers);
   document.getElementById('resetFamilyMembersBtn')?.addEventListener('click', handleResetFamilyMembers);
+  document.getElementById('addMoreMembersBtn')?.addEventListener('click', addMoreMembers);
   
   // Allow Enter key to add categories
   document.getElementById('newExpenseCategory')?.addEventListener('keypress', (e) => {
@@ -684,7 +686,322 @@ async function handleResetCategories() {
 // FAMILY MEMBERS MANAGEMENT
 // ============================================
 
-// Family members management removed
+// Get default family members
+function getDefaultFamilyMembers() {
+  return [
+    { id: 'member-1', name: 'Me', icon: '\u{1F468}', role: 'Self', active: true },
+    { id: 'member-2', name: 'Spouse', icon: '\u{1F469}', role: 'Spouse', active: true },
+    { id: 'member-3', name: 'Child 1', icon: '\u{1F467}', role: 'Child', active: true },
+    { id: 'member-4', name: 'Child 2', icon: '\u{1F466}', role: 'Child', active: true },
+    { id: 'member-5', name: 'Father', icon: '\u{1F474}', role: 'Parent', active: true },
+    { id: 'member-6', name: 'Mother', icon: '\u{1F475}', role: 'Parent', active: true }
+  ];
+}
+
+// Get family members from localStorage
+function getFamilyMembers() {
+  try {
+    const stored = localStorage.getItem('familyMembers');
+    if (stored) {
+      return JSON.parse(stored);
+    }
+    return getDefaultFamilyMembers();
+  } catch (error) {
+    console.error('Error getting family members:', error);
+    return getDefaultFamilyMembers();
+  }
+}
+
+// Load family members UI
+async function loadFamilyMembersUI() {
+  const familyMembersGrid = document.getElementById('familyMembersGrid');
+  if (!familyMembersGrid) return;
+
+  try {
+    const members = getFamilyMembers();
+    const iconOptions = ['👤', '👨', '👩', '👧', '👦', '👶', '👴', '👵', '🧑', '👨‍🦱', '👩‍🦱', '👨‍🦲', '👩‍🦲'];
+    const isExtraMember = (index) => index >= 6;
+
+    familyMembersGrid.innerHTML = members.map((member, index) => `
+      <div class="family-member-slot ${member.active ? 'active' : ''} ${isExtraMember(index) ? 'extra-member' : ''}" data-member-id="${member.id}">
+        <div class="family-member-header">
+          <div>
+            <input 
+              type="checkbox" 
+              class="family-member-checkbox" 
+              data-member-id="${member.id}"
+              ${member.active ? 'checked' : ''}
+            >
+            <span class="family-member-slot-number">${isExtraMember(index) ? 'Extra' : 'Slot ' + (index + 1)}</span>
+          </div>
+          ${isExtraMember(index) ? `
+            <button 
+              type="button" 
+              class="btn-delete-member" 
+              data-member-id="${member.id}"
+              title="Delete member"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          ` : ''}
+        </div>
+
+        <div class="family-member-inputs">
+          <div>
+            <label>Name</label>
+            <input 
+              type="text" 
+              class="family-member-name-input" 
+              data-member-id="${member.id}"
+              value="${escapeHtml(member.name)}"
+              placeholder="Enter name"
+            >
+          </div>
+
+          <div>
+            <label>Role</label>
+            <input 
+              type="text" 
+              class="family-member-role-input" 
+              data-member-id="${member.id}"
+              value="${escapeHtml(member.role)}"
+              placeholder="e.g., Spouse, Child"
+            >
+          </div>
+
+          <div>
+            <label>Icon</label>
+            <div class="family-member-icon-selector">
+              ${iconOptions.map(icon => `
+                <button 
+                  type="button" 
+                  class="icon-option ${icon === member.icon ? 'selected' : ''}" 
+                  data-member-id="${member.id}"
+                  data-icon="${icon}"
+                  title="${icon}"
+                >
+                  ${icon}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+
+        <div class="family-member-preview">
+          <div class="family-member-preview-icon">${member.icon}</div>
+          <div class="family-member-preview-info">
+            <div class="family-member-preview-name">${escapeHtml(member.name)}</div>
+            <div class="family-member-preview-role">${escapeHtml(member.role)}</div>
+          </div>
+          <div class="family-member-status ${member.active ? 'active' : 'inactive'}">
+            ${member.active ? 'Active' : 'Inactive'}
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+    // Add event listeners
+    setupFamilyMembersEventListeners();
+    
+    // Update "Add More Members" button visibility
+    updateAddMoreButtonVisibility();
+  } catch (error) {
+    console.error('Error loading family members UI:', error);
+    familyMembersGrid.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Error loading family members</p>';
+  }
+}
+
+// Update "Add More Members" button visibility
+function updateAddMoreButtonVisibility() {
+  const addMoreBtn = document.getElementById('addMoreMembersBtn');
+  if (!addMoreBtn) return;
+  
+  const members = getFamilyMembers();
+  addMoreBtn.style.display = members.length >= 10 ? 'none' : 'inline-flex';
+}
+
+// Setup event listeners for family members
+function setupFamilyMembersEventListeners() {
+  // Checkbox listeners
+  document.querySelectorAll('.family-member-checkbox').forEach(checkbox => {
+    checkbox.addEventListener('change', (e) => {
+      const slot = e.target.closest('.family-member-slot');
+      if (e.target.checked) {
+        slot.classList.add('active');
+      } else {
+        slot.classList.remove('active');
+      }
+      updateFamilyMemberPreview(e.target.dataset.memberId);
+    });
+  });
+
+  // Name input listeners
+  document.querySelectorAll('.family-member-name-input').forEach(input => {
+    input.addEventListener('input', (e) => {
+      updateFamilyMemberPreview(e.target.dataset.memberId);
+    });
+  });
+
+  // Role input listeners
+  document.querySelectorAll('.family-member-role-input').forEach(input => {
+    input.addEventListener('input', (e) => {
+      updateFamilyMemberPreview(e.target.dataset.memberId);
+    });
+  });
+
+  // Icon option listeners
+  document.querySelectorAll('.icon-option').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const memberId = e.target.dataset.memberId;
+      const slot = document.querySelector(`[data-member-id="${memberId}"]`);
+      
+      // Remove selected class from all icons in this slot
+      slot.querySelectorAll('.icon-option').forEach(opt => opt.classList.remove('selected'));
+      
+      // Add selected class to clicked icon
+      e.target.classList.add('selected');
+      
+      updateFamilyMemberPreview(memberId);
+    });
+  });
+
+  // Delete button listeners (for extra members)
+  document.querySelectorAll('.btn-delete-member').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const memberId = e.target.closest('.btn-delete-member').dataset.memberId;
+      deleteFamilyMember(memberId);
+    });
+  });
+}
+
+// Update family member preview
+function updateFamilyMemberPreview(memberId) {
+  const slot = document.querySelector(`[data-member-id="${memberId}"]`);
+  if (!slot) return;
+
+  const name = slot.querySelector('.family-member-name-input').value || 'Unnamed';
+  const role = slot.querySelector('.family-member-role-input').value || 'Family Member';
+  const icon = slot.querySelector('.icon-option.selected').dataset.icon || '👤';
+  const isActive = slot.querySelector('.family-member-checkbox').checked;
+
+  const preview = slot.querySelector('.family-member-preview');
+  preview.querySelector('.family-member-preview-icon').textContent = icon;
+  preview.querySelector('.family-member-preview-name').textContent = name;
+  preview.querySelector('.family-member-preview-role').textContent = role;
+  
+  const status = preview.querySelector('.family-member-status');
+  status.textContent = isActive ? 'Active' : 'Inactive';
+  status.classList.remove('active', 'inactive');
+  status.classList.add(isActive ? 'active' : 'inactive');
+}
+
+// Add more family members
+async function addMoreMembers() {
+  try {
+    const members = getFamilyMembers();
+    
+    if (members.length >= 10) {
+      toast.warning('Maximum 10 family members allowed');
+      return;
+    }
+
+    // Create new member
+    const newMember = {
+      id: 'member-' + Date.now(),
+      name: `Member ${members.length + 1}`,
+      icon: '👤',
+      role: 'Family Member',
+      active: false
+    };
+
+    members.push(newMember);
+    localStorage.setItem('familyMembers', JSON.stringify(members));
+    
+    await loadFamilyMembersUI();
+    toast.success('New family member added');
+  } catch (error) {
+    console.error('Error adding family member:', error);
+    toast.error('Failed to add family member');
+  }
+}
+
+// Delete family member
+async function deleteFamilyMember(memberId) {
+  try {
+    const confirmed = await confirmationModal.show({
+      title: 'Delete Family Member',
+      message: 'Are you sure you want to delete this family member?',
+      confirmText: 'Delete',
+      cancelText: 'Cancel'
+    });
+
+    if (confirmed) {
+      const members = getFamilyMembers();
+      const filtered = members.filter(m => m.id !== memberId);
+      localStorage.setItem('familyMembers', JSON.stringify(filtered));
+      
+      await loadFamilyMembersUI();
+      toast.success('Family member deleted');
+    }
+  } catch (error) {
+    console.error('Error deleting family member:', error);
+    toast.error('Failed to delete family member');
+  }
+}
+
+// Handle save family members
+async function handleSaveFamilyMembers() {
+  try {
+    const members = [];
+    document.querySelectorAll('.family-member-slot').forEach((slot, index) => {
+      const memberId = slot.dataset.memberId;
+      const name = slot.querySelector('.family-member-name-input').value;
+      const role = slot.querySelector('.family-member-role-input').value;
+      const icon = slot.querySelector('.icon-option.selected').dataset.icon;
+      const active = slot.querySelector('.family-member-checkbox').checked;
+
+      members.push({
+        id: memberId,
+        name: name || `Member ${index + 1}`,
+        role: role || 'Family Member',
+        icon: icon || '👤',
+        active: active
+      });
+    });
+
+    localStorage.setItem('familyMembers', JSON.stringify(members));
+    toast.success('Family members saved successfully');
+  } catch (error) {
+    console.error('Error saving family members:', error);
+    toast.error('Failed to save family members');
+  }
+}
+
+// Handle reset family members
+async function handleResetFamilyMembers() {
+  try {
+    const confirmed = await confirmationModal.show({
+      title: 'Reset Family Members',
+      message: 'Are you sure you want to reset all family members to default values?',
+      confirmText: 'Reset',
+      cancelText: 'Cancel'
+    });
+
+    if (confirmed) {
+      const defaultMembers = getDefaultFamilyMembers();
+      localStorage.setItem('familyMembers', JSON.stringify(defaultMembers));
+      await loadFamilyMembersUI();
+      toast.success('Family members reset to defaults');
+    }
+  } catch (error) {
+    console.error('Error resetting family members:', error);
+    toast.error('Failed to reset family members');
+  }
+}
 
 // Expose functions to window
 window.deleteExpenseCategory = deleteExpenseCategory;
@@ -1267,3 +1584,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+
+
+

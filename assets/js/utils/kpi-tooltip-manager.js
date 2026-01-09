@@ -223,5 +223,3 @@ class KPITooltipManager {
 // Initialize on page load
 const kpiTooltipManager = new KPITooltipManager();
 kpiTooltipManager.init();
-
-export default kpiTooltipManager;

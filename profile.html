@@ -197,6 +197,12 @@
           </svg>
           <span>Payment Methods</span>
         </button>
+        <button class="tab-btn" data-tab="family">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-2a6 6 0 0112 0v2zm6-11a3 3 0 11-6 0 3 3 0 016 0zM18 21h3v-2a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+          </svg>
+          <span>Family Members</span>
+        </button>
         <button class="tab-btn" data-tab="preferences">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
@@ -589,6 +595,39 @@
                   <div class="spinner"></div>
                   <p>Loading payment methods...</p>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Family Members Tab -->
+        <div class="tab-content" id="family-tab">
+          <div class="settings-card">
+            <div class="settings-card-header">
+              <h2 class="settings-card-title">Family Members</h2>
+              <p class="settings-card-subtitle">Add and manage your family members for expense splitting</p>
+            </div>
+            <div class="settings-card-body">
+              <div class="family-members-info">
+                <p>Manage your family members for expense splitting. You can add up to 10 members.</p>
+              </div>
+
+              <div class="family-members-grid" id="familyMembersGrid">
+                <!-- Family member slots will be loaded here -->
+              </div>
+
+              <div class="family-members-actions">
+                <button type="button" class="btn btn-outline" id="addMoreMembersBtn">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                  </svg>
+                  Add More Members
+                </button>
+              </div>
+
+              <div class="form-actions">
+                <button type="button" class="btn btn-primary" id="saveFamilyMembersBtn">Save Family Members</button>
+                <button type="button" class="btn btn-outline" id="resetFamilyMembersBtn">Reset to Defaults</button>
               </div>
             </div>
           </div>

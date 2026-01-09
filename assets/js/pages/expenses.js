@@ -190,6 +190,9 @@ async function initPage() {
     // Initialize categories
     await categoriesService.initializeCategories();
     
+    // Initialize family members (creates defaults if none exist)
+    initializeFamilyMembers();
+    
     // Load categories into dropdowns
     await loadCategoryDropdowns();
     
@@ -235,7 +238,22 @@ async function loadCategoryDropdowns() {
 
 // Load family members into filter dropdown
 async function loadFamilyMemberFilter() {
-  // Family member filtering has been removed
+  const familyMemberFilter = document.getElementById('familyMemberFilter');
+  if (!familyMemberFilter) return;
+  
+  try {
+    const familyMembers = getActiveFamilyMembers();
+    
+    if (familyMembers && familyMembers.length > 0) {
+      const options = familyMembers.map(member => 
+        `<option value="${member.id}">${escapeHtml(member.name)}</option>`
+      ).join('');
+      
+      familyMemberFilter.innerHTML = '<option value="">All Members</option>' + options;
+    }
+  } catch (error) {
+    console.error('Error loading family member filter:', error);
+  }
 }
 
 // Handle payment method filter change (cascading filter)
@@ -913,18 +931,22 @@ async function loadFamilyMembersForSplit() {
   if (!splitMembersList) return;
   
   try {
-    // Family member splitting has been removed
-    splitMembersList.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Expense splitting feature is not available.</p>';
-    return;
+    // Get active family members for splitting
+    const familyMembers = getActiveFamilyMembers();
     
-    // Create input for each member
-    splitMembersList.innerHTML = members.map(member => {
+    if (!familyMembers || familyMembers.length === 0) {
+      splitMembersList.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">No active family members. Please enable members in your profile settings.</p>';
+      return;
+    }
+    
+    // Create input for each active member
+    splitMembersList.innerHTML = familyMembers.map(member => {
       return `
         <div class="split-member-item" data-member-id="${member.id}">
           <div class="split-member-avatar">${member.icon}</div>
           <div class="split-member-info">
             <div class="split-member-name">${escapeHtml(member.name)}</div>
-            <div class="split-member-role">${member.role}</div>
+            <div class="split-member-role">${member.role || 'Family Member'}</div>
           </div>
           <div class="split-member-input-wrapper">
             <span>₹</span>
@@ -953,6 +975,94 @@ async function loadFamilyMembersForSplit() {
   } catch (error) {
     console.error('Error loading family members:', error);
     splitMembersList.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Error loading family members</p>';
+  }
+}
+
+// Get family members from localStorage
+function getFamilyMembers() {
+  try {
+    const stored = localStorage.getItem('familyMembers');
+    if (stored) {
+      return JSON.parse(stored);
+    }
+    return getDefaultFamilyMembers();
+  } catch (error) {
+    console.error('Error getting family members:', error);
+    return getDefaultFamilyMembers();
+  }
+}
+
+// Get default family members (6 slots)
+function getDefaultFamilyMembers() {
+  return [
+    { id: 'member-1', name: 'Me', icon: '\u{1F468}', role: 'Self', active: true },
+    { id: 'member-2', name: 'Spouse', icon: '\u{1F469}', role: 'Spouse', active: true },
+    { id: 'member-3', name: 'Child 1', icon: '\u{1F467}', role: 'Child', active: true },
+    { id: 'member-4', name: 'Child 2', icon: '\u{1F466}', role: 'Child', active: true },
+    { id: 'member-5', name: 'Father', icon: '\u{1F474}', role: 'Parent', active: true },
+    { id: 'member-6', name: 'Mother', icon: '\u{1F475}', role: 'Parent', active: true }
+  ];
+}
+
+// Initialize default family members if none exist
+function initializeFamilyMembers() {
+  try {
+    const existing = localStorage.getItem('familyMembers');
+    if (!existing) {
+      const defaultMembers = getDefaultFamilyMembers();
+      localStorage.setItem('familyMembers', JSON.stringify(defaultMembers));
+      return defaultMembers;
+    }
+    return JSON.parse(existing);
+  } catch (error) {
+    console.error('Error initializing family members:', error);
+    return getDefaultFamilyMembers();
+  }
+}
+
+// Get active family members (for splitting)
+function getActiveFamilyMembers() {
+  const members = getFamilyMembers();
+  return members.filter(m => m.active);
+}
+
+// Update family member
+function updateFamilyMember(memberId, updates) {
+  try {
+    const members = getFamilyMembers();
+    const index = members.findIndex(m => m.id === memberId);
+    if (index !== -1) {
+      members[index] = { ...members[index], ...updates };
+      localStorage.setItem('familyMembers', JSON.stringify(members));
+      return members[index];
+    }
+    return null;
+  } catch (error) {
+    console.error('Error updating family member:', error);
+    return null;
+  }
+}
+
+// Save all family members
+function saveFamilyMembers(members) {
+  try {
+    localStorage.setItem('familyMembers', JSON.stringify(members));
+    return true;
+  } catch (error) {
+    console.error('Error saving family members:', error);
+    return false;
+  }
+}
+
+// Reset family members to defaults
+function resetFamilyMembers() {
+  try {
+    const defaultMembers = getDefaultFamilyMembers();
+    localStorage.setItem('familyMembers', JSON.stringify(defaultMembers));
+    return defaultMembers;
+  } catch (error) {
+    console.error('Error resetting family members:', error);
+    return getDefaultFamilyMembers();
   }
 }
 
