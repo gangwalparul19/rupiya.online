@@ -45,6 +45,9 @@ async function init() {
     return;
   }
 
+  // Preload Google Sheets data in background for faster symbol search
+  googleSheetsPriceService.preloadData();
+
   // Initialize DOM elements FIRST (before any function that uses them)
   initDOMElements();
 

@@ -1259,6 +1259,7 @@
   gap: 0.25rem;
   padding: 0.75rem;
   background: var(--white);
+  border: 2px solid var(--border-color);
   border-radius: var(--border-radius);
   text-align: center;
 }
@@ -1289,22 +1290,23 @@
 }
 
 .split-members-list {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 0.75rem;
   margin-bottom: 1rem;
 }
 
 .split-member-item {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
   padding: 0.75rem;
   background: var(--white);
   border: 2px solid var(--border-color);
   border-radius: var(--border-radius);
   transition: all 0.3s ease;
+  text-align: center;
 }
 
 .split-member-item:hover {
@@ -1329,12 +1331,12 @@
 .split-member-info {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-  min-width: 0;
+  gap: 0.125rem;
+  width: 100%;
 }
 
 .split-member-name {
-  font-size: 0.875rem;
+  font-size: 0.8rem;
   font-weight: 600;
   color: var(--text-primary);
   white-space: nowrap;
@@ -1343,29 +1345,31 @@
 }
 
 .split-member-role {
-  font-size: 0.75rem;
+  font-size: 0.65rem;
   color: var(--text-secondary);
 }
 
 .split-member-input-wrapper {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  min-width: 120px;
+  gap: 0.25rem;
+  width: 100%;
+  justify-content: center;
 }
 
 .split-member-input-wrapper span {
-  font-size: 1rem;
+  font-size: 0.875rem;
   font-weight: 600;
   color: var(--text-secondary);
 }
 
 .split-member-input-wrapper input {
   width: 100%;
-  padding: 0.5rem 0.75rem;
+  max-width: 80px;
+  padding: 0.4rem 0.5rem;
   border: 2px solid var(--border-color);
   border-radius: var(--border-radius);
-  font-size: 0.875rem;
+  font-size: 0.8rem;
   font-weight: 600;
   text-align: right;
   transition: all 0.3s ease;
@@ -1397,52 +1401,66 @@
 
 /* Mobile responsive */
 @media (max-width: 768px) {
+  /* Keep 3 columns for split summary on mobile */
   .split-summary {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, 1fr);
     gap: 0.5rem;
     padding-bottom: 0.75rem;
   }
   
   .split-summary-item {
-    padding: 0.5rem;
+    padding: 0.5rem 0.25rem;
+    border-width: 1px;
   }
   
   .split-summary-item span {
-    font-size: 0.7rem;
+    font-size: 0.55rem;
+    letter-spacing: 0.25px;
   }
   
   .split-summary-item strong {
-    font-size: 1rem;
+    font-size: 0.85rem;
+  }
+  
+  /* Keep 3 columns for split members on mobile */
+  .split-members-list {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
   }
   
   .split-member-item {
-    grid-template-columns: auto 1fr;
-    gap: 0.5rem;
-    padding: 0.5rem;
+    padding: 0.5rem 0.25rem;
+    gap: 0.375rem;
+    border-width: 1px;
   }
   
   .split-member-avatar {
-    width: 36px;
-    height: 36px;
-    font-size: 0.75rem;
-  }
-  
-  .split-member-name {
-    font-size: 0.8rem;
-  }
-  
-  .split-member-role {
+    width: 32px;
+    height: 32px;
     font-size: 0.7rem;
   }
   
+  .split-member-name {
+    font-size: 0.7rem;
+  }
+  
+  .split-member-role {
+    font-size: 0.55rem;
+    display: none;
+  }
+  
   .split-member-input-wrapper {
-    grid-column: 1 / -1;
-    min-width: 100%;
+    width: 100%;
+  }
+  
+  .split-member-input-wrapper span {
+    font-size: 0.75rem;
   }
   
   .split-member-input-wrapper input {
-    padding: 0.5rem;
-    font-size: 0.875rem;
+    padding: 0.35rem 0.4rem;
+    font-size: 0.75rem;
+    max-width: 60px;
   }
   
   #splitDetailsContainer {
@@ -1460,29 +1478,48 @@
 
 @media (max-width: 480px) {
   .split-summary {
-    gap: 0.4rem;
+    gap: 0.35rem;
   }
   
   .split-summary-item {
-    padding: 0.4rem;
+    padding: 0.4rem 0.2rem;
   }
   
   .split-summary-item span {
-    font-size: 0.65rem;
+    font-size: 0.5rem;
   }
   
   .split-summary-item strong {
-    font-size: 0.9rem;
+    font-size: 0.75rem;
+  }
+  
+  .split-members-list {
+    gap: 0.35rem;
   }
   
   .split-member-item {
-    padding: 0.4rem;
+    padding: 0.4rem 0.2rem;
+    gap: 0.25rem;
   }
   
   .split-member-avatar {
-    width: 32px;
-    height: 32px;
-    font-size: 0.7rem;
+    width: 28px;
+    height: 28px;
+    font-size: 0.6rem;
+  }
+  
+  .split-member-name {
+    font-size: 0.6rem;
+  }
+  
+  .split-member-input-wrapper span {
+    font-size: 0.65rem;
+  }
+  
+  .split-member-input-wrapper input {
+    padding: 0.3rem 0.35rem;
+    font-size: 0.65rem;
+    max-width: 50px;
   }
 }
 
@@ -1522,28 +1559,36 @@
 }
 
 .expense-split-list {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 0.5rem;
 }
 
 .expense-split-item {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
   padding: 0.5rem;
   background: var(--white);
+  border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
+  text-align: center;
+  gap: 0.25rem;
 }
 
 .expense-split-item .split-member {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: var(--text-primary);
   font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .expense-split-item .split-amount {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 700;
   color: var(--primary-blue);
 }
@@ -1555,24 +1600,48 @@
   }
   
   .expense-split-header {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     margin-bottom: 0.4rem;
   }
   
+  .expense-split-list {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.35rem;
+  }
+  
   .expense-split-item {
-    padding: 0.4rem;
+    padding: 0.35rem 0.25rem;
+    gap: 0.15rem;
   }
   
   .expense-split-item .split-member {
-    font-size: 0.75rem;
+    font-size: 0.65rem;
   }
   
   .expense-split-item .split-amount {
-    font-size: 0.8rem;
+    font-size: 0.7rem;
   }
   
   .split-badge {
-    font-size: 0.65rem;
-    padding: 2px 6px;
+    font-size: 0.6rem;
+    padding: 2px 5px;
+  }
+}
+
+@media (max-width: 480px) {
+  .expense-split-list {
+    gap: 0.25rem;
+  }
+  
+  .expense-split-item {
+    padding: 0.3rem 0.2rem;
+  }
+  
+  .expense-split-item .split-member {
+    font-size: 0.55rem;
+  }
+  
+  .expense-split-item .split-amount {
+    font-size: 0.6rem;
   }
 }

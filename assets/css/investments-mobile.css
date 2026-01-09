@@ -139,6 +139,8 @@
     border: 1px solid #ddd;
     width: 100%;
     box-sizing: border-box;
+    background: #FFFFFF !important;
+    background-color: #FFFFFF !important;
   }
 
   .form-group textarea {
@@ -544,6 +546,8 @@
   .form-group select,
   .form-group textarea {
     padding: 10px;
+    background: #FFFFFF !important;
+    background-color: #FFFFFF !important;
   }
 
   .investment-card-body {
@@ -566,6 +570,8 @@
   .form-group textarea {
     padding: 12px;
     font-size: 16px;
+    background: #FFFFFF !important;
+    background-color: #FFFFFF !important;
   }
 
   .symbol-item {
@@ -616,64 +622,63 @@
   }
 }
 
-/* Dark mode adjustments for mobile */
-@media (prefers-color-scheme: dark) {
-  .portfolio-summary {
-    background: var(--bg-secondary);
-  }
+/* Dark mode adjustments for mobile - only when explicitly set */
+[data-theme="dark"] .portfolio-summary {
+  background: var(--bg-secondary);
+}
 
-  .summary-card {
-    background: var(--bg-card);
-    border-color: var(--border-color);
-  }
+[data-theme="dark"] .summary-card {
+  background: var(--bg-card);
+  border-color: var(--border-color);
+}
 
-  .investment-card {
-    background: var(--bg-card);
-    border-color: var(--border-color);
-  }
+[data-theme="dark"] .investment-card {
+  background: var(--bg-card);
+  border-color: var(--border-color);
+}
 
-  .investment-returns-row {
-    border-top-color: var(--border-color);
-  }
+[data-theme="dark"] .investment-returns-row {
+  border-top-color: var(--border-color);
+}
 
-  .investment-card-footer {
-    border-top-color: var(--border-color);
-    background: var(--bg-secondary);
-  }
+[data-theme="dark"] .investment-card-footer {
+  border-top-color: var(--border-color);
+  background: var(--bg-secondary);
+}
 
-  .investment-notes {
-    background: var(--bg-secondary);
-    border-top-color: var(--border-color);
-  }
+[data-theme="dark"] .investment-notes {
+  background: var(--bg-secondary);
+  border-top-color: var(--border-color);
+}
 
-  .form-group input,
-  .form-group select,
-  .form-group textarea {
-    background: var(--bg-hover);
-    color: var(--text-primary);
-    border-color: var(--border-color);
-  }
+[data-theme="dark"] .form-group input,
+[data-theme="dark"] .form-group select,
+[data-theme="dark"] .form-group textarea {
+  background: var(--bg-hover) !important;
+  background-color: var(--bg-hover) !important;
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
 
-  .delete-info {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-  }
+[data-theme="dark"] .delete-info {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+}
 
-  .investment-type {
-    background: var(--bg-secondary);
-    color: var(--text-secondary);
-  }
+[data-theme="dark"] .investment-type {
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+}
 
-  .investment-symbol {
-    background: var(--bg-secondary);
-    color: var(--primary-blue);
-  }
+[data-theme="dark"] .investment-symbol {
+  background: var(--bg-secondary);
+  color: var(--primary-blue);
+}
 
-  .btn-icon {
-    background: var(--bg-secondary);
-  }
+[data-theme="dark"] .btn-icon {
+  background: var(--bg-secondary);
+}
 
-  .btn-icon.btn-danger {
-    background: rgba(244, 67, 54, 0.1);
-  }
+[data-theme="dark"] .btn-icon.btn-danger {
+  background: rgba(244, 67, 54, 0.1);
 }

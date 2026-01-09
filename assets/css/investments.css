@@ -298,6 +298,14 @@
   margin: 0;
 }
 
+/* Ensure all form inputs in add-investment-section have white background */
+.add-investment-section .form-group input,
+.add-investment-section .form-group select,
+.add-investment-section .form-group textarea {
+  background: #FFFFFF !important;
+  background-color: #FFFFFF !important;
+}
+
 /* Form Styles */
 .form-grid {
   display: grid;
@@ -334,7 +342,8 @@
   border-radius: 8px;
   font-size: 1rem;
   color: #2C3E50;
-  background: white;
+  background: white !important;
+  background-color: white !important;
   transition: all 0.25s ease;
   font-family: inherit;
   line-height: 1.5;

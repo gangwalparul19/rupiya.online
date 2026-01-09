@@ -14,6 +14,7 @@ class SymbolSearchService {
 
   /**
    * Search for symbols in Google Sheets data
+   * Optimized to only fetch the relevant sheet based on type
    */
   async searchSymbols(query, type = 'all', limit = 15) {
     if (!query || query.length < 1) {
@@ -30,10 +31,10 @@ class SymbolSearchService {
     try {
       console.log('Searching Google Sheets for:', query, 'type:', type);
       
-      // Use Google Sheets service to search
-      const results = await googleSheetsPriceService.searchSymbols(query, limit);
+      // Pass type to Google Sheets service for optimized sheet selection
+      const results = await googleSheetsPriceService.searchSymbols(query, limit, type);
       
-      // Filter by type if specified
+      // Filter by type if specified (additional filtering for edge cases)
       let filteredResults = results;
       if (type && type !== 'all') {
         filteredResults = results.filter(r => {
@@ -61,6 +62,7 @@ class SymbolSearchService {
         };
       });
 
+      // Cache for longer since data doesn't change frequently
       this.setCache(cacheKey, enhancedResults);
       console.log('Found results:', enhancedResults.length);
       return enhancedResults;

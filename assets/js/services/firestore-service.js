@@ -42,7 +42,9 @@ class FirestoreService {
       houseHelpPayments: 'houseHelpPayments',
       fuelLogs: 'fuelLogs',
       splits: 'splits',
-      paymentMethods: 'paymentMethods'
+      paymentMethods: 'paymentMethods',
+      transfers: 'transfers',
+      netWorthSnapshots: 'netWorthSnapshots'
     };
     
     // Cache configuration

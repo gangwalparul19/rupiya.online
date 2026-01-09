@@ -84,7 +84,9 @@ const navigationConfig = {
         { href: 'budgets.html', icon: '💳', label: 'Budgets' },
         { href: 'goals.html', icon: '🎯', label: 'Goals' },
         { href: 'investments.html', icon: '📈', label: 'Investments' },
-        { href: 'loans.html', icon: '🏦', label: 'Loans & EMI' }
+        { href: 'loans.html', icon: '🏦', label: 'Loans & EMI' },
+        { href: 'transfers.html', icon: '🔄', label: 'Transfers' },
+        { href: 'net-worth.html', icon: '💎', label: 'Net Worth' }
       ]
     },
     {

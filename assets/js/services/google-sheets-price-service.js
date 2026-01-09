@@ -20,6 +20,30 @@ class GoogleSheetsPriceService {
       stocks: 0,
       mutualFunds: 0
     };
+    
+    // Track ongoing fetch promises to prevent duplicate requests
+    this.fetchPromises = {
+      stocks: null,
+      mutualFunds: null
+    };
+    
+    // Flag to track if initial preload has been done
+    this.preloadStarted = false;
+  }
+
+  /**
+   * Preload data in background (call this early in app lifecycle)
+   * This prevents the first search from being slow
+   */
+  preloadData() {
+    if (this.preloadStarted) return;
+    this.preloadStarted = true;
+    
+    console.log('[GoogleSheets] Preloading data in background...');
+    // Fire and forget - don't await, let it load in background
+    this.getAllData().catch(err => {
+      console.warn('[GoogleSheets] Background preload failed:', err.message);
+    });
   }
 
   /**
@@ -87,79 +111,108 @@ class GoogleSheetsPriceService {
 
   /**
    * Fetch data from Google Sheets via serverless API
+   * Uses promise deduplication to prevent multiple simultaneous requests
    */
   async fetchSheetData(sheetType) {
     if (!['stocks', 'mutualFunds'].includes(sheetType)) {
       throw new Error(`Unknown sheet type: ${sheetType}`);
     }
 
-    try {
-      console.log(`[GoogleSheets] Fetching ${sheetType} data...`);
-      
-      const response = await fetch(`${this.API_ENDPOINT}?sheetType=${sheetType}`, {
-        method: 'GET',
-        headers: {
-          'Accept': 'text/plain, application/json',
-          'Content-Type': 'application/json'
-        },
-        mode: 'cors',
-        credentials: 'omit'
-      });
-      
-      console.log(`[GoogleSheets] Response status: ${response.status}`);
-      
-      if (!response.ok) {
-        // Try to get error details from response
-        let errorMessage = `Failed to fetch sheet: ${response.status}`;
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.message || errorData.error || errorMessage;
-          console.error('[GoogleSheets] API Error Details:', errorData);
-        } catch (e) {
-          // Response might not be JSON
-          const text = await response.text();
-          console.error('[GoogleSheets] API Error Response:', text);
-          errorMessage = text || errorMessage;
-        }
-        throw new Error(errorMessage);
-      }
-
-      const text = await response.text();
-      console.log(`[GoogleSheets] Received ${text.length} bytes`);
-      
-      const data = this.parseGoogleSheetsResponse(text);
-
-      // Store data
-      if (sheetType === 'stocks') {
-        this.stocksData = data;
-      } else if (sheetType === 'mutualFunds') {
-        this.mutualFundsData = data;
-      }
-
-      this.lastFetch[sheetType] = Date.now();
-      
-      console.log(`[GoogleSheets] Fetched ${data.length} rows from ${sheetType} sheet`);
-      return data;
-    } catch (error) {
-      console.error(`[GoogleSheets] Error fetching ${sheetType} sheet:`, error);
-      throw error;
+    // If there's already a fetch in progress for this sheet type, return that promise
+    if (this.fetchPromises[sheetType]) {
+      console.log(`[GoogleSheets] Reusing existing fetch promise for ${sheetType}`);
+      return this.fetchPromises[sheetType];
     }
+
+    // Create new fetch promise
+    this.fetchPromises[sheetType] = (async () => {
+      try {
+        console.log(`[GoogleSheets] Fetching ${sheetType} data...`);
+        
+        const response = await fetch(`${this.API_ENDPOINT}?sheetType=${sheetType}`, {
+          method: 'GET',
+          headers: {
+            'Accept': 'text/plain, application/json',
+            'Content-Type': 'application/json'
+          },
+          mode: 'cors',
+          credentials: 'omit'
+        });
+        
+        console.log(`[GoogleSheets] Response status: ${response.status}`);
+        
+        if (!response.ok) {
+          // Try to get error details from response
+          let errorMessage = `Failed to fetch sheet: ${response.status}`;
+          try {
+            const errorData = await response.json();
+            errorMessage = errorData.message || errorData.error || errorMessage;
+            console.error('[GoogleSheets] API Error Details:', errorData);
+          } catch (e) {
+            // Response might not be JSON
+            const text = await response.text();
+            console.error('[GoogleSheets] API Error Response:', text);
+            errorMessage = text || errorMessage;
+          }
+          throw new Error(errorMessage);
+        }
+
+        const text = await response.text();
+        console.log(`[GoogleSheets] Received ${text.length} bytes`);
+        
+        const data = this.parseGoogleSheetsResponse(text);
+
+        // Store data
+        if (sheetType === 'stocks') {
+          this.stocksData = data;
+        } else if (sheetType === 'mutualFunds') {
+          this.mutualFundsData = data;
+        }
+
+        this.lastFetch[sheetType] = Date.now();
+        
+        console.log(`[GoogleSheets] Fetched ${data.length} rows from ${sheetType} sheet`);
+        return data;
+      } finally {
+        // Clear the promise so future requests can fetch fresh data
+        this.fetchPromises[sheetType] = null;
+      }
+    })();
+
+    return this.fetchPromises[sheetType];
   }
 
   /**
    * Get all data (fetch if needed)
+   * Fetches both sheets in PARALLEL for faster loading
    */
   async getAllData() {
     const now = Date.now();
     
-    // Fetch stocks if cache expired
-    if (now - this.lastFetch.stocks > this.CACHE_DURATION) {
-      await this.fetchSheetData('stocks');
+    // Check which sheets need fetching
+    const needsStocks = now - this.lastFetch.stocks > this.CACHE_DURATION;
+    const needsMutualFunds = now - this.lastFetch.mutualFunds > this.CACHE_DURATION;
+
+    // Fetch both sheets in parallel if needed
+    const fetchPromises = [];
+    
+    if (needsStocks) {
+      fetchPromises.push(this.fetchSheetData('stocks').catch(err => {
+        console.warn('[GoogleSheets] Failed to fetch stocks:', err.message);
+        return null; // Don't fail completely if one sheet fails
+      }));
+    }
+    
+    if (needsMutualFunds) {
+      fetchPromises.push(this.fetchSheetData('mutualFunds').catch(err => {
+        console.warn('[GoogleSheets] Failed to fetch mutual funds:', err.message);
+        return null;
+      }));
     }
 
-    // Fetch mutual funds if cache expired
-    if (now - this.lastFetch.mutualFunds > this.CACHE_DURATION) {
-      await this.fetchSheetData('mutualFunds');
+    // Wait for all fetches to complete in parallel
+    if (fetchPromises.length > 0) {
+      await Promise.all(fetchPromises);
     }
 
     return {
@@ -453,6 +506,7 @@ class GoogleSheetsPriceService {
 
   /**
    * Search symbols (for autocomplete)
+   * Optimized to only fetch the relevant sheet based on type
    * 
    * STOCKS Sheet columns:
    * - Symbol_Name: Company/Asset name
@@ -465,15 +519,70 @@ class GoogleSheetsPriceService {
    * - Scheme Code: Fund code
    * - Scheme Name: Fund name
    * - Net Asset Value: NAV/Price
+   * 
+   * @param {string} query - Search query
+   * @param {number} limit - Max results to return
+   * @param {string} type - Investment type filter ('all', 'Stocks', 'Cryptocurrency', 'Mutual Funds', etc.)
    */
-  async searchSymbols(query, limit = 10) {
-    const allData = await this.getAllData();
+  async searchSymbols(query, limit = 10, type = 'all') {
     const queryUpper = query.toUpperCase();
-
     const results = [];
+    const now = Date.now();
+    
+    // Determine which sheets to search based on type
+    const typeUpper = (type || 'all').toUpperCase();
+    const needsStocksSheet = typeUpper === 'ALL' || 
+                             typeUpper.includes('STOCK') || 
+                             typeUpper.includes('CRYPTO') ||
+                             typeUpper.includes('GOLD') ||
+                             typeUpper.includes('OTHER');
+    const needsMutualFundsSheet = typeUpper === 'ALL' || 
+                                   typeUpper.includes('MUTUAL') || 
+                                   typeUpper.includes('FUND');
+    
+    console.log(`[GoogleSheets] Search type: ${type}, needsStocks: ${needsStocksSheet}, needsMF: ${needsMutualFundsSheet}`);
+    
+    // Only fetch the sheets we need
+    let stocksData = [];
+    let mutualFundsData = [];
+    
+    if (needsStocksSheet) {
+      // Use cached data if available, otherwise fetch only stocks sheet
+      if (this.stocksData.length > 0) {
+        stocksData = this.stocksData;
+        // Trigger background refresh if stale
+        if (now - this.lastFetch.stocks > this.CACHE_DURATION) {
+          this.fetchSheetData('stocks').catch(err => {
+            console.warn('[GoogleSheets] Background stocks refresh failed:', err.message);
+          });
+        }
+      } else {
+        // Need to fetch stocks sheet
+        await this.fetchSheetData('stocks');
+        stocksData = this.stocksData;
+      }
+    }
+    
+    if (needsMutualFundsSheet) {
+      // Use cached data if available, otherwise fetch only mutual funds sheet
+      if (this.mutualFundsData.length > 0) {
+        mutualFundsData = this.mutualFundsData;
+        // Trigger background refresh if stale
+        if (now - this.lastFetch.mutualFunds > this.CACHE_DURATION) {
+          this.fetchSheetData('mutualFunds').catch(err => {
+            console.warn('[GoogleSheets] Background MF refresh failed:', err.message);
+          });
+        }
+      } else {
+        // Need to fetch mutual funds sheet
+        await this.fetchSheetData('mutualFunds');
+        mutualFundsData = this.mutualFundsData;
+      }
+    }
 
-    // Search in stocks
-    allData.stocks.forEach(row => {
+    // Search in stocks (only if needed)
+    if (needsStocksSheet) {
+      stocksData.forEach(row => {
       // Get symbol from Symbol column
       let symbol = (row.Symbol || row.symbol || row.Ticker || row.ticker || '').toString();
       
@@ -525,9 +634,11 @@ class GoogleSheetsPriceService {
         });
       }
     });
+    }
 
-    // Search in mutual funds
-    allData.mutualFunds.forEach(row => {
+    // Search in mutual funds (only if needed)
+    if (needsMutualFundsSheet) {
+    mutualFundsData.forEach(row => {
       // Get symbol from Scheme Code column
       const symbol = this.stripExchangePrefix(
         (row['Scheme Code'] || row.scheme_code || row['Scheme_Code'] || row.SchemeCode ||
@@ -552,6 +663,7 @@ class GoogleSheetsPriceService {
         });
       }
     });
+    }
 
     console.log('Search results:', results);
     return results.slice(0, limit);

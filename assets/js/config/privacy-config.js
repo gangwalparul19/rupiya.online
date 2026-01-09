@@ -64,7 +64,9 @@ export const privacyConfig = {
     'paymentMethods',
     'tripGroupExpenses',
     'tripGroupSettlements',
-    'tripGroupMembers'       // Member info (name, email, phone)
+    'tripGroupMembers',      // Member info (name, email, phone)
+    'transfers',             // Money transfers between accounts
+    'netWorthSnapshots'      // Net worth history snapshots
     // NOTE: familyGroups and familyInvitations are NOT encrypted because:
     // - They are shared across multiple users
     // - Each user has a different encryption key (derived from their userId)

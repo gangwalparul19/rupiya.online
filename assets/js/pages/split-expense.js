@@ -194,12 +194,14 @@ function createSplitCard(split) {
       </div>
       <div class="split-participants">
         <div class="split-participants-title">Participants</div>
-        ${split.participants.map(p => `
-          <div class="split-participant-item">
-            <span class="split-participant-name">${escapeHtml(p.name)}</span>
-            <span class="split-participant-amount ${p.name === 'Me' ? (split.paidBy === 'me' ? 'owed' : 'owes') : (split.paidBy === 'me' ? 'owes' : 'owed')}">${formatCurrency(p.amount)}</span>
-          </div>
-        `).join('')}
+        <div class="split-participants-grid">
+          ${split.participants.map(p => `
+            <div class="split-participant-item">
+              <span class="split-participant-name">${escapeHtml(p.name)}</span>
+              <span class="split-participant-amount ${p.name === 'Me' ? (split.paidBy === 'me' ? 'owed' : 'owes') : (split.paidBy === 'me' ? 'owes' : 'owed')}">${formatCurrency(p.amount)}</span>
+            </div>
+          `).join('')}
+        </div>
       </div>
       ${split.status === 'settled' && escapedSettleNotes ? `
         <div class="split-card-meta">
