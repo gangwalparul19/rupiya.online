@@ -18,7 +18,7 @@ async function encryptExistingNotes() {
     }
     
     // Wait for encryption to be ready
-    await encryptionService.waitForRestore();
+    await encryptionService.waitForInitialization();
     if (!encryptionService.isReady()) {
       console.error('Encryption service not ready');
       return;

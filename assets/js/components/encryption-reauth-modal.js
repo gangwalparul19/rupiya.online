@@ -216,32 +216,28 @@ class EncryptionReauthModal {
   }
 
   // Check if reauth is needed and show modal
+  // V5: Encryption is now automatic - this always succeeds without prompts
   async checkAndPrompt(onSuccess = null) {
     const user = authService.getCurrentUser();
     if (!user) return false;
 
-    // Check if encryption is needed but not initialized
+    // V5: Encryption is automatic for all users - no reauth needed
+    // Check if encryption is initialized, if not, initialize automatically
     const needsReinit = await authEncryptionHelper.needsReinitialization();
+    
+    // In V5, needsReinitialization handles auto-init and only returns true if it completely failed
+    // This should be extremely rare
     if (needsReinit) {
-      // Don't prompt for Google users
-      if (authEncryptionHelper.isGoogleUser()) {
-        console.log('[EncryptionReauth] Google user - encryption not available');
-        // Still call onSuccess for Google users so data loads
-        if (onSuccess) {
-          onSuccess();
-        }
-        return false;
-      }
-
-      this.show('Please enter your password to decrypt your data', onSuccess);
-      return true;
+      console.warn('[EncryptionReauth] Encryption auto-init failed - this is unusual');
+      // Even if init failed, still call onSuccess so app doesn't hang
+      // Data will just not be decrypted
     }
 
-    // Encryption is ready, call onSuccess
+    // Always call onSuccess - encryption is automatic
     if (onSuccess) {
       onSuccess();
     }
-    return false;
+    return false; // Never show modal in V5
   }
 }
 
