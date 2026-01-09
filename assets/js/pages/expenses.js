@@ -6,6 +6,7 @@ import categoriesService from '../services/categories-service.js';
 import paymentMethodsService from '../services/payment-methods-service.js';
 import smartCategorizationService from '../services/smart-categorization-service.js';
 import encryptionService from '../services/encryption-service.js';
+import loadingService from '../services/loading-service.js';
 import toast from '../components/toast.js';
 import confirmationModal from '../components/confirmation-modal.js';
 import themeManager from '../utils/theme-manager.js';
@@ -316,7 +317,8 @@ function checkURLParameters() {
 // Load expenses from Firestore
 async function loadExpenses() {
   try {
-    loadingState.style.display = 'flex';
+    // Show skeleton screen instead of spinner
+    const skeleton = loadingService.showLoading(loadingState, 'list');
     emptyState.style.display = 'none';
     expensesList.style.display = 'none';
     

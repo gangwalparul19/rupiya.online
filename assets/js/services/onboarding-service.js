@@ -1,351 +1,416 @@
-// Onboarding Service - Interactive Tutorial, Demo Mode, Quick Setup
-import { db } from '../config/firebase-config.js';
-import {
-  doc,
-  getDoc,
-  setDoc,
-  updateDoc,
-  Timestamp
-} from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
-import authService from './auth-service.js';
-
-// Onboarding Steps
-const ONBOARDING_STEPS = [
-  {
-    id: 'welcome',
-    title: 'Welcome to Rupiya! 🎉',
-    description: 'Your personal finance companion. Let\'s get you set up in just 2 minutes.',
-    target: null,
-    position: 'center'
-  },
-  {
-    id: 'dashboard',
-    title: 'Your Dashboard',
-    description: 'This is your financial command center. See income, expenses, and savings at a glance.',
-    target: '.kpi-grid',
-    position: 'bottom'
-  },
-  {
-    id: 'add_expense',
-    title: 'Track Expenses',
-    description: 'Click here to add your first expense. Categorize and track every rupee.',
-    target: '[href="expenses.html"]',
-    position: 'right'
-  },
-  {
-    id: 'add_income',
-    title: 'Record Income',
-    description: 'Log your salary, freelance income, or any money coming in.',
-    target: '[href="income.html"]',
-    position: 'right'
-  },
-  {
-    id: 'budgets',
-    title: 'Set Budgets',
-    description: 'Create monthly budgets to control your spending and save more.',
-    target: '[href="budgets.html"]',
-    position: 'right'
-  },
-  {
-    id: 'goals',
-    title: 'Financial Goals',
-    description: 'Set savings goals and track your progress towards them.',
-    target: '[href="goals.html"]',
-    position: 'right'
-  },
-  {
-    id: 'complete',
-    title: 'You\'re All Set! 🚀',
-    description: 'Start by adding your first expense or income. We\'ll help you along the way!',
-    target: null,
-    position: 'center'
-  }
-];
-
-// Demo Data for exploration
-const DEMO_DATA = {
-  expenses: [
-    { description: 'Grocery Shopping', amount: 2500, category: 'Food', date: new Date() },
-    { description: 'Electricity Bill', amount: 1800, category: 'Utilities', date: new Date() },
-    { description: 'Netflix Subscription', amount: 649, category: 'Entertainment', date: new Date() },
-    { description: 'Petrol', amount: 3000, category: 'Transport', date: new Date() },
-    { description: 'Restaurant Dinner', amount: 1200, category: 'Food', date: new Date() }
-  ],
-  income: [
-    { description: 'Monthly Salary', amount: 75000, category: 'Salary', date: new Date() },
-    { description: 'Freelance Project', amount: 15000, category: 'Freelance', date: new Date() }
-  ],
-  budgets: [
-    { category: 'Food', limit: 8000, spent: 3700 },
-    { category: 'Transport', limit: 5000, spent: 3000 },
-    { category: 'Entertainment', limit: 3000, spent: 649 },
-    { category: 'Utilities', limit: 4000, spent: 1800 }
-  ],
-  goals: [
-    { name: 'Emergency Fund', target: 100000, current: 45000, deadline: '2026-06-30' },
-    { name: 'New Laptop', target: 80000, current: 25000, deadline: '2026-03-31' }
-  ]
-};
-
-// Quick Setup Templates
-const BUDGET_TEMPLATES = {
-  student: {
-    name: 'Student Budget',
-    icon: '🎓',
-    budgets: [
-      { category: 'Food', limit: 5000 },
-      { category: 'Transport', limit: 2000 },
-      { category: 'Education', limit: 3000 },
-      { category: 'Entertainment', limit: 1500 }
-    ]
-  },
-  professional: {
-    name: 'Working Professional',
-    icon: '💼',
-    budgets: [
-      { category: 'Food', limit: 8000 },
-      { category: 'Transport', limit: 5000 },
-      { category: 'Utilities', limit: 4000 },
-      { category: 'Entertainment', limit: 3000 },
-      { category: 'Shopping', limit: 5000 }
-    ]
-  },
-  family: {
-    name: 'Family Budget',
-    icon: '👨‍👩‍👧‍👦',
-    budgets: [
-      { category: 'Food', limit: 15000 },
-      { category: 'Utilities', limit: 6000 },
-      { category: 'Education', limit: 10000 },
-      { category: 'Healthcare', limit: 5000 },
-      { category: 'Entertainment', limit: 4000 }
-    ]
-  },
-  frugal: {
-    name: 'Frugal Saver',
-    icon: '💰',
-    budgets: [
-      { category: 'Food', limit: 4000 },
-      { category: 'Transport', limit: 1500 },
-      { category: 'Utilities', limit: 2500 },
-      { category: 'Entertainment', limit: 1000 }
-    ]
-  }
-};
+// Onboarding Service
+// Manages first-time user experience and guided tours
 
 class OnboardingService {
   constructor() {
-    this.steps = ONBOARDING_STEPS;
-    this.demoData = DEMO_DATA;
-    this.budgetTemplates = BUDGET_TEMPLATES;
     this.currentStep = 0;
-    this.overlay = null;
-    this.tooltip = null;
+    this.completedSteps = new Set();
+    this.onboardingSteps = [];
+    this.isOnboardingComplete = false;
+    this.loadOnboardingState();
   }
 
-  getUserId() {
-    const user = authService.getCurrentUser();
-    return user?.uid || null;
-  }
-
-  // Check if user needs onboarding
-  async needsOnboarding() {
-    const userId = this.getUserId();
-    if (!userId) return false;
-
-    try {
-      const docRef = doc(db, 'userPreferences', userId);
-      const docSnap = await getDoc(docRef);
-      
-      if (!docSnap.exists()) return true;
-      
-      const data = docSnap.data();
-      return !data.onboardingCompleted;
-    } catch (error) {
-      console.error('Error checking onboarding status:', error);
-      return false;
-    }
-  }
-
-  // Mark onboarding as complete
-  async completeOnboarding() {
-    const userId = this.getUserId();
-    if (!userId) return;
-
-    try {
-      const docRef = doc(db, 'userPreferences', userId);
-      await setDoc(docRef, {
-        onboardingCompleted: true,
-        onboardingCompletedAt: Timestamp.now()
-      }, { merge: true });
-    } catch (error) {
-      console.error('Error completing onboarding:', error);
-    }
-  }
-
-  // Start interactive tutorial
-  startTutorial() {
-    this.currentStep = 0;
-    this.createOverlay();
-    this.showStep(0);
-  }
-
-  createOverlay() {
-    // Remove existing overlay
-    this.removeOverlay();
-
-    // Create overlay
-    this.overlay = document.createElement('div');
-    this.overlay.className = 'onboarding-overlay';
-    this.overlay.innerHTML = `<div class="onboarding-backdrop"></div>`;
-    document.body.appendChild(this.overlay);
-
-    // Create tooltip
-    this.tooltip = document.createElement('div');
-    this.tooltip.className = 'onboarding-tooltip';
-    document.body.appendChild(this.tooltip);
-  }
-
-  removeOverlay() {
-    if (this.overlay) {
-      this.overlay.remove();
-      this.overlay = null;
-    }
-    if (this.tooltip) {
-      this.tooltip.remove();
-      this.tooltip = null;
-    }
-    document.querySelectorAll('.onboarding-highlight').forEach(el => {
-      el.classList.remove('onboarding-highlight');
-    });
-  }
-
-  showStep(index) {
-    if (index >= this.steps.length) {
-      this.finishTutorial();
-      return;
-    }
-
-    const step = this.steps[index];
-    this.currentStep = index;
-
-    // Remove previous highlights
-    document.querySelectorAll('.onboarding-highlight').forEach(el => {
-      el.classList.remove('onboarding-highlight');
-    });
-
-    // Find and highlight target
-    let targetEl = null;
-    if (step.target) {
-      targetEl = document.querySelector(step.target);
-      if (targetEl) {
-        targetEl.classList.add('onboarding-highlight');
-        targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  /**
+   * Define onboarding steps
+   */
+  defineSteps() {
+    this.onboardingSteps = [
+      {
+        id: 'welcome',
+        title: 'Welcome to Rupiya',
+        subtitle: 'Your Personal Finance Tracker',
+        icon: '👋',
+        description: 'Let\'s get you started with managing your finances effectively.',
+        content: `
+          <div class="onboarding-step-content">
+            <p>Rupiya helps you track expenses, manage budgets, and achieve your financial goals.</p>
+            <p>This quick tour will show you the key features.</p>
+          </div>
+        `,
+        action: null
+      },
+      {
+        id: 'dashboard',
+        title: 'Dashboard Overview',
+        subtitle: 'Your Financial Snapshot',
+        icon: '📊',
+        description: 'The dashboard shows your key financial metrics at a glance.',
+        content: `
+          <div class="onboarding-step-content">
+            <div class="onboarding-checklist">
+              <div class="onboarding-checklist-item">
+                <div class="onboarding-checklist-checkbox"></div>
+                <div class="onboarding-checklist-text">
+                  <p class="onboarding-checklist-label">Total Balance</p>
+                  <p class="onboarding-checklist-hint">Your net worth across all accounts</p>
+                </div>
+              </div>
+              <div class="onboarding-checklist-item">
+                <div class="onboarding-checklist-checkbox"></div>
+                <div class="onboarding-checklist-text">
+                  <p class="onboarding-checklist-label">Monthly Income</p>
+                  <p class="onboarding-checklist-hint">Total income this month</p>
+                </div>
+              </div>
+              <div class="onboarding-checklist-item">
+                <div class="onboarding-checklist-checkbox"></div>
+                <div class="onboarding-checklist-text">
+                  <p class="onboarding-checklist-label">Monthly Expenses</p>
+                  <p class="onboarding-checklist-hint">Total spending this month</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        `,
+        action: 'dashboard'
+      },
+      {
+        id: 'expenses',
+        title: 'Track Expenses',
+        subtitle: 'Record Your Spending',
+        icon: '💸',
+        description: 'Easily add and categorize your expenses.',
+        content: `
+          <div class="onboarding-step-content">
+            <p>Click the "Add Expense" button to record a new expense. You can:</p>
+            <div class="onboarding-checklist">
+              <div class="onboarding-checklist-item">
+                <div class="onboarding-checklist-checkbox"></div>
+                <div class="onboarding-checklist-text">
+                  <p class="onboarding-checklist-label">Set amount and category</p>
+                </div>
+              </div>
+              <div class="onboarding-checklist-item">
+                <div class="onboarding-checklist-checkbox"></div>
+                <div class="onboarding-checklist-text">
+                  <p class="onboarding-checklist-label">Add description and date</p>
+                </div>
+              </div>
+              <div class="onboarding-checklist-item">
+                <div class="onboarding-checklist-checkbox"></div>
+                <div class="onboarding-checklist-text">
+                  <p class="onboarding-checklist-label">Mark as recurring if needed</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        `,
+        action: 'expenses'
+      },
+      {
+        id: 'budgets',
+        title: 'Set Budgets',
+        subtitle: 'Control Your Spending',
+        icon: '💰',
+        description: 'Create budgets to manage your spending by category.',
+        content: `
+          <div class="onboarding-step-content">
+            <p>Budgets help you stay on track with your financial goals.</p>
+            <div class="onboarding-checklist">
+              <div class="onboarding-checklist-item">
+                <div class="onboarding-checklist-checkbox"></div>
+                <div class="onboarding-checklist-text">
+                  <p class="onboarding-checklist-label">Create category budgets</p>
+                </div>
+              </div>
+              <div class="onboarding-checklist-item">
+                <div class="onboarding-checklist-checkbox"></div>
+                <div class="onboarding-checklist-text">
+                  <p class="onboarding-checklist-label">Get alerts when approaching limit</p>
+                </div>
+              </div>
+              <div class="onboarding-checklist-item">
+                <div class="onboarding-checklist-checkbox"></div>
+                <div class="onboarding-checklist-text">
+                  <p class="onboarding-checklist-label">Track progress visually</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        `,
+        action: 'budgets'
+      },
+      {
+        id: 'analytics',
+        title: 'View Analytics',
+        subtitle: 'Understand Your Finances',
+        icon: '📈',
+        description: 'Get insights into your spending patterns and financial health.',
+        content: `
+          <div class="onboarding-step-content">
+            <p>Analytics help you understand your financial behavior.</p>
+            <div class="onboarding-checklist">
+              <div class="onboarding-checklist-item">
+                <div class="onboarding-checklist-checkbox"></div>
+                <div class="onboarding-checklist-text">
+                  <p class="onboarding-checklist-label">View spending by category</p>
+                </div>
+              </div>
+              <div class="onboarding-checklist-item">
+                <div class="onboarding-checklist-checkbox"></div>
+                <div class="onboarding-checklist-text">
+                  <p class="onboarding-checklist-label">Track trends over time</p>
+                </div>
+              </div>
+              <div class="onboarding-checklist-item">
+                <div class="onboarding-checklist-checkbox"></div>
+                <div class="onboarding-checklist-text">
+                  <p class="onboarding-checklist-label">Compare periods</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        `,
+        action: 'analytics'
+      },
+      {
+        id: 'complete',
+        title: 'You\'re All Set!',
+        subtitle: 'Ready to Manage Your Finances',
+        icon: '🎉',
+        description: 'You\'ve completed the onboarding tour.',
+        content: `
+          <div class="onboarding-step-content">
+            <p>You now know the basics of Rupiya. Start by:</p>
+            <div class="onboarding-checklist">
+              <div class="onboarding-checklist-item">
+                <div class="onboarding-checklist-checkbox"></div>
+                <div class="onboarding-checklist-text">
+                  <p class="onboarding-checklist-label">Add your first expense</p>
+                </div>
+              </div>
+              <div class="onboarding-checklist-item">
+                <div class="onboarding-checklist-checkbox"></div>
+                <div class="onboarding-checklist-text">
+                  <p class="onboarding-checklist-label">Set up a budget</p>
+                </div>
+              </div>
+              <div class="onboarding-checklist-item">
+                <div class="onboarding-checklist-checkbox"></div>
+                <div class="onboarding-checklist-text">
+                  <p class="onboarding-checklist-label">Explore analytics</p>
+                </div>
+              </div>
+            </div>
+            <p style="margin-top: 1rem; font-size: 0.875rem; color: var(--text-secondary);">
+              You can always access this tour from Settings → Help & Tutorials
+            </p>
+          </div>
+        `,
+        action: null
       }
-    }
+    ];
+  }
 
-    // Update tooltip
-    this.tooltip.innerHTML = `
-      <div class="onboarding-tooltip-content">
-        <div class="onboarding-step-indicator">Step ${index + 1} of ${this.steps.length}</div>
-        <h3>${step.title}</h3>
-        <p>${step.description}</p>
-        <div class="onboarding-actions">
-          ${index > 0 ? '<button class="btn btn-sm btn-outline" id="onboardingPrev">Back</button>' : ''}
-          <button class="btn btn-sm btn-outline" id="onboardingSkip">Skip</button>
-          <button class="btn btn-sm btn-primary" id="onboardingNext">
-            ${index === this.steps.length - 1 ? 'Get Started' : 'Next'}
-          </button>
+  /**
+   * Start onboarding flow
+   */
+  startOnboarding() {
+    this.defineSteps();
+    this.currentStep = 0;
+    this.completedSteps.clear();
+    this.showOnboardingModal();
+  }
+
+  /**
+   * Show onboarding modal
+   */
+  showOnboardingModal() {
+    const step = this.onboardingSteps[this.currentStep];
+    if (!step) return;
+
+    const modal = this.createOnboardingModal(step);
+    document.body.appendChild(modal);
+
+    // Bind events
+    this.bindModalEvents(modal);
+  }
+
+  /**
+   * Create onboarding modal element
+   */
+  createOnboardingModal(step) {
+    const modal = document.createElement('div');
+    modal.className = 'onboarding-overlay';
+    modal.id = 'onboarding-modal';
+
+    const isLastStep = this.currentStep === this.onboardingSteps.length - 1;
+    const isFirstStep = this.currentStep === 0;
+
+    modal.innerHTML = `
+      <div class="onboarding-modal">
+        <div class="onboarding-header">
+          <div class="onboarding-icon">${step.icon}</div>
+          <h2 class="onboarding-title">${step.title}</h2>
+          <p class="onboarding-subtitle">${step.subtitle}</p>
+        </div>
+
+        <div class="onboarding-content">
+          <div class="onboarding-progress">
+            ${this.onboardingSteps.map((_, index) => `
+              <div class="onboarding-progress-dot ${index === this.currentStep ? 'active' : ''} ${index < this.currentStep ? 'completed' : ''}"></div>
+            `).join('')}
+          </div>
+
+          <div class="onboarding-step active">
+            <h3 class="onboarding-step-title">${step.title}</h3>
+            <p class="onboarding-step-description">${step.description}</p>
+            ${step.content}
+          </div>
+        </div>
+
+        <div class="onboarding-footer">
+          <button class="onboarding-skip-btn" id="onboarding-skip">Skip Tour</button>
+          <div class="onboarding-nav-buttons">
+            ${!isFirstStep ? '<button class="onboarding-btn onboarding-btn-prev" id="onboarding-prev">← Back</button>' : ''}
+            ${!isLastStep ? '<button class="onboarding-btn onboarding-btn-next" id="onboarding-next">Next →</button>' : ''}
+            ${isLastStep ? '<button class="onboarding-btn onboarding-btn-finish" id="onboarding-finish">Get Started</button>' : ''}
+          </div>
         </div>
       </div>
     `;
 
-    // Position tooltip
-    this.positionTooltip(targetEl, step.position);
-
-    // Add event listeners
-    document.getElementById('onboardingNext')?.addEventListener('click', () => this.showStep(index + 1));
-    document.getElementById('onboardingPrev')?.addEventListener('click', () => this.showStep(index - 1));
-    document.getElementById('onboardingSkip')?.addEventListener('click', () => this.finishTutorial());
+    return modal;
   }
 
-  positionTooltip(targetEl, position) {
-    if (!this.tooltip) return;
+  /**
+   * Bind modal events
+   */
+  bindModalEvents(modal) {
+    const skipBtn = modal.querySelector('#onboarding-skip');
+    const prevBtn = modal.querySelector('#onboarding-prev');
+    const nextBtn = modal.querySelector('#onboarding-next');
+    const finishBtn = modal.querySelector('#onboarding-finish');
 
-    if (!targetEl || position === 'center') {
-      this.tooltip.style.position = 'fixed';
-      this.tooltip.style.top = '50%';
-      this.tooltip.style.left = '50%';
-      this.tooltip.style.transform = 'translate(-50%, -50%)';
-      return;
-    }
+    skipBtn?.addEventListener('click', () => this.skipOnboarding());
+    prevBtn?.addEventListener('click', () => this.previousStep());
+    nextBtn?.addEventListener('click', () => this.nextStep());
+    finishBtn?.addEventListener('click', () => this.completeOnboarding());
 
-    const rect = targetEl.getBoundingClientRect();
-    const tooltipRect = this.tooltip.getBoundingClientRect();
+    // Close on overlay click
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        this.skipOnboarding();
+      }
+    });
+  }
 
-    this.tooltip.style.position = 'fixed';
-    this.tooltip.style.transform = 'none';
-
-    switch (position) {
-      case 'bottom':
-        this.tooltip.style.top = `${rect.bottom + 16}px`;
-        this.tooltip.style.left = `${rect.left + rect.width / 2 - tooltipRect.width / 2}px`;
-        break;
-      case 'top':
-        this.tooltip.style.top = `${rect.top - tooltipRect.height - 16}px`;
-        this.tooltip.style.left = `${rect.left + rect.width / 2 - tooltipRect.width / 2}px`;
-        break;
-      case 'right':
-        this.tooltip.style.top = `${rect.top + rect.height / 2 - tooltipRect.height / 2}px`;
-        this.tooltip.style.left = `${rect.right + 16}px`;
-        break;
-      case 'left':
-        this.tooltip.style.top = `${rect.top + rect.height / 2 - tooltipRect.height / 2}px`;
-        this.tooltip.style.left = `${rect.left - tooltipRect.width - 16}px`;
-        break;
+  /**
+   * Go to next step
+   */
+  nextStep() {
+    if (this.currentStep < this.onboardingSteps.length - 1) {
+      this.currentStep++;
+      this.completedSteps.add(this.onboardingSteps[this.currentStep - 1].id);
+      this.closeOnboardingModal();
+      this.showOnboardingModal();
     }
   }
 
-  finishTutorial() {
-    this.removeOverlay();
-    this.completeOnboarding();
-    
-    // Show completion message
-    if (typeof toast !== 'undefined') {
-      toast.success('🎉 Tutorial complete! Start tracking your finances.');
+  /**
+   * Go to previous step
+   */
+  previousStep() {
+    if (this.currentStep > 0) {
+      this.currentStep--;
+      this.closeOnboardingModal();
+      this.showOnboardingModal();
     }
   }
 
-  // Demo Mode
-  isDemoMode() {
-    return localStorage.getItem('rupiya_demo_mode') === 'true';
+  /**
+   * Skip onboarding
+   */
+  skipOnboarding() {
+    this.closeOnboardingModal();
+    this.isOnboardingComplete = true;
+    this.saveOnboardingState();
   }
 
-  enableDemoMode() {
-    localStorage.setItem('rupiya_demo_mode', 'true');
+  /**
+   * Complete onboarding
+   */
+  completeOnboarding() {
+    this.closeOnboardingModal();
+    this.isOnboardingComplete = true;
+    this.completedSteps.add(this.onboardingSteps[this.currentStep].id);
+    this.saveOnboardingState();
+    this.showAchievementBadge('Onboarding Complete! 🎉');
   }
 
-  disableDemoMode() {
-    localStorage.removeItem('rupiya_demo_mode');
+  /**
+   * Close onboarding modal
+   */
+  closeOnboardingModal() {
+    const modal = document.getElementById('onboarding-modal');
+    if (modal) {
+      modal.remove();
+    }
   }
 
-  getDemoData(type) {
-    return this.demoData[type] || [];
+  /**
+   * Show achievement badge
+   */
+  showAchievementBadge(text) {
+    const badge = document.createElement('div');
+    badge.className = 'achievement-badge';
+    badge.innerHTML = `<span class="achievement-badge-icon">✨</span><span>${text}</span>`;
+    document.body.appendChild(badge);
+
+    setTimeout(() => {
+      badge.remove();
+    }, 3000);
   }
 
-  // Quick Setup
-  getBudgetTemplates() {
-    return this.budgetTemplates;
+  /**
+   * Check if onboarding should be shown
+   */
+  shouldShowOnboarding() {
+    return !this.isOnboardingComplete;
   }
 
-  async applyBudgetTemplate(templateId) {
-    const template = this.budgetTemplates[templateId];
-    if (!template) return { success: false, error: 'Template not found' };
+  /**
+   * Save onboarding state to localStorage
+   */
+  saveOnboardingState() {
+    try {
+      localStorage.setItem('rupiya_onboarding_complete', JSON.stringify({
+        isComplete: this.isOnboardingComplete,
+        completedSteps: Array.from(this.completedSteps),
+        timestamp: Date.now()
+      }));
+    } catch (e) {
+      console.warn('Failed to save onboarding state:', e);
+    }
+  }
 
-    // This would integrate with the budget service to create budgets
-    return { success: true, template };
+  /**
+   * Load onboarding state from localStorage
+   */
+  loadOnboardingState() {
+    try {
+      const saved = localStorage.getItem('rupiya_onboarding_complete');
+      if (saved) {
+        const state = JSON.parse(saved);
+        this.isOnboardingComplete = state.isComplete;
+        this.completedSteps = new Set(state.completedSteps);
+      }
+    } catch (e) {
+      console.warn('Failed to load onboarding state:', e);
+    }
+  }
+
+  /**
+   * Reset onboarding
+   */
+  resetOnboarding() {
+    this.isOnboardingComplete = false;
+    this.currentStep = 0;
+    this.completedSteps.clear();
+    this.saveOnboardingState();
   }
 }
 
+// Create and export singleton instance
 const onboardingService = new OnboardingService();
 export default onboardingService;

@@ -3,6 +3,7 @@ import '../services/services-init.js'; // Initialize services
 import authService from '../services/auth-service.js';
 import toast from '../components/toast.js';
 import { validateForm, setupRealtimeValidation } from '../utils/validation.js';
+import FormValidator from '../utils/form-validation.js';
 
 // Get form elements
 const signupForm = document.getElementById('signupForm');
@@ -12,6 +13,9 @@ const togglePasswordBtn = document.getElementById('togglePassword');
 const toggleConfirmPasswordBtn = document.getElementById('toggleConfirmPassword');
 const passwordInput = document.getElementById('password');
 const confirmPasswordInput = document.getElementById('confirmPassword');
+
+// Initialize form validator for real-time validation
+const formValidator = new FormValidator(signupForm);
 
 // Validation rules
 const validationRules = {

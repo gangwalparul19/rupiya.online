@@ -5,6 +5,7 @@ import authEncryptionHelper from '../utils/auth-encryption-helper.js';
 import toast from '../components/toast.js';
 import confirmationModal from '../components/confirmation-modal.js';
 import { validateForm, setupRealtimeValidation } from '../utils/validation.js';
+import FormValidator from '../utils/form-validation.js';
 
 // Get form elements
 const loginForm = document.getElementById('loginForm');
@@ -13,6 +14,9 @@ const googleSignInBtn = document.getElementById('googleSignInBtn');
 const togglePasswordBtn = document.getElementById('togglePassword');
 const passwordInput = document.getElementById('password');
 const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+
+// Initialize form validator for real-time validation
+const formValidator = new FormValidator(loginForm);
 
 // Track if user needs verification (for resend functionality)
 let pendingVerificationEmail = null;

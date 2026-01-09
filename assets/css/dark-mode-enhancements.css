@@ -1,0 +1,330 @@
+/* Dark Mode Enhancements */
+
+/* Theme Change Notification */
+.theme-change-notification {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background-color: var(--card-bg);
+  color: var(--text-primary);
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  font-size: 0.875rem;
+  font-weight: 500;
+  z-index: 1000;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+.theme-change-notification.show {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* Theme Toggle Button */
+.theme-toggle-btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border-color);
+  background-color: var(--hover-bg);
+  color: var(--text-primary);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.theme-toggle-btn:hover {
+  background-color: var(--border-color);
+  border-color: var(--primary-color);
+}
+
+.theme-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* Theme Preview */
+.theme-preview {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.theme-preview-item {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.light-preview {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+.dark-preview {
+  background-color: #1a1a1a;
+  color: #ffffff;
+}
+
+.theme-preview-content {
+  padding: 1rem;
+}
+
+.theme-preview-header {
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.7;
+}
+
+.theme-preview-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.theme-preview-card {
+  height: 40px;
+  border-radius: 4px;
+  background-color: currentColor;
+  opacity: 0.2;
+}
+
+/* Dark Mode Specific Adjustments */
+:root.dark-mode {
+  /* Improve contrast in dark mode */
+  --text-primary: #f5f5f5;
+  --text-secondary: #b0b0b0;
+  --card-bg: #2a2a2a;
+  --hover-bg: #333333;
+  --border-color: #404040;
+  --input-bg: #1f1f1f;
+  --danger-color: #ff6b6b;
+  --success-color: #51cf66;
+  --warning-color: #ffd43b;
+}
+
+/* Smooth theme transition */
+html,
+body,
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Disable transition during theme switch to prevent flashing */
+html.theme-switching,
+html.theme-switching * {
+  transition: none !important;
+}
+
+/* Image optimization for dark mode */
+img[data-dark-mode-src] {
+  transition: opacity 0.3s ease;
+}
+
+/* Dark mode specific image handling */
+:root.dark-mode img[data-dark-mode-src] {
+  opacity: 0.9;
+}
+
+/* Reduce brightness of images in dark mode */
+:root.dark-mode img:not([data-dark-mode-src]) {
+  opacity: 0.85;
+  filter: brightness(0.9);
+}
+
+/* Dark mode specific shadows */
+:root.dark-mode {
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.5);
+}
+
+/* Improve form inputs in dark mode */
+:root.dark-mode input,
+:root.dark-mode select,
+:root.dark-mode textarea {
+  background-color: var(--input-bg);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+:root.dark-mode input::placeholder,
+:root.dark-mode textarea::placeholder {
+  color: var(--text-secondary);
+}
+
+/* Improve buttons in dark mode */
+:root.dark-mode .btn-outline {
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+:root.dark-mode .btn-outline:hover {
+  background-color: var(--hover-bg);
+  border-color: var(--primary-color);
+}
+
+/* Improve tables in dark mode */
+:root.dark-mode table {
+  border-color: var(--border-color);
+}
+
+:root.dark-mode th {
+  background-color: var(--hover-bg);
+  color: var(--text-primary);
+}
+
+:root.dark-mode td {
+  border-color: var(--border-color);
+}
+
+:root.dark-mode tr:hover {
+  background-color: var(--hover-bg);
+}
+
+/* Improve code blocks in dark mode */
+:root.dark-mode code,
+:root.dark-mode pre {
+  background-color: var(--input-bg);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+/* Improve scrollbars in dark mode */
+:root.dark-mode ::-webkit-scrollbar {
+  background-color: var(--card-bg);
+}
+
+:root.dark-mode ::-webkit-scrollbar-track {
+  background-color: var(--hover-bg);
+}
+
+:root.dark-mode ::-webkit-scrollbar-thumb {
+  background-color: var(--border-color);
+}
+
+:root.dark-mode ::-webkit-scrollbar-thumb:hover {
+  background-color: var(--text-secondary);
+}
+
+/* Improve modals in dark mode */
+:root.dark-mode .modal-overlay {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+/* Improve cards in dark mode */
+:root.dark-mode .card {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Improve badges in dark mode */
+:root.dark-mode .badge {
+  background-color: var(--hover-bg);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+/* Improve alerts in dark mode */
+:root.dark-mode .alert {
+  background-color: var(--hover-bg);
+  border-color: var(--border-color);
+}
+
+/* Improve tooltips in dark mode */
+:root.dark-mode .tooltip {
+  background-color: var(--card-bg);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+/* Improve dropdowns in dark mode */
+:root.dark-mode .dropdown-menu {
+  background-color: var(--card-bg);
+  border-color: var(--border-color);
+}
+
+:root.dark-mode .dropdown-item {
+  color: var(--text-primary);
+}
+
+:root.dark-mode .dropdown-item:hover {
+  background-color: var(--hover-bg);
+}
+
+/* Improve tabs in dark mode */
+:root.dark-mode .tab-btn {
+  color: var(--text-secondary);
+  border-color: var(--border-color);
+}
+
+:root.dark-mode .tab-btn.active {
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+/* Improve progress bars in dark mode */
+:root.dark-mode .progress-bar {
+  background-color: var(--hover-bg);
+}
+
+:root.dark-mode .progress-fill {
+  background-color: var(--primary-color);
+}
+
+/* Improve spinners in dark mode */
+:root.dark-mode .spinner {
+  border-color: var(--border-color);
+  border-top-color: var(--primary-color);
+}
+
+/* Mobile dark mode */
+@media (max-width: 768px) {
+  .theme-change-notification {
+    bottom: 1rem;
+    right: 1rem;
+    left: 1rem;
+  }
+
+  .theme-preview {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Reduced motion for dark mode transition */
+@media (prefers-reduced-motion: reduce) {
+  html,
+  body,
+  * {
+    transition: none !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: more) {
+  :root.dark-mode {
+    --text-primary: #ffffff;
+    --text-secondary: #cccccc;
+    --border-color: #666666;
+  }
+}
+
+/* Forced colors mode support */
+@media (forced-colors: active) {
+  :root.dark-mode {
+    --text-primary: CanvasText;
+    --card-bg: Canvas;
+    --border-color: ButtonBorder;
+  }
+}

@@ -1,0 +1,386 @@
+/* ============================================
+   RUPIYA - SKELETON SCREENS
+   Comprehensive skeleton screen templates
+   for all content types
+   ============================================ */
+
+/* Base Skeleton Screen */
+.skeleton-screen {
+  display: grid;
+  gap: 16px;
+  padding: 16px;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.skeleton-item {
+  background-color: #e0e0e0;
+  border-radius: 8px;
+  animation: shimmer 1.5s ease-in-out infinite;
+  background-image: linear-gradient(90deg, #e0e0e0 0%, #f0f0f0 50%, #e0e0e0 100%);
+  background-size: 200% 100%;
+  background-position: 0% 0%;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0%;
+  }
+  100% {
+    background-position: 200% 0%;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.skeleton-to-content-transition {
+  animation: fadeOut 0.3s ease-in-out forwards;
+}
+
+.content-fade-in {
+  animation: fadeIn 0.3s ease-in-out forwards;
+}
+
+/* Dashboard Skeleton */
+.skeleton-screen[data-skeleton-type="dashboard"] {
+  grid-template-rows: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
+  height: 600px;
+}
+
+.skeleton-screen[data-skeleton-type="dashboard"] .skeleton-item {
+  min-height: 180px;
+}
+
+/* List Skeleton */
+.skeleton-screen[data-skeleton-type="list"] {
+  grid-template-rows: repeat(5, 1fr);
+  grid-template-columns: 1fr;
+  height: 400px;
+}
+
+.skeleton-screen[data-skeleton-type="list"] .skeleton-item {
+  min-height: 60px;
+}
+
+/* Chart Skeleton */
+.skeleton-screen[data-skeleton-type="chart"] {
+  grid-template-rows: 1fr;
+  grid-template-columns: 1fr;
+  height: 300px;
+}
+
+.skeleton-screen[data-skeleton-type="chart"] .skeleton-item {
+  min-height: 300px;
+}
+
+/* Form Skeleton */
+.skeleton-screen[data-skeleton-type="form"] {
+  grid-template-rows: repeat(4, 1fr);
+  grid-template-columns: 1fr;
+  height: 250px;
+}
+
+.skeleton-screen[data-skeleton-type="form"] .skeleton-item {
+  min-height: 50px;
+}
+
+/* Analytics Dashboard Skeleton */
+.skeleton-analytics-dashboard {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+  padding: 16px;
+}
+
+.skeleton-kpi-card {
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skeleton-kpi-label {
+  height: 14px;
+  width: 40%;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  animation: shimmer 1.5s ease-in-out infinite;
+  background-image: linear-gradient(90deg, #e0e0e0 0%, #f0f0f0 50%, #e0e0e0 100%);
+  background-size: 200% 100%;
+}
+
+.skeleton-kpi-value {
+  height: 32px;
+  width: 60%;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  animation: shimmer 1.5s ease-in-out infinite;
+  background-image: linear-gradient(90deg, #e0e0e0 0%, #f0f0f0 50%, #e0e0e0 100%);
+  background-size: 200% 100%;
+}
+
+.skeleton-kpi-subtitle {
+  height: 12px;
+  width: 50%;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  animation: shimmer 1.5s ease-in-out infinite;
+  background-image: linear-gradient(90deg, #e0e0e0 0%, #f0f0f0 50%, #e0e0e0 100%);
+  background-size: 200% 100%;
+}
+
+/* Chart Skeleton */
+.skeleton-chart {
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 20px;
+  height: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skeleton-chart-title {
+  height: 20px;
+  width: 30%;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  animation: shimmer 1.5s ease-in-out infinite;
+  background-image: linear-gradient(90deg, #e0e0e0 0%, #f0f0f0 50%, #e0e0e0 100%);
+  background-size: 200% 100%;
+}
+
+.skeleton-chart-content {
+  flex: 1;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  animation: shimmer 1.5s ease-in-out infinite;
+  background-image: linear-gradient(90deg, #e0e0e0 0%, #f0f0f0 50%, #e0e0e0 100%);
+  background-size: 200% 100%;
+}
+
+/* Table Skeleton */
+.skeleton-table {
+  width: 100%;
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.skeleton-table-header {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  padding: 16px;
+  border-bottom: 1px solid #e0e0e0;
+  background-color: #f9f9f9;
+}
+
+.skeleton-table-header-cell {
+  height: 16px;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  animation: shimmer 1.5s ease-in-out infinite;
+  background-image: linear-gradient(90deg, #e0e0e0 0%, #f0f0f0 50%, #e0e0e0 100%);
+  background-size: 200% 100%;
+}
+
+.skeleton-table-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  padding: 16px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.skeleton-table-cell {
+  height: 16px;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  animation: shimmer 1.5s ease-in-out infinite;
+  background-image: linear-gradient(90deg, #e0e0e0 0%, #f0f0f0 50%, #e0e0e0 100%);
+  background-size: 200% 100%;
+}
+
+/* Button Spinner */
+.button-spinner {
+  display: inline-block;
+  margin-right: 8px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Form Input Skeleton */
+.skeleton-form-input {
+  height: 44px;
+  background-color: #e0e0e0;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  animation: shimmer 1.5s ease-in-out infinite;
+  background-image: linear-gradient(90deg, #e0e0e0 0%, #f0f0f0 50%, #e0e0e0 100%);
+  background-size: 200% 100%;
+}
+
+.skeleton-form-label {
+  height: 14px;
+  width: 30%;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  animation: shimmer 1.5s ease-in-out infinite;
+  background-image: linear-gradient(90deg, #e0e0e0 0%, #f0f0f0 50%, #e0e0e0 100%);
+  background-size: 200% 100%;
+}
+
+/* Progressive Loading */
+.progressive-loading {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.progressive-loading-section {
+  opacity: 0;
+  animation: fadeIn 0.3s ease-in-out forwards;
+}
+
+.progressive-loading-section:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.progressive-loading-section:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.progressive-loading-section:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+.progressive-loading-section:nth-child(4) {
+  animation-delay: 0.6s;
+}
+
+/* Mobile Optimizations */
+@media (max-width: 768px) {
+  .skeleton-screen {
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .skeleton-analytics-dashboard {
+    grid-template-columns: 1fr;
+  }
+
+  .skeleton-table-header,
+  .skeleton-table-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .skeleton-kpi-card {
+    padding: 16px;
+  }
+
+  .skeleton-chart {
+    padding: 16px;
+    height: 250px;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .skeleton-item {
+    background-color: #333;
+    background-image: linear-gradient(90deg, #333 0%, #444 50%, #333 100%);
+  }
+
+  .skeleton-kpi-card {
+    background-color: #1e1e1e;
+    border-color: #333;
+  }
+
+  .skeleton-kpi-label,
+  .skeleton-kpi-value,
+  .skeleton-kpi-subtitle,
+  .skeleton-chart-title,
+  .skeleton-chart-content,
+  .skeleton-table-header-cell,
+  .skeleton-table-cell,
+  .skeleton-form-input,
+  .skeleton-form-label {
+    background-color: #333;
+    background-image: linear-gradient(90deg, #333 0%, #444 50%, #333 100%);
+  }
+
+  .skeleton-chart {
+    background-color: #1e1e1e;
+    border-color: #333;
+  }
+
+  .skeleton-table {
+    background-color: #1e1e1e;
+    border-color: #333;
+  }
+
+  .skeleton-table-header {
+    background-color: #2a2a2a;
+    border-bottom-color: #333;
+  }
+
+  .skeleton-table-row {
+    border-bottom-color: #333;
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-item,
+  .skeleton-kpi-label,
+  .skeleton-kpi-value,
+  .skeleton-kpi-subtitle,
+  .skeleton-chart-title,
+  .skeleton-chart-content,
+  .skeleton-table-header-cell,
+  .skeleton-table-cell,
+  .skeleton-form-input,
+  .skeleton-form-label,
+  .button-spinner {
+    animation: none;
+    background-image: none;
+    background-color: #e0e0e0;
+  }
+
+  .skeleton-to-content-transition,
+  .content-fade-in,
+  .progressive-loading-section {
+    animation: none;
+  }
+}

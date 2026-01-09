@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Primary Meta Tags -->
+  <title>Predictive Analytics - Financial Forecasts & Insights | Rupiya</title>
+  <meta name="title" content="Predictive Analytics - Financial Forecasts & Insights | Rupiya">
+  <meta name="description" content="Forward-looking financial predictions: spending forecasts, savings goal projections, budget overspend warnings, anomaly detection, and spending pattern analysis.">
+  <meta name="keywords" content="predictive analytics, spending forecast, financial predictions, budget planning, savings goals, anomaly detection">
+  <meta name="author" content="Rupiya">
+  <meta name="robots" content="index, follow">
+  <meta name="language" content="English">
+  <meta name="theme-color" content="#4A90E2">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://rupiya.online/predictive-analytics.html">
+  <meta property="og:title" content="Predictive Analytics - Financial Forecasts & Insights">
+  <meta property="og:description" content="Forward-looking financial predictions and insights">
+  <meta property="og:image" content="https://rupiya.online/assets/images/og-image.png">
+  <meta property="og:site_name" content="Rupiya">
+  <meta property="og:locale" content="en_IN">
+  
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://rupiya.online/predictive-analytics.html">
+  <meta property="twitter:title" content="Predictive Analytics - Financial Forecasts & Insights">
+  <meta property="twitter:description" content="Forward-looking financial predictions and insights">
+  <meta property="twitter:image" content="https://rupiya.online/assets/images/og-image.png">
+  <meta property="twitter:site" content="@RupiyaApp">
+  
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://rupiya.online/predictive-analytics.html">
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="assets/images/logo.png" type="image/png">
+  <link rel="apple-touch-icon" href="/android-chrome-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="assets/css/common.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/dark-mode.css">
+  <link rel="stylesheet" href="assets/css/dashboard.css">
+  <link rel="stylesheet" href="assets/css/analytics.css">
+  <link rel="stylesheet" href="assets/css/loading.css">
+  <link rel="stylesheet" href="assets/css/breadcrumbs.css">
+  <link rel="stylesheet" href="assets/css/predictive-analytics.css">
+  <link rel="stylesheet" href="assets/css/enhancements.css">
+  <link rel="stylesheet" href="assets/css/animations.css">
+  <link rel="stylesheet" href="assets/css/mobile-enhancements.css">
+  <link rel="stylesheet" href="assets/css/ux-enhancements.css">
+  <link rel="stylesheet" href="assets/css/sidebar.css">
+  <link rel="stylesheet" href="assets/css/setup-wizard.css">
+  <link rel="stylesheet" href="assets/css/layout-fixes.css">
+  <link rel="stylesheet" href="assets/css/form-mobile-optimization.css">
+  <link rel="stylesheet" href="assets/css/button-fix.css">
+  
+  <!-- Auth Guard - Must be loaded early to prevent flash of protected content -->
+  <script src="assets/js/utils/auth-guard.js"></script>
+  <!-- Button Reset Fix - Prevents buttons from getting stuck -->
+  <script src="assets/js/utils/button-reset-fix.js"></script>
+  
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+</head>
+<body>
+  <!-- Sidebar -->
+  <div id="sidebar" class="sidebar">
+    <div class="sidebar-header">
+      <img src="assets/images/logo.png" alt="Rupiya Logo" class="sidebar-logo">
+      <span class="sidebar-title">Rupiya</span>
+      <button id="sidebarClose" class="sidebar-close">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <nav class="sidebar-nav"></nav>
+  </div>
+  <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+  <!-- Main Content -->
+  <div class="main-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <button id="sidebarOpen" class="sidebar-toggle">
+          <i class="fas fa-bars"></i>
+        </button>
+        <h1 class="page-title">Predictive Analytics</h1>
+      </div>
+      <div class="header-right">
+        <div class="user-menu">
+          <div class="user-avatar" id="userAvatar">U</div>
+          <div class="user-info">
+            <div class="user-name" id="userName">User</div>
+            <div class="user-email" id="userEmail">user@example.com</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Page Content -->
+    <main class="page-content">
+      <!-- Breadcrumbs -->
+      <div class="breadcrumb-container"></div>
+
+      <!-- Loading State -->
+      <div id="loadingState" class="loading-state" style="display: none;">
+        <div class="spinner"></div>
+        <p>Loading predictive analytics...</p>
+      </div>
+
+      <!-- Alerts Section -->
+      <section class="alerts-section" id="alertsSection" style="display: none;">
+        <h2 class="section-title">Alerts & Warnings</h2>
+        <div class="alerts-container" id="alertsContainer"></div>
+      </section>
+
+      <!-- Spending Forecast Section -->
+      <section class="forecast-section">
+        <h2 class="section-title">30-Day Spending Forecast</h2>
+        <div class="chart-container">
+          <canvas id="spendingForecastChart"></canvas>
+        </div>
+      </section>
+
+      <!-- Budget Overspend Warnings Section -->
+      <section class="warnings-section" id="warningsSection" style="display: none;">
+        <h2 class="section-title">Budget Overspend Warnings</h2>
+        <div class="warnings-container" id="warningsContainer"></div>
+      </section>
+
+      <!-- Savings Goals Section -->
+      <section class="goals-section" id="goalsSection" style="display: none;">
+        <h2 class="section-title">Savings Goal Projections</h2>
+        <div class="goals-container" id="goalsContainer"></div>
+      </section>
+
+      <!-- Anomalies Section -->
+      <section class="anomalies-section" id="anomaliesSection" style="display: none;">
+        <h2 class="section-title">Spending Anomalies</h2>
+        <div class="anomalies-container" id="anomaliesContainer"></div>
+      </section>
+
+      <!-- Spending Patterns Section -->
+      <section class="patterns-section" id="patternsSection" style="display: none;">
+        <h2 class="section-title">Recurring Spending Patterns</h2>
+        <div class="patterns-container" id="patternsContainer"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="assets/js/pages/predictive-analytics.js"></script>
+</body>
+</html>

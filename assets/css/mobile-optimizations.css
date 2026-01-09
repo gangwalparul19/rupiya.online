@@ -1,0 +1,328 @@
+/* Mobile Optimizations Styles */
+
+/* Bottom Sheet Modal */
+.bottom-sheet-modal {
+  position: fixed !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  top: auto !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  border-radius: 16px 16px 0 0 !important;
+  max-height: 90vh !important;
+  animation: slideUpModal 0.3s ease !important;
+}
+
+@keyframes slideUpModal {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.bottom-sheet-modal::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 4px;
+  background-color: var(--border-color);
+  border-radius: 2px;
+}
+
+/* Pull to Refresh Indicator */
+.pull-to-refresh-indicator {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background-color: var(--card-bg);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  z-index: 100;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Swipeable List Items */
+[data-swipeable] {
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+[data-swipeable].swiped {
+  background-color: var(--danger-color);
+}
+
+[data-swipeable].swiped::after {
+  content: 'Delete';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* Mobile Form Optimizations */
+@media (max-width: 768px) {
+  /* Increase touch target sizes */
+  button,
+  a,
+  [role="button"],
+  input[type="checkbox"],
+  input[type="radio"] {
+    min-width: 48px;
+    min-height: 48px;
+  }
+
+  /* Form inputs */
+  input,
+  select,
+  textarea {
+    min-height: 44px;
+    font-size: 16px; /* Prevents zoom on iOS */
+    padding: 12px;
+  }
+
+  /* Form groups */
+  .form-group {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Stack buttons vertically */
+  .form-actions,
+  .modal-footer,
+  .create-group-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .form-actions button,
+  .modal-footer button,
+  .create-group-footer button {
+    width: 100%;
+  }
+
+  /* Bottom tab navigation */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background-color: var(--card-bg);
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-around;
+    z-index: 100;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .bottom-nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.75rem;
+    transition: color 0.2s ease;
+  }
+
+  .bottom-nav-item:hover,
+  .bottom-nav-item.active {
+    color: var(--primary-color);
+  }
+
+  .bottom-nav-item-icon {
+    font-size: 1.5rem;
+  }
+
+  /* Adjust main content for bottom nav */
+  main {
+    padding-bottom: 60px;
+  }
+
+  /* Landscape orientation */
+  @media (orientation: landscape) {
+    .bottom-nav {
+      height: 50px;
+    }
+
+    .bottom-nav-item-label {
+      display: none;
+    }
+
+    main {
+      padding-bottom: 50px;
+    }
+  }
+
+  /* Safe area insets for notched devices */
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+
+  .bottom-sheet-modal {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Optimize modals for mobile */
+  .modal,
+  [role="dialog"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    border-radius: 16px 16px 0 0 !important;
+  }
+
+  /* Optimize cards for mobile */
+  .card,
+  [role="article"] {
+    margin-bottom: 1rem;
+  }
+
+  /* Optimize spacing */
+  .page-header {
+    padding: 1rem;
+  }
+
+  .page-content {
+    padding: 1rem;
+  }
+
+  /* Optimize typography for mobile */
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  h2 {
+    font-size: 1.25rem;
+  }
+
+  h3 {
+    font-size: 1.1rem;
+  }
+
+  /* Optimize images */
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Optimize tables */
+  table {
+    font-size: 0.875rem;
+  }
+
+  /* Optimize lists */
+  ul,
+  ol {
+    padding-left: 1.5rem;
+  }
+
+  /* Optimize links */
+  a {
+    padding: 0.5rem;
+    margin: -0.5rem;
+  }
+
+  /* Optimize scrolling */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Optimize keyboard appearance */
+  input[type="email"],
+  input[type="url"] {
+    font-family: monospace;
+  }
+
+  /* Prevent zoom on input focus */
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+
+/* Tablet Optimizations */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .form-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .chart-comparison {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Ultra-wide screens */
+@media (min-width: 1920px) {
+  .container,
+  .page-content {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .form-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+
+  .chart-comparison {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Landscape orientation specific */
+@media (orientation: landscape) and (max-height: 500px) {
+  .page-header {
+    padding: 0.5rem;
+  }
+
+  .page-content {
+    padding: 0.5rem;
+  }
+
+  h1 {
+    font-size: 1.25rem;
+  }
+
+  .form-group {
+    margin-bottom: 0.5rem;
+  }
+}

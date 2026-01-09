@@ -8,6 +8,9 @@ global.firebase = {
   }
 };
 
+// Mock fetch for Firebase imports
+global.fetch = () => Promise.reject(new Error('Firebase module not available in tests'));
+
 // Suppress console output in tests
 const noop = () => {};
 global.console = {

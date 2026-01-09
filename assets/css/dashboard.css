@@ -945,6 +945,18 @@
   margin-bottom: var(--spacing-lg);
 }
 
+/* Tablet Responsive (768px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .widgets-row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-md);
+  }
+  
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Mobile Responsive */
 @media (max-width: 768px) {
   .sidebar {
@@ -1345,6 +1357,19 @@
   
   .dashboard-subtitle {
     font-size: var(--font-size-sm);
+  }
+  
+  .widgets-row {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .savings-rate-widget,
+  .goal-progress-widget,
+  .top-categories-widget,
+  .upcoming-bills-widget {
+    padding: 12px;
   }
   
   .transactions-card {

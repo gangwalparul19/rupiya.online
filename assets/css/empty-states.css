@@ -1,0 +1,282 @@
+/* ============================================
+   RUPIYA - ENHANCED EMPTY STATES
+   Contextual, actionable empty states with illustrations
+   ============================================ */
+
+/* Empty State Container */
+.empty-state {
+  text-align: center;
+  padding: var(--spacing-2xl) var(--spacing-lg);
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--white) 100%);
+  border-radius: var(--border-radius-lg);
+  border: 2px dashed var(--border-color);
+  transition: all var(--transition-base);
+}
+
+.empty-state:hover {
+  border-color: var(--primary-blue);
+  background: linear-gradient(135deg, rgba(74, 144, 226, 0.05) 0%, var(--white) 100%);
+}
+
+/* Empty State Icon */
+.empty-state-icon {
+  font-size: 80px;
+  margin-bottom: var(--spacing-lg);
+  opacity: 0.4;
+  animation: floatIcon 3s ease-in-out infinite;
+  display: inline-block;
+}
+
+@keyframes floatIcon {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Empty State Title */
+.empty-state-title {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+  line-height: 1.4;
+}
+
+/* Empty State Text */
+.empty-state-text {
+  font-size: var(--font-size-base);
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-lg);
+  line-height: 1.6;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Empty State Subtext */
+.empty-state-subtext {
+  font-size: var(--font-size-sm);
+  color: var(--text-light);
+  margin-bottom: var(--spacing-lg);
+  font-style: italic;
+}
+
+/* Empty State Actions */
+.empty-state-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: var(--spacing-lg);
+}
+
+.empty-state-actions .btn {
+  min-width: 160px;
+}
+
+/* Empty State Illustration Variants */
+.empty-state.expenses-empty .empty-state-icon::before {
+  content: '💸';
+}
+
+.empty-state.income-empty .empty-state-icon::before {
+  content: '💰';
+}
+
+.empty-state.investments-empty .empty-state-icon::before {
+  content: '📈';
+}
+
+.empty-state.goals-empty .empty-state-icon::before {
+  content: '🎯';
+}
+
+.empty-state.transactions-empty .empty-state-icon::before {
+  content: '📊';
+}
+
+.empty-state.search-empty .empty-state-icon::before {
+  content: '🔍';
+}
+
+.empty-state.filter-empty .empty-state-icon::before {
+  content: '🔎';
+}
+
+.empty-state.family-empty .empty-state-icon::before {
+  content: '👨‍👩‍👧‍👦';
+}
+
+.empty-state.documents-empty .empty-state-icon::before {
+  content: '📄';
+}
+
+.empty-state.notes-empty .empty-state-icon::before {
+  content: '📝';
+}
+
+/* Contextual Empty State Messages */
+.empty-state-context {
+  background: rgba(74, 144, 226, 0.05);
+  border-left: 4px solid var(--primary-blue);
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius);
+  margin-top: var(--spacing-lg);
+  text-align: left;
+}
+
+.empty-state-context-title {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--primary-blue);
+  margin-bottom: var(--spacing-xs);
+}
+
+.empty-state-context-text {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* Empty State Tips */
+.empty-state-tips {
+  margin-top: var(--spacing-lg);
+  padding: var(--spacing-md);
+  background: var(--white);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-color);
+}
+
+.empty-state-tips-title {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.empty-state-tips-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.empty-state-tips-item {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  padding: var(--spacing-xs) 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.empty-state-tips-item::before {
+  content: '✓';
+  color: var(--accent-green);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* Empty State with Example Data */
+.empty-state-example {
+  margin-top: var(--spacing-lg);
+  padding: var(--spacing-md);
+  background: var(--bg-secondary);
+  border-radius: var(--border-radius);
+  text-align: left;
+}
+
+.empty-state-example-title {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.empty-state-example-item {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  padding: var(--spacing-xs) 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.empty-state-example-item-label {
+  color: var(--text-secondary);
+}
+
+.empty-state-example-item-value {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* Empty State Animation */
+.empty-state.animate-in {
+  animation: emptyStateSlideIn 0.5s ease-out;
+}
+
+@keyframes emptyStateSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Dark Mode */
+[data-theme="dark"] .empty-state {
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(255, 255, 255, 0.05) 100%);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .empty-state:hover {
+  background: linear-gradient(135deg, rgba(74, 144, 226, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+  border-color: var(--primary-blue);
+}
+
+[data-theme="dark"] .empty-state-context {
+  background: rgba(74, 144, 226, 0.1);
+}
+
+[data-theme="dark"] .empty-state-tips {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .empty-state-example {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .empty-state {
+    padding: var(--spacing-xl) var(--spacing-md);
+  }
+
+  .empty-state-icon {
+    font-size: 60px;
+    margin-bottom: var(--spacing-md);
+  }
+
+  .empty-state-title {
+    font-size: var(--font-size-lg);
+  }
+
+  .empty-state-text {
+    font-size: var(--font-size-sm);
+  }
+
+  .empty-state-actions {
+    flex-direction: column;
+  }
+
+  .empty-state-actions .btn {
+    width: 100%;
+  }
+}

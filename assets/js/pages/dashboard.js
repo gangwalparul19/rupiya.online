@@ -11,6 +11,8 @@ import encryptionReauthModal from '../components/encryption-reauth-modal.js';
 import { formatCurrency, formatCurrencyCompact, getRelativeTime, escapeHtml } from '../utils/helpers.js';
 import timezoneService from '../utils/timezone.js';
 import logger from '../utils/logger.js';
+import kpiEnhancer from '../utils/kpi-enhancements.js';
+import TransactionListEnhancer from '../utils/transaction-list-enhancements.js';
 
 const log = logger.create('Dashboard');
 
@@ -227,6 +229,12 @@ async function loadDashboardData() {
     if (expenseKpi) expenseKpi.setAttribute('data-tooltip', formatCurrency(currentMonthExpenses));
     if (cashflowKpi) cashflowKpi.setAttribute('data-tooltip', formatCurrency(cashFlow));
     if (savingsKpi) savingsKpi.setAttribute('data-tooltip', `${savingsRate.toFixed(2)}%`);
+    
+    // Initialize KPI enhancements
+    kpiEnhancer.initCard('incomeKpi', { showSparkline: true, showDetails: true, detailsLink: 'income.html' });
+    kpiEnhancer.initCard('expenseKpi', { showSparkline: true, showDetails: true, detailsLink: 'expenses.html' });
+    kpiEnhancer.initCard('cashflowKpi', { showSparkline: false, showDetails: true });
+    kpiEnhancer.initCard('savingsKpi', { showSparkline: false, showDetails: false });
     
     // Update changes
     updateChange(incomeChange, incomeChangePercent, 'positive');
@@ -575,48 +583,63 @@ function loadRecentTransactions(expenses, income, splits) {
   }).slice(0, 10); // Get last 10 transactions
   
   if (allTransactions.length === 0) {
-    // Show empty state (already in HTML)
+    // Show empty state
+    transactionsList.innerHTML = `
+      <div class="empty-state transactions-empty animate-in">
+        <div class="empty-state-icon">📊</div>
+        <h3 class="empty-state-title">No transactions yet</h3>
+        <p class="empty-state-text">Start tracking your expenses and income to see them here.</p>
+        <div class="empty-state-actions">
+          <a href="expenses.html" class="btn btn-primary">Add Your First Transaction</a>
+        </div>
+      </div>
+    `;
     return;
   }
   
-  // Build transactions HTML
-  const html = `
-    <div class="transaction-list">
-      ${allTransactions.map(t => {
-        const date = t.date.toDate ? t.date.toDate() : new Date(t.date);
-        let icon, amountClass, amountPrefix;
-        
-        if (t.type === 'split') {
-          icon = '🤝';
-          amountClass = 'expense';
-          amountPrefix = '-';
-        } else if (t.type === 'expense') {
-          icon = '💸';
-          amountClass = 'expense';
-          amountPrefix = '-';
-        } else {
-          icon = '💰';
-          amountClass = 'income';
-          amountPrefix = '+';
-        }
-        
-        const amount = parseFloat(t.amount) || 0;
-        
-        return `
-          <div class="transaction-item">
-            <div class="transaction-icon">${icon}</div>
-            <div class="transaction-details">
-              <div class="transaction-title">${escapeHtml(t.description || t.category || 'Transaction')}</div>
-              <div class="transaction-meta">${escapeHtml(t.category || t.source || 'Uncategorized')}${t.type === 'split' ? ' (Split)' : ''} • ${getRelativeTime(date)}</div>
-            </div>
-            <div class="transaction-amount ${amountClass}">${amountPrefix}${formatCurrency(amount)}</div>
-          </div>
-        `;
-      }).join('')}
-    </div>
-  `;
+  // Use TransactionListEnhancer for rendering
+  const enhancer = new TransactionListEnhancer();
+  enhancer.init('transactionsList', allTransactions);
   
-  transactionsList.innerHTML = html;
+  // Override edit/delete handlers
+  enhancer.onEdit = (transactionId) => {
+    const transaction = allTransactions.find(t => t.id === transactionId);
+    if (transaction && transaction.type === 'split') {
+      window.location.href = `split-expense.html?id=${transactionId}&action=edit`;
+    } else if (transaction && transaction.type === 'income') {
+      window.location.href = `income.html?id=${transactionId}&action=edit`;
+    } else {
+      window.location.href = `expenses.html?id=${transactionId}&action=edit`;
+    }
+  };
+  
+  enhancer.onDelete = (transactionId) => {
+    const transaction = allTransactions.find(t => t.id === transactionId);
+    if (!transaction) return;
+    
+    confirmationModal.show({
+      title: 'Delete Transaction',
+      message: `Are you sure you want to delete this ${transaction.type}?`,
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      onConfirm: async () => {
+        try {
+          if (transaction.type === 'split') {
+            await firestoreService.deleteSplit(transactionId);
+          } else if (transaction.type === 'income') {
+            await firestoreService.deleteIncome(transactionId);
+          } else {
+            await firestoreService.deleteExpense(transactionId);
+          }
+          toast.success('Transaction deleted');
+          enhancer.removeTransaction(transactionId);
+        } catch (error) {
+          log.error('Error deleting transaction:', error);
+          toast.error('Failed to delete transaction');
+        }
+      }
+    });
+  };
 }
 
 // Sidebar toggle (mobile)

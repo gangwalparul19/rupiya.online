@@ -54,6 +54,7 @@
   <link rel="stylesheet" href="assets/css/components.css">
   <link rel="stylesheet" href="assets/css/dark-mode.css">
   <link rel="stylesheet" href="assets/css/auth.css">
+  <link rel="stylesheet" href="assets/css/form-validation-enhancements.css">
   <!-- Structured Data - WebPage -->
   <script type="application/ld+json">
   {
@@ -136,7 +137,8 @@
               placeholder="Enter your full name"
               required
             >
-            <div class="invalid-feedback"></div>
+            <div class="valid-feedback">✓ Name looks good!</div>
+            <div class="invalid-feedback">Please enter your full name</div>
           </div>
 
           <div class="form-group">
@@ -149,7 +151,8 @@
               placeholder="Enter your email"
               required
             >
-            <div class="invalid-feedback"></div>
+            <div class="valid-feedback">✓ Email looks good!</div>
+            <div class="invalid-feedback">Please enter a valid email</div>
           </div>
 
           <div class="form-group">
@@ -160,8 +163,10 @@
                 id="password" 
                 name="password" 
                 class="form-control" 
-                placeholder="Create a password (min 6 characters)"
+                placeholder="Create a password (min 8 characters)"
                 required
+                minlength="8"
+                data-validate="password"
               >
               <button type="button" class="password-toggle-btn" id="togglePassword" aria-label="Toggle password visibility">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
@@ -170,7 +175,8 @@
                 </svg>
               </button>
             </div>
-            <div class="invalid-feedback"></div>
+            <div class="valid-feedback">✓ Password strength: Good</div>
+            <div class="invalid-feedback">Password must be at least 8 characters</div>
           </div>
 
           <div class="form-group">
@@ -183,6 +189,7 @@
                 class="form-control" 
                 placeholder="Confirm your password"
                 required
+                data-validate="confirmPassword"
               >
               <button type="button" class="password-toggle-btn" id="toggleConfirmPassword" aria-label="Toggle password visibility">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
@@ -191,7 +198,8 @@
                 </svg>
               </button>
             </div>
-            <div class="invalid-feedback"></div>
+            <div class="valid-feedback">✓ Passwords match</div>
+            <div class="invalid-feedback">Passwords do not match</div>
           </div>
 
           <div class="form-group">

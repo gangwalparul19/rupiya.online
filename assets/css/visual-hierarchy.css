@@ -1,0 +1,426 @@
+/* Color & Visual Hierarchy Refinement */
+
+/* Enhanced Color Palette */
+:root {
+  /* Primary Colors */
+  --primary-color: #4A90E2;
+  --primary-dark: #2E5C8A;
+  --primary-light: #7BA8E8;
+
+  /* Secondary Colors */
+  --secondary-color: #50C878;
+  --secondary-dark: #2D7A4A;
+  --secondary-light: #7FD99F;
+
+  /* Accent Colors */
+  --accent-color: #FFB84D;
+  --accent-dark: #CC8F2E;
+  --accent-light: #FFD699;
+
+  /* Status Colors */
+  --success-color: #51CF66;
+  --warning-color: #FFD43B;
+  --danger-color: #FF6B6B;
+  --info-color: #4ECDC4;
+
+  /* Neutral Colors */
+  --text-primary: #1a1a1a;
+  --text-secondary: #666666;
+  --text-tertiary: #999999;
+  --text-disabled: #CCCCCC;
+
+  /* Background Colors */
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #F8F9FA;
+  --bg-tertiary: #F0F2F5;
+
+  /* Card & Component Colors */
+  --card-bg: #FFFFFF;
+  --hover-bg: #F5F7FA;
+  --active-bg: #E8F0FF;
+  --disabled-bg: #F0F0F0;
+
+  /* Border Colors */
+  --border-color: #E0E0E0;
+  --border-light: #F0F0F0;
+  --border-dark: #CCCCCC;
+
+  /* Input Colors */
+  --input-bg: #FFFFFF;
+  --input-border: #E0E0E0;
+  --input-focus: #4A90E2;
+
+  /* Shadow Colors */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Typography Hierarchy */
+h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--text-primary);
+}
+
+h4 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--text-primary);
+}
+
+h5 {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+h6 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+p {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+
+.text-secondary {
+  color: var(--text-secondary);
+}
+
+.text-tertiary {
+  color: var(--text-tertiary);
+}
+
+.text-disabled {
+  color: var(--text-disabled);
+}
+
+/* Font Weights */
+.font-light {
+  font-weight: 300;
+}
+
+.font-normal {
+  font-weight: 400;
+}
+
+.font-medium {
+  font-weight: 500;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+/* Font Sizes */
+.text-xs {
+  font-size: 0.75rem;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+}
+
+.text-base {
+  font-size: 1rem;
+}
+
+.text-lg {
+  font-size: 1.125rem;
+}
+
+.text-xl {
+  font-size: 1.25rem;
+}
+
+.text-2xl {
+  font-size: 1.5rem;
+}
+
+.text-3xl {
+  font-size: 1.875rem;
+}
+
+/* Visual Distinction Between Sections */
+.section {
+  padding: 2rem;
+  background-color: var(--card-bg);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  margin-bottom: 2rem;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--border-light);
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.section-subtitle {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0.5rem 0 0 0;
+}
+
+.section-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+/* Card Hierarchy */
+.card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  border-color: var(--primary-color);
+  box-shadow: var(--shadow-md);
+}
+
+.card-primary {
+  border-color: var(--primary-color);
+  background-color: var(--active-bg);
+}
+
+.card-success {
+  border-color: var(--success-color);
+  background-color: rgba(81, 207, 102, 0.05);
+}
+
+.card-warning {
+  border-color: var(--warning-color);
+  background-color: rgba(255, 212, 59, 0.05);
+}
+
+.card-danger {
+  border-color: var(--danger-color);
+  background-color: rgba(255, 107, 107, 0.05);
+}
+
+/* Icon Consistency */
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  font-size: 1rem;
+}
+
+.icon-sm {
+  width: 16px;
+  height: 16px;
+  font-size: 0.75rem;
+}
+
+.icon-lg {
+  width: 32px;
+  height: 32px;
+  font-size: 1.25rem;
+}
+
+.icon-xl {
+  width: 48px;
+  height: 48px;
+  font-size: 1.75rem;
+}
+
+/* Subtle Background Patterns */
+.pattern-dots {
+  background-image: radial-gradient(circle, var(--border-light) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.pattern-lines {
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 19px,
+    var(--border-light) 19px,
+    var(--border-light) 20px
+  );
+}
+
+.pattern-grid {
+  background-image:
+    linear-gradient(var(--border-light) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border-light) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Enhanced Card Shadows & Depth */
+.shadow-sm {
+  box-shadow: var(--shadow-sm);
+}
+
+.shadow-md {
+  box-shadow: var(--shadow-md);
+}
+
+.shadow-lg {
+  box-shadow: var(--shadow-lg);
+}
+
+.shadow-xl {
+  box-shadow: var(--shadow-xl);
+}
+
+.shadow-none {
+  box-shadow: none;
+}
+
+/* Depth Levels */
+.depth-1 {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.depth-2 {
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+}
+
+.depth-3 {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.depth-4 {
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+}
+
+/* Color Contrast Utilities */
+.high-contrast {
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
+}
+
+.medium-contrast {
+  color: var(--text-secondary);
+  background-color: var(--bg-secondary);
+}
+
+.low-contrast {
+  color: var(--text-tertiary);
+  background-color: var(--bg-tertiary);
+}
+
+/* Status Indicators */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.status-success {
+  background-color: rgba(81, 207, 102, 0.1);
+  color: var(--success-color);
+}
+
+.status-warning {
+  background-color: rgba(255, 212, 59, 0.1);
+  color: var(--warning-color);
+}
+
+.status-danger {
+  background-color: rgba(255, 107, 107, 0.1);
+  color: var(--danger-color);
+}
+
+.status-info {
+  background-color: rgba(78, 205, 196, 0.1);
+  color: var(--info-color);
+}
+
+/* Visual Emphasis */
+.emphasis-high {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.emphasis-medium {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.emphasis-low {
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+/* Responsive Typography */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  h2 {
+    font-size: 1.25rem;
+  }
+
+  h3 {
+    font-size: 1.125rem;
+  }
+
+  .section {
+    padding: 1.5rem;
+  }
+
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .section-actions {
+    width: 100%;
+    margin-top: 1rem;
+  }
+}
