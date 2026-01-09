@@ -939,23 +939,28 @@ async function loadFamilyMembersForSplit() {
       return;
     }
     
-    // Create input for each active member
+    // Create input for each active member with selection checkbox
     splitMembersList.innerHTML = familyMembers.map(member => {
       return `
         <div class="split-member-item" data-member-id="${member.id}">
+          <input 
+            type="checkbox" 
+            class="split-member-checkbox" 
+            data-member-id="${member.id}"
+            title="Select to include in split"
+            style="width: 18px; height: 18px; cursor: pointer; flex-shrink: 0;"
+          >
           <div class="split-member-avatar">${member.icon}</div>
           <div class="split-member-info">
             <div class="split-member-name">${escapeHtml(member.name)}</div>
-            <div class="split-member-role">${member.role || 'Family Member'}</div>
           </div>
           <div class="split-member-input-wrapper">
-            <span>₹</span>
             <input 
               type="number" 
               class="split-amount-input" 
               data-member-id="${member.id}"
               data-member-name="${escapeHtml(member.name)}"
-              placeholder="0.00" 
+              placeholder="0" 
               step="0.01" 
               min="0"
               value="0"
@@ -968,6 +973,21 @@ async function loadFamilyMembersForSplit() {
     // Add event listeners to split inputs
     document.querySelectorAll('.split-amount-input').forEach(input => {
       input.addEventListener('input', updateSplitSummary);
+    });
+
+    // Add event listeners to checkboxes
+    document.querySelectorAll('.split-member-checkbox').forEach(checkbox => {
+      checkbox.addEventListener('change', (e) => {
+        const item = e.target.closest('.split-member-item');
+        if (e.target.checked) {
+          item.classList.add('selected');
+        } else {
+          item.classList.remove('selected');
+          // Clear the amount when unchecked
+          item.querySelector('.split-amount-input').value = '0';
+        }
+        updateSplitSummary();
+      });
     });
     
     // Initialize summary
@@ -1069,10 +1089,13 @@ function resetFamilyMembers() {
 // Update split summary
 function updateSplitSummary() {
   const totalAmount = parseFloat(amountInput.value) || 0;
-  const splitInputs = document.querySelectorAll('.split-amount-input');
+  
+  // Only count checked members
+  const checkedItems = document.querySelectorAll('.split-member-item.selected');
   
   let allocatedAmount = 0;
-  splitInputs.forEach(input => {
+  checkedItems.forEach(item => {
+    const input = item.querySelector('.split-amount-input');
     allocatedAmount += parseFloat(input.value) || 0;
   });
   
@@ -1099,24 +1122,27 @@ function updateSplitSummary() {
 // Auto-distribute split equally
 function autoDistributeSplit() {
   const totalAmount = parseFloat(amountInput.value) || 0;
-  const splitInputs = document.querySelectorAll('.split-amount-input');
   
   if (totalAmount <= 0) {
     toast.warning('Please enter a total amount first');
     return;
   }
   
-  if (splitInputs.length === 0) {
-    toast.warning('No family members to split with');
+  // Get only checked members
+  const checkedInputs = Array.from(document.querySelectorAll('.split-member-checkbox:checked'))
+    .map(checkbox => checkbox.closest('.split-member-item').querySelector('.split-amount-input'));
+  
+  if (checkedInputs.length === 0) {
+    toast.warning('Please select at least one family member to split with');
     return;
   }
   
-  const amountPerMember = (totalAmount / splitInputs.length).toFixed(2);
+  const amountPerMember = (totalAmount / checkedInputs.length).toFixed(2);
   
-  splitInputs.forEach((input, index) => {
+  checkedInputs.forEach((input, index) => {
     // For the last member, adjust to account for rounding
-    if (index === splitInputs.length - 1) {
-      const currentTotal = Array.from(splitInputs).slice(0, -1).reduce((sum, inp) => sum + parseFloat(inp.value || 0), 0);
+    if (index === checkedInputs.length - 1) {
+      const currentTotal = checkedInputs.slice(0, -1).reduce((sum, inp) => sum + parseFloat(inp.value || 0), 0);
       input.value = (totalAmount - currentTotal).toFixed(2);
     } else {
       input.value = amountPerMember;
@@ -1124,7 +1150,7 @@ function autoDistributeSplit() {
   });
   
   updateSplitSummary();
-  toast.success('Amount distributed equally among members');
+  toast.success('Amount distributed equally among selected members');
 }
 
 // Validate split details
@@ -1136,12 +1162,15 @@ function validateSplitDetails() {
   }
   
   const totalAmount = parseFloat(amountInput.value) || 0;
-  const splitInputs = document.querySelectorAll('.split-amount-input');
+  
+  // Only validate checked members
+  const checkedItems = document.querySelectorAll('.split-member-item.selected');
   
   let allocatedAmount = 0;
   let hasNonZero = false;
   
-  splitInputs.forEach(input => {
+  checkedItems.forEach(item => {
+    const input = item.querySelector('.split-amount-input');
     const value = parseFloat(input.value) || 0;
     allocatedAmount += value;
     if (value > 0) hasNonZero = true;
@@ -1150,7 +1179,7 @@ function validateSplitDetails() {
   const splitDetailsError = document.getElementById('splitDetailsError');
   
   if (!hasNonZero) {
-    splitDetailsError.textContent = 'Please allocate amounts to at least one family member';
+    splitDetailsError.textContent = 'Please allocate amounts to at least one selected family member';
     return false;
   }
   
@@ -1173,10 +1202,12 @@ function getSplitDetailsData() {
     return null;
   }
   
-  const splitInputs = document.querySelectorAll('.split-amount-input');
+  // Only get checked members
+  const checkedItems = document.querySelectorAll('.split-member-item.selected');
   const splitDetails = [];
   
-  splitInputs.forEach(input => {
+  checkedItems.forEach(item => {
+    const input = item.querySelector('.split-amount-input');
     const amount = parseFloat(input.value) || 0;
     if (amount > 0) {
       splitDetails.push({
