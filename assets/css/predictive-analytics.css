@@ -107,6 +107,40 @@
   text-overflow: ellipsis;
 }
 
+/* Desktop: 4 columns (1025px+) */
+@media (min-width: 1025px) {
+  .summary-cards-row {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+}
+
+/* Tablet: 4 columns (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .summary-cards-row {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.875rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .summary-card {
+    padding: 1rem;
+  }
+
+  .summary-card-icon {
+    font-size: 1.75rem;
+  }
+
+  .summary-card-label {
+    font-size: 0.7rem;
+  }
+
+  .summary-card-value {
+    font-size: 1.25rem;
+  }
+}
+
 /* Desktop Layout */
 @media (min-width: 769px) {
   .main-content {
