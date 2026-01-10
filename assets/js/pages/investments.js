@@ -2,6 +2,7 @@
 import '../services/services-init.js'; // Initialize services first
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
+import encryptionService from '../services/encryption-service.js';
 import investmentHistoryService from '../services/investment-history-service.js';
 import googleSheetsPriceService from '../services/google-sheets-price-service.js'; // Changed from livePriceService
 import symbolSearchService from '../services/symbol-search-service.js';
@@ -230,6 +231,8 @@ function showEditForm(investment) {
   document.getElementById('purchasePrice').value = investment.purchasePrice;
   document.getElementById('currentPrice').value = investment.currentPrice;
   document.getElementById('purchaseDate').value = formatDateForInput(investment.purchaseDate);
+  document.getElementById('brokerageUsername').value = investment.brokerageUsername || '';
+  document.getElementById('dividendDetails').value = investment.dividendDetails || '';
   document.getElementById('notes').value = investment.notes || '';
   document.getElementById('currency').value = investment.currency || 'INR';
 
@@ -250,6 +253,8 @@ async function handleSubmit(e) {
     purchasePrice: parseFloat(document.getElementById('purchasePrice').value),
     currentPrice: parseFloat(document.getElementById('currentPrice').value),
     purchaseDate: timezoneService.parseInputDate(document.getElementById('purchaseDate').value),
+    brokerageUsername: document.getElementById('brokerageUsername').value.trim(),
+    dividendDetails: document.getElementById('dividendDetails').value.trim(),
     notes: document.getElementById('notes').value.trim(),
     currency: 'INR' // Always store as INR
   };

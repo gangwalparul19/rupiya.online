@@ -1205,3 +1205,65 @@
     font-size: 0.7rem;
   }
 }
+
+
+/* ============================================
+   SPLIT INCOME STYLES
+   ============================================ */
+
+.split-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  background: rgba(155, 89, 182, 0.15);
+  color: #9B59B6;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+.income-source-with-icon {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.split-info {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-color);
+}
+
+.split-members {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.split-member-tag {
+  display: inline-block;
+  padding: 4px 8px;
+  background: rgba(74, 144, 226, 0.1);
+  color: var(--primary-blue);
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+@media (max-width: 768px) {
+  .split-badge {
+    padding: 3px 6px;
+    font-size: 10px;
+    margin-left: 2px;
+  }
+  
+  .split-member-tag {
+    padding: 3px 6px;
+    font-size: 10px;
+  }
+}

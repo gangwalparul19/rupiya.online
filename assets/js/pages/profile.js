@@ -3,6 +3,7 @@ import '../services/services-init.js'; // Initialize services first
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
 import categoriesService from '../services/categories-service.js';
+import encryptionService from '../services/encryption-service.js';
 import toast from '../components/toast.js';
 import confirmationModal from '../components/confirmation-modal.js';
 import themeManager from '../utils/theme-manager.js';
@@ -699,8 +700,36 @@ function getDefaultFamilyMembers() {
 }
 
 // Get family members from localStorage
-function getFamilyMembers() {
+// Get family members from Firestore (with fallback to localStorage)
+async function getFamilyMembers() {
   try {
+    const userId = authService.getCurrentUser()?.uid;
+    if (!userId) {
+      // Fallback to localStorage if not authenticated
+      const stored = localStorage.getItem('familyMembers');
+      if (stored) {
+        return JSON.parse(stored);
+      }
+      return getDefaultFamilyMembers();
+    }
+
+    // Try to load from Firestore first
+    try {
+      const familyData = await firestoreService.getAll('familyMembers');
+      if (familyData && familyData.length > 0) {
+        // Decryption happens automatically in firestoreService
+        const decryptedData = await encryptionService.decryptObject(familyData[0], 'familyMembers');
+        if (decryptedData && decryptedData.members) {
+          // Also update localStorage for offline access
+          localStorage.setItem('familyMembers', JSON.stringify(decryptedData.members));
+          return decryptedData.members;
+        }
+      }
+    } catch (firestoreError) {
+      console.warn('Error loading from Firestore, falling back to localStorage:', firestoreError);
+    }
+
+    // Fallback to localStorage
     const stored = localStorage.getItem('familyMembers');
     if (stored) {
       return JSON.parse(stored);
@@ -718,7 +747,7 @@ async function loadFamilyMembersUI() {
   if (!familyMembersGrid) return;
 
   try {
-    const members = getFamilyMembers();
+    const members = await getFamilyMembers();
     const iconOptions = ['👤', '👨', '👩', '👧', '👦', '👶', '👴', '👵', '🧑', '👨‍🦱', '👩‍🦱', '👨‍🦲', '👩‍🦲'];
     const isExtraMember = (index) => index >= 6;
 
@@ -961,7 +990,7 @@ async function handleSaveFamilyMembers() {
       const memberId = slot.dataset.memberId;
       const name = slot.querySelector('.family-member-name-input').value;
       const role = slot.querySelector('.family-member-role-input').value;
-      const icon = slot.querySelector('.icon-option.selected').dataset.icon;
+      const icon = slot.querySelector('.icon-option.selected').data-icon;
       const active = slot.querySelector('.family-member-checkbox').checked;
 
       members.push({
@@ -973,8 +1002,24 @@ async function handleSaveFamilyMembers() {
       });
     });
 
-    localStorage.setItem('familyMembers', JSON.stringify(members));
-    toast.success('Family members saved successfully');
+    // Save to Firestore with encryption
+    const userId = authService.getCurrentUser().uid;
+    const familyMembersData = {
+      userId: userId,
+      members: members,
+      updatedAt: new Date()
+    };
+
+    // Encryption happens automatically in firestoreService
+    const result = await firestoreService.add('familyMembers', familyMembersData);
+    
+    if (result.success) {
+      // Also keep in localStorage for backward compatibility
+      localStorage.setItem('familyMembers', JSON.stringify(members));
+      toast.success('Family members saved successfully');
+    } else {
+      toast.error('Failed to save family members to cloud');
+    }
   } catch (error) {
     console.error('Error saving family members:', error);
     toast.error('Failed to save family members');

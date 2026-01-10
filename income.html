@@ -266,6 +266,13 @@
             </div>
 
             <div class="filter-group">
+              <label for="familyMemberFilter">Family Member</label>
+              <select id="familyMemberFilter" class="filter-select">
+                <option value="">All Members</option>
+              </select>
+            </div>
+
+            <div class="filter-group">
               <label for="dateFromFilter">From Date</label>
               <input type="date" id="dateFromFilter" class="filter-input">
             </div>
@@ -363,7 +370,48 @@
               <span class="error-message" id="descriptionError"></span>
             </div>
 
+            <!-- Split Income Checkbox -->
+            <div class="form-group form-group-full">
+              <label class="checkbox-label">
+                <input type="checkbox" id="enableSplitByMember" style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary-blue);">
+                <span>Split income among family members</span>
+              </label>
+            </div>
 
+          </div>
+
+          <!-- Split Details Container -->
+          <div id="splitDetailsContainer" style="display: none;" class="split-details-section">
+            <div class="split-details-header">
+              <h3>Split Details</h3>
+              <button type="button" class="btn btn-sm btn-outline" id="autoDistributeBtn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                </svg>
+                Auto Distribute
+              </button>
+            </div>
+
+            <div id="splitMembersList" class="split-members-list">
+              <!-- Family members will be loaded here -->
+            </div>
+
+            <div class="split-summary">
+              <div class="split-summary-row">
+                <span>Total Amount:</span>
+                <span id="splitTotalAmount">₹0</span>
+              </div>
+              <div class="split-summary-row">
+                <span>Allocated:</span>
+                <span id="splitAllocatedAmount">₹0</span>
+              </div>
+              <div class="split-summary-row" id="splitRemainingItem">
+                <span>Remaining:</span>
+                <span id="splitRemainingAmount">₹0</span>
+              </div>
+            </div>
+
+            <span class="error-message" id="splitDetailsError"></span>
           </div>
 
           <div class="form-actions">

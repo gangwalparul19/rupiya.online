@@ -537,6 +537,7 @@ function populateLoanForm(loan) {
   document.getElementById('loanName').value = loan.loanName || '';
   document.getElementById('loanType').value = loan.loanType || '';
   document.getElementById('lender').value = loan.lender || '';
+  document.getElementById('borrower').value = loan.borrower || '';  // ADD THIS
   document.getElementById('accountNumber').value = loan.accountNumber || '';
   document.getElementById('principalAmount').value = loan.principalAmount || '';
   document.getElementById('interestRate').value = loan.interestRate || '';
@@ -570,6 +571,7 @@ async function saveLoan(e) {
     loanName: document.getElementById('loanName').value.trim(),
     loanType: document.getElementById('loanType').value,
     lender: document.getElementById('lender').value.trim(),
+    borrower: document.getElementById('borrower').value.trim(),  // ADD THIS
     accountNumber: document.getElementById('accountNumber').value.trim(),
     principalAmount: parseFloat(document.getElementById('principalAmount').value) || 0,
     interestRate: parseFloat(document.getElementById('interestRate').value) || 0,

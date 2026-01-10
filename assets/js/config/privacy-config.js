@@ -67,7 +67,8 @@ export const privacyConfig = {
     'tripGroupMembers',      // Member info (name, email, phone)
     'transfers',             // Money transfers between accounts
     'netWorthSnapshots',     // Net worth history snapshots
-    'notifications'          // EMI reminders and alerts
+    'notifications',         // EMI reminders and alerts
+    'familyMembers'          // Family member names and roles
     // NOTE: familyGroups and familyInvitations are NOT encrypted because:
     // - They are shared across multiple users
     // - Each user has a different encryption key (derived from their userId)
@@ -89,15 +90,15 @@ export const privacyConfig = {
     expenses: ['amount', 'description', 'paymentMethod', 'notes', 'merchant', 'location'],
     income: ['amount', 'description', 'source', 'paymentMethod', 'notes'],
     budgets: ['amount', 'notes', 'spent'],
-    investments: ['name', 'quantity', 'purchasePrice', 'currentPrice', 'notes', 'symbol', 'broker', 'accountNumber'],
+    investments: ['name', 'quantity', 'purchasePrice', 'currentPrice', 'notes', 'symbol', 'broker', 'accountNumber', 'brokerageUsername', 'dividendDetails'],
     investmentPriceHistory: ['price', 'quantity', 'totalValue', 'notes'],
     goals: ['name', 'targetAmount', 'currentAmount', 'description', 'notes'],
-    loans: ['name', 'lender', 'accountNumber', 'principalAmount', 'emiAmount', 'outstandingAmount', 'interestRate', 'notes'],
-    houses: ['name', 'address', 'purchasePrice', 'currentValue', 'notes', 'rentAmount'],
-    vehicles: ['name', 'registrationNumber', 'purchasePrice', 'currentValue', 'notes', 'insuranceDetails'],
+    loans: ['name', 'lender', 'borrower', 'accountNumber', 'principalAmount', 'emiAmount', 'outstandingAmount', 'interestRate', 'notes'],
+    houses: ['name', 'address', 'purchasePrice', 'currentValue', 'notes', 'rentAmount', 'ownerName', 'tenantName'],
+    vehicles: ['name', 'registrationNumber', 'purchasePrice', 'currentValue', 'notes', 'insuranceDetails', 'ownerName', 'driverName'],
     notes: ['title', 'content'],
     documents: ['name', 'description', 'fileUrl', 'fileName'],
-    recurringTransactions: ['amount', 'description', 'paymentMethod', 'notes'],
+    recurringTransactions: ['amount', 'description', 'paymentMethod', 'notes', 'recipientName'],
     houseHelps: ['name', 'phone', 'monthlySalary', 'notes', 'address'],
     houseHelpPayments: ['amount', 'notes'],
     fuelLogs: ['fuelPrice', 'totalCost', 'fuelStation', 'notes', 'odometer', 'quantity'],
@@ -124,7 +125,8 @@ export const privacyConfig = {
     tripGroupExpenses: ['amount', 'description', 'notes', 'splits'],
     tripGroupSettlements: ['amount', 'notes'],
     tripGroupMembers: ['name', 'email', 'phone'],  // Member personal information
-    notifications: ['title', 'message', 'data']   // EMI reminders contain loan amounts
+    notifications: ['title', 'message', 'data'],   // EMI reminders contain loan amounts
+    familyMembers: ['name', 'role']  // Family member personal information
     // NOTE: familyGroups and familyInvitations are NOT in sensitiveFields
     // because they are shared across users and cannot use per-user encryption
   }

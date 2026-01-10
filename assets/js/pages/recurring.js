@@ -2,6 +2,7 @@
 import '../services/services-init.js'; // Initialize services first
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
+import encryptionService from '../services/encryption-service.js';
 import categoriesService from '../services/categories-service.js';
 import paymentMethodsService from '../services/payment-methods-service.js';
 import toast from '../components/toast.js';
@@ -365,6 +366,7 @@ function showEditForm(recurring) {
   // Fill form
   document.getElementById('type').value = recurring.type;
   document.getElementById('description').value = recurring.description;
+  document.getElementById('recipientName').value = recurring.recipientName || '';
   document.getElementById('amount').value = recurring.amount;
   document.getElementById('category').value = recurring.category;
   document.getElementById('frequency').value = recurring.frequency;
@@ -396,6 +398,7 @@ async function handleSubmit(e) {
   const formData = {
     type: document.getElementById('type').value,
     description: document.getElementById('description').value,
+    recipientName: document.getElementById('recipientName').value.trim(),
     amount: parseFloat(document.getElementById('amount').value),
     category: document.getElementById('category').value,
     frequency: document.getElementById('frequency').value,

@@ -303,18 +303,36 @@ function checkSpendingAlerts(currentExpenses, lastMonthExpenses) {
 function loadTopCategoriesWidget(expenses, splits, startDate, endDate) {
   const container = document.getElementById('topCategoriesList');
   if (!container) return;
-  
+    
   // Filter current month expenses (with null check for date)
   const monthExpenses = expenses.filter(e => {
     if (!e.date) return false;
-    const date = e.date.toDate ? e.date.toDate() : new Date(e.date);
+    let date;
+    if (e.date instanceof Date) {
+      date = e.date;
+    } else if (e.date.toDate && typeof e.date.toDate === 'function') {
+      date = e.date.toDate();
+    } else if (typeof e.date === 'string') {
+      date = new Date(e.date);
+    } else {
+      return false;
+    }
     return date >= startDate && date <= endDate;
   });
-  
+    
   // Filter current month splits and convert to expense-like objects
   const monthSplits = (splits || []).filter(s => {
     if (!s.date) return false;
-    const date = s.date.toDate ? s.date.toDate() : new Date(s.date);
+    let date;
+    if (s.date instanceof Date) {
+      date = s.date;
+    } else if (s.date.toDate && typeof s.date.toDate === 'function') {
+      date = s.date.toDate();
+    } else if (typeof s.date === 'string') {
+      date = new Date(s.date);
+    } else {
+      return false;
+    }
     return date >= startDate && date <= endDate;
   });
   
@@ -324,7 +342,7 @@ function loadTopCategoriesWidget(expenses, splits, startDate, endDate) {
     const cat = e.category || 'Other';
     categoryTotals[cat] = (categoryTotals[cat] || 0) + (parseFloat(e.amount) || 0);
   });
-  
+    
   // Add split expenses to categories (your share only)
   monthSplits.forEach(split => {
     const myShare = split.participants?.find(p => p.name === 'Me');
@@ -339,6 +357,8 @@ function loadTopCategoriesWidget(expenses, splits, startDate, endDate) {
   const sorted = Object.entries(categoryTotals)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 5);
+  
+  log.log('Top 5 categories:', sorted);
   
   if (sorted.length === 0) {
     container.innerHTML = '<p style="color: #7F8C8D; text-align: center; padding: 1rem;">No expenses this month</p>';
@@ -867,26 +887,64 @@ function createCategoryChart(expenses, period = 'current', splits = []) {
   
   if (period === 'current') {
     filteredExpenses = expenses.filter(e => {
-      const date = e.date.toDate ? e.date.toDate() : new Date(e.date);
+      if (!e.date) return false;
+      let date;
+      if (e.date instanceof Date) {
+        date = e.date;
+      } else if (e.date.toDate && typeof e.date.toDate === 'function') {
+        date = e.date.toDate();
+      } else if (typeof e.date === 'string') {
+        date = new Date(e.date);
+      } else {
+        return false;
+      }
       return date.getMonth() === now.getMonth() && 
              date.getFullYear() === now.getFullYear();
     });
     filteredSplits = (splits || []).filter(s => {
       if (!s.date) return false;
-      const date = s.date.toDate ? s.date.toDate() : new Date(s.date);
+      let date;
+      if (s.date instanceof Date) {
+        date = s.date;
+      } else if (s.date.toDate && typeof s.date.toDate === 'function') {
+        date = s.date.toDate();
+      } else if (typeof s.date === 'string') {
+        date = new Date(s.date);
+      } else {
+        return false;
+      }
       return date.getMonth() === now.getMonth() && 
              date.getFullYear() === now.getFullYear();
     });
   } else if (period === 'last') {
     const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
     filteredExpenses = expenses.filter(e => {
-      const date = e.date.toDate ? e.date.toDate() : new Date(e.date);
+      if (!e.date) return false;
+      let date;
+      if (e.date instanceof Date) {
+        date = e.date;
+      } else if (e.date.toDate && typeof e.date.toDate === 'function') {
+        date = e.date.toDate();
+      } else if (typeof e.date === 'string') {
+        date = new Date(e.date);
+      } else {
+        return false;
+      }
       return date.getMonth() === lastMonth.getMonth() && 
              date.getFullYear() === lastMonth.getFullYear();
     });
     filteredSplits = (splits || []).filter(s => {
       if (!s.date) return false;
-      const date = s.date.toDate ? s.date.toDate() : new Date(s.date);
+      let date;
+      if (s.date instanceof Date) {
+        date = s.date;
+      } else if (s.date.toDate && typeof s.date.toDate === 'function') {
+        date = s.date.toDate();
+      } else if (typeof s.date === 'string') {
+        date = new Date(s.date);
+      } else {
+        return false;
+      }
       return date.getMonth() === lastMonth.getMonth() && 
              date.getFullYear() === lastMonth.getFullYear();
     });

@@ -5,6 +5,7 @@ import firestoreService from '../services/firestore-service.js';
 import categoriesService from '../services/categories-service.js';
 import paymentMethodsService from '../services/payment-methods-service.js';
 import smartCategorizationService from '../services/smart-categorization-service.js';
+import encryptionService from '../services/encryption-service.js';
 import toast from '../components/toast.js';
 import confirmationModal from '../components/confirmation-modal.js';
 import themeManager from '../utils/theme-manager.js';
@@ -23,6 +24,7 @@ const state = {
   filters: {
     source: '',
     paymentMethod: '',
+    familyMember: '',
     dateFrom: '',
     dateTo: '',
     search: ''
@@ -172,6 +174,9 @@ async function initPage() {
     // Load categories into dropdowns
     await loadSourceDropdowns();
     
+    // Populate family member filter
+    populateFamilyMemberFilter();
+    
     // Load user's payment methods
     await loadUserPaymentMethods();
     
@@ -212,6 +217,21 @@ async function loadSourceDropdowns() {
       sources.map(src => `<option value="${src}">${src}</option>`).join('');
   } catch (error) {
     console.error('Error loading income sources:', error);
+  }
+}
+
+// Populate family member filter
+function populateFamilyMemberFilter() {
+  try {
+    const familyMembers = getActiveFamilyMembers();
+    const familyMemberFilter = document.getElementById('familyMemberFilter');
+    
+    if (!familyMemberFilter || !familyMembers) return;
+    
+    familyMemberFilter.innerHTML = '<option value="">All Members</option>' +
+      familyMembers.map(member => `<option value="${member.id}">${member.icon} ${escapeHtml(member.name)}</option>`).join('');
+  } catch (error) {
+    console.error('Error populating family member filter:', error);
   }
 }
 
@@ -406,6 +426,14 @@ function applyFilters() {
     filtered = filtered.filter(i => i.paymentMethod === state.filters.paymentMethod);
   }
   
+  // Family member filter (for split income)
+  if (state.filters.familyMember) {
+    filtered = filtered.filter(i => {
+      if (!i.hasSplit || !i.splitDetails) return false;
+      return i.splitDetails.some(split => split.memberId === state.filters.familyMember);
+    });
+  }
+  
   // Date range filter
   if (state.filters.dateFrom) {
     const fromDate = timezoneService.parseInputDate(state.filters.dateFrom);
@@ -503,6 +531,7 @@ function createIncomeCard(income) {
             <span class="category-icon">${sourceIcon}</span>
             <span>${income.source}</span>
             ${isRecurring ? '<span class="recurring-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Recurring</span>' : ''}
+            ${income.hasSplit ? '<span class="split-badge" title="Split income">👥 Split</span>' : ''}
           </div>
           <div class="income-actions">
             <button class="btn-icon btn-duplicate" data-id="${income.id}" title="Duplicate">
@@ -523,6 +552,13 @@ function createIncomeCard(income) {
           </div>
         </div>
         ${income.description ? `<div class="income-description">${escapeHtml(income.description)}</div>` : ''}
+        ${income.hasSplit && income.splitDetails ? `
+          <div class="split-info">
+            <div class="split-members">
+              ${income.splitDetails.map(split => `<span class="split-member-tag">${split.memberName}: ${formatCurrency(split.amount)}</span>`).join('')}
+            </div>
+          </div>
+        ` : ''}
         <div class="income-meta">
           <div class="income-meta-item">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -832,6 +868,29 @@ function setupEventListeners() {
   // Payment method cascading selection
   paymentMethodInput.addEventListener('change', handlePaymentMethodChange);
   
+  // Split by member functionality
+  const enableSplitCheckbox = document.getElementById('enableSplitByMember');
+  const splitDetailsContainer = document.getElementById('splitDetailsContainer');
+  const autoDistributeBtn = document.getElementById('autoDistributeBtn');
+  
+  if (enableSplitCheckbox) {
+    enableSplitCheckbox.addEventListener('change', (e) => {
+      if (e.target.checked) {
+        splitDetailsContainer.style.display = 'block';
+        loadFamilyMembersForSplitIncome();
+      } else {
+        splitDetailsContainer.style.display = 'none';
+      }
+    });
+  }
+  
+  if (autoDistributeBtn) {
+    autoDistributeBtn.addEventListener('click', autoDistributeSplitIncome);
+  }
+  
+  // Update split summary when amount changes
+  amountInput.addEventListener('input', updateSplitIncomeSummary);
+  
   // Filters
   sourceFilter.addEventListener('change', () => {
     state.filters.source = sourceFilter.value;
@@ -842,6 +901,14 @@ function setupEventListeners() {
     state.filters.paymentMethod = paymentMethodFilter.value;
     applyFilters();
   });
+  
+  const familyMemberFilter = document.getElementById('familyMemberFilter');
+  if (familyMemberFilter) {
+    familyMemberFilter.addEventListener('change', () => {
+      state.filters.familyMember = familyMemberFilter.value;
+      applyFilters();
+    });
+  }
   
   dateFromFilter.addEventListener('change', () => {
     state.filters.dateFrom = dateFromFilter.value;
@@ -964,6 +1031,7 @@ function clearFilters() {
   state.filters = {
     source: '',
     paymentMethod: '',
+    familyMember: '',
     dateFrom: '',
     dateTo: '',
     search: ''
@@ -971,6 +1039,10 @@ function clearFilters() {
   
   sourceFilter.value = '';
   paymentMethodFilter.value = '';
+  const familyMemberFilter = document.getElementById('familyMemberFilter');
+  if (familyMemberFilter) {
+    familyMemberFilter.value = '';
+  }
   dateFromFilter.value = '';
   dateToFilter.value = '';
   searchInput.value = '';
@@ -993,6 +1065,16 @@ function openAddForm() {
   
   // Clear errors
   clearFormErrors();
+  
+  // Reset split details
+  const enableSplitCheckbox = document.getElementById('enableSplitByMember');
+  const splitDetailsContainer = document.getElementById('splitDetailsContainer');
+  if (enableSplitCheckbox) {
+    enableSplitCheckbox.checked = false;
+  }
+  if (splitDetailsContainer) {
+    splitDetailsContainer.style.display = 'none';
+  }
   
   // Show form and scroll to it
   addIncomeSection.classList.add('show');
@@ -1019,6 +1101,42 @@ function openEditForm(id) {
   dateInput.value = timezoneService.formatDateForInput(date);
   paymentMethodInput.value = income.paymentMethod;
   
+  // Trigger payment method change to populate saved methods dropdown
+  handlePaymentMethodChange();
+  
+  // Set specific payment method if available
+  if (income.specificPaymentMethodId && specificPaymentMethodInput) {
+    specificPaymentMethodInput.value = income.specificPaymentMethodId;
+  }
+  
+  // Populate split details if available
+  const enableSplitCheckbox = document.getElementById('enableSplitByMember');
+  const splitDetailsContainer = document.getElementById('splitDetailsContainer');
+  
+  if (income.hasSplit && income.splitDetails && income.splitDetails.length > 0) {
+    if (enableSplitCheckbox) {
+      enableSplitCheckbox.checked = true;
+      splitDetailsContainer.style.display = 'block';
+      
+      // Load family members first
+      loadFamilyMembersForSplitIncome().then(() => {
+        // Then populate the split amounts
+        income.splitDetails.forEach(split => {
+          const input = document.querySelector(`.split-amount-input[data-member-id="${split.memberId}"]`);
+          if (input) {
+            input.value = split.amount;
+          }
+        });
+        updateSplitIncomeSummary();
+      });
+    }
+  } else {
+    if (enableSplitCheckbox) {
+      enableSplitCheckbox.checked = false;
+      splitDetailsContainer.style.display = 'none';
+    }
+  }
+  
   // Clear errors
   clearFormErrors();
   
@@ -1033,6 +1151,16 @@ function closeIncomeForm() {
   incomeForm.reset();
   clearFormErrors();
   state.editingIncomeId = null;
+  
+  // Reset split details
+  const enableSplitCheckbox = document.getElementById('enableSplitByMember');
+  const splitDetailsContainer = document.getElementById('splitDetailsContainer');
+  if (enableSplitCheckbox) {
+    enableSplitCheckbox.checked = false;
+  }
+  if (splitDetailsContainer) {
+    splitDetailsContainer.style.display = 'none';
+  }
 }
 
 // Clear form errors
@@ -1042,7 +1170,254 @@ function clearFormErrors() {
   });
 }
 
-// Validate form
+// ============================================
+// FAMILY MEMBER FUNCTIONS
+// ============================================
+
+// Get family members from localStorage
+function getFamilyMembers() {
+  try {
+    const stored = localStorage.getItem('familyMembers');
+    if (stored) {
+      return JSON.parse(stored);
+    }
+    return getDefaultFamilyMembers();
+  } catch (error) {
+    console.error('Error getting family members:', error);
+    return getDefaultFamilyMembers();
+  }
+}
+
+// Get default family members (6 slots)
+function getDefaultFamilyMembers() {
+  return [
+    { id: 'member-1', name: 'Me', icon: '\u{1F468}', role: 'Self', active: true },
+    { id: 'member-2', name: 'Spouse', icon: '\u{1F469}', role: 'Spouse', active: true },
+    { id: 'member-3', name: 'Child 1', icon: '\u{1F467}', role: 'Child', active: true },
+    { id: 'member-4', name: 'Child 2', icon: '\u{1F466}', role: 'Child', active: true },
+    { id: 'member-5', name: 'Father', icon: '\u{1F474}', role: 'Parent', active: true },
+    { id: 'member-6', name: 'Mother', icon: '\u{1F475}', role: 'Parent', active: true }
+  ];
+}
+
+// Get active family members (for splitting)
+function getActiveFamilyMembers() {
+  const members = getFamilyMembers();
+  return members.filter(m => m.active);
+}
+
+// ============================================
+// SPLIT INCOME FUNCTIONS
+// ============================================
+
+async function loadFamilyMembersForSplitIncome() {
+  const splitMembersList = document.getElementById('splitMembersList');
+  if (!splitMembersList) return;
+  
+  try {
+    // Get active family members for splitting
+    const familyMembers = getActiveFamilyMembers();
+    
+    if (!familyMembers || familyMembers.length === 0) {
+      splitMembersList.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">No active family members. Please enable members in your profile settings.</p>';
+      return;
+    }
+    
+    // Create input for each active member with selection checkbox
+    splitMembersList.innerHTML = familyMembers.map(member => {
+      return `
+        <div class="split-member-item" data-member-id="${member.id}">
+          <input 
+            type="checkbox" 
+            class="split-member-checkbox" 
+            data-member-id="${member.id}"
+            title="Select to include in split"
+            style="width: 18px; height: 18px; cursor: pointer; flex-shrink: 0;"
+          >
+          <div class="split-member-avatar">${member.icon}</div>
+          <div class="split-member-info">
+            <div class="split-member-name">${escapeHtml(member.name)}</div>
+          </div>
+          <div class="split-member-input-wrapper">
+            <input 
+              type="number" 
+              class="split-amount-input" 
+              data-member-id="${member.id}"
+              data-member-name="${escapeHtml(member.name)}"
+              placeholder="0" 
+              step="0.01" 
+              min="0"
+              value="0"
+            >
+          </div>
+        </div>
+      `;
+    }).join('');
+    
+    // Add event listeners to split inputs
+    document.querySelectorAll('.split-amount-input').forEach(input => {
+      input.addEventListener('input', updateSplitIncomeSummary);
+    });
+
+    // Add event listeners to checkboxes
+    document.querySelectorAll('.split-member-checkbox').forEach(checkbox => {
+      checkbox.addEventListener('change', (e) => {
+        const item = e.target.closest('.split-member-item');
+        if (e.target.checked) {
+          item.classList.add('selected');
+        } else {
+          item.classList.remove('selected');
+          // Clear the amount when unchecked
+          item.querySelector('.split-amount-input').value = '0';
+        }
+        updateSplitIncomeSummary();
+      });
+    });
+    
+    // Initialize summary
+    updateSplitIncomeSummary();
+  } catch (error) {
+    console.error('Error loading family members:', error);
+    splitMembersList.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Error loading family members</p>';
+  }
+}
+
+// Update split income summary
+function updateSplitIncomeSummary() {
+  const totalAmount = parseFloat(amountInput.value) || 0;
+  
+  // Only count checked members
+  const checkedItems = document.querySelectorAll('.split-member-item.selected');
+  
+  let allocatedAmount = 0;
+  checkedItems.forEach(item => {
+    const input = item.querySelector('.split-amount-input');
+    allocatedAmount += parseFloat(input.value) || 0;
+  });
+  
+  const remainingAmount = totalAmount - allocatedAmount;
+  
+  // Update UI
+  document.getElementById('splitTotalAmount').textContent = formatCurrency(totalAmount);
+  document.getElementById('splitAllocatedAmount').textContent = formatCurrency(allocatedAmount);
+  document.getElementById('splitRemainingAmount').textContent = formatCurrency(Math.abs(remainingAmount));
+  
+  // Update remaining item styling
+  const remainingItem = document.getElementById('splitRemainingItem');
+  remainingItem.classList.remove('positive', 'negative', 'zero');
+  
+  if (remainingAmount > 0.01) {
+    remainingItem.classList.add('positive');
+  } else if (remainingAmount < -0.01) {
+    remainingItem.classList.add('negative');
+  } else {
+    remainingItem.classList.add('zero');
+  }
+}
+
+// Auto-distribute split income equally
+function autoDistributeSplitIncome() {
+  const totalAmount = parseFloat(amountInput.value) || 0;
+  
+  if (totalAmount <= 0) {
+    toast.warning('Please enter a total amount first');
+    return;
+  }
+  
+  // Get only checked members
+  const checkedInputs = Array.from(document.querySelectorAll('.split-member-checkbox:checked'))
+    .map(checkbox => checkbox.closest('.split-member-item').querySelector('.split-amount-input'));
+  
+  if (checkedInputs.length === 0) {
+    toast.warning('Please select at least one family member to split with');
+    return;
+  }
+  
+  const amountPerMember = (totalAmount / checkedInputs.length).toFixed(2);
+  
+  checkedInputs.forEach((input, index) => {
+    // For the last member, adjust to account for rounding
+    if (index === checkedInputs.length - 1) {
+      const currentTotal = checkedInputs.slice(0, -1).reduce((sum, inp) => sum + parseFloat(inp.value || 0), 0);
+      input.value = (totalAmount - currentTotal).toFixed(2);
+    } else {
+      input.value = amountPerMember;
+    }
+  });
+  
+  updateSplitIncomeSummary();
+  toast.success('Amount distributed equally among selected members');
+}
+
+// Validate split income details
+function validateSplitIncomeDetails() {
+  const enableSplitCheckbox = document.getElementById('enableSplitByMember');
+  
+  if (!enableSplitCheckbox || !enableSplitCheckbox.checked) {
+    return true; // Split not enabled, no validation needed
+  }
+  
+  const totalAmount = parseFloat(amountInput.value) || 0;
+  
+  // Only validate checked members
+  const checkedItems = document.querySelectorAll('.split-member-item.selected');
+  
+  let allocatedAmount = 0;
+  let hasNonZero = false;
+  
+  checkedItems.forEach(item => {
+    const input = item.querySelector('.split-amount-input');
+    const value = parseFloat(input.value) || 0;
+    allocatedAmount += value;
+    if (value > 0) hasNonZero = true;
+  });
+  
+  const splitDetailsError = document.getElementById('splitDetailsError');
+  
+  if (!hasNonZero) {
+    splitDetailsError.textContent = 'Please allocate amounts to at least one selected family member';
+    return false;
+  }
+  
+  const difference = Math.abs(totalAmount - allocatedAmount);
+  
+  if (difference > 0.01) {
+    splitDetailsError.textContent = `Split amounts must equal total amount. Difference: ${formatCurrency(difference)}`;
+    return false;
+  }
+  
+  splitDetailsError.textContent = '';
+  return true;
+}
+
+// Get split income details data
+function getSplitIncomeDetailsData() {
+  const enableSplitCheckbox = document.getElementById('enableSplitByMember');
+  
+  if (!enableSplitCheckbox || !enableSplitCheckbox.checked) {
+    return null;
+  }
+  
+  // Only get checked members
+  const checkedItems = document.querySelectorAll('.split-member-item.selected');
+  const splitDetails = [];
+  
+  checkedItems.forEach(item => {
+    const input = item.querySelector('.split-amount-input');
+    const amount = parseFloat(input.value) || 0;
+    if (amount > 0) {
+      splitDetails.push({
+        memberId: input.dataset.memberId,
+        memberName: input.dataset.memberName,
+        amount: amount
+      });
+    }
+  });
+  
+  return splitDetails.length > 0 ? splitDetails : null;
+}
+
+// Validate income form
 function validateIncomeForm() {
   clearFormErrors();
   
@@ -1082,6 +1457,11 @@ function validateIncomeForm() {
     isValid = false;
   }
   
+  // Split income details validation
+  if (!validateSplitIncomeDetails()) {
+    isValid = false;
+  }
+  
   return isValid;
 }
 
@@ -1110,7 +1490,20 @@ async function handleFormSubmit(e) {
         specificPaymentMethodInput.options[specificPaymentMethodInput.selectedIndex].text : null
     };
     
-    // Family group feature removed
+    // Add split details if enabled (encrypt member names)
+    const splitDetails = getSplitIncomeDetailsData();
+    if (splitDetails) {
+      // Encrypt member names in split details
+      const encryptedSplitDetails = await Promise.all(splitDetails.map(async (split) => {
+        return {
+          ...split,
+          memberName: await encryptionService.encryptValue(split.memberName)
+        };
+      }));
+      
+      incomeData.splitDetails = encryptedSplitDetails;
+      incomeData.hasSplit = true;
+    }
     
     // Add linked data if present
     if (incomeForm.dataset.linkedType) {

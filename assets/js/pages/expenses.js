@@ -469,6 +469,50 @@ function updateExpenseKPIs() {
   if (totalKpi) totalKpi.setAttribute('data-tooltip', formatCurrency(totalAll));
 }
 
+// Update KPIs based on filtered data
+function updateFilteredExpenseKPIs() {
+  const now = new Date();
+  const thisMonthStart = timezoneService.startOfMonth(now);
+  const lastMonthStart = timezoneService.startOfMonth(new Date(now.getFullYear(), now.getMonth() - 1, 1));
+  const lastMonthEnd = timezoneService.endOfMonth(new Date(now.getFullYear(), now.getMonth() - 1, 1));
+  
+  let thisMonthTotal = 0;
+  let lastMonthTotal = 0;
+  let totalAll = 0;
+  
+  // Use filtered expenses instead of all expenses
+  state.filteredExpenses.forEach(expense => {
+    const amount = Number(expense.amount) || 0;
+    const expenseDate = timezoneService.toLocalDate(expense.date);
+    
+    totalAll += amount;
+    
+    if (expenseDate >= thisMonthStart) {
+      thisMonthTotal += amount;
+    } else if (expenseDate >= lastMonthStart && expenseDate <= lastMonthEnd) {
+      lastMonthTotal += amount;
+    }
+  });
+  
+  // Update UI with compact format
+  const thisMonthEl = document.getElementById('thisMonthExpenses');
+  const lastMonthEl = document.getElementById('lastMonthExpenses');
+  const totalEl = document.getElementById('totalExpenses');
+  
+  if (thisMonthEl) thisMonthEl.textContent = formatCurrencyCompact(thisMonthTotal);
+  if (lastMonthEl) lastMonthEl.textContent = formatCurrencyCompact(lastMonthTotal);
+  if (totalEl) totalEl.textContent = formatCurrencyCompact(totalAll);
+  
+  // Update tooltips with full amounts
+  const thisMonthKpi = document.getElementById('thisMonthKpi');
+  const lastMonthKpi = document.getElementById('lastMonthKpi');
+  const totalKpi = document.getElementById('totalKpi');
+  
+  if (thisMonthKpi) thisMonthKpi.setAttribute('data-tooltip', formatCurrency(thisMonthTotal));
+  if (lastMonthKpi) lastMonthKpi.setAttribute('data-tooltip', formatCurrency(lastMonthTotal));
+  if (totalKpi) totalKpi.setAttribute('data-tooltip', formatCurrency(totalAll));
+}
+
 // Apply filters
 function applyFilters() {
   let filtered = [...state.expenses];

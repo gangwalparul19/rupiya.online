@@ -2,6 +2,7 @@
 import '../services/services-init.js'; // Initialize services first
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
+import encryptionService from '../services/encryption-service.js';
 import crossFeatureIntegrationService from '../services/cross-feature-integration-service.js';
 import toast from '../components/toast.js';
 import confirmationModal from '../components/confirmation-modal.js';
@@ -205,6 +206,8 @@ function showEditForm(vehicle) {
   document.getElementById('currentMileage').value = vehicle.currentMileage || 0;
   document.getElementById('fuelType').value = vehicle.fuelType || '';
   document.getElementById('insuranceExpiry').value = vehicle.insuranceExpiry ? formatDateForInput(vehicle.insuranceExpiry) : '';
+  document.getElementById('ownerName').value = vehicle.ownerName || '';
+  document.getElementById('driverName').value = vehicle.driverName || '';
   document.getElementById('notes').value = vehicle.notes || '';
 
   addVehicleSection.classList.add('show');
@@ -221,6 +224,8 @@ async function handleSubmit(e) {
     currentMileage: parseFloat(document.getElementById('currentMileage').value) || 0,
     fuelType: document.getElementById('fuelType').value,
     insuranceExpiry: document.getElementById('insuranceExpiry').value ? timezoneService.parseInputDate(document.getElementById('insuranceExpiry').value) : null,
+    ownerName: document.getElementById('ownerName').value.trim(),
+    driverName: document.getElementById('driverName').value.trim(),
     notes: document.getElementById('notes').value.trim()
   };
 
