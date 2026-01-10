@@ -126,6 +126,7 @@ const navigationConfig = {
       expanded: false,
       items: [
         { href: 'profile.html', icon: '⚙️', label: 'Settings' },
+        { href: 'privacy-settings.html', icon: '🔒', label: 'Privacy Settings' },
         { href: 'user-guide.html', icon: '📖', label: 'User Guide' },
         { href: 'feedback.html', icon: '💬', label: 'Feedback' }
       ]

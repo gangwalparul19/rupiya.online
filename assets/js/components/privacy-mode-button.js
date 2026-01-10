@@ -1,19 +1,20 @@
 /**
  * Privacy Mode Button Component
  * Provides UI control for privacy mode toggle
+ * Automatically adds button to mobile header and dashboard header
  */
 
 import privacyMode from '../utils/privacy-mode.js';
 
 export function initPrivacyModeButton() {
-    // Create privacy mode button if it doesn't exist
-    const existingBtn = document.getElementById('privacyModeBtn');
-    if (!existingBtn) {
-        createPrivacyModeButton();
+    // Wait for DOM to be ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+            createAndAttachPrivacyButton();
+        });
+    } else {
+        createAndAttachPrivacyButton();
     }
-    
-    // Attach event listeners
-    attachEventListeners();
     
     // Listen for privacy mode changes
     window.addEventListener('privacyModeChanged', (e) => {
@@ -22,12 +23,38 @@ export function initPrivacyModeButton() {
 }
 
 /**
- * Create privacy mode button
+ * Create and attach privacy button to header
  */
-function createPrivacyModeButton() {
+function createAndAttachPrivacyButton() {
+    // Try to add to mobile header first
     const mobileHeaderActions = document.querySelector('.mobile-header-actions');
-    const dashboardHeaderActions = document.querySelector('.dashboard-header-actions');
+    if (mobileHeaderActions && !document.getElementById('privacyModeBtn')) {
+        const button = createPrivacyButton();
+        // Insert after install button, before theme toggle
+        const themeToggle = mobileHeaderActions.querySelector('.theme-toggle-btn');
+        if (themeToggle) {
+            themeToggle.parentNode.insertBefore(button, themeToggle);
+        } else {
+            mobileHeaderActions.insertBefore(button, mobileHeaderActions.firstChild);
+        }
+    }
     
+    // Also try to add to dashboard header actions
+    const dashboardHeaderActions = document.querySelector('.dashboard-header-actions');
+    if (dashboardHeaderActions && !document.getElementById('privacyModeBtnDashboard')) {
+        const button = createPrivacyButton();
+        button.id = 'privacyModeBtnDashboard';
+        dashboardHeaderActions.insertBefore(button, dashboardHeaderActions.firstChild);
+    }
+    
+    // Update button state
+    updatePrivacyButton();
+}
+
+/**
+ * Create privacy button element
+ */
+function createPrivacyButton() {
     const button = document.createElement('button');
     button.id = 'privacyModeBtn';
     button.className = 'privacy-mode-btn';
@@ -41,45 +68,36 @@ function createPrivacyModeButton() {
         </svg>
     `;
     
-    button.addEventListener('click', () => {
+    button.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         privacyMode.toggle();
+        updatePrivacyButton();
     });
     
-    // Add to mobile header if available
-    if (mobileHeaderActions) {
-        mobileHeaderActions.insertBefore(button, mobileHeaderActions.firstChild);
-    }
-    
-    // Also add to dashboard header if available
-    if (dashboardHeaderActions) {
-        const dashboardBtn = button.cloneNode(true);
-        dashboardBtn.id = 'privacyModeBtnDashboard';
-        dashboardBtn.addEventListener('click', () => {
-            privacyMode.toggle();
-        });
-        dashboardHeaderActions.insertBefore(dashboardBtn, dashboardHeaderActions.firstChild);
-    }
+    return button;
 }
 
 /**
- * Attach event listeners
+ * Update privacy button appearance
  */
-function attachEventListeners() {
+function updatePrivacyButton() {
     const btn = document.getElementById('privacyModeBtn');
-    if (btn) {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            privacyMode.toggle();
-        });
-    }
-    
     const dashboardBtn = document.getElementById('privacyModeBtnDashboard');
-    if (dashboardBtn) {
-        dashboardBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            privacyMode.toggle();
-        });
-    }
+    
+    const buttons = [btn, dashboardBtn].filter(b => b !== null);
+    
+    buttons.forEach(button => {
+        if (privacyMode.isEnabled()) {
+            button.classList.add('active');
+            button.setAttribute('title', 'Privacy Mode: ON - Data Hidden');
+            button.setAttribute('aria-pressed', 'true');
+        } else {
+            button.classList.remove('active');
+            button.setAttribute('title', 'Privacy Mode: OFF - Data Visible');
+            button.setAttribute('aria-pressed', 'false');
+        }
+    });
 }
 
 /**
