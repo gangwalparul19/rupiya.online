@@ -27,10 +27,10 @@ class PrivacyModeManager {
         // Wait for DOM to be ready
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => {
-                setTimeout(() => this.applyPrivacyMode(), 500);
+                setTimeout(() => this.applyPrivacyMode(), 100);
             });
         } else {
-            setTimeout(() => this.applyPrivacyMode(), 500);
+            setTimeout(() => this.applyPrivacyMode(), 100);
         }
     }
 
@@ -120,25 +120,13 @@ class PrivacyModeManager {
 
         // Target transaction amounts
         const transactionAmounts = document.querySelectorAll(
-            '.transaction-amount, .bill-amount, .detail-value, [class*="amount"]'
+            '.transaction-amount, .bill-amount, .detail-value'
         );
         transactionAmounts.forEach(element => {
             this.hideElement(element, 'amount');
         });
 
-        // Target income/expense values
-        const incomeExpenseValues = document.querySelectorAll(
-            '[id*="Value"], [class*="value"], [class*="total"]'
-        );
-        incomeExpenseValues.forEach(element => {
-            const text = element.textContent.trim();
-            // Check if it contains currency symbol or looks like a number
-            if (/₹[\d,]+|₹\d+|\d+,\d+|\d+\.\d+/.test(text)) {
-                this.hideElement(element, 'amount');
-            }
-        });
-
-        // Find all text nodes containing currency amounts
+        // Find text nodes containing currency amounts (limited scope)
         this.hideTextNodesWithPattern(/₹[\d,]+|₹\d+/, 'amount');
     }
 
@@ -229,50 +217,57 @@ class PrivacyModeManager {
      * Hide text nodes matching a pattern
      */
     hideTextNodesWithPattern(pattern, type = 'amount') {
-        const walker = document.createTreeWalker(
-            document.body,
-            NodeFilter.SHOW_TEXT,
-            null,
-            false
+        // Limit to specific containers to avoid scanning entire DOM
+        const containers = document.querySelectorAll(
+            '.kpi-card, .transaction-item, .card-body, .dashboard-header, .widgets-row'
         );
+        
+        containers.forEach(container => {
+            const walker = document.createTreeWalker(
+                container,
+                NodeFilter.SHOW_TEXT,
+                null,
+                false
+            );
 
-        const nodesToProcess = [];
-        let node;
-        while (node = walker.nextNode()) {
-            if (pattern.test(node.textContent)) {
-                nodesToProcess.push(node);
+            const nodesToProcess = [];
+            let node;
+            while (node = walker.nextNode()) {
+                if (pattern.test(node.textContent)) {
+                    nodesToProcess.push(node);
+                }
             }
-        }
 
-        nodesToProcess.forEach(node => {
-            const parent = node.parentElement;
-            if (!parent) return;
+            nodesToProcess.forEach(node => {
+                const parent = node.parentElement;
+                if (!parent) return;
 
-            if (this.isPrivacyMode) {
-                // Store original value
-                if (!this.originalValues.has(parent)) {
-                    this.originalValues.set(parent, node.textContent);
+                if (this.isPrivacyMode) {
+                    // Store original value
+                    if (!this.originalValues.has(parent)) {
+                        this.originalValues.set(parent, node.textContent);
+                    }
+                    
+                    // Replace with masked value
+                    let maskedValue = '••••••';
+                    if (type === 'percent') {
+                        maskedValue = '••%';
+                    } else if (type === 'email') {
+                        maskedValue = '••••••••@••••••';
+                    } else if (type === 'amount') {
+                        maskedValue = '₹ ••••••';
+                    }
+                    
+                    node.textContent = maskedValue;
+                    parent.classList.add('privacy-hidden');
+                } else {
+                    // Restore original value
+                    if (this.originalValues.has(parent)) {
+                        node.textContent = this.originalValues.get(parent);
+                    }
+                    parent.classList.remove('privacy-hidden');
                 }
-                
-                // Replace with masked value
-                let maskedValue = '••••••';
-                if (type === 'percent') {
-                    maskedValue = '••%';
-                } else if (type === 'email') {
-                    maskedValue = '••••••••@••••••';
-                } else if (type === 'amount') {
-                    maskedValue = '₹ ••••••';
-                }
-                
-                node.textContent = maskedValue;
-                parent.classList.add('privacy-hidden');
-            } else {
-                // Restore original value
-                if (this.originalValues.has(parent)) {
-                    node.textContent = this.originalValues.get(parent);
-                }
-                parent.classList.remove('privacy-hidden');
-            }
+            });
         });
     }
 
@@ -328,14 +323,19 @@ class PrivacyModeManager {
      * Watch for DOM changes and reapply privacy mode
      */
     watchForChanges() {
+        // Debounce to avoid excessive reapplication
+        let debounceTimer;
         const observer = new MutationObserver(() => {
-            if (this.isPrivacyMode) {
-                // Reapply privacy mode to newly added elements
-                this.autoHideAmounts();
-                this.autoHidePercentages();
-                this.autoHideEmails();
-                this.autoHideCharts();
-            }
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                if (this.isPrivacyMode) {
+                    // Reapply privacy mode to newly added elements
+                    this.autoHideAmounts();
+                    this.autoHidePercentages();
+                    this.autoHideEmails();
+                    this.autoHideCharts();
+                }
+            }, 500);
         });
 
         observer.observe(document.body, {

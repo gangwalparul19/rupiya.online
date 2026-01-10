@@ -61,10 +61,6 @@ async function checkFirstTimeSetup() {
 // Initialize dashboard only after auth check
 async function init() {
   log.log('Initializing...');
-  
-  // Initialize privacy mode button
-  initPrivacyModeButton();
-  
   const isAuthenticated = await checkAuth();
   if (isAuthenticated) {
     // Check if encryption reauth is needed (after page refresh)
@@ -78,9 +74,13 @@ async function init() {
       await initDashboard();
       // Check for first-time setup after dashboard loads
       await checkFirstTimeSetup();
+      // Initialize privacy mode button after dashboard is ready
+      setTimeout(() => initPrivacyModeButton(), 1000);
     } else {
       // Show basic UI while waiting for reauth
       await initDashboard();
+      // Initialize privacy mode button after dashboard is ready
+      setTimeout(() => initPrivacyModeButton(), 1000);
     }
   }
 }
