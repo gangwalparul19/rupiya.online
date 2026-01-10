@@ -122,6 +122,47 @@
     padding: 20px;
 }
 
+/* Sidebar Header and Logo */
+.sidebar-header {
+    padding: var(--spacing-lg);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.sidebar-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+}
+
+.sidebar-logo img {
+    height: 36px;
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+.sidebar-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+}
+
+.sidebar-toggle:hover {
+    background: var(--bg-hover);
+    border-radius: 6px;
+    color: var(--primary-blue);
+}
+
 .guide-header {
     background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
     color: white;
@@ -483,6 +524,14 @@
         display: block;
     }
     
+    .sidebar-header {
+        padding: 0.75rem 1rem;
+    }
+    
+    .sidebar-logo img {
+        height: 32px;
+    }
+    
     .main-content {
         margin-left: 0;
     }
@@ -636,6 +685,14 @@
     .sidebar {
         width: 100%;
         max-width: 280px;
+    }
+    
+    .sidebar-header {
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .sidebar-logo img {
+        height: 28px;
     }
     
     .mobile-header {

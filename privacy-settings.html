@@ -8,26 +8,22 @@
     <link rel="stylesheet" href="assets/css/components.css">
     <link rel="stylesheet" href="assets/css/sidebar.css">
     <link rel="stylesheet" href="assets/css/privacy-mode.css">
+    <link rel="stylesheet" href="assets/css/user-guide.css">
     <style>
-        .dashboard-layout { display: flex; min-height: 100vh; }
-        .sidebar { position: fixed; left: 0; top: 0; width: 280px; height: 100vh; background: white; border-right: 1px solid #e5e7eb; overflow-y: auto; z-index: 1000; }
-        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 999; }
-        .main-content { flex: 1; margin-left: 280px; }
-        .mobile-header { display: none; }
         .page-container { max-width: 900px; margin: 0 auto; padding: 30px 20px; }
         .page-header { margin-bottom: 30px; }
         .page-header h1 { color: #4A90E2; font-size: 2em; margin-bottom: 10px; }
         .page-header p { color: #666; font-size: 1.05em; }
         
         @media (max-width: 768px) {
-            .sidebar { transform: translateX(-100%); transition: transform 0.3s ease; }
-            .sidebar.active { transform: translateX(0); }
-            .sidebar-overlay { display: block; }
-            .sidebar-overlay.active { display: block; }
-            .main-content { margin-left: 0; }
-            .mobile-header { display: flex; }
             .page-container { padding: 20px 15px; }
             .page-header h1 { font-size: 1.5em; }
+        }
+        
+        @media (max-width: 480px) {
+            .page-container { padding: 15px 10px; }
+            .page-header h1 { font-size: 1.3em; }
+            .page-header p { font-size: 0.9em; }
         }
     </style>
 </head>

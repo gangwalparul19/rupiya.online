@@ -5,6 +5,17 @@
    ============================================ */
 
 /* ============================================
+   RESET ALL CONFLICTING RULES
+   ============================================ */
+
+/* Force reset of all KPI-related elements */
+.kpi-summary,
+.kpi-content,
+.kpi-label {
+  all: revert !important;
+}
+
+/* ============================================
    MAIN CONTENT WIDTH CONSTRAINT
    ============================================ */
 
@@ -13,21 +24,6 @@
   flex-direction: column !important;
   width: 100% !important;
   box-sizing: border-box !important;
-}
-
-/* ============================================
-   RESET CONFLICTING RULES FROM layout-fixes.css
-   ============================================ */
-
-/* Desktop: Override layout-fixes.css horizontal layout */
-@media (min-width: 769px) {
-  .kpi-card {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    gap: 0 !important;
-    padding: var(--spacing-lg) !important;
-  }
 }
 
 /* ============================================
@@ -80,17 +76,10 @@
     width: 100% !important;
     box-sizing: border-box !important;
   }
-  
-  .kpi-card {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    gap: 0 !important;
-  }
 }
 
 /* ============================================
-   KPI CARD - LAYOUT FIX
+   KPI CARD - VERTICAL LAYOUT FIX
    ============================================ */
 
 .kpi-card {
@@ -104,7 +93,7 @@
   overflow: visible !important;
   min-width: 0 !important;
   gap: 0 !important;
-  align-items: flex-start !important;
+  align-items: stretch !important;
 }
 
 .kpi-card:hover {
@@ -125,7 +114,7 @@
 .kpi-header {
   display: flex !important;
   flex-direction: row !important;
-  align-items: flex-start !important;
+  align-items: center !important;
   justify-content: space-between !important;
   margin-bottom: var(--spacing-md) !important;
   gap: var(--spacing-sm) !important;
@@ -242,7 +231,6 @@
    WIDGETS ROW - RESPONSIVE LAYOUT
    ============================================ */
 
-/* All screen sizes: Base layout with 2 columns for Goal + Bills */
 .widgets-row {
   display: grid !important;
   grid-template-columns: 1fr 1fr !important;
@@ -252,31 +240,26 @@
   box-sizing: border-box !important;
 }
 
-/* Savings Rate - Full width on all screens */
 .savings-rate-widget {
   grid-column: 1 / -1 !important;
   order: 1 !important;
 }
 
-/* Top Categories - Full width on all screens */
 .top-categories-widget {
   grid-column: 1 / -1 !important;
   order: 2 !important;
 }
 
-/* Goal Progress - 1 column (order 3) */
 .goal-progress-widget {
   grid-column: auto !important;
   order: 3 !important;
 }
 
-/* Upcoming Bills - 1 column (order 4) */
 .upcoming-bills-widget {
   grid-column: auto !important;
   order: 4 !important;
 }
 
-/* Tablet: Adjust gaps */
 @media (min-width: 769px) and (max-width: 1024px) {
   .widgets-row {
     gap: var(--spacing-md) !important;
@@ -284,7 +267,6 @@
   }
 }
 
-/* Mobile: Adjust gaps */
 @media (max-width: 768px) {
   .widgets-row {
     gap: 12px !important;
@@ -326,7 +308,6 @@
    CHARTS GRID - RESPONSIVE LAYOUT
    ============================================ */
 
-/* Mobile: 1 column (max-width: 768px) */
 @media (max-width: 768px) {
   .charts-grid {
     display: grid !important;
@@ -338,7 +319,6 @@
   }
 }
 
-/* Tablet and above: 2 columns (769px+) */
 @media (min-width: 769px) {
   .charts-grid {
     display: grid !important;
@@ -350,7 +330,6 @@
   }
 }
 
-/* Tablet specific adjustments */
 @media (min-width: 769px) and (max-width: 1024px) {
   .charts-grid {
     gap: var(--spacing-md) !important;
@@ -382,6 +361,10 @@
   border-color: var(--accent-cyan) !important;
 }
 
+/* ============================================
+   MOBILE BREAKPOINTS
+   ============================================ */
+
 @media (max-width: 480px) {
   .kpi-card {
     padding: 12px !important;
@@ -390,7 +373,7 @@
   .kpi-header {
     margin-bottom: 8px !important;
     gap: 6px !important;
-    align-items: flex-start !important;
+    align-items: center !important;
   }
 
   .kpi-title {
@@ -493,7 +476,6 @@
    REMOVE CONFLICTING FLEX LAYOUTS
    ============================================ */
 
-/* Override layout-fixes.css flex layout */
 .kpi-content {
   display: none !important;
 }
