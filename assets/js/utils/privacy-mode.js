@@ -27,10 +27,10 @@ class PrivacyModeManager {
         // Wait for DOM to be ready
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => {
-                this.applyPrivacyMode();
+                setTimeout(() => this.applyPrivacyMode(), 500);
             });
         } else {
-            this.applyPrivacyMode();
+            setTimeout(() => this.applyPrivacyMode(), 500);
         }
     }
 
@@ -70,6 +70,8 @@ class PrivacyModeManager {
      * AUTO-DETECTS financial data without requiring HTML changes
      */
     applyPrivacyMode() {
+        console.log('Applying Privacy Mode:', this.isPrivacyMode);
+        
         // Auto-detect and hide KPI values (numbers with ₹ or currency)
         this.autoHideAmounts();
         
@@ -107,100 +109,37 @@ class PrivacyModeManager {
     }
 
     /**
-     * Watch for DOM changes and reapply privacy mode
-     */
-    watchForChanges() {
-        const observer = new MutationObserver(() => {
-            if (this.isPrivacyMode) {
-                // Reapply privacy mode to newly added elements
-                this.autoHideAmounts();
-                this.autoHidePercentages();
-                this.autoHideEmails();
-                this.autoHideCharts();
-            }
-        });
-
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true,
-            characterData: true
-        });
-    }
-
-    /**
      * Auto-detect and hide amounts (₹ or currency values)
      */
     autoHideAmounts() {
         // Specifically target KPI values
         const kpiValues = document.querySelectorAll('.kpi-value');
         kpiValues.forEach(element => {
-            if (this.isPrivacyMode) {
-                if (!this.originalValues.has(element)) {
-                    this.originalValues.set(element, element.textContent);
-                }
-                element.textContent = '₹ ••••••';
-                element.classList.add('privacy-hidden');
-            } else {
-                if (this.originalValues.has(element)) {
-                    element.textContent = this.originalValues.get(element);
-                }
-                element.classList.remove('privacy-hidden');
-            }
+            this.hideElement(element, 'amount');
         });
 
         // Target transaction amounts
-        const transactionAmounts = document.querySelectorAll('.transaction-amount, [class*="amount"]');
-        transactionAmounts.forEach(element => {
-            if (this.isPrivacyMode) {
-                if (!this.originalValues.has(element)) {
-                    this.originalValues.set(element, element.textContent);
-                }
-                element.textContent = '₹ ••••••';
-                element.classList.add('privacy-hidden');
-            } else {
-                if (this.originalValues.has(element)) {
-                    element.textContent = this.originalValues.get(element);
-                }
-                element.classList.remove('privacy-hidden');
-            }
-        });
-
-        // Find all elements containing currency amounts via TreeWalker
-        const walker = document.createTreeWalker(
-            document.body,
-            NodeFilter.SHOW_TEXT,
-            null,
-            false
+        const transactionAmounts = document.querySelectorAll(
+            '.transaction-amount, .bill-amount, .detail-value, [class*="amount"]'
         );
+        transactionAmounts.forEach(element => {
+            this.hideElement(element, 'amount');
+        });
 
-        const nodesToProcess = [];
-        let node;
-        while (node = walker.nextNode()) {
-            // Match patterns like ₹50,000 or ₹0 or currency amounts
-            if (/₹[\d,]+|₹\d+/.test(node.textContent)) {
-                nodesToProcess.push(node);
-            }
-        }
-
-        nodesToProcess.forEach(node => {
-            const parent = node.parentElement;
-            if (parent && !parent.classList.contains('privacy-hidden')) {
-                if (this.isPrivacyMode) {
-                    // Store original value
-                    if (!this.originalValues.has(parent)) {
-                        this.originalValues.set(parent, node.textContent);
-                    }
-                    node.textContent = '₹ ••••••';
-                    parent.classList.add('privacy-hidden');
-                } else {
-                    // Restore original value
-                    if (this.originalValues.has(parent)) {
-                        node.textContent = this.originalValues.get(parent);
-                    }
-                    parent.classList.remove('privacy-hidden');
-                }
+        // Target income/expense values
+        const incomeExpenseValues = document.querySelectorAll(
+            '[id*="Value"], [class*="value"], [class*="total"]'
+        );
+        incomeExpenseValues.forEach(element => {
+            const text = element.textContent.trim();
+            // Check if it contains currency symbol or looks like a number
+            if (/₹[\d,]+|₹\d+|\d+,\d+|\d+\.\d+/.test(text)) {
+                this.hideElement(element, 'amount');
             }
         });
+
+        // Find all text nodes containing currency amounts
+        this.hideTextNodesWithPattern(/₹[\d,]+|₹\d+/, 'amount');
     }
 
     /**
@@ -213,96 +152,25 @@ class PrivacyModeManager {
         );
         
         percentageElements.forEach(element => {
-            const text = element.textContent;
+            const text = element.textContent.trim();
             if (/\d+(\.\d+)?%/.test(text)) {
-                if (this.isPrivacyMode) {
-                    if (!this.originalValues.has(element)) {
-                        this.originalValues.set(element, text);
-                    }
-                    element.textContent = '••%';
-                    element.classList.add('privacy-hidden-percent');
-                } else {
-                    if (this.originalValues.has(element)) {
-                        element.textContent = this.originalValues.get(element);
-                    }
-                    element.classList.remove('privacy-hidden-percent');
-                }
+                this.hideElement(element, 'percent');
             }
         });
 
-        // TreeWalker for other percentage patterns
-        const walker = document.createTreeWalker(
-            document.body,
-            NodeFilter.SHOW_TEXT,
-            null,
-            false
-        );
-
-        const nodesToProcess = [];
-        let node;
-        while (node = walker.nextNode()) {
-            // Match patterns like 25% or 0%
-            if (/\d+(\.\d+)?%/.test(node.textContent)) {
-                nodesToProcess.push(node);
-            }
-        }
-
-        nodesToProcess.forEach(node => {
-            const parent = node.parentElement;
-            if (parent && !parent.classList.contains('privacy-hidden-percent')) {
-                if (this.isPrivacyMode) {
-                    if (!this.originalValues.has(parent)) {
-                        this.originalValues.set(parent, node.textContent);
-                    }
-                    node.textContent = '••%';
-                    parent.classList.add('privacy-hidden-percent');
-                } else {
-                    if (this.originalValues.has(parent)) {
-                        node.textContent = this.originalValues.get(parent);
-                    }
-                    parent.classList.remove('privacy-hidden-percent');
-                }
-            }
-        });
+        // Find all text nodes containing percentages
+        this.hideTextNodesWithPattern(/\d+(\.\d+)?%/, 'percent');
     }
 
     /**
      * Auto-detect and hide emails
      */
     autoHideEmails() {
-        const walker = document.createTreeWalker(
-            document.body,
-            NodeFilter.SHOW_TEXT,
-            null,
-            false
+        // Find all text nodes containing emails
+        this.hideTextNodesWithPattern(
+            /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/,
+            'email'
         );
-
-        const nodesToProcess = [];
-        let node;
-        while (node = walker.nextNode()) {
-            // Match email pattern
-            if (/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(node.textContent)) {
-                nodesToProcess.push(node);
-            }
-        }
-
-        nodesToProcess.forEach(node => {
-            const parent = node.parentElement;
-            if (parent && !parent.classList.contains('privacy-hidden-email')) {
-                if (this.isPrivacyMode) {
-                    if (!this.originalValues.has(parent)) {
-                        this.originalValues.set(parent, node.textContent);
-                    }
-                    node.textContent = '••••••••@••••••';
-                    parent.classList.add('privacy-hidden-email');
-                } else {
-                    if (this.originalValues.has(parent)) {
-                        node.textContent = this.originalValues.get(parent);
-                    }
-                    parent.classList.remove('privacy-hidden-email');
-                }
-            }
-        });
     }
 
     /**
@@ -320,6 +188,90 @@ class PrivacyModeManager {
                     parent.classList.remove('privacy-hidden-chart');
                     canvas.style.opacity = '1';
                 }
+            }
+        });
+    }
+
+    /**
+     * Hide element by replacing its content
+     */
+    hideElement(element, type = 'amount') {
+        if (!element) return;
+
+        if (this.isPrivacyMode) {
+            // Store original value
+            if (!this.originalValues.has(element)) {
+                this.originalValues.set(element, element.textContent);
+            }
+            
+            // Replace with masked value
+            let maskedValue = '••••••';
+            if (type === 'percent') {
+                maskedValue = '••%';
+            } else if (type === 'email') {
+                maskedValue = '••••••••@••••••';
+            } else if (type === 'amount') {
+                maskedValue = '₹ ••••••';
+            }
+            
+            element.textContent = maskedValue;
+            element.classList.add('privacy-hidden');
+        } else {
+            // Restore original value
+            if (this.originalValues.has(element)) {
+                element.textContent = this.originalValues.get(element);
+            }
+            element.classList.remove('privacy-hidden');
+        }
+    }
+
+    /**
+     * Hide text nodes matching a pattern
+     */
+    hideTextNodesWithPattern(pattern, type = 'amount') {
+        const walker = document.createTreeWalker(
+            document.body,
+            NodeFilter.SHOW_TEXT,
+            null,
+            false
+        );
+
+        const nodesToProcess = [];
+        let node;
+        while (node = walker.nextNode()) {
+            if (pattern.test(node.textContent)) {
+                nodesToProcess.push(node);
+            }
+        }
+
+        nodesToProcess.forEach(node => {
+            const parent = node.parentElement;
+            if (!parent) return;
+
+            if (this.isPrivacyMode) {
+                // Store original value
+                if (!this.originalValues.has(parent)) {
+                    this.originalValues.set(parent, node.textContent);
+                }
+                
+                // Replace with masked value
+                let maskedValue = '••••••';
+                if (type === 'percent') {
+                    maskedValue = '••%';
+                } else if (type === 'email') {
+                    maskedValue = '••••••••@••••••';
+                } else if (type === 'amount') {
+                    maskedValue = '₹ ••••••';
+                }
+                
+                node.textContent = maskedValue;
+                parent.classList.add('privacy-hidden');
+            } else {
+                // Restore original value
+                if (this.originalValues.has(parent)) {
+                    node.textContent = this.originalValues.get(parent);
+                }
+                parent.classList.remove('privacy-hidden');
             }
         });
     }
@@ -373,6 +325,27 @@ class PrivacyModeManager {
     }
 
     /**
+     * Watch for DOM changes and reapply privacy mode
+     */
+    watchForChanges() {
+        const observer = new MutationObserver(() => {
+            if (this.isPrivacyMode) {
+                // Reapply privacy mode to newly added elements
+                this.autoHideAmounts();
+                this.autoHidePercentages();
+                this.autoHideEmails();
+                this.autoHideCharts();
+            }
+        });
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true,
+            characterData: false
+        });
+    }
+
+    /**
      * Get privacy mode status
      */
     isEnabled() {
@@ -384,7 +357,7 @@ class PrivacyModeManager {
      */
     formatAmount(amount) {
         if (this.isPrivacyMode) {
-            return '••••••';
+            return '₹ ••••••';
         }
         return amount;
     }

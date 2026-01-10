@@ -39,20 +39,25 @@
 .privacy-hidden {
     color: #999 !important;
     font-weight: 500 !important;
-    letter-spacing: 1px !important;
+    letter-spacing: 2px !important;
     user-select: none !important;
+    cursor: default !important;
 }
 
 .privacy-hidden-percent {
     color: #999 !important;
     font-weight: 500 !important;
+    letter-spacing: 1px !important;
     user-select: none !important;
+    cursor: default !important;
 }
 
 .privacy-hidden-email {
     color: #999 !important;
     font-weight: 500 !important;
+    letter-spacing: 1px !important;
     user-select: none !important;
+    cursor: default !important;
 }
 
 .privacy-hidden-chart {

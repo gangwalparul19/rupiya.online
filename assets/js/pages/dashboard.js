@@ -14,6 +14,7 @@ import logger from '../utils/logger.js';
 import kpiEnhancer from '../utils/kpi-enhancements.js';
 import TransactionListEnhancer from '../utils/transaction-list-enhancements.js';
 import { setupAutoCacheClear } from '../utils/cache-buster.js';
+import initPrivacyModeButton from '../components/privacy-mode-button.js';
 
 const log = logger.create('Dashboard');
 
@@ -60,6 +61,10 @@ async function checkFirstTimeSetup() {
 // Initialize dashboard only after auth check
 async function init() {
   log.log('Initializing...');
+  
+  // Initialize privacy mode button
+  initPrivacyModeButton();
+  
   const isAuthenticated = await checkAuth();
   if (isAuthenticated) {
     // Check if encryption reauth is needed (after page refresh)

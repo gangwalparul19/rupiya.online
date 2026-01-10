@@ -469,6 +469,17 @@ service cloud.firestore {
     }
     
     // ============================================
+    // FAMILY MEMBERS (Family sharing and management)
+    // ============================================
+    match /familyMembers/{memberId} {
+      // Users can only access their own family members
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && hasValidUserId();
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
+    }
+    
+    // ============================================
     // DENY ALL OTHER COLLECTIONS
     // ============================================
     // Explicitly deny access to any other collections
