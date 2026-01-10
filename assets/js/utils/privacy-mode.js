@@ -84,6 +84,9 @@ class PrivacyModeManager {
         // Auto-detect and hide charts
         this.autoHideCharts();
         
+        // Hide transaction descriptions
+        this.hideTransactionDescriptions();
+        
         // Hide tooltips with financial data
         this.hideTooltips();
         
@@ -112,6 +115,45 @@ class PrivacyModeManager {
     }
 
     /**
+     * Hide transaction descriptions
+     */
+    hideTransactionDescriptions() {
+        // Hide income descriptions
+        const incomeDescriptions = document.querySelectorAll('.income-description');
+        incomeDescriptions.forEach(element => {
+            if (this.isPrivacyMode) {
+                if (!this.originalValues.has(element)) {
+                    this.originalValues.set(element, element.textContent);
+                }
+                element.textContent = '••••••••••';
+                element.classList.add('privacy-hidden');
+            } else {
+                if (this.originalValues.has(element)) {
+                    element.textContent = this.originalValues.get(element);
+                }
+                element.classList.remove('privacy-hidden');
+            }
+        });
+
+        // Hide expense descriptions
+        const expenseDescriptions = document.querySelectorAll('.expense-description');
+        expenseDescriptions.forEach(element => {
+            if (this.isPrivacyMode) {
+                if (!this.originalValues.has(element)) {
+                    this.originalValues.set(element, element.textContent);
+                }
+                element.textContent = '••••••••••';
+                element.classList.add('privacy-hidden');
+            } else {
+                if (this.originalValues.has(element)) {
+                    element.textContent = this.originalValues.get(element);
+                }
+                element.classList.remove('privacy-hidden');
+            }
+        });
+    }
+
+    /**
      * Auto-detect and hide amounts (₹ or currency values)
      */
     autoHideAmounts() {
@@ -121,9 +163,9 @@ class PrivacyModeManager {
             this.hideElement(element, 'amount');
         });
 
-        // Target transaction amounts
+        // Target transaction amounts (income and expense cards)
         const transactionAmounts = document.querySelectorAll(
-            '.transaction-amount, .bill-amount, .detail-value'
+            '.income-amount, .expense-amount, .transaction-amount, .bill-amount, .detail-value'
         );
         transactionAmounts.forEach(element => {
             this.hideElement(element, 'amount');
