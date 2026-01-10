@@ -18,8 +18,7 @@ class ConfirmationModal {
   }
 
   createModal() {
-    console.log('[ConfirmationModal] Creating modal...');
-    
+   
     // Create modal HTML
     const modalHTML = `
       <div id="confirmationModal" class="modal-overlay" style="display: none;">
@@ -43,14 +42,12 @@ class ConfirmationModal {
     // Add to body if not already present
     if (!document.getElementById('confirmationModal')) {
       document.body.insertAdjacentHTML('beforeend', modalHTML);
-      console.log('[ConfirmationModal] Modal HTML added to DOM');
     } else {
       console.log('[ConfirmationModal] Modal already exists in DOM');
     }
 
     this.modal = document.getElementById('confirmationModal');
     this.setupEventListeners();
-    console.log('[ConfirmationModal] Modal initialized successfully');
   }
 
   setupEventListeners() {
@@ -91,7 +88,6 @@ class ConfirmationModal {
   show(options = {}) {
     // Ensure modal is created
     if (!this.modal) {
-      console.log('[ConfirmationModal] Modal not initialized, creating now...');
       this.createModal();
     }
 
@@ -105,8 +101,7 @@ class ConfirmationModal {
     } = options;
 
     try {
-      console.log('[ConfirmationModal] Showing modal with options:', { title, message, type });
-      
+
       // Set content
       const titleEl = document.getElementById('confirmationModalTitle');
       const messageEl = document.getElementById('confirmationModalMessage');
@@ -114,24 +109,19 @@ class ConfirmationModal {
       const cancelBtnEl = document.getElementById('confirmationModalCancel');
 
       if (!titleEl || !messageEl || !confirmBtnEl || !cancelBtnEl) {
-        console.error('[ConfirmationModal] Modal elements not found, recreating modal...');
         this.createModal();
         // Try again after recreation
         return this.show(options);
       }
 
-      console.log('[ConfirmationModal] Setting title...');
       titleEl.textContent = title;
       
-      console.log('[ConfirmationModal] Setting message...');
       messageEl.textContent = message;
       
-      console.log('[ConfirmationModal] Setting button text...');
       confirmBtnEl.textContent = confirmText;
       cancelBtnEl.textContent = cancelText;
 
       // Set icon based on type
-      console.log('[ConfirmationModal] Setting icon...');
       const iconEl = document.getElementById('confirmationModalIcon');
       const defaultIcons = {
         danger: '🗑️',
@@ -145,7 +135,6 @@ class ConfirmationModal {
       }
 
       // Set confirm button style based on type
-      console.log('[ConfirmationModal] Setting button style...');
       const confirmBtn = document.getElementById('confirmationModalConfirm');
       if (confirmBtn) {
         confirmBtn.className = 'btn';
@@ -159,33 +148,18 @@ class ConfirmationModal {
       }
 
       // Show modal
-      console.log('[ConfirmationModal] Displaying modal...');
       if (this.modal) {
         this.modal.style.display = 'flex';
         
         // Debug: Check if modal is actually visible
         const computedStyle = window.getComputedStyle(this.modal);
-        console.log('[ConfirmationModal] Modal computed display:', computedStyle.display);
-        console.log('[ConfirmationModal] Modal computed visibility:', computedStyle.visibility);
-        console.log('[ConfirmationModal] Modal computed opacity:', computedStyle.opacity);
-        console.log('[ConfirmationModal] Modal computed z-index:', computedStyle.zIndex);
-        console.log('[ConfirmationModal] Modal inline style:', this.modal.style.cssText);
-        console.log('[ConfirmationModal] Modal in DOM:', document.body.contains(this.modal));
-        console.log('[ConfirmationModal] Modal bounding rect:', this.modal.getBoundingClientRect());
-        
+
         // Check modal container
         const container = this.modal.querySelector('.modal-container');
         if (container) {
           const containerStyle = window.getComputedStyle(container);
-          console.log('[ConfirmationModal] Container computed display:', containerStyle.display);
-          console.log('[ConfirmationModal] Container computed opacity:', containerStyle.opacity);
-          console.log('[ConfirmationModal] Container computed transform:', containerStyle.transform);
-          console.log('[ConfirmationModal] Container bounding rect:', container.getBoundingClientRect());
         }
-        
-        console.log('[ConfirmationModal] Modal displayed successfully');
       } else {
-        console.error('[ConfirmationModal] Modal element not found!');
         return Promise.resolve(false);
       }
 
@@ -200,8 +174,6 @@ class ConfirmationModal {
   }
 
   hide(confirmed) {
-    console.log('[ConfirmationModal] hide() called with confirmed:', confirmed);
-    console.trace('[ConfirmationModal] hide() stack trace');
     if (this.modal) {
       this.modal.style.display = 'none';
     }
