@@ -1,124 +1,147 @@
 /* ============================================
    INCOME PAGE KPI OVERRIDE
-   Fixes KPI card layout to display horizontally
+   Fixes KPI card layout to display horizontally on desktop
    ============================================ */
 
-/* Reset all conflicting styles */
-.kpi-summary {
-  display: grid !important;
-  grid-template-columns: repeat(3, 1fr) !important;
-  gap: 1rem !important;
-  margin-bottom: 1.5rem !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
+/* Desktop: 1025px and above - HORIZONTAL LAYOUT */
+@media (min-width: 1025px) {
+  .kpi-summary {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 1rem !important;
+    margin-bottom: 1.5rem !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .kpi-card {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 1rem !important;
+    background: white !important;
+    border: 2px solid #4A90E2 !important;
+    border-radius: 12px !important;
+    padding: 1.25rem !important;
+    transition: all 0.3s ease !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    min-height: auto !important;
+    height: auto !important;
+    text-align: left !important;
+  }
+
+  .kpi-card:hover {
+    border-color: #00CED1 !important;
+    box-shadow: 0 4px 12px rgba(74, 144, 226, 0.15) !important;
+    transform: translateY(-2px) !important;
+  }
+
+  .kpi-card.kpi-expense {
+    border-color: #E74C3C !important;
+    background: linear-gradient(135deg, #fff5f5 0%, #fff 100%) !important;
+  }
+
+  .kpi-card.kpi-expense:hover {
+    border-color: #C0392B !important;
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.15) !important;
+  }
+
+  .kpi-card.kpi-income {
+    border-color: #27AE60 !important;
+    background: linear-gradient(135deg, #f0fff4 0%, #fff 100%) !important;
+  }
+
+  .kpi-card.kpi-income:hover {
+    border-color: #1E8449 !important;
+    box-shadow: 0 4px 12px rgba(39, 174, 96, 0.15) !important;
+  }
+
+  /* Icon styling - Fixed size */
+  .kpi-icon {
+    font-size: 2rem !important;
+    width: 50px !important;
+    height: 50px !important;
+    min-width: 50px !important;
+    min-height: 50px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: linear-gradient(135deg, #4A90E2 0%, #00CED1 100%) !important;
+    border-radius: 10px !important;
+    flex-shrink: 0 !important;
+    flex-grow: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .kpi-card.kpi-expense .kpi-icon {
+    background: linear-gradient(135deg, #E74C3C 0%, #C0392B 100%) !important;
+  }
+
+  .kpi-card.kpi-income .kpi-icon {
+    background: linear-gradient(135deg, #27AE60 0%, #2ECC71 100%) !important;
+  }
+
+  /* Content area - Flex column for label and value */
+  .kpi-content {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    gap: 0.25rem !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .kpi-label {
+    font-size: 0.8rem !important;
+    color: #7F8C8D !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    text-align: left !important;
+    white-space: nowrap !important;
+  }
+
+  .kpi-value {
+    font-size: 1.5rem !important;
+    font-weight: 700 !important;
+    color: #2C3E50 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    text-align: left !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+  }
 }
 
-/* Override the flex-direction: column from income.css */
-.kpi-card {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  justify-content: flex-start !important;
-  gap: 1rem !important;
-  background: white !important;
-  border: 2px solid #4A90E2 !important;
-  border-radius: 12px !important;
-  padding: 1.25rem !important;
-  transition: all 0.3s ease !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
-  min-height: auto !important;
-  height: auto !important;
-  text-align: left !important;
+/* Tablet: 769px - 1024px - VERTICAL LAYOUT (mobile look is fine) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .kpi-card {
+    flex-direction: column !important;
+    text-align: center !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .kpi-content {
+    text-align: center !important;
+  }
+
+  .kpi-label {
+    text-align: center !important;
+  }
+
+  .kpi-value {
+    text-align: center !important;
+  }
 }
 
-.kpi-card:hover {
-  border-color: #00CED1 !important;
-  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.15) !important;
-  transform: translateY(-2px) !important;
-}
-
-.kpi-card.kpi-expense {
-  border-color: #E74C3C !important;
-  background: linear-gradient(135deg, #fff5f5 0%, #fff 100%) !important;
-}
-
-.kpi-card.kpi-expense:hover {
-  border-color: #C0392B !important;
-  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.15) !important;
-}
-
-.kpi-card.kpi-income {
-  border-color: #27AE60 !important;
-  background: linear-gradient(135deg, #f0fff4 0%, #fff 100%) !important;
-}
-
-.kpi-card.kpi-income:hover {
-  border-color: #1E8449 !important;
-  box-shadow: 0 4px 12px rgba(39, 174, 96, 0.15) !important;
-}
-
-/* Icon styling - Fixed size, no flex-shrink */
-.kpi-icon {
-  font-size: 2rem !important;
-  width: 50px !important;
-  height: 50px !important;
-  min-width: 50px !important;
-  min-height: 50px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  background: linear-gradient(135deg, #4A90E2 0%, #00CED1 100%) !important;
-  border-radius: 10px !important;
-  flex-shrink: 0 !important;
-  flex-grow: 0 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-.kpi-card.kpi-expense .kpi-icon {
-  background: linear-gradient(135deg, #E74C3C 0%, #C0392B 100%) !important;
-}
-
-.kpi-card.kpi-income .kpi-icon {
-  background: linear-gradient(135deg, #27AE60 0%, #2ECC71 100%) !important;
-}
-
-/* Content area - Flex column for label and value */
-.kpi-content {
-  flex: 1 !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: center !important;
-  gap: 0.25rem !important;
-  min-width: 0 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-.kpi-label {
-  font-size: 0.8rem !important;
-  color: #7F8C8D !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.5px !important;
-  text-align: left !important;
-  white-space: nowrap !important;
-}
-
-.kpi-value {
-  font-size: 1.5rem !important;
-  font-weight: 700 !important;
-  color: #2C3E50 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  text-align: left !important;
-  word-break: break-word !important;
-  overflow-wrap: break-word !important;
-}
-
-/* Mobile: Switch to vertical layout */
+/* Mobile: 768px and below - VERTICAL LAYOUT (mobile look is fine) */
 @media (max-width: 768px) {
   .kpi-summary {
     grid-template-columns: repeat(3, 1fr) !important;

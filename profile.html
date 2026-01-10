@@ -66,6 +66,9 @@
   <link rel="stylesheet" href="assets/css/button-fix.css">
   <link rel="stylesheet" href="assets/css/confirmation-modal.css">
   
+  <!-- Feature Configuration System -->
+  <link rel="stylesheet" href="assets/css/feature-settings.css">
+  
   <!-- Auth Guard - Must be loaded early to prevent flash of protected content -->
   <script src="assets/js/utils/auth-guard.js"></script>
   <!-- Button Reset Fix - Prevents buttons from getting stuck -->
@@ -215,6 +218,12 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
           </svg>
           Data
+        </button>
+        <button class="tab-btn" data-tab="features">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+          </svg>
+          <span>Features</span>
         </button>
       </div>
 
@@ -667,6 +676,11 @@
             </div>
           </div>
         </div>
+
+        <!-- Features Tab -->
+        <div class="tab-content" id="features-tab">
+          <div id="featureSettingsContainer"></div>
+        </div>
       </div>
     </main>
   </div>
@@ -734,5 +748,11 @@
   <script type="module" src="assets/js/components/sidebar.js"></script>
   <script type="module" src="assets/js/pages/profile.js"></script>
   <script type="module" src="assets/js/pwa-setup.js"></script>
+
+  <!-- Feature Settings -->
+  <script type="module">
+    import { featureSettings } from './assets/js/components/feature-settings.js';
+    featureSettings.init('featureSettingsContainer');
+  </script>
 </body>
 </html>

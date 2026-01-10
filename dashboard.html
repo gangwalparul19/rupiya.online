@@ -78,6 +78,10 @@
   <link rel="stylesheet" href="assets/css/dashboard-kpi-override.css">
   <link rel="stylesheet" href="assets/css/privacy-mode.css">
   
+  <!-- Feature Configuration System -->
+  <link rel="stylesheet" href="assets/css/feature-settings.css">
+  <link rel="stylesheet" href="assets/css/feature-onboarding.css">
+  
   <!-- Auth Guard - Must be loaded early to prevent flash of protected content -->
   <script src="assets/js/utils/auth-guard.js"></script>
   <!-- Button Reset Fix - Prevents buttons from getting stuck -->
@@ -441,5 +445,12 @@
   <script src="assets/js/utils/kpi-tooltip-manager.js"></script>
   <script type="module" src="assets/js/pages/dashboard.js"></script>
   <script type="module" src="assets/js/pwa-setup.js"></script>
+
+  <!-- Feature Onboarding Modal -->
+  <div id="featureOnboardingContainer"></div>
+  <script type="module">
+    import { featureOnboarding } from './assets/js/components/feature-onboarding.js';
+    featureOnboarding.init('featureOnboardingContainer');
+  </script>
 </body>
 </html>

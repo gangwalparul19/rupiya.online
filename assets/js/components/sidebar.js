@@ -21,6 +21,7 @@ import { db } from '../config/firebase-config.js';
 import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
 import authService from '../services/auth-service.js';
 import { initLogoutHandler } from '../utils/logout-handler.js';
+import { featureConfig } from '../config/feature-config.js';
 
 // Check if current user is admin (non-blocking)
 async function checkIsAdmin() {
@@ -50,6 +51,7 @@ async function checkIsAdmin() {
 }
 
 // Navigation configuration - edit this to update nav across all pages
+// Maps to feature keys in feature-config.js
 const navigationConfig = {
   sections: [
     {
@@ -58,9 +60,9 @@ const navigationConfig = {
       icon: '📊',
       expanded: true,
       items: [
-        { href: 'dashboard.html', icon: '📊', label: 'Dashboard' },
-        { href: 'predictive-analytics.html', icon: '🔮', label: 'Predictive Analytics' },
-        { href: 'ai-insights.html', icon: '🤖', label: 'AI Insights' }
+        { href: 'dashboard.html', icon: '📊', label: 'Dashboard', featureKey: 'dashboard' },
+        { href: 'predictive-analytics.html', icon: '🔮', label: 'Predictive Analytics', featureKey: 'predictiveAnalytics' },
+        { href: 'ai-insights.html', icon: '🤖', label: 'AI Insights', featureKey: 'aiInsights' }
       ]
     },
     {
@@ -69,10 +71,10 @@ const navigationConfig = {
       icon: '💰',
       expanded: false,
       items: [
-        { href: 'expenses.html', icon: '💸', label: 'Expenses' },
-        { href: 'income.html', icon: '💰', label: 'Income' },
-        { href: 'split-expense.html', icon: '🤝', label: 'Split Expenses' },
-        { href: 'recurring.html', icon: '🔄', label: 'Recurring' }
+        { href: 'expenses.html', icon: '💸', label: 'Expenses', featureKey: 'expenses' },
+        { href: 'income.html', icon: '💰', label: 'Income', featureKey: 'income' },
+        { href: 'split-expense.html', icon: '🤝', label: 'Split Expenses', featureKey: 'splitExpense' },
+        { href: 'recurring.html', icon: '🔄', label: 'Recurring', featureKey: 'recurring' }
       ]
     },
     {
@@ -81,12 +83,12 @@ const navigationConfig = {
       icon: '🎯',
       expanded: false,
       items: [
-        { href: 'budgets.html', icon: '💳', label: 'Budgets' },
-        { href: 'goals.html', icon: '🎯', label: 'Goals' },
-        { href: 'investments.html', icon: '📈', label: 'Investments' },
-        { href: 'loans.html', icon: '🏦', label: 'Loans & EMI' },
-        { href: 'transfers.html', icon: '🔄', label: 'Transfers' },
-        { href: 'net-worth.html', icon: '💎', label: 'Net Worth' }
+        { href: 'budgets.html', icon: '💳', label: 'Budgets', featureKey: 'budgets' },
+        { href: 'goals.html', icon: '🎯', label: 'Goals', featureKey: 'goals' },
+        { href: 'investments.html', icon: '📈', label: 'Investments', featureKey: 'investments' },
+        { href: 'loans.html', icon: '🏦', label: 'Loans & EMI', featureKey: 'loans' },
+        { href: 'transfers.html', icon: '🔄', label: 'Transfers', featureKey: 'transfers' },
+        { href: 'net-worth.html', icon: '💎', label: 'Net Worth', featureKey: 'netWorth' }
       ]
     },
     {
@@ -95,9 +97,9 @@ const navigationConfig = {
       icon: '🏠',
       expanded: false,
       items: [
-        { href: 'houses.html', icon: '🏠', label: 'Houses' },
-        { href: 'vehicles.html', icon: '🚗', label: 'Vehicles' },
-        { href: 'house-help.html', icon: '🧹', label: 'House Help' }
+        { href: 'houses.html', icon: '🏠', label: 'Houses', featureKey: 'houses' },
+        { href: 'vehicles.html', icon: '🚗', label: 'Vehicles', featureKey: 'vehicles' },
+        { href: 'house-help.html', icon: '🧹', label: 'House Help', featureKey: 'houseHelp' }
       ]
     },
     {
@@ -106,7 +108,7 @@ const navigationConfig = {
       icon: '👥',
       expanded: false,
       items: [
-        { href: 'trip-groups.html', icon: '✈️', label: 'Trip Groups' }
+        { href: 'trip-groups.html', icon: '✈️', label: 'Trip Groups', featureKey: 'tripGroups' }
       ]
     },
     {
@@ -115,8 +117,8 @@ const navigationConfig = {
       icon: '📁',
       expanded: false,
       items: [
-        { href: 'notes.html', icon: '📝', label: 'Notes' },
-        { href: 'documents.html', icon: '📄', label: 'Documents' }
+        { href: 'notes.html', icon: '📝', label: 'Notes', featureKey: 'notes' },
+        { href: 'documents.html', icon: '📄', label: 'Documents', featureKey: 'documents' }
       ]
     },
     {
@@ -125,10 +127,10 @@ const navigationConfig = {
       icon: '⚙️',
       expanded: false,
       items: [
-        { href: 'profile.html', icon: '⚙️', label: 'Settings' },
-        { href: 'privacy-settings.html', icon: '🔒', label: 'Privacy Settings' },
-        { href: 'user-guide.html', icon: '📖', label: 'User Guide' },
-        { href: 'feedback.html', icon: '💬', label: 'Feedback' }
+        { href: 'profile.html', icon: '⚙️', label: 'Settings', featureKey: null },
+        { href: 'privacy-settings.html', icon: '🔒', label: 'Privacy Settings', featureKey: null },
+        { href: 'user-guide.html', icon: '📖', label: 'User Guide', featureKey: null },
+        { href: 'feedback.html', icon: '💬', label: 'Feedback', featureKey: null }
       ]
     },
     {
@@ -138,7 +140,7 @@ const navigationConfig = {
       expanded: false,
       adminOnly: true,
       items: [
-        { href: 'admin.html', icon: '📊', label: 'Admin Dashboard' }
+        { href: 'admin.html', icon: '📊', label: 'Admin Dashboard', featureKey: null }
       ]
     }
   ]
@@ -191,6 +193,17 @@ function generateSidebarHTML(isAdmin = false) {
       return;
     }
     
+    // Filter items based on enabled features
+    const visibleItems = section.items.filter(item => {
+      // Always show items without feature keys (like Settings, Feedback)
+      if (!item.featureKey) return true;
+      // Show items if their feature is enabled
+      return featureConfig.isEnabled(item.featureKey);
+    });
+
+    // Skip section if no visible items
+    if (visibleItems.length === 0) return;
+    
     // Determine if section should be expanded
     const isCurrentSection = section.id === currentSection;
     const savedState = sectionState[section.id];
@@ -210,7 +223,7 @@ function generateSidebarHTML(isAdmin = false) {
         <div class="nav-section-items">
     `;
     
-    section.items.forEach(item => {
+    visibleItems.forEach(item => {
       const isActive = item.href === currentPage;
       navHTML += `
           <a href="${item.href}" class="nav-item ${isActive ? 'active' : ''}">
@@ -254,6 +267,9 @@ export async function initSidebar() {
   const sidebarNav = sidebar.querySelector('.sidebar-nav');
   if (!sidebarNav) return;
 
+  // Initialize feature config first
+  await featureConfig.init();
+
   // Check if user is admin
   const isAdmin = await checkIsAdmin();
 
@@ -271,6 +287,13 @@ export async function initSidebar() {
   
   // Initialize global logout handler
   initLogoutHandler();
+
+  // Listen for feature changes and update navigation
+  window.addEventListener('featuresUpdated', () => {
+    sidebarNav.innerHTML = generateQuickSearchHTML() + generateSidebarHTML(isAdmin);
+    setupSectionToggles();
+    setupQuickSearch(isAdmin);
+  });
 }
 
 // Setup collapsible section toggles
