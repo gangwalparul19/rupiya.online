@@ -150,67 +150,87 @@
     background: white;
     border: 1px solid #e5e7eb;
     border-radius: 8px;
-    padding: 20px;
+    padding: 24px;
     margin: 20px 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .privacy-settings-panel h3 {
     color: #4A90E2;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
     font-size: 1.1em;
+    font-weight: 600;
 }
 
 .privacy-setting-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 0;
+    padding: 16px 0;
     border-bottom: 1px solid #f3f4f6;
+    gap: 20px;
 }
 
 .privacy-setting-item:last-child {
     border-bottom: none;
+    padding-bottom: 0;
 }
 
 .privacy-setting-label {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 6px;
+    flex: 1;
 }
 
 .privacy-setting-label strong {
     color: #1f2937;
+    font-size: 0.95em;
+    font-weight: 600;
 }
 
 .privacy-setting-label small {
     color: #9ca3af;
     font-size: 0.85em;
+    line-height: 1.4;
 }
 
 .privacy-toggle {
     position: relative;
-    width: 50px;
-    height: 28px;
-    background: #ccc;
-    border-radius: 14px;
+    width: 52px;
+    height: 30px;
+    background: #d1d5db;
+    border-radius: 15px;
     cursor: pointer;
     transition: background 0.3s ease;
+    border: none;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.privacy-toggle:hover {
+    background: #c4c7ce;
 }
 
 .privacy-toggle.active {
     background: #4A90E2;
 }
 
+.privacy-toggle.active:hover {
+    background: #3a7bc8;
+}
+
 .privacy-toggle::after {
     content: '';
     position: absolute;
-    width: 24px;
-    height: 24px;
+    width: 26px;
+    height: 26px;
     background: white;
     border-radius: 50%;
     top: 2px;
     left: 2px;
     transition: left 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .privacy-toggle.active::after {
@@ -302,12 +322,48 @@
     }
     
     .privacy-settings-panel {
-        padding: 15px;
+        padding: 16px;
         margin: 15px 0;
     }
     
     .privacy-setting-item {
-        padding: 10px 0;
+        padding: 14px 0;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    
+    .privacy-setting-label {
+        width: 100%;
+    }
+    
+    .privacy-toggle {
+        align-self: flex-end;
+        margin-top: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .privacy-settings-panel {
+        padding: 12px;
+        margin: 12px 0;
+    }
+    
+    .privacy-settings-panel h3 {
+        font-size: 1em;
+        margin-bottom: 16px;
+    }
+    
+    .privacy-setting-item {
+        padding: 12px 0;
+    }
+    
+    .privacy-setting-label strong {
+        font-size: 0.9em;
+    }
+    
+    .privacy-setting-label small {
+        font-size: 0.8em;
     }
 }
 

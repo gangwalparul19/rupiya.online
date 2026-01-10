@@ -45,7 +45,8 @@ const htmlFiles = [
   'sync-encryption-salt.html',
   'clear-encrypted-family-data.html',
   'transfers.html',
-  'net-worth.html'
+  'net-worth.html',
+  'privacy-settings.html'
 ];
 
 // Pages that have the dashboard layout with sidebar
@@ -72,7 +73,8 @@ const pagesWithSidebar = [
   'trip-group-detail.html',
   'admin.html',
   'transfers.html',
-  'net-worth.html'
+  'net-worth.html',
+  'privacy-settings.html'
 ];
 
 // Environment variable injection script (only inject if values are present)
