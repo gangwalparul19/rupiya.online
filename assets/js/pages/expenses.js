@@ -417,6 +417,11 @@ function updateExpenseKPIsFromSummary(summary) {
   if (thisMonthKpi) thisMonthKpi.setAttribute('data-tooltip', formatCurrency(summary.thisMonth));
   if (lastMonthKpi) lastMonthKpi.setAttribute('data-tooltip', formatCurrency(summary.lastMonth));
   if (totalKpi) totalKpi.setAttribute('data-tooltip', `${summary.totalCount} expenses`);
+  
+  // Reinitialize tooltips after data is set
+  if (window.kpiTooltipManager) {
+    window.kpiTooltipManager.reinitializeTooltips();
+  }
 }
 
 // Handle page change from pagination component
@@ -467,6 +472,11 @@ function updateExpenseKPIs() {
   if (thisMonthKpi) thisMonthKpi.setAttribute('data-tooltip', formatCurrency(thisMonthTotal));
   if (lastMonthKpi) lastMonthKpi.setAttribute('data-tooltip', formatCurrency(lastMonthTotal));
   if (totalKpi) totalKpi.setAttribute('data-tooltip', formatCurrency(totalAll));
+  
+  // Reinitialize tooltips after data is set
+  if (window.kpiTooltipManager) {
+    window.kpiTooltipManager.reinitializeTooltips();
+  }
 }
 
 // Update KPIs based on filtered data
@@ -511,6 +521,11 @@ function updateFilteredExpenseKPIs() {
   if (thisMonthKpi) thisMonthKpi.setAttribute('data-tooltip', formatCurrency(thisMonthTotal));
   if (lastMonthKpi) lastMonthKpi.setAttribute('data-tooltip', formatCurrency(lastMonthTotal));
   if (totalKpi) totalKpi.setAttribute('data-tooltip', formatCurrency(totalAll));
+  
+  // Reinitialize tooltips after data is set
+  if (window.kpiTooltipManager) {
+    window.kpiTooltipManager.reinitializeTooltips();
+  }
 }
 
 // Apply filters

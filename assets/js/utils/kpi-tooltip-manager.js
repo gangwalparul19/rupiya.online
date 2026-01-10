@@ -7,6 +7,7 @@ class KPITooltipManager {
   constructor() {
     this.tooltips = new Map();
     this.activeTooltip = null;
+    this.initialized = false;
   }
 
   /**
@@ -22,6 +23,9 @@ class KPITooltipManager {
 
     // Handle clicks outside tooltips
     document.addEventListener('click', (e) => this.handleOutsideClick(e));
+    
+    // Re-initialize tooltips after a delay to catch dynamically added content
+    setTimeout(() => this.reinitializeTooltips(), 500);
   }
 
   /**
@@ -32,13 +36,30 @@ class KPITooltipManager {
     
     kpiCards.forEach(card => {
       const tooltipText = card.getAttribute('data-tooltip');
-      if (tooltipText) {
+      if (tooltipText && !card.querySelector('.kpi-info-btn')) {
         this.createTooltip(card, tooltipText);
       }
     });
 
     // Also watch for dynamically added cards
-    this.observeNewCards();
+    if (!this.initialized) {
+      this.observeNewCards();
+      this.initialized = true;
+    }
+  }
+
+  /**
+   * Reinitialize tooltips for dynamically updated content
+   */
+  reinitializeTooltips() {
+    const kpiCards = document.querySelectorAll('[data-tooltip]');
+    
+    kpiCards.forEach(card => {
+      const tooltipText = card.getAttribute('data-tooltip');
+      if (tooltipText && !card.querySelector('.kpi-info-btn')) {
+        this.createTooltip(card, tooltipText);
+      }
+    });
   }
 
   /**
@@ -223,3 +244,6 @@ class KPITooltipManager {
 // Initialize on page load
 const kpiTooltipManager = new KPITooltipManager();
 kpiTooltipManager.init();
+
+// Expose globally for reinitializing after data updates
+window.kpiTooltipManager = kpiTooltipManager;

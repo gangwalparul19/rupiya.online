@@ -360,6 +360,11 @@ function updateIncomeKPIsFromSummary(summary) {
   if (thisMonthKpi) thisMonthKpi.setAttribute('data-tooltip', formatCurrency(summary.thisMonth));
   if (lastMonthKpi) lastMonthKpi.setAttribute('data-tooltip', formatCurrency(summary.lastMonth));
   if (totalKpi) totalKpi.setAttribute('data-tooltip', `${summary.totalCount} income entries`);
+  
+  // Reinitialize tooltips after data is set
+  if (window.kpiTooltipManager) {
+    window.kpiTooltipManager.reinitializeTooltips();
+  }
 }
 
 // Handle page change from pagination component
@@ -410,6 +415,11 @@ function updateIncomeKPIs() {
   if (thisMonthKpi) thisMonthKpi.setAttribute('data-tooltip', formatCurrency(thisMonthTotal));
   if (lastMonthKpi) lastMonthKpi.setAttribute('data-tooltip', formatCurrency(lastMonthTotal));
   if (totalKpi) totalKpi.setAttribute('data-tooltip', formatCurrency(totalAll));
+  
+  // Reinitialize tooltips after data is set
+  if (window.kpiTooltipManager) {
+    window.kpiTooltipManager.reinitializeTooltips();
+  }
 }
 
 // Apply filters

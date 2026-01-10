@@ -234,6 +234,11 @@ async function loadDashboardData() {
     if (cashflowKpi) cashflowKpi.setAttribute('data-tooltip', formatCurrency(cashFlow));
     if (savingsKpi) savingsKpi.setAttribute('data-tooltip', `${savingsRate.toFixed(2)}%`);
     
+    // Reinitialize tooltips after data is set
+    if (window.kpiTooltipManager) {
+      window.kpiTooltipManager.reinitializeTooltips();
+    }
+    
     // Initialize KPI enhancements
     kpiEnhancer.initCard('incomeKpi', { showSparkline: true, showDetails: true, detailsLink: 'income.html' });
     kpiEnhancer.initCard('expenseKpi', { showSparkline: true, showDetails: true, detailsLink: 'expenses.html' });
