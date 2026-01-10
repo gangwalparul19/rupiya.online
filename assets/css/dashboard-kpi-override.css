@@ -101,7 +101,7 @@
   border-radius: var(--border-radius-lg) !important;
   padding: var(--spacing-lg) !important;
   transition: all var(--transition-base) !important;
-  overflow: hidden !important;
+  overflow: visible !important;
   min-width: 0 !important;
   gap: 0 !important;
   align-items: flex-start !important;
@@ -307,7 +307,7 @@
   border-radius: var(--border-radius-lg) !important;
   padding: var(--spacing-lg) !important;
   transition: all var(--transition-base) !important;
-  overflow: hidden !important;
+  overflow: visible !important;
   min-width: 0 !important;
 }
 
@@ -369,7 +369,7 @@
   border: 2px solid var(--primary-blue) !important;
   border-radius: var(--border-radius-lg) !important;
   padding: var(--spacing-lg) !important;
-  overflow: hidden !important;
+  overflow: visible !important;
   min-width: 0 !important;
   margin-bottom: var(--spacing-xl) !important;
   box-sizing: border-box !important;

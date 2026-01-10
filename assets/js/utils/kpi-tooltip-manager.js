@@ -36,8 +36,9 @@ class KPITooltipManager {
     
     kpiCards.forEach(card => {
       const tooltipText = card.getAttribute('data-tooltip');
-      if (tooltipText && !card.querySelector('.kpi-info-btn')) {
-        this.createTooltip(card, tooltipText);
+      // Create tooltip even if text is empty initially (will be populated later)
+      if (!card.querySelector('.kpi-info-btn')) {
+        this.createTooltip(card, tooltipText || '');
       }
     });
 
@@ -56,8 +57,16 @@ class KPITooltipManager {
     
     kpiCards.forEach(card => {
       const tooltipText = card.getAttribute('data-tooltip');
-      if (tooltipText && !card.querySelector('.kpi-info-btn')) {
-        this.createTooltip(card, tooltipText);
+      if (tooltipText) {
+        // Update existing tooltip or create new one
+        let tooltip = card.querySelector('.kpi-info-tooltip');
+        if (tooltip) {
+          // Update existing tooltip text
+          tooltip.textContent = tooltipText;
+        } else if (!card.querySelector('.kpi-info-btn')) {
+          // Create new tooltip if it doesn't exist
+          this.createTooltip(card, tooltipText);
+        }
       }
     });
   }
@@ -71,7 +80,7 @@ class KPITooltipManager {
       return;
     }
 
-    // Find or create header
+    // Find existing header
     let header = card.querySelector('.kpi-header');
     if (!header) {
       // Create header if it doesn't exist
@@ -94,7 +103,7 @@ class KPITooltipManager {
     tooltip.textContent = tooltipText;
     tooltip.setAttribute('role', 'tooltip');
 
-    // Add to header
+    // Append to header (at the end, after the icon)
     header.appendChild(infoBtn);
     header.appendChild(tooltip);
 

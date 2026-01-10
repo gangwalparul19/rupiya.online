@@ -10,7 +10,7 @@
 .kpi-card[data-tooltip],
 .kpi-summary .kpi-card[data-tooltip],
 .summary-card[data-tooltip] {
-  position: relative;
+  position: relative !important;
 }
 
 /* Info icon button - positioned in header */
@@ -66,9 +66,10 @@
   gap: 8px !important;
   flex-wrap: nowrap !important;
   width: 100% !important;
+  position: relative !important;
 }
 
-/* Tooltip container - positioned relative to info button */
+/* Tooltip container - positioned relative to header */
 .kpi-info-tooltip {
   position: absolute;
   background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
@@ -93,8 +94,9 @@
   text-align: center;
   bottom: auto;
   top: calc(100% + 12px);
-  left: 50%;
-  transform: translateX(-50%) translateY(-12px) scale(0.95);
+  right: 0;
+  left: auto;
+  transform: translateY(-12px) scale(0.95);
 }
 
 /* Show tooltip on hover or focus */
@@ -103,7 +105,7 @@
 .kpi-info-tooltip.show {
   opacity: 1;
   visibility: visible;
-  transform: translateX(-50%) translateY(0) scale(1);
+  transform: translateY(0) scale(1);
   pointer-events: auto;
 }
 
@@ -112,8 +114,7 @@
   content: '';
   position: absolute;
   bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
+  right: 20px;
   width: 0;
   height: 0;
   border-left: 8px solid transparent;
