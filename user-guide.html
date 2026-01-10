@@ -5,10 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rupiya - User Guide & Tutorial</title>
     <link rel="stylesheet" href="assets/css/common.css">
+    <link rel="stylesheet" href="assets/css/components.css">
+    <link rel="stylesheet" href="assets/css/sidebar.css">
     <link rel="stylesheet" href="assets/css/user-guide.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f7fa; color: #333; }
+        
+        .dashboard-layout { display: flex; min-height: 100vh; }
+        .sidebar { position: fixed; left: 0; top: 0; width: 280px; height: 100vh; background: white; border-right: 1px solid #e5e7eb; overflow-y: auto; z-index: 1000; }
+        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 999; }
+        .main-content { flex: 1; margin-left: 280px; }
+        .mobile-header { display: none; }
+        
         .guide-container { max-width: 1200px; margin: 0 auto; padding: 20px; }
         .guide-header { background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%); color: white; padding: 40px 20px; border-radius: 8px; margin-bottom: 40px; text-align: center; }
         .guide-header h1 { font-size: 2.5em; margin-bottom: 10px; }
@@ -35,16 +44,122 @@
         .warning strong { color: #ff9800; }
         .btn-primary { background: #4A90E2; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 1em; transition: all 0.3s; text-decoration: none; display: inline-block; }
         .btn-primary:hover { background: #357ABD; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(74, 144, 226, 0.3); }
+        
+        /* Mobile Responsive */
+        @media (max-width: 1024px) {
+            .sidebar { width: 250px; }
+            .main-content { margin-left: 250px; }
+            .guide-header h1 { font-size: 2em; }
+            .section { padding: 30px; }
+        }
+        
         @media (max-width: 768px) {
-            .guide-header h1 { font-size: 1.8em; }
-            .section { padding: 20px; }
-            .feature-grid { grid-template-columns: 1fr; }
-            .toc-list { grid-template-columns: 1fr; }
+            .sidebar { transform: translateX(-100%); transition: transform 0.3s ease; width: 280px; }
+            .sidebar.active { transform: translateX(0); }
+            .sidebar-overlay { display: block; }
+            .sidebar-overlay.active { display: block; }
+            .main-content { margin-left: 0; }
+            .mobile-header { display: flex; }
+            .guide-header h1 { font-size: 1.8em; padding: 30px 15px; }
+            .guide-header p { font-size: 0.95em; }
+            .section { padding: 20px; margin-bottom: 20px; }
+            .feature-grid { grid-template-columns: 1fr; gap: 15px; }
+            .toc-list { grid-template-columns: 1fr; gap: 10px; }
+            .toc { padding: 20px; margin-bottom: 30px; }
+            .toc h2 { font-size: 1.3em; margin-bottom: 15px; }
+            .guide-container { padding: 15px; }
+            .step { padding: 15px; margin: 15px 0; }
+            .feature-card { padding: 20px; }
+            .section h2 { font-size: 1.5em; }
+            .section h3 { font-size: 1.2em; }
+        }
+        
+        @media (max-width: 480px) {
+            .guide-header h1 { font-size: 1.5em; padding: 25px 10px; }
+            .guide-header p { font-size: 0.9em; }
+            .section { padding: 15px; }
+            .section h2 { font-size: 1.3em; }
+            .section h3 { font-size: 1.1em; }
+            .toc-item { padding: 12px; }
+            .toc-item a { font-size: 0.95em; }
+            .feature-card h4 { font-size: 1.1em; }
+            .feature-card p { font-size: 0.95em; }
+            .step { padding: 12px; margin: 12px 0; }
+            .step-number { width: 30px; height: 30px; line-height: 30px; font-size: 0.9em; margin-right: 10px; }
+            .guide-container { padding: 10px; }
         }
     </style>
 </head>
 <body>
-    <div class="guide-container">
+    <div class="dashboard-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <img src="assets/images/logo.png" alt="Rupiya">
+                </div>
+                <button class="sidebar-toggle" id="sidebarClose">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <nav class="sidebar-nav" id="sidebarNav">
+                <!-- Navigation will be loaded by sidebar.js -->
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-profile" id="userProfile">
+                    <div class="user-avatar" id="userAvatar">U</div>
+                    <div class="user-info">
+                        <div class="user-name" id="userName">Loading...</div>
+                        <div class="user-email" id="userEmail">Loading...</div>
+                    </div>
+                </div>
+                <button class="btn btn-sm btn-outline w-100 mt-3" id="logoutBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                    </svg>
+                    Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Sidebar Overlay (Mobile) -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Mobile Header -->
+            <div class="mobile-header">
+                <a href="dashboard.html" class="mobile-brand">
+                    <img src="assets/images/logo.png" alt="Rupiya">
+                </a>
+                <div class="mobile-header-actions">
+                    <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle theme">
+                        <svg class="theme-icon-light" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <circle cx="12" cy="12" r="5"/>
+                            <line x1="12" y1="1" x2="12" y2="3"/>
+                            <line x1="12" y1="21" x2="12" y2="23"/>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                            <line x1="1" y1="12" x2="3" y2="12"/>
+                            <line x1="21" y1="12" x2="23" y2="12"/>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                        </svg>
+                        <svg class="theme-icon-dark" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                        </svg>
+                    </button>
+                    <button class="sidebar-toggle" id="sidebarOpen">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="guide-container">
         <div class="guide-header">
             <h1>📚 Rupiya User Guide</h1>
             <p>Master your personal finances with our comprehensive tutorial</p>
@@ -650,14 +765,51 @@
             </div>
         </div>
 
-        <!-- Footer -->
-        <div style="background: #f9f9f9; padding: 30px; border-radius: 8px; margin-top: 40px; text-align: center; color: #666;">
-            <p>📚 <strong>Rupiya User Guide</strong> - Last Updated: January 2025</p>
-            <p style="margin-top: 10px; font-size: 0.9em;">For more help, visit our <a href="about-us.html" style="color: #4A90E2;">About Us</a> page or <a href="contact-us.html" style="color: #4A90E2;">Contact Us</a></p>
-        </div>
+                <!-- Footer -->
+                <div style="background: #f9f9f9; padding: 30px; border-radius: 8px; margin-top: 40px; text-align: center; color: #666;">
+                    <p>📚 <strong>Rupiya User Guide</strong> - Last Updated: January 2025</p>
+                    <p style="margin-top: 10px; font-size: 0.9em;">For more help, visit our <a href="about-us.html" style="color: #4A90E2;">About Us</a> page or <a href="contact-us.html" style="color: #4A90E2;">Contact Us</a></p>
+                </div>
+            </div>
+        </main>
     </div>
 
-    <script>
+    <!-- Scripts -->
+    <script type="module">
+        import { initSidebar } from './assets/js/components/sidebar.js';
+        import { initLogoutHandler } from './assets/js/utils/logout-handler.js';
+        
+        // Initialize sidebar navigation
+        initSidebar();
+        
+        // Initialize logout handler
+        initLogoutHandler();
+        
+        // Mobile sidebar toggle
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const sidebarOpen = document.getElementById('sidebarOpen');
+        const sidebarClose = document.getElementById('sidebarClose');
+        
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
+            sidebarOverlay.classList.toggle('active');
+        }
+        
+        sidebarOpen?.addEventListener('click', toggleSidebar);
+        sidebarClose?.addEventListener('click', toggleSidebar);
+        sidebarOverlay?.addEventListener('click', toggleSidebar);
+        
+        // Close sidebar when clicking on a link
+        document.querySelectorAll('.sidebar-nav a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('active');
+                    sidebarOverlay.classList.remove('active');
+                }
+            });
+        });
+        
         // Smooth scrolling for TOC links
         document.querySelectorAll('.toc-item a').forEach(link => {
             link.addEventListener('click', (e) => {
@@ -667,6 +819,14 @@
                     target.scrollIntoView({ behavior: 'smooth' });
                 }
             });
+        });
+        
+        // Close sidebar on window resize
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('active');
+                sidebarOverlay.classList.remove('active');
+            }
         });
     </script>
 </body>

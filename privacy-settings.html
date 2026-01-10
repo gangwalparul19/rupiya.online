@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Settings - Rupiya</title>
+    <link rel="stylesheet" href="assets/css/common.css">
+    <link rel="stylesheet" href="assets/css/components.css">
+    <link rel="stylesheet" href="assets/css/sidebar.css">
+    <link rel="stylesheet" href="assets/css/privacy-mode.css">
+    <style>
+        .dashboard-layout { display: flex; min-height: 100vh; }
+        .sidebar { position: fixed; left: 0; top: 0; width: 280px; height: 100vh; background: white; border-right: 1px solid #e5e7eb; overflow-y: auto; z-index: 1000; }
+        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 999; }
+        .main-content { flex: 1; margin-left: 280px; }
+        .mobile-header { display: none; }
+        .page-container { max-width: 900px; margin: 0 auto; padding: 30px 20px; }
+        .page-header { margin-bottom: 30px; }
+        .page-header h1 { color: #4A90E2; font-size: 2em; margin-bottom: 10px; }
+        .page-header p { color: #666; font-size: 1.05em; }
+        
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); transition: transform 0.3s ease; }
+            .sidebar.active { transform: translateX(0); }
+            .sidebar-overlay { display: block; }
+            .sidebar-overlay.active { display: block; }
+            .main-content { margin-left: 0; }
+            .mobile-header { display: flex; }
+            .page-container { padding: 20px 15px; }
+            .page-header h1 { font-size: 1.5em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <img src="assets/images/logo.png" alt="Rupiya">
+                </div>
+                <button class="sidebar-toggle" id="sidebarClose">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <nav class="sidebar-nav" id="sidebarNav">
+                <!-- Navigation will be loaded by sidebar.js -->
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-profile" id="userProfile">
+                    <div class="user-avatar" id="userAvatar">U</div>
+                    <div class="user-info">
+                        <div class="user-name" id="userName">Loading...</div>
+                        <div class="user-email" id="userEmail">Loading...</div>
+                    </div>
+                </div>
+                <button class="btn btn-sm btn-outline w-100 mt-3" id="logoutBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                    </svg>
+                    Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Sidebar Overlay -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Mobile Header -->
+            <div class="mobile-header">
+                <a href="dashboard.html" class="mobile-brand">
+                    <img src="assets/images/logo.png" alt="Rupiya">
+                </a>
+                <div class="mobile-header-actions">
+                    <button class="sidebar-toggle" id="sidebarOpen">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="page-container">
+                <!-- Page Header -->
+                <div class="page-header">
+                    <h1>🔒 Privacy Settings</h1>
+                    <p>Control how your financial data is displayed and shared</p>
+                </div>
+
+                <!-- Privacy Mode Info -->
+                <div class="privacy-info-box">
+                    <h4>What is Privacy Mode?</h4>
+                    <p>Privacy Mode hides all sensitive financial data (amounts, percentages, charts) while keeping the app interface fully functional. Perfect for:</p>
+                    <ul>
+                        <li>Sharing your device with family members</li>
+                        <li>Demonstrating app features to others</li>
+                        <li>Taking screenshots for support</li>
+                        <li>Protecting your financial information in public</li>
+                    </ul>
+                </div>
+
+                <!-- Privacy Settings Panel -->
+                <div class="privacy-settings-panel">
+                    <h3>Privacy Mode Settings</h3>
+                    
+                    <!-- Main Toggle -->
+                    <div class="privacy-setting-item">
+                        <div class="privacy-setting-label">
+                            <strong>Enable Privacy Mode</strong>
+                            <small>Hide all financial amounts and sensitive data</small>
+                        </div>
+                        <div class="privacy-toggle" id="mainPrivacyToggle"></div>
+                    </div>
+
+                    <!-- Hide Amounts -->
+                    <div class="privacy-setting-item">
+                        <div class="privacy-setting-label">
+                            <strong>Hide Financial Amounts</strong>
+                            <small>Hide income, expenses, and balance amounts</small>
+                        </div>
+                        <div class="privacy-toggle" id="hideAmountsToggle"></div>
+                    </div>
+
+                    <!-- Hide Charts -->
+                    <div class="privacy-setting-item">
+                        <div class="privacy-setting-label">
+                            <strong>Hide Charts & Graphs</strong>
+                            <small>Hide visual representations of financial data</small>
+                        </div>
+                        <div class="privacy-toggle" id="hideChartsToggle"></div>
+                    </div>
+
+                    <!-- Hide User Info -->
+                    <div class="privacy-setting-item">
+                        <div class="privacy-setting-label">
+                            <strong>Hide User Information</strong>
+                            <small>Hide name and email address</small>
+                        </div>
+                        <div class="privacy-toggle" id="hideUserInfoToggle"></div>
+                    </div>
+
+                    <!-- Hide Percentages -->
+                    <div class="privacy-setting-item">
+                        <div class="privacy-setting-label">
+                            <strong>Hide Percentages</strong>
+                            <small>Hide savings rate and other percentages</small>
+                        </div>
+                        <div class="privacy-toggle" id="hidePercentagesToggle"></div>
+                    </div>
+                </div>
+
+                <!-- Privacy Warning -->
+                <div class="privacy-warning">
+                    <h4>⚠️ Important Notes</h4>
+                    <p>
+                        Privacy Mode only hides data on the display. Your actual data remains secure in our servers and is protected by encryption. 
+                        Privacy Mode is stored locally on your device and doesn't affect other users' access to their own data.
+                    </p>
+                </div>
+
+                <!-- Demo Mode Info -->
+                <div class="privacy-info-box">
+                    <h4>Demo Mode for Sharing</h4>
+                    <p>When Privacy Mode is enabled, you can safely:</p>
+                    <ul>
+                        <li>Share your device with family members to explore features</li>
+                        <li>Show the app interface without revealing financial details</li>
+                        <li>Demonstrate how to use different sections</li>
+                        <li>Take screenshots for tutorials or support</li>
+                    </ul>
+                </div>
+
+                <!-- Quick Actions -->
+                <div style="margin-top: 30px; display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn btn-primary" id="enablePrivacyBtn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="display: inline; margin-right: 8px;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-4.803m5.596-3.856a3.375 3.375 0 11-4.753 4.753m4.753-4.753L3.596 3.039m10.318 10.318L21 21"/>
+                        </svg>
+                        Enable Privacy Mode
+                    </button>
+                    <button class="btn btn-outline" id="disablePrivacyBtn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="display: inline; margin-right: 8px;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                        </svg>
+                        Disable Privacy Mode
+                    </button>
+                </div>
+
+                <!-- FAQ Section -->
+                <div style="margin-top: 40px;">
+                    <h2 style="color: #4A90E2; margin-bottom: 20px;">Frequently Asked Questions</h2>
+                    
+                    <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-bottom: 15px;">
+                        <h4 style="color: #357ABD; margin-bottom: 10px;">Is my data safe in Privacy Mode?</h4>
+                        <p style="color: #666; margin: 0;">Yes, Privacy Mode only hides data on your screen. Your actual data remains encrypted and secure on our servers. Privacy Mode is a display-only feature.</p>
+                    </div>
+
+                    <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-bottom: 15px;">
+                        <h4 style="color: #357ABD; margin-bottom: 10px;">Can I use Privacy Mode on shared devices?</h4>
+                        <p style="color: #666; margin: 0;">Yes! Privacy Mode is perfect for shared devices. When enabled, all financial amounts are hidden, allowing others to explore the app without seeing your financial details.</p>
+                    </div>
+
+                    <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-bottom: 15px;">
+                        <h4 style="color: #357ABD; margin-bottom: 10px;">Does Privacy Mode affect other users?</h4>
+                        <p style="color: #666; margin: 0;">No, Privacy Mode is stored locally on your device. It only affects your view of the app and doesn't impact other users' access to their own data.</p>
+                    </div>
+
+                    <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px;">
+                        <h4 style="color: #357ABD; margin-bottom: 10px;">Can I toggle Privacy Mode quickly?</h4>
+                        <p style="color: #666; margin: 0;">Yes! There's a privacy button in the header (eye icon) that lets you toggle Privacy Mode instantly. You can also use this settings page for more detailed control.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module">
+        import { initSidebar } from './assets/js/components/sidebar.js';
+        import { initLogoutHandler } from './assets/js/utils/logout-handler.js';
+        import privacyMode from './assets/js/utils/privacy-mode.js';
+        import initPrivacyModeButton from './assets/js/components/privacy-mode-button.js';
+
+        // Initialize components
+        initSidebar();
+        initLogoutHandler();
+        initPrivacyModeButton();
+
+        // Mobile sidebar toggle
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const sidebarOpen = document.getElementById('sidebarOpen');
+        const sidebarClose = document.getElementById('sidebarClose');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
+            sidebarOverlay.classList.toggle('active');
+        }
+
+        sidebarOpen?.addEventListener('click', toggleSidebar);
+        sidebarClose?.addEventListener('click', toggleSidebar);
+        sidebarOverlay?.addEventListener('click', toggleSidebar);
+
+        // Privacy mode controls
+        const mainToggle = document.getElementById('mainPrivacyToggle');
+        const enableBtn = document.getElementById('enablePrivacyBtn');
+        const disableBtn = document.getElementById('disablePrivacyBtn');
+
+        function updateToggleState() {
+            if (privacyMode.isEnabled()) {
+                mainToggle.classList.add('active');
+            } else {
+                mainToggle.classList.remove('active');
+            }
+        }
+
+        mainToggle?.addEventListener('click', () => {
+            privacyMode.toggle();
+            updateToggleState();
+        });
+
+        enableBtn?.addEventListener('click', () => {
+            privacyMode.enable();
+            updateToggleState();
+        });
+
+        disableBtn?.addEventListener('click', () => {
+            privacyMode.disable();
+            updateToggleState();
+        });
+
+        // Initialize toggle state
+        updateToggleState();
+
+        // Listen for privacy mode changes
+        window.addEventListener('privacyModeChanged', () => {
+            updateToggleState();
+        });
+    </script>
+</body>
+</html>

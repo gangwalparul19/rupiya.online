@@ -1,0 +1,327 @@
+/**
+ * Privacy Mode Styles
+ * Auto-detects and hides sensitive financial data
+ * No HTML changes required!
+ */
+
+/* Privacy Mode Button */
+.privacy-mode-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    color: #666;
+    font-size: 1.2em;
+}
+
+.privacy-mode-btn:hover {
+    background: #f3f4f6;
+    color: #4A90E2;
+}
+
+.privacy-mode-btn.active {
+    background: #e8f1ff;
+    color: #4A90E2;
+    border: 1px solid #4A90E2;
+}
+
+.privacy-mode-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Auto-Hidden Elements */
+.privacy-hidden {
+    color: #999;
+    font-weight: 500;
+    letter-spacing: 1px;
+}
+
+.privacy-hidden-percent {
+    color: #999;
+    font-weight: 500;
+}
+
+.privacy-hidden-email {
+    color: #999;
+    font-weight: 500;
+}
+
+.privacy-hidden-chart {
+    position: relative;
+}
+
+.privacy-hidden-chart::after {
+    content: 'Chart Hidden for Privacy';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 0.9em;
+    z-index: 10;
+    white-space: nowrap;
+}
+
+/* Privacy Mode Indicator */
+.privacy-mode-indicator {
+    display: none;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #fff3cd;
+    border: 2px solid #ffc107;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 0.9em;
+    color: #856404;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+    animation: slideIn 0.3s ease;
+}
+
+.privacy-mode-indicator.show {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.privacy-mode-indicator svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* Privacy Mode Badge */
+.privacy-badge {
+    display: inline-block;
+    background: #e8f1ff;
+    color: #4A90E2;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75em;
+    font-weight: 600;
+    margin-left: 8px;
+}
+
+/* Privacy Mode Tooltip */
+.privacy-tooltip {
+    position: relative;
+}
+
+.privacy-tooltip::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    margin-bottom: 8px;
+    z-index: 100;
+}
+
+.privacy-tooltip:hover::after {
+    opacity: 1;
+}
+
+/* Blur effect alternative (optional) */
+.privacy-blur {
+    filter: blur(4px);
+    user-select: none;
+}
+
+/* Privacy Mode Settings Panel */
+.privacy-settings-panel {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+}
+
+.privacy-settings-panel h3 {
+    color: #4A90E2;
+    margin-bottom: 15px;
+    font-size: 1.1em;
+}
+
+.privacy-setting-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.privacy-setting-item:last-child {
+    border-bottom: none;
+}
+
+.privacy-setting-label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.privacy-setting-label strong {
+    color: #1f2937;
+}
+
+.privacy-setting-label small {
+    color: #9ca3af;
+    font-size: 0.85em;
+}
+
+.privacy-toggle {
+    position: relative;
+    width: 50px;
+    height: 28px;
+    background: #ccc;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.privacy-toggle.active {
+    background: #4A90E2;
+}
+
+.privacy-toggle::after {
+    content: '';
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    background: white;
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    transition: left 0.3s ease;
+}
+
+.privacy-toggle.active::after {
+    left: 24px;
+}
+
+/* Privacy Mode Info Box */
+.privacy-info-box {
+    background: #f0f9ff;
+    border-left: 4px solid #00D4FF;
+    padding: 15px;
+    border-radius: 6px;
+    margin: 15px 0;
+}
+
+.privacy-info-box h4 {
+    color: #00A8CC;
+    margin-bottom: 8px;
+    font-size: 0.95em;
+}
+
+.privacy-info-box p {
+    color: #0369a1;
+    font-size: 0.9em;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.privacy-info-box ul {
+    margin: 8px 0 0 20px;
+    color: #0369a1;
+    font-size: 0.9em;
+}
+
+.privacy-info-box li {
+    margin: 4px 0;
+}
+
+/* Privacy Mode Warning */
+.privacy-warning {
+    background: #fff3cd;
+    border-left: 4px solid #ffc107;
+    padding: 15px;
+    border-radius: 6px;
+    margin: 15px 0;
+}
+
+.privacy-warning h4 {
+    color: #856404;
+    margin-bottom: 8px;
+    font-size: 0.95em;
+}
+
+.privacy-warning p {
+    color: #856404;
+    font-size: 0.9em;
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* Animations */
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .privacy-mode-indicator {
+        top: 10px;
+        right: 10px;
+        padding: 10px 12px;
+        font-size: 0.85em;
+    }
+    
+    .privacy-settings-panel {
+        padding: 15px;
+        margin: 15px 0;
+    }
+    
+    .privacy-setting-item {
+        padding: 10px 0;
+    }
+}
+
+/* Print Mode - Always show data */
+@media print {
+    .privacy-hidden {
+        color: inherit;
+    }
+    
+    .privacy-hidden::before {
+        content: none;
+    }
+    
+    .privacy-mode-indicator {
+        display: none;
+    }
+}
