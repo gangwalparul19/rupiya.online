@@ -37,19 +37,22 @@
 
 /* Auto-Hidden Elements */
 .privacy-hidden {
-    color: #999;
-    font-weight: 500;
-    letter-spacing: 1px;
+    color: #999 !important;
+    font-weight: 500 !important;
+    letter-spacing: 1px !important;
+    user-select: none !important;
 }
 
 .privacy-hidden-percent {
-    color: #999;
-    font-weight: 500;
+    color: #999 !important;
+    font-weight: 500 !important;
+    user-select: none !important;
 }
 
 .privacy-hidden-email {
-    color: #999;
-    font-weight: 500;
+    color: #999 !important;
+    font-weight: 500 !important;
+    user-select: none !important;
 }
 
 .privacy-hidden-chart {

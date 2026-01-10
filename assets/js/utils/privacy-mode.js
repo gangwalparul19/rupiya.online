@@ -21,6 +21,9 @@ class PrivacyModeManager {
         const saved = localStorage.getItem(this.storageKey);
         this.isPrivacyMode = saved === 'true';
         
+        // Start watching for DOM changes
+        this.watchForChanges();
+        
         // Wait for DOM to be ready
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => {
@@ -99,13 +102,70 @@ class PrivacyModeManager {
         window.dispatchEvent(new CustomEvent('privacyModeChanged', {
             detail: { isPrivacyMode: this.isPrivacyMode }
         }));
+        
+        console.log('Privacy Mode Applied:', this.isPrivacyMode);
+    }
+
+    /**
+     * Watch for DOM changes and reapply privacy mode
+     */
+    watchForChanges() {
+        const observer = new MutationObserver(() => {
+            if (this.isPrivacyMode) {
+                // Reapply privacy mode to newly added elements
+                this.autoHideAmounts();
+                this.autoHidePercentages();
+                this.autoHideEmails();
+                this.autoHideCharts();
+            }
+        });
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true,
+            characterData: true
+        });
     }
 
     /**
      * Auto-detect and hide amounts (₹ or currency values)
      */
     autoHideAmounts() {
-        // Find all elements containing currency amounts
+        // Specifically target KPI values
+        const kpiValues = document.querySelectorAll('.kpi-value');
+        kpiValues.forEach(element => {
+            if (this.isPrivacyMode) {
+                if (!this.originalValues.has(element)) {
+                    this.originalValues.set(element, element.textContent);
+                }
+                element.textContent = '₹ ••••••';
+                element.classList.add('privacy-hidden');
+            } else {
+                if (this.originalValues.has(element)) {
+                    element.textContent = this.originalValues.get(element);
+                }
+                element.classList.remove('privacy-hidden');
+            }
+        });
+
+        // Target transaction amounts
+        const transactionAmounts = document.querySelectorAll('.transaction-amount, [class*="amount"]');
+        transactionAmounts.forEach(element => {
+            if (this.isPrivacyMode) {
+                if (!this.originalValues.has(element)) {
+                    this.originalValues.set(element, element.textContent);
+                }
+                element.textContent = '₹ ••••••';
+                element.classList.add('privacy-hidden');
+            } else {
+                if (this.originalValues.has(element)) {
+                    element.textContent = this.originalValues.get(element);
+                }
+                element.classList.remove('privacy-hidden');
+            }
+        });
+
+        // Find all elements containing currency amounts via TreeWalker
         const walker = document.createTreeWalker(
             document.body,
             NodeFilter.SHOW_TEXT,
@@ -147,6 +207,30 @@ class PrivacyModeManager {
      * Auto-detect and hide percentages
      */
     autoHidePercentages() {
+        // Target specific percentage elements
+        const percentageElements = document.querySelectorAll(
+            '.savings-rate-value, .goal-progress-percent, [class*="percent"], [class*="rate"]'
+        );
+        
+        percentageElements.forEach(element => {
+            const text = element.textContent;
+            if (/\d+(\.\d+)?%/.test(text)) {
+                if (this.isPrivacyMode) {
+                    if (!this.originalValues.has(element)) {
+                        this.originalValues.set(element, text);
+                    }
+                    element.textContent = '••%';
+                    element.classList.add('privacy-hidden-percent');
+                } else {
+                    if (this.originalValues.has(element)) {
+                        element.textContent = this.originalValues.get(element);
+                    }
+                    element.classList.remove('privacy-hidden-percent');
+                }
+            }
+        });
+
+        // TreeWalker for other percentage patterns
         const walker = document.createTreeWalker(
             document.body,
             NodeFilter.SHOW_TEXT,
