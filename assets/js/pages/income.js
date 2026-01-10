@@ -14,6 +14,7 @@ import { Validator } from '../utils/validation.js';
 import { formatCurrency, formatCurrencyCompact, formatDate, formatDateForInput, debounce, exportToCSV, escapeHtml } from '../utils/helpers.js';
 import timezoneService from '../utils/timezone.js';
 import encryptionReauthModal from '../components/encryption-reauth-modal.js';
+import initPrivacyModeButton from '../components/privacy-mode-button.js';
 
 // State management
 const state = {
@@ -80,6 +81,9 @@ async function init() {
   });
   
   await initPage();
+  
+  // Initialize privacy mode button after page is ready
+  setTimeout(() => initPrivacyModeButton(), 1000);
 }
 
 // Start initialization

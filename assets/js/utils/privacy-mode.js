@@ -84,6 +84,9 @@ class PrivacyModeManager {
         // Auto-detect and hide charts
         this.autoHideCharts();
         
+        // Hide tooltips with financial data
+        this.hideTooltips();
+        
         // Hide elements with data-privacy attributes (if any)
         this.toggleElements('[data-privacy="amount"]', this.isPrivacyMode);
         this.toggleElements('[data-privacy="value"]', this.isPrivacyMode);
@@ -175,6 +178,77 @@ class PrivacyModeManager {
                 } else {
                     parent.classList.remove('privacy-hidden-chart');
                     canvas.style.opacity = '1';
+                }
+            }
+        });
+    }
+
+    /**
+     * Hide tooltips containing financial data
+     */
+    hideTooltips() {
+        // Create a unique key for storing tooltip values
+        const tooltipKey = 'tooltip_';
+        
+        // Hide title attributes (browser tooltips)
+        const elementsWithTitle = document.querySelectorAll('[title]');
+        elementsWithTitle.forEach(element => {
+            const title = element.getAttribute('title');
+            if (title && /₹[\d,]+|₹\d+|\d+%|\d+,\d+/.test(title)) {
+                const key = tooltipKey + 'title_' + Math.random();
+                if (this.isPrivacyMode) {
+                    if (!this.originalValues.has(key)) {
+                        this.originalValues.set(key, title);
+                        element.dataset.privacyTooltipKey = key;
+                    }
+                    element.setAttribute('title', 'Hidden for privacy');
+                } else {
+                    const storedKey = element.dataset.privacyTooltipKey;
+                    if (storedKey && this.originalValues.has(storedKey)) {
+                        element.setAttribute('title', this.originalValues.get(storedKey));
+                    }
+                }
+            }
+        });
+
+        // Hide data-tooltip attributes
+        const elementsWithDataTooltip = document.querySelectorAll('[data-tooltip]');
+        elementsWithDataTooltip.forEach(element => {
+            const tooltip = element.getAttribute('data-tooltip');
+            if (tooltip && /₹[\d,]+|₹\d+|\d+%|\d+,\d+/.test(tooltip)) {
+                const key = tooltipKey + 'data_' + Math.random();
+                if (this.isPrivacyMode) {
+                    if (!this.originalValues.has(key)) {
+                        this.originalValues.set(key, tooltip);
+                        element.dataset.privacyDataTooltipKey = key;
+                    }
+                    element.setAttribute('data-tooltip', 'Hidden for privacy');
+                } else {
+                    const storedKey = element.dataset.privacyDataTooltipKey;
+                    if (storedKey && this.originalValues.has(storedKey)) {
+                        element.setAttribute('data-tooltip', this.originalValues.get(storedKey));
+                    }
+                }
+            }
+        });
+
+        // Hide aria-label attributes with financial data
+        const elementsWithAriaLabel = document.querySelectorAll('[aria-label]');
+        elementsWithAriaLabel.forEach(element => {
+            const label = element.getAttribute('aria-label');
+            if (label && /₹[\d,]+|₹\d+|\d+%|\d+,\d+/.test(label)) {
+                const key = tooltipKey + 'aria_' + Math.random();
+                if (this.isPrivacyMode) {
+                    if (!this.originalValues.has(key)) {
+                        this.originalValues.set(key, label);
+                        element.dataset.privacyAriaLabelKey = key;
+                    }
+                    element.setAttribute('aria-label', 'Hidden for privacy');
+                } else {
+                    const storedKey = element.dataset.privacyAriaLabelKey;
+                    if (storedKey && this.originalValues.has(storedKey)) {
+                        element.setAttribute('aria-label', this.originalValues.get(storedKey));
+                    }
                 }
             }
         });
@@ -334,6 +408,7 @@ class PrivacyModeManager {
                     this.autoHidePercentages();
                     this.autoHideEmails();
                     this.autoHideCharts();
+                    this.hideTooltips();
                 }
             }, 500);
         });
@@ -341,7 +416,9 @@ class PrivacyModeManager {
         observer.observe(document.body, {
             childList: true,
             subtree: true,
-            characterData: false
+            characterData: false,
+            attributes: true,
+            attributeFilter: ['title', 'data-tooltip', 'aria-label']
         });
     }
 

@@ -1,0 +1,134 @@
+/* ============================================
+   INCOME PAGE KPI OVERRIDE
+   Fixes KPI card layout to display horizontally
+   ============================================ */
+
+/* Override the flex-direction: column from income.css */
+.kpi-card {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 1rem !important;
+  background: white !important;
+  border: 2px solid #4A90E2 !important;
+  border-radius: 12px !important;
+  padding: 1.25rem !important;
+  transition: all 0.3s ease !important;
+}
+
+.kpi-card:hover {
+  border-color: #00CED1 !important;
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.15) !important;
+  transform: translateY(-2px) !important;
+}
+
+.kpi-card.kpi-expense {
+  border-color: #E74C3C !important;
+  background: linear-gradient(135deg, #fff5f5 0%, #fff 100%) !important;
+}
+
+.kpi-card.kpi-expense:hover {
+  border-color: #C0392B !important;
+  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.15) !important;
+}
+
+.kpi-card.kpi-income {
+  border-color: #27AE60 !important;
+  background: linear-gradient(135deg, #f0fff4 0%, #fff 100%) !important;
+}
+
+.kpi-card.kpi-income:hover {
+  border-color: #1E8449 !important;
+  box-shadow: 0 4px 12px rgba(39, 174, 96, 0.15) !important;
+}
+
+/* Icon styling */
+.kpi-icon {
+  font-size: 2rem !important;
+  width: 50px !important;
+  height: 50px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: linear-gradient(135deg, #4A90E2 0%, #00CED1 100%) !important;
+  border-radius: 10px !important;
+  flex-shrink: 0 !important;
+}
+
+.kpi-card.kpi-expense .kpi-icon {
+  background: linear-gradient(135deg, #E74C3C 0%, #C0392B 100%) !important;
+}
+
+.kpi-card.kpi-income .kpi-icon {
+  background: linear-gradient(135deg, #27AE60 0%, #2ECC71 100%) !important;
+}
+
+/* Content area */
+.kpi-content {
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+}
+
+.kpi-label {
+  font-size: 0.8rem !important;
+  color: #7F8C8D !important;
+  margin-bottom: 0.25rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+}
+
+.kpi-value {
+  font-size: 1.5rem !important;
+  font-weight: 700 !important;
+  color: #2C3E50 !important;
+}
+
+/* Mobile: Switch to vertical layout */
+@media (max-width: 768px) {
+  .kpi-card {
+    flex-direction: column !important;
+    text-align: center !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0.75rem !important;
+    gap: 0.5rem !important;
+  }
+
+  .kpi-icon {
+    width: 40px !important;
+    height: 40px !important;
+    font-size: 1.5rem !important;
+  }
+
+  .kpi-label {
+    font-size: 0.65rem !important;
+  }
+
+  .kpi-value {
+    font-size: 1rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .kpi-card {
+    padding: 0.5rem !important;
+  }
+
+  .kpi-icon {
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 1.25rem !important;
+    border-radius: 8px !important;
+  }
+
+  .kpi-label {
+    font-size: 0.55rem !important;
+  }
+
+  .kpi-value {
+    font-size: 0.85rem !important;
+  }
+}
