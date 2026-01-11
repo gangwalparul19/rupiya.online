@@ -4,6 +4,7 @@
  */
 
 import { featureConfig, FEATURE_CATEGORIES } from '../config/feature-config.js';
+import toast from '../components/toast.js';
 
 // Detailed feature information with benefits and use cases
 const FEATURE_DETAILS = {
@@ -688,7 +689,13 @@ class FeatureDetailsPage {
     modalBody.querySelector('.toggle-feature-btn').addEventListener('click', async (e) => {
       const btn = e.target;
       const featureKey = btn.dataset.feature;
+      const featureLabel = feature.label;
       const newState = !featureConfig.isEnabled(featureKey);
+      
+      // Store original text and show loading state
+      const originalText = btn.textContent;
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Saving...';
       
       try {
         await featureConfig.toggleFeature(featureKey, newState);
@@ -700,9 +707,17 @@ class FeatureDetailsPage {
         statusBadge.textContent = newState ? '✓ Enabled' : '○ Disabled';
         statusBadge.classList.toggle('enabled');
         statusBadge.classList.toggle('disabled');
+        
+        // Show success toast
+        const action = newState ? 'enabled' : 'disabled';
+        toast.success(`${featureLabel} has been ${action}`);
       } catch (error) {
         console.error('Error toggling feature:', error);
-        alert('Error updating feature. Please try again.');
+        // Restore original button text on error
+        btn.textContent = originalText;
+        toast.error('Error updating feature. Please try again.');
+      } finally {
+        btn.disabled = false;
       }
     });
 

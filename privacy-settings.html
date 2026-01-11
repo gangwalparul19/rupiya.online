@@ -156,6 +156,11 @@
                         Privacy Mode only hides data on the display. Your actual data remains secure in our servers and is protected by encryption. 
                         Privacy Mode is stored locally on your device and doesn't affect other users' access to their own data.
                     </p>
+                    <p style="margin-top: 10px;">
+                        <strong>Security Feature:</strong> When Privacy Mode is enabled, the toggle button in the header is hidden. 
+                        This prevents others from accidentally disabling privacy mode and viewing your data. 
+                        You can only disable Privacy Mode from this settings page.
+                    </p>
                 </div>
 
                 <!-- Demo Mode Info -->
@@ -208,7 +213,7 @@
 
                     <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px;">
                         <h4 style="color: #357ABD; margin-bottom: 10px;">Can I toggle Privacy Mode quickly?</h4>
-                        <p style="color: #666; margin: 0;">Yes! There's a privacy button in the header (eye icon) that lets you toggle Privacy Mode instantly. You can also use this settings page for more detailed control.</p>
+                        <p style="color: #666; margin: 0;">You can enable Privacy Mode using the eye icon button in the header. Once enabled, the button is hidden for security - you must return to this settings page to disable Privacy Mode. This prevents others from accidentally revealing your data.</p>
                     </div>
                 </div>
             </div>
@@ -221,11 +226,39 @@
         import { initLogoutHandler } from './assets/js/utils/logout-handler.js';
         import privacyMode from './assets/js/utils/privacy-mode.js';
         import initPrivacyModeButton from './assets/js/components/privacy-mode-button.js';
+        import authService from './assets/js/services/auth-service.js';
 
         // Initialize components
         initSidebar();
         initLogoutHandler();
         initPrivacyModeButton();
+
+        // Load user profile
+        async function loadUserProfile() {
+            try {
+                const user = await authService.waitForAuth();
+                if (user) {
+                    const userAvatar = document.getElementById('userAvatar');
+                    const userName = document.getElementById('userName');
+                    const userEmail = document.getElementById('userEmail');
+                    
+                    if (userAvatar) {
+                        const initials = user.displayName 
+                            ? user.displayName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
+                            : user.email[0].toUpperCase();
+                        userAvatar.textContent = initials;
+                    }
+                    if (userName) userName.textContent = user.displayName || 'User';
+                    if (userEmail) userEmail.textContent = user.email;
+                } else {
+                    window.location.href = 'login.html';
+                }
+            } catch (error) {
+                console.error('Error loading user profile:', error);
+            }
+        }
+        
+        loadUserProfile();
 
         // Mobile sidebar toggle
         const sidebar = document.getElementById('sidebar');

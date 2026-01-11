@@ -217,12 +217,50 @@ class PrivacyModeManager {
                 if (this.isPrivacyMode) {
                     parent.classList.add('privacy-hidden-chart');
                     canvas.style.opacity = '0.1';
+                    // Disable pointer events to prevent hover tooltips
+                    canvas.style.pointerEvents = 'none';
                 } else {
                     parent.classList.remove('privacy-hidden-chart');
                     canvas.style.opacity = '1';
+                    canvas.style.pointerEvents = 'auto';
                 }
             }
         });
+        
+        // Disable Chart.js tooltips when privacy mode is enabled
+        this.disableChartTooltips();
+    }
+
+    /**
+     * Disable Chart.js tooltips when privacy mode is enabled
+     */
+    disableChartTooltips() {
+        // Check if Chart.js is available
+        if (typeof Chart !== 'undefined') {
+            // Get all Chart.js instances
+            const chartInstances = Object.values(Chart.instances || {});
+            chartInstances.forEach(chart => {
+                if (chart && chart.options && chart.options.plugins) {
+                    if (this.isPrivacyMode) {
+                        // Store original tooltip state
+                        if (!chart._privacyOriginalTooltip) {
+                            chart._privacyOriginalTooltip = chart.options.plugins.tooltip?.enabled !== false;
+                        }
+                        // Disable tooltips
+                        if (chart.options.plugins.tooltip) {
+                            chart.options.plugins.tooltip.enabled = false;
+                        }
+                    } else {
+                        // Restore original tooltip state
+                        if (chart.options.plugins.tooltip && chart._privacyOriginalTooltip !== undefined) {
+                            chart.options.plugins.tooltip.enabled = chart._privacyOriginalTooltip;
+                        }
+                    }
+                    // Update the chart to apply changes
+                    chart.update('none');
+                }
+            });
+        }
     }
 
     /**
@@ -404,20 +442,26 @@ class PrivacyModeManager {
 
     /**
      * Update privacy button appearance
+     * When privacy mode is ON, hide the toggle button (can only disable from settings)
      */
     updatePrivacyButton() {
         const btn = document.getElementById('privacyModeBtn');
-        if (btn) {
+        const dashboardBtn = document.getElementById('privacyModeBtnDashboard');
+        
+        const buttons = [btn, dashboardBtn].filter(b => b !== null);
+        
+        buttons.forEach(button => {
             if (this.isPrivacyMode) {
-                btn.classList.add('active');
-                btn.setAttribute('title', 'Privacy Mode: ON - Data Hidden');
-                btn.setAttribute('aria-pressed', 'true');
+                // Hide the toggle button when privacy mode is ON
+                // Users must go to settings to disable privacy mode
+                button.style.display = 'none';
             } else {
-                btn.classList.remove('active');
-                btn.setAttribute('title', 'Privacy Mode: OFF - Data Visible');
-                btn.setAttribute('aria-pressed', 'false');
+                button.style.display = '';
+                button.classList.remove('active');
+                button.setAttribute('title', 'Privacy Mode: OFF - Click to enable');
+                button.setAttribute('aria-pressed', 'false');
             }
-        }
+        });
     }
 
     /**
