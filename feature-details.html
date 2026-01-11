@@ -38,9 +38,74 @@
             max-height: 36px !important;
         }
         
+        /* Ensure sidebar footer shows only once */
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 1rem;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        /* Hide any duplicate user profiles */
+        .sidebar-footer .user-profile:not(:first-of-type),
+        .sidebar-footer > .user-profile ~ .user-profile {
+            display: none !important;
+        }
+        
+        /* User profile styling */
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem;
+            border-radius: 8px;
+        }
+        
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #4A90E2;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+            flex-shrink: 0;
+        }
+        
+        .user-info {
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+        }
+        
+        .user-name, .user-email {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: #2C3E50;
+        }
+        
+        .user-email {
+            font-size: 0.75rem;
+            color: #7F8C8D;
+        }
+        
         /* Desktop - sidebar on LEFT, hide mobile header */
         @media (min-width: 769px) {
             .mobile-header { display: none !important; }
+            
+            /* Hide close button on desktop - only needed on mobile */
+            .sidebar-header .sidebar-toggle,
+            #sidebarClose {
+                display: none !important;
+            }
             
             .sidebar {
                 display: flex !important;
@@ -72,6 +137,20 @@
             
             .feature-content-area {
                 padding: 0;
+            }
+            
+            /* Ensure only one user profile shows */
+            .sidebar-footer .user-profile:not(:first-of-type) {
+                display: none !important;
+            }
+            
+            /* Sidebar header - logo only, no close button */
+            .sidebar-header {
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+                padding: 1rem;
+                border-bottom: 1px solid #e0e0e0;
             }
         }
         
