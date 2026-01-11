@@ -46,7 +46,8 @@ const htmlFiles = [
   'clear-encrypted-family-data.html',
   'transfers.html',
   'net-worth.html',
-  'privacy-settings.html'
+   'privacy-settings.html',
+  'feature-details.html'
 ];
 
 // Pages that have the dashboard layout with sidebar
@@ -74,7 +75,8 @@ const pagesWithSidebar = [
   'admin.html',
   'transfers.html',
   'net-worth.html',
-  'privacy-settings.html'
+  'privacy-settings.html',
+  'feature-details.html'
 ];
 
 // Environment variable injection script (only inject if values are present)

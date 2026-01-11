@@ -20,13 +20,13 @@ const DEFAULT_FEATURES = {
     required: true // Cannot be disabled
   },
   predictiveAnalytics: {
-    enabled: true,
+    enabled: false,
     label: 'Predictive Analytics',
     description: 'AI-powered forecasting and trends',
     category: 'analytics'
   },
   aiInsights: {
-    enabled: true,
+    enabled: false,
     label: 'AI Insights',
     description: 'Personalized spending analysis',
     category: 'analytics'
@@ -39,79 +39,79 @@ const DEFAULT_FEATURES = {
     required: true
   },
   income: {
-    enabled: true,
+    enabled: false,
     label: 'Income',
     description: 'Track your earnings',
     category: 'transactions'
   },
   splitExpense: {
-    enabled: true,
+    enabled: false,
     label: 'Split Expenses',
     description: 'Share expenses with friends',
     category: 'transactions'
   },
   recurring: {
-    enabled: true,
+    enabled: false,
     label: 'Recurring',
     description: 'Auto-track subscriptions & EMIs',
     category: 'transactions'
   },
   budgets: {
-    enabled: true,
+    enabled: false,
     label: 'Budgets',
     description: 'Set and manage budgets',
     category: 'planning'
   },
   goals: {
-    enabled: true,
+    enabled: false,
     label: 'Goals',
     description: 'Set financial milestones',
     category: 'planning'
   },
   investments: {
-    enabled: true,
+    enabled: false,
     label: 'Investments',
     description: 'Track stocks, MFs & portfolio',
     category: 'planning'
   },
   loans: {
-    enabled: true,
+    enabled: false,
     label: 'Loans & EMI',
     description: 'Track loans and EMIs',
     category: 'planning'
   },
   transfers: {
-    enabled: true,
+    enabled: false,
     label: 'Transfers',
     description: 'Track money transfers',
     category: 'planning'
   },
   netWorth: {
-    enabled: true,
+    enabled: false,
     label: 'Net Worth',
     description: 'Calculate total net worth',
     category: 'planning'
   },
   houses: {
-    enabled: true,
+    enabled: false,
     label: 'Houses',
     description: 'Track properties',
     category: 'assets'
   },
   vehicles: {
-    enabled: true,
+    enabled: false,
     label: 'Vehicles',
     description: 'Track vehicles & maintenance',
     category: 'assets'
   },
   houseHelp: {
-    enabled: true,
+    enabled: false,
     label: 'House Help',
     description: 'Track staff payments',
     category: 'assets'
   },
   tripGroups: {
-    enabled: true,
+    enabled: false,
     label: 'Trip Groups',
     description: 'Manage group trips',
     category: 'social'
@@ -120,10 +120,11 @@ const DEFAULT_FEATURES = {
     enabled: true,
     label: 'Notes',
     description: 'Keep notes and reminders',
-    category: 'organize'
+    category: 'organize',
+    required: true
   },
   documents: {
-    enabled: true,
+    enabled: false,
     label: 'Documents',
     description: 'Store and organize documents',
     category: 'organize'

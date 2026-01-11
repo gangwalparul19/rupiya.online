@@ -338,3 +338,192 @@ textarea,
 [data-theme="dark"] .chart-filter:focus {
   border-color: var(--primary-blue);
 }
+
+
+/* Feature Details Page Dark Mode */
+[data-theme="dark"] .feature-details-wrapper {
+  background: var(--bg-primary);
+}
+
+[data-theme="dark"] .feature-search,
+[data-theme="dark"] .category-filter {
+  background: var(--bg-hover);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .feature-search:focus,
+[data-theme="dark"] .category-filter:focus {
+  border-color: var(--primary-blue);
+  background: var(--bg-card);
+}
+
+[data-theme="dark"] .feature-card {
+  background: var(--bg-card);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .feature-card:hover {
+  border-color: var(--primary-blue);
+  box-shadow: 0 4px 12px rgba(91, 163, 245, 0.2);
+}
+
+[data-theme="dark"] .feature-card.required {
+  background: linear-gradient(135deg, rgba(91, 163, 245, 0.1), rgba(171, 71, 188, 0.1));
+  border-color: var(--primary-blue);
+}
+
+[data-theme="dark"] .feature-card.disabled {
+  background: var(--bg-secondary);
+  opacity: 0.6;
+}
+
+[data-theme="dark"] .feature-card-title h3 {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .feature-card-description {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .feature-card-body h3 {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .feature-short-desc {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .feature-benefits-preview {
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .feature-benefits-preview strong {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .feature-benefits-preview li {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .feature-card-footer {
+  border-top-color: var(--border-color);
+}
+
+[data-theme="dark"] .feature-status {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .feature-status.enabled {
+  color: #4CAF50;
+}
+
+[data-theme="dark"] .learn-more-btn {
+  background: var(--primary-blue);
+  color: white;
+}
+
+[data-theme="dark"] .learn-more-btn:hover {
+  background: #5BA3F5;
+}
+
+[data-theme="dark"] .empty-state {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .empty-state h3 {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .modal-content {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+}
+
+[data-theme="dark"] .modal-close {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .modal-close:hover {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .detail-title-section h2 {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .detail-short-desc {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .detail-section h3 {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .detail-section p {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .why-enable-text {
+  background: linear-gradient(135deg, rgba(91, 163, 245, 0.1), rgba(171, 71, 188, 0.1));
+  border-left-color: var(--primary-blue);
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .benefits-list li {
+  background: var(--bg-secondary);
+  border-left-color: #4CAF50;
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .benefits-list li::before {
+  color: #4CAF50;
+}
+
+[data-theme="dark"] .use-cases-list li {
+  background: var(--bg-secondary);
+  border-left-color: var(--primary-blue);
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .use-cases-list li::before {
+  color: var(--primary-blue);
+}
+
+[data-theme="dark"] .feature-item-tag {
+  background: linear-gradient(135deg, var(--primary-blue), var(--accent-purple));
+  color: white;
+}
+
+[data-theme="dark"] .detail-actions {
+  border-top-color: var(--border-color);
+}
+
+[data-theme="dark"] .toggle-feature-btn {
+  background: var(--primary-blue);
+  color: white;
+}
+
+[data-theme="dark"] .toggle-feature-btn:hover {
+  background: #5BA3F5;
+}
+
+[data-theme="dark"] .toggle-feature-btn.btn-danger {
+  background: #F44336;
+}
+
+[data-theme="dark"] .toggle-feature-btn.btn-danger:hover {
+  background: #E53935;
+}
+
+[data-theme="dark"] .status-badge.enabled {
+  background: rgba(76, 175, 80, 0.2);
+  color: #4CAF50;
+}
+
+[data-theme="dark"] .status-badge.disabled {
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+}
