@@ -52,12 +52,15 @@ class EncryptionService {
     if (this._initializationLock) {
       log.log('Initialization already in progress, waiting...');
       
-      // Add to queue and wait
-      return new Promise((resolve) => {
-        this._initializationQueue.push(() => {
-          resolve(this.isReady());
-        });
-      });
+      // Wait for the current initialization to complete
+      try {
+        await this._initializationLock;
+      } catch (e) {
+        // Ignore errors from the other initialization
+      }
+      
+      // Return current ready state
+      return this.isReady();
     }
 
     // Create initialization lock
@@ -65,33 +68,9 @@ class EncryptionService {
     
     try {
       const result = await this._initializationLock;
-      
-      // Process queued initialization requests
-      const queue = this._initializationQueue;
-      this._initializationQueue = [];
-      queue.forEach(callback => {
-        try {
-          callback();
-        } catch (error) {
-          log.error('Error processing queued initialization:', error);
-        }
-      });
-      
       return result;
     } catch (error) {
       log.error('Initialization error:', error);
-      
-      // Process queued requests even on error
-      const queue = this._initializationQueue;
-      this._initializationQueue = [];
-      queue.forEach(callback => {
-        try {
-          callback();
-        } catch (err) {
-          log.error('Error processing queued initialization:', err);
-        }
-      });
-      
       return false;
     } finally {
       this._initializationLock = null;
@@ -536,7 +515,7 @@ class EncryptionService {
 
     // Wait for any ongoing initialization to complete with retries
     let retries = 0;
-    const maxRetries = 10;
+    const maxRetries = 30; // 30 * 200ms = 6 seconds max wait
     
     while (retries < maxRetries) {
       await this.waitForInitialization();
@@ -546,7 +525,10 @@ class EncryptionService {
       }
       
       // Not ready, wait and retry
-      await new Promise(resolve => setTimeout(resolve, 300));
+      if (retries % 10 === 0 && retries > 0) {
+        log.log(`[${collectionName}] Waiting for encryption... (${retries} retries)`);
+      }
+      await new Promise(resolve => setTimeout(resolve, 200));
       retries++;
     }
 

@@ -148,6 +148,9 @@ class FirestoreService {
       const cached = this.getFromCache(cacheKey);
       if (cached) return { success: true, data: cached, fromCache: true };
       
+      // Wait for encryption to be ready before loading data
+      await encryptionService.waitForInitialization();
+      
       const docRef = doc(db, collectionName, docId);
       const docSnap = await getDoc(docRef);
       
@@ -181,6 +184,9 @@ class FirestoreService {
         console.log(`[FirestoreService] Cache hit for ${collectionName}:`, cached.length);
         return cached;
       }
+      
+      // Wait for encryption to be ready before loading data
+      await encryptionService.waitForInitialization();
       
       let q = query(
         collection(db, collectionName),
@@ -224,6 +230,10 @@ class FirestoreService {
     
     try {
       const userId = this.getUserId();
+      
+      // Wait for encryption to be ready before loading data
+      await encryptionService.waitForInitialization();
+      
       let constraints = [
         where('userId', '==', userId),
         orderBy(orderByField, orderDirection)
@@ -568,6 +578,10 @@ class FirestoreService {
   async query(collectionName, filters = [], orderByField = null, orderDirection = 'asc', limitCount = null) {
     try {
       const userId = this.getUserId();
+      
+      // Wait for encryption to be ready before loading data
+      await encryptionService.waitForInitialization();
+      
       let constraints = [where('userId', '==', userId)];
       
       // Add filters
@@ -870,6 +884,10 @@ class FirestoreService {
   async getSplitsByDateRange(startDate, endDate) {
     try {
       const userId = this.getUserId();
+      
+      // Wait for encryption to be ready before loading data
+      await encryptionService.waitForInitialization();
+      
       const q = query(
         collection(db, this.collections.splits),
         where('userId', '==', userId),
@@ -896,6 +914,10 @@ class FirestoreService {
   async getTripGroupExpensesByDateRange(startDate, endDate) {
     try {
       const userId = this.getUserId();
+      
+      // Wait for encryption to be ready before loading data
+      await encryptionService.waitForInitialization();
+      
       // Query personal expenses that are linked to trip groups
       const q = query(
         collection(db, this.collections.expenses),
@@ -924,6 +946,10 @@ class FirestoreService {
   async queryByDateRange(collectionName, startDate, endDate) {
     try {
       const userId = this.getUserId();
+      
+      // Wait for encryption to be ready before loading data
+      await encryptionService.waitForInitialization();
+      
       const q = query(
         collection(db, collectionName),
         where('userId', '==', userId),
@@ -1004,6 +1030,10 @@ class FirestoreService {
   async getExpensesByLinked(linkedType, linkedId) {
     try {
       const userId = this.getUserId();
+      
+      // Wait for encryption to be ready before loading data
+      await encryptionService.waitForInitialization();
+      
       const q = query(
         collection(db, this.collections.expenses),
         where('userId', '==', userId),
@@ -1029,6 +1059,10 @@ class FirestoreService {
   async getIncomeByLinked(linkedType, linkedId) {
     try {
       const userId = this.getUserId();
+      
+      // Wait for encryption to be ready before loading data
+      await encryptionService.waitForInitialization();
+      
       const q = query(
         collection(db, this.collections.income),
         where('userId', '==', userId),
@@ -1055,6 +1089,10 @@ class FirestoreService {
   async findExpenseByField(fieldName, fieldValue) {
     try {
       const userId = this.getUserId();
+      
+      // Wait for encryption to be ready before loading data
+      await encryptionService.waitForInitialization();
+      
       const q = query(
         collection(db, this.collections.expenses),
         where('userId', '==', userId),
@@ -1086,6 +1124,9 @@ class FirestoreService {
       const cached = this.getFromCache(cacheKey);
       if (cached) return cached;
       
+      // Wait for encryption to be ready before loading data
+      await encryptionService.waitForInitialization();
+      
       const q = query(
         collection(db, this.collections.expenses),
         where('userId', '==', userId),
@@ -1115,6 +1156,9 @@ class FirestoreService {
       const cacheKey = this.getCacheKey('incomeByLinkedType', { linkedType });
       const cached = this.getFromCache(cacheKey);
       if (cached) return cached;
+      
+      // Wait for encryption to be ready before loading data
+      await encryptionService.waitForInitialization();
       
       const q = query(
         collection(db, this.collections.income),

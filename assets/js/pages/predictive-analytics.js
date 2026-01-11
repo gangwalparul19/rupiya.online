@@ -59,10 +59,6 @@ async function init() {
   await encryptionReauthModal.checkAndPrompt(async () => {
     await loadData();
   });
-  
-  // Also load data directly (in case callback didn't work)
-  // This ensures data loads even if encryption check has issues
-  await loadData();
 }
 
 // Initialize DOM elements
