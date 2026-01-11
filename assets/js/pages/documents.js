@@ -56,6 +56,8 @@ async function init() {
 
     setupEventListeners();
     loadUserProfile(user);
+    
+    // Load data again after encryption is ready (fixes race condition)
     await loadDocuments();
     
     // Set default date if element exists

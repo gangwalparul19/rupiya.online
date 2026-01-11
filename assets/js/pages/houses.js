@@ -47,7 +47,7 @@ async function init() {
   // Load user profile
   loadUserProfile(user);
 
-  // Load houses
+  // Load houses again after encryption is ready (fixes race condition)
   await loadHouses();
 
   // Set default date to today if element exists

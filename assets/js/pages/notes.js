@@ -46,6 +46,8 @@ async function init() {
 
   setupEventListeners();
   loadUserProfile(user);
+  
+  // Load data again after encryption is ready (fixes race condition)
   await loadNotes();
 }
 

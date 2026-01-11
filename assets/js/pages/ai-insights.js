@@ -28,6 +28,10 @@ async function init() {
   await encryptionReauthModal.checkAndPrompt(async () => {
     await initPage();
   });
+  
+  // Also call initPage directly (in case callback didn't work)
+  // This ensures data loads even if encryption check has issues
+  await initPage();
 }
 
 init();

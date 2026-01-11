@@ -56,6 +56,9 @@ async function init() {
     });
     
     await initLoansPage();
+    
+    // Load data again after encryption is ready (fixes race condition)
+    await loadLoans();
   }
 }
 

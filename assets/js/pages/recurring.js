@@ -63,6 +63,9 @@ async function init() {
     await loadRecurringTransactions();
   });
 
+  // Load data again after encryption is ready (fixes race condition)
+  await loadRecurringTransactions();
+
   // Set default date to today if element exists
   const startDateInput = document.getElementById('startDate');
   if (startDateInput) {

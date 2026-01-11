@@ -36,6 +36,9 @@ async function init() {
   });
   
   await initPage();
+  
+  // Load data again after encryption is ready (fixes race condition)
+  await loadGoals();
 }
 
 // Start initialization

@@ -55,10 +55,14 @@ async function init() {
   // Load user profile
   loadUserProfile(user);
 
-  // Check if encryption reauth is needed
+  // Check if encryption reauth is needed and load data
   await encryptionReauthModal.checkAndPrompt(async () => {
     await loadData();
   });
+  
+  // Also load data directly (in case callback didn't work)
+  // This ensures data loads even if encryption check has issues
+  await loadData();
 }
 
 // Initialize DOM elements

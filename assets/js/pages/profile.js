@@ -58,6 +58,11 @@ async function init() {
     await loadCategories();
     await loadFamilyMembersUI();
   });
+  
+  // Load data again after encryption is ready (fixes race condition)
+  await loadUserPreferences();
+  await loadCategories();
+  await loadFamilyMembersUI();
 }
 
 function initDOMElements() {

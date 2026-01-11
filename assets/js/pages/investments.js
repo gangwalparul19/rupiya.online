@@ -62,7 +62,7 @@ async function init() {
   // Load user profile
   loadUserProfile(user);
 
-  // Load investments
+  // Load investments again after encryption is ready (fixes race condition)
   await loadInvestments();
 
   // Set default date to today if element exists
