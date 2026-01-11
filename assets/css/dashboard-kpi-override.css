@@ -1,110 +1,110 @@
 /* ============================================
-   DASHBOARD KPI OVERRIDE - FINAL FIX
-   This file overrides all conflicting CSS rules
-   to ensure proper KPI and widget layout
+   DASHBOARD KPI OVERRIDE - RESPONSIVE LAYOUT
+   This file provides clean, responsive KPI layout
    ============================================ */
 
 /* ============================================
-   RESET ALL CONFLICTING RULES
-   ============================================ */
-
-/* Force reset of all KPI-related elements */
-.kpi-summary,
-.kpi-content,
-.kpi-label {
-  all: revert !important;
-}
-
-/* ============================================
-   MAIN CONTENT WIDTH CONSTRAINT
+   MAIN CONTENT - PROPER FLEX LAYOUT
    ============================================ */
 
 .main-content {
-  display: flex !important;
-  flex-direction: column !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* ============================================
-   KPI GRID - ALL SCREEN SIZES
+   KPI GRID - RESPONSIVE COLUMNS
    ============================================ */
 
-/* Large Desktop: 4 columns (1440px+) */
-@media (min-width: 1440px) {
+/* Extra Large Desktop: 4 columns (1920px+) */
+@media (min-width: 1920px) {
   .kpi-grid {
-    display: grid !important;
-    grid-template-columns: repeat(4, 1fr) !important;
-    gap: var(--spacing-lg) !important;
-    margin-bottom: var(--spacing-xl) !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+    width: 100%;
+    box-sizing: border-box;
+    max-width: 100%;
   }
 }
 
-/* Desktop: 3 columns (1025px - 1439px) */
-@media (min-width: 1025px) and (max-width: 1439px) {
+/* Large Desktop: 3 columns (1200px - 1919px) - CENTERED */
+@media (min-width: 1200px) and (max-width: 1919px) {
   .kpi-grid {
-    display: grid !important;
-    grid-template-columns: repeat(3, 1fr) !important;
-    gap: var(--spacing-lg) !important;
-    margin-bottom: var(--spacing-xl) !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(280px, 1fr));
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+    width: 100%;
+    box-sizing: border-box;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    justify-content: center;
   }
 }
 
-/* Tablet: 2 columns */
+/* Desktop: 3 columns (1025px - 1199px) */
+@media (min-width: 1025px) and (max-width: 1199px) {
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+/* Tablet: 2 columns (769px - 1024px) */
 @media (min-width: 769px) and (max-width: 1024px) {
   .kpi-grid {
-    display: grid !important;
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: var(--spacing-md) !important;
-    margin-bottom: var(--spacing-lg) !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+    width: 100%;
+    box-sizing: border-box;
   }
 }
 
-/* Mobile: 2 columns */
+/* Mobile: 2 columns (max 768px) */
 @media (max-width: 768px) {
   .kpi-grid {
-    display: grid !important;
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 12px !important;
-    margin-bottom: 16px !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+    width: 100%;
+    box-sizing: border-box;
   }
 }
 
 /* ============================================
-   KPI CARD - VERTICAL LAYOUT FIX
+   KPI CARD - VERTICAL FLEX LAYOUT
    ============================================ */
 
 .kpi-card {
-  display: flex !important;
-  flex-direction: column !important;
-  background: var(--white) !important;
-  border: 2px solid var(--primary-blue) !important;
-  border-radius: var(--border-radius-lg) !important;
-  padding: var(--spacing-lg) !important;
-  transition: all var(--transition-base) !important;
-  overflow: visible !important;
-  min-width: 0 !important;
-  gap: 0 !important;
-  align-items: stretch !important;
+  display: flex;
+  flex-direction: column;
+  background: var(--white);
+  border: 2px solid var(--primary-blue);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  transition: all var(--transition-base);
+  overflow: visible;
+  min-width: 0;
+  gap: 0;
+  align-items: stretch;
 }
 
 .kpi-card:hover {
-  box-shadow: var(--shadow-md) !important;
-  transform: translateY(-2px) !important;
-  border-color: var(--accent-cyan) !important;
-}
-
-/* Remove nth-child override from responsive.css */
-.kpi-card:nth-child(3) {
-  grid-column: auto !important;
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+  border-color: var(--accent-cyan);
 }
 
 /* ============================================
@@ -112,119 +112,120 @@
    ============================================ */
 
 .kpi-header {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  margin-bottom: var(--spacing-md) !important;
-  gap: var(--spacing-sm) !important;
-  min-width: 0 !important;
-  flex-wrap: nowrap !important;
-  width: 100% !important;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-md);
+  gap: var(--spacing-sm);
+  min-width: 0;
+  flex-wrap: nowrap;
+  width: 100%;
 }
 
 .kpi-header > div:first-child {
-  min-width: 0 !important;
-  flex: 1 !important;
-  display: block !important;
+  min-width: 0;
+  flex: 1;
+  display: block;
 }
 
 /* ============================================
-   KPI TITLE - TEXT TRUNCATION
+   KPI TITLE - PROPER TEXT HANDLING
    ============================================ */
 
 .kpi-title {
-  font-size: var(--font-size-sm) !important;
-  font-weight: 600 !important;
-  color: var(--text-secondary) !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.5px !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  line-height: 1.2 !important;
-  display: block !important;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
+  padding: 0;
+  line-height: 1.2;
+  display: block;
 }
 
 /* ============================================
-   KPI ICON - FIXED SIZE
+   KPI ICON - FIXED SIZE & FLEX SHRINK
    ============================================ */
 
 .kpi-icon {
-  width: 40px !important;
-  height: 40px !important;
-  border-radius: var(--border-radius) !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  font-size: 20px !important;
-  flex-shrink: 0 !important;
-  margin: 0 !important;
-  padding: 0 !important;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--border-radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0;
 }
 
 .kpi-icon.income {
-  background: rgba(39, 174, 96, 0.1) !important;
-  color: var(--accent-green) !important;
+  background: rgba(39, 174, 96, 0.1);
+  color: var(--accent-green);
 }
 
 .kpi-icon.expense {
-  background: rgba(231, 76, 60, 0.1) !important;
-  color: var(--accent-red) !important;
+  background: rgba(231, 76, 60, 0.1);
+  color: var(--accent-red);
 }
 
 .kpi-icon.cashflow {
-  background: rgba(74, 144, 226, 0.1) !important;
-  color: var(--primary-blue) !important;
+  background: rgba(74, 144, 226, 0.1);
+  color: var(--primary-blue);
 }
 
 .kpi-icon.networth {
-  background: rgba(155, 89, 182, 0.1) !important;
-  color: var(--accent-purple) !important;
+  background: rgba(155, 89, 182, 0.1);
+  color: var(--accent-purple);
 }
 
 /* ============================================
-   KPI VALUE - LARGE DISPLAY
+   KPI VALUE - LARGE DISPLAY WITH PROPER ALIGNMENT
    ============================================ */
 
 .kpi-value {
-  font-size: var(--font-size-3xl) !important;
-  font-weight: 700 !important;
-  color: var(--text-primary) !important;
-  margin-bottom: var(--spacing-xs) !important;
-  margin-top: 0 !important;
-  padding: 0 !important;
-  line-height: 1.2 !important;
-  width: 100% !important;
-  display: block !important;
-  word-break: break-word !important;
-  overflow-wrap: break-word !important;
+  font-size: var(--font-size-3xl);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xs);
+  margin-top: 0;
+  padding: 0;
+  line-height: 1.2;
+  width: 100%;
+  display: block;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  text-align: left;
 }
 
 /* ============================================
-   KPI CHANGE - INDICATOR
+   KPI CHANGE - INDICATOR STYLING
    ============================================ */
 
 .kpi-change {
-  font-size: var(--font-size-sm) !important;
-  font-weight: 600 !important;
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  gap: 4px !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  flex-wrap: nowrap !important;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  flex-wrap: nowrap;
 }
 
 .kpi-change.positive {
-  color: var(--accent-green) !important;
+  color: var(--accent-green);
 }
 
 .kpi-change.negative {
-  color: var(--accent-red) !important;
+  color: var(--accent-red);
 }
 
 /* ============================================
@@ -232,45 +233,45 @@
    ============================================ */
 
 .widgets-row {
-  display: grid !important;
-  grid-template-columns: 1fr 1fr !important;
-  gap: var(--spacing-lg) !important;
-  margin-bottom: var(--spacing-xl) !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .savings-rate-widget {
-  grid-column: 1 / -1 !important;
-  order: 1 !important;
+  grid-column: 1 / -1;
+  order: 1;
 }
 
 .top-categories-widget {
-  grid-column: 1 / -1 !important;
-  order: 2 !important;
+  grid-column: 1 / -1;
+  order: 2;
 }
 
 .goal-progress-widget {
-  grid-column: auto !important;
-  order: 3 !important;
+  grid-column: auto;
+  order: 3;
 }
 
 .upcoming-bills-widget {
-  grid-column: auto !important;
-  order: 4 !important;
+  grid-column: auto;
+  order: 4;
 }
 
 @media (min-width: 769px) and (max-width: 1024px) {
   .widgets-row {
-    gap: var(--spacing-md) !important;
-    margin-bottom: var(--spacing-lg) !important;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
   }
 }
 
 @media (max-width: 768px) {
   .widgets-row {
-    gap: 12px !important;
-    margin-bottom: 16px !important;
+    gap: 12px;
+    margin-bottom: 16px;
   }
 }
 
@@ -283,15 +284,15 @@
 .top-categories-widget,
 .upcoming-bills-widget,
 .chart-card {
-  display: flex !important;
-  flex-direction: column !important;
-  background: var(--white) !important;
-  border: 2px solid var(--primary-blue) !important;
-  border-radius: var(--border-radius-lg) !important;
-  padding: var(--spacing-lg) !important;
-  transition: all var(--transition-base) !important;
-  overflow: visible !important;
-  min-width: 0 !important;
+  display: flex;
+  flex-direction: column;
+  background: var(--white);
+  border: 2px solid var(--primary-blue);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  transition: all var(--transition-base);
+  overflow: visible;
+  min-width: 0;
 }
 
 .savings-rate-widget:hover,
@@ -299,9 +300,9 @@
 .top-categories-widget:hover,
 .upcoming-bills-widget:hover,
 .chart-card:hover {
-  box-shadow: var(--shadow-md) !important;
-  transform: translateY(-2px) !important;
-  border-color: var(--accent-cyan) !important;
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+  border-color: var(--accent-cyan);
 }
 
 /* ============================================
@@ -310,30 +311,30 @@
 
 @media (max-width: 768px) {
   .charts-grid {
-    display: grid !important;
-    grid-template-columns: 1fr !important;
-    gap: 12px !important;
-    margin-bottom: 16px !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+    width: 100%;
+    box-sizing: border-box;
   }
 }
 
 @media (min-width: 769px) {
   .charts-grid {
-    display: grid !important;
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: var(--spacing-lg) !important;
-    margin-bottom: var(--spacing-xl) !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+    width: 100%;
+    box-sizing: border-box;
   }
 }
 
 @media (min-width: 769px) and (max-width: 1024px) {
   .charts-grid {
-    gap: var(--spacing-md) !important;
-    margin-bottom: var(--spacing-lg) !important;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
   }
 }
 
@@ -342,88 +343,88 @@
    ============================================ */
 
 .transactions-card {
-  display: block !important;
-  width: 100% !important;
-  grid-column: 1 / -1 !important;
-  background: var(--white) !important;
-  border: 2px solid var(--primary-blue) !important;
-  border-radius: var(--border-radius-lg) !important;
-  padding: var(--spacing-lg) !important;
-  overflow: visible !important;
-  min-width: 0 !important;
-  margin-bottom: var(--spacing-xl) !important;
-  box-sizing: border-box !important;
+  display: block;
+  width: 100%;
+  grid-column: 1 / -1;
+  background: var(--white);
+  border: 2px solid var(--primary-blue);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  overflow: visible;
+  min-width: 0;
+  margin-bottom: var(--spacing-xl);
+  box-sizing: border-box;
 }
 
 .transactions-card:hover {
-  box-shadow: var(--shadow-md) !important;
-  transform: translateY(-2px) !important;
-  border-color: var(--accent-cyan) !important;
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+  border-color: var(--accent-cyan);
 }
 
 /* ============================================
-   MOBILE BREAKPOINTS
+   MOBILE BREAKPOINTS - SMALL SCREENS
    ============================================ */
 
 @media (max-width: 480px) {
   .kpi-card {
-    padding: 12px !important;
+    padding: 12px;
   }
 
   .kpi-header {
-    margin-bottom: 8px !important;
-    gap: 6px !important;
-    align-items: center !important;
+    margin-bottom: 8px;
+    gap: 6px;
+    align-items: center;
   }
 
   .kpi-title {
-    font-size: 10px !important;
-    letter-spacing: 0.2px !important;
-    display: block !important;
+    font-size: 10px;
+    letter-spacing: 0.2px;
+    display: block;
   }
 
   .kpi-value {
-    font-size: 18px !important;
-    margin-bottom: 4px !important;
-    display: block !important;
+    font-size: 18px;
+    margin-bottom: 4px;
+    display: block;
   }
 
   .kpi-icon {
-    width: 32px !important;
-    height: 32px !important;
-    font-size: 16px !important;
-    flex-shrink: 0 !important;
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+    flex-shrink: 0;
   }
 
   .kpi-change {
-    font-size: 10px !important;
-    gap: 2px !important;
+    font-size: 10px;
+    gap: 2px;
   }
 
   .widgets-row {
-    gap: 10px !important;
-    margin-bottom: 12px !important;
+    gap: 10px;
+    margin-bottom: 12px;
   }
 
   .savings-rate-widget,
   .goal-progress-widget,
   .top-categories-widget,
   .upcoming-bills-widget {
-    padding: 12px !important;
+    padding: 12px;
   }
 
   .charts-grid {
-    gap: 10px !important;
-    margin-bottom: 12px !important;
+    gap: 10px;
+    margin-bottom: 12px;
   }
 
   .chart-card {
-    padding: 12px !important;
+    padding: 12px;
   }
 
   .transactions-card {
-    padding: 12px !important;
-    margin-bottom: 12px !important;
+    padding: 12px;
+    margin-bottom: 12px;
   }
 }
 
@@ -433,61 +434,57 @@
 
 @media (max-width: 374px) {
   .kpi-card {
-    padding: 10px !important;
+    padding: 10px;
   }
 
   .kpi-header {
-    margin-bottom: 6px !important;
-    gap: 4px !important;
+    margin-bottom: 6px;
+    gap: 4px;
   }
 
   .kpi-title {
-    font-size: 9px !important;
+    font-size: 9px;
   }
 
   .kpi-value {
-    font-size: 16px !important;
-    margin-bottom: 3px !important;
+    font-size: 16px;
+    margin-bottom: 3px;
   }
 
   .kpi-icon {
-    width: 28px !important;
-    height: 28px !important;
-    font-size: 14px !important;
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
   }
 
   .kpi-change {
-    font-size: 9px !important;
+    font-size: 9px;
   }
 
   .widgets-row {
-    gap: 8px !important;
+    gap: 8px;
   }
 
   .savings-rate-widget,
   .goal-progress-widget,
   .top-categories-widget,
   .upcoming-bills-widget {
-    padding: 10px !important;
+    padding: 10px;
   }
 }
 
 /* ============================================
-   REMOVE CONFLICTING FLEX LAYOUTS
+   REMOVE CONFLICTING STYLES
    ============================================ */
 
 .kpi-content {
-  display: none !important;
+  display: none;
 }
-
-/* ============================================
-   ENSURE PROPER TEXT ALIGNMENT
-   ============================================ */
 
 .kpi-header span,
 .kpi-title span,
 .kpi-value span,
 .kpi-change span {
-  margin: 0 !important;
-  padding: 0 !important;
+  margin: 0;
+  padding: 0;
 }

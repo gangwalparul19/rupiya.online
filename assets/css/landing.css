@@ -3144,3 +3144,201 @@
     font-size: 0.875rem;
   }
 }
+
+
+/* ============================================
+   CUSTOMIZATION HIGHLIGHT SECTION
+   ============================================ */
+
+.customization-highlight {
+  margin-top: 4rem;
+  padding: 2.5rem;
+  background: linear-gradient(135deg, rgba(74, 144, 226, 0.1), rgba(155, 89, 182, 0.1));
+  border: 2px solid rgba(74, 144, 226, 0.2);
+  border-radius: 1rem;
+  backdrop-filter: blur(10px);
+  animation: slideUp 0.6s ease-out;
+}
+
+.customization-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 2rem;
+}
+
+.customization-icon {
+  font-size: 3rem;
+  flex-shrink: 0;
+  animation: rotate 3s linear infinite;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.customization-text h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.75rem;
+}
+
+.customization-text p {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+.customization-features {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.custom-feature {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 0.5rem;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.custom-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: linear-gradient(135deg, #4A90E2, #9B59B6);
+  color: white;
+  border-radius: 50%;
+  font-weight: bold;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.btn-customization {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #4A90E2, #9B59B6);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.btn-customization:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(74, 144, 226, 0.3);
+}
+
+.btn-customization:active {
+  transform: translateY(0);
+}
+
+/* Responsive - Customization Section */
+@media (max-width: 768px) {
+  .customization-highlight {
+    margin-top: 3rem;
+    padding: 1.5rem;
+  }
+
+  .customization-content {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .customization-icon {
+    font-size: 2.5rem;
+    text-align: center;
+    width: 100%;
+  }
+
+  .customization-text h3 {
+    font-size: 1.25rem;
+  }
+
+  .customization-text p {
+    font-size: 0.95rem;
+  }
+
+  .customization-features {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .custom-feature {
+    padding: 0.6rem;
+    font-size: 0.9rem;
+  }
+
+  .btn-customization {
+    width: 100%;
+    justify-content: center;
+    padding: 0.85rem 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .customization-highlight {
+    margin-top: 2rem;
+    padding: 1rem;
+    border-radius: 0.75rem;
+  }
+
+  .customization-icon {
+    font-size: 2rem;
+  }
+
+  .customization-text h3 {
+    font-size: 1.1rem;
+  }
+
+  .customization-text p {
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+  }
+
+  .customization-features {
+    gap: 0.5rem;
+  }
+
+  .custom-feature {
+    padding: 0.5rem;
+    font-size: 0.85rem;
+  }
+
+  .custom-icon {
+    width: 20px;
+    height: 20px;
+    font-size: 0.75rem;
+  }
+
+  .btn-customization {
+    padding: 0.7rem 1rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* Animation for slide up */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
