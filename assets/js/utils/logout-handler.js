@@ -20,9 +20,18 @@ export function initLogoutHandler() {
       e.preventDefault();
       e.stopPropagation();
       
+      console.log('Logout button clicked - showing modal');
+      
       // Show beautiful logout modal
       const confirmed = await logoutModal.show();
-      if (!confirmed) return;
+      console.log('Modal result:', confirmed);
+      
+      if (!confirmed) {
+        console.log('User cancelled logout');
+        return;
+      }
+      
+      console.log('User confirmed logout - proceeding with logout');
       
       try {
         // Set flag to prevent double-clicks
@@ -34,7 +43,9 @@ export function initLogoutHandler() {
         logoutBtn.style.cursor = 'not-allowed';
         
         // Perform logout
+        console.log('Calling authService.signOut()');
         const result = await authService.signOut();
+        console.log('SignOut result:', result);
         
         if (result.success) {
           // Show success message if toast is available
@@ -51,6 +62,7 @@ export function initLogoutHandler() {
           }
           
           // Redirect to login page
+          console.log('Redirecting to login page');
           setTimeout(() => {
             window.location.href = 'login.html';
           }, 500);
@@ -61,6 +73,7 @@ export function initLogoutHandler() {
           logoutBtn.style.opacity = '1';
           logoutBtn.style.cursor = 'pointer';
           
+          console.error('Logout failed:', result);
           if (window.toast) {
             window.toast.error('Failed to logout. Please try again.');
           } else {

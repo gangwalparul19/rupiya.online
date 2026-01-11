@@ -57,37 +57,52 @@ class LogoutModal {
     const overlay = document.getElementById('logoutModalOverlay');
 
     // Cancel button
-    cancelBtn.addEventListener('click', () => {
-      this.hide();
-      if (this.resolvePromise) {
-        this.resolvePromise(false);
-      }
-    });
-
-    // Confirm button
-    confirmBtn.addEventListener('click', () => {
-      this.hide();
-      if (this.resolvePromise) {
-        this.resolvePromise(true);
-      }
-    });
-
-    // Click outside to cancel
-    overlay.addEventListener('click', (e) => {
-      if (e.target === overlay) {
+    if (cancelBtn) {
+      cancelBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         this.hide();
         if (this.resolvePromise) {
           this.resolvePromise(false);
+          this.resolvePromise = null;
         }
-      }
-    });
+      });
+    }
+
+    // Confirm button
+    if (confirmBtn) {
+      confirmBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('Logout confirmed - resolving with true');
+        this.hide();
+        if (this.resolvePromise) {
+          this.resolvePromise(true);
+          this.resolvePromise = null;
+        }
+      });
+    }
+
+    // Click outside to cancel
+    if (overlay) {
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+          this.hide();
+          if (this.resolvePromise) {
+            this.resolvePromise(false);
+            this.resolvePromise = null;
+          }
+        }
+      });
+    }
 
     // ESC key to cancel
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && this.modal.classList.contains('show')) {
+      if (e.key === 'Escape' && this.modal && this.modal.classList.contains('show')) {
         this.hide();
         if (this.resolvePromise) {
           this.resolvePromise(false);
+          this.resolvePromise = null;
         }
       }
     });
