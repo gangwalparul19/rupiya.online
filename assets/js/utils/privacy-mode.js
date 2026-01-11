@@ -72,6 +72,19 @@ class PrivacyModeManager {
     applyPrivacyMode() {
         console.log('Applying Privacy Mode:', this.isPrivacyMode);
         
+        // Skip applying privacy mode effects on privacy-settings page
+        // Users need to be able to interact with this page to disable privacy mode
+        const isPrivacySettingsPage = window.location.pathname.includes('privacy-settings');
+        if (isPrivacySettingsPage && this.isPrivacyMode) {
+            // Only update the button state and dispatch event, don't hide content
+            this.updatePrivacyButton();
+            window.dispatchEvent(new CustomEvent('privacyModeChanged', {
+                detail: { isPrivacyMode: this.isPrivacyMode }
+            }));
+            console.log('Privacy Mode: Skipping content hiding on privacy-settings page');
+            return;
+        }
+        
         // Auto-detect and hide KPI values (numbers with ₹ or currency)
         this.autoHideAmounts();
         
@@ -488,6 +501,10 @@ class PrivacyModeManager {
         const observer = new MutationObserver(() => {
             clearTimeout(debounceTimer);
             debounceTimer = setTimeout(() => {
+                // Skip on privacy-settings page
+                const isPrivacySettingsPage = window.location.pathname.includes('privacy-settings');
+                if (isPrivacySettingsPage) return;
+                
                 if (this.isPrivacyMode) {
                     // Reapply privacy mode to newly added elements
                     this.autoHideAmounts();

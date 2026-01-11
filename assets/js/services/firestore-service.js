@@ -181,7 +181,6 @@ class FirestoreService {
       const cacheKey = this.getCacheKey(collectionName, { orderByField, orderDirection, maxLimit });
       const cached = this.getFromCache(cacheKey);
       if (cached) {
-        console.log(`[FirestoreService] Cache hit for ${collectionName}:`, cached.length);
         return cached;
       }
       
@@ -199,14 +198,10 @@ class FirestoreService {
       const querySnapshot = await getDocs(q);
       const data = [];
       querySnapshot.forEach((doc) => data.push({ id: doc.id, ...doc.data() }));
-      
-      console.log(`[FirestoreService] Loaded ${data.length} docs from ${collectionName}`);
-      
+
       // Decrypt all documents
       const decryptedData = await encryptionService.decryptArray(data, collectionName);
-      
-      console.log(`[FirestoreService] Decrypted ${decryptedData.length} docs from ${collectionName}`);
-      
+  
       this.setCache(cacheKey, decryptedData);
       return decryptedData;
     } catch (error) {
