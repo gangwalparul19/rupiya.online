@@ -170,9 +170,17 @@ class FirestoreService {
   async getAll(collectionName, orderByField = 'createdAt', orderDirection = 'desc', maxLimit = null) {
     try {
       const userId = this.getUserId();
+      if (!userId) {
+        console.warn(`[FirestoreService] No userId for getAll ${collectionName}`);
+        return [];
+      }
+      
       const cacheKey = this.getCacheKey(collectionName, { orderByField, orderDirection, maxLimit });
       const cached = this.getFromCache(cacheKey);
-      if (cached) return cached;
+      if (cached) {
+        console.log(`[FirestoreService] Cache hit for ${collectionName}:`, cached.length);
+        return cached;
+      }
       
       let q = query(
         collection(db, collectionName),
@@ -186,13 +194,17 @@ class FirestoreService {
       const data = [];
       querySnapshot.forEach((doc) => data.push({ id: doc.id, ...doc.data() }));
       
+      console.log(`[FirestoreService] Loaded ${data.length} docs from ${collectionName}`);
+      
       // Decrypt all documents
       const decryptedData = await encryptionService.decryptArray(data, collectionName);
+      
+      console.log(`[FirestoreService] Decrypted ${decryptedData.length} docs from ${collectionName}`);
       
       this.setCache(cacheKey, decryptedData);
       return decryptedData;
     } catch (error) {
-      console.error(`Error getting all from ${collectionName}:`, error);
+      console.error(`[FirestoreService] Error getting all from ${collectionName}:`, error);
       return [];
     }
   }

@@ -35,14 +35,22 @@ class PredictionService {
 
     try {
       const expenses = await firestoreService.getExpenses();
+      console.log('[PredictionService] Loaded expenses for forecast:', expenses?.length || 0);
+      
+      if (!expenses || expenses.length === 0) {
+        console.log('[PredictionService] No expenses found, returning empty forecast');
+        return [];
+      }
+      
       const forecasts = this.calculateSpendingForecast(expenses, days);
+      console.log('[PredictionService] Generated forecasts:', forecasts?.length || 0);
       
       // Cache result
       cacheManager.set(cacheKey, forecasts, this.cacheTTL);
       
       return forecasts;
     } catch (error) {
-      console.error('Error forecasting spending:', error);
+      console.error('[PredictionService] Error forecasting spending:', error);
       return [];
     }
   }

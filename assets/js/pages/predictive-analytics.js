@@ -119,6 +119,8 @@ async function loadData() {
   const skeleton = loadingService.showLoading(loadingState, 'dashboard');
 
   try {
+    console.log('[PredictiveAnalytics] Loading prediction data...');
+    
     // Load all prediction data in parallel
     const [forecasts, warnings, goals, anomalies, patterns] = await Promise.all([
       predictionService.forecastSpending(30),
@@ -128,6 +130,14 @@ async function loadData() {
       predictionService.analyzeSpendingPatterns()
     ]);
 
+    console.log('[PredictiveAnalytics] Data loaded:', {
+      forecasts: forecasts?.length || 0,
+      warnings: warnings?.length || 0,
+      goals: goals?.length || 0,
+      anomalies: anomalies?.length || 0,
+      patterns: patterns?.length || 0
+    });
+
     currentData = {
       forecasts,
       warnings,
@@ -135,6 +145,16 @@ async function loadData() {
       anomalies,
       patterns
     };
+
+    // Check if we have any data at all
+    const hasAnyData = forecasts.length > 0 || warnings.length > 0 || 
+                       goals.length > 0 || anomalies.length > 0 || patterns.length > 0;
+    
+    if (!hasAnyData) {
+      console.log('[PredictiveAnalytics] No data available, showing empty state');
+      showEmptyState();
+      return;
+    }
 
     // Render all sections
     renderSpendingForecastChart();
@@ -144,10 +164,39 @@ async function loadData() {
     renderSpendingPatterns();
     renderAlerts();
   } catch (error) {
-    console.error('Error loading predictive analytics:', error);
+    console.error('[PredictiveAnalytics] Error loading predictive analytics:', error);
     showToast('Failed to load predictive analytics', 'error');
   } finally {
     loadingState.style.display = 'none';
+  }
+}
+
+// Show empty state when no data is available
+function showEmptyState() {
+  const emptyHTML = `
+    <div class="empty-state" style="text-align: center; padding: 60px 20px;">
+      <div style="font-size: 64px; margin-bottom: 20px;">📊</div>
+      <h2 style="color: var(--text-primary); margin-bottom: 10px;">No Data Available</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 20px;">
+        Add some expenses and income to see predictive analytics and insights.
+      </p>
+      <a href="expenses.html" class="btn btn-primary">Add Expenses</a>
+    </div>
+  `;
+  
+  // Hide all sections and show empty state
+  if (alertsSection) alertsSection.style.display = 'none';
+  if (warningsSection) warningsSection.style.display = 'none';
+  if (goalsSection) goalsSection.style.display = 'none';
+  if (anomaliesSection) anomaliesSection.style.display = 'none';
+  if (patternsSection) patternsSection.style.display = 'none';
+  
+  // Insert empty state after loading state
+  const mainContent = document.querySelector('.main-content');
+  if (mainContent) {
+    const emptyDiv = document.createElement('div');
+    emptyDiv.innerHTML = emptyHTML;
+    mainContent.appendChild(emptyDiv);
   }
 }
 

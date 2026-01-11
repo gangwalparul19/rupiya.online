@@ -219,7 +219,13 @@ class EncryptionReauthModal {
   // V5: Encryption is now automatic - this always succeeds without prompts
   async checkAndPrompt(onSuccess = null) {
     const user = authService.getCurrentUser();
-    if (!user) return false;
+    if (!user) {
+      // No user, just call onSuccess
+      if (onSuccess) {
+        await onSuccess();
+      }
+      return false;
+    }
 
     // V5: Encryption is automatic for all users - no reauth needed
     // Check if encryption is initialized, if not, initialize automatically
@@ -233,9 +239,23 @@ class EncryptionReauthModal {
       // Data will just not be decrypted
     }
 
+    // Wait for encryption to be fully ready (with timeout)
+    try {
+      await Promise.race([
+        encryptionService.waitForInitialization(),
+        new Promise(resolve => setTimeout(resolve, 5000)) // 5 second timeout
+      ]);
+    } catch (e) {
+      console.warn('[EncryptionReauth] Timeout waiting for encryption:', e);
+    }
+    
+    // Log encryption status for debugging
+    const status = encryptionService.getStatus ? encryptionService.getStatus() : { ready: false };
+    console.log('[EncryptionReauth] Encryption status before loading data:', status);
+
     // Always call onSuccess - encryption is automatic
     if (onSuccess) {
-      onSuccess();
+      await onSuccess();
     }
     return false; // Never show modal in V5
   }
