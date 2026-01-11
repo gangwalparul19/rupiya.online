@@ -353,8 +353,13 @@
             <div class="page-header">
                 <div class="page-header-content">
                     <h1 class="page-title">✨ Feature Details & Benefits</h1>
-                    <p class="page-subtitle">Learn about each feature and discover how they can help you manage your finances better</p>
+                    <p class="page-subtitle">Explore all features organized by category. Enable the ones that match your financial needs.</p>
                 </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="feature-stats" id="featureStats">
+                <!-- Stats will be populated by JS -->
             </div>
 
             <!-- Feature Details Wrapper -->
@@ -398,9 +403,39 @@
     <script type="module">
         import { initSidebar } from './assets/js/components/sidebar.js';
         import { FeatureDetailsPage } from './assets/js/pages/feature-details.js';
+        import { initLogoutHandler } from './assets/js/utils/logout-handler.js';
+        import authService from './assets/js/services/auth-service.js';
 
         // Initialize sidebar
         initSidebar();
+        
+        // Initialize logout handler
+        initLogoutHandler();
+
+        // Load user profile
+        async function loadUserProfile() {
+            try {
+                const user = await authService.waitForAuth();
+                if (user) {
+                    const userAvatar = document.getElementById('userAvatar');
+                    const userName = document.getElementById('userName');
+                    const userEmail = document.getElementById('userEmail');
+                    
+                    if (userAvatar) {
+                        const initials = user.displayName 
+                            ? user.displayName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
+                            : user.email[0].toUpperCase();
+                        userAvatar.textContent = initials;
+                    }
+                    if (userName) userName.textContent = user.displayName || 'User';
+                    if (userEmail) userEmail.textContent = user.email;
+                }
+            } catch (error) {
+                console.error('Error loading user profile:', error);
+            }
+        }
+        
+        loadUserProfile();
 
         // Initialize feature details page
         const featureDetailsPage = new FeatureDetailsPage();

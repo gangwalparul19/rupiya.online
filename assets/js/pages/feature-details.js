@@ -566,6 +566,7 @@ class FeatureDetailsPage {
     this.initialized = false;
     this.allFeatures = FEATURE_DETAILS;
     this.filteredFeatures = FEATURE_DETAILS;
+    this.categories = FEATURE_CATEGORIES;
   }
 
   async init() {
@@ -573,9 +574,44 @@ class FeatureDetailsPage {
 
     await featureConfig.init();
     this.setupEventListeners();
+    this.renderStats();
     this.renderFeatures();
     this.populateCategoryFilter();
     this.initialized = true;
+  }
+
+  renderStats() {
+    const statsContainer = document.getElementById('featureStats');
+    if (!statsContainer) return;
+
+    const allFeatures = Object.keys(this.allFeatures);
+    const enabledCount = allFeatures.filter(key => featureConfig.isEnabled(key)).length;
+    const totalCount = allFeatures.length;
+    const categoryCount = Object.keys(this.categories).length;
+
+    statsContainer.innerHTML = `
+      <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-info">
+          <span class="stat-value">${enabledCount}</span>
+          <span class="stat-label">Enabled</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📦</div>
+        <div class="stat-info">
+          <span class="stat-value">${totalCount}</span>
+          <span class="stat-label">Total Features</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📂</div>
+        <div class="stat-info">
+          <span class="stat-value">${categoryCount}</span>
+          <span class="stat-label">Categories</span>
+        </div>
+      </div>
+    `;
   }
 
   renderFeatures() {
@@ -584,37 +620,101 @@ class FeatureDetailsPage {
 
     grid.innerHTML = '';
 
+    // Group features by category
+    const groupedFeatures = {};
     Object.entries(this.filteredFeatures).forEach(([key, feature]) => {
-      const card = document.createElement('div');
-      card.className = 'feature-card';
-      card.innerHTML = `
-        <div class="feature-card-header">
-          <span class="feature-icon">${feature.icon}</span>
-          <span class="feature-category-badge">${feature.category}</span>
-        </div>
-        <div class="feature-card-body">
-          <h3>${feature.label}</h3>
-          <p class="feature-short-desc">${feature.shortDescription}</p>
-          <div class="feature-benefits-preview">
-            <strong>Key Benefits:</strong>
-            <ul>
-              ${feature.benefits.slice(0, 2).map(b => `<li>${b}</li>`).join('')}
-            </ul>
+      const category = feature.category;
+      if (!groupedFeatures[category]) {
+        groupedFeatures[category] = [];
+      }
+      groupedFeatures[category].push({ key, ...feature });
+    });
+
+    // Define category order
+    const categoryOrder = ['core', 'analytics', 'transactions', 'planning', 'assets', 'social', 'organize'];
+    
+    // Render each category group
+    categoryOrder.forEach(categoryKey => {
+      const features = groupedFeatures[categoryKey];
+      if (!features || features.length === 0) return;
+
+      const categoryInfo = this.categories[categoryKey] || { 
+        label: categoryKey.charAt(0).toUpperCase() + categoryKey.slice(1), 
+        icon: '📁',
+        description: ''
+      };
+
+      // Create category section
+      const categorySection = document.createElement('div');
+      categorySection.className = 'feature-category-section';
+      categorySection.innerHTML = `
+        <div class="category-header">
+          <div class="category-header-left">
+            <span class="category-icon">${categoryInfo.icon}</span>
+            <div class="category-info">
+              <h2 class="category-title">${categoryInfo.label}</h2>
+              <p class="category-description">${categoryInfo.description}</p>
+            </div>
           </div>
+          <span class="category-count">${features.length} feature${features.length > 1 ? 's' : ''}</span>
         </div>
-        <div class="feature-card-footer">
-          <button class="btn btn-sm btn-primary" data-feature="${key}">
-            Learn More
-          </button>
-        </div>
+        <div class="category-features-grid"></div>
       `;
 
-      card.querySelector('button').addEventListener('click', () => {
-        this.showFeatureDetail(key);
+      const featuresGrid = categorySection.querySelector('.category-features-grid');
+
+      // Render features in this category
+      features.forEach(feature => {
+        const isEnabled = featureConfig.isEnabled(feature.key);
+        const isRequired = featureConfig.getFeatureInfo(feature.key)?.required;
+        
+        const card = document.createElement('div');
+        card.className = `feature-card ${isEnabled ? 'enabled' : ''} ${isRequired ? 'required' : ''}`;
+        card.innerHTML = `
+          <div class="feature-card-header">
+            <span class="feature-icon">${feature.icon}</span>
+            <div class="feature-status-badges">
+              ${isRequired ? '<span class="badge badge-required">Required</span>' : ''}
+              <span class="badge ${isEnabled ? 'badge-enabled' : 'badge-disabled'}">${isEnabled ? '✓ Enabled' : 'Disabled'}</span>
+            </div>
+          </div>
+          <div class="feature-card-body">
+            <h3>${feature.label}</h3>
+            <p class="feature-short-desc">${feature.shortDescription}</p>
+            <div class="feature-benefits-preview">
+              <strong>Key Benefits:</strong>
+              <ul>
+                ${feature.benefits.slice(0, 2).map(b => `<li>${b}</li>`).join('')}
+              </ul>
+            </div>
+          </div>
+          <div class="feature-card-footer">
+            <button class="btn btn-sm btn-primary learn-more-btn" data-feature="${feature.key}">
+              Learn More
+            </button>
+          </div>
+        `;
+
+        card.querySelector('button').addEventListener('click', () => {
+          this.showFeatureDetail(feature.key);
+        });
+
+        featuresGrid.appendChild(card);
       });
 
-      grid.appendChild(card);
+      grid.appendChild(categorySection);
     });
+
+    // If no features found after filtering
+    if (Object.keys(groupedFeatures).length === 0) {
+      grid.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">🔍</div>
+          <h3>No features found</h3>
+          <p>Try adjusting your search or filter criteria</p>
+        </div>
+      `;
+    }
   }
 
   showFeatureDetail(featureKey) {
@@ -711,6 +811,10 @@ class FeatureDetailsPage {
         // Show success toast
         const action = newState ? 'enabled' : 'disabled';
         toast.success(`${featureLabel} has been ${action}`);
+        
+        // Refresh stats and feature cards
+        this.renderStats();
+        this.renderFeatures();
       } catch (error) {
         console.error('Error toggling feature:', error);
         // Restore original button text on error

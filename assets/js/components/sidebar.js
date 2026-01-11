@@ -268,7 +268,15 @@ export async function initSidebar() {
   const sidebarNav = sidebar.querySelector('.sidebar-nav');
   if (!sidebarNav) return;
 
-  // Initialize feature config first
+  // Wait for auth to be ready first
+  let user = null;
+  try {
+    user = await authService.waitForAuth();
+  } catch (e) {
+    console.log('[Sidebar] Auth not ready, using defaults');
+  }
+
+  // Initialize feature config (will use cache if available)
   await featureConfig.init();
 
   // Check if user is admin
@@ -289,28 +297,30 @@ export async function initSidebar() {
   // Initialize global logout handler
   initLogoutHandler();
 
-  // Listen for feature changes and update navigation
-  window.addEventListener('featuresUpdated', async () => {
-    sidebarNav.innerHTML = generateQuickSearchHTML() + generateSidebarHTML(isAdmin);
+  // Helper function to refresh sidebar
+  const refreshSidebar = async () => {
+    // Re-check admin status in case it changed
+    const currentIsAdmin = await checkIsAdmin();
+    sidebarNav.innerHTML = generateQuickSearchHTML() + generateSidebarHTML(currentIsAdmin);
     setupSectionToggles();
-    setupQuickSearch(isAdmin);
-  });
+    setupQuickSearch(currentIsAdmin);
+  };
+
+  // Listen for feature changes and update navigation
+  window.addEventListener('featuresUpdated', refreshSidebar);
   
   // Listen for features reset
-  window.addEventListener('featuresReset', async () => {
-    sidebarNav.innerHTML = generateQuickSearchHTML() + generateSidebarHTML(isAdmin);
-    setupSectionToggles();
-    setupQuickSearch(isAdmin);
-  });
+  window.addEventListener('featuresReset', refreshSidebar);
+  
+  // Listen for feature toggle events
+  window.addEventListener('featureToggled', refreshSidebar);
   
   // Re-initialize features after encryption is ready (for page refresh scenarios)
   // This handles the case where sidebar loads before encryption is initialized
   window.addEventListener('encryptionReady', async () => {
     console.log('[Sidebar] Encryption ready, re-initializing features');
     await featureConfig.reinitialize();
-    sidebarNav.innerHTML = generateQuickSearchHTML() + generateSidebarHTML(isAdmin);
-    setupSectionToggles();
-    setupQuickSearch(isAdmin);
+    await refreshSidebar();
   });
 }
 

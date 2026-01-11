@@ -220,7 +220,21 @@ class FeatureConfigManager {
     if (this.initialized) return;
 
     try {
-      const user = authService.getCurrentUser();
+      // Try to get current user, or wait for auth if not ready
+      let user = authService.getCurrentUser();
+      
+      if (!user) {
+        // Wait for auth to be ready (with timeout)
+        try {
+          user = await Promise.race([
+            authService.waitForAuth(),
+            new Promise(resolve => setTimeout(() => resolve(null), 3000))
+          ]);
+        } catch (e) {
+          console.log('[FeatureConfig] Auth wait failed:', e);
+        }
+      }
+      
       console.log('[FeatureConfig] Initializing for user:', user?.uid || 'no user');
       
       if (!user) {

@@ -104,6 +104,7 @@ function updatePrivacyButton() {
 
 /**
  * Update privacy indicator
+ * Shows a temporary notification that auto-dismisses after 3 seconds
  */
 function updatePrivacyIndicator(isPrivacyMode) {
     let indicator = document.querySelector('.privacy-mode-indicator');
@@ -112,6 +113,11 @@ function updatePrivacyIndicator(isPrivacyMode) {
         indicator = document.createElement('div');
         indicator.className = 'privacy-mode-indicator';
         document.body.appendChild(indicator);
+    }
+    
+    // Clear any existing timeout
+    if (indicator._dismissTimeout) {
+        clearTimeout(indicator._dismissTimeout);
     }
     
     if (isPrivacyMode) {
@@ -123,6 +129,11 @@ function updatePrivacyIndicator(isPrivacyMode) {
             <span>Privacy Mode: ON</span>
         `;
         indicator.classList.add('show');
+        
+        // Auto-dismiss after 3 seconds
+        indicator._dismissTimeout = setTimeout(() => {
+            indicator.classList.remove('show');
+        }, 3000);
     } else {
         indicator.classList.remove('show');
     }
