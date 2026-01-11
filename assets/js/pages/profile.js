@@ -7,6 +7,7 @@ import encryptionService from '../services/encryption-service.js';
 import toast from '../components/toast.js';
 import confirmationModal from '../components/confirmation-modal.js';
 import themeManager from '../utils/theme-manager.js';
+import { featureSettings } from '../components/feature-settings.js';
 import { updateProfile, updatePassword, EmailAuthProvider, reauthenticateWithCredential, deleteUser, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
 import { doc, setDoc, Timestamp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
 import { db, auth } from '../config/firebase-config.js';
@@ -47,6 +48,9 @@ async function init() {
   setupEventListeners();
   loadUserProfile(currentUser);
   setupSecuritySection();
+  
+  // Initialize feature settings
+  await featureSettings.init('featureSettingsContainer');
   
   // Check if encryption reauth is needed
   await encryptionReauthModal.checkAndPrompt(async () => {
