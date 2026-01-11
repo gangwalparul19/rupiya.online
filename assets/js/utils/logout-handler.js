@@ -5,9 +5,21 @@
 
 import authService from '../services/auth-service.js';
 import logoutModal from '../components/logout-modal.js';
+import logger from '../utils/logger.js';
+
+const log = logger.create('LogoutHandler');
 
 // Track if logout is in progress to prevent double-clicks
 let isLoggingOut = false;
+
+// Helper to restore button state
+function restoreButtonState(logoutBtn) {
+  if (logoutBtn) {
+    logoutBtn.disabled = false;
+    logoutBtn.style.opacity = '1';
+    logoutBtn.style.cursor = 'pointer';
+  }
+}
 
 // Initialize logout handler
 export function initLogoutHandler() {
@@ -20,18 +32,28 @@ export function initLogoutHandler() {
       e.preventDefault();
       e.stopPropagation();
       
-      console.log('Logout button clicked - showing modal');
+      log.log('Logout button clicked - showing modal');
       
       // Show beautiful logout modal
-      const confirmed = await logoutModal.show();
-      console.log('Modal result:', confirmed);
-      
-      if (!confirmed) {
-        console.log('User cancelled logout');
+      let confirmed = false;
+      try {
+        confirmed = await logoutModal.show();
+      } catch (error) {
+        log.error('Modal error:', error);
+        if (window.toast) {
+          window.toast.error('An error occurred. Please try again.');
+        }
         return;
       }
       
-      console.log('User confirmed logout - proceeding with logout');
+      log.log('Modal result:', confirmed);
+      
+      if (!confirmed) {
+        log.log('User cancelled logout');
+        return;
+      }
+      
+      log.log('User confirmed logout - proceeding with logout');
       
       try {
         // Set flag to prevent double-clicks
@@ -43,11 +65,11 @@ export function initLogoutHandler() {
         logoutBtn.style.cursor = 'not-allowed';
         
         // Perform logout
-        console.log('Calling authService.signOut()');
+        log.log('Calling authService.signOut()');
         const result = await authService.signOut();
-        console.log('SignOut result:', result);
+        log.log('SignOut result:', result);
         
-        if (result.success) {
+        if (result && result.success) {
           // Show success message if toast is available
           if (window.toast) {
             window.toast.success('Logged out successfully. See you soon!');
@@ -58,22 +80,20 @@ export function initLogoutHandler() {
             localStorage.removeItem('rupiya_user_logged_in');
             sessionStorage.clear();
           } catch (err) {
-            console.warn('Error clearing storage:', err);
+            log.warn('Error clearing storage:', err);
           }
           
           // Redirect to login page
-          console.log('Redirecting to login page');
+          log.log('Redirecting to login page');
           setTimeout(() => {
             window.location.href = 'login.html';
           }, 500);
         } else {
           // Re-enable button on failure
           isLoggingOut = false;
-          logoutBtn.disabled = false;
-          logoutBtn.style.opacity = '1';
-          logoutBtn.style.cursor = 'pointer';
+          restoreButtonState(logoutBtn);
           
-          console.error('Logout failed:', result);
+          log.error('Logout failed:', result);
           if (window.toast) {
             window.toast.error('Failed to logout. Please try again.');
           } else {
@@ -81,13 +101,11 @@ export function initLogoutHandler() {
           }
         }
       } catch (error) {
-        console.error('Logout error:', error);
+        log.error('Logout error:', error);
         
-        // Re-enable button on error
+        // Re-enable button on error - ensure this always happens
         isLoggingOut = false;
-        logoutBtn.disabled = false;
-        logoutBtn.style.opacity = '1';
-        logoutBtn.style.cursor = 'pointer';
+        restoreButtonState(logoutBtn);
         
         if (window.toast) {
           window.toast.error('An error occurred during logout');

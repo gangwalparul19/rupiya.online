@@ -5,6 +5,7 @@ class ConfirmationModal {
   constructor() {
     this.modal = null;
     this.resolveCallback = null;
+    this.isShowing = false;
     this.init();
   }
 
@@ -18,6 +19,12 @@ class ConfirmationModal {
   }
 
   createModal() {
+    // Check if modal already exists to prevent duplicates
+    if (document.getElementById('confirmationModal')) {
+      this.modal = document.getElementById('confirmationModal');
+      this.setupEventListeners();
+      return;
+    }
    
     // Create modal HTML
     const modalHTML = `
@@ -25,7 +32,7 @@ class ConfirmationModal {
         <div class="modal-container confirmation-modal-container">
           <div class="modal-header">
             <h2 class="modal-title" id="confirmationModalTitle">Confirm Action</h2>
-            <button class="modal-close" id="confirmationModalClose">&times;</button>
+            <button class="modal-close" id="confirmationModalClose" type="button" aria-label="Close modal">&times;</button>
           </div>
           <div class="modal-body">
             <div class="confirmation-icon" id="confirmationModalIcon">⚠️</div>
@@ -39,13 +46,8 @@ class ConfirmationModal {
       </div>
     `;
 
-    // Add to body if not already present
-    if (!document.getElementById('confirmationModal')) {
-      document.body.insertAdjacentHTML('beforeend', modalHTML);
-    } else {
-      console.log('[ConfirmationModal] Modal already exists in DOM');
-    }
-
+    // Add to body
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
     this.modal = document.getElementById('confirmationModal');
     this.setupEventListeners();
   }
@@ -55,20 +57,37 @@ class ConfirmationModal {
     const cancelBtn = document.getElementById('confirmationModalCancel');
     const confirmBtn = document.getElementById('confirmationModalConfirm');
 
-    closeBtn?.addEventListener('click', () => this.hide(false));
-    cancelBtn?.addEventListener('click', () => this.hide(false));
-    confirmBtn?.addEventListener('click', () => this.hide(true));
+    // Remove existing listeners by cloning and replacing
+    if (closeBtn) {
+      const newCloseBtn = closeBtn.cloneNode(true);
+      closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
+      newCloseBtn.addEventListener('click', () => this.hide(false));
+    }
+
+    if (cancelBtn) {
+      const newCancelBtn = cancelBtn.cloneNode(true);
+      cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+      newCancelBtn.addEventListener('click', () => this.hide(false));
+    }
+
+    if (confirmBtn) {
+      const newConfirmBtn = confirmBtn.cloneNode(true);
+      confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+      newConfirmBtn.addEventListener('click', () => this.hide(true));
+    }
 
     // Close on overlay click
-    this.modal?.addEventListener('click', (e) => {
-      if (e.target === this.modal) {
-        this.hide(false);
-      }
-    });
+    if (this.modal) {
+      this.modal.addEventListener('click', (e) => {
+        if (e.target === this.modal) {
+          this.hide(false);
+        }
+      });
+    }
 
     // Close on Escape key
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && this.modal?.style.display === 'flex') {
+      if (e.key === 'Escape' && this.isShowing && this.modal?.style.display !== 'none') {
         this.hide(false);
       }
     });
@@ -86,6 +105,11 @@ class ConfirmationModal {
    * @returns {Promise<boolean>} - Resolves to true if confirmed, false if cancelled
    */
   show(options = {}) {
+    // Prevent multiple concurrent shows
+    if (this.isShowing) {
+      return Promise.resolve(false);
+    }
+
     // Ensure modal is created
     if (!this.modal) {
       this.createModal();
@@ -101,7 +125,6 @@ class ConfirmationModal {
     } = options;
 
     try {
-
       // Set content
       const titleEl = document.getElementById('confirmationModalTitle');
       const messageEl = document.getElementById('confirmationModalMessage');
@@ -115,9 +138,7 @@ class ConfirmationModal {
       }
 
       titleEl.textContent = title;
-      
       messageEl.textContent = message;
-      
       confirmBtnEl.textContent = confirmText;
       cancelBtnEl.textContent = cancelText;
 
@@ -149,15 +170,13 @@ class ConfirmationModal {
 
       // Show modal
       if (this.modal) {
+        this.isShowing = true;
         this.modal.style.display = 'flex';
         
-        // Debug: Check if modal is actually visible
-        const computedStyle = window.getComputedStyle(this.modal);
-
-        // Check modal container
-        const container = this.modal.querySelector('.modal-container');
-        if (container) {
-          const containerStyle = window.getComputedStyle(container);
+        // Focus on confirm button for accessibility
+        const confirmButton = document.getElementById('confirmationModalConfirm');
+        if (confirmButton) {
+          setTimeout(() => confirmButton.focus(), 100);
         }
       } else {
         return Promise.resolve(false);
@@ -169,11 +188,13 @@ class ConfirmationModal {
       });
     } catch (error) {
       console.error('[ConfirmationModal] Error showing modal:', error);
+      this.isShowing = false;
       return Promise.resolve(false);
     }
   }
 
   hide(confirmed) {
+    this.isShowing = false;
     if (this.modal) {
       this.modal.style.display = 'none';
     }

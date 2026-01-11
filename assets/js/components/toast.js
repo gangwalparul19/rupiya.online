@@ -3,6 +3,8 @@
 class ToastManager {
   constructor() {
     this.container = null;
+    this.maxToasts = 5;
+    this.activeToasts = [];
     this.init();
   }
 
@@ -19,32 +21,73 @@ class ToastManager {
   }
 
   show(message, type = 'info', duration = 3000) {
+    // Enforce max toasts limit
+    if (this.activeToasts.length >= this.maxToasts) {
+      const oldestToast = this.activeToasts.shift();
+      oldestToast.remove();
+    }
+
     const toast = document.createElement('div');
     toast.className = `toast toast-${type} fade-in`;
     
     const icon = this.getIcon(type);
     
+    // Sanitize message to prevent XSS
+    const messageEl = document.createElement('div');
+    messageEl.textContent = message;
+    const sanitizedMessage = messageEl.innerHTML;
+    
     toast.innerHTML = `
       <div class="toast-icon">${icon}</div>
-      <div class="toast-message">${message}</div>
-      <button class="toast-close" onclick="this.parentElement.remove()">
+      <div class="toast-message">${sanitizedMessage}</div>
+      <button class="toast-close" type="button" aria-label="Close notification">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
           <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
         </svg>
       </button>
     `;
 
+    // Add close button handler
+    const closeBtn = toast.querySelector('.toast-close');
+    closeBtn.addEventListener('click', () => {
+      this.removeToast(toast);
+    });
+
     this.container.appendChild(toast);
+    this.activeToasts.push(toast);
 
     // Auto remove after duration
     if (duration > 0) {
-      setTimeout(() => {
-        toast.classList.add('fade-out');
-        setTimeout(() => toast.remove(), 300);
+      const timeoutId = setTimeout(() => {
+        this.removeToast(toast);
       }, duration);
+      
+      // Store timeout ID for cleanup
+      toast.dataset.timeoutId = timeoutId;
     }
 
     return toast;
+  }
+
+  removeToast(toast) {
+    if (!toast || !toast.parentElement) return;
+    
+    // Clear timeout if exists
+    if (toast.dataset.timeoutId) {
+      clearTimeout(parseInt(toast.dataset.timeoutId));
+    }
+    
+    toast.classList.add('fade-out');
+    setTimeout(() => {
+      if (toast.parentElement) {
+        toast.remove();
+      }
+      // Remove from active toasts array
+      const index = this.activeToasts.indexOf(toast);
+      if (index > -1) {
+        this.activeToasts.splice(index, 1);
+      }
+    }, 300);
   }
 
   success(message, duration = 3000) {

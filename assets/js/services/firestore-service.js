@@ -47,10 +47,12 @@ class FirestoreService {
       netWorthSnapshots: 'netWorthSnapshots'
     };
     
-    // Cache configuration
+    // Cache configuration with size limits
     this.cache = new Map();
-    this.cacheExpiry = 5 * 60 * 1000; // 5 minutes cache (increased for better performance)
+    this.cacheExpiry = 5 * 60 * 1000; // 5 minutes cache
+    this.maxCacheSize = 100; // Maximum number of cache entries
     this.lastCursors = new Map();
+    this.maxCursorSize = 50; // Maximum number of cursor entries
     this.defaultPageSize = 10;
   }
 
@@ -80,6 +82,12 @@ class FirestoreService {
   }
   
   setCache(key, data) {
+    // Enforce cache size limit with LRU eviction
+    if (this.cache.size >= this.maxCacheSize) {
+      // Remove oldest entry (first entry in Map)
+      const firstKey = this.cache.keys().next().value;
+      this.cache.delete(firstKey);
+    }
     this.cache.set(key, { data, timestamp: Date.now() });
   }
   
@@ -101,7 +109,12 @@ class FirestoreService {
     } else {
       this.cache.clear();
     }
-    this.lastCursors.clear();
+    
+    // Enforce cursor size limit
+    if (this.lastCursors.size > this.maxCursorSize) {
+      const firstKey = this.lastCursors.keys().next().value;
+      this.lastCursors.delete(firstKey);
+    }
   }
 
   // ============================================
