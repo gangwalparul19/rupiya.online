@@ -722,17 +722,13 @@ async function getFamilyMembers() {
       return getDefaultFamilyMembers();
     }
 
-    // Try to load from Firestore first
+    // Try to load from Firestore userSettings first
     try {
-      const familyData = await firestoreService.getAll('familyMembers');
-      if (familyData && familyData.length > 0) {
-        // Decryption happens automatically in firestoreService
-        const decryptedData = await encryptionService.decryptObject(familyData[0], 'familyMembers');
-        if (decryptedData && decryptedData.members) {
-          // Also update localStorage for offline access
-          localStorage.setItem('familyMembers', JSON.stringify(decryptedData.members));
-          return decryptedData.members;
-        }
+      const settings = await firestoreService.getUserSettings();
+      if (settings && settings.familyMembers && Array.isArray(settings.familyMembers)) {
+        // Also update localStorage for offline access
+        localStorage.setItem('familyMembers', JSON.stringify(settings.familyMembers));
+        return settings.familyMembers;
       }
     } catch (firestoreError) {
       console.warn('Error loading from Firestore, falling back to localStorage:', firestoreError);
@@ -852,11 +848,11 @@ async function loadFamilyMembersUI() {
 }
 
 // Update "Add More Members" button visibility
-function updateAddMoreButtonVisibility() {
+async function updateAddMoreButtonVisibility() {
   const addMoreBtn = document.getElementById('addMoreMembersBtn');
   if (!addMoreBtn) return;
   
-  const members = getFamilyMembers();
+  const members = await getFamilyMembers();
   addMoreBtn.style.display = members.length >= 10 ? 'none' : 'inline-flex';
 }
 
@@ -940,7 +936,7 @@ function updateFamilyMemberPreview(memberId) {
 // Add more family members
 async function addMoreMembers() {
   try {
-    const members = getFamilyMembers();
+    const members = await getFamilyMembers();
     
     if (members.length >= 10) {
       toast.warning('Maximum 10 family members allowed');
@@ -978,7 +974,7 @@ async function deleteFamilyMember(memberId) {
     });
 
     if (confirmed) {
-      const members = getFamilyMembers();
+      const members = await getFamilyMembers();
       const filtered = members.filter(m => m.id !== memberId);
       localStorage.setItem('familyMembers', JSON.stringify(filtered));
       
@@ -994,12 +990,19 @@ async function deleteFamilyMember(memberId) {
 // Handle save family members
 async function handleSaveFamilyMembers() {
   try {
+    const saveBtn = document.getElementById('saveFamilyMembersBtn');
+    if (saveBtn) {
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'Saving...';
+    }
+
     const members = [];
     document.querySelectorAll('.family-member-slot').forEach((slot, index) => {
       const memberId = slot.dataset.memberId;
       const name = slot.querySelector('.family-member-name-input').value;
       const role = slot.querySelector('.family-member-role-input').value;
-      const icon = slot.querySelector('.icon-option.selected').data-icon;
+      const selectedIcon = slot.querySelector('.icon-option.selected');
+      const icon = selectedIcon ? selectedIcon.dataset.icon : '👤';
       const active = slot.querySelector('.family-member-checkbox').checked;
 
       members.push({
@@ -1011,27 +1014,46 @@ async function handleSaveFamilyMembers() {
       });
     });
 
-    // Save to Firestore with encryption
-    const userId = authService.getCurrentUser().uid;
-    const familyMembersData = {
-      userId: userId,
-      members: members,
-      updatedAt: new Date()
-    };
+    // Save to localStorage first for immediate access
+    localStorage.setItem('familyMembers', JSON.stringify(members));
 
-    // Encryption happens automatically in firestoreService
-    const result = await firestoreService.add('familyMembers', familyMembersData);
-    
-    if (result.success) {
-      // Also keep in localStorage for backward compatibility
-      localStorage.setItem('familyMembers', JSON.stringify(members));
-      toast.success('Family members saved successfully');
+    // Save to Firestore with encryption using userSettings collection
+    const userId = authService.getCurrentUser()?.uid;
+    if (userId) {
+      // Wait for encryption to be ready
+      await encryptionService.waitForInitialization();
+      
+      const familyMembersData = {
+        familyMembers: members,
+        updatedAt: Timestamp.now()
+      };
+
+      // Use userSettings collection with setDoc (merge) to update
+      const result = await firestoreService.updateUserSettings(familyMembersData);
+      
+      if (result.success) {
+        toast.success('Family members saved successfully');
+      } else {
+        console.warn('Failed to save to Firestore, but saved locally');
+        toast.success('Family members saved locally');
+      }
     } else {
-      toast.error('Failed to save family members to cloud');
+      toast.success('Family members saved locally');
+    }
+
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.textContent = 'Save Family Members';
     }
   } catch (error) {
     console.error('Error saving family members:', error);
     toast.error('Failed to save family members');
+    
+    const saveBtn = document.getElementById('saveFamilyMembersBtn');
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.textContent = 'Save Family Members';
+    }
   }
 }
 
