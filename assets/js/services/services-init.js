@@ -52,11 +52,15 @@ authService.onAuthStateChanged(async (user) => {
         const success = await authEncryptionHelper.initializeAfterLogin(null, user.uid);
         if (success) {
           log.log('✅ Encryption initialized - seamless cross-device sync enabled');
+          // Dispatch event so other components can re-initialize with encryption
+          window.dispatchEvent(new CustomEvent('encryptionReady'));
         } else {
           log.warn('⚠️ Failed to initialize encryption');
         }
       } else if (encryptionStatus.ready) {
         log.log('✅ Encryption already ready');
+        // Dispatch event in case components are waiting
+        window.dispatchEvent(new CustomEvent('encryptionReady'));
       }
       
       // Log final encryption status

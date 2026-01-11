@@ -173,6 +173,18 @@ class FeatureConfigManager {
 
       this.currentUserId = user.uid;
 
+      // Wait for encryption to be ready (with timeout)
+      try {
+        if (encryptionService.waitForInitialization) {
+          await Promise.race([
+            encryptionService.waitForInitialization(),
+            new Promise(resolve => setTimeout(resolve, 3000)) // 3 second timeout
+          ]);
+        }
+      } catch (e) {
+        console.warn('[FeatureConfig] Encryption wait failed:', e);
+      }
+
       // Load user's feature config from Firestore
       // Document ID is the userId
       const docRef = doc(db, FEATURES_COLLECTION, user.uid);
@@ -181,23 +193,54 @@ class FeatureConfigManager {
       if (docSnap.exists()) {
         console.log('[FeatureConfig] Found existing feature document for user:', user.uid);
         let savedData = docSnap.data();
+        console.log('[FeatureConfig] Raw saved data:', savedData);
         
-        // Decrypt the data
-        const decryptedData = await encryptionService.decryptObject(savedData, FEATURES_COLLECTION);
-        console.log('[FeatureConfig] Decrypted data:', decryptedData);
+        // Try to decrypt the data
+        let decryptedData = savedData;
+        const isEncryptionReady = encryptionService.isReady ? encryptionService.isReady() : false;
+        console.log('[FeatureConfig] Encryption ready:', isEncryptionReady);
+        
+        try {
+          if (isEncryptionReady && savedData._encrypted) {
+            decryptedData = await encryptionService.decryptObject(savedData, FEATURES_COLLECTION);
+            console.log('[FeatureConfig] Decrypted data:', decryptedData);
+          } else if (savedData._encrypted) {
+            console.log('[FeatureConfig] Data is encrypted but encryption not ready, using defaults');
+            this.userFeatures = JSON.parse(JSON.stringify(DEFAULT_FEATURES));
+            this.initialized = true;
+            return;
+          } else {
+            console.log('[FeatureConfig] Data is not encrypted, using raw data');
+          }
+        } catch (decryptError) {
+          console.warn('[FeatureConfig] Decryption failed:', decryptError);
+          // If decryption fails, use defaults
+          this.userFeatures = JSON.parse(JSON.stringify(DEFAULT_FEATURES));
+          this.initialized = true;
+          return;
+        }
+        
+        // Extract features from decrypted data
+        let savedFeatures = null;
         
         if (decryptedData && decryptedData.features) {
+          savedFeatures = decryptedData.features;
+        }
+        
+        if (savedFeatures) {
           // Parse features if it's a string (from encryption)
-          let savedFeatures = decryptedData.features;
           if (typeof savedFeatures === 'string') {
             try {
               savedFeatures = JSON.parse(savedFeatures);
+              console.log('[FeatureConfig] Parsed features from string');
             } catch (e) {
               console.warn('[FeatureConfig] Could not parse features string:', e);
-              savedFeatures = {};
+              savedFeatures = null;
             }
           }
-          
+        }
+        
+        if (savedFeatures && typeof savedFeatures === 'object') {
           // Deep merge: start with defaults, then apply saved enabled states
           this.userFeatures = JSON.parse(JSON.stringify(DEFAULT_FEATURES));
           Object.keys(savedFeatures).forEach(key => {
@@ -211,9 +254,9 @@ class FeatureConfigManager {
             }
           });
           
-          console.log('[FeatureConfig] Merged features:', this.userFeatures);
+          console.log('[FeatureConfig] Loaded user features successfully');
         } else {
-          console.log('[FeatureConfig] No features in decrypted data, using defaults');
+          console.log('[FeatureConfig] No valid features found, using defaults');
           this.userFeatures = JSON.parse(JSON.stringify(DEFAULT_FEATURES));
         }
       } else {

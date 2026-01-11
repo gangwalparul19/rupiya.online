@@ -290,7 +290,24 @@ export async function initSidebar() {
   initLogoutHandler();
 
   // Listen for feature changes and update navigation
-  window.addEventListener('featuresUpdated', () => {
+  window.addEventListener('featuresUpdated', async () => {
+    sidebarNav.innerHTML = generateQuickSearchHTML() + generateSidebarHTML(isAdmin);
+    setupSectionToggles();
+    setupQuickSearch(isAdmin);
+  });
+  
+  // Listen for features reset
+  window.addEventListener('featuresReset', async () => {
+    sidebarNav.innerHTML = generateQuickSearchHTML() + generateSidebarHTML(isAdmin);
+    setupSectionToggles();
+    setupQuickSearch(isAdmin);
+  });
+  
+  // Re-initialize features after encryption is ready (for page refresh scenarios)
+  // This handles the case where sidebar loads before encryption is initialized
+  window.addEventListener('encryptionReady', async () => {
+    console.log('[Sidebar] Encryption ready, re-initializing features');
+    await featureConfig.reinitialize();
     sidebarNav.innerHTML = generateQuickSearchHTML() + generateSidebarHTML(isAdmin);
     setupSectionToggles();
     setupQuickSearch(isAdmin);
