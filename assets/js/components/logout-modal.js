@@ -116,7 +116,8 @@ class LogoutModal {
       this.resolvePromise = resolve;
       
       if (this.modal) {
-        this.modal.style.display = 'flex';
+        // Add 'show' class to make modal visible (CSS uses this for visibility)
+        this.modal.classList.add('show');
         // Focus on confirm button for accessibility
         const confirmBtn = document.getElementById('logoutModalConfirm');
         if (confirmBtn) {
@@ -129,7 +130,8 @@ class LogoutModal {
   hide() {
     this.isShowing = false;
     if (this.modal) {
-      this.modal.style.display = 'none';
+      // Remove 'show' class to hide modal
+      this.modal.classList.remove('show');
     }
   }
 }

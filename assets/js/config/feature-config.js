@@ -293,10 +293,11 @@ class FeatureConfigManager {
       if (!user) return;
 
       const userRef = doc(db, 'users', user.uid);
-      await updateDoc(userRef, {
+      // Use setDoc with merge to create or update the document
+      await setDoc(userRef, {
         features: this.userFeatures,
         featureConfigUpdatedAt: new Date()
-      });
+      }, { merge: true });
     } catch (error) {
       console.error('Error saving feature config:', error);
       throw error;
