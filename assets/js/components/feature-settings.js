@@ -154,6 +154,14 @@ class FeatureSettings {
    * Save feature settings
    */
   async saveSettings() {
+    const saveBtn = document.getElementById('saveFeatureSettingsBtn');
+    const originalText = saveBtn?.textContent;
+    
+    if (saveBtn) {
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'Saving...';
+    }
+    
     const updates = {};
     document.querySelectorAll('.feature-checkbox').forEach(checkbox => {
       const featureKey = checkbox.dataset.feature;
@@ -164,9 +172,15 @@ class FeatureSettings {
       await featureConfig.updateFeatures(updates);
       this.showNotification('Settings saved successfully!', 'success');
       this.render();
+      this.setupEventListeners(); // Re-attach event listeners after render
     } catch (error) {
       console.error('Error saving feature settings:', error);
       this.showNotification('Error saving settings. Please try again.', 'error');
+    } finally {
+      if (saveBtn) {
+        saveBtn.disabled = false;
+        saveBtn.textContent = originalText;
+      }
     }
   }
 
@@ -178,6 +192,7 @@ class FeatureSettings {
       await featureConfig.resetToDefaults();
       this.showNotification('Features reset to defaults!', 'success');
       this.render();
+      this.setupEventListeners(); // Re-attach event listeners after render
     } catch (error) {
       console.error('Error resetting features:', error);
       this.showNotification('Error resetting features. Please try again.', 'error');

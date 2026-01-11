@@ -482,12 +482,13 @@ service cloud.firestore {
     // ============================================
     // FEATURES (User feature preferences)
     // ============================================
-    match /features/{featureId} {
+    match /features/{userId} {
+      // Features document ID is the userId itself
       // Users can only access their own feature preferences
-      allow read: if belongsToUser();
-      allow create: if isAuthenticated() && hasValidUserId();
-      allow update: if belongsToUser() && userIdNotChanged();
-      allow delete: if belongsToUser();
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId);
     }
     
     // ============================================
