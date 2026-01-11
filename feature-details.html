@@ -19,31 +19,110 @@
     <!-- Auth Guard -->
     <script src="assets/js/utils/auth-guard.js"></script>
     
-    <!-- Mobile Header Override Styles -->
+    <!-- Page-specific Mobile Fixes -->
     <style>
-        /* Ensure mobile header displays correctly on this page */
+        /* Desktop - hide mobile header */
+        @media (min-width: 769px) {
+            .mobile-header { display: none !important; }
+            .sidebar { display: flex !important; }
+            .main-content { margin-left: 260px; }
+        }
+        
+        /* Mobile - show mobile header, hide sidebar */
         @media (max-width: 768px) {
+            .sidebar {
+                position: fixed !important;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                width: 260px;
+                transform: translateX(-100%);
+                z-index: 1001;
+                transition: transform 0.3s ease;
+            }
+            .sidebar.open { transform: translateX(0); }
+            
+            .main-content {
+                margin-left: 0 !important;
+                padding: 0 !important;
+            }
+            
             .mobile-header {
                 display: flex !important;
-                visibility: visible !important;
-                opacity: 1 !important;
+                align-items: center;
+                justify-content: space-between;
+                padding: 12px 16px;
+                background: #fff;
+                border-bottom: 2px solid #4A90E2;
+                position: sticky;
+                top: 0;
+                z-index: 100;
             }
-            .mobile-header .sidebar-toggle,
-            #sidebarOpen {
-                display: flex !important;
-                visibility: visible !important;
-                opacity: 1 !important;
+            
+            .mobile-brand {
+                display: flex;
+                align-items: center;
+                text-decoration: none;
             }
+            
             .mobile-brand img {
                 height: 32px !important;
                 width: auto !important;
-                max-height: 32px !important;
             }
-        }
-        @media (max-width: 480px) {
-            .mobile-brand img {
-                height: 28px !important;
-                max-height: 28px !important;
+            
+            .mobile-header-actions {
+                display: flex !important;
+                align-items: center;
+            }
+            
+            .mobile-header .sidebar-toggle {
+                display: flex !important;
+                align-items: center;
+                justify-content: center;
+                width: 44px;
+                height: 44px;
+                background: none;
+                border: none;
+                cursor: pointer;
+                border-radius: 8px;
+            }
+            
+            .mobile-header .sidebar-toggle:hover {
+                background: #f1f3f5;
+            }
+            
+            .mobile-header .sidebar-toggle svg {
+                width: 24px;
+                height: 24px;
+                stroke: #2C3E50;
+            }
+            
+            .sidebar-overlay.show { display: block; }
+            
+            .feature-content-area {
+                padding: 16px;
+            }
+            
+            /* Page header - bigger for feature prominence */
+            .page-header {
+                padding: 24px 20px !important;
+                margin: 0 0 16px 0 !important;
+                border-radius: 12px;
+            }
+            
+            .page-title { font-size: 1.5rem !important; }
+            
+            /* Learn more button - smaller */
+            .learn-more-btn {
+                padding: 8px 14px !important;
+                font-size: 0.8rem !important;
+                width: auto !important;
+            }
+            
+            .feature-card-footer {
+                flex-direction: row !important;
+                justify-content: space-between;
+                align-items: center;
             }
         }
     </style>
@@ -52,37 +131,37 @@
     <div class="dashboard-layout">
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
-      <div class="sidebar-header">
-        <div class="sidebar-logo">
-          <img src="assets/images/logo.png" alt="Rupiya">
-        </div>
-        <button class="sidebar-toggle" id="sidebarClose">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-          </svg>
-        </button>
-      </div>
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <img src="assets/images/logo.png" alt="Rupiya">
+                </div>
+                <button class="sidebar-toggle" id="sidebarClose">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
 
-      <nav class="sidebar-nav">
-        <!-- Navigation is dynamically generated by sidebar.js -->
-      </nav>
+            <nav class="sidebar-nav">
+                <!-- Navigation is dynamically generated by sidebar.js -->
+            </nav>
 
-      <div class="sidebar-footer">
-        <div class="user-profile" id="userProfile">
-          <div class="user-avatar" id="userAvatar">U</div>
-          <div class="user-info">
-            <div class="user-name" id="userName">Loading...</div>
-            <div class="user-email" id="userEmail">Loading...</div>
-          </div>
-        </div>
-        <button class="btn btn-sm btn-outline w-100 mt-3" id="logoutBtn">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-          </svg>
-          Logout
-        </button>
-      </div>
-    </aside>
+            <div class="sidebar-footer">
+                <div class="user-profile" id="userProfile">
+                    <div class="user-avatar" id="userAvatar">U</div>
+                    <div class="user-info">
+                        <div class="user-name" id="userName">Loading...</div>
+                        <div class="user-email" id="userEmail">Loading...</div>
+                    </div>
+                </div>
+                <button class="btn btn-sm btn-outline w-100 mt-3" id="logoutBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                    </svg>
+                    Logout
+                </button>
+            </div>
+        </aside>
 
         <!-- Sidebar Overlay (Mobile) -->
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
@@ -92,7 +171,7 @@
             <!-- Mobile Header -->
             <div class="mobile-header">
                 <a href="dashboard.html" class="mobile-brand">
-                    <img src="assets/images/logo.png" alt="Rupiya" style="height: 32px; width: auto; max-height: 32px;">
+                    <img src="assets/images/logo.png" alt="Rupiya">
                 </a>
                 <div class="mobile-header-actions">
                     <button class="sidebar-toggle" id="sidebarOpen" aria-label="Open menu">
@@ -102,6 +181,9 @@
                     </button>
                 </div>
             </div>
+            
+            <!-- Feature Content Area -->
+            <div class="feature-content-area">
 
             <!-- Page Header -->
             <div class="page-header">
@@ -143,6 +225,8 @@
                     </div>
                 </div>
             </div>
+            </div>
+            <!-- End Feature Content Area -->
         </main>
     </div>
 
