@@ -3,12 +3,16 @@
  * Allows users to enable/disable features they want to use
  * 
  * Features are organized by category and can be toggled on/off
- * Configuration is stored in Firestore per user
+ * Configuration is stored encrypted in Firestore 'features' collection per user
  */
 
 import { db } from './firebase-config.js';
-import { doc, getDoc, setDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+import { doc, getDoc, setDoc, collection, query, where, getDocs, addDoc, updateDoc, Timestamp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
 import authService from '../services/auth-service.js';
+import encryptionService from '../services/encryption-service.js';
+
+// Collection name for features
+const FEATURES_COLLECTION = 'features';
 
 // Default feature configuration - all features available
 const DEFAULT_FEATURES = {
@@ -146,6 +150,7 @@ class FeatureConfigManager {
   constructor() {
     this.userFeatures = null;
     this.initialized = false;
+    this.featureDocId = null; // Store the document ID for updates
   }
 
   /**
@@ -156,6 +161,8 @@ class FeatureConfigManager {
 
     try {
       const user = authService.getCurrentUser();
+      console.log('[FeatureConfig] Initializing for user:', user?.uid || 'no user');
+      
       if (!user) {
         // Use defaults for non-authenticated users
         this.userFeatures = JSON.parse(JSON.stringify(DEFAULT_FEATURES));
@@ -163,25 +170,66 @@ class FeatureConfigManager {
         return;
       }
 
-      // Load user's feature config from Firestore
-      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      // Load user's feature config from Firestore 'features' collection
+      const featuresQuery = query(
+        collection(db, FEATURES_COLLECTION),
+        where('userId', '==', user.uid)
+      );
       
-      if (userDoc.exists() && userDoc.data().features) {
-        // Merge saved config with defaults (in case new features were added)
-        this.userFeatures = {
-          ...DEFAULT_FEATURES,
-          ...userDoc.data().features
-        };
+      const querySnapshot = await getDocs(featuresQuery);
+      
+      if (!querySnapshot.empty) {
+        // User has existing feature config
+        const docSnap = querySnapshot.docs[0];
+        this.featureDocId = docSnap.id;
+        let savedData = docSnap.data();
+        
+        console.log('[FeatureConfig] Found existing feature doc:', this.featureDocId);
+        
+        // Decrypt the data
+        const decryptedData = await encryptionService.decryptObject(savedData, FEATURES_COLLECTION);
+        console.log('[FeatureConfig] Decrypted data:', decryptedData);
+        
+        if (decryptedData && decryptedData.features) {
+          // Parse features if it's a string (from encryption)
+          let savedFeatures = decryptedData.features;
+          if (typeof savedFeatures === 'string') {
+            try {
+              savedFeatures = JSON.parse(savedFeatures);
+            } catch (e) {
+              console.warn('[FeatureConfig] Could not parse features string:', e);
+              savedFeatures = {};
+            }
+          }
+          
+          // Deep merge: start with defaults, then apply saved enabled states
+          this.userFeatures = JSON.parse(JSON.stringify(DEFAULT_FEATURES));
+          Object.keys(savedFeatures).forEach(key => {
+            if (this.userFeatures[key] && savedFeatures[key] !== undefined) {
+              // Handle both object format and boolean format
+              if (typeof savedFeatures[key] === 'object') {
+                this.userFeatures[key].enabled = savedFeatures[key].enabled;
+              } else if (typeof savedFeatures[key] === 'boolean') {
+                this.userFeatures[key].enabled = savedFeatures[key];
+              }
+            }
+          });
+          
+          console.log('[FeatureConfig] Merged features:', this.userFeatures);
+        } else {
+          console.log('[FeatureConfig] No features in decrypted data, using defaults');
+          this.userFeatures = JSON.parse(JSON.stringify(DEFAULT_FEATURES));
+        }
       } else {
-        // First time user - use all defaults
+        // First time user - use all defaults and save
+        console.log('[FeatureConfig] No saved features, creating new document with defaults');
         this.userFeatures = JSON.parse(JSON.stringify(DEFAULT_FEATURES));
-        // Save defaults to Firestore
         await this.saveFeatureConfig();
       }
 
       this.initialized = true;
     } catch (error) {
-      console.error('Error initializing feature config:', error);
+      console.error('[FeatureConfig] Error initializing feature config:', error);
       this.userFeatures = JSON.parse(JSON.stringify(DEFAULT_FEATURES));
       this.initialized = true;
     }
@@ -261,11 +309,18 @@ class FeatureConfigManager {
   async updateFeatures(updates) {
     if (!this.userFeatures) await this.init();
 
+    console.log('[FeatureConfig] Updating features with:', updates);
+
     Object.entries(updates).forEach(([key, enabled]) => {
-      if (this.userFeatures[key] && !this.userFeatures[key].required) {
-        this.userFeatures[key].enabled = enabled;
+      if (this.userFeatures[key]) {
+        // Allow updating non-required features, or enabling required features
+        if (!this.userFeatures[key].required || enabled) {
+          this.userFeatures[key].enabled = enabled;
+        }
       }
     });
+
+    console.log('[FeatureConfig] Features after update:', this.userFeatures);
 
     await this.saveFeatureConfig();
     
@@ -285,21 +340,50 @@ class FeatureConfigManager {
   }
 
   /**
-   * Save feature config to Firestore
+   * Save feature config to Firestore with encryption
    */
   async saveFeatureConfig() {
     try {
       const user = authService.getCurrentUser();
-      if (!user) return;
+      if (!user) {
+        console.warn('[FeatureConfig] No user found, cannot save features');
+        return;
+      }
 
-      const userRef = doc(db, 'users', user.uid);
-      // Use setDoc with merge to create or update the document
-      await setDoc(userRef, {
-        features: this.userFeatures,
-        featureConfigUpdatedAt: new Date()
-      }, { merge: true });
+      console.log('[FeatureConfig] Saving features for user:', user.uid);
+
+      // Prepare data for encryption
+      const dataToSave = {
+        features: JSON.stringify(this.userFeatures),
+        userId: user.uid,
+        updatedAt: Timestamp.now()
+      };
+
+      // Encrypt the data
+      const encryptedData = await encryptionService.encryptObject(dataToSave, FEATURES_COLLECTION);
+      console.log('[FeatureConfig] Encrypted data prepared');
+
+      if (this.featureDocId) {
+        // Update existing document
+        const docRef = doc(db, FEATURES_COLLECTION, this.featureDocId);
+        await updateDoc(docRef, {
+          ...encryptedData,
+          updatedAt: Timestamp.now()
+        });
+        console.log('[FeatureConfig] Updated existing document:', this.featureDocId);
+      } else {
+        // Create new document
+        const docRef = await addDoc(collection(db, FEATURES_COLLECTION), {
+          ...encryptedData,
+          createdAt: Timestamp.now()
+        });
+        this.featureDocId = docRef.id;
+        console.log('[FeatureConfig] Created new document:', this.featureDocId);
+      }
+      
+      console.log('[FeatureConfig] Features saved successfully');
     } catch (error) {
-      console.error('Error saving feature config:', error);
+      console.error('[FeatureConfig] Error saving feature config:', error);
       throw error;
     }
   }
