@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="assets/js/config/env-local.js"></script>
+
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Primary Meta Tags -->
+  <title>Recurring Transactions - Subscription & SIP Tracker | Rupiya</title>
+  <meta name="title" content="Recurring Transactions - Subscription & SIP Tracker | Rupiya">
+  <meta name="description" content="Track recurring expenses, subscriptions, SIPs, and automated investments. Never miss a payment or investment. Manage all recurring transactions in one place.">
+  <meta name="keywords" content="recurring expense tracker, subscription tracker, SIP tracker, recurring payment tracker, subscription management app India, automated investment tracker">
+  <meta name="author" content="Rupiya">
+  <meta name="robots" content="index, follow">
+  <meta name="language" content="English">
+  <meta name="theme-color" content="#4A90E2">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://rupiya.online/recurring.html">
+  <meta property="og:title" content="Recurring Transactions - Track Subscriptions & SIPs">
+  <meta property="og:description" content="Track recurring expenses, subscriptions, and automated investments">
+  <meta property="og:image" content="https://rupiya.online/assets/images/og-image.png">
+  <meta property="og:site_name" content="Rupiya">
+  <meta property="og:locale" content="en_IN">
+  
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://rupiya.online/recurring.html">
+  <meta property="twitter:title" content="Recurring Transactions - Track Subscriptions & SIPs">
+  <meta property="twitter:description" content="Track recurring expenses, subscriptions, and automated investments">
+  <meta property="twitter:image" content="https://rupiya.online/assets/images/og-image.png">
+  <meta property="twitter:site" content="@RupiyaApp">
+  
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://rupiya.online/recurring.html">
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="assets/images/logo.png" type="image/png">
+  <link rel="apple-touch-icon" href="/android-chrome-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="assets/css/common.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/dark-mode.css">
+  <link rel="stylesheet" href="assets/css/dashboard.css">
+  <link rel="stylesheet" href="assets/css/recurring.css">
+  <link rel="stylesheet" href="assets/css/enhancements.css">
+  <link rel="stylesheet" href="assets/css/animations.css">
+  <link rel="stylesheet" href="assets/css/mobile-enhancements.css">
+  <link rel="stylesheet" href="assets/css/family.css">
+  <link rel="stylesheet" href="assets/css/ux-enhancements.css">
+  <link rel="stylesheet" href="assets/css/sidebar.css">
+  <link rel="stylesheet" href="assets/css/setup-wizard.css">
+  <link rel="stylesheet" href="assets/css/layout-fixes.css">
+  <link rel="stylesheet" href="assets/css/form-mobile-optimization.css">
+  <link rel="stylesheet" href="assets/css/button-fix.css">
+  
+  <!-- Auth Guard - Must be loaded early to prevent flash of protected content -->
+  <script src="assets/js/utils/auth-guard.js"></script>
+  <!-- Button Reset Fix - Prevents buttons from getting stuck -->
+  <script src="assets/js/utils/button-reset-fix.js"></script>
+  <!-- Structured Data - WebPage -->
+  <script type="application/ld+json">
+  {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Recurring Transactions - Subscription & SIP Tracker | Rupiya",
+  "description": "Track recurring expenses, subscriptions, SIPs, and automated investments. Never miss a payment or investment. Manage all recurring transactions in one place.",
+  "url": "https://rupiya.online/recurring.html",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Rupiya",
+    "url": "https://rupiya.online"
+  }
+}
+  </script>
+  <!-- Structured Data - Breadcrumb -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://rupiya.online/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Recurring Transactions",
+        "item": "https://rupiya.online/recurring.html"
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <div class="dashboard-layout">
+        <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <img src="assets/images/logo.png" alt="Rupiya">
+        </div>
+        <button class="sidebar-toggle" id="sidebarClose">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <nav class="sidebar-nav">
+        <!-- Navigation is dynamically generated by sidebar.js -->
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-profile" id="userProfile">
+          <div class="user-avatar" id="userAvatar">U</div>
+          <div class="user-info">
+            <div class="user-name" id="userName">Loading...</div>
+            <div class="user-email" id="userEmail">Loading...</div>
+          </div>
+        </div>
+        <button class="btn btn-sm btn-outline w-100 mt-3" id="logoutBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+          </svg>
+          Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- Sidebar Overlay (Mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Mobile Header -->
+      <div class="mobile-header">
+        <a href="dashboard.html" class="mobile-brand">
+          <img src="assets/images/logo.png" alt="Rupiya">
+          
+        </a>
+        <div class="mobile-header-actions">
+          <div id="familySwitcherContainer"></div>
+          <button class="sidebar-toggle" id="sidebarOpen">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Page Header -->
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Recurring Transactions</h1>
+          <p class="page-subtitle" id="recurringSubtitle">Manage your recurring expenses and income</p>
+        </div>
+        <div class="page-actions">
+          <!-- Desktop Family Switcher -->
+          <div id="familySwitcherContainerDesktop"></div>
+          <button class="btn btn-outline" id="processNowBtn" title="Process due recurring transactions now">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+            </svg>
+            Process Now
+          </button>
+          <button class="btn btn-primary" id="addRecurringBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Add Recurring
+          </button>
+        </div>
+      </div>
+
+      <!-- Summary Cards -->
+      <div class="recurring-summary" id="recurringSummary">
+        <div class="summary-card">
+          <div class="summary-icon">💸</div>
+          <div class="summary-content">
+            <div class="summary-label">Monthly Expenses</div>
+            <div class="summary-value" id="monthlyExpenses">₹0</div>
+          </div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-icon">💰</div>
+          <div class="summary-content">
+            <div class="summary-label">Monthly Income</div>
+            <div class="summary-value" id="monthlyIncome">₹0</div>
+          </div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-icon">🔄</div>
+          <div class="summary-content">
+            <div class="summary-label">Active Recurring</div>
+            <div class="summary-value" id="activeCount">0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add Recurring Form (Inline) -->
+      <div class="add-recurring-section" id="addRecurringSection">
+        <div class="add-recurring-header">
+          <h2 class="add-recurring-title" id="formTitle">Add Recurring Transaction</h2>
+          <button class="modal-close" id="closeFormBtn">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <form id="recurringForm">
+          <div class="form-grid">
+            <!-- Row 1: Type and Amount -->
+            <div class="form-group">
+              <label for="type">Type *</label>
+              <select id="type" required>
+                <option value="">Select type</option>
+                <option value="expense">Expense</option>
+                <option value="income">Income</option>
+              </select>
+              <span class="error-message" id="typeError"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="amount">Amount *</label>
+              <input type="number" id="amount" step="0.01" min="0" required placeholder="0.00">
+              <span class="error-message" id="amountError"></span>
+            </div>
+
+            <!-- Row 2: Description (full width) -->
+            <div class="form-group form-group-full">
+              <label for="description">Description *</label>
+              <input type="text" id="description" required maxlength="200" placeholder="e.g., Netflix Subscription">
+              <span class="error-message" id="descriptionError"></span>
+            </div>
+
+            <!-- Row 3: Category and Frequency -->
+            <div class="form-group">
+              <label for="category">Category *</label>
+              <select id="category" required>
+                <option value="">Select category</option>
+                <option value="Rent">Rent</option>
+                <option value="Utilities">Utilities</option>
+                <option value="Subscriptions">Subscriptions</option>
+                <option value="Insurance">Insurance</option>
+                <option value="Loan Payment">Loan Payment</option>
+                <option value="Salary">Salary</option>
+                <option value="Investment Returns">Investment Returns</option>
+                <option value="Other">Other</option>
+              </select>
+              <span class="error-message" id="categoryError"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="frequency">Frequency *</label>
+              <select id="frequency" required>
+                <option value="">Select frequency</option>
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="monthly">Monthly</option>
+                <option value="quarterly">Quarterly</option>
+                <option value="yearly">Yearly</option>
+              </select>
+              <span class="error-message" id="frequencyError"></span>
+            </div>
+
+            <!-- Row 4: Start Date and End Date -->
+            <div class="form-group">
+              <label for="startDate">Start Date *</label>
+              <input type="date" id="startDate" required>
+              <span class="error-message" id="startDateError"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="endDate">End Date (Optional)</label>
+              <input type="date" id="endDate">
+              <span class="error-message" id="endDateError"></span>
+            </div>
+
+            <!-- Row 5: Status and Payment Method -->
+            <div class="form-group">
+              <label for="status">Status *</label>
+              <select id="status" required>
+                <option value="active">Active</option>
+                <option value="paused">Paused</option>
+              </select>
+              <span class="error-message" id="statusError"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="paymentMethod">Payment Method</label>
+              <select id="paymentMethod">
+                <option value="cash">💵 Cash</option>
+                <option value="card">💳 Card</option>
+                <option value="upi">📱 UPI</option>
+                <option value="bank">🏦 Bank Transfer</option>
+                <option value="wallet">👛 Digital Wallet</option>
+              </select>
+              <span class="error-message" id="paymentMethodError"></span>
+            </div>
+
+            <!-- Row 6: Specific Payment Method (conditional, full width) -->
+            <div class="form-group form-group-full" id="specificPaymentMethodGroup" style="display: none;">
+              <label for="specificPaymentMethod">Select Account</label>
+              <select id="specificPaymentMethod">
+                <option value="">Select...</option>
+              </select>
+              <span class="helper-text">Choose from your saved payment methods</span>
+            </div>
+
+            <!-- Row 7: Notes (full width) -->
+            <div class="form-group form-group-full">
+              <label for="notes">Notes</label>
+              <textarea id="notes" rows="3" maxlength="500" placeholder="Add notes..."></textarea>
+              <span class="error-message" id="notesError"></span>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-outline" id="cancelFormBtn">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="saveFormBtn">Save Recurring</button>
+          </div>
+        </form>
+      </div>
+
+
+      <!-- Recurring List -->
+      <div class="recurring-container">
+        <div id="recurringList" class="recurring-grid">
+          <!-- Recurring cards will be loaded here -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="empty-state" style="display: none;">
+          <div class="empty-state-icon">🔄</div>
+          <h3 class="empty-state-title">No recurring transactions yet</h3>
+          <p class="empty-state-text">Set up recurring transactions to automate your expense and income tracking.</p>
+          <button class="btn btn-primary" onclick="document.getElementById('addRecurringBtn').click()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Add Your First Recurring
+          </button>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="loading-state">
+          <div class="spinner-lg"></div>
+          <p>Loading recurring transactions...</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal-overlay" id="deleteModal">
+    <div class="modal-container modal-sm">
+      <div class="modal-header">
+        <h2 class="modal-title">Delete Recurring Transaction</h2>
+        <button class="modal-close" id="closeDeleteModalBtn">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p>Are you sure you want to delete this recurring transaction?</p>
+        <div class="delete-info">
+          <strong id="deleteRecurringDescription"></strong>
+          <span id="deleteRecurringAmount"></span>
+        </div>
+        <p class="text-danger">This action cannot be undone.</p>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" id="cancelDeleteBtn">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Family Modals -->
+  <script>
+    fetch('family-modals.html')
+      .then(response => response.text())
+      .then(html => {
+        const div = document.createElement('div');
+        div.innerHTML = html;
+        document.body.appendChild(div);
+      });
+  </script>
+
+  <!-- Scripts -->
+  <script type="module" src="assets/js/utils/ux-enhancements.js"></script>
+  <script type="module" src="assets/js/components/sidebar.js"></script>
+  <script type="module" src="assets/js/pages/recurring.js"></script>
+  <script type="module" src="assets/js/pwa-setup.js"></script>
+</body>
+</html>

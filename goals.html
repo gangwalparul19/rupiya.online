@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="assets/js/config/env-local.js"></script>
+
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Primary Meta Tags -->
+  <title>Financial Goals Tracker - Investment & Savings Goals | Rupiya</title>
+  <meta name="title" content="Financial Goals Tracker - Investment & Savings Goals | Rupiya">
+  <meta name="description" content="Set and track financial goals, investment targets, retirement planning, wealth milestones. Goal-based investing made easy. Track progress towards financial freedom.">
+  <meta name="keywords" content="financial goals tracker, investment goals, savings goals tracker, retirement planning app, wealth goals, goal-based investing, financial targets tracker, investment milestone tracker">
+  <meta name="author" content="Rupiya">
+  <meta name="robots" content="index, follow">
+  <meta name="language" content="English">
+  <meta name="theme-color" content="#4A90E2">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://rupiya.online/goals.html">
+  <meta property="og:title" content="Financial Goals - Achieve Investment Targets">
+  <meta property="og:description" content="Set and track investment goals, savings targets, and wealth milestones">
+  <meta property="og:image" content="https://rupiya.online/assets/images/og-image.png">
+  <meta property="og:site_name" content="Rupiya">
+  <meta property="og:locale" content="en_IN">
+  
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://rupiya.online/goals.html">
+  <meta property="twitter:title" content="Financial Goals - Achieve Investment Targets">
+  <meta property="twitter:description" content="Set and track investment goals, savings targets, and wealth milestones">
+  <meta property="twitter:image" content="https://rupiya.online/assets/images/og-image.png">
+  <meta property="twitter:site" content="@RupiyaApp">
+  
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://rupiya.online/goals.html">
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="assets/images/logo.png" type="image/png">
+  <link rel="apple-touch-icon" href="/android-chrome-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="assets/css/common.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/dark-mode.css">
+  <link rel="stylesheet" href="assets/css/dashboard.css">
+  <link rel="stylesheet" href="assets/css/goals.css">
+  <link rel="stylesheet" href="assets/css/enhancements.css">
+  <link rel="stylesheet" href="assets/css/animations.css">
+  <link rel="stylesheet" href="assets/css/mobile-enhancements.css">
+  <link rel="stylesheet" href="assets/css/family.css">
+  <link rel="stylesheet" href="assets/css/ux-enhancements.css">
+  <link rel="stylesheet" href="assets/css/sidebar.css">
+  <link rel="stylesheet" href="assets/css/setup-wizard.css">
+  <link rel="stylesheet" href="assets/css/layout-fixes.css">
+  <link rel="stylesheet" href="assets/css/form-mobile-optimization.css">
+  <link rel="stylesheet" href="assets/css/button-fix.css">
+  
+  <!-- Auth Guard - Must be loaded early to prevent flash of protected content -->
+  <script src="assets/js/utils/auth-guard.js"></script>
+  <!-- Button Reset Fix - Prevents buttons from getting stuck -->
+  <script src="assets/js/utils/button-reset-fix.js"></script>
+  <!-- Structured Data - WebPage -->
+  <script type="application/ld+json">
+  {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Financial Goals Tracker - Investment & Savings Goals | Rupiya",
+  "description": "Set and track financial goals, investment targets, retirement planning, wealth milestones. Goal-based investing made easy. Track progress towards financial freedom.",
+  "url": "https://rupiya.online/goals.html",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Rupiya",
+    "url": "https://rupiya.online"
+  }
+}
+  </script>
+  <!-- Structured Data - Breadcrumb -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://rupiya.online/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Financial Goals Tracker",
+        "item": "https://rupiya.online/goals.html"
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <div class="dashboard-layout">
+        <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <img src="assets/images/logo.png" alt="Rupiya">
+        </div>
+        <button class="sidebar-toggle" id="sidebarClose">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <nav class="sidebar-nav">
+        <!-- Navigation is dynamically generated by sidebar.js -->
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-profile" id="userProfile">
+          <div class="user-avatar" id="userAvatar">U</div>
+          <div class="user-info">
+            <div class="user-name" id="userName">Loading...</div>
+            <div class="user-email" id="userEmail">Loading...</div>
+          </div>
+        </div>
+        <button class="btn btn-sm btn-outline w-100 mt-3" id="logoutBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+          </svg>
+          Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- Sidebar Overlay (Mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Mobile Header -->
+      <div class="mobile-header">
+        <a href="dashboard.html" class="mobile-brand">
+          <img src="assets/images/logo.png" alt="Rupiya">
+          
+        </a>
+        <div class="mobile-header-actions">
+          <div id="familySwitcherContainer"></div>
+          <button class="sidebar-toggle" id="sidebarOpen">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Page Header -->
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Financial Goals</h1>
+          <p class="page-subtitle" id="goalsSubtitle">Set and track your financial goals</p>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-primary" id="addGoalBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Add Goal
+          </button>
+        </div>
+      </div>
+
+      <!-- Goals Summary Cards -->
+      <div class="goals-summary" id="goalsSummary">
+        <div class="summary-card">
+          <div class="summary-icon">🎯</div>
+          <div class="summary-content">
+            <div class="summary-label">Active Goals</div>
+            <div class="summary-value" id="activeGoals">0</div>
+          </div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-icon">💰</div>
+          <div class="summary-content">
+            <div class="summary-label">Total Target</div>
+            <div class="summary-value" id="totalTarget">₹0</div>
+          </div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-icon">✅</div>
+          <div class="summary-content">
+            <div class="summary-label">Total Saved</div>
+            <div class="summary-value" id="totalSaved">₹0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add Goal Form (Inline) -->
+      <div class="add-goal-section" id="addGoalSection">
+        <div class="add-goal-header">
+          <h2 class="add-goal-title" id="formTitle">Add Goal</h2>
+          <button class="modal-close" id="closeFormBtn">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <form id="goalForm">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="name">Goal Name *</label>
+              <input type="text" id="name" required maxlength="100" placeholder="e.g., Emergency Fund">
+              <span class="error-message" id="nameError"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="targetAmount">Target Amount *</label>
+              <input type="number" id="targetAmount" step="0.01" min="0" required placeholder="0.00">
+              <span class="error-message" id="targetAmountError"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="currentAmount">Current Amount *</label>
+              <input type="number" id="currentAmount" step="0.01" min="0" value="0" required placeholder="0.00">
+              <span class="error-message" id="currentAmountError"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="targetDate">Target Date *</label>
+              <input type="date" id="targetDate" required>
+              <span class="error-message" id="targetDateError"></span>
+            </div>
+
+            <div class="form-group form-group-full">
+              <label for="description">Description</label>
+              <textarea id="description" rows="3" maxlength="500" placeholder="Describe your goal..."></textarea>
+              <span class="error-message" id="descriptionError"></span>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-outline" id="cancelFormBtn">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="saveFormBtn">Save Goal</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Goals List -->
+      <div class="goals-container">
+        <div id="goalsList" class="goals-grid">
+          <!-- Goal cards will be loaded here -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="empty-state" style="display: none;">
+          <div class="empty-state-icon">🎯</div>
+          <h3 class="empty-state-title">No goals yet</h3>
+          <p class="empty-state-text">Start achieving your dreams by setting your first financial goal.</p>
+          <button class="btn btn-primary" onclick="document.getElementById('addGoalBtn').click()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Set Your First Goal
+          </button>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="loading-state">
+          <div class="spinner-lg"></div>
+          <p>Loading goals...</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Add Contribution Modal -->
+  <div class="modal-overlay" id="contributionModal">
+    <div class="modal-container modal-sm">
+      <div class="modal-header">
+        <h2 class="modal-title">Add Contribution</h2>
+        <button class="modal-close" id="closeContributionModalBtn">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <form id="contributionForm" class="modal-body">
+        <div class="contribution-info">
+          <strong id="contributionGoalName"></strong>
+          <span id="contributionGoalProgress"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="contributionAmount">Amount *</label>
+          <input type="number" id="contributionAmount" step="0.01" min="0" required placeholder="0.00">
+          <span class="error-message" id="contributionAmountError"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="contributionDate">Date *</label>
+          <input type="date" id="contributionDate" required>
+          <span class="error-message" id="contributionDateError"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="contributionNote">Note</label>
+          <input type="text" id="contributionNote" maxlength="200" placeholder="Optional note">
+        </div>
+      </form>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" id="cancelContributionBtn">Cancel</button>
+        <button type="submit" form="contributionForm" class="btn btn-primary" id="saveContributionBtn">Add Contribution</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal-overlay" id="deleteModal">
+    <div class="modal-container modal-sm">
+      <div class="modal-header">
+        <h2 class="modal-title">Delete Goal</h2>
+        <button class="modal-close" id="closeDeleteModalBtn">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p>Are you sure you want to delete this goal?</p>
+        <div class="delete-info">
+          <strong id="deleteGoalName"></strong>
+          <span id="deleteGoalTarget"></span>
+        </div>
+        <p class="text-danger">This action cannot be undone.</p>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" id="cancelDeleteBtn">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Family Modals -->
+  <script>
+    fetch('family-modals.html')
+      .then(response => response.text())
+      .then(html => {
+        const div = document.createElement('div');
+        div.innerHTML = html;
+        document.body.appendChild(div);
+      });
+  </script>
+
+  <!-- Scripts -->
+  <script type="module" src="assets/js/utils/ux-enhancements.js"></script>
+  <script type="module" src="assets/js/components/sidebar.js"></script>
+  <script type="module" src="assets/js/pages/goals.js"></script>
+  <script type="module" src="assets/js/pwa-setup.js"></script>
+</body>
+</html>

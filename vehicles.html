@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="assets/js/config/env-local.js"></script>
+
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Primary Meta Tags -->
+  <title>Vehicle Expense Tracker - Fuel, Service, Mileage Tracking | Rupiya</title>
+  <meta name="title" content="Vehicle Expense Tracker - Fuel, Service, Mileage Tracking | Rupiya">
+  <meta name="description" content="Track vehicle expenses, fuel costs, service records, mileage, and maintenance. Complete vehicle expense management for car and bike owners in India.">
+  <meta name="keywords" content="vehicle expense tracker, fuel tracker, car expense tracker, mileage tracker, vehicle maintenance tracker, auto expense tracker India, bike expense tracker">
+  <meta name="author" content="Rupiya">
+  <meta name="robots" content="index, follow">
+  <meta name="language" content="English">
+  <meta name="theme-color" content="#4A90E2">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://rupiya.online/vehicles.html">
+  <meta property="og:title" content="Vehicle Expense Tracker - Track Fuel & Maintenance">
+  <meta property="og:description" content="Track vehicle expenses, fuel costs, service records, and mileage">
+  <meta property="og:image" content="https://rupiya.online/assets/images/og-image.png">
+  <meta property="og:site_name" content="Rupiya">
+  <meta property="og:locale" content="en_IN">
+  
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://rupiya.online/vehicles.html">
+  <meta property="twitter:title" content="Vehicle Expense Tracker - Track Fuel & Maintenance">
+  <meta property="twitter:description" content="Track vehicle expenses, fuel costs, service records, and mileage">
+  <meta property="twitter:image" content="https://rupiya.online/assets/images/og-image.png">
+  <meta property="twitter:site" content="@RupiyaApp">
+  
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://rupiya.online/vehicles.html">
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="assets/images/logo.png" type="image/png">
+  <link rel="apple-touch-icon" href="/android-chrome-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="assets/css/common.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/dark-mode.css">
+  <link rel="stylesheet" href="assets/css/dashboard.css">
+  <link rel="stylesheet" href="assets/css/vehicles.css">
+  <link rel="stylesheet" href="assets/css/enhancements.css">
+  <link rel="stylesheet" href="assets/css/animations.css">
+  <link rel="stylesheet" href="assets/css/mobile-enhancements.css">
+  <link rel="stylesheet" href="assets/css/family.css">
+  <link rel="stylesheet" href="assets/css/ux-enhancements.css">
+  <link rel="stylesheet" href="assets/css/sidebar.css">
+  <link rel="stylesheet" href="assets/css/setup-wizard.css">
+  <link rel="stylesheet" href="assets/css/layout-fixes.css">
+  <link rel="stylesheet" href="assets/css/form-mobile-optimization.css">
+  <link rel="stylesheet" href="assets/css/button-fix.css">
+  
+  <!-- Auth Guard - Must be loaded early to prevent flash of protected content -->
+  <script src="assets/js/utils/auth-guard.js"></script>
+  <!-- Button Reset Fix - Prevents buttons from getting stuck -->
+  <script src="assets/js/utils/button-reset-fix.js"></script>
+  <!-- Structured Data - WebPage -->
+  <script type="application/ld+json">
+  {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Vehicle Expense Tracker - Fuel, Service, Mileage Tracking | Rupiya",
+  "description": "Track vehicle expenses, fuel costs, service records, mileage, and maintenance. Complete vehicle expense management for car and bike owners in India.",
+  "url": "https://rupiya.online/vehicles.html",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Rupiya",
+    "url": "https://rupiya.online"
+  }
+}
+  </script>
+  <!-- Structured Data - Breadcrumb -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://rupiya.online/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Vehicle Expense Tracker",
+        "item": "https://rupiya.online/vehicles.html"
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <div class="dashboard-layout">
+        <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <img src="assets/images/logo.png" alt="Rupiya">
+        </div>
+        <button class="sidebar-toggle" id="sidebarClose">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <nav class="sidebar-nav">
+        <!-- Navigation is dynamically generated by sidebar.js -->
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-profile" id="userProfile">
+          <div class="user-avatar" id="userAvatar">U</div>
+          <div class="user-info">
+            <div class="user-name" id="userName">Loading...</div>
+            <div class="user-email" id="userEmail">Loading...</div>
+          </div>
+        </div>
+        <button class="btn btn-sm btn-outline w-100 mt-3" id="logoutBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+          </svg>
+          Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- Sidebar Overlay (Mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Mobile Header -->
+      <div class="mobile-header">
+        <a href="dashboard.html" class="mobile-brand">
+          <img src="assets/images/logo.png" alt="Rupiya">
+          
+        </a>
+        <div class="mobile-header-actions">
+          <div id="familySwitcherContainer"></div>
+          <button class="sidebar-toggle" id="sidebarOpen">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Page Header -->
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Vehicles</h1>
+          <p class="page-subtitle">Manage your vehicles and track maintenance</p>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-primary" id="addVehicleBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Add Vehicle
+          </button>
+        </div>
+      </div>
+
+      <!-- Vehicles Summary Cards -->
+      <div class="vehicles-summary" id="vehiclesSummary">
+        <div class="summary-card">
+          <div class="summary-icon">🚗</div>
+          <div class="summary-content">
+            <div class="summary-label">Total Vehicles</div>
+            <div class="summary-value" id="totalVehicles">0</div>
+          </div>
+        </div>
+        <div class="summary-card card-expense">
+          <div class="summary-icon">💸</div>
+          <div class="summary-content">
+            <div class="summary-label">Total Expenses</div>
+            <div class="summary-value" id="totalVehicleExpenses">₹0</div>
+          </div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-icon">📈</div>
+          <div class="summary-content">
+            <div class="summary-label">Avg Mileage</div>
+            <div class="summary-value" id="avgMileage">-- km/l</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add Vehicle Form (Inline) -->
+      <div class="add-vehicle-section" id="addVehicleSection">
+        <div class="add-vehicle-header">
+          <h2 class="add-vehicle-title" id="formTitle">Add Vehicle</h2>
+          <button class="modal-close" id="closeFormBtn">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <form id="vehicleForm">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="name">Vehicle Name *</label>
+              <input type="text" id="name" required maxlength="100" placeholder="e.g., My Honda Civic">
+              <span class="error-message" id="nameError"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="type">Vehicle Type *</label>
+              <select id="type" required>
+                <option value="">Select type</option>
+                <option value="Car">Car</option>
+                <option value="Motorcycle">Motorcycle</option>
+                <option value="Truck">Truck</option>
+                <option value="SUV">SUV</option>
+                <option value="Van">Van</option>
+                <option value="Scooter">Scooter</option>
+                <option value="Other">Other</option>
+              </select>
+              <span class="error-message" id="typeError"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="registrationNumber">Registration Number</label>
+              <input type="text" id="registrationNumber" maxlength="20" placeholder="e.g., ABC-1234">
+              <span class="error-message" id="registrationNumberError"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="currentMileage">Current Odometer Reading (km) *</label>
+              <input type="number" id="currentMileage" step="0.01" min="0" required placeholder="0">
+              <span class="error-message" id="currentMileageError"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="fuelType">Fuel Type *</label>
+              <select id="fuelType" required>
+                <option value="">Select fuel type</option>
+                <option value="Petrol">Petrol</option>
+                <option value="Diesel">Diesel</option>
+                <option value="Electric">Electric</option>
+                <option value="Hybrid">Hybrid</option>
+                <option value="CNG">CNG</option>
+                <option value="LPG">LPG</option>
+              </select>
+              <span class="error-message" id="fuelTypeError"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="insuranceExpiry">Insurance Expiry Date</label>
+              <input type="date" id="insuranceExpiry">
+              <span class="error-message" id="insuranceExpiryError"></span>
+            </div>
+
+            <div class="form-group form-group-full">
+              <label for="notes">Notes</label>
+              <textarea id="notes" rows="3" maxlength="500" placeholder="Add any additional notes about this vehicle..."></textarea>
+              <span class="error-message" id="notesError"></span>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-outline" id="cancelFormBtn">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="saveFormBtn">Save Vehicle</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Vehicles List -->
+      <div class="vehicles-container">
+        <div id="vehiclesList" class="vehicles-grid">
+          <!-- Vehicle cards will be loaded here -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="empty-state" style="display: none;">
+          <div class="empty-state-icon">🚗</div>
+          <h3 class="empty-state-title">No vehicles yet</h3>
+          <p class="empty-state-text">Start tracking your vehicles by adding your first one.</p>
+          <button class="btn btn-primary" onclick="document.getElementById('addVehicleBtn').click()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Add Your First Vehicle
+          </button>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="loading-state">
+          <div class="spinner-lg"></div>
+          <p>Loading vehicles...</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal-overlay" id="deleteModal">
+    <div class="modal-container modal-sm">
+      <div class="modal-header">
+        <h2 class="modal-title">Delete Vehicle</h2>
+        <button class="modal-close" id="closeDeleteModalBtn">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p>Are you sure you want to delete this vehicle?</p>
+        <div class="delete-info">
+          <strong id="deleteVehicleName"></strong>
+          <span id="deleteVehicleDetails"></span>
+        </div>
+        <p class="text-danger">This action cannot be undone.</p>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" id="cancelDeleteBtn">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fuel Log Modal -->
+  <div class="modal-overlay" id="fuelLogModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h2 class="modal-title">⛽ Add Fuel Entry</h2>
+        <button class="modal-close" id="closeFuelLogModalBtn">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p class="fuel-log-vehicle-name" id="fuelLogVehicleName"></p>
+        <form id="fuelLogForm">
+          <input type="hidden" id="fuelLogVehicleId">
+          
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="fuelDate">Date *</label>
+              <input type="date" id="fuelDate" required>
+            </div>
+
+            <div class="form-group">
+              <label for="odometerReading">Odometer Reading (km) *</label>
+              <input type="number" id="odometerReading" step="0.1" min="0" required placeholder="Current odometer">
+              <small class="form-hint">Enter current odometer reading</small>
+            </div>
+
+            <div class="form-group">
+              <label for="fuelQuantity">Fuel Quantity (liters) *</label>
+              <input type="number" id="fuelQuantity" step="0.01" min="0" required placeholder="e.g., 25.5">
+            </div>
+
+            <div class="form-group">
+              <label for="fuelPrice">Price per Liter (₹) *</label>
+              <input type="number" id="fuelPrice" step="0.01" min="0" required placeholder="e.g., 102.50">
+            </div>
+
+            <div class="form-group">
+              <label for="totalCost">Total Cost (₹)</label>
+              <input type="number" id="totalCost" step="0.01" min="0" readonly placeholder="Auto-calculated">
+            </div>
+
+            <div class="form-group">
+              <label for="fuelStation">Fuel Station</label>
+              <input type="text" id="fuelStation" maxlength="100" placeholder="e.g., HP Petrol Pump">
+            </div>
+
+            <div class="form-group">
+              <label>
+                <input type="checkbox" id="fullTank"> Full Tank Fill
+              </label>
+              <small class="form-hint">Check if tank was filled completely (required for accurate mileage)</small>
+            </div>
+
+            <div class="form-group form-group-full">
+              <label for="fuelNotes">Notes</label>
+              <textarea id="fuelNotes" rows="2" maxlength="200" placeholder="Any additional notes..."></textarea>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" id="cancelFuelLogBtn">Cancel</button>
+        <button type="button" class="btn btn-primary" id="saveFuelLogBtn">Save Entry</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mileage History Modal -->
+  <div class="modal-overlay" id="mileageHistoryModal">
+    <div class="modal-container modal-lg">
+      <div class="modal-header">
+        <h2 class="modal-title">📊 Mileage History</h2>
+        <button class="modal-close" id="closeMileageHistoryBtn">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p class="mileage-vehicle-name" id="mileageVehicleName"></p>
+        
+        <div class="mileage-summary-cards">
+          <div class="mileage-stat-card">
+            <div class="mileage-stat-icon">⛽</div>
+            <div class="mileage-stat-value" id="vehicleAvgMileage">-- km/l</div>
+            <div class="mileage-stat-label">Avg Mileage</div>
+          </div>
+          <div class="mileage-stat-card">
+            <div class="mileage-stat-icon">🛣️</div>
+            <div class="mileage-stat-value" id="vehicleTotalDistance">0 km</div>
+            <div class="mileage-stat-label">Total Distance</div>
+          </div>
+          <div class="mileage-stat-card">
+            <div class="mileage-stat-icon">💰</div>
+            <div class="mileage-stat-value" id="vehicleTotalFuelCost">₹0</div>
+            <div class="mileage-stat-label">Total Fuel Cost</div>
+          </div>
+          <div class="mileage-stat-card">
+            <div class="mileage-stat-icon">📈</div>
+            <div class="mileage-stat-value" id="vehicleCostPerKm">₹0/km</div>
+            <div class="mileage-stat-label">Cost per km</div>
+          </div>
+        </div>
+
+        <div class="fuel-log-list" id="fuelLogList">
+          <div class="loading-state">
+            <div class="spinner"></div>
+            <p>Loading fuel logs...</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" id="closeMileageHistoryFooterBtn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Maintenance Modal -->
+  <div class="modal-overlay" id="maintenanceModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h2 class="modal-title">🔧 Add Maintenance Expense</h2>
+        <button class="modal-close" id="closeMaintenanceModalBtn">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p class="modal-vehicle-name" id="maintenanceVehicleName"></p>
+        <form id="maintenanceForm">
+          <input type="hidden" id="maintenanceVehicleId">
+          
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="maintenanceDate">Date *</label>
+              <input type="date" id="maintenanceDate" required>
+            </div>
+
+            <div class="form-group">
+              <label for="maintenanceType">Maintenance Type *</label>
+              <select id="maintenanceType" required>
+                <option value="">Select type</option>
+                <option value="Oil Change">Oil Change</option>
+                <option value="Tire Replacement">Tire Replacement</option>
+                <option value="Tire Rotation">Tire Rotation</option>
+                <option value="Brake Service">Brake Service</option>
+                <option value="Battery Replacement">Battery Replacement</option>
+                <option value="Air Filter">Air Filter</option>
+                <option value="AC Service">AC Service</option>
+                <option value="Engine Repair">Engine Repair</option>
+                <option value="Body Work">Body Work</option>
+                <option value="Washing/Cleaning">Washing/Cleaning</option>
+                <option value="Insurance">Insurance</option>
+                <option value="Registration/Tax">Registration/Tax</option>
+                <option value="Parking">Parking</option>
+                <option value="Toll">Toll</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="maintenanceAmount">Amount (₹) *</label>
+              <input type="number" id="maintenanceAmount" step="0.01" min="0" required placeholder="e.g., 2500">
+            </div>
+
+            <div class="form-group">
+              <label for="serviceCenter">Service Center</label>
+              <input type="text" id="serviceCenter" maxlength="100" placeholder="e.g., Authorized Service Center">
+            </div>
+
+            <div class="form-group form-group-full">
+              <label for="maintenanceDescription">Description</label>
+              <textarea id="maintenanceDescription" rows="2" maxlength="300" placeholder="Details about the maintenance..."></textarea>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" id="cancelMaintenanceBtn">Cancel</button>
+        <button type="button" class="btn btn-primary" id="saveMaintenanceBtn">Save Expense</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vehicle Income Modal -->
+  <div class="modal-overlay" id="vehicleIncomeModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h2 class="modal-title">💰 Add Vehicle Income</h2>
+        <button class="modal-close" id="closeVehicleIncomeModalBtn">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p class="modal-vehicle-name" id="vehicleIncomeVehicleName"></p>
+        <form id="vehicleIncomeForm">
+          <input type="hidden" id="vehicleIncomeVehicleId">
+          
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="vehicleIncomeDate">Date *</label>
+              <input type="date" id="vehicleIncomeDate" required>
+            </div>
+
+            <div class="form-group">
+              <label for="vehicleIncomeSource">Income Source *</label>
+              <select id="vehicleIncomeSource" required>
+                <option value="">Select source</option>
+                <option value="Rental Income">Rental Income</option>
+                <option value="Ride Sharing">Ride Sharing (Uber/Ola)</option>
+                <option value="Delivery Service">Delivery Service</option>
+                <option value="Commercial Use">Commercial Use</option>
+                <option value="Vehicle Sale">Vehicle Sale</option>
+                <option value="Insurance Claim">Insurance Claim</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="vehicleIncomeAmount">Amount (₹) *</label>
+              <input type="number" id="vehicleIncomeAmount" step="0.01" min="0" required placeholder="e.g., 5000">
+            </div>
+
+            <div class="form-group form-group-full">
+              <label for="vehicleIncomeDescription">Description</label>
+              <textarea id="vehicleIncomeDescription" rows="2" maxlength="300" placeholder="Details about the income..."></textarea>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" id="cancelVehicleIncomeBtn">Cancel</button>
+        <button type="button" class="btn btn-success" id="saveVehicleIncomeBtn">Save Income</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="assets/js/utils/ux-enhancements.js"></script>
+  <script type="module" src="assets/js/components/sidebar.js"></script>
+  <script type="module" src="assets/js/pages/vehicles.js"></script>
+  <script type="module" src="assets/js/pwa-setup.js"></script>
+</body>
+</html>

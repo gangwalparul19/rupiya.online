@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="assets/js/config/env-local.js"></script>
+
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Primary Meta Tags -->
+  <title>Investment Portfolio Tracker - Stocks, Mutual Funds, Crypto, Gold | Rupiya</title>
+  <meta name="title" content="Investment Portfolio Tracker - Stocks, Mutual Funds, Crypto, Gold | Rupiya">
+  <meta name="description" content="Complete investment portfolio management app. Track stocks (NSE/BSE), mutual funds, ETFs, crypto, gold, real estate. Real-time prices, returns calculator, XIRR, portfolio analytics. Best investment tracker India 2026.">
+  <meta name="keywords" content="investment portfolio tracker, stock portfolio app, mutual fund tracker India, crypto portfolio tracker, investment tracker app, portfolio management app, stock market tracker, investment returns calculator, XIRR calculator, portfolio analyzer India">
+  <meta name="author" content="Rupiya">
+  <meta name="robots" content="index, follow">
+  <meta name="language" content="English">
+  <meta name="theme-color" content="#4A90E2">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://rupiya.online/investments.html">
+  <meta property="og:title" content="Investment Portfolio Tracker - Track All Your Investments">
+  <meta property="og:description" content="Track stocks, mutual funds, crypto, gold & more. Real-time portfolio analysis, returns tracking, AI insights.">
+  <meta property="og:image" content="https://rupiya.online/assets/images/og-image.png">
+  <meta property="og:site_name" content="Rupiya">
+  <meta property="og:locale" content="en_IN">
+  
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://rupiya.online/investments.html">
+  <meta property="twitter:title" content="Investment Portfolio Tracker - Track All Your Investments">
+  <meta property="twitter:description" content="Track stocks, mutual funds, crypto, gold & more. Real-time portfolio analysis, returns tracking, AI insights.">
+  <meta property="twitter:image" content="https://rupiya.online/assets/images/og-image.png">
+  <meta property="twitter:site" content="@RupiyaApp">
+  
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://rupiya.online/investments.html">
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="assets/images/logo.png" type="image/png">
+  <link rel="apple-touch-icon" href="/android-chrome-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="assets/css/common.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/dark-mode.css">
+  <link rel="stylesheet" href="assets/css/dashboard.css">
+  <link rel="stylesheet" href="assets/css/investments.css">
+  <link rel="stylesheet" href="assets/css/investments-mobile.css">
+  <link rel="stylesheet" href="assets/css/symbol-search.css">
+  <link rel="stylesheet" href="assets/css/enhancements.css">
+  <link rel="stylesheet" href="assets/css/animations.css">
+  <link rel="stylesheet" href="assets/css/mobile-enhancements.css">
+  <link rel="stylesheet" href="assets/css/family.css">
+  <link rel="stylesheet" href="assets/css/ux-enhancements.css">
+  <link rel="stylesheet" href="assets/css/sidebar.css">
+  <link rel="stylesheet" href="assets/css/setup-wizard.css">
+  <link rel="stylesheet" href="assets/css/layout-fixes.css">
+  <link rel="stylesheet" href="assets/css/form-mobile-optimization.css">
+  <link rel="stylesheet" href="assets/css/button-fix.css">
+  
+  <!-- Auth Guard - Must be loaded early to prevent flash of protected content -->
+  <script src="assets/js/utils/auth-guard.js"></script>
+  <!-- Button Reset Fix - Prevents buttons from getting stuck -->
+  <script src="assets/js/utils/button-reset-fix.js"></script>
+  <!-- Structured Data - Investment App -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Rupiya Investment Tracker",
+    "applicationCategory": "FinanceApplication",
+    "applicationSubCategory": "Investment Portfolio Management",
+    "operatingSystem": "Web, Android, iOS",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "INR"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.9",
+      "ratingCount": "10000",
+      "bestRating": "5",
+      "worstRating": "1"
+    },
+    "description": "Complete investment portfolio management app. Track stocks (NSE/BSE), mutual funds, ETFs, crypto, gold, real estate. Real-time prices, returns calculator, XIRR, portfolio analytics. Best investment tracker India 2026.",
+    "featureList": "Stock Tracking, Mutual Fund Tracking, Crypto Portfolio, Real Estate Investment Tracking, Portfolio Analytics, XIRR Calculator, Returns Analysis, AI Insights",
+    "softwareVersion": "1.0",
+    "author": {
+      "@type": "Organization",
+      "name": "Rupiya"
+    }
+  }
+  </script>
+</head>
+
+<body>
+  <div class="dashboard-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <img src="assets/images/logo.png" alt="Rupiya">
+        </div>
+        <button class="sidebar-toggle" id="sidebarClose">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <nav class="sidebar-nav">
+        <!-- Navigation is dynamically generated by sidebar.js -->
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-profile" id="userProfile">
+          <div class="user-avatar" id="userAvatar">U</div>
+          <div class="user-info">
+            <div class="user-name" id="userName">Loading...</div>
+            <div class="user-email" id="userEmail">Loading...</div>
+          </div>
+        </div>
+        <button class="btn btn-sm btn-outline w-100 mt-3" id="logoutBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- Sidebar Overlay (Mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Mobile Header -->
+      <div class="mobile-header">
+        <a href="dashboard.html" class="mobile-brand">
+          <img src="assets/images/logo.png" alt="Rupiya">
+
+        </a>
+        <div class="mobile-header-actions">
+          <div id="familySwitcherContainer"></div>
+          <button class="sidebar-toggle" id="sidebarOpen">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Page Header -->
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Investments</h1>
+          <p class="page-subtitle" id="investmentsSubtitle">Track your investment portfolio</p>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-primary" id="addInvestmentBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            Add Investment
+          </button>
+        </div>
+      </div>
+
+      <!-- Portfolio Summary Cards -->
+      <div class="portfolio-summary" id="portfolioSummary">
+        <div class="summary-card">
+          <div class="summary-icon">💼</div>
+          <div class="summary-content">
+            <div class="summary-label">Total Invested</div>
+            <div class="summary-value" id="totalInvested">₹0</div>
+          </div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-icon">📈</div>
+          <div class="summary-content">
+            <div class="summary-label">Current Value</div>
+            <div class="summary-value" id="currentValue">₹0</div>
+          </div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-icon">💹</div>
+          <div class="summary-content">
+            <div class="summary-label">Total Returns</div>
+            <div class="summary-value" id="totalReturns">₹0</div>
+            <div class="summary-change" id="returnsPercentage">0%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Portfolio Analytics Toggle -->
+      <div class="analytics-toggle-section">
+        <button class="btn btn-outline analytics-toggle-btn" id="toggleAnalyticsBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+          </svg>
+          <span id="analyticsToggleText">Show Analytics</span>
+        </button>
+      </div>
+
+      <!-- Portfolio Analytics Section (Hidden by default) -->
+      <div class="portfolio-analytics-section" id="portfolioAnalyticsSection" style="display: none;">
+        <div class="analytics-header">
+          <h2>Portfolio Analytics</h2>
+          <button class="btn btn-sm btn-outline" id="refreshAnalyticsBtn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+            </svg>
+            Refresh
+          </button>
+        </div>
+
+        <!-- Analytics Grid -->
+        <div class="analytics-grid">
+          <!-- Performance Metrics -->
+          <div class="analytics-card analytics-card-wide">
+            <h3>Performance Metrics</h3>
+            <div class="performance-metrics">
+              <div class="metric-item">
+                <span class="metric-label">CAGR</span>
+                <span class="metric-value" id="analyticsCAGR">0%</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">XIRR</span>
+                <span class="metric-value" id="analyticsXIRR">0%</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">Absolute Returns</span>
+                <span class="metric-value" id="analyticsAbsoluteReturns">₹0</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">Investment Period</span>
+                <span class="metric-value" id="analyticsInvestmentPeriod">0 years</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Risk Analysis -->
+          <div class="analytics-card">
+            <h3>Risk Analysis</h3>
+            <div class="risk-meter">
+              <div class="risk-score" id="riskScore">0</div>
+              <div class="risk-label" id="riskLabel">N/A</div>
+              <div class="risk-bar">
+                <div class="risk-bar-fill" id="riskBarFill" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Diversification Score -->
+          <div class="analytics-card">
+            <h3>Diversification</h3>
+            <div class="diversification-score">
+              <div class="score-circle" id="diversificationCircle">
+                <span class="score-value" id="diversificationScore">0</span>
+                <span class="score-label">/100</span>
+              </div>
+              <p class="score-description" id="diversificationDescription">Add investments to see score</p>
+            </div>
+          </div>
+
+          <!-- Allocation Chart -->
+          <div class="analytics-card">
+            <h3>Asset Allocation</h3>
+            <div class="allocation-chart" id="allocationChart">
+              <div class="chart-placeholder">Loading...</div>
+            </div>
+            <div class="allocation-legend" id="allocationLegend"></div>
+          </div>
+
+          <!-- Sector Distribution -->
+          <div class="analytics-card">
+            <h3>Sector Distribution</h3>
+            <div class="sector-chart" id="sectorChart">
+              <div class="chart-placeholder">Loading...</div>
+            </div>
+            <div class="sector-legend" id="sectorLegend"></div>
+          </div>
+
+          <!-- Benchmark Comparison -->
+          <div class="analytics-card analytics-card-wide">
+            <h3>Benchmark Comparison</h3>
+            <div class="benchmark-table" id="benchmarkTable">
+              <div class="chart-placeholder">Loading...</div>
+            </div>
+          </div>
+
+          <!-- Top Performers -->
+          <div class="analytics-card">
+            <h3>🏆 Top Performers</h3>
+            <div class="performers-list" id="topPerformersList">
+              <div class="chart-placeholder">Loading...</div>
+            </div>
+          </div>
+
+          <!-- Bottom Performers -->
+          <div class="analytics-card">
+            <h3>📉 Underperformers</h3>
+            <div class="performers-list" id="bottomPerformersList">
+              <div class="chart-placeholder">Loading...</div>
+            </div>
+          </div>
+
+          <!-- Recommendations -->
+          <div class="analytics-card analytics-card-full">
+            <h3>💡 Recommendations</h3>
+            <div class="recommendations-list" id="recommendationsList">
+              <div class="chart-placeholder">Loading...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add Investment Form (Inline) -->
+      <div class="add-investment-section" id="addInvestmentSection">
+        <div class="add-investment-header">
+          <h2 class="add-investment-title" id="formTitle">Add Investment</h2>
+          <button class="modal-close" id="closeFormBtn">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <form id="investmentForm">
+          <div class="form-grid">
+            <!-- Row 1: Investment Name and Type -->
+            <div class="form-group">
+              <label for="name">Investment Name *</label>
+              <input type="text" id="name" required maxlength="100" placeholder="e.g., Apple Stock">
+              <span class="error-message" id="nameError"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="type">Type *</label>
+              <select id="type" required>
+                <option value="">Select type</option>
+                <option value="Stocks">Stocks</option>
+                <option value="Mutual Funds">Mutual Funds</option>
+                <option value="Real Estate">Real Estate</option>
+                <option value="Cryptocurrency">Cryptocurrency</option>
+                <option value="Gold">Gold</option>
+                <option value="Fixed Deposit">Fixed Deposit</option>
+                <option value="Other">Other</option>
+              </select>
+              <span class="error-message" id="typeError"></span>
+            </div>
+
+            <!-- Currency Selector - Hidden, auto-set to INR -->
+            <div class="form-group" style="display: none;">
+              <label for="currency">Currency *</label>
+              <select id="currency">
+                <option value="INR" selected>INR (₹)</option>
+              </select>
+            </div>
+
+            <!-- Row 2: Symbol (with autocomplete) -->
+            <div class="form-group form-group-full">
+              <label for="symbol">Symbol (Yahoo Finance) *</label>
+              <div class="symbol-input-wrapper">
+                <input type="text" id="symbol" class="symbol-input" required maxlength="20"
+                  placeholder="e.g., AAPL, BTC-USD, RELIANCE.NS">
+                <div id="symbolDropdown" class="symbol-dropdown"></div>
+              </div>
+              <small style="color: #666; font-size: 12px; margin-top: 4px; display: block;">
+                Search for supported stocks, crypto, or mutual funds. You can also enter a custom symbol.
+              </small>
+              <span class="error-message" id="symbolError"></span>
+            </div>
+
+            <!-- Row 3: Quantity and Purchase Price -->
+            <div class="form-group">
+              <label for="quantity">Quantity *</label>
+              <input type="number" id="quantity" step="0.01" min="0" required placeholder="0">
+              <span class="error-message" id="quantityError"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="purchasePrice">Purchase Price *</label>
+              <input type="number" id="purchasePrice" step="0.01" min="0" required placeholder="0.00">
+              <span class="error-message" id="purchasePriceError"></span>
+            </div>
+
+            <!-- Row 4: Current Price and Purchase Date -->
+            <div class="form-group">
+              <label for="currentPrice">Current Price *</label>
+              <input type="number" id="currentPrice" step="0.01" min="0" required placeholder="0.00">
+              <small style="color: #666; font-size: 12px; margin-top: 2px; display: block;">
+                Will be auto-filled with live price if symbol is found
+              </small>
+              <span class="error-message" id="currentPriceError"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="purchaseDate">Purchase Date *</label>
+              <input type="date" id="purchaseDate" required>
+              <span class="error-message" id="purchaseDateError"></span>
+            </div>
+
+            <!-- Row 5: Notes (full width) -->
+            <div class="form-group form-group-full">
+              <label for="notes">Notes</label>
+              <textarea id="notes" rows="3" maxlength="500" placeholder="Add notes about this investment..."></textarea>
+              <span class="error-message" id="notesError"></span>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-outline" id="cancelFormBtn">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="saveFormBtn">Save Investment</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Investments Tabs -->
+      <div class="investments-tabs-container">
+        <div class="investments-tabs">
+          <button class="tab-button active" data-tab="all">
+            <span class="tab-icon">📊</span>
+            <span class="tab-label">All</span>
+          </button>
+          <button class="tab-button" data-tab="stocks">
+            <span class="tab-icon">📈</span>
+            <span class="tab-label">Stocks</span>
+          </button>
+          <button class="tab-button" data-tab="mf">
+            <span class="tab-icon">💼</span>
+            <span class="tab-label">MF</span>
+          </button>
+          <button class="tab-button" data-tab="crypto">
+            <span class="tab-icon">₿</span>
+            <span class="tab-label">Crypto</span>
+          </button>
+          <button class="tab-button" data-tab="other">
+            <span class="tab-icon">🏆</span>
+            <span class="tab-label">Other</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Investments List -->
+      <div class="investments-container">
+        <div id="investmentsList" class="investments-grid">
+          <!-- Investment cards will be loaded here -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="empty-state" style="display: none;">
+          <div class="empty-state-icon">📈</div>
+          <h3 class="empty-state-title">No investments yet</h3>
+          <p class="empty-state-text">Start building your portfolio by adding your first investment.</p>
+          <button class="btn btn-primary" onclick="document.getElementById('addInvestmentBtn').click()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            Add Your First Investment
+          </button>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="loading-state">
+          <div class="spinner-lg"></div>
+          <p>Loading investments...</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal-overlay" id="deleteModal">
+    <div class="modal-container modal-sm">
+      <div class="modal-header">
+        <h2 class="modal-title">Delete Investment</h2>
+        <button class="modal-close" id="closeDeleteModalBtn">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p>Are you sure you want to delete this investment?</p>
+        <div class="delete-info">
+          <strong id="deleteInvestmentName"></strong>
+          <span id="deleteInvestmentType"></span>
+        </div>
+        <p class="text-danger">This action cannot be undone.</p>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" id="cancelDeleteBtn">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Family Modals -->
+  <script>
+    fetch('family-modals.html')
+      .then(response => response.text())
+      .then(html => {
+        const div = document.createElement('div');
+        div.innerHTML = html;
+        document.body.appendChild(div);
+      });
+  </script>
+
+  <!-- Scripts -->
+  <script type="module" src="assets/js/utils/ux-enhancements.js"></script>
+  <script type="module" src="assets/js/components/sidebar.js"></script>
+  <script type="module" src="assets/js/pages/investments.js"></script>
+  <script type="module" src="assets/js/pwa-setup.js"></script>
+</body>
+
+</html>

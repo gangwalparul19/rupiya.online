@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="assets/js/config/env-local.js"></script>
+
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Primary Meta Tags -->
+  <title>Financial Notes - Investment Ideas & Money Logs | Rupiya</title>
+  <meta name="title" content="Financial Notes - Investment Ideas & Money Logs | Rupiya">
+  <meta name="description" content="Keep financial notes, investment ideas, money logs, and personal finance observations. Digital notebook for investors.">
+  <meta name="keywords" content="financial notes app, investment notes, money journal, finance notebook, investment ideas tracker">
+  <meta name="author" content="Rupiya">
+  <meta name="robots" content="index, follow">
+  <meta name="language" content="English">
+  <meta name="theme-color" content="#4A90E2">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://rupiya.online/notes.html">
+  <meta property="og:title" content="Financial Notes - Track Investment Ideas">
+  <meta property="og:description" content="Keep financial notes and investment observations">
+  <meta property="og:image" content="https://rupiya.online/assets/images/og-image.png">
+  <meta property="og:site_name" content="Rupiya">
+  <meta property="og:locale" content="en_IN">
+  
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://rupiya.online/notes.html">
+  <meta property="twitter:title" content="Financial Notes - Track Investment Ideas">
+  <meta property="twitter:description" content="Keep financial notes and investment observations">
+  <meta property="twitter:image" content="https://rupiya.online/assets/images/og-image.png">
+  <meta property="twitter:site" content="@RupiyaApp">
+  
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://rupiya.online/notes.html">
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="assets/images/logo.png" type="image/png">
+  <link rel="apple-touch-icon" href="/android-chrome-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="assets/css/common.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/dark-mode.css">
+  <link rel="stylesheet" href="assets/css/dashboard.css">
+  <link rel="stylesheet" href="assets/css/notes.css">
+  <link rel="stylesheet" href="assets/css/enhancements.css">
+  <link rel="stylesheet" href="assets/css/animations.css">
+  <link rel="stylesheet" href="assets/css/mobile-enhancements.css">
+  <link rel="stylesheet" href="assets/css/family.css">
+  <link rel="stylesheet" href="assets/css/ux-enhancements.css">
+  <link rel="stylesheet" href="assets/css/sidebar.css">
+  <link rel="stylesheet" href="assets/css/setup-wizard.css">
+  <link rel="stylesheet" href="assets/css/layout-fixes.css">
+  <link rel="stylesheet" href="assets/css/form-mobile-optimization.css">
+  <link rel="stylesheet" href="assets/css/button-fix.css">
+  
+  <!-- Auth Guard - Must be loaded early to prevent flash of protected content -->
+  <script src="assets/js/utils/auth-guard.js"></script>
+  <!-- Button Reset Fix - Prevents buttons from getting stuck -->
+  <script src="assets/js/utils/button-reset-fix.js"></script>
+  <!-- Structured Data - WebPage -->
+  <script type="application/ld+json">
+  {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Financial Notes - Investment Ideas & Money Logs | Rupiya",
+  "description": "Keep financial notes, investment ideas, money logs, and personal finance observations. Digital notebook for investors.",
+  "url": "https://rupiya.online/notes.html",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Rupiya",
+    "url": "https://rupiya.online"
+  }
+}
+  </script>
+  <!-- Structured Data - Breadcrumb -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://rupiya.online/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Financial Notes",
+        "item": "https://rupiya.online/notes.html"
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <div class="dashboard-layout">
+        <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <img src="assets/images/logo.png" alt="Rupiya">
+        </div>
+        <button class="sidebar-toggle" id="sidebarClose">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <nav class="sidebar-nav">
+        <!-- Navigation is dynamically generated by sidebar.js -->
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-profile" id="userProfile">
+          <div class="user-avatar" id="userAvatar">U</div>
+          <div class="user-info">
+            <div class="user-name" id="userName">Loading...</div>
+            <div class="user-email" id="userEmail">Loading...</div>
+          </div>
+        </div>
+        <button class="btn btn-sm btn-outline w-100 mt-3" id="logoutBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+          </svg>
+          Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- Sidebar Overlay (Mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Mobile Header -->
+      <div class="mobile-header">
+        <a href="dashboard.html" class="mobile-brand">
+          <img src="assets/images/logo.png" alt="Rupiya">
+          
+        </a>
+        <div class="mobile-header-actions">
+          <div id="familySwitcherContainer"></div>
+          <button class="sidebar-toggle" id="sidebarOpen">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Page Header -->
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Notes</h1>
+          <p class="page-subtitle">Personal notes and financial logs</p>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-primary" id="addNoteBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Add Note
+          </button>
+        </div>
+      </div>
+
+      <!-- Notes Summary Cards -->
+      <div class="notes-summary" id="notesSummary">
+        <div class="summary-card">
+          <div class="summary-icon">📝</div>
+          <div class="summary-content">
+            <div class="summary-label">Total Notes</div>
+            <div class="summary-value" id="totalNotes">0</div>
+          </div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-icon">📌</div>
+          <div class="summary-content">
+            <div class="summary-label">Pinned Notes</div>
+            <div class="summary-value" id="pinnedNotes">0</div>
+          </div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-icon">🏷️</div>
+          <div class="summary-content">
+            <div class="summary-label">Categories</div>
+            <div class="summary-value" id="totalCategories">0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search and Filter -->
+      <div class="notes-toolbar">
+        <div class="search-box">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+          <input type="text" id="searchInput" placeholder="Search notes...">
+        </div>
+        <select class="form-select" id="categoryFilter">
+          <option value="">All Categories</option>
+          <option value="Personal">Personal</option>
+          <option value="Financial">Financial</option>
+          <option value="Work">Work</option>
+          <option value="Ideas">Ideas</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <!-- Add Note Form (Inline) -->
+      <div class="add-note-section" id="addNoteSection">
+        <div class="add-note-header">
+          <h2 class="add-note-title" id="formTitle">Add Note</h2>
+          <button class="modal-close" id="closeFormBtn">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <form id="noteForm">
+          <div class="form-grid">
+            <div class="form-group form-group-full">
+              <label for="title">Title *</label>
+              <input type="text" id="title" required maxlength="200" placeholder="Note title">
+              <span class="error-message" id="titleError"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="category">Category *</label>
+              <select id="category" required>
+                <option value="">Select category</option>
+                <option value="Personal">Personal</option>
+                <option value="Financial">Financial</option>
+                <option value="Work">Work</option>
+                <option value="Ideas">Ideas</option>
+                <option value="Other">Other</option>
+              </select>
+              <span class="error-message" id="categoryError"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="isPinned">Pin Note</label>
+              <select id="isPinned">
+                <option value="false">No</option>
+                <option value="true">Yes</option>
+              </select>
+            </div>
+
+            <div class="form-group form-group-full">
+              <label for="content">Content *</label>
+              <textarea id="content" rows="8" required maxlength="5000" placeholder="Write your note here..."></textarea>
+              <span class="error-message" id="contentError"></span>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-outline" id="cancelFormBtn">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="saveFormBtn">Save Note</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Notes List -->
+      <div class="notes-container">
+        <div id="notesList" class="notes-grid">
+          <!-- Note cards will be loaded here -->
+        </div>
+
+        <!-- Pagination -->
+        <div id="paginationContainer" class="pagination-container" style="display: none;"></div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="empty-state" style="display: none;">
+          <div class="empty-state-icon">📝</div>
+          <h3 class="empty-state-title">No notes yet</h3>
+          <p class="empty-state-text">Start organizing your thoughts by creating your first note.</p>
+          <button class="btn btn-primary" onclick="document.getElementById('addNoteBtn').click()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Create Your First Note
+          </button>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="loading-state">
+          <div class="spinner-lg"></div>
+          <p>Loading notes...</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal-overlay" id="deleteModal">
+    <div class="modal-container modal-sm">
+      <div class="modal-header">
+        <h2 class="modal-title">Delete Note</h2>
+        <button class="modal-close" id="closeDeleteModalBtn">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p>Are you sure you want to delete this note?</p>
+        <div class="delete-info">
+          <strong id="deleteNoteTitle"></strong>
+        </div>
+        <p class="text-danger">This action cannot be undone.</p>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" id="cancelDeleteBtn">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="assets/js/utils/ux-enhancements.js"></script>
+  <script type="module" src="assets/js/components/sidebar.js"></script>
+  <script type="module" src="assets/js/pages/notes.js"></script>
+  <script type="module" src="assets/js/pwa-setup.js"></script>
+</body>
+</html>
