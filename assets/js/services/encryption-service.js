@@ -534,11 +534,24 @@ class EncryptionService {
       return data;
     }
 
-    // Wait for any ongoing initialization to complete
-    await this.waitForInitialization();
+    // Wait for any ongoing initialization to complete with retries
+    let retries = 0;
+    const maxRetries = 10;
+    
+    while (retries < maxRetries) {
+      await this.waitForInitialization();
+      
+      if (this.isReady()) {
+        break;
+      }
+      
+      // Not ready, wait and retry
+      await new Promise(resolve => setTimeout(resolve, 300));
+      retries++;
+    }
 
     if (!this.isReady()) {
-      log.warn('Not initialized, returning data with encrypted fields visible');
+      log.warn(`[${collectionName}] Encryption not ready after ${maxRetries} retries, returning placeholder data`);
       // Return data but try to show something useful
       const partialData = { ...data };
       // Copy encrypted fields as-is so UI doesn't break completely

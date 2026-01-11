@@ -227,34 +227,61 @@ class EncryptionReauthModal {
       return false;
     }
 
-    // V5: Encryption is automatic for all users - no reauth needed
-    // Check if encryption is initialized, if not, initialize automatically
-    const needsReinit = await authEncryptionHelper.needsReinitialization();
-    
-    // In V5, needsReinitialization handles auto-init and only returns true if it completely failed
-    // This should be extremely rare
-    if (needsReinit) {
-      console.warn('[EncryptionReauth] Encryption auto-init failed - this is unusual');
-      // Even if init failed, still call onSuccess so app doesn't hang
-      // Data will just not be decrypted
+    console.log('[EncryptionReauth] Starting encryption check for user:', user.uid);
+
+    // First, try to initialize encryption if not already done
+    // This handles the case where services-init hasn't completed yet
+    if (!encryptionService.isReady()) {
+      console.log('[EncryptionReauth] Encryption not ready, initializing...');
+      try {
+        const success = await authEncryptionHelper.initializeAfterLogin(null, user.uid);
+        console.log('[EncryptionReauth] Direct initialization result:', success);
+      } catch (e) {
+        console.warn('[EncryptionReauth] Direct initialization error:', e);
+      }
     }
 
-    // Wait for encryption to be fully ready (with timeout)
-    try {
-      await Promise.race([
-        encryptionService.waitForInitialization(),
-        new Promise(resolve => setTimeout(resolve, 5000)) // 5 second timeout
-      ]);
-    } catch (e) {
-      console.warn('[EncryptionReauth] Timeout waiting for encryption:', e);
+    // Wait for encryption to be FULLY ready - this is critical
+    // Keep checking until encryption is ready or max retries reached
+    let retries = 0;
+    const maxRetries = 30; // 30 * 300ms = 9 seconds max wait
+    
+    while (retries < maxRetries) {
+      // Wait for any ongoing initialization
+      await encryptionService.waitForInitialization();
+      
+      // Check if encryption is actually ready
+      if (encryptionService.isReady()) {
+        console.log('[EncryptionReauth] Encryption is ready after', retries, 'checks');
+        break;
+      }
+      
+      // Not ready yet, wait and retry
+      if (retries % 5 === 0) {
+        console.log('[EncryptionReauth] Encryption not ready, waiting... (check', retries + 1, ')');
+      }
+      await new Promise(resolve => setTimeout(resolve, 300));
+      retries++;
     }
     
-    // Log encryption status for debugging
-    const status = encryptionService.getStatus ? encryptionService.getStatus() : { ready: false };
-    console.log('[EncryptionReauth] Encryption status before loading data:', status);
+    // Final status check
+    const isReady = encryptionService.isReady();
+    console.log('[EncryptionReauth] Final encryption status - ready:', isReady);
+    
+    if (!isReady) {
+      console.error('[EncryptionReauth] Encryption failed to initialize after max retries');
+      // Try one more time with direct initialization
+      try {
+        console.log('[EncryptionReauth] Final attempt to initialize encryption...');
+        await authEncryptionHelper.initializeAfterLogin(null, user.uid);
+      } catch (e) {
+        console.error('[EncryptionReauth] Final initialization attempt failed:', e);
+      }
+    }
 
     // Always call onSuccess - encryption is automatic
     if (onSuccess) {
+      console.log('[EncryptionReauth] Calling onSuccess callback');
       await onSuccess();
     }
     return false; // Never show modal in V5
