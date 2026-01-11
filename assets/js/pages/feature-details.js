@@ -594,7 +594,7 @@ class FeatureDetailsPage {
         <div class="stat-icon">✅</div>
         <div class="stat-info">
           <span class="stat-value">${enabledCount}</span>
-          <span class="stat-label">Enabled</span>
+          <span class="stat-label">Features Enabled</span>
         </div>
       </div>
       <div class="stat-card">
