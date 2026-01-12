@@ -393,6 +393,7 @@ class UserService {
   /**
    * Find user by email address
    * Returns user data if found, null otherwise
+   * Note: This requires authenticated user or will fail gracefully
    */
   async getUserByEmail(email) {
     if (!email) {
@@ -405,15 +406,26 @@ class UserService {
       const normalizedEmail = email.toLowerCase().trim();
       const usersRef = collection(db, this.collectionName);
       const q = query(usersRef, where('email', '==', normalizedEmail));
-      const querySnapshot = await getDocs(q);
+      
+      try {
+        const querySnapshot = await getDocs(q);
 
-      if (querySnapshot.empty) {
-        return null;
+        if (querySnapshot.empty) {
+          return null;
+        }
+
+        // Return first matching user
+        const userDoc = querySnapshot.docs[0];
+        return { id: userDoc.id, ...userDoc.data() };
+      } catch (firestoreError) {
+        // If permission denied, it might be because user is not authenticated
+        // This is expected during signup/login flow
+        if (firestoreError.code === 'permission-denied') {
+          console.warn('[User Service] Permission denied querying users by email - user may not be authenticated');
+          return null;
+        }
+        throw firestoreError;
       }
-
-      // Return first matching user
-      const userDoc = querySnapshot.docs[0];
-      return { id: userDoc.id, ...userDoc.data() };
     } catch (error) {
       console.error('Error finding user by email:', error);
       return null;

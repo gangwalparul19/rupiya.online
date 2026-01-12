@@ -327,7 +327,8 @@ class AuthService {
       };
     } catch (error) {
       logError('Error getting auth methods for email:', error);
-      return { success: false, error: error.message };
+      // Return generic error - don't expose permission details
+      return { success: false, error: 'Unable to check account. Please try again.' };
     }
   }
 

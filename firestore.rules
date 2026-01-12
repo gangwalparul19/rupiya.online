@@ -47,7 +47,8 @@ service cloud.firestore {
     match /users/{userId} {
       // Users can read and write their own profile
       // Admins can read all user profiles for analytics
-      allow read: if isOwner(userId) || isAdmin();
+      // Authenticated users can read for email lookups (dual auth - needed for signup/login)
+      allow read: if isOwner(userId) || isAdmin() || isAuthenticated();
       allow create: if isOwner(userId);
       allow update: if isOwner(userId);
       allow delete: if isOwner(userId);

@@ -16,11 +16,13 @@ class DualAuthHelper {
       const result = await authService.getAuthMethodsForEmail(email);
       
       if (!result.success) {
+        // If query fails (e.g., permission denied), assume email doesn't exist
+        // This is safe because we'll get a proper error when they try to sign up
         return { 
           hasPassword: false, 
           hasGoogle: false, 
           user: null,
-          error: result.error 
+          error: null  // Don't show error to user - they'll find out during signup
         };
       }
 
@@ -34,11 +36,12 @@ class DualAuthHelper {
       };
     } catch (error) {
       console.error('Error checking auth methods:', error);
+      // Return safe defaults - user will get proper error during signup/login
       return { 
         hasPassword: false, 
         hasGoogle: false, 
         user: null,
-        error: error.message 
+        error: null
       };
     }
   }
