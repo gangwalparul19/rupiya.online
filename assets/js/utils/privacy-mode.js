@@ -116,22 +116,22 @@ class PrivacyModeManager {
         
         interactiveSelectors.forEach(selector => {
             document.querySelectorAll(selector).forEach(el => {
-                el.style.pointerEvents = 'auto';
-                el.style.opacity = '1';
-                el.style.filter = 'none';
+                el.style.pointerEvents = 'auto !important';
+                el.style.opacity = '1 !important';
+                el.style.filter = 'none !important';
             });
         });
         
         // Ensure body and main content are not blocked
-        document.body.style.pointerEvents = 'auto';
-        document.body.style.opacity = '1';
-        document.body.style.filter = 'none';
+        document.body.style.pointerEvents = 'auto !important';
+        document.body.style.opacity = '1 !important';
+        document.body.style.filter = 'none !important';
         
         // Ensure sidebar overlay doesn't block interaction
         const sidebarOverlay = document.getElementById('sidebarOverlay');
         if (sidebarOverlay) {
-            sidebarOverlay.style.pointerEvents = 'auto';
-            sidebarOverlay.style.opacity = '1';
+            sidebarOverlay.style.pointerEvents = 'auto !important';
+            sidebarOverlay.style.opacity = '1 !important';
         }
         
         console.log('Privacy Mode: Ensured privacy-settings page is interactive');
@@ -373,12 +373,12 @@ class PrivacyModeManager {
                 if (this.isPrivacyMode) {
                     parent.classList.add('privacy-hidden-chart');
                     canvas.style.opacity = '0.1';
-                    // Disable pointer events to prevent hover tooltips
-                    canvas.style.pointerEvents = 'none';
+                    // DO NOT disable pointer-events on canvas - it blocks the entire page on mobile
+                    // canvas.style.pointerEvents = 'none';
                 } else {
                     parent.classList.remove('privacy-hidden-chart');
                     canvas.style.opacity = '1';
-                    canvas.style.pointerEvents = 'auto';
+                    // canvas.style.pointerEvents = 'auto';
                 }
             }
         });

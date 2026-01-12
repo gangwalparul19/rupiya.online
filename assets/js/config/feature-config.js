@@ -166,9 +166,9 @@ class FeatureConfigManager {
         const data = JSON.parse(cached);
         // Only use cache if it's for the same user
         if (data.userId === userId && data.features) {
-          // Check cache age - invalidate if older than 2 minutes (more aggressive)
+          // Check cache age - invalidate if older than 1 minute (very aggressive)
           const cacheAge = Date.now() - (data.timestamp || 0);
-          const CACHE_MAX_AGE = 2 * 60 * 1000; // 2 minutes
+          const CACHE_MAX_AGE = 1 * 60 * 1000; // 1 minute only
           
           if (cacheAge > CACHE_MAX_AGE) {
             console.log('[FeatureConfig] Cache is stale (age:', cacheAge, 'ms), will reload from Firestore');
@@ -180,10 +180,10 @@ class FeatureConfigManager {
             typeof f === 'object' && f.enabled === true
           ).length;
           
-          console.log('[FeatureConfig] Using cached features for instant load (age:', cacheAge, 'ms, enabled:', enabledCount, ')');
+          console.log('[FeatureConfig] Cache found (age:', cacheAge, 'ms, enabled:', enabledCount, ')');
           
           // If cache shows suspiciously few features, reload from Firestore
-          if (enabledCount < 10) {
+          if (enabledCount < 3) {
             console.log('[FeatureConfig] Cache shows only', enabledCount, 'enabled features, forcing Firestore reload');
             return null;
           }
@@ -275,26 +275,9 @@ class FeatureConfigManager {
 
       this.currentUserId = user.uid;
 
-      // Try to load from cache first for instant rendering (but don't trust it completely)
-      const cachedFeatures = this._getCachedFeatures(user.uid);
-      
-      // On mobile, always load from Firestore to ensure fresh data
-      const isMobile = window.innerWidth <= 768;
-      
-      if (cachedFeatures && !isMobile) {
-        // Use cached features immediately for instant display (desktop only)
-        this.userFeatures = JSON.parse(JSON.stringify(cachedFeatures));
-        this.initialized = true;
-        console.log('[FeatureConfig] Using cached features for instant load (desktop)');
-        
-        // IMPORTANT: Always load from Firestore in background to get latest features
-        // This ensures devices get updated features even if cache is stale
-        this._loadFromFirestoreInBackground(user.uid);
-        return;
-      }
-
-      // No cache or mobile device - wait for encryption and load from Firestore
-      console.log('[FeatureConfig] Loading from Firestore (mobile:', isMobile, ', cache:', !!cachedFeatures, ')');
+      // ALWAYS load from Firestore first to ensure data is fresh
+      // Cache is only used as a fallback if Firestore fails
+      console.log('[FeatureConfig] Loading from Firestore (always fresh load)');
 
       // Wait for encryption to be ready (with extended timeout and retries)
       let encryptionReady = false;
@@ -398,7 +381,8 @@ class FeatureConfigManager {
           // Cache the full userFeatures object, not just savedFeatures
           this._cacheFeatures(user.uid, this.userFeatures);
           
-          console.log('[FeatureConfig] Loaded user features successfully');
+          const enabledCount = Object.values(this.userFeatures).filter(f => f.enabled).length;
+          console.log('[FeatureConfig] Loaded user features successfully (enabled:', enabledCount, ')');
         } else {
           console.log('[FeatureConfig] No valid features found, using defaults');
           this.userFeatures = JSON.parse(JSON.stringify(DEFAULT_FEATURES));
@@ -415,77 +399,6 @@ class FeatureConfigManager {
       console.error('[FeatureConfig] Error initializing feature config:', error);
       this.userFeatures = JSON.parse(JSON.stringify(DEFAULT_FEATURES));
       this.initialized = true;
-    }
-  }
-
-  /**
-   * Load features from Firestore in background (for cache validation)
-   */
-  async _loadFromFirestoreInBackground(userId) {
-    try {
-      // Wait for encryption
-      await encryptionService.waitForInitialization();
-      
-      if (!encryptionService.isReady()) {
-        // Wait a bit more
-        await new Promise(resolve => setTimeout(resolve, 2000));
-      }
-      
-      const docRef = doc(db, FEATURES_COLLECTION, userId);
-      const docSnap = await getDoc(docRef);
-      
-      if (docSnap.exists()) {
-        let savedData = docSnap.data();
-        let decryptedData = savedData;
-        
-        if (encryptionService.isReady() && savedData._encrypted) {
-          decryptedData = await encryptionService.decryptObject(savedData, FEATURES_COLLECTION);
-        }
-        
-        let savedFeatures = decryptedData?.features;
-        if (typeof savedFeatures === 'string') {
-          savedFeatures = JSON.parse(savedFeatures);
-        }
-        
-        if (savedFeatures && typeof savedFeatures === 'object') {
-          // Check if features changed from what we loaded from cache
-          let hasChanges = false;
-          
-          // Create a new features object with defaults merged with saved features
-          const newUserFeatures = JSON.parse(JSON.stringify(DEFAULT_FEATURES));
-          
-          Object.keys(savedFeatures).forEach(key => {
-            if (newUserFeatures[key]) {
-              const savedEnabled = typeof savedFeatures[key] === 'object' 
-                ? savedFeatures[key].enabled 
-                : savedFeatures[key];
-              
-              // Check if this feature's enabled state changed
-              if (this.userFeatures[key] && this.userFeatures[key].enabled !== savedEnabled) {
-                hasChanges = true;
-                console.log(`[FeatureConfig] Feature "${key}" changed from ${this.userFeatures[key].enabled} to ${savedEnabled}`);
-              }
-              
-              newUserFeatures[key].enabled = savedEnabled;
-            }
-          });
-          
-          // Update the userFeatures with the new data from Firestore
-          this.userFeatures = newUserFeatures;
-          
-          // Update cache with the latest features
-          this._cacheFeatures(userId, this.userFeatures);
-          
-          if (hasChanges) {
-            console.log('[FeatureConfig] Features updated from Firestore, dispatching event');
-            window.dispatchEvent(new CustomEvent('featuresUpdated', { detail: {} }));
-          } else {
-            console.log('[FeatureConfig] Features verified from Firestore, no changes');
-          }
-        }
-      }
-    } catch (error) {
-      console.warn('[FeatureConfig] Background load error:', error);
     }
   }
 

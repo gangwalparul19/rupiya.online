@@ -295,7 +295,7 @@ export async function initSidebar() {
 
   console.log('[Sidebar] Auth ready, initializing feature config...');
 
-  // Initialize feature config (will use cache if available)
+  // Initialize feature config (will always load from Firestore now)
   await featureConfig.init();
   
   // Add a small delay to ensure features are fully loaded and cached
@@ -327,6 +327,7 @@ export async function initSidebar() {
 
   // Helper function to refresh sidebar
   const refreshSidebar = async () => {
+    console.log('[Sidebar] Refreshing sidebar due to feature changes...');
     // Re-check admin status in case it changed
     const currentIsAdmin = await checkIsAdmin();
     sidebarNav.innerHTML = generateQuickSearchHTML() + generateSidebarHTML(currentIsAdmin);

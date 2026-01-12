@@ -1,0 +1,121 @@
+/**
+ * Feature Count Display Styles
+ * Styles for displaying feature counts across pages
+ */
+
+/* Feature count elements */
+[data-feature-count] {
+  display: inline-block;
+  font-weight: 600;
+  color: #4A90E2;
+  transition: all 0.3s ease;
+}
+
+/* Animation when feature count updates */
+[data-feature-count].feature-count-updated {
+  animation: featureCountPulse 0.3s ease;
+}
+
+@keyframes featureCountPulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Feature count in cards */
+.feature-count-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  border: 2px solid #e0e0e0;
+  transition: all 0.3s ease;
+}
+
+.feature-count-card:hover {
+  border-color: #4A90E2;
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.15);
+}
+
+.feature-count-card .count {
+  font-size: 2em;
+  font-weight: 700;
+  color: #4A90E2;
+  margin-bottom: 8px;
+}
+
+.feature-count-card .label {
+  font-size: 0.9em;
+  color: #666;
+  text-align: center;
+}
+
+/* Feature count in stats */
+.feature-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.feature-stat {
+  text-align: center;
+  padding: 15px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.feature-stat-value {
+  font-size: 1.8em;
+  font-weight: 700;
+  color: #4A90E2;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.feature-stat-label {
+  font-size: 0.85em;
+  color: #666;
+  display: block;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .feature-count-card {
+    padding: 15px;
+  }
+
+  .feature-count-card .count {
+    font-size: 1.5em;
+  }
+
+  .feature-stats {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+  }
+
+  .feature-stat {
+    padding: 12px;
+  }
+
+  .feature-stat-value {
+    font-size: 1.5em;
+  }
+
+  .feature-stat-label {
+    font-size: 0.8em;
+  }
+}
