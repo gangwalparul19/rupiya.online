@@ -452,24 +452,56 @@ html.privacy-settings-page body {
     display: block !important;
 }
 
+/* Force sidebar to be visible */
+html.privacy-settings-page .sidebar {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 280px !important;
+    height: 100vh !important;
+    z-index: 1000 !important;
+    transform: none !important;
+    pointer-events: auto !important;
+    background: white !important;
+    border-right: 1px solid #e0e0e0 !important;
+}
+
+html.privacy-settings-page .sidebar.open {
+    transform: none !important;
+}
+
+html.privacy-settings-page .main-content {
+    margin-left: 280px !important;
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    flex: 1 !important;
+}
+
+html.privacy-settings-page .dashboard-layout {
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+}
+
+html.privacy-settings-page .mobile-header,
+html.privacy-settings-page .sidebar-overlay {
+    display: none !important;
+}
+
 html.privacy-settings-page .main-content,
 html.privacy-settings-page .page-container,
-html.privacy-settings-page .dashboard-layout,
-html.privacy-settings-page .sidebar,
-html.privacy-settings-page .mobile-header,
-html.privacy-settings-page .sidebar-overlay,
 html.privacy-settings-page .privacy-settings-panel {
     opacity: 1 !important;
     visibility: visible !important;
     pointer-events: auto !important;
     filter: none !important;
     display: block !important;
-}
-
-html.privacy-settings-page .main-content,
-html.privacy-settings-page .dashboard-layout,
-html.privacy-settings-page .sidebar {
-    display: flex !important;
 }
 
 html.privacy-settings-page button,
@@ -509,64 +541,25 @@ html.privacy-settings-page .privacy-blur {
     user-select: auto !important;
 }
 
-/* Mobile-specific: ensure no overlay blocks the page */
+/* Mobile-specific: ensure sidebar is hidden and main content takes full width */
 @media (max-width: 768px) {
-    html.privacy-settings-page {
-        pointer-events: auto !important;
-        opacity: 1 !important;
-        filter: none !important;
-    }
-    
-    html.privacy-settings-page * {
-        pointer-events: auto !important;
-        opacity: 1 !important;
-        filter: none !important;
+    html.privacy-settings-page .sidebar {
+        display: none !important;
     }
     
     html.privacy-settings-page .main-content {
-        filter: none !important;
-        opacity: 1 !important;
-        background: inherit !important;
-    }
-    
-    html.privacy-settings-page .sidebar-overlay {
-        pointer-events: auto !important;
-        opacity: 1 !important;
-    }
-    
-    html.privacy-settings-page .sidebar {
-        pointer-events: auto !important;
-        opacity: 1 !important;
+        margin-left: 0 !important;
+        width: 100% !important;
     }
     
     html.privacy-settings-page .mobile-header {
-        pointer-events: auto !important;
-        opacity: 1 !important;
-        z-index: 1001 !important;
-        visibility: visible !important;
         display: flex !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
     }
     
-    html.privacy-settings-page .mobile-header-actions {
-        pointer-events: auto !important;
-        z-index: 1001 !important;
-        visibility: visible !important;
-        display: flex !important;
-    }
-    
-    html.privacy-settings-page button,
-    html.privacy-settings-page .btn,
-    html.privacy-settings-page .sidebar-toggle {
-        pointer-events: auto !important;
-        opacity: 1 !important;
-        z-index: 1001 !important;
-        visibility: visible !important;
-        display: flex !important;
-    }
-    
-    html.privacy-settings-page .page-container {
-        filter: none !important;
-        opacity: 1 !important;
-        background: inherit !important;
+    html.privacy-settings-page .sidebar-overlay {
+        display: none !important;
     }
 }

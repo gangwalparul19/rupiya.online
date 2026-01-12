@@ -158,62 +158,22 @@ class FeatureConfigManager {
 
   /**
    * Get cached features from localStorage for instant loading
+   * DISABLED - Always load from Firestore to prevent stale cache issues
    */
   _getCachedFeatures(userId) {
-    try {
-      const cached = localStorage.getItem(this.CACHE_KEY);
-      if (cached) {
-        const data = JSON.parse(cached);
-        // Only use cache if it's for the same user
-        if (data.userId === userId && data.features) {
-          // Check cache age - invalidate if older than 1 minute (very aggressive)
-          const cacheAge = Date.now() - (data.timestamp || 0);
-          const CACHE_MAX_AGE = 1 * 60 * 1000; // 1 minute only
-          
-          if (cacheAge > CACHE_MAX_AGE) {
-            console.log('[FeatureConfig] Cache is stale (age:', cacheAge, 'ms), will reload from Firestore');
-            return null; // Return null to force Firestore load
-          }
-          
-          // Count enabled features in cache to detect corruption
-          const enabledCount = Object.values(data.features).filter(f => 
-            typeof f === 'object' && f.enabled === true
-          ).length;
-          
-          console.log('[FeatureConfig] Cache found (age:', cacheAge, 'ms, enabled:', enabledCount, ')');
-          
-          // If cache shows suspiciously few features, reload from Firestore
-          if (enabledCount < 3) {
-            console.log('[FeatureConfig] Cache shows only', enabledCount, 'enabled features, forcing Firestore reload');
-            return null;
-          }
-          
-          // Return the full cached features object
-          return data.features;
-        }
-      }
-    } catch (e) {
-      console.warn('[FeatureConfig] Error reading cache:', e);
-    }
+    // ALWAYS return null to force Firestore load
+    // Cache is causing issues with stale data
+    console.log('[FeatureConfig] Cache disabled - always loading from Firestore');
     return null;
   }
 
   /**
    * Save features to localStorage cache
+   * DISABLED - Cache is causing stale data issues
    */
   _cacheFeatures(userId, features) {
-    try {
-      // Store the full userFeatures object (with all metadata)
-      const featuresToCache = features || this.userFeatures;
-      localStorage.setItem(this.CACHE_KEY, JSON.stringify({
-        userId,
-        features: featuresToCache,
-        timestamp: Date.now()
-      }));
-      console.log('[FeatureConfig] Features cached for user:', userId);
-    } catch (e) {
-      console.warn('[FeatureConfig] Error caching features:', e);
-    }
+    // Don't cache - always load from Firestore
+    console.log('[FeatureConfig] Cache saving disabled - always loading from Firestore');
   }
 
   /**
@@ -252,6 +212,14 @@ class FeatureConfigManager {
     this.initialized = true;
 
     try {
+      // CLEAR CACHE IMMEDIATELY - Don't use any cached data
+      try {
+        localStorage.removeItem(this.CACHE_KEY);
+        console.log('[FeatureConfig] Cache cleared on init');
+      } catch (e) {
+        console.warn('[FeatureConfig] Error clearing cache:', e);
+      }
+
       // Try to get current user, or wait for auth if not ready
       let user = authService.getCurrentUser();
       
