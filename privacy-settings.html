@@ -9,6 +9,17 @@
     <link rel="stylesheet" href="assets/css/sidebar.css">
     <link rel="stylesheet" href="assets/css/privacy-mode.css">
     <link rel="stylesheet" href="assets/css/user-guide.css">
+    
+    <!-- CRITICAL: Add privacy-settings-page class IMMEDIATELY before any CSS applies -->
+    <script>
+        // This runs BEFORE any CSS is applied
+        if (window.location.pathname.toLowerCase().includes('privacy-settings') || 
+            window.location.href.toLowerCase().includes('privacy-settings')) {
+            document.documentElement.classList.add('privacy-settings-page');
+            document.body.classList.add('privacy-settings-page');
+        }
+    </script>
+    
     <style>
         .page-container { max-width: 900px; margin: 0 auto; padding: 30px 20px; }
         .page-header { margin-bottom: 30px; }
@@ -24,6 +35,49 @@
             .page-container { padding: 15px 10px; }
             .page-header h1 { font-size: 1.3em; }
             .page-header p { font-size: 0.9em; }
+        }
+        
+        /* CRITICAL: Ensure privacy-settings page is ALWAYS visible and interactive */
+        /* This must override ALL other CSS including privacy-mode.css */
+        body.privacy-settings-page,
+        body.privacy-settings-page * {
+            opacity: 1 !important;
+            visibility: visible !important;
+            display: block !important;
+            pointer-events: auto !important;
+            filter: none !important;
+            background: inherit !important;
+        }
+        
+        body.privacy-settings-page .main-content,
+        body.privacy-settings-page .page-container,
+        body.privacy-settings-page .dashboard-layout,
+        body.privacy-settings-page .sidebar,
+        body.privacy-settings-page .mobile-header,
+        body.privacy-settings-page .sidebar-overlay {
+            opacity: 1 !important;
+            visibility: visible !important;
+            display: flex !important;
+            pointer-events: auto !important;
+            filter: none !important;
+        }
+        
+        body.privacy-settings-page .page-container {
+            display: block !important;
+        }
+        
+        body.privacy-settings-page button,
+        body.privacy-settings-page input,
+        body.privacy-settings-page select,
+        body.privacy-settings-page textarea,
+        body.privacy-settings-page a,
+        body.privacy-settings-page .btn,
+        body.privacy-settings-page .sidebar-toggle,
+        body.privacy-settings-page .privacy-toggle {
+            opacity: 1 !important;
+            visibility: visible !important;
+            pointer-events: auto !important;
+            cursor: pointer !important;
         }
         
         /* Ensure logout modal doesn't block page when hidden */

@@ -437,11 +437,62 @@
    Ensure privacy-settings page is NEVER blocked
    ============================================ */
 
+/* CRITICAL: Use html.privacy-settings-page selector for maximum specificity */
+html.privacy-settings-page,
+html.privacy-settings-page body,
+html.privacy-settings-page body * {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    filter: none !important;
+    background: inherit !important;
+}
+
+html.privacy-settings-page body {
+    display: block !important;
+}
+
+html.privacy-settings-page .main-content,
+html.privacy-settings-page .page-container,
+html.privacy-settings-page .dashboard-layout,
+html.privacy-settings-page .sidebar,
+html.privacy-settings-page .mobile-header,
+html.privacy-settings-page .sidebar-overlay,
+html.privacy-settings-page .privacy-settings-panel {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    filter: none !important;
+    display: block !important;
+}
+
+html.privacy-settings-page .main-content,
+html.privacy-settings-page .dashboard-layout,
+html.privacy-settings-page .sidebar {
+    display: flex !important;
+}
+
+html.privacy-settings-page button,
+html.privacy-settings-page input,
+html.privacy-settings-page select,
+html.privacy-settings-page textarea,
+html.privacy-settings-page a,
+html.privacy-settings-page .btn,
+html.privacy-settings-page .sidebar-toggle,
+html.privacy-settings-page .privacy-toggle,
+html.privacy-settings-page .privacy-setting-item {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    filter: none !important;
+}
+
 /* On privacy-settings page, disable ALL privacy mode visual effects */
-body.privacy-settings-page .privacy-hidden,
-body.privacy-settings-page .privacy-hidden-percent,
-body.privacy-settings-page .privacy-hidden-email,
-body.privacy-settings-page .privacy-hidden-chart {
+html.privacy-settings-page .privacy-hidden,
+html.privacy-settings-page .privacy-hidden-percent,
+html.privacy-settings-page .privacy-hidden-email,
+html.privacy-settings-page .privacy-hidden-chart {
     color: inherit !important;
     filter: none !important;
     opacity: 1 !important;
@@ -449,90 +500,71 @@ body.privacy-settings-page .privacy-hidden-chart {
     user-select: auto !important;
 }
 
-body.privacy-settings-page .privacy-hidden-chart::after {
+html.privacy-settings-page .privacy-hidden-chart::after {
     display: none !important;
 }
 
-body.privacy-settings-page .privacy-blur {
+html.privacy-settings-page .privacy-blur {
     filter: none !important;
     user-select: auto !important;
 }
 
-/* Ensure all interactive elements work on privacy-settings page */
-body.privacy-settings-page button,
-body.privacy-settings-page input,
-body.privacy-settings-page select,
-body.privacy-settings-page textarea,
-body.privacy-settings-page a,
-body.privacy-settings-page .privacy-toggle,
-body.privacy-settings-page .btn {
-    pointer-events: auto !important;
-    opacity: 1 !important;
-    cursor: pointer !important;
-}
-
-/* Ensure the page content is never grayed out or blocked */
-body.privacy-settings-page .main-content,
-body.privacy-settings-page .page-container,
-body.privacy-settings-page .privacy-settings-panel,
-body.privacy-settings-page .dashboard-layout {
-    pointer-events: auto !important;
-    opacity: 1 !important;
-    filter: none !important;
-    background: inherit !important;
-}
-
-/* Ensure body itself is not affected */
-body.privacy-settings-page {
-    pointer-events: auto !important;
-    opacity: 1 !important;
-    filter: none !important;
-    background: inherit !important;
-}
-
 /* Mobile-specific: ensure no overlay blocks the page */
 @media (max-width: 768px) {
-    body.privacy-settings-page {
+    html.privacy-settings-page {
         pointer-events: auto !important;
         opacity: 1 !important;
         filter: none !important;
     }
     
-    body.privacy-settings-page * {
+    html.privacy-settings-page * {
         pointer-events: auto !important;
         opacity: 1 !important;
         filter: none !important;
     }
     
-    body.privacy-settings-page .main-content {
+    html.privacy-settings-page .main-content {
         filter: none !important;
         opacity: 1 !important;
         background: inherit !important;
     }
     
-    body.privacy-settings-page .sidebar-overlay {
+    html.privacy-settings-page .sidebar-overlay {
         pointer-events: auto !important;
         opacity: 1 !important;
     }
     
-    body.privacy-settings-page .sidebar {
+    html.privacy-settings-page .sidebar {
         pointer-events: auto !important;
         opacity: 1 !important;
     }
     
-    body.privacy-settings-page .mobile-header {
+    html.privacy-settings-page .mobile-header {
         pointer-events: auto !important;
         opacity: 1 !important;
+        z-index: 1001 !important;
+        visibility: visible !important;
+        display: flex !important;
     }
     
-    body.privacy-settings-page button,
-    body.privacy-settings-page .btn,
-    body.privacy-settings-page .sidebar-toggle {
+    html.privacy-settings-page .mobile-header-actions {
+        pointer-events: auto !important;
+        z-index: 1001 !important;
+        visibility: visible !important;
+        display: flex !important;
+    }
+    
+    html.privacy-settings-page button,
+    html.privacy-settings-page .btn,
+    html.privacy-settings-page .sidebar-toggle {
         pointer-events: auto !important;
         opacity: 1 !important;
+        z-index: 1001 !important;
+        visibility: visible !important;
+        display: flex !important;
     }
     
-    body.privacy-settings-page .page-container {
+    html.privacy-settings-page .page-container {
         filter: none !important;
         opacity: 1 !important;
         background: inherit !important;

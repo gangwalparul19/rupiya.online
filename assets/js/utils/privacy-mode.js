@@ -11,7 +11,27 @@ class PrivacyModeManager {
         this.isPrivacyMode = false;
         this.storageKey = 'rupiya_privacy_mode';
         this.originalValues = new Map();
+        
+        // ADD BODY CLASS IMMEDIATELY - BEFORE ANYTHING ELSE
+        this._addPrivacySettingsPageClass();
+        
         this.init();
+    }
+
+    /**
+     * Add privacy-settings-page class to body IMMEDIATELY
+     * This must happen before any CSS is applied
+     */
+    _addPrivacySettingsPageClass() {
+        const pathname = window.location.pathname.toLowerCase();
+        const href = window.location.href.toLowerCase();
+        const isPrivacyPage = pathname.includes('privacy-settings') || 
+                              href.includes('privacy-settings');
+        
+        if (isPrivacyPage) {
+            document.body.classList.add('privacy-settings-page');
+            console.log('[PrivacyMode] Added privacy-settings-page class to body');
+        }
     }
 
     /**
