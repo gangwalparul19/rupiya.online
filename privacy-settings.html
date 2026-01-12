@@ -15,11 +15,13 @@
         .page-header h1 { color: #4A90E2; font-size: 2em; margin-bottom: 10px; }
         .page-header p { color: #666; font-size: 1.05em; }
         
-        /* CRITICAL: Ensure privacy-settings page is never grayed out */
+        /* CRITICAL: Ensure privacy-settings page is never grayed out or hidden */
         body.privacy-settings-page {
             filter: none !important;
             opacity: 1 !important;
             background: white !important;
+            visibility: visible !important;
+            display: block !important;
         }
         
         body.privacy-settings-page .main-content,
@@ -28,10 +30,14 @@
             filter: none !important;
             opacity: 1 !important;
             background: inherit !important;
+            visibility: visible !important;
+            display: block !important;
         }
         
         body.privacy-settings-page * {
             filter: none !important;
+            visibility: visible !important;
+            opacity: 1 !important;
         }
         
         /* CRITICAL: Ensure mobile header is above sidebar on mobile */
@@ -39,30 +45,46 @@
             z-index: 1001 !important;
             pointer-events: auto !important;
             opacity: 1 !important;
+            visibility: visible !important;
+            display: flex !important;
         }
         
         body.privacy-settings-page .mobile-header-actions {
             pointer-events: auto !important;
             z-index: 1001 !important;
+            visibility: visible !important;
+            display: flex !important;
         }
         
         body.privacy-settings-page .sidebar-toggle {
             pointer-events: auto !important;
             z-index: 1001 !important;
+            visibility: visible !important;
+            display: flex !important;
         }
         
         @media (max-width: 768px) {
             .page-container { padding: 20px 15px; }
             .page-header h1 { font-size: 1.5em; }
             
-            /* Mobile: Ensure no graying out */
+            /* Mobile: Ensure no graying out and everything is visible */
             body.privacy-settings-page {
                 filter: none !important;
                 opacity: 1 !important;
+                visibility: visible !important;
+                display: block !important;
             }
             
             body.privacy-settings-page .main-content {
                 filter: none !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+                display: block !important;
+            }
+            
+            body.privacy-settings-page .page-container {
+                visibility: visible !important;
+                display: block !important;
                 opacity: 1 !important;
             }
             
@@ -71,17 +93,23 @@
                 z-index: 1001 !important;
                 pointer-events: auto !important;
                 opacity: 1 !important;
+                visibility: visible !important;
+                display: flex !important;
             }
             
             body.privacy-settings-page .mobile-header-actions {
                 pointer-events: auto !important;
                 z-index: 1001 !important;
+                visibility: visible !important;
+                display: flex !important;
             }
             
             body.privacy-settings-page .sidebar-toggle {
                 pointer-events: auto !important;
                 z-index: 1001 !important;
                 cursor: pointer !important;
+                visibility: visible !important;
+                display: flex !important;
             }
         }
         
@@ -90,9 +118,23 @@
             .page-header h1 { font-size: 1.3em; }
             .page-header p { font-size: 0.9em; }
             
-            /* Mobile small: Ensure no graying out */
+            /* Mobile small: Ensure no graying out and everything is visible */
             body.privacy-settings-page {
                 filter: none !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+                display: block !important;
+            }
+            
+            body.privacy-settings-page .main-content {
+                visibility: visible !important;
+                display: block !important;
+                opacity: 1 !important;
+            }
+            
+            body.privacy-settings-page .page-container {
+                visibility: visible !important;
+                display: block !important;
                 opacity: 1 !important;
             }
             
@@ -101,17 +143,23 @@
                 z-index: 1001 !important;
                 pointer-events: auto !important;
                 opacity: 1 !important;
+                visibility: visible !important;
+                display: flex !important;
             }
             
             body.privacy-settings-page .mobile-header-actions {
                 pointer-events: auto !important;
                 z-index: 1001 !important;
+                visibility: visible !important;
+                display: flex !important;
             }
             
             body.privacy-settings-page .sidebar-toggle {
                 pointer-events: auto !important;
                 z-index: 1001 !important;
                 cursor: pointer !important;
+                visibility: visible !important;
+                display: flex !important;
             }
         }
     </style>

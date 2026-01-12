@@ -568,11 +568,15 @@ body.privacy-settings-page {
         pointer-events: auto !important;
         opacity: 1 !important;
         z-index: 1001 !important;
+        visibility: visible !important;
+        display: flex !important;
     }
     
     body.privacy-settings-page .mobile-header-actions {
         pointer-events: auto !important;
         z-index: 1001 !important;
+        visibility: visible !important;
+        display: flex !important;
     }
     
     body.privacy-settings-page button,
@@ -581,5 +585,7 @@ body.privacy-settings-page {
         pointer-events: auto !important;
         opacity: 1 !important;
         z-index: 1001 !important;
+        visibility: visible !important;
+        display: flex !important;
     }
 }

@@ -187,23 +187,36 @@ function generateSidebarHTML(isAdmin = false) {
   });
 
   let navHTML = '';
+  let sectionCount = 0;
   
   navigationConfig.sections.forEach(section => {
     // Skip admin-only sections for non-admin users
     if (section.adminOnly && !isAdmin) {
+      console.log(`[Sidebar] Skipping admin section "${section.title}"`);
       return;
     }
     
     // Filter items based on enabled features
     const visibleItems = section.items.filter(item => {
       // Always show items without feature keys (like Settings, Feedback)
-      if (!item.featureKey) return true;
+      if (!item.featureKey) {
+        console.log(`[Sidebar] Including item "${item.label}" (no feature key)`);
+        return true;
+      }
       // Show items if their feature is enabled
-      return featureConfig.isEnabled(item.featureKey);
+      const isEnabled = featureConfig.isEnabled(item.featureKey);
+      console.log(`[Sidebar] Item "${item.label}" (${item.featureKey}): ${isEnabled ? 'enabled' : 'disabled'}`);
+      return isEnabled;
     });
 
     // Skip section if no visible items
-    if (visibleItems.length === 0) return;
+    if (visibleItems.length === 0) {
+      console.log(`[Sidebar] Skipping section "${section.title}" - no visible items`);
+      return;
+    }
+    
+    sectionCount++;
+    console.log(`[Sidebar] Rendering section "${section.title}" with ${visibleItems.length} items`);
     
     // Determine if section should be expanded
     const isCurrentSection = section.id === currentSection;
@@ -239,6 +252,8 @@ function generateSidebarHTML(isAdmin = false) {
       </div>
     `;
   });
+  
+  console.log(`[Sidebar] Generated ${sectionCount} sections total`);
 
   return navHTML;
 }
@@ -268,6 +283,8 @@ export async function initSidebar() {
   const sidebarNav = sidebar.querySelector('.sidebar-nav');
   if (!sidebarNav) return;
 
+  console.log('[Sidebar] Initializing sidebar...');
+
   // Wait for auth to be ready first
   let user = null;
   try {
@@ -276,14 +293,25 @@ export async function initSidebar() {
     console.log('[Sidebar] Auth not ready, using defaults');
   }
 
+  console.log('[Sidebar] Auth ready, initializing feature config...');
+
   // Initialize feature config (will use cache if available)
   await featureConfig.init();
+  
+  // Add a small delay to ensure features are fully loaded and cached
+  await new Promise(resolve => setTimeout(resolve, 100));
+
+  console.log('[Sidebar] Feature config initialized, checking admin status...');
 
   // Check if user is admin
   const isAdmin = await checkIsAdmin();
 
+  console.log('[Sidebar] Admin status:', isAdmin, '- Generating sidebar HTML...');
+
   // Generate and inject navigation
   sidebarNav.innerHTML = generateQuickSearchHTML() + generateSidebarHTML(isAdmin);
+
+  console.log('[Sidebar] Sidebar HTML generated, setting up handlers...');
 
   // Setup section toggle handlers
   setupSectionToggles();
