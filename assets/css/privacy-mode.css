@@ -389,3 +389,67 @@
         display: none;
     }
 }
+
+/* ============================================
+   PRIVACY SETTINGS PAGE EXCLUSION
+   Ensure privacy-settings page is NEVER blocked
+   ============================================ */
+
+/* On privacy-settings page, disable ALL privacy mode visual effects */
+body.privacy-settings-page .privacy-hidden,
+body.privacy-settings-page .privacy-hidden-percent,
+body.privacy-settings-page .privacy-hidden-email,
+body.privacy-settings-page .privacy-hidden-chart {
+    color: inherit !important;
+    filter: none !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    user-select: auto !important;
+}
+
+body.privacy-settings-page .privacy-hidden-chart::after {
+    display: none !important;
+}
+
+body.privacy-settings-page .privacy-blur {
+    filter: none !important;
+    user-select: auto !important;
+}
+
+/* Ensure all interactive elements work on privacy-settings page */
+body.privacy-settings-page button,
+body.privacy-settings-page input,
+body.privacy-settings-page select,
+body.privacy-settings-page textarea,
+body.privacy-settings-page a,
+body.privacy-settings-page .privacy-toggle,
+body.privacy-settings-page .btn {
+    pointer-events: auto !important;
+    opacity: 1 !important;
+    cursor: pointer !important;
+}
+
+/* Ensure the page content is never grayed out or blocked */
+body.privacy-settings-page .main-content,
+body.privacy-settings-page .page-container,
+body.privacy-settings-page .privacy-settings-panel {
+    pointer-events: auto !important;
+    opacity: 1 !important;
+    filter: none !important;
+}
+
+/* Mobile-specific: ensure no overlay blocks the page */
+@media (max-width: 768px) {
+    body.privacy-settings-page {
+        pointer-events: auto !important;
+    }
+    
+    body.privacy-settings-page * {
+        pointer-events: auto !important;
+    }
+    
+    body.privacy-settings-page .main-content {
+        filter: none !important;
+        opacity: 1 !important;
+    }
+}

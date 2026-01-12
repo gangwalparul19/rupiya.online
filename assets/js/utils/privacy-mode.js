@@ -21,17 +21,77 @@ class PrivacyModeManager {
         const saved = localStorage.getItem(this.storageKey);
         this.isPrivacyMode = saved === 'true';
         
-        // Start watching for DOM changes
-        this.watchForChanges();
+        // Check if on privacy-settings page early and add body class
+        const isPrivacyPage = this._isPrivacySettingsPage();
+        
+        // Start watching for DOM changes (but not on privacy-settings page)
+        if (!isPrivacyPage) {
+            this.watchForChanges();
+        }
         
         // Wait for DOM to be ready
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => {
+                // Re-check and add body class after DOM is ready
+                this._isPrivacySettingsPage();
                 setTimeout(() => this.applyPrivacyMode(), 100);
             });
         } else {
+            // Re-check and add body class
+            this._isPrivacySettingsPage();
             setTimeout(() => this.applyPrivacyMode(), 100);
         }
+    }
+
+    /**
+     * Check if current page is privacy-settings page
+     * More robust check for mobile and different URL formats
+     */
+    _isPrivacySettingsPage() {
+        const pathname = window.location.pathname.toLowerCase();
+        const href = window.location.href.toLowerCase();
+        const isPrivacyPage = pathname.includes('privacy-settings') || 
+                              href.includes('privacy-settings') ||
+                              document.body.classList.contains('privacy-settings-page');
+        
+        // Add body class for CSS targeting if on privacy settings page
+        if (isPrivacyPage && !document.body.classList.contains('privacy-settings-page')) {
+            document.body.classList.add('privacy-settings-page');
+        }
+        
+        return isPrivacyPage;
+    }
+
+    /**
+     * Remove all privacy mode effects from the page
+     * Used on privacy-settings page to ensure users can interact
+     */
+    _removeAllPrivacyEffects() {
+        // Remove privacy-hidden class from all elements
+        document.querySelectorAll('.privacy-hidden').forEach(el => {
+            el.classList.remove('privacy-hidden');
+        });
+        
+        document.querySelectorAll('.privacy-hidden-chart').forEach(el => {
+            el.classList.remove('privacy-hidden-chart');
+        });
+        
+        document.querySelectorAll('.privacy-blur').forEach(el => {
+            el.classList.remove('privacy-blur');
+        });
+        
+        // Restore canvas elements
+        document.querySelectorAll('canvas').forEach(canvas => {
+            canvas.style.opacity = '1';
+            canvas.style.pointerEvents = 'auto';
+        });
+        
+        // Ensure all interactive elements are clickable
+        document.querySelectorAll('button, input, select, textarea, a, .privacy-toggle, .btn').forEach(el => {
+            el.style.pointerEvents = 'auto';
+        });
+        
+        console.log('Privacy Mode: Removed all effects for privacy-settings page');
     }
 
     /**
@@ -74,14 +134,16 @@ class PrivacyModeManager {
         
         // Skip applying privacy mode effects on privacy-settings page
         // Users need to be able to interact with this page to disable privacy mode
-        const isPrivacySettingsPage = window.location.pathname.includes('privacy-settings');
-        if (isPrivacySettingsPage && this.isPrivacyMode) {
+        if (this._isPrivacySettingsPage()) {
+            // Remove any privacy mode effects that might have been applied
+            this._removeAllPrivacyEffects();
+            
             // Only update the button state and dispatch event, don't hide content
             this.updatePrivacyButton();
             window.dispatchEvent(new CustomEvent('privacyModeChanged', {
                 detail: { isPrivacyMode: this.isPrivacyMode }
             }));
-            console.log('Privacy Mode: Skipping content hiding on privacy-settings page');
+            console.log('Privacy Mode: Skipping ALL effects on privacy-settings page');
             return;
         }
         
