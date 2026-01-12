@@ -166,16 +166,28 @@ class FeatureConfigManager {
         const data = JSON.parse(cached);
         // Only use cache if it's for the same user
         if (data.userId === userId && data.features) {
-          // Check cache age - invalidate if older than 5 minutes
+          // Check cache age - invalidate if older than 2 minutes (more aggressive)
           const cacheAge = Date.now() - (data.timestamp || 0);
-          const CACHE_MAX_AGE = 5 * 60 * 1000; // 5 minutes
+          const CACHE_MAX_AGE = 2 * 60 * 1000; // 2 minutes
           
           if (cacheAge > CACHE_MAX_AGE) {
             console.log('[FeatureConfig] Cache is stale (age:', cacheAge, 'ms), will reload from Firestore');
             return null; // Return null to force Firestore load
           }
           
-          console.log('[FeatureConfig] Using cached features for instant load (age:', cacheAge, 'ms)');
+          // Count enabled features in cache to detect corruption
+          const enabledCount = Object.values(data.features).filter(f => 
+            typeof f === 'object' && f.enabled === true
+          ).length;
+          
+          console.log('[FeatureConfig] Using cached features for instant load (age:', cacheAge, 'ms, enabled:', enabledCount, ')');
+          
+          // If cache shows suspiciously few features, reload from Firestore
+          if (enabledCount < 10) {
+            console.log('[FeatureConfig] Cache shows only', enabledCount, 'enabled features, forcing Firestore reload');
+            return null;
+          }
+          
           // Return the full cached features object
           return data.features;
         }
@@ -230,7 +242,11 @@ class FeatureConfigManager {
    * Initialize feature config for current user
    */
   async init() {
-    if (this.initialized) return;
+    // Prevent double initialization
+    if (this.initialized) {
+      console.log('[FeatureConfig] Already initialized, skipping');
+      return;
+    }
 
     try {
       // Try to get current user, or wait for auth if not ready
@@ -531,7 +547,17 @@ class FeatureConfigManager {
     }
 
     this.userFeatures[featureKey].enabled = enabled;
+    console.log(`[FeatureConfig] Toggling feature "${featureKey}" to ${enabled}`);
+    
     await this.saveFeatureConfig();
+    
+    // Clear cache to ensure fresh load on next page
+    try {
+      localStorage.removeItem(this.CACHE_KEY);
+      console.log('[FeatureConfig] Cache cleared after feature toggle');
+    } catch (e) {
+      console.warn('[FeatureConfig] Error clearing cache:', e);
+    }
     
     // Dispatch event for UI updates
     window.dispatchEvent(new CustomEvent('featureToggled', {
@@ -562,6 +588,14 @@ class FeatureConfigManager {
 
     await this.saveFeatureConfig();
     
+    // Clear cache to ensure fresh load on next page
+    try {
+      localStorage.removeItem(this.CACHE_KEY);
+      console.log('[FeatureConfig] Cache cleared after features update');
+    } catch (e) {
+      console.warn('[FeatureConfig] Error clearing cache:', e);
+    }
+    
     window.dispatchEvent(new CustomEvent('featuresUpdated', {
       detail: { updates }
     }));
@@ -573,6 +607,14 @@ class FeatureConfigManager {
   async resetToDefaults() {
     this.userFeatures = JSON.parse(JSON.stringify(DEFAULT_FEATURES));
     await this.saveFeatureConfig();
+    
+    // Clear cache to ensure fresh load on next page
+    try {
+      localStorage.removeItem(this.CACHE_KEY);
+      console.log('[FeatureConfig] Cache cleared after reset to defaults');
+    } catch (e) {
+      console.warn('[FeatureConfig] Error clearing cache:', e);
+    }
     
     window.dispatchEvent(new CustomEvent('featuresReset'));
   }
@@ -647,12 +689,37 @@ class FeatureConfigManager {
   }
   
   /**
+   * Clear cache and reload features from Firestore
+   * Useful when features are updated and need to be refreshed
+   */
+  async clearCacheAndReload() {
+    try {
+      localStorage.removeItem(this.CACHE_KEY);
+      console.log('[FeatureConfig] Cache cleared');
+    } catch (e) {
+      console.warn('[FeatureConfig] Error clearing cache:', e);
+    }
+    
+    // Reinitialize to load fresh from Firestore
+    await this.reinitialize();
+  }
+
+  /**
    * Force re-initialization (useful after login)
    */
   async reinitialize() {
     this.initialized = false;
     this.userFeatures = null;
     this.currentUserId = null;
+    
+    // Clear the cache to force fresh load
+    try {
+      localStorage.removeItem(this.CACHE_KEY);
+      console.log('[FeatureConfig] Cache cleared, forcing fresh load');
+    } catch (e) {
+      console.warn('[FeatureConfig] Error clearing cache:', e);
+    }
+    
     await this.init();
   }
 }

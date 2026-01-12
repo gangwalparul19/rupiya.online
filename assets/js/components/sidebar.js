@@ -467,4 +467,22 @@ function setupMobileSidebar() {
   overlay?.addEventListener('click', closeSidebar);
 }
 
+// Auto-initialize sidebar when DOM is ready
+// This ensures sidebar works on all pages, even if initSidebar() is not explicitly called
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    // Only initialize if not already initialized
+    if (!window._sidebarInitialized) {
+      window._sidebarInitialized = true;
+      initSidebar();
+    }
+  });
+} else {
+  // DOM is already loaded
+  if (!window._sidebarInitialized) {
+    window._sidebarInitialized = true;
+    initSidebar();
+  }
+}
+
 export { navigationConfig };

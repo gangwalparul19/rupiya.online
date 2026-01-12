@@ -117,4 +117,22 @@ export function initLogoutHandler() {
   });
 }
 
+// Auto-initialize logout handler when DOM is ready
+// This ensures logout works on all pages, even if initLogoutHandler() is not explicitly called
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    // Only initialize if not already initialized
+    if (!window._logoutHandlerInitialized) {
+      window._logoutHandlerInitialized = true;
+      initLogoutHandler();
+    }
+  });
+} else {
+  // DOM is already loaded
+  if (!window._logoutHandlerInitialized) {
+    window._logoutHandlerInitialized = true;
+    initLogoutHandler();
+  }
+}
+
 export default { initLogoutHandler };
