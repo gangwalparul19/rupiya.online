@@ -178,6 +178,9 @@ async function initPage() {
     // Initialize categories
     await categoriesService.initializeCategories();
     
+    // Initialize family members (creates defaults if none exist)
+    initializeFamilyMembers();
+    
     // Load categories into dropdowns
     await loadSourceDropdowns();
     
@@ -1301,6 +1304,22 @@ function clearFormErrors() {
 // FAMILY MEMBER FUNCTIONS
 // ============================================
 
+// Initialize default family members if none exist
+function initializeFamilyMembers() {
+  try {
+    const existing = localStorage.getItem('familyMembers');
+    if (!existing) {
+      const defaultMembers = getDefaultFamilyMembers();
+      localStorage.setItem('familyMembers', JSON.stringify(defaultMembers));
+      return defaultMembers;
+    }
+    return JSON.parse(existing);
+  } catch (error) {
+    console.error('Error initializing family members:', error);
+    return getDefaultFamilyMembers();
+  }
+}
+
 // Get family members from localStorage
 function getFamilyMembers() {
   try {
@@ -1331,60 +1350,6 @@ function getDefaultFamilyMembers() {
 function getActiveFamilyMembers() {
   const members = getFamilyMembers();
   return members.filter(m => m.active);
-}
-
-// Get payment method display name
-function getPaymentMethodDisplayName(method) {
-  let details = method.name;
-  
-  switch (method.type) {
-    case 'card':
-      if (method.cardNumber) {
-        details += ` (****${method.cardNumber})`;
-      }
-      break;
-    case 'upi':
-      if (method.upiId) {
-        details += ` (${method.upiId})`;
-      }
-      break;
-    case 'wallet':
-      if (method.walletNumber) {
-        details += ` (${method.walletNumber})`;
-      }
-      break;
-    case 'bank':
-      if (method.bankAccountNumber) {
-        details += ` (****${method.bankAccountNumber})`;
-      }
-      break;
-  }
-  
-  return details;
-}
-
-// Get payment method icon
-function getPaymentMethodIcon(type) {
-  const icons = {
-    cash: '💵',
-    card: '💳',
-    upi: '📱',
-    wallet: '👛',
-    bank: '🏦'
-  };
-  return icons[type] || '💰';
-}
-
-// Get payment type label
-function getPaymentTypeLabel(type) {
-  const labels = {
-    cash: 'Cash',
-    card: 'Cards',
-    upi: 'UPI methods',
-    wallet: 'Wallets',
-    bank: 'Bank Accounts'
-  };
-  return labels[type] || type;
 }
 
 // ============================================

@@ -61,6 +61,11 @@ class PrivacyModeManager {
             document.body.classList.add('privacy-settings-page');
         }
         
+        // Remove privacy-settings-page class if NOT on privacy settings page
+        if (!isPrivacyPage && document.body.classList.contains('privacy-settings-page')) {
+            document.body.classList.remove('privacy-settings-page');
+        }
+        
         return isPrivacyPage;
     }
 

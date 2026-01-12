@@ -537,7 +537,23 @@ async function calculateVehicleExpenses(vehicleId) {
 async function loadFuelLogs() {
   try {
     // Use createdAt for ordering as it's more reliable
-    fuelLogs = await firestoreService.getAll('fuelLogs', 'createdAt', 'desc');
+    const rawFuelLogs = await firestoreService.getAll('fuelLogs', 'createdAt', 'desc');
+    
+    // Decrypt vehicleId for each fuel log
+    fuelLogs = await Promise.all(rawFuelLogs.map(async (log) => {
+      try {
+        // Decrypt the vehicleId if it's encrypted
+        const decryptedVehicleId = await encryptionService.decryptValue(log.vehicleId);
+        return {
+          ...log,
+          vehicleId: decryptedVehicleId
+        };
+      } catch (error) {
+        console.warn('Error decrypting vehicleId for fuel log:', error);
+        // If decryption fails, return the log as-is (might already be decrypted)
+        return log;
+      }
+    }));
   } catch (error) {
     console.error('Error loading fuel logs:', error);
     fuelLogs = [];

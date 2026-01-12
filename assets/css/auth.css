@@ -194,17 +194,6 @@
   min-height: auto;
 }
 
-/* Ensure all direct children except footer grow to fill space */
-.auth-card > *:not(.auth-footer) {
-  flex-shrink: 0;
-}
-
-/* Make the main content area flexible */
-.auth-card > #emailStep,
-.auth-card > #authMethodsStep {
-  flex-shrink: 0;
-}
-
 .auth-card::before {
   content: '';
   position: absolute;
@@ -295,6 +284,11 @@
 
 .auth-form {
   margin-bottom: 24px;
+}
+
+#emailStep,
+#authMethodsStep {
+  width: 100%;
 }
 
 .auth-form .form-group {
@@ -554,6 +548,21 @@
 }
 
 /* ============================================
+   AUTH METHODS
+   ============================================ */
+
+.auth-methods-info {
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.auth-methods-message {
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* ============================================
    SOCIAL LOGIN
    ============================================ */
 
@@ -623,9 +632,10 @@
   font-size: 0.9375rem;
   color: var(--text-secondary);
   animation: fadeIn 0.5s ease-out 1.3s both;
-  margin-top: auto;
+  margin-top: 32px;
   padding-top: 24px;
   border-top: 1px solid rgba(0, 0, 0, 0.05);
+  width: 100%;
 }
 
 .auth-footer a {
@@ -715,6 +725,11 @@
   
   .btn-google {
     padding: 12px 20px;
+  }
+  
+  .auth-footer {
+    margin-top: 24px;
+    padding-top: 20px;
   }
 }
 

@@ -474,10 +474,69 @@ body.privacy-settings-page .btn {
 /* Ensure the page content is never grayed out or blocked */
 body.privacy-settings-page .main-content,
 body.privacy-settings-page .page-container,
-body.privacy-settings-page .privacy-settings-panel {
+body.privacy-settings-page .privacy-settings-panel,
+body.privacy-settings-page .dashboard-layout {
     pointer-events: auto !important;
     opacity: 1 !important;
     filter: none !important;
+    background: inherit !important;
+}
+
+/* Ensure body itself is not affected */
+body.privacy-settings-page {
+    pointer-events: auto !important;
+    opacity: 1 !important;
+    filter: none !important;
+    background: inherit !important;
+}
+
+/* Mobile-specific: ensure no overlay blocks the page */
+@media (max-width: 768px) {
+    body.privacy-settings-page {
+        pointer-events: auto !important;
+        opacity: 1 !important;
+        filter: none !important;
+    }
+    
+    body.privacy-settings-page * {
+        pointer-events: auto !important;
+        opacity: 1 !important;
+        filter: none !important;
+    }
+    
+    body.privacy-settings-page .main-content {
+        filter: none !important;
+        opacity: 1 !important;
+        background: inherit !important;
+    }
+    
+    body.privacy-settings-page .sidebar-overlay {
+        pointer-events: auto !important;
+        opacity: 1 !important;
+    }
+    
+    body.privacy-settings-page .sidebar {
+        pointer-events: auto !important;
+        opacity: 1 !important;
+    }
+    
+    body.privacy-settings-page .mobile-header {
+        pointer-events: auto !important;
+        opacity: 1 !important;
+    }
+    
+    body.privacy-settings-page button,
+    body.privacy-settings-page .btn,
+    body.privacy-settings-page .sidebar-toggle {
+        pointer-events: auto !important;
+        opacity: 1 !important;
+    }
+    
+    body.privacy-settings-page .page-container {
+        filter: none !important;
+        opacity: 1 !important;
+        background: inherit !important;
+    }
 }
 
 /* Mobile-specific: ensure no overlay blocks the page */
