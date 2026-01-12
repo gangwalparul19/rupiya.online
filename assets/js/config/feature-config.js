@@ -167,6 +167,7 @@ class FeatureConfigManager {
         // Only use cache if it's for the same user
         if (data.userId === userId && data.features) {
           console.log('[FeatureConfig] Using cached features for instant load');
+          // Return the full cached features object
           return data.features;
         }
       }
@@ -181,11 +182,14 @@ class FeatureConfigManager {
    */
   _cacheFeatures(userId, features) {
     try {
+      // Store the full userFeatures object (with all metadata)
+      const featuresToCache = features || this.userFeatures;
       localStorage.setItem(this.CACHE_KEY, JSON.stringify({
         userId,
-        features,
+        features: featuresToCache,
         timestamp: Date.now()
       }));
+      console.log('[FeatureConfig] Features cached for user:', userId);
     } catch (e) {
       console.warn('[FeatureConfig] Error caching features:', e);
     }
@@ -249,18 +253,10 @@ class FeatureConfigManager {
       // Try to load from cache first for instant rendering
       const cachedFeatures = this._getCachedFeatures(user.uid);
       if (cachedFeatures) {
-        // Use cached features immediately
-        this.userFeatures = JSON.parse(JSON.stringify(DEFAULT_FEATURES));
-        Object.keys(cachedFeatures).forEach(key => {
-          if (this.userFeatures[key] && cachedFeatures[key] !== undefined) {
-            if (typeof cachedFeatures[key] === 'object' && cachedFeatures[key] !== null) {
-              this.userFeatures[key].enabled = cachedFeatures[key].enabled;
-            } else if (typeof cachedFeatures[key] === 'boolean') {
-              this.userFeatures[key].enabled = cachedFeatures[key];
-            }
-          }
-        });
+        // Use cached features immediately - they already have the full structure
+        this.userFeatures = JSON.parse(JSON.stringify(cachedFeatures));
         this.initialized = true;
+        console.log('[FeatureConfig] Using cached features, initialized:', this.initialized);
         
         // Load from Firestore in background to verify/update cache
         this._loadFromFirestoreInBackground(user.uid);
@@ -368,7 +364,8 @@ class FeatureConfigManager {
           });
           
           // Cache the loaded features for faster subsequent loads
-          this._cacheFeatures(user.uid, savedFeatures);
+          // Cache the full userFeatures object, not just savedFeatures
+          this._cacheFeatures(user.uid, this.userFeatures);
           
           console.log('[FeatureConfig] Loaded user features successfully');
         } else {

@@ -467,11 +467,4 @@ function setupMobileSidebar() {
   overlay?.addEventListener('click', closeSidebar);
 }
 
-// Auto-initialize when DOM is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initSidebar);
-} else {
-  initSidebar();
-}
-
 export { navigationConfig };

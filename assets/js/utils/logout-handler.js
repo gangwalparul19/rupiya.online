@@ -117,11 +117,4 @@ export function initLogoutHandler() {
   });
 }
 
-// Auto-initialize when DOM is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initLogoutHandler);
-} else {
-  initLogoutHandler();
-}
-
 export default { initLogoutHandler };
