@@ -61,6 +61,7 @@ function createPrivacyButton() {
     button.setAttribute('title', 'Toggle Privacy Mode');
     button.setAttribute('aria-label', 'Privacy Mode');
     button.setAttribute('aria-pressed', 'false');
+    button.style.pointerEvents = 'auto';
     button.innerHTML = `
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
@@ -69,6 +70,14 @@ function createPrivacyButton() {
     `;
     
     button.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        privacyMode.toggle();
+        updatePrivacyButton();
+    });
+    
+    // Add touch event for better mobile support
+    button.addEventListener('touchend', (e) => {
         e.preventDefault();
         e.stopPropagation();
         privacyMode.toggle();

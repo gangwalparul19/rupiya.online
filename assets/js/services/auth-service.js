@@ -159,6 +159,17 @@ class AuthService {
       };
     } catch (error) {
       logError('Sign-up error:', error.code);
+      
+      // Check if email already exists via another provider
+      if (error.code === 'auth/email-already-in-use') {
+        return { 
+          success: false, 
+          error: 'This email is already registered. Please sign in instead.',
+          emailExists: true,
+          email: email
+        };
+      }
+      
       return { success: false, error: this.getErrorMessage(error.code) };
     }
   }
@@ -287,6 +298,170 @@ class AuthService {
     };
 
     return errorMessages[errorCode] || 'An error occurred. Please try again.';
+  }
+
+  // ============================================
+  // DUAL-AUTH SUPPORT: Account Linking Methods
+  // ============================================
+
+  /**
+   * Check what auth methods are available for an email
+   * Used during login to show appropriate auth options
+   */
+  async getAuthMethodsForEmail(email) {
+    try {
+      if (!this.userService) {
+        throw new Error('User service not initialized');
+      }
+
+      const user = await this.userService.getUserByEmail(email);
+      if (!user) {
+        return { success: false, error: 'No account found with this email' };
+      }
+
+      const authMethods = user.authMethods || [];
+      return { 
+        success: true, 
+        authMethods: authMethods.map(m => m.providerId),
+        user 
+      };
+    } catch (error) {
+      logError('Error getting auth methods for email:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Link password authentication to existing Google account
+   * User must be logged in with Google first
+   */
+  async linkPasswordToGoogleAccount(password) {
+    try {
+      const { EmailAuthProvider, linkWithCredential } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js');
+      
+      if (!this.currentUser) {
+        throw new Error('User not authenticated');
+      }
+
+      // Create credential from password
+      const credential = EmailAuthProvider.credential(this.currentUser.email, password);
+      
+      // Link the credential to current user
+      await linkWithCredential(this.currentUser, credential);
+      
+      log('Password linked to Google account');
+
+      // Update user profile in Firestore
+      if (this.userService) {
+        await this.userService.addAuthMethod('password', this.currentUser.email);
+      }
+
+      return { success: true, message: 'Password added successfully' };
+    } catch (error) {
+      logError('Error linking password:', error.code);
+      
+      if (error.code === 'auth/credential-already-in-use') {
+        return { 
+          success: false, 
+          error: 'This email is already associated with another account. Please use a different email or sign in with that account.'
+        };
+      }
+      
+      return { success: false, error: this.getErrorMessage(error.code) };
+    }
+  }
+
+  /**
+   * Link Google authentication to existing password account
+   * User must be logged in with email/password first
+   */
+  async linkGoogleToPasswordAccount() {
+    try {
+      const { GoogleAuthProvider, linkWithPopup } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js');
+      
+      if (!this.currentUser) {
+        throw new Error('User not authenticated');
+      }
+
+      const provider = new GoogleAuthProvider();
+      
+      // Link Google provider to current user
+      await linkWithPopup(this.currentUser, provider);
+      
+      log('Google linked to password account');
+
+      // Update user profile in Firestore
+      if (this.userService) {
+        await this.userService.addAuthMethod('google.com', this.currentUser.email);
+      }
+
+      return { success: true, message: 'Google account linked successfully' };
+    } catch (error) {
+      logError('Error linking Google:', error.code);
+      
+      if (error.code === 'auth/credential-already-in-use') {
+        return { 
+          success: false, 
+          error: 'This Google account is already linked to another email. Please use a different Google account.'
+        };
+      }
+      
+      return { success: false, error: this.getErrorMessage(error.code) };
+    }
+  }
+
+  /**
+   * Unlink an authentication method from current user
+   * Prevents unlinking the last auth method
+   */
+  async unlinkAuthMethod(providerId) {
+    try {
+      const { unlink } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js');
+      
+      if (!this.currentUser) {
+        throw new Error('User not authenticated');
+      }
+
+      // Check if this is the last auth method
+      if (this.userService) {
+        const result = await this.userService.getLinkedAuthMethods();
+        if (result.success && result.authMethods.length <= 1) {
+          return { success: false, error: 'Cannot remove the last authentication method' };
+        }
+      }
+
+      // Unlink the provider
+      await unlink(this.currentUser, providerId);
+      
+      log(`${providerId} unlinked from account`);
+
+      // Update user profile in Firestore
+      if (this.userService) {
+        await this.userService.removeAuthMethod(providerId);
+      }
+
+      return { success: true, message: `${providerId} unlinked successfully` };
+    } catch (error) {
+      logError('Error unlinking auth method:', error.code);
+      return { success: false, error: this.getErrorMessage(error.code) };
+    }
+  }
+
+  /**
+   * Get all linked auth methods for current user
+   */
+  async getLinkedAuthMethods() {
+    try {
+      if (!this.userService) {
+        throw new Error('User service not initialized');
+      }
+
+      const result = await this.userService.getLinkedAuthMethods();
+      return result;
+    } catch (error) {
+      logError('Error getting linked auth methods:', error);
+      return { success: false, error: error.message };
+    }
   }
 }
 

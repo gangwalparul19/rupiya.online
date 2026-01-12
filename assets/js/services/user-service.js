@@ -116,6 +116,13 @@ class UserService {
       console.warn('[User Service] Could not detect location:', error);
     }
 
+    // Extract auth methods from provider data
+    const authMethods = user.providerData.map(provider => ({
+      providerId: provider.providerId,
+      linkedAt: serverTimestamp(),
+      email: provider.email || user.email
+    }));
+
     return {
       email: user.email,
       displayName: user.displayName || this._extractNameFromEmail(user.email),
@@ -131,8 +138,13 @@ class UserService {
       locationSource: location?.source || null,
       locationDetectedAt: location ? serverTimestamp() : null,
       
-      // Provider information
+      // Provider information - DEPRECATED (kept for backward compatibility)
       providerId: user.providerData[0]?.providerId || 'password',
+      
+      // Auth methods - NEW: Track all linked authentication methods
+      authMethods: authMethods.length > 0 ? authMethods : [
+        { providerId: 'password', linkedAt: serverTimestamp(), email: user.email }
+      ],
       
       // Metadata
       createdAt: serverTimestamp(),
@@ -540,6 +552,143 @@ class UserService {
       pendingInvitationId: null,
       pendingInvitationAcceptedAt: serverTimestamp()
     });
+  }
+
+  /**
+   * Get all linked auth methods for current user
+   * Returns array of auth methods (e.g., ['password', 'google.com'])
+   */
+  async getLinkedAuthMethods(userId = null) {
+    const uid = userId || authService.getCurrentUser()?.uid;
+    if (!uid) {
+      throw new Error('User not authenticated');
+    }
+
+    try {
+      const userRef = doc(db, this.collectionName, uid);
+      const userDoc = await getDoc(userRef);
+
+      if (userDoc.exists()) {
+        const authMethods = userDoc.data().authMethods || [];
+        return { success: true, authMethods };
+      } else {
+        return { success: false, error: 'User profile not found' };
+      }
+    } catch (error) {
+      console.error('Error getting auth methods:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Check if user has a specific auth method linked
+   */
+  async hasAuthMethod(providerId, userId = null) {
+    const uid = userId || authService.getCurrentUser()?.uid;
+    if (!uid) {
+      throw new Error('User not authenticated');
+    }
+
+    try {
+      const result = await this.getLinkedAuthMethods(uid);
+      if (result.success) {
+        return result.authMethods.some(method => method.providerId === providerId);
+      }
+      return false;
+    } catch (error) {
+      console.error('Error checking auth method:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Add a new auth method to user's linked methods
+   * Called when user links a new provider (e.g., adds password to Google account)
+   */
+  async addAuthMethod(providerId, email) {
+    const userId = authService.getCurrentUser()?.uid;
+    if (!userId) {
+      throw new Error('User not authenticated');
+    }
+
+    try {
+      const userRef = doc(db, this.collectionName, userId);
+      const userDoc = await getDoc(userRef);
+
+      if (!userDoc.exists()) {
+        return { success: false, error: 'User profile not found' };
+      }
+
+      const authMethods = userDoc.data().authMethods || [];
+      
+      // Check if method already exists
+      if (authMethods.some(method => method.providerId === providerId)) {
+        return { success: false, error: `${providerId} is already linked to this account` };
+      }
+
+      // Add new method
+      authMethods.push({
+        providerId,
+        linkedAt: serverTimestamp(),
+        email
+      });
+
+      await updateDoc(userRef, {
+        authMethods,
+        updatedAt: serverTimestamp()
+      });
+
+      // Invalidate cache
+      this.invalidateCache(userId);
+
+      return { success: true, message: `${providerId} linked successfully` };
+    } catch (error) {
+      console.error('Error adding auth method:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Remove an auth method from user's linked methods
+   * Prevents removing the last auth method
+   */
+  async removeAuthMethod(providerId) {
+    const userId = authService.getCurrentUser()?.uid;
+    if (!userId) {
+      throw new Error('User not authenticated');
+    }
+
+    try {
+      const userRef = doc(db, this.collectionName, userId);
+      const userDoc = await getDoc(userRef);
+
+      if (!userDoc.exists()) {
+        return { success: false, error: 'User profile not found' };
+      }
+
+      let authMethods = userDoc.data().authMethods || [];
+
+      // Prevent removing the last auth method
+      if (authMethods.length <= 1) {
+        return { success: false, error: 'Cannot remove the last authentication method' };
+      }
+
+      // Remove the method
+      authMethods = authMethods.filter(method => method.providerId !== providerId);
+
+      await updateDoc(userRef, {
+        authMethods,
+        updatedAt: serverTimestamp()
+      });
+
+      // Invalidate cache
+      this.invalidateCache(userId);
+
+      return { success: true, message: `${providerId} unlinked successfully` };
+    } catch (error) {
+      console.error('Error removing auth method:', error);
+      return { success: false, error: error.message };
+    }
   }
 
   /**

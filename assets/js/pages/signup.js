@@ -1,6 +1,8 @@
-// Signup Page Logic
+// Signup Page Logic - Dual Auth Support
 import '../services/services-init.js'; // Initialize services
 import authService from '../services/auth-service.js';
+import dualAuthHelper from '../utils/dual-auth-helper.js';
+import authEncryptionHelper from '../utils/auth-encryption-helper.js';
 import toast from '../components/toast.js';
 import { validateForm, setupRealtimeValidation } from '../utils/validation.js';
 import FormValidator from '../utils/form-validation.js';
@@ -111,8 +113,37 @@ signupForm.addEventListener('submit', async (e) => {
     const result = await authService.signUp(email, password, displayName);
     
     if (result.success) {
+      // Initialize encryption with user's password
+      const encryptionInitialized = await authEncryptionHelper.initializeAfterLogin(
+        password, 
+        result.user.uid
+      );
+      
+      if (!encryptionInitialized) {
+        console.warn('[Signup] Encryption initialization failed, data will not be encrypted');
+      }
+      
       // Show verification message
       showVerificationMessage(email);
+    } else if (result.emailExists) {
+      // Email already exists via another provider
+      const methods = await dualAuthHelper.getAvailableAuthMethods(email);
+      
+      let message = 'This email is already registered. ';
+      if (methods.hasGoogle && methods.hasPassword) {
+        message += 'You can sign in with Google or password.';
+      } else if (methods.hasGoogle) {
+        message += 'You can sign in with Google.';
+      } else if (methods.hasPassword) {
+        message += 'You can sign in with password.';
+      }
+      
+      toast.show(message, 'info');
+      
+      // Redirect to login with email pre-filled
+      setTimeout(() => {
+        window.location.href = `login.html?email=${encodeURIComponent(email)}`;
+      }, 2000);
     } else {
       toast.error(result.error);
       signupBtn.disabled = false;
@@ -152,15 +183,14 @@ function showVerificationMessage(email) {
 // Handle Google Sign Up
 googleSignUpBtn.addEventListener('click', async () => {
   googleSignUpBtn.disabled = true;
+  const originalText = googleSignUpBtn.textContent;
+  googleSignUpBtn.textContent = 'Creating Account...';
   
   try {
     const result = await authService.signInWithGoogle();
     
     if (result.success) {
-      // Encryption for Google users is automatically initialized in services-init.js
-      // No need to initialize here as it doesn't require a password
-      
-      toast.success('Account created successfully! Redirecting...');
+      toast.show('Account created successfully! Redirecting...', 'success');
       const redirectUrl = getRedirectUrl();
       setTimeout(() => {
         window.location.href = redirectUrl;
@@ -168,17 +198,29 @@ googleSignUpBtn.addEventListener('click', async () => {
     } else {
       toast.error(result.error);
       googleSignUpBtn.disabled = false;
+      googleSignUpBtn.textContent = originalText;
     }
   } catch (error) {
     console.error('Google sign up error:', error);
     toast.error('An unexpected error occurred. Please try again.');
     googleSignUpBtn.disabled = false;
+    googleSignUpBtn.textContent = originalText;
   }
 });
 
 // Check if already logged in (on page load only)
 (async () => {
   try {
+    // Pre-fill email if provided in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const emailParam = urlParams.get('email');
+    if (emailParam) {
+      const emailInput = document.getElementById('email');
+      if (emailInput) {
+        emailInput.value = decodeURIComponent(emailParam);
+      }
+    }
+
     await authService.waitForAuth();
     if (authService.isAuthenticated()) {
       // User is already logged in, redirect

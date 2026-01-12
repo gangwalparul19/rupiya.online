@@ -95,6 +95,34 @@ class PrivacyModeManager {
     }
 
     /**
+     * Ensure privacy settings page is fully interactive
+     * Removes any CSS or JS blocks that might prevent interaction
+     */
+    _ensurePrivacySettingsPageInteractive() {
+        // Force pointer-events on all interactive elements
+        const interactiveSelectors = [
+            'button', 'input', 'select', 'textarea', 'a',
+            '.privacy-toggle', '.btn', '.privacy-setting-item',
+            '.privacy-settings-panel', '.main-content', '.page-container'
+        ];
+        
+        interactiveSelectors.forEach(selector => {
+            document.querySelectorAll(selector).forEach(el => {
+                el.style.pointerEvents = 'auto';
+                el.style.opacity = '1';
+                el.style.filter = 'none';
+            });
+        });
+        
+        // Ensure body and main content are not blocked
+        document.body.style.pointerEvents = 'auto';
+        document.body.style.opacity = '1';
+        document.body.style.filter = 'none';
+        
+        console.log('Privacy Mode: Ensured privacy-settings page is interactive');
+    }
+
+    /**
      * Toggle privacy mode on/off
      */
     toggle() {
@@ -137,6 +165,9 @@ class PrivacyModeManager {
         if (this._isPrivacySettingsPage()) {
             // Remove any privacy mode effects that might have been applied
             this._removeAllPrivacyEffects();
+            
+            // Ensure all interactive elements are clickable
+            this._ensurePrivacySettingsPageInteractive();
             
             // Only update the button state and dispatch event, don't hide content
             this.updatePrivacyButton();

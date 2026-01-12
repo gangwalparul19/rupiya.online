@@ -284,17 +284,45 @@
             }
         }
 
-        mainToggle?.addEventListener('click', () => {
-            privacyMode.toggle();
-            updateToggleState();
-        });
+        // Ensure toggle is always clickable
+        if (mainToggle) {
+            mainToggle.style.pointerEvents = 'auto';
+            mainToggle.style.cursor = 'pointer';
+            
+            mainToggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                privacyMode.toggle();
+                updateToggleState();
+            });
+            
+            // Add touch support for mobile
+            mainToggle.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                privacyMode.toggle();
+                updateToggleState();
+            });
+        }
 
         enableBtn?.addEventListener('click', () => {
             privacyMode.enable();
             updateToggleState();
         });
+        
+        enableBtn?.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            privacyMode.enable();
+            updateToggleState();
+        });
 
         disableBtn?.addEventListener('click', () => {
+            privacyMode.disable();
+            updateToggleState();
+        });
+        
+        disableBtn?.addEventListener('touchend', (e) => {
+            e.preventDefault();
             privacyMode.disable();
             updateToggleState();
         });

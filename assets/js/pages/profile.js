@@ -1,6 +1,7 @@
 // Profile & Settings Page Logic
 import '../services/services-init.js'; // Initialize services first
 import authService from '../services/auth-service.js';
+import dualAuthHelper from '../utils/dual-auth-helper.js';
 import firestoreService from '../services/firestore-service.js';
 import categoriesService from '../services/categories-service.js';
 import encryptionService from '../services/encryption-service.js';
@@ -185,14 +186,241 @@ function setupEventListeners() {
 
 // Setup security section based on auth provider
 function setupSecuritySection() {
-  if (isGoogleUser) {
-    // Show Google notice, hide email/password form
-    if (googleAuthNotice) googleAuthNotice.style.display = 'block';
-    if (emailAuthSection) emailAuthSection.style.display = 'none';
-  } else {
-    // Show email/password form, hide Google notice
-    if (googleAuthNotice) googleAuthNotice.style.display = 'none';
-    if (emailAuthSection) emailAuthSection.style.display = 'block';
+  // Load auth methods
+  loadAuthMethods();
+}
+
+// Load and display linked auth methods
+async function loadAuthMethods() {
+  try {
+    const result = await authService.getLinkedAuthMethods();
+    
+    if (!result.success) {
+      console.error('Error loading auth methods:', result.error);
+      return;
+    }
+    
+    const authMethods = result.authMethods || [];
+    const methodsList = document.getElementById('linkedAuthMethodsList');
+    const availableList = document.getElementById('availableAuthMethodsList');
+    
+    if (!methodsList || !availableList) return;
+    
+    // Clear existing content
+    methodsList.innerHTML = '';
+    availableList.innerHTML = '';
+    
+    // Display linked methods
+    if (authMethods.length > 0) {
+      const methodsHtml = authMethods.map(method => {
+        const displayName = getAuthMethodDisplayName(method.providerId);
+        const linkedDate = new Date(method.linkedAt).toLocaleDateString();
+        const isLastMethod = authMethods.length === 1;
+        
+        return `
+          <div class="auth-method-item">
+            <div class="method-info">
+              <span class="method-name">${displayName}</span>
+              <span class="method-email">${method.email}</span>
+              <span class="method-date">Linked: ${linkedDate}</span>
+            </div>
+            <button 
+              type="button"
+              class="btn btn-sm btn-outline"
+              onclick="unlinkAuthMethod('${method.providerId}')"
+              ${isLastMethod ? 'disabled title="Cannot remove the last authentication method"' : ''}
+            >
+              Unlink
+            </button>
+          </div>
+        `;
+      }).join('');
+      
+      methodsList.innerHTML = `
+        <div class="auth-methods-list">
+          ${methodsHtml}
+        </div>
+      `;
+    }
+    
+    // Show available methods to add
+    const allMethods = ['password', 'google.com'];
+    const linkedProviders = authMethods.map(m => m.providerId);
+    const availableMethods = allMethods.filter(m => !linkedProviders.includes(m));
+    
+    if (availableMethods.length > 0) {
+      const availableHtml = availableMethods.map(method => {
+        const displayName = getAuthMethodDisplayName(method);
+        return `
+          <button 
+            type="button"
+            class="btn btn-primary"
+            onclick="addAuthMethod('${method}')"
+            style="width: 100%; margin-bottom: 8px;"
+          >
+            Add ${displayName}
+          </button>
+        `;
+      }).join('');
+      
+      availableList.innerHTML = `
+        <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #e0e0e0;">
+          <h4 style="margin-bottom: 12px;">Add Another Authentication Method</h4>
+          ${availableHtml}
+        </div>
+      `;
+    }
+  } catch (error) {
+    console.error('Error in loadAuthMethods:', error);
+  }
+}
+
+// Get display name for auth method
+function getAuthMethodDisplayName(providerId) {
+  const names = {
+    'password': 'Email & Password',
+    'google.com': 'Google'
+  };
+  return names[providerId] || providerId;
+}
+
+// Add auth method
+async function addAuthMethod(providerId) {
+  if (providerId === 'password') {
+    showAddPasswordDialog();
+  } else if (providerId === 'google.com') {
+    await linkGoogleAccount();
+  }
+}
+
+// Show dialog for adding password
+function showAddPasswordDialog() {
+  const dialog = document.createElement('div');
+  dialog.className = 'modal';
+  dialog.id = 'addPasswordModal';
+  dialog.innerHTML = `
+    <div class="modal-content" style="max-width: 400px;">
+      <h3>Add Password Authentication</h3>
+      <p>Set a password for your account to enable password-based login</p>
+      
+      <div class="form-group">
+        <label for="newPassword">New Password</label>
+        <input type="password" id="newPassword" placeholder="New password" required minlength="6">
+      </div>
+      
+      <div class="form-group">
+        <label for="confirmPassword">Confirm Password</label>
+        <input type="password" id="confirmPassword" placeholder="Confirm password" required minlength="6">
+      </div>
+      
+      <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px;">
+        <button type="button" class="btn btn-outline" onclick="closeAddPasswordDialog()">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="confirmAddPassword()">Add Password</button>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(dialog);
+}
+
+// Close add password dialog
+function closeAddPasswordDialog() {
+  const dialog = document.getElementById('addPasswordModal');
+  if (dialog) {
+    dialog.remove();
+  }
+}
+
+// Confirm add password
+async function confirmAddPassword() {
+  const password = document.getElementById('newPassword').value;
+  const confirmPassword = document.getElementById('confirmPassword').value;
+  
+  if (!password || !confirmPassword) {
+    showToast('Please fill in all fields', 'error');
+    return;
+  }
+  
+  if (password !== confirmPassword) {
+    showToast('Passwords do not match', 'error');
+    return;
+  }
+  
+  if (password.length < 6) {
+    showToast('Password must be at least 6 characters', 'error');
+    return;
+  }
+  
+  const btn = document.querySelector('#addPasswordModal .btn-primary');
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Adding...';
+  }
+  
+  try {
+    const result = await authService.linkPasswordToGoogleAccount(password);
+    
+    if (result.success) {
+      showToast('Password added successfully', 'success');
+      closeAddPasswordDialog();
+      await loadAuthMethods();
+    } else {
+      showToast(result.error, 'error');
+    }
+  } catch (error) {
+    console.error('Error adding password:', error);
+    showToast('Failed to add password', 'error');
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = 'Add Password';
+    }
+  }
+}
+
+// Link Google account
+async function linkGoogleAccount() {
+  try {
+    const result = await authService.linkGoogleToPasswordAccount();
+    
+    if (result.success) {
+      showToast('Google account linked successfully', 'success');
+      await loadAuthMethods();
+    } else {
+      showToast(result.error, 'error');
+    }
+  } catch (error) {
+    console.error('Error linking Google:', error);
+    showToast('Failed to link Google account', 'error');
+  }
+}
+
+// Unlink auth method
+async function unlinkAuthMethod(providerId) {
+  const methodName = getAuthMethodDisplayName(providerId);
+  
+  const confirmed = await confirmationModal.show({
+    title: 'Unlink Authentication Method',
+    message: `Are you sure you want to unlink ${methodName}? You'll need another authentication method to log in.`,
+    confirmText: 'Unlink',
+    cancelText: 'Cancel',
+    type: 'warning'
+  });
+  
+  if (!confirmed) return;
+  
+  try {
+    const result = await authService.unlinkAuthMethod(providerId);
+    
+    if (result.success) {
+      showToast(`${methodName} unlinked successfully`, 'success');
+      await loadAuthMethods();
+    } else {
+      showToast(result.error, 'error');
+    }
+  } catch (error) {
+    console.error('Error unlinking auth method:', error);
+    showToast('Failed to unlink authentication method', 'error');
   }
 }
 
