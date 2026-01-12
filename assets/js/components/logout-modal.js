@@ -48,6 +48,10 @@ class LogoutModal {
     this.modal = tempDiv.firstElementChild;
     document.body.appendChild(this.modal);
 
+    // Ensure modal is hidden by default
+    this.modal.classList.remove('show');
+    this.isShowing = false;
+
     // Add event listeners
     this.setupEventListeners();
   }

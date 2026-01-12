@@ -18,11 +18,13 @@
   visibility: hidden;
   transition: all 0.3s ease;
   padding: 1rem;
+  pointer-events: none;
 }
 
 .logout-modal-overlay.show {
   opacity: 1;
   visibility: visible;
+  pointer-events: auto;
 }
 
 .logout-modal-container {

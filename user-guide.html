@@ -98,6 +98,40 @@
             .step-number { width: 30px; height: 30px; line-height: 30px; font-size: 0.9em; margin-right: 10px; }
             .guide-container { padding: 10px; }
         }
+        
+        /* ============================================
+           ENSURE PAGE IS NEVER GRAYED OUT
+           ============================================ */
+        
+        /* Prevent any opacity/filter from graying out the page */
+        body {
+            opacity: 1 !important;
+            filter: none !important;
+            background: #f5f7fa !important;
+        }
+        
+        .dashboard-layout,
+        .main-content,
+        .guide-container,
+        .sidebar,
+        .mobile-header {
+            opacity: 1 !important;
+            filter: none !important;
+            pointer-events: auto !important;
+        }
+        
+        /* Ensure all interactive elements are clickable */
+        button, a, input, select, textarea {
+            opacity: 1 !important;
+            pointer-events: auto !important;
+        }
+        
+        /* Ensure logout modal overlay doesn't block page when hidden */
+        .logout-modal-overlay:not(.show) {
+            opacity: 0 !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+        }
     </style>
 </head>
 <body>

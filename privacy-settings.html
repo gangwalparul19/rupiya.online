@@ -162,6 +162,17 @@
                 display: flex !important;
             }
         }
+        
+        /* ============================================
+           ENSURE LOGOUT MODAL DOESN'T BLOCK PAGE
+           ============================================ */
+        
+        /* Ensure logout modal overlay doesn't block page when hidden */
+        .logout-modal-overlay:not(.show) {
+            opacity: 0 !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+        }
     </style>
 </head>
 <body class="privacy-settings-page">
