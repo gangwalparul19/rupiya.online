@@ -183,15 +183,23 @@ class FeatureConfigManager {
     if (typeof window !== 'undefined') {
       window.addEventListener('encryptionReady', async () => {
         console.log('[FeatureConfig] Encryption ready event received');
-        // If we have a user and features are still using defaults, reinitialize
+        
+        // If we have a user and features are loaded, try to reload with proper decryption
         if (this.currentUserId && this.userFeatures) {
-          const enabledCount = Object.values(this.userFeatures).filter(f => f.enabled).length;
+          const enabledCount = Object.values(this.userFeatures).filter(f => {
+            if (typeof f === 'object' && f !== null) {
+              return f.enabled === true;
+            }
+            return f === true;
+          }).length;
+          
           console.log('[FeatureConfig] Current enabled features:', enabledCount);
           
           // If we only have 3 features (the defaults), we likely failed to decrypt
+          // Try to reload now that encryption is ready
           if (enabledCount <= 3) {
-            console.log('[FeatureConfig] Only', enabledCount, 'features loaded, reinitializing to decrypt...');
-            await this.reinitialize();
+            console.log('[FeatureConfig] Only', enabledCount, 'features loaded, reloading with encryption...');
+            await this.reloadFromFirestore();
           }
         }
       });
@@ -236,27 +244,49 @@ class FeatureConfigManager {
       // ALWAYS load from Firestore first to ensure data is fresh
       console.log('[FeatureConfig] Loading from Firestore');
 
-      // Wait for encryption to be ready (with extended timeout and retries)
-      let encryptionReady = false;
-      const maxWaitTime = 10000; // 10 seconds max
-      const checkInterval = 200; // Check every 200ms
-      const startTime = Date.now();
+      // Check if encryption is already ready (might be initialized before this)
+      let encryptionReady = encryptionService.isReady && encryptionService.isReady();
+      console.log('[FeatureConfig] Initial encryption ready status:', encryptionReady);
       
-      while (!encryptionReady && (Date.now() - startTime) < maxWaitTime) {
-        try {
-          if (encryptionService.waitForInitialization) {
-            await encryptionService.waitForInitialization();
+      // If not ready, wait for it
+      if (!encryptionReady) {
+        // Wait for encryption to be ready (with extended timeout and retries)
+        const maxWaitTime = 15000; // 15 seconds max
+        const checkInterval = 300; // Check every 300ms
+        const startTime = Date.now();
+        let waitAttempts = 0;
+        
+        while (!encryptionReady && (Date.now() - startTime) < maxWaitTime) {
+          try {
+            // First wait for initialization to complete
+            if (encryptionService.waitForInitialization) {
+              await Promise.race([
+                encryptionService.waitForInitialization(),
+                new Promise(resolve => setTimeout(resolve, 1000))
+              ]);
+            }
+            
+            // Then check if ready
+            if (encryptionService.isReady && encryptionService.isReady()) {
+              encryptionReady = true;
+              console.log('[FeatureConfig] Encryption ready after', waitAttempts, 'attempts');
+              break;
+            }
+            
+            waitAttempts++;
+            if (waitAttempts % 5 === 0) {
+              console.log('[FeatureConfig] Still waiting for encryption... attempt', waitAttempts);
+            }
+          } catch (e) {
+            console.warn('[FeatureConfig] Error checking encryption readiness:', e.message);
           }
           
-          if (encryptionService.isReady && encryptionService.isReady()) {
-            encryptionReady = true;
-            break;
-          }
-        } catch (e) {
-          // Ignore
+          await new Promise(resolve => setTimeout(resolve, checkInterval));
         }
         
-        await new Promise(resolve => setTimeout(resolve, checkInterval));
+        if (!encryptionReady) {
+          console.warn('[FeatureConfig] Encryption not ready after', maxWaitTime, 'ms, proceeding with fallback');
+        }
       }
 
       // Load user's feature config from Firestore
@@ -272,24 +302,46 @@ class FeatureConfigManager {
         let decryptedData = savedData;
         const isEncryptionReady = encryptionService.isReady ? encryptionService.isReady() : false;
         
+        console.log('[FeatureConfig] Encryption ready status:', isEncryptionReady);
+        
         try {
           if (savedData._encrypted) {
             console.log('[FeatureConfig] Data is encrypted, attempting decryption...');
-            // If encryption is ready, decrypt
+            
+            // If encryption is ready, decrypt immediately
             if (isEncryptionReady) {
-              console.log('[FeatureConfig] Encryption ready, decrypting...');
+              console.log('[FeatureConfig] Encryption ready, decrypting immediately...');
               decryptedData = await encryptionService.decryptObject(savedData, FEATURES_COLLECTION);
+              console.log('[FeatureConfig] Decryption successful');
             } else {
-              // Encryption not ready yet - wait a bit more and try again
-              console.log('[FeatureConfig] Encryption not ready, waiting...');
-              await new Promise(resolve => setTimeout(resolve, 2000));
+              // Encryption not ready yet - wait longer and try again
+              console.log('[FeatureConfig] Encryption not ready, waiting for initialization...');
               
-              // Check again
-              if (encryptionService.isReady && encryptionService.isReady()) {
-                console.log('[FeatureConfig] Encryption now ready, decrypting...');
-                decryptedData = await encryptionService.decryptObject(savedData, FEATURES_COLLECTION);
-              } else {
-                console.log('[FeatureConfig] Encryption still not ready, using fallback...');
+              // Wait up to 5 seconds for encryption to be ready
+              let decryptRetries = 0;
+              const maxDecryptRetries = 50; // 50 * 100ms = 5 seconds
+              let decryptionSucceeded = false;
+              
+              while (decryptRetries < maxDecryptRetries && !decryptionSucceeded) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                if (encryptionService.isReady && encryptionService.isReady()) {
+                  try {
+                    console.log('[FeatureConfig] Encryption now ready, attempting decryption...');
+                    decryptedData = await encryptionService.decryptObject(savedData, FEATURES_COLLECTION);
+                    decryptionSucceeded = true;
+                    console.log('[FeatureConfig] Decryption successful after', decryptRetries, 'retries');
+                  } catch (decryptErr) {
+                    console.warn('[FeatureConfig] Decryption attempt failed:', decryptErr.message);
+                    decryptRetries++;
+                  }
+                } else {
+                  decryptRetries++;
+                }
+              }
+              
+              if (!decryptionSucceeded) {
+                console.warn('[FeatureConfig] Decryption failed after', maxDecryptRetries, 'retries, using fallback...');
                 // Try to extract features from the encrypted string if possible
                 if (savedData.features && typeof savedData.features === 'string') {
                   try {
@@ -297,7 +349,7 @@ class FeatureConfigManager {
                     decryptedData = { features: parsed };
                     console.log('[FeatureConfig] Extracted features from encrypted string');
                   } catch (e) {
-                    console.warn('[FeatureConfig] Failed to parse features string:', e);
+                    console.warn('[FeatureConfig] Failed to parse features string:', e.message);
                   }
                 }
               }
@@ -314,7 +366,7 @@ class FeatureConfigManager {
               decryptedData = { features: parsed };
               console.log('[FeatureConfig] Recovered features from string after decryption error');
             } catch (e) {
-              console.error('[FeatureConfig] Failed to recover features:', e);
+              console.error('[FeatureConfig] Failed to recover features:', e.message);
               this.userFeatures = JSON.parse(JSON.stringify(DEFAULT_FEATURES));
               return;
             }
@@ -603,6 +655,7 @@ class FeatureConfigManager {
    * Force re-initialization (useful after login)
    */
   async reinitialize() {
+    console.log('[FeatureConfig] Reinitializing features...');
     this.initialized = false;
     this.userFeatures = null;
     this.currentUserId = null;
@@ -616,6 +669,84 @@ class FeatureConfigManager {
     }
     
     await this.init();
+    console.log('[FeatureConfig] Reinitialization complete');
+  }
+
+  /**
+   * Reload features from Firestore (useful when encryption becomes ready)
+   */
+  async reloadFromFirestore() {
+    console.log('[FeatureConfig] Reloading features from Firestore...');
+    
+    try {
+      const user = authService.getCurrentUser();
+      if (!user) {
+        console.warn('[FeatureConfig] No user found, cannot reload');
+        return;
+      }
+
+      // Check if encryption is ready now
+      const isEncryptionReady = encryptionService.isReady && encryptionService.isReady();
+      console.log('[FeatureConfig] Encryption ready for reload:', isEncryptionReady);
+
+      // Load fresh from Firestore
+      const docRef = doc(db, FEATURES_COLLECTION, user.uid);
+      const docSnap = await getDoc(docRef);
+      
+      if (docSnap.exists()) {
+        let savedData = docSnap.data();
+        console.log('[FeatureConfig] Fresh data from Firestore:', savedData);
+        
+        let decryptedData = savedData;
+        
+        try {
+          if (savedData._encrypted && isEncryptionReady) {
+            console.log('[FeatureConfig] Attempting to decrypt fresh data...');
+            decryptedData = await encryptionService.decryptObject(savedData, FEATURES_COLLECTION);
+            console.log('[FeatureConfig] Decryption successful');
+          }
+        } catch (decryptError) {
+          console.error('[FeatureConfig] Decryption error during reload:', decryptError);
+        }
+        
+        // Extract and merge features
+        let savedFeatures = decryptedData?.features;
+        
+        if (savedFeatures) {
+          if (typeof savedFeatures === 'string') {
+            try {
+              savedFeatures = JSON.parse(savedFeatures);
+            } catch (e) {
+              console.warn('[FeatureConfig] Failed to parse features string:', e);
+              return;
+            }
+          }
+        }
+        
+        if (savedFeatures && typeof savedFeatures === 'object') {
+          // Deep merge with defaults
+          this.userFeatures = JSON.parse(JSON.stringify(DEFAULT_FEATURES));
+          Object.keys(savedFeatures).forEach(key => {
+            if (this.userFeatures[key] && savedFeatures[key] !== undefined) {
+              if (typeof savedFeatures[key] === 'object' && savedFeatures[key] !== null) {
+                this.userFeatures[key].enabled = savedFeatures[key].enabled;
+              } else if (typeof savedFeatures[key] === 'boolean') {
+                this.userFeatures[key].enabled = savedFeatures[key];
+              }
+            }
+          });
+          
+          console.log('[FeatureConfig] Features reloaded successfully');
+          
+          // Dispatch event to notify UI
+          window.dispatchEvent(new CustomEvent('featuresReloaded', {
+            detail: { features: this.userFeatures }
+          }));
+        }
+      }
+    } catch (error) {
+      console.error('[FeatureConfig] Error reloading features:', error);
+    }
   }
 }
 
