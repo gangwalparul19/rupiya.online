@@ -208,8 +208,6 @@ function showEditForm(vehicle) {
   document.getElementById('currentMileage').value = vehicle.currentMileage || 0;
   document.getElementById('fuelType').value = vehicle.fuelType || '';
   document.getElementById('insuranceExpiry').value = vehicle.insuranceExpiry ? formatDateForInput(vehicle.insuranceExpiry) : '';
-  document.getElementById('ownerName').value = vehicle.ownerName || '';
-  document.getElementById('driverName').value = vehicle.driverName || '';
   document.getElementById('notes').value = vehicle.notes || '';
 
   addVehicleSection.classList.add('show');
@@ -226,8 +224,6 @@ async function handleSubmit(e) {
     currentMileage: parseFloat(document.getElementById('currentMileage').value) || 0,
     fuelType: document.getElementById('fuelType').value,
     insuranceExpiry: document.getElementById('insuranceExpiry').value ? timezoneService.parseInputDate(document.getElementById('insuranceExpiry').value) : null,
-    ownerName: document.getElementById('ownerName').value.trim(),
-    driverName: document.getElementById('driverName').value.trim(),
     notes: document.getElementById('notes').value.trim()
   };
 
@@ -496,6 +492,47 @@ function calculateOverallMileageStats() {
   };
 }
 
+// Calculate total expenses for a specific vehicle (fuel + maintenance + income)
+async function calculateVehicleExpenses(vehicleId) {
+  try {
+    // Get fuel expenses for this vehicle
+    const vehicleFuelLogs = fuelLogs.filter(log => log.vehicleId === vehicleId);
+    const fuelStats = calculateVehicleMileage(vehicleFuelLogs);
+    let totalExpense = fuelStats.totalFuelCost;
+    
+    // Get maintenance expenses for this vehicle
+    const maintenanceExpenses = await firestoreService.getAll('vehicleMaintenanceExpenses', 'createdAt', 'desc');
+    const vehicleMaintenanceExpenses = maintenanceExpenses.filter(exp => exp.vehicleId === vehicleId);
+    const maintenanceCost = vehicleMaintenanceExpenses.reduce((sum, exp) => sum + (parseFloat(exp.amount) || 0), 0);
+    totalExpense += maintenanceCost;
+    
+    // Get vehicle income for this vehicle
+    const vehicleIncomeData = await firestoreService.getAll('vehicleIncome', 'createdAt', 'desc');
+    const vehicleIncomeList = vehicleIncomeData.filter(inc => inc.vehicleId === vehicleId);
+    const totalIncome = vehicleIncomeList.reduce((sum, inc) => sum + (parseFloat(inc.amount) || 0), 0);
+    
+    // Net expense = total expense - income
+    const netExpense = totalExpense - totalIncome;
+    
+    return {
+      totalExpense,
+      fuelCost: fuelStats.totalFuelCost,
+      maintenanceCost,
+      totalIncome,
+      netExpense
+    };
+  } catch (error) {
+    console.error('Error calculating vehicle expenses:', error);
+    return {
+      totalExpense: 0,
+      fuelCost: 0,
+      maintenanceCost: 0,
+      totalIncome: 0,
+      netExpense: 0
+    };
+  }
+}
+
 // Load fuel logs from Firestore
 async function loadFuelLogs() {
   try {
@@ -646,11 +683,14 @@ async function showMileageHistory(vehicleId, vehicleName) {
   const vehicleFuelLogs = fuelLogs.filter(log => log.vehicleId === vehicleId);
   const stats = calculateVehicleMileage(vehicleFuelLogs);
   
+  // Calculate total expenses for this vehicle (fuel + maintenance + income)
+  const vehicleExpenses = await calculateVehicleExpenses(vehicleId);
+  
   // Update stats
   vehicleAvgMileage.textContent = stats.avgMileage > 0 ? stats.avgMileage.toFixed(2) + ' km/l' : '-- km/l';
   vehicleTotalDistance.textContent = stats.totalDistance.toLocaleString() + ' km';
-  vehicleTotalFuelCost.textContent = formatCurrency(stats.totalFuelCost);
-  vehicleCostPerKm.textContent = stats.totalDistance > 0 ? '₹' + (stats.totalFuelCost / stats.totalDistance).toFixed(2) + '/km' : '₹0/km';
+  vehicleTotalFuelCost.textContent = formatCurrency(vehicleExpenses.totalExpense);
+  vehicleCostPerKm.textContent = stats.totalDistance > 0 ? '₹' + (vehicleExpenses.totalExpense / stats.totalDistance).toFixed(2) + '/km' : '₹0/km';
   
   // Render fuel logs
   if (vehicleFuelLogs.length === 0) {

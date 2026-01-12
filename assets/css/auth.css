@@ -189,6 +189,20 @@
   animation: cardEntrance 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: auto;
+}
+
+/* Ensure all direct children except footer grow to fill space */
+.auth-card > *:not(.auth-footer) {
+  flex-shrink: 0;
+}
+
+/* Make the main content area flexible */
+.auth-card > #emailStep,
+.auth-card > #authMethodsStep {
+  flex-shrink: 0;
 }
 
 .auth-card::before {
@@ -609,6 +623,9 @@
   font-size: 0.9375rem;
   color: var(--text-secondary);
   animation: fadeIn 0.5s ease-out 1.3s both;
+  margin-top: auto;
+  padding-top: 24px;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .auth-footer a {

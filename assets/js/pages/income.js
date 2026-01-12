@@ -25,6 +25,7 @@ const state = {
   filters: {
     source: '',
     paymentMethod: '',
+    specificPaymentMethod: '',
     familyMember: '',
     dateFrom: '',
     dateTo: '',
@@ -111,6 +112,8 @@ const filtersToggle = document.getElementById('filtersToggle');
 const filtersContent = document.getElementById('filtersContent');
 const sourceFilter = document.getElementById('sourceFilter');
 const paymentMethodFilter = document.getElementById('paymentMethodFilter');
+const specificPaymentMethodFilter = document.getElementById('specificPaymentMethodFilter');
+const familyMemberFilter = document.getElementById('familyMemberFilter');
 const dateFromFilter = document.getElementById('dateFromFilter');
 const dateToFilter = document.getElementById('dateToFilter');
 const clearFiltersBtn = document.getElementById('clearFiltersBtn');
@@ -237,6 +240,44 @@ function populateFamilyMemberFilter() {
   } catch (error) {
     console.error('Error populating family member filter:', error);
   }
+}
+
+// Handle payment method filter change (cascading filter)
+function handlePaymentMethodFilterChange() {
+  const selectedType = paymentMethodFilter.value;
+  const specificPaymentMethodGroup = document.getElementById('specificPaymentMethodFilterGroup');
+  
+  if (!selectedType || selectedType === 'cash') {
+    // Hide specific payment method dropdown for cash or no selection
+    specificPaymentMethodGroup.style.display = 'none';
+    specificPaymentMethodFilter.value = '';
+    state.filters.specificPaymentMethod = '';
+    applyFilters();
+    return;
+  }
+  
+  // Filter payment methods by selected type
+  const methodsOfType = userPaymentMethods.filter(method => method.type === selectedType);
+  
+  if (methodsOfType.length === 0) {
+    // No saved methods of this type
+    specificPaymentMethodGroup.style.display = 'none';
+    specificPaymentMethodFilter.value = '';
+    state.filters.specificPaymentMethod = '';
+    applyFilters();
+    return;
+  }
+  
+  // Populate specific payment method dropdown
+  specificPaymentMethodFilter.innerHTML = '<option value="">All ' + getPaymentTypeLabel(selectedType) + '</option>' +
+    methodsOfType.map(method => {
+      const displayName = getPaymentMethodDisplayName(method);
+      const icon = getPaymentMethodIcon(method.type);
+      return `<option value="${method.id}">${icon} ${displayName}</option>`;
+    }).join('');
+  
+  // Show the dropdown
+  specificPaymentMethodGroup.style.display = 'block';
 }
 
 // Check URL parameters for pre-filled data
@@ -426,6 +467,55 @@ function updateIncomeKPIs() {
   }
 }
 
+// Update KPIs based on filtered data
+function updateFilteredIncomeKPIs() {
+  const now = new Date();
+  const thisMonthStart = timezoneService.startOfMonth(now);
+  const lastMonthStart = timezoneService.startOfMonth(new Date(now.getFullYear(), now.getMonth() - 1, 1));
+  const lastMonthEnd = timezoneService.endOfMonth(new Date(now.getFullYear(), now.getMonth() - 1, 1));
+  
+  let thisMonthTotal = 0;
+  let lastMonthTotal = 0;
+  let totalAll = 0;
+  
+  // Use filtered income instead of all income
+  state.filteredIncome.forEach(income => {
+    const amount = Number(income.amount) || 0;
+    const incomeDate = timezoneService.toLocalDate(income.date);
+    
+    totalAll += amount;
+    
+    if (incomeDate >= thisMonthStart) {
+      thisMonthTotal += amount;
+    } else if (incomeDate >= lastMonthStart && incomeDate <= lastMonthEnd) {
+      lastMonthTotal += amount;
+    }
+  });
+  
+  // Update UI with compact format
+  const thisMonthEl = document.getElementById('thisMonthIncome');
+  const lastMonthEl = document.getElementById('lastMonthIncome');
+  const totalEl = document.getElementById('totalIncome');
+  
+  if (thisMonthEl) thisMonthEl.textContent = formatCurrencyCompact(thisMonthTotal);
+  if (lastMonthEl) lastMonthEl.textContent = formatCurrencyCompact(lastMonthTotal);
+  if (totalEl) totalEl.textContent = formatCurrencyCompact(totalAll);
+  
+  // Update tooltips with full amounts
+  const thisMonthKpi = document.getElementById('thisMonthKpi');
+  const lastMonthKpi = document.getElementById('lastMonthKpi');
+  const totalKpi = document.getElementById('totalKpi');
+  
+  if (thisMonthKpi) thisMonthKpi.setAttribute('data-tooltip', formatCurrency(thisMonthTotal));
+  if (lastMonthKpi) lastMonthKpi.setAttribute('data-tooltip', formatCurrency(lastMonthTotal));
+  if (totalKpi) totalKpi.setAttribute('data-tooltip', formatCurrency(totalAll));
+  
+  // Reinitialize tooltips after data is set
+  if (window.kpiTooltipManager) {
+    window.kpiTooltipManager.reinitializeTooltips();
+  }
+}
+
 // Apply filters
 function applyFilters() {
   let filtered = [...state.income];
@@ -435,9 +525,14 @@ function applyFilters() {
     filtered = filtered.filter(i => i.source === state.filters.source);
   }
   
-  // Payment method filter
+  // Payment method type filter
   if (state.filters.paymentMethod) {
     filtered = filtered.filter(i => i.paymentMethod === state.filters.paymentMethod);
+  }
+  
+  // Specific payment method filter (e.g., specific card, UPI ID)
+  if (state.filters.specificPaymentMethod) {
+    filtered = filtered.filter(i => i.specificPaymentMethodId === state.filters.specificPaymentMethod);
   }
   
   // Family member filter (for split income)
@@ -485,6 +580,7 @@ function applyFilters() {
   }
   
   updateCounts();
+  updateFilteredIncomeKPIs();
   renderIncome();
 }
 
@@ -913,8 +1009,15 @@ function setupEventListeners() {
   
   paymentMethodFilter.addEventListener('change', () => {
     state.filters.paymentMethod = paymentMethodFilter.value;
-    applyFilters();
+    handlePaymentMethodFilterChange();
   });
+  
+  if (specificPaymentMethodFilter) {
+    specificPaymentMethodFilter.addEventListener('change', () => {
+      state.filters.specificPaymentMethod = specificPaymentMethodFilter.value;
+      applyFilters();
+    });
+  }
   
   const familyMemberFilter = document.getElementById('familyMemberFilter');
   if (familyMemberFilter) {
@@ -1045,6 +1148,7 @@ function clearFilters() {
   state.filters = {
     source: '',
     paymentMethod: '',
+    specificPaymentMethod: '',
     familyMember: '',
     dateFrom: '',
     dateTo: '',
@@ -1053,6 +1157,13 @@ function clearFilters() {
   
   sourceFilter.value = '';
   paymentMethodFilter.value = '';
+  const specificPaymentMethodGroup = document.getElementById('specificPaymentMethodFilterGroup');
+  if (specificPaymentMethodGroup) {
+    specificPaymentMethodGroup.style.display = 'none';
+  }
+  if (specificPaymentMethodFilter) {
+    specificPaymentMethodFilter.value = '';
+  }
   const familyMemberFilter = document.getElementById('familyMemberFilter');
   if (familyMemberFilter) {
     familyMemberFilter.value = '';
@@ -1062,6 +1173,8 @@ function clearFilters() {
   searchInput.value = '';
   
   applyFilters();
+  // Reload full KPI data when filters are cleared
+  updateIncomeKPIs();
 }
 
 // Open add form
@@ -1218,6 +1331,60 @@ function getDefaultFamilyMembers() {
 function getActiveFamilyMembers() {
   const members = getFamilyMembers();
   return members.filter(m => m.active);
+}
+
+// Get payment method display name
+function getPaymentMethodDisplayName(method) {
+  let details = method.name;
+  
+  switch (method.type) {
+    case 'card':
+      if (method.cardNumber) {
+        details += ` (****${method.cardNumber})`;
+      }
+      break;
+    case 'upi':
+      if (method.upiId) {
+        details += ` (${method.upiId})`;
+      }
+      break;
+    case 'wallet':
+      if (method.walletNumber) {
+        details += ` (${method.walletNumber})`;
+      }
+      break;
+    case 'bank':
+      if (method.bankAccountNumber) {
+        details += ` (****${method.bankAccountNumber})`;
+      }
+      break;
+  }
+  
+  return details;
+}
+
+// Get payment method icon
+function getPaymentMethodIcon(type) {
+  const icons = {
+    cash: '💵',
+    card: '💳',
+    upi: '📱',
+    wallet: '👛',
+    bank: '🏦'
+  };
+  return icons[type] || '💰';
+}
+
+// Get payment type label
+function getPaymentTypeLabel(type) {
+  const labels = {
+    cash: 'Cash',
+    card: 'Cards',
+    upi: 'UPI methods',
+    wallet: 'Wallets',
+    bank: 'Bank Accounts'
+  };
+  return labels[type] || type;
 }
 
 // ============================================

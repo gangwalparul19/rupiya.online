@@ -34,12 +34,14 @@ class PrivacyModeManager {
             document.addEventListener('DOMContentLoaded', () => {
                 // Re-check and add body class after DOM is ready
                 this._isPrivacySettingsPage();
-                setTimeout(() => this.applyPrivacyMode(), 100);
+                // Add small delay to ensure all elements are rendered
+                setTimeout(() => this.applyPrivacyMode(), 200);
             });
         } else {
             // Re-check and add body class
             this._isPrivacySettingsPage();
-            setTimeout(() => this.applyPrivacyMode(), 100);
+            // Add small delay to ensure all elements are rendered
+            setTimeout(() => this.applyPrivacyMode(), 200);
         }
     }
 
@@ -103,7 +105,8 @@ class PrivacyModeManager {
         const interactiveSelectors = [
             'button', 'input', 'select', 'textarea', 'a',
             '.privacy-toggle', '.btn', '.privacy-setting-item',
-            '.privacy-settings-panel', '.main-content', '.page-container'
+            '.privacy-settings-panel', '.main-content', '.page-container',
+            '.sidebar', '.sidebar-overlay', '.mobile-header', '.dashboard-layout'
         ];
         
         interactiveSelectors.forEach(selector => {
@@ -118,6 +121,13 @@ class PrivacyModeManager {
         document.body.style.pointerEvents = 'auto';
         document.body.style.opacity = '1';
         document.body.style.filter = 'none';
+        
+        // Ensure sidebar overlay doesn't block interaction
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        if (sidebarOverlay) {
+            sidebarOverlay.style.pointerEvents = 'auto';
+            sidebarOverlay.style.opacity = '1';
+        }
         
         console.log('Privacy Mode: Ensured privacy-settings page is interactive');
     }
@@ -209,6 +219,9 @@ class PrivacyModeManager {
         this.toggleElements('[data-privacy="goal"]', this.isPrivacyMode);
         this.toggleElements('[data-privacy="networth"]', this.isPrivacyMode);
         
+        // Ensure sidebar and mobile elements remain interactive
+        this._ensureUIElementsInteractive();
+        
         // Update privacy button state
         this.updatePrivacyButton();
         
@@ -218,6 +231,38 @@ class PrivacyModeManager {
         }));
         
         console.log('Privacy Mode Applied:', this.isPrivacyMode);
+    }
+
+    /**
+     * Ensure UI elements (sidebar, buttons, etc.) remain interactive
+     * This prevents the page from becoming unresponsive on mobile
+     */
+    _ensureUIElementsInteractive() {
+        // Ensure sidebar and overlay remain interactive
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const mobileHeader = document.querySelector('.mobile-header');
+        
+        if (sidebar) {
+            sidebar.style.pointerEvents = 'auto';
+            sidebar.style.opacity = '1';
+        }
+        
+        if (sidebarOverlay) {
+            sidebarOverlay.style.pointerEvents = 'auto';
+            sidebarOverlay.style.opacity = '1';
+        }
+        
+        if (mobileHeader) {
+            mobileHeader.style.pointerEvents = 'auto';
+            mobileHeader.style.opacity = '1';
+        }
+        
+        // Ensure all buttons are clickable
+        document.querySelectorAll('button, .btn, .sidebar-toggle').forEach(btn => {
+            btn.style.pointerEvents = 'auto';
+            btn.style.opacity = '1';
+        });
     }
 
     /**

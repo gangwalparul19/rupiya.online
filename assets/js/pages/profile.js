@@ -1317,6 +1317,14 @@ if (document.readyState === 'loading') {
   init();
 }
 
+// Export functions to global scope for onclick handlers
+window.addAuthMethod = addAuthMethod;
+window.closeAddPasswordDialog = closeAddPasswordDialog;
+window.confirmAddPassword = confirmAddPassword;
+window.unlinkAuthMethod = unlinkAuthMethod;
+window.deleteExpenseCategory = deleteExpenseCategory;
+window.deleteIncomeCategory = deleteIncomeCategory;
+
 
 // ============================================
 // PAYMENT METHODS MANAGEMENT

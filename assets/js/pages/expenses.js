@@ -600,6 +600,7 @@ function applyFilters() {
   }
   
   updateCounts();
+  updateFilteredExpenseKPIs();
   renderExpenses();
 }
 
@@ -1529,6 +1530,8 @@ function clearFilters() {
   }
   
   applyFilters();
+  // Reload full KPI data when filters are cleared
+  updateExpenseKPIs();
 }
 
 // Open add form

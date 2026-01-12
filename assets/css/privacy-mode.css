@@ -494,4 +494,26 @@ body.privacy-settings-page .privacy-settings-panel {
         filter: none !important;
         opacity: 1 !important;
     }
+    
+    body.privacy-settings-page .sidebar-overlay {
+        pointer-events: auto !important;
+        opacity: 1 !important;
+    }
+    
+    body.privacy-settings-page .sidebar {
+        pointer-events: auto !important;
+        opacity: 1 !important;
+    }
+    
+    body.privacy-settings-page .mobile-header {
+        pointer-events: auto !important;
+        opacity: 1 !important;
+    }
+    
+    body.privacy-settings-page button,
+    body.privacy-settings-page .btn,
+    body.privacy-settings-page .sidebar-toggle {
+        pointer-events: auto !important;
+        opacity: 1 !important;
+    }
 }
