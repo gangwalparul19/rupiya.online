@@ -266,6 +266,7 @@ class FeatureConfigManager {
       
       if (docSnap.exists()) {
         let savedData = docSnap.data();
+        console.log('[FeatureConfig] Raw data from Firestore:', savedData);
         
         // Try to decrypt the data
         let decryptedData = savedData;
@@ -273,40 +274,52 @@ class FeatureConfigManager {
         
         try {
           if (savedData._encrypted) {
+            console.log('[FeatureConfig] Data is encrypted, attempting decryption...');
             // If encryption is ready, decrypt
             if (isEncryptionReady) {
+              console.log('[FeatureConfig] Encryption ready, decrypting...');
               decryptedData = await encryptionService.decryptObject(savedData, FEATURES_COLLECTION);
             } else {
               // Encryption not ready yet - wait a bit more and try again
+              console.log('[FeatureConfig] Encryption not ready, waiting...');
               await new Promise(resolve => setTimeout(resolve, 2000));
               
               // Check again
               if (encryptionService.isReady && encryptionService.isReady()) {
+                console.log('[FeatureConfig] Encryption now ready, decrypting...');
                 decryptedData = await encryptionService.decryptObject(savedData, FEATURES_COLLECTION);
               } else {
+                console.log('[FeatureConfig] Encryption still not ready, using fallback...');
                 // Try to extract features from the encrypted string if possible
                 if (savedData.features && typeof savedData.features === 'string') {
                   try {
                     const parsed = JSON.parse(savedData.features);
                     decryptedData = { features: parsed };
+                    console.log('[FeatureConfig] Extracted features from encrypted string');
                   } catch (e) {
-                    // Ignore
+                    console.warn('[FeatureConfig] Failed to parse features string:', e);
                   }
                 }
               }
             }
+          } else {
+            console.log('[FeatureConfig] Data is not encrypted');
           }
         } catch (decryptError) {
+          console.error('[FeatureConfig] Decryption error:', decryptError);
           // Try to extract features from the encrypted string as fallback
           if (savedData.features && typeof savedData.features === 'string') {
             try {
               const parsed = JSON.parse(savedData.features);
               decryptedData = { features: parsed };
+              console.log('[FeatureConfig] Recovered features from string after decryption error');
             } catch (e) {
+              console.error('[FeatureConfig] Failed to recover features:', e);
               this.userFeatures = JSON.parse(JSON.stringify(DEFAULT_FEATURES));
               return;
             }
           } else {
+            console.error('[FeatureConfig] No features to recover, using defaults');
             this.userFeatures = JSON.parse(JSON.stringify(DEFAULT_FEATURES));
             return;
           }
@@ -317,6 +330,7 @@ class FeatureConfigManager {
         
         if (decryptedData && decryptedData.features) {
           savedFeatures = decryptedData.features;
+          console.log('[FeatureConfig] Extracted features from decrypted data');
         }
         
         if (savedFeatures) {
@@ -324,7 +338,9 @@ class FeatureConfigManager {
           if (typeof savedFeatures === 'string') {
             try {
               savedFeatures = JSON.parse(savedFeatures);
+              console.log('[FeatureConfig] Parsed features from string');
             } catch (e) {
+              console.error('[FeatureConfig] Failed to parse features string:', e);
               savedFeatures = null;
             }
           }
@@ -343,11 +359,14 @@ class FeatureConfigManager {
               }
             }
           });
+          console.log('[FeatureConfig] Features loaded and merged with defaults');
         } else {
+          console.log('[FeatureConfig] No valid saved features, using defaults');
           this.userFeatures = JSON.parse(JSON.stringify(DEFAULT_FEATURES));
         }
       } else {
         // First time user - use all defaults and save
+        console.log('[FeatureConfig] No existing features document, creating new one');
         this.userFeatures = JSON.parse(JSON.stringify(DEFAULT_FEATURES));
         await this.saveFeatureConfig();
       }
@@ -500,6 +519,7 @@ class FeatureConfigManager {
       }
 
       console.log('[FeatureConfig] Saving features for user:', user.uid);
+      console.log('[FeatureConfig] Features to save:', this.userFeatures);
 
       // Wait for encryption to be ready before saving
       await encryptionService.waitForInitialization();
@@ -514,15 +534,18 @@ class FeatureConfigManager {
         }
       }
 
-      // Prepare data for encryption
+      // Prepare data for encryption - store features as object, not string
       const dataToSave = {
-        features: JSON.stringify(this.userFeatures),
+        features: this.userFeatures,
         updatedAt: Timestamp.now()
       };
+
+      console.log('[FeatureConfig] Data prepared for encryption:', dataToSave);
 
       // Encrypt the data (will work even if encryption not ready - stores unencrypted)
       const encryptedData = await encryptionService.encryptObject(dataToSave, FEATURES_COLLECTION);
       console.log('[FeatureConfig] Encrypted data prepared, encryption ready:', encryptionService.isReady());
+      console.log('[FeatureConfig] Encrypted data:', encryptedData);
 
       // Use setDoc with the userId as document ID
       // This creates or updates the document

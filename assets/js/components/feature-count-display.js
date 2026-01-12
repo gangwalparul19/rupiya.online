@@ -54,9 +54,19 @@ class FeatureCountDisplay {
       return 0;
     }
     
-    return Object.values(featureConfig.userFeatures).filter(f => 
-      typeof f === 'object' && f.enabled === true
-    ).length;
+    let count = 0;
+    Object.values(featureConfig.userFeatures).forEach(f => {
+      // Handle both object format and boolean format
+      if (typeof f === 'object' && f !== null) {
+        if (f.enabled === true) {
+          count++;
+        }
+      } else if (typeof f === 'boolean' && f === true) {
+        count++;
+      }
+    });
+    
+    return count;
   }
 
   /**

@@ -372,6 +372,19 @@
     .privacy-toggle.active::after {
         left: 27px;
     }
+    
+    /* Fix layout on mobile */
+    html.privacy-settings-page .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+        padding: 0 !important;
+    }
+    
+    html.privacy-settings-page .page-container {
+        max-width: 100% !important;
+        padding: 15px 12px !important;
+        margin: 0 !important;
+    }
 }
 
 @media (max-width: 480px) {
@@ -550,6 +563,13 @@ html.privacy-settings-page .privacy-blur {
     html.privacy-settings-page .main-content {
         margin-left: 0 !important;
         width: 100% !important;
+        padding: 0 !important;
+    }
+    
+    html.privacy-settings-page .page-container {
+        max-width: 100% !important;
+        padding: 15px 12px !important;
+        margin: 0 !important;
     }
     
     html.privacy-settings-page .mobile-header {
@@ -561,5 +581,18 @@ html.privacy-settings-page .privacy-blur {
     
     html.privacy-settings-page .sidebar-overlay {
         display: none !important;
+    }
+}
+
+/* Desktop: Optimize layout for better content width */
+@media (min-width: 769px) {
+    html.privacy-settings-page .page-container {
+        max-width: 1000px !important;
+        margin: 0 auto !important;
+        padding: 30px 20px !important;
+    }
+    
+    html.privacy-settings-page .main-content {
+        padding: 0 !important;
     }
 }

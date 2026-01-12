@@ -19,20 +19,117 @@
     <link rel="stylesheet" href="assets/css/user-guide.css">
     
     <style>
-        .page-container { max-width: 900px; margin: 0 auto; padding: 30px 20px; }
+        .page-container { max-width: 1000px; margin: 0 auto; padding: 30px 20px; }
         .page-header { margin-bottom: 30px; }
         .page-header h1 { color: #4A90E2; font-size: 2em; margin-bottom: 10px; }
         .page-header p { color: #666; font-size: 1.05em; }
         
+        /* FAQ and info boxes responsive */
+        .privacy-info-box,
+        .privacy-warning {
+            margin: 20px 0;
+        }
+        
+        .privacy-info-box h4,
+        .privacy-warning h4 {
+            margin-bottom: 10px;
+        }
+        
+        .privacy-info-box ul,
+        .privacy-warning ul {
+            margin-left: 20px;
+        }
+        
+        /* FAQ items responsive */
+        [style*="background: white; border: 1px solid"] {
+            margin-bottom: 15px;
+            padding: 20px;
+        }
+        
+        @media (max-width: 1024px) {
+            .page-container { max-width: 100%; padding: 25px 20px; }
+        }
+        
         @media (max-width: 768px) {
-            .page-container { padding: 20px 15px; }
+            .page-container { padding: 20px 15px; max-width: 100%; }
             .page-header h1 { font-size: 1.5em; }
+            .page-header p { font-size: 0.95em; }
+            
+            .privacy-info-box,
+            .privacy-warning {
+                padding: 15px;
+                margin: 15px 0;
+            }
+            
+            .privacy-info-box h4,
+            .privacy-warning h4 {
+                font-size: 0.95em;
+            }
+            
+            .privacy-info-box p,
+            .privacy-warning p {
+                font-size: 0.9em;
+            }
+            
+            [style*="background: white; border: 1px solid"] {
+                padding: 15px;
+                margin-bottom: 12px;
+            }
+            
+            [style*="background: white; border: 1px solid"] h4 {
+                font-size: 0.95em;
+            }
+            
+            [style*="background: white; border: 1px solid"] p {
+                font-size: 0.9em;
+            }
         }
         
         @media (max-width: 480px) {
-            .page-container { padding: 15px 10px; }
+            .page-container { padding: 15px 12px; max-width: 100%; }
             .page-header h1 { font-size: 1.3em; }
             .page-header p { font-size: 0.9em; }
+            
+            .privacy-info-box,
+            .privacy-warning {
+                padding: 12px;
+                margin: 12px 0;
+                border-radius: 4px;
+            }
+            
+            .privacy-info-box h4,
+            .privacy-warning h4 {
+                font-size: 0.9em;
+                margin-bottom: 8px;
+            }
+            
+            .privacy-info-box p,
+            .privacy-warning p {
+                font-size: 0.85em;
+                line-height: 1.4;
+            }
+            
+            .privacy-info-box ul,
+            .privacy-warning ul {
+                margin-left: 15px;
+                font-size: 0.85em;
+            }
+            
+            [style*="background: white; border: 1px solid"] {
+                padding: 12px;
+                margin-bottom: 10px;
+                border-radius: 4px;
+            }
+            
+            [style*="background: white; border: 1px solid"] h4 {
+                font-size: 0.9em;
+                margin-bottom: 8px;
+            }
+            
+            [style*="background: white; border: 1px solid"] p {
+                font-size: 0.85em;
+                line-height: 1.4;
+            }
         }
         
         /* CRITICAL: Force sidebar to be visible on privacy-settings page */
@@ -242,13 +339,13 @@
 
                 <!-- Quick Actions -->
                 <div style="margin-top: 30px; display: flex; gap: 10px; flex-wrap: wrap;">
-                    <button class="btn btn-primary" id="enablePrivacyBtn">
+                    <button class="btn btn-primary" id="enablePrivacyBtn" style="flex: 1; min-width: 150px;">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="display: inline; margin-right: 8px;">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-4.803m5.596-3.856a3.375 3.375 0 11-4.753 4.753m4.753-4.753L3.596 3.039m10.318 10.318L21 21"/>
                         </svg>
                         Enable Privacy Mode
                     </button>
-                    <button class="btn btn-outline" id="disablePrivacyBtn">
+                    <button class="btn btn-outline" id="disablePrivacyBtn" style="flex: 1; min-width: 150px;">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="display: inline; margin-right: 8px;">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
