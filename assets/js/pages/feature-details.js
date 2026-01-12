@@ -577,29 +577,20 @@ class FeatureDetailsPage {
     // Mark as initialized immediately to prevent concurrent calls
     this.initialized = true;
     
-    // Render UI immediately with default state
+    // Wait for features to load from Firebase BEFORE rendering
+    // This ensures we have the correct feature data
+    try {
+      await featureConfig.init();
+      console.log('[FeatureDetails] Features loaded from Firebase');
+    } catch (error) {
+      console.error('[FeatureDetails] Error loading features:', error);
+    }
+    
+    // Now render UI with actual feature data
     this.setupEventListeners();
     this.renderStats();
     this.renderFeatures();
     this.populateCategoryFilter();
-    
-    // Load features from Firebase in background (non-blocking)
-    this._loadFeaturesInBackground();
-  }
-
-  async _loadFeaturesInBackground() {
-    try {
-      // Load features from Firebase without blocking UI
-      await featureConfig.init();
-      
-      console.log('[FeatureDetails] Features loaded from Firebase');
-      
-      // Re-render with actual feature data
-      this.renderStats();
-      this.renderFeatures();
-    } catch (error) {
-      console.error('[FeatureDetails] Error loading features:', error);
-    }
   }
 
   renderStats() {

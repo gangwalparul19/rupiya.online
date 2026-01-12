@@ -248,11 +248,11 @@ class FeatureConfigManager {
       let encryptionReady = encryptionService.isReady && encryptionService.isReady();
       console.log('[FeatureConfig] Initial encryption ready status:', encryptionReady);
       
-      // If not ready, wait for it
+      // If not ready, wait for it with aggressive retries
       if (!encryptionReady) {
         // Wait for encryption to be ready (with extended timeout and retries)
-        const maxWaitTime = 15000; // 15 seconds max
-        const checkInterval = 300; // Check every 300ms
+        const maxWaitTime = 30000; // 30 seconds max (increased from 15)
+        const checkInterval = 200; // Check every 200ms (more frequent)
         const startTime = Date.now();
         let waitAttempts = 0;
         
@@ -262,7 +262,7 @@ class FeatureConfigManager {
             if (encryptionService.waitForInitialization) {
               await Promise.race([
                 encryptionService.waitForInitialization(),
-                new Promise(resolve => setTimeout(resolve, 1000))
+                new Promise(resolve => setTimeout(resolve, 500))
               ]);
             }
             
@@ -274,7 +274,7 @@ class FeatureConfigManager {
             }
             
             waitAttempts++;
-            if (waitAttempts % 5 === 0) {
+            if (waitAttempts % 10 === 0) {
               console.log('[FeatureConfig] Still waiting for encryption... attempt', waitAttempts);
             }
           } catch (e) {
@@ -317,9 +317,9 @@ class FeatureConfigManager {
               // Encryption not ready yet - wait longer and try again
               console.log('[FeatureConfig] Encryption not ready, waiting for initialization...');
               
-              // Wait up to 5 seconds for encryption to be ready
+              // Wait up to 10 seconds for encryption to be ready with more frequent retries
               let decryptRetries = 0;
-              const maxDecryptRetries = 50; // 50 * 100ms = 5 seconds
+              const maxDecryptRetries = 100; // 100 * 100ms = 10 seconds (increased from 50)
               let decryptionSucceeded = false;
               
               while (decryptRetries < maxDecryptRetries && !decryptionSucceeded) {
