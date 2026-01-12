@@ -1,26 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="privacy-settings-page">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Privacy Settings - Rupiya</title>
+    
+    <!-- CRITICAL: Add class to html element IMMEDIATELY -->
+    <script>
+        // Ensure class is on html element before CSS loads
+        document.documentElement.classList.add('privacy-settings-page');
+        document.body.classList.add('privacy-settings-page');
+    </script>
+    
     <link rel="stylesheet" href="assets/css/common.css">
     <link rel="stylesheet" href="assets/css/components.css">
     <link rel="stylesheet" href="assets/css/sidebar.css">
     <link rel="stylesheet" href="assets/css/privacy-mode.css">
     <link rel="stylesheet" href="assets/css/user-guide.css">
-    
-    <!-- CRITICAL: Add privacy-settings-page class IMMEDIATELY before any CSS applies -->
-    <script>
-        // This runs BEFORE any CSS is applied
-        if (window.location.pathname.toLowerCase().includes('privacy-settings') || 
-            window.location.href.toLowerCase().includes('privacy-settings')) {
-            document.documentElement.classList.add('privacy-settings-page');
-            document.body.classList.add('privacy-settings-page');
-            // Force sidebar to be visible
-            document.documentElement.style.setProperty('--sidebar-display', 'flex', 'important');
-        }
-    </script>
     
     <style>
         .page-container { max-width: 900px; margin: 0 auto; padding: 30px 20px; }

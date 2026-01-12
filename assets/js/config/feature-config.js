@@ -198,47 +198,35 @@ class FeatureConfigManager {
     }
   }
 
-  /**
-   * Initialize feature config for current user
-   */
   async init() {
-    // Prevent double initialization
-    if (this.initialized) {
-      console.log('[FeatureConfig] Already initialized, skipping');
-      return;
-    }
+    if (this.initialized) return;
 
     // Mark as initialized immediately to prevent concurrent calls
     this.initialized = true;
 
     try {
-      // CLEAR CACHE IMMEDIATELY - Don't use any cached data
+      // Clear cache immediately
       try {
         localStorage.removeItem(this.CACHE_KEY);
-        console.log('[FeatureConfig] Cache cleared on init');
       } catch (e) {
-        console.warn('[FeatureConfig] Error clearing cache:', e);
+        // Ignore
       }
 
       // Try to get current user, or wait for auth if not ready
       let user = authService.getCurrentUser();
       
       if (!user) {
-        // Wait for auth to be ready (with timeout)
         try {
           user = await Promise.race([
             authService.waitForAuth(),
             new Promise(resolve => setTimeout(() => resolve(null), 3000))
           ]);
         } catch (e) {
-          console.log('[FeatureConfig] Auth wait failed:', e);
+          // Ignore
         }
       }
       
-      console.log('[FeatureConfig] Initializing for user:', user?.uid || 'no user');
-      
       if (!user) {
-        // Use defaults for non-authenticated users
         this.userFeatures = JSON.parse(JSON.stringify(DEFAULT_FEATURES));
         return;
       }
@@ -246,13 +234,12 @@ class FeatureConfigManager {
       this.currentUserId = user.uid;
 
       // ALWAYS load from Firestore first to ensure data is fresh
-      // Cache is only used as a fallback if Firestore fails
-      console.log('[FeatureConfig] Loading from Firestore (always fresh load)');
+      console.log('[FeatureConfig] Loading from Firestore');
 
       // Wait for encryption to be ready (with extended timeout and retries)
       let encryptionReady = false;
-      const maxWaitTime = 10000; // 10 seconds max (increased from 5)
-      const checkInterval = 200; // Check every 200ms (increased from 100)
+      const maxWaitTime = 10000; // 10 seconds max
+      const checkInterval = 200; // Check every 200ms
       const startTime = Date.now();
       
       while (!encryptionReady && (Date.now() - startTime) < maxWaitTime) {
@@ -263,19 +250,13 @@ class FeatureConfigManager {
           
           if (encryptionService.isReady && encryptionService.isReady()) {
             encryptionReady = true;
-            console.log('[FeatureConfig] Encryption is ready');
             break;
           }
         } catch (e) {
-          console.warn('[FeatureConfig] Encryption wait error:', e);
+          // Ignore
         }
         
-        // Wait before next check
         await new Promise(resolve => setTimeout(resolve, checkInterval));
-      }
-      
-      if (!encryptionReady) {
-        console.warn('[FeatureConfig] Encryption not ready after timeout, will retry after loading');
       }
 
       // Load user's feature config from Firestore
@@ -284,66 +265,49 @@ class FeatureConfigManager {
       const docSnap = await getDoc(docRef);
       
       if (docSnap.exists()) {
-        console.log('[FeatureConfig] Found existing feature document for user:', user.uid);
         let savedData = docSnap.data();
-        console.log('[FeatureConfig] Raw saved data:', savedData);
         
         // Try to decrypt the data
         let decryptedData = savedData;
         const isEncryptionReady = encryptionService.isReady ? encryptionService.isReady() : false;
-        console.log('[FeatureConfig] Encryption ready:', isEncryptionReady);
         
         try {
           if (savedData._encrypted) {
             // If encryption is ready, decrypt
             if (isEncryptionReady) {
               decryptedData = await encryptionService.decryptObject(savedData, FEATURES_COLLECTION);
-              console.log('[FeatureConfig] Decrypted data:', decryptedData);
             } else {
               // Encryption not ready yet - wait a bit more and try again
-              console.log('[FeatureConfig] Encryption not ready, waiting 2 seconds and retrying...');
               await new Promise(resolve => setTimeout(resolve, 2000));
               
               // Check again
               if (encryptionService.isReady && encryptionService.isReady()) {
                 decryptedData = await encryptionService.decryptObject(savedData, FEATURES_COLLECTION);
-                console.log('[FeatureConfig] Decrypted data after retry:', decryptedData);
               } else {
-                console.warn('[FeatureConfig] Encryption still not ready, cannot decrypt features');
-                // Don't use defaults yet - try to extract features from the encrypted string if possible
+                // Try to extract features from the encrypted string if possible
                 if (savedData.features && typeof savedData.features === 'string') {
                   try {
                     const parsed = JSON.parse(savedData.features);
-                    console.log('[FeatureConfig] Extracted features from encrypted string:', parsed);
                     decryptedData = { features: parsed };
                   } catch (e) {
-                    console.warn('[FeatureConfig] Could not parse features string:', e);
+                    // Ignore
                   }
                 }
               }
             }
-          } else {
-            console.log('[FeatureConfig] Data is not encrypted, using raw data');
           }
         } catch (decryptError) {
-          console.warn('[FeatureConfig] Decryption failed:', decryptError);
           // Try to extract features from the encrypted string as fallback
           if (savedData.features && typeof savedData.features === 'string') {
             try {
               const parsed = JSON.parse(savedData.features);
-              console.log('[FeatureConfig] Extracted features from string after decrypt error:', parsed);
               decryptedData = { features: parsed };
             } catch (e) {
-              console.warn('[FeatureConfig] Could not parse features string:', e);
-              // If all else fails, use defaults
               this.userFeatures = JSON.parse(JSON.stringify(DEFAULT_FEATURES));
-              this.initialized = true;
               return;
             }
           } else {
-            // If decryption fails and no string fallback, use defaults
             this.userFeatures = JSON.parse(JSON.stringify(DEFAULT_FEATURES));
-            this.initialized = true;
             return;
           }
         }
@@ -360,9 +324,7 @@ class FeatureConfigManager {
           if (typeof savedFeatures === 'string') {
             try {
               savedFeatures = JSON.parse(savedFeatures);
-              console.log('[FeatureConfig] Parsed features from string');
             } catch (e) {
-              console.warn('[FeatureConfig] Could not parse features string:', e);
               savedFeatures = null;
             }
           }
@@ -381,20 +343,11 @@ class FeatureConfigManager {
               }
             }
           });
-          
-          // Cache the loaded features for faster subsequent loads
-          // Cache the full userFeatures object, not just savedFeatures
-          this._cacheFeatures(user.uid, this.userFeatures);
-          
-          const enabledCount = Object.values(this.userFeatures).filter(f => f.enabled).length;
-          console.log('[FeatureConfig] Loaded user features successfully (enabled:', enabledCount, ')');
         } else {
-          console.log('[FeatureConfig] No valid features found, using defaults');
           this.userFeatures = JSON.parse(JSON.stringify(DEFAULT_FEATURES));
         }
       } else {
         // First time user - use all defaults and save
-        console.log('[FeatureConfig] No saved features, creating new document with defaults for user:', user.uid);
         this.userFeatures = JSON.parse(JSON.stringify(DEFAULT_FEATURES));
         await this.saveFeatureConfig();
       }
@@ -600,7 +553,11 @@ class FeatureConfigManager {
    * Get all features (enabled and disabled)
    */
   getAllFeatures() {
-    return this.userFeatures || DEFAULT_FEATURES;
+    if (!this.userFeatures) {
+      return DEFAULT_FEATURES;
+    }
+    
+    return this.userFeatures;
   }
   
   /**

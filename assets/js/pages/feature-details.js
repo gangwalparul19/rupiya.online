@@ -572,22 +572,50 @@ class FeatureDetailsPage {
   async init() {
     if (this.initialized) return;
 
-    await featureConfig.init();
+    console.log('[FeatureDetails] Initializing...');
+    
+    // Mark as initialized immediately to prevent concurrent calls
+    this.initialized = true;
+    
+    // Render UI immediately with default state
     this.setupEventListeners();
     this.renderStats();
     this.renderFeatures();
     this.populateCategoryFilter();
-    this.initialized = true;
+    
+    // Load features from Firebase in background (non-blocking)
+    this._loadFeaturesInBackground();
+  }
+
+  async _loadFeaturesInBackground() {
+    try {
+      // Load features from Firebase without blocking UI
+      await featureConfig.init();
+      
+      console.log('[FeatureDetails] Features loaded from Firebase');
+      
+      // Re-render with actual feature data
+      this.renderStats();
+      this.renderFeatures();
+    } catch (error) {
+      console.error('[FeatureDetails] Error loading features:', error);
+    }
   }
 
   renderStats() {
     const statsContainer = document.getElementById('featureStats');
     if (!statsContainer) return;
 
-    const allFeatures = Object.keys(this.allFeatures);
-    const enabledCount = allFeatures.filter(key => featureConfig.isEnabled(key)).length;
-    const totalCount = allFeatures.length;
+    // Get all features from featureConfig (the actual user's features from Firebase)
+    const userFeatures = featureConfig.getAllFeatures();
+    
+    // Count enabled features from the actual user data
+    const enabledCount = Object.values(userFeatures).filter(f => f.enabled === true).length;
+    const totalCount = Object.keys(userFeatures).length;
     const categoryCount = Object.keys(this.categories).length;
+
+    console.log('[FeatureDetails] Rendering stats - enabled:', enabledCount, 'total:', totalCount);
+    console.log('[FeatureDetails] User features:', userFeatures);
 
     statsContainer.innerHTML = `
       <div class="stat-card">
@@ -618,8 +646,6 @@ class FeatureDetailsPage {
     const grid = document.getElementById('featuresGrid');
     if (!grid) return;
 
-    grid.innerHTML = '';
-
     // Group features by category
     const groupedFeatures = {};
     Object.entries(this.filteredFeatures).forEach(([key, feature]) => {
@@ -633,7 +659,9 @@ class FeatureDetailsPage {
     // Define category order
     const categoryOrder = ['core', 'analytics', 'transactions', 'planning', 'assets', 'social', 'organize'];
     
-    // Render each category group
+    // Build HTML string instead of creating DOM elements one by one
+    let html = '';
+    
     categoryOrder.forEach(categoryKey => {
       const features = groupedFeatures[categoryKey];
       if (!features || features.length === 0) return;
@@ -644,70 +672,63 @@ class FeatureDetailsPage {
         description: ''
       };
 
-      // Create category section
-      const categorySection = document.createElement('div');
-      categorySection.className = 'feature-category-section';
-      categorySection.innerHTML = `
-        <div class="category-header">
-          <div class="category-header-left">
-            <span class="category-icon">${categoryInfo.icon}</span>
-            <div class="category-info">
-              <h2 class="category-title">${categoryInfo.label}</h2>
-              <p class="category-description">${categoryInfo.description}</p>
+      html += `
+        <div class="feature-category-section">
+          <div class="category-header">
+            <div class="category-header-left">
+              <span class="category-icon">${categoryInfo.icon}</span>
+              <div class="category-info">
+                <h2 class="category-title">${categoryInfo.label}</h2>
+                <p class="category-description">${categoryInfo.description}</p>
+              </div>
             </div>
+            <span class="category-count">${features.length} feature${features.length > 1 ? 's' : ''}</span>
           </div>
-          <span class="category-count">${features.length} feature${features.length > 1 ? 's' : ''}</span>
-        </div>
-        <div class="category-features-grid"></div>
+          <div class="category-features-grid">
       `;
-
-      const featuresGrid = categorySection.querySelector('.category-features-grid');
 
       // Render features in this category
       features.forEach(feature => {
         const isEnabled = featureConfig.isEnabled(feature.key);
         const isRequired = featureConfig.getFeatureInfo(feature.key)?.required;
         
-        const card = document.createElement('div');
-        card.className = `feature-card ${isEnabled ? 'enabled' : ''} ${isRequired ? 'required' : ''}`;
-        card.innerHTML = `
-          <div class="feature-card-header">
-            <span class="feature-icon">${feature.icon}</span>
-            <div class="feature-status-badges">
-              ${isRequired ? '<span class="badge badge-required">Required</span>' : ''}
-              <span class="badge ${isEnabled ? 'badge-enabled' : 'badge-disabled'}">${isEnabled ? '✓ Enabled' : 'Disabled'}</span>
+        html += `
+          <div class="feature-card ${isEnabled ? 'enabled' : ''} ${isRequired ? 'required' : ''}">
+            <div class="feature-card-header">
+              <span class="feature-icon">${feature.icon}</span>
+              <div class="feature-status-badges">
+                ${isRequired ? '<span class="badge badge-required">Required</span>' : ''}
+                <span class="badge ${isEnabled ? 'badge-enabled' : 'badge-disabled'}">${isEnabled ? '✓ Enabled' : 'Disabled'}</span>
+              </div>
             </div>
-          </div>
-          <div class="feature-card-body">
-            <h3>${feature.label}</h3>
-            <p class="feature-short-desc">${feature.shortDescription}</p>
-            <div class="feature-benefits-preview">
-              <strong>Key Benefits:</strong>
-              <ul>
-                ${feature.benefits.slice(0, 2).map(b => `<li>${b}</li>`).join('')}
-              </ul>
+            <div class="feature-card-body">
+              <h3>${feature.label}</h3>
+              <p class="feature-short-desc">${feature.shortDescription}</p>
+              <div class="feature-benefits-preview">
+                <strong>Key Benefits:</strong>
+                <ul>
+                  ${feature.benefits.slice(0, 2).map(b => `<li>${b}</li>`).join('')}
+                </ul>
+              </div>
             </div>
-          </div>
-          <div class="feature-card-footer">
-            <button class="btn btn-sm btn-primary learn-more-btn" data-feature="${feature.key}">
-              Learn More
-            </button>
+            <div class="feature-card-footer">
+              <button class="btn btn-sm btn-primary learn-more-btn" data-feature="${feature.key}">
+                Learn More
+              </button>
+            </div>
           </div>
         `;
-
-        card.querySelector('button').addEventListener('click', () => {
-          this.showFeatureDetail(feature.key);
-        });
-
-        featuresGrid.appendChild(card);
       });
 
-      grid.appendChild(categorySection);
+      html += `
+          </div>
+        </div>
+      `;
     });
 
     // If no features found after filtering
     if (Object.keys(groupedFeatures).length === 0) {
-      grid.innerHTML = `
+      html = `
         <div class="empty-state">
           <div class="empty-state-icon">🔍</div>
           <h3>No features found</h3>
@@ -715,6 +736,17 @@ class FeatureDetailsPage {
         </div>
       `;
     }
+
+    // Set all HTML at once (much faster than appending elements one by one)
+    grid.innerHTML = html;
+
+    // Add event listeners after DOM is updated
+    grid.querySelectorAll('.learn-more-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const featureKey = e.target.dataset.feature;
+        this.showFeatureDetail(featureKey);
+      });
+    });
   }
 
   showFeatureDetail(featureKey) {

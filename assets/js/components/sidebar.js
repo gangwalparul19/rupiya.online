@@ -10,7 +10,7 @@
  * 4. Changes here automatically apply to ALL pages
  * 
  * FEATURES:
- * - Collapsible sections (state saved in localStorage)
+ * - Collapsible sections (state NOT cached - always fresh)
  * - Quick search with Cmd/Ctrl+K shortcut
  * - Auto-expands section containing current page
  * - Mobile responsive with hamburger menu
@@ -155,22 +155,14 @@ function getCurrentPage() {
 
 // Save/load expanded sections state
 function getSectionState() {
-  try {
-    const saved = localStorage.getItem('rupiya_nav_sections');
-    return saved ? JSON.parse(saved) : {};
-  } catch {
-    return {};
-  }
+  // CACHING DISABLED - Always use default state
+  console.log('[Sidebar] Caching disabled - using default section state');
+  return {};
 }
 
 function saveSectionState(sectionId, expanded) {
-  try {
-    const state = getSectionState();
-    state[sectionId] = expanded;
-    localStorage.setItem('rupiya_nav_sections', JSON.stringify(state));
-  } catch {
-    // Ignore storage errors
-  }
+  // CACHING DISABLED - Don't save section state
+  console.log('[Sidebar] Caching disabled - not saving section state');
 }
 
 // Generate sidebar HTML
@@ -192,7 +184,6 @@ function generateSidebarHTML(isAdmin = false) {
   navigationConfig.sections.forEach(section => {
     // Skip admin-only sections for non-admin users
     if (section.adminOnly && !isAdmin) {
-      console.log(`[Sidebar] Skipping admin section "${section.title}"`);
       return;
     }
     
@@ -200,23 +191,19 @@ function generateSidebarHTML(isAdmin = false) {
     const visibleItems = section.items.filter(item => {
       // Always show items without feature keys (like Settings, Feedback)
       if (!item.featureKey) {
-        console.log(`[Sidebar] Including item "${item.label}" (no feature key)`);
         return true;
       }
       // Show items if their feature is enabled
       const isEnabled = featureConfig.isEnabled(item.featureKey);
-      console.log(`[Sidebar] Item "${item.label}" (${item.featureKey}): ${isEnabled ? 'enabled' : 'disabled'}`);
       return isEnabled;
     });
 
     // Skip section if no visible items
     if (visibleItems.length === 0) {
-      console.log(`[Sidebar] Skipping section "${section.title}" - no visible items`);
       return;
     }
     
     sectionCount++;
-    console.log(`[Sidebar] Rendering section "${section.title}" with ${visibleItems.length} items`);
     
     // Determine if section should be expanded
     const isCurrentSection = section.id === currentSection;
@@ -253,8 +240,6 @@ function generateSidebarHTML(isAdmin = false) {
     `;
   });
   
-  console.log(`[Sidebar] Generated ${sectionCount} sections total`);
-
   return navHTML;
 }
 
@@ -283,8 +268,6 @@ export async function initSidebar() {
   const sidebarNav = sidebar.querySelector('.sidebar-nav');
   if (!sidebarNav) return;
 
-  console.log('[Sidebar] Initializing sidebar...');
-
   // Wait for auth to be ready first
   let user = null;
   try {
@@ -293,25 +276,17 @@ export async function initSidebar() {
     console.log('[Sidebar] Auth not ready, using defaults');
   }
 
-  console.log('[Sidebar] Auth ready, initializing feature config...');
-
   // Initialize feature config (will always load from Firestore now)
   await featureConfig.init();
   
   // Add a small delay to ensure features are fully loaded and cached
   await new Promise(resolve => setTimeout(resolve, 100));
 
-  console.log('[Sidebar] Feature config initialized, checking admin status...');
-
   // Check if user is admin
   const isAdmin = await checkIsAdmin();
 
-  console.log('[Sidebar] Admin status:', isAdmin, '- Generating sidebar HTML...');
-
   // Generate and inject navigation
   sidebarNav.innerHTML = generateQuickSearchHTML() + generateSidebarHTML(isAdmin);
-
-  console.log('[Sidebar] Sidebar HTML generated, setting up handlers...');
 
   // Setup section toggle handlers
   setupSectionToggles();
@@ -327,7 +302,6 @@ export async function initSidebar() {
 
   // Helper function to refresh sidebar
   const refreshSidebar = async () => {
-    console.log('[Sidebar] Refreshing sidebar due to feature changes...');
     // Re-check admin status in case it changed
     const currentIsAdmin = await checkIsAdmin();
     sidebarNav.innerHTML = generateQuickSearchHTML() + generateSidebarHTML(currentIsAdmin);
@@ -347,7 +321,6 @@ export async function initSidebar() {
   // Re-initialize features after encryption is ready (for page refresh scenarios)
   // This handles the case where sidebar loads before encryption is initialized
   window.addEventListener('encryptionReady', async () => {
-    console.log('[Sidebar] Encryption ready, re-initializing features');
     await featureConfig.reinitialize();
     await refreshSidebar();
   });
