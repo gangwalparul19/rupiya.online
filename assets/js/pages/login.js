@@ -21,6 +21,7 @@ const backToEmailBtn = document.getElementById('backToEmailBtn');
 const loginForm = document.getElementById('loginForm');
 const loginBtn = document.getElementById('loginBtn');
 const googleSignInBtn = document.getElementById('googleSignInBtn');
+const quickGoogleSignInBtn = document.getElementById('quickGoogleSignInBtn');
 const togglePasswordBtn = document.getElementById('togglePassword');
 const passwordInput = document.getElementById('password');
 const forgotPasswordLink = document.getElementById('forgotPasswordLink');
@@ -136,6 +137,35 @@ backToEmailBtn.addEventListener('click', () => {
     passwordInput.value = '';
   }
 });
+
+// Quick Google sign-in button (for existing Google users)
+if (quickGoogleSignInBtn) {
+  quickGoogleSignInBtn.addEventListener('click', async () => {
+    quickGoogleSignInBtn.disabled = true;
+    const originalText = quickGoogleSignInBtn.textContent;
+    quickGoogleSignInBtn.textContent = 'Signing in...';
+    
+    try {
+      const result = await authService.signInWithGoogle();
+      
+      if (result.success) {
+        toast.show('Signed in successfully', 'success');
+        setTimeout(() => {
+          window.location.href = getRedirectUrl();
+        }, 500);
+      } else {
+        toast.show(result.error, 'error');
+        quickGoogleSignInBtn.disabled = false;
+        quickGoogleSignInBtn.textContent = originalText;
+      }
+    } catch (error) {
+      console.error('Google sign in error:', error);
+      toast.show('An unexpected error occurred. Please try again.', 'error');
+      quickGoogleSignInBtn.disabled = false;
+      quickGoogleSignInBtn.textContent = originalText;
+    }
+  });
+}
 
 // Toggle password visibility
 if (togglePasswordBtn && passwordInput) {
