@@ -246,7 +246,7 @@ async function loadFamilyMemberFilter() {
   if (!familyMemberFilter) return;
   
   try {
-    const familyMembers = getActiveFamilyMembers();
+    const familyMembers = await getActiveFamilyMembers();
     
     if (familyMembers && familyMembers.length > 0) {
       const options = familyMembers.map(member => 
@@ -996,7 +996,7 @@ async function loadFamilyMembersForSplit() {
   
   try {
     // Get active family members for splitting
-    const familyMembers = getActiveFamilyMembers();
+    const familyMembers = await getActiveFamilyMembers();
     
     if (!familyMembers || familyMembers.length === 0) {
       splitMembersList.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">No active family members. Please enable members in your profile settings.</p>';
@@ -1063,11 +1063,30 @@ async function loadFamilyMembersForSplit() {
 }
 
 // Get family members from localStorage
-function getFamilyMembers() {
+async function getFamilyMembers() {
   try {
     const stored = localStorage.getItem('familyMembers');
     if (stored) {
-      return JSON.parse(stored);
+      const members = JSON.parse(stored);
+      
+      // Decrypt family member names and roles
+      const decryptedMembers = await Promise.all(members.map(async (member) => {
+        try {
+          const decryptedName = await encryptionService.decryptValue(member.name);
+          const decryptedRole = await encryptionService.decryptValue(member.role);
+          return {
+            ...member,
+            name: decryptedName,
+            role: decryptedRole
+          };
+        } catch (error) {
+          console.warn('Error decrypting family member data:', error);
+          // Return member as-is if decryption fails (might already be decrypted)
+          return member;
+        }
+      }));
+      
+      return decryptedMembers;
     }
     return getDefaultFamilyMembers();
   } catch (error) {
@@ -1105,8 +1124,8 @@ function initializeFamilyMembers() {
 }
 
 // Get active family members (for splitting)
-function getActiveFamilyMembers() {
-  const members = getFamilyMembers();
+async function getActiveFamilyMembers() {
+  const members = await getFamilyMembers();
   return members.filter(m => m.active);
 }
 

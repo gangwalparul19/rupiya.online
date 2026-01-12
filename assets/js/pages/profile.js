@@ -954,9 +954,26 @@ async function getFamilyMembers() {
     try {
       const settings = await firestoreService.getUserSettings();
       if (settings && settings.familyMembers && Array.isArray(settings.familyMembers)) {
+        // Decrypt family member names and roles
+        const decryptedMembers = await Promise.all(settings.familyMembers.map(async (member) => {
+          try {
+            const decryptedName = await encryptionService.decryptValue(member.name);
+            const decryptedRole = await encryptionService.decryptValue(member.role);
+            return {
+              ...member,
+              name: decryptedName,
+              role: decryptedRole
+            };
+          } catch (error) {
+            console.warn('Error decrypting family member data:', error);
+            // Return member as-is if decryption fails (might already be decrypted)
+            return member;
+          }
+        }));
+        
         // Also update localStorage for offline access
-        localStorage.setItem('familyMembers', JSON.stringify(settings.familyMembers));
-        return settings.familyMembers;
+        localStorage.setItem('familyMembers', JSON.stringify(decryptedMembers));
+        return decryptedMembers;
       }
     } catch (firestoreError) {
       console.warn('Error loading from Firestore, falling back to localStorage:', firestoreError);

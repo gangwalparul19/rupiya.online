@@ -34,6 +34,23 @@
             filter: none !important;
         }
         
+        /* CRITICAL: Ensure mobile header is above sidebar on mobile */
+        body.privacy-settings-page .mobile-header {
+            z-index: 1001 !important;
+            pointer-events: auto !important;
+            opacity: 1 !important;
+        }
+        
+        body.privacy-settings-page .mobile-header-actions {
+            pointer-events: auto !important;
+            z-index: 1001 !important;
+        }
+        
+        body.privacy-settings-page .sidebar-toggle {
+            pointer-events: auto !important;
+            z-index: 1001 !important;
+        }
+        
         @media (max-width: 768px) {
             .page-container { padding: 20px 15px; }
             .page-header h1 { font-size: 1.5em; }
@@ -48,6 +65,24 @@
                 filter: none !important;
                 opacity: 1 !important;
             }
+            
+            /* Mobile: Ensure hamburger is clickable and visible */
+            body.privacy-settings-page .mobile-header {
+                z-index: 1001 !important;
+                pointer-events: auto !important;
+                opacity: 1 !important;
+            }
+            
+            body.privacy-settings-page .mobile-header-actions {
+                pointer-events: auto !important;
+                z-index: 1001 !important;
+            }
+            
+            body.privacy-settings-page .sidebar-toggle {
+                pointer-events: auto !important;
+                z-index: 1001 !important;
+                cursor: pointer !important;
+            }
         }
         
         @media (max-width: 480px) {
@@ -59,6 +94,24 @@
             body.privacy-settings-page {
                 filter: none !important;
                 opacity: 1 !important;
+            }
+            
+            /* Mobile small: Ensure hamburger is clickable and visible */
+            body.privacy-settings-page .mobile-header {
+                z-index: 1001 !important;
+                pointer-events: auto !important;
+                opacity: 1 !important;
+            }
+            
+            body.privacy-settings-page .mobile-header-actions {
+                pointer-events: auto !important;
+                z-index: 1001 !important;
+            }
+            
+            body.privacy-settings-page .sidebar-toggle {
+                pointer-events: auto !important;
+                z-index: 1001 !important;
+                cursor: pointer !important;
             }
         }
     </style>

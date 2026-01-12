@@ -567,6 +567,12 @@ body.privacy-settings-page {
     body.privacy-settings-page .mobile-header {
         pointer-events: auto !important;
         opacity: 1 !important;
+        z-index: 1001 !important;
+    }
+    
+    body.privacy-settings-page .mobile-header-actions {
+        pointer-events: auto !important;
+        z-index: 1001 !important;
     }
     
     body.privacy-settings-page button,
@@ -574,5 +580,6 @@ body.privacy-settings-page {
     body.privacy-settings-page .sidebar-toggle {
         pointer-events: auto !important;
         opacity: 1 !important;
+        z-index: 1001 !important;
     }
 }
