@@ -136,6 +136,18 @@ class AuthService {
         await userCredential.user.reload();
       }
       
+      // Create user profile in Firestore BEFORE signing out
+      // This ensures the user profile exists when they verify their email
+      if (this.userService) {
+        try {
+          await this.userService.getOrCreateUserProfile(userCredential.user);
+          log('User profile created in Firestore');
+        } catch (profileError) {
+          logError('Error creating user profile:', profileError);
+          // Continue anyway - user can still verify email
+        }
+      }
+      
       // Send email verification
       const actionCodeSettings = {
         url: `${window.location.origin}/login.html?verified=true`,

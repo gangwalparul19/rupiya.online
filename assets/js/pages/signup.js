@@ -1,12 +1,9 @@
 // Signup Page Logic - Dual Auth Support
 import '../services/services-init.js'; // Initialize services
 import authService from '../services/auth-service.js';
-import userService from '../services/user-service.js';
-import dualAuthHelper from '../utils/dual-auth-helper.js';
 import authEncryptionHelper from '../utils/auth-encryption-helper.js';
 import toast from '../components/toast.js';
 import { validateForm, setupRealtimeValidation } from '../utils/validation.js';
-import FormValidator from '../utils/form-validation.js';
 
 // Get form elements
 const signupForm = document.getElementById('signupForm');
@@ -16,9 +13,6 @@ const togglePasswordBtn = document.getElementById('togglePassword');
 const toggleConfirmPasswordBtn = document.getElementById('toggleConfirmPassword');
 const passwordInput = document.getElementById('password');
 const confirmPasswordInput = document.getElementById('confirmPassword');
-
-// Initialize form validator for real-time validation
-const formValidator = new FormValidator(signupForm);
 
 // Validation rules
 const validationRules = {
@@ -112,41 +106,8 @@ signupForm.addEventListener('submit', async (e) => {
   try {
     const { email, password, displayName } = validation.data;
     
-    // IMPORTANT: Check if email already exists BEFORE trying to create account
-    // This prevents "auth/email-already-in-use" errors
-    try {
-      const existingUser = await userService.getUserByEmail(email);
-      if (existingUser) {
-        // Email already exists - show helpful message
-        const methods = await dualAuthHelper.getAvailableAuthMethods(email);
-        
-        let message = 'This email is already registered. ';
-        if (methods.hasGoogle && methods.hasPassword) {
-          message += 'You can sign in with Google or password.';
-        } else if (methods.hasGoogle) {
-          message += 'You can sign in with Google.';
-        } else if (methods.hasPassword) {
-          message += 'You can sign in with password.';
-        }
-        
-        toast.show(message, 'info');
-        
-        // Redirect to login with email pre-filled
-        setTimeout(() => {
-          window.location.href = `login.html?email=${encodeURIComponent(email)}`;
-        }, 2000);
-        
-        signupBtn.disabled = false;
-        signupBtn.textContent = originalText;
-        return;
-      }
-    } catch (checkError) {
-      // If check fails (permission denied), proceed with signup
-      // Firebase will catch duplicate email error
-      console.warn('[Signup] Could not check if email exists, proceeding with signup:', checkError);
-    }
-    
-    // Email doesn't exist, proceed with account creation
+    // Proceed directly with account creation
+    // Firebase will handle duplicate email errors
     const result = await authService.signUp(email, password, displayName);
     
     if (result.success) {
