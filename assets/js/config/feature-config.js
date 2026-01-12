@@ -343,11 +343,21 @@ class FeatureConfigManager {
               if (!decryptionSucceeded) {
                 console.warn('[FeatureConfig] Decryption failed after', maxDecryptRetries, 'retries, using fallback...');
                 // Try to extract features from the encrypted string if possible
-                if (savedData.features && typeof savedData.features === 'string') {
+                if (savedData._encrypted && savedData._encrypted.features) {
+                  try {
+                    console.log('[FeatureConfig] Attempting to decrypt _encrypted.features directly...');
+                    const encryptedFeatures = savedData._encrypted.features;
+                    const decryptedFeatures = await encryptionService.decryptValue(encryptedFeatures);
+                    decryptedData = { features: decryptedFeatures };
+                    console.log('[FeatureConfig] Successfully extracted features from _encrypted.features');
+                  } catch (e) {
+                    console.warn('[FeatureConfig] Failed to extract from _encrypted.features:', e.message);
+                  }
+                } else if (savedData.features && typeof savedData.features === 'string') {
                   try {
                     const parsed = JSON.parse(savedData.features);
                     decryptedData = { features: parsed };
-                    console.log('[FeatureConfig] Extracted features from encrypted string');
+                    console.log('[FeatureConfig] Extracted features from plain features field');
                   } catch (e) {
                     console.warn('[FeatureConfig] Failed to parse features string:', e.message);
                   }
@@ -378,12 +388,32 @@ class FeatureConfigManager {
         }
         
         // Extract features from decrypted data
+        // The features are stored in _encrypted.features after decryption
         let savedFeatures = null;
         
+        console.log('[FeatureConfig] Decrypted data:', decryptedData);
+        console.log('[FeatureConfig] Decrypted data keys:', decryptedData ? Object.keys(decryptedData) : 'none');
+        
+        // First try to get from decrypted data (after decryptObject)
         if (decryptedData && decryptedData.features) {
           savedFeatures = decryptedData.features;
           console.log('[FeatureConfig] Extracted features from decrypted data');
         }
+        
+        // If not found, check if it's still in _encrypted (decryption might have failed)
+        if (!savedFeatures && savedData && savedData._encrypted && savedData._encrypted.features) {
+          console.log('[FeatureConfig] Features still in _encrypted, attempting direct decryption...');
+          try {
+            const encryptedFeatures = savedData._encrypted.features;
+            savedFeatures = await encryptionService.decryptValue(encryptedFeatures);
+            console.log('[FeatureConfig] Successfully decrypted features from _encrypted.features');
+          } catch (e) {
+            console.error('[FeatureConfig] Failed to decrypt _encrypted.features:', e);
+            savedFeatures = null;
+          }
+        }
+        
+        console.log('[FeatureConfig] Extracted features:', savedFeatures);
         
         if (savedFeatures) {
           // Parse features if it's a string (from encryption)
@@ -710,7 +740,27 @@ class FeatureConfigManager {
         }
         
         // Extract and merge features
-        let savedFeatures = decryptedData?.features;
+        // The features are stored in _encrypted.features after decryption
+        let savedFeatures = null;
+        
+        // First try to get from decrypted data
+        if (decryptedData && decryptedData.features) {
+          savedFeatures = decryptedData.features;
+          console.log('[FeatureConfig] Extracted features from decrypted data');
+        }
+        
+        // If not found, check if it's still in _encrypted (decryption might have failed)
+        if (!savedFeatures && savedData && savedData._encrypted && savedData._encrypted.features) {
+          console.log('[FeatureConfig] Features still in _encrypted, attempting direct decryption...');
+          try {
+            const encryptedFeatures = savedData._encrypted.features;
+            savedFeatures = await encryptionService.decryptValue(encryptedFeatures);
+            console.log('[FeatureConfig] Successfully decrypted features from _encrypted.features');
+          } catch (e) {
+            console.error('[FeatureConfig] Failed to decrypt _encrypted.features:', e);
+            savedFeatures = null;
+          }
+        }
         
         if (savedFeatures) {
           if (typeof savedFeatures === 'string') {

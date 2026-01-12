@@ -104,26 +104,36 @@
            ============================================ */
         
         /* Prevent any opacity/filter from graying out the page */
-        body {
+        html, body {
             opacity: 1 !important;
             filter: none !important;
             background: #f5f7fa !important;
+            visibility: visible !important;
+            pointer-events: auto !important;
         }
         
         .dashboard-layout,
         .main-content,
         .guide-container,
         .sidebar,
-        .mobile-header {
+        .sidebar-nav,
+        .sidebar-footer,
+        .mobile-header,
+        .toc,
+        .section,
+        .guide-header {
             opacity: 1 !important;
             filter: none !important;
             pointer-events: auto !important;
+            visibility: visible !important;
         }
         
         /* Ensure all interactive elements are clickable */
-        button, a, input, select, textarea {
+        button, a, input, select, textarea, .btn, .toc-item, .feature-card {
             opacity: 1 !important;
             pointer-events: auto !important;
+            visibility: visible !important;
+            filter: none !important;
         }
         
         /* Ensure logout modal overlay doesn't block page when hidden */
@@ -131,6 +141,29 @@
             opacity: 0 !important;
             visibility: hidden !important;
             pointer-events: none !important;
+        }
+        
+        /* Ensure sidebar overlay only shows when active */
+        .sidebar-overlay:not(.active) {
+            opacity: 0 !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+        }
+        
+        .sidebar-overlay.active {
+            opacity: 1 !important;
+            visibility: visible !important;
+            pointer-events: auto !important;
+        }
+        
+        /* Prevent privacy mode from affecting user guide */
+        .guide-container *,
+        .sidebar *,
+        .mobile-header * {
+            opacity: 1 !important;
+            visibility: visible !important;
+            pointer-events: auto !important;
+            filter: none !important;
         }
     </style>
 </head>
