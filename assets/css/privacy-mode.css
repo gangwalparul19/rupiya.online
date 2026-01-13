@@ -2,6 +2,8 @@
  * Privacy Mode Styles
  * Auto-detects and hides sensitive financial data
  * No HTML changes required!
+ * 
+ * NOTE: admin.html is excluded from privacy mode effects
  */
 
 /* Privacy Mode Button */
@@ -77,6 +79,13 @@
     background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%) !important;
     background-size: 200% 100% !important;
     animation: shimmer 1.5s infinite !important;
+}
+
+.privacy-hidden-label {
+    color: #999 !important;
+    font-weight: 500 !important;
+    user-select: none !important;
+    cursor: default !important;
 }
 
 .privacy-hidden-chart {
@@ -489,12 +498,7 @@ html.privacy-settings-page body {
 
 html.privacy-settings-page body {
     display: block !important;
-}
-
-html.privacy-settings-page body * {
-    visibility: visible !important;
-    pointer-events: auto !important;
-    filter: none !important;
+    overflow: auto !important;
 }
 
 /* Force sidebar to be visible */
@@ -575,6 +579,16 @@ html.privacy-settings-page .main-content {
     flex: 1 !important;
     width: calc(100% - 280px) !important;
     opacity: 1 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+}
+
+html.privacy-settings-page .page-container {
+    visibility: visible !important;
+    pointer-events: auto !important;
+    filter: none !important;
+    display: block !important;
+    overflow: visible !important;
 }
 
 html.privacy-settings-page .dashboard-layout {
@@ -589,15 +603,6 @@ html.privacy-settings-page .dashboard-layout {
 html.privacy-settings-page .mobile-header,
 html.privacy-settings-page .sidebar-overlay {
     display: none !important;
-}
-
-html.privacy-settings-page .main-content,
-html.privacy-settings-page .page-container,
-html.privacy-settings-page .privacy-settings-panel {
-    visibility: visible !important;
-    pointer-events: auto !important;
-    filter: none !important;
-    display: block !important;
 }
 
 html.privacy-settings-page button,

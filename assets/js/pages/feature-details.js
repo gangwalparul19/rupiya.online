@@ -3,9 +3,45 @@
  * Displays detailed information about each feature with benefits and use cases
  */
 
-import '../services/services-init.js'; // Initialize services first (includes encryption)
+import '../services/services-init.js'; // Initialize services first
 import { featureConfig, FEATURE_CATEGORIES } from '../config/feature-config.js';
 import toast from '../components/toast.js';
+
+// Setup sidebar toggle for mobile
+function setupSidebarToggle() {
+  const sidebarOpen = document.getElementById('sidebarOpen');
+  const sidebarClose = document.getElementById('sidebarClose');
+  const sidebar = document.getElementById('sidebar');
+  const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+  if (sidebarOpen) {
+    sidebarOpen.addEventListener('click', () => {
+      sidebar.classList.add('open');
+      sidebarOverlay.classList.add('show');
+    });
+  }
+
+  if (sidebarClose) {
+    sidebarClose.addEventListener('click', () => {
+      sidebar.classList.remove('open');
+      sidebarOverlay.classList.remove('show');
+    });
+  }
+
+  if (sidebarOverlay) {
+    sidebarOverlay.addEventListener('click', () => {
+      sidebar.classList.remove('open');
+      sidebarOverlay.classList.remove('show');
+    });
+  }
+}
+
+// Initialize sidebar toggle when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', setupSidebarToggle);
+} else {
+  setupSidebarToggle();
+}
 
 // Detailed feature information with benefits and use cases
 const FEATURE_DETAILS = {

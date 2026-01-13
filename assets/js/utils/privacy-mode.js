@@ -195,6 +195,16 @@ class PrivacyModeManager {
     applyPrivacyMode() {
         console.log('Applying Privacy Mode:', this.isPrivacyMode);
         
+        // Skip privacy mode on admin.html and privacy-settings page
+        const pathname = window.location.pathname.toLowerCase();
+        const href = window.location.href.toLowerCase();
+        const isAdminPage = pathname.includes('admin') || href.includes('admin');
+        
+        if (isAdminPage) {
+            console.log('Privacy Mode: Skipping admin page');
+            return;
+        }
+        
         // Skip applying privacy mode effects on privacy-settings page
         // Users need to be able to interact with this page to disable privacy mode
         if (this._isPrivacySettingsPage()) {
@@ -212,6 +222,9 @@ class PrivacyModeManager {
             console.log('Privacy Mode: Skipping ALL effects on privacy-settings page');
             return;
         }
+        
+        // Hide KPI cards and their values
+        this.hideKPICards();
         
         // Auto-detect and hide KPI values (numbers with ₹ or currency)
         this.autoHideAmounts();
@@ -287,6 +300,69 @@ class PrivacyModeManager {
         document.querySelectorAll('button, .btn, .sidebar-toggle').forEach(btn => {
             btn.style.pointerEvents = 'auto';
             btn.style.opacity = '1';
+        });
+    }
+
+    /**
+     * Hide KPI cards and their values
+     */
+    hideKPICards() {
+        // Hide all KPI card values
+        const kpiCards = document.querySelectorAll('.kpi-card, [class*="kpi"]');
+        kpiCards.forEach(card => {
+            // Find all value elements within the card
+            const values = card.querySelectorAll(
+                '.kpi-value, .value, .amount, .balance, .total, ' +
+                '[class*="value"], [class*="amount"], [class*="balance"], [class*="total"]'
+            );
+            
+            values.forEach(element => {
+                if (this.isPrivacyMode) {
+                    // Store original value
+                    if (!this.originalValues.has(element)) {
+                        this.originalValues.set(element, element.textContent);
+                    }
+                    
+                    // Replace with masked value
+                    const text = element.textContent.trim();
+                    let maskedValue = '₹ ••••••';
+                    
+                    // Check if it's a percentage
+                    if (/\d+(\.\d+)?%/.test(text)) {
+                        maskedValue = '••%';
+                    }
+                    // Check if it's an email
+                    else if (/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(text)) {
+                        maskedValue = '••••••••@••••••';
+                    }
+                    
+                    element.textContent = maskedValue;
+                    element.classList.add('privacy-hidden');
+                } else {
+                    // Restore original value
+                    if (this.originalValues.has(element)) {
+                        element.textContent = this.originalValues.get(element);
+                    }
+                    element.classList.remove('privacy-hidden');
+                }
+            });
+            
+            // Also hide card labels/titles that might contain sensitive info
+            const labels = card.querySelectorAll('.kpi-label, .label, .title, [class*="label"]');
+            labels.forEach(label => {
+                const text = label.textContent.trim();
+                // Only hide if it contains financial keywords
+                if (/balance|total|amount|income|expense|savings|net worth|portfolio/i.test(text)) {
+                    if (this.isPrivacyMode) {
+                        if (!this.originalValues.has(label)) {
+                            this.originalValues.set(label, label.textContent);
+                        }
+                        label.classList.add('privacy-hidden-label');
+                    } else {
+                        label.classList.remove('privacy-hidden-label');
+                    }
+                }
+            });
         });
     }
 
@@ -689,13 +765,18 @@ class PrivacyModeManager {
         const observer = new MutationObserver(() => {
             clearTimeout(debounceTimer);
             debounceTimer = setTimeout(() => {
-                // Skip on privacy-settings page
-                const isPrivacySettingsPage = window.location.pathname.includes('privacy-settings');
-                if (isPrivacySettingsPage) return;
+                // Skip on privacy-settings page and admin page
+                const pathname = window.location.pathname.toLowerCase();
+                const href = window.location.href.toLowerCase();
+                const isAdminPage = pathname.includes('admin') || href.includes('admin');
+                const isPrivacySettingsPage = pathname.includes('privacy-settings');
+                
+                if (isAdminPage || isPrivacySettingsPage) return;
                 
                 if (this.isPrivacyMode) {
                     // Reapply privacy mode to newly added elements
                     console.log('[PrivacyMode] Reapplying privacy mode to new content');
+                    this.hideKPICards();
                     this.autoHideAmounts();
                     this.autoHidePercentages();
                     this.autoHideEmails();
