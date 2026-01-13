@@ -2,6 +2,7 @@
 import '../services/services-init.js';
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
+import storageService from '../services/storage-service.js';
 import toast from '../components/toast.js';
 import { formatCurrency, formatDate } from '../utils/helpers.js';
 import encryptionReauthModal from '../components/encryption-reauth-modal.js';
@@ -160,6 +161,15 @@ function renderPolicies() {
       statusText = 'Expiring Soon';
     }
 
+    // Document badge if file attached
+    const documentBadge = policy.fileUrl ? `
+      <div style="margin-top: 0.5rem;">
+        <a href="${policy.fileUrl}" target="_blank" class="document-badge" onclick="event.stopPropagation()">
+          📄 View Policy Document
+        </a>
+      </div>
+    ` : '';
+
     return `
       <div class="policy-card ${isExpiringSoon ? 'expiring-soon' : ''}">
         <div class="policy-header">
@@ -198,6 +208,8 @@ function renderPolicies() {
           </div>
         ` : ''}
 
+        ${documentBadge}
+
         <div class="policy-actions">
           <button class="btn btn-sm btn-outline" onclick="editPolicy('${policy.id}')">Edit</button>
           <button class="btn btn-sm btn-danger-outline" onclick="deletePolicy('${policy.id}', '${policy.policyName}')">Delete</button>
@@ -212,21 +224,15 @@ function updatePolicyKPIs() {
   const now = new Date();
   const activePolicies = policies.filter(p => new Date(p.endDate) > now).length;
   const totalCoverage = policies.reduce((sum, p) => sum + (p.coverageAmount || 0), 0);
-  const annualPremium = policies.reduce((sum, p) => sum + (p.premiumAmount || 0), 0);
-  const expiringSoon = policies.filter(p => {
-    const daysUntilExpiry = Math.ceil((new Date(p.endDate) - now) / (1000 * 60 * 60 * 24));
-    return daysUntilExpiry <= 30 && daysUntilExpiry > 0;
-  }).length;
+  const policiesWithDocuments = policies.filter(p => p.fileUrl).length;
 
   const activePoliciesEl = document.getElementById('activePolicies');
   const totalCoverageEl = document.getElementById('totalCoverage');
-  const annualPremiumEl = document.getElementById('annualPremium');
-  const expiringSoonEl = document.getElementById('expiringSoon');
+  const policyDocumentsEl = document.getElementById('policyDocuments');
 
   if (activePoliciesEl) activePoliciesEl.textContent = activePolicies;
   if (totalCoverageEl) totalCoverageEl.textContent = formatCurrency(totalCoverage);
-  if (annualPremiumEl) annualPremiumEl.textContent = formatCurrency(annualPremium);
-  if (expiringSoonEl) expiringSoonEl.textContent = expiringSoon;
+  if (policyDocumentsEl) policyDocumentsEl.textContent = policiesWithDocuments;
 }
 
 // Load expenses
@@ -385,9 +391,14 @@ function filterExpenses() {
 
 // Policy form functions
 function openPolicyForm(policyId = null) {
+  // Close expense form if open
+  closeExpenseForm();
+
   const formSection = document.getElementById('addPolicySection');
   const formTitle = document.getElementById('policyFormTitle');
   const form = document.getElementById('policyForm');
+  const policyUploadProgress = document.getElementById('policyUploadProgress');
+  const currentPolicyFileGroup = document.getElementById('currentPolicyFileGroup');
 
   editingPolicyId = policyId;
 
@@ -405,12 +416,23 @@ function openPolicyForm(policyId = null) {
       document.getElementById('endDate').value = policy.endDate || '';
       document.getElementById('coveredMembers').value = policy.coveredMembers || '';
       document.getElementById('policyNotes').value = policy.notes || '';
+      
+      // Show current file if exists
+      if (policy.fileUrl) {
+        currentPolicyFileGroup.style.display = 'block';
+        document.getElementById('currentPolicyFileName').textContent = policy.fileName || 'View Document';
+        document.getElementById('currentPolicyFileLink').href = policy.fileUrl;
+      } else {
+        currentPolicyFileGroup.style.display = 'none';
+      }
     }
   } else {
     formTitle.textContent = 'Add Insurance Policy';
     form.reset();
+    currentPolicyFileGroup.style.display = 'none';
   }
 
+  policyUploadProgress.style.display = 'none';
   formSection.classList.add('show');
   formSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
@@ -418,6 +440,8 @@ function openPolicyForm(policyId = null) {
 function closePolicyForm() {
   document.getElementById('addPolicySection').classList.remove('show');
   document.getElementById('policyForm').reset();
+  document.getElementById('policyUploadProgress').style.display = 'none';
+  document.getElementById('currentPolicyFileGroup').style.display = 'none';
   editingPolicyId = null;
 }
 
@@ -425,13 +449,49 @@ async function handlePolicySubmit(e) {
   e.preventDefault();
 
   const saveBtn = document.getElementById('savePolicyBtn');
-  const btnText = saveBtn.querySelector('.btn-text');
-  const btnSpinner = saveBtn.querySelector('.btn-spinner');
+  const originalText = saveBtn.textContent;
 
   try {
     saveBtn.disabled = true;
-    btnText.style.display = 'none';
-    btnSpinner.style.display = 'inline-block';
+    saveBtn.textContent = 'Saving...';
+
+    let fileUrl = null;
+    let filePath = null;
+    let fileName = null;
+    let fileSize = null;
+    let fileType = null;
+
+    // Upload file if selected
+    const fileInput = document.getElementById('policyFileInput');
+    const file = fileInput.files[0];
+    
+    if (file) {
+      const policyUploadProgress = document.getElementById('policyUploadProgress');
+      const policyProgressFill = document.getElementById('policyProgressFill');
+      const policyProgressText = document.getElementById('policyProgressText');
+      
+      policyUploadProgress.style.display = 'block';
+      
+      const uploadResult = await storageService.uploadFile(
+        file,
+        'insurance-policies',
+        (progress) => {
+          policyProgressFill.style.width = `${progress}%`;
+          policyProgressText.textContent = `${Math.round(progress)}%`;
+        }
+      );
+
+      if (!uploadResult.success) {
+        toast.error(uploadResult.error || 'Failed to upload file');
+        return;
+      }
+
+      fileUrl = uploadResult.url;
+      filePath = uploadResult.path;
+      fileName = uploadResult.name;
+      fileSize = uploadResult.size;
+      fileType = uploadResult.type;
+    }
 
     const policyData = {
       policyName: document.getElementById('policyName').value,
@@ -447,7 +507,24 @@ async function handlePolicySubmit(e) {
       userId: currentUser.uid
     };
 
+    // Add file data if uploaded
+    if (fileUrl) {
+      policyData.fileUrl = fileUrl;
+      policyData.filePath = filePath;
+      policyData.fileName = fileName;
+      policyData.fileSize = fileSize;
+      policyData.fileType = fileType;
+    }
+
     if (editingPolicyId) {
+      // If editing and new file uploaded, delete old file
+      if (fileUrl) {
+        const oldPolicy = policies.find(p => p.id === editingPolicyId);
+        if (oldPolicy && oldPolicy.filePath) {
+          await storageService.deleteFile(oldPolicy.filePath);
+        }
+      }
+      
       await firestoreService.update('insurancePolicies', editingPolicyId, policyData);
       toast.success('Policy updated successfully');
     } else {
@@ -462,13 +539,18 @@ async function handlePolicySubmit(e) {
     toast.error('Failed to save policy');
   } finally {
     saveBtn.disabled = false;
-    btnText.style.display = 'inline';
-    btnSpinner.style.display = 'none';
+    saveBtn.textContent = originalText;
+    document.getElementById('policyUploadProgress').style.display = 'none';
+    document.getElementById('policyProgressFill').style.width = '0%';
+    document.getElementById('policyProgressText').textContent = '0%';
   }
 }
 
 // Expense form functions
 function openExpenseForm(expenseId = null) {
+  // Close policy form if open
+  closePolicyForm();
+
   const formSection = document.getElementById('addExpenseSection');
   const formTitle = document.getElementById('expenseFormTitle');
   const form = document.getElementById('expenseForm');

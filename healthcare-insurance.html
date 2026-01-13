@@ -216,10 +216,10 @@
           </div>
         </div>
         <div class="kpi-card">
-          <div class="kpi-icon">📅</div>
+          <div class="kpi-icon">📄</div>
           <div class="kpi-content">
-            <div class="kpi-label">Upcoming Renewals</div>
-            <div class="kpi-value" id="upcomingRenewals">0</div>
+            <div class="kpi-label">Policy Documents</div>
+            <div class="kpi-value" id="policyDocuments">0</div>
           </div>
         </div>
       </div>
@@ -292,6 +292,26 @@
             <div class="form-group form-group-full">
               <label for="policyNotes">Notes</label>
               <textarea id="policyNotes" class="form-input" rows="3" placeholder="Additional notes about this policy"></textarea>
+            </div>
+
+            <div class="form-group form-group-full">
+              <label for="policyFileInput">Upload Policy Document (Optional)</label>
+              <input type="file" id="policyFileInput" class="form-input" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+              <small class="form-help">Max 10MB. Allowed: PDF, Images, Word documents</small>
+              <div id="policyUploadProgress" class="upload-progress" style="display: none;">
+                <div class="progress-bar">
+                  <div class="progress-fill" id="policyProgressFill"></div>
+                </div>
+                <div class="progress-text" id="policyProgressText">0%</div>
+              </div>
+            </div>
+
+            <div class="form-group form-group-full" id="currentPolicyFileGroup" style="display: none;">
+              <label>Current Document</label>
+              <div class="current-file">
+                <span id="currentPolicyFileName"></span>
+                <a href="#" id="currentPolicyFileLink" target="_blank" class="btn btn-sm btn-outline">View</a>
+              </div>
             </div>
           </div>
 
