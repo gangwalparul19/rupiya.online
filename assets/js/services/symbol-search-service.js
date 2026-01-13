@@ -192,7 +192,6 @@ class SymbolSearchService {
    * Clear cache
    */
   clearCache() {
-    console.log('Clearing symbol search cache');
     this.cache.clear();
   }
 

@@ -19,13 +19,9 @@ class TripGroupDetailPage {
   }
 
   async init() {
-    console.log('Initializing Trip Group Detail Page');
-
     // Get group ID from URL
     const params = new URLSearchParams(window.location.search);
     this.groupId = params.get('id');
-
-    console.log('Group ID from URL:', this.groupId);
 
     if (!this.groupId) {
       console.error('No group ID provided');
@@ -37,7 +33,6 @@ class TripGroupDetailPage {
     if (!user) return; // Redirecting to login
 
     this.currentUserId = authService.getCurrentUser()?.uid;
-    console.log('Current user ID:', this.currentUserId);
 
     this.bindEvents();
     await this.loadGroupData();
@@ -117,38 +112,25 @@ class TripGroupDetailPage {
     this.showLoading(true);
 
     try {
-      console.log('Loading group data for group:', this.groupId);
-
       // Load group details
-      console.log('Fetching group details...');
       const groupResult = await tripGroupsService.getGroup(this.groupId);
-      console.log('Group result:', groupResult);
 
       if (!groupResult.success) {
         throw new Error(groupResult.error);
       }
       this.group = groupResult.data;
-      console.log('Group loaded:', this.group.name);
 
       // Load members, expenses, settlements in parallel
-      console.log('Loading members, expenses, and settlements...');
       [this.members, this.expenses, this.settlements] = await Promise.all([
         tripGroupsService.getGroupMembers(this.groupId),
         tripGroupsService.getGroupExpenses(this.groupId),
         tripGroupsService.getSettlements(this.groupId)
       ]);
 
-      console.log('Members loaded:', this.members.length);
-      console.log('Expenses loaded:', this.expenses.length);
-      console.log('Settlements loaded:', this.settlements.length);
-
       // Calculate balances
-      console.log('Calculating balances...');
       this.balances = await tripGroupsService.calculateBalances(this.groupId);
-      console.log('Balances calculated:', this.balances);
 
       // Render everything
-      console.log('Rendering UI...');
       this.renderHeader();
       this.renderBudget();
       this.renderBalances();
@@ -166,8 +148,6 @@ class TripGroupDetailPage {
       this.initializeFilters();
       this.initializeQuickActions();
       this.initializeKeyboardShortcuts();
-
-      console.log('UI rendered successfully');
     } catch (error) {
       console.error('Error loading group data:', error);
       this.showToast('Failed to load group data', 'error');
@@ -727,7 +707,6 @@ class TripGroupDetailPage {
 
   async handleExpenseSubmit(e) {
     e.preventDefault();
-    console.log('=== Form submitted ===');
 
     const amount = parseFloat(document.getElementById('expenseAmount').value);
     const category = document.getElementById('expenseCategory').value;
@@ -736,11 +715,8 @@ class TripGroupDetailPage {
     const paidBy = document.getElementById('expensePaidBy').value;
     const splitType = document.querySelector('input[name="splitType"]:checked')?.value || 'equal';
 
-    console.log('Form values:', { amount, category, description, date, paidBy, splitType });
-
     // Get selected members and their splits
     const checkedMembers = document.querySelectorAll('#splitMembers input[type="checkbox"]:checked');
-    console.log('Checked members:', checkedMembers.length);
     const splits = [];
 
     if (splitType === 'equal') {
@@ -776,11 +752,8 @@ class TripGroupDetailPage {
       });
     }
 
-    console.log('Splits:', splits);
-
     // Validate splits sum
     const splitSum = splits.reduce((sum, s) => sum + s.amount, 0);
-    console.log('Split sum:', splitSum, 'Amount:', amount, 'Difference:', Math.abs(splitSum - amount));
     
     if (Math.abs(splitSum - amount) > 0.01) {
       console.error('Split validation failed');
@@ -788,7 +761,6 @@ class TripGroupDetailPage {
       return;
     }
 
-    console.log('Validation passed, calling service...');
     this.setExpenseLoading(true);
 
     try {
@@ -801,8 +773,6 @@ class TripGroupDetailPage {
         splitType,
         splits
       });
-
-      console.log('Service result:', result);
 
       if (!result.success) {
         throw new Error(result.error);

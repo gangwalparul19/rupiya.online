@@ -34,16 +34,13 @@ class PredictionService {
     }
 
     try {
-      const expenses = await firestoreService.getExpenses();
-      console.log('[PredictionService] Loaded expenses for forecast:', expenses?.length || 0);
+    const expenses = await firestoreService.getExpenses();
       
       if (!expenses || expenses.length === 0) {
-        console.log('[PredictionService] No expenses found, returning empty forecast');
         return [];
       }
       
       const forecasts = this.calculateSpendingForecast(expenses, days);
-      console.log('[PredictionService] Generated forecasts:', forecasts?.length || 0);
       
       // Cache result
       cacheManager.set(cacheKey, forecasts, this.cacheTTL);

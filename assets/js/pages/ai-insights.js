@@ -2,9 +2,12 @@
 import '../services/services-init.js'; // Initialize services first
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
-import AIInsightsEngine from '../utils/ai-insights-engine.js';
+// Lazy load AI insights engine - only loaded when page initializes
+// import AIInsightsEngine from '../utils/ai-insights-engine.js';
+import lazyLoader from '../utils/lazy-loader.js';
 import toast from '../components/toast.js';
-import confirmationModal from '../components/confirmation-modal.js';
+// Lazy load confirmation modal
+// import confirmationModal from '../components/confirmation-modal.js';
 import { formatCurrency, formatCurrencyCompact } from '../utils/helpers.js';
 import encryptionReauthModal from '../components/encryption-reauth-modal.js';
 import privacyMode from '../utils/privacy-mode.js';
@@ -14,7 +17,7 @@ import { initPrivacyModeButton } from '../components/privacy-mode-button.js';
 initPrivacyModeButton();
 
 
-const aiEngine = new AIInsightsEngine();
+let aiEngine = null; // Will be lazy loaded
 
 async function checkAuth() {
   await authService.waitForAuth();
@@ -28,6 +31,10 @@ async function checkAuth() {
 async function init() {
   const isAuthenticated = await checkAuth();
   if (!isAuthenticated) return;
+  
+  // Lazy load AI insights engine
+  const AIInsightsEngine = await lazyLoader.util('ai-insights-engine');
+  aiEngine = new AIInsightsEngine();
   
   // Check if encryption reauth is needed
   await encryptionReauthModal.checkAndPrompt(async () => {

@@ -271,8 +271,6 @@ class TripGroupsPage {
     const email = emailInput.value.trim();
     const phone = phoneInput.value.trim();
 
-    console.log('Adding pending member:', { name, email, phone });
-
     if (!name) {
       this.showToast('Member name is required', 'error');
       nameInput.focus();
@@ -287,7 +285,6 @@ class TripGroupsPage {
 
     const newMember = { name, email, phone };
     this.pendingMembers.push(newMember);
-    console.log('Pending members array:', this.pendingMembers);
 
     this.renderPendingMembers();
     this.showToast(`${name} added to the group`, 'success');
@@ -386,15 +383,10 @@ class TripGroupsPage {
         throw new Error(result.error);
       }
 
-      console.log('Group created:', result.groupId);
-      console.log('Pending members to add:', this.pendingMembers);
-
       // Add pending members
       const addedMembers = [];
       for (const member of this.pendingMembers) {
-        console.log('Adding member:', member);
         const addResult = await tripGroupsService.addMember(result.groupId, member);
-        console.log('Add member result:', addResult);
         if (addResult.success) {
           addedMembers.push(member);
         } else {
@@ -403,15 +395,11 @@ class TripGroupsPage {
         }
       }
 
-      console.log('Successfully added members:', addedMembers.length);
-
       // Send invitation emails to members with valid emails
       const membersWithEmail = addedMembers.filter(m => m.email && m.email.trim() !== '');
-      console.log('Members with email:', membersWithEmail);
 
       if (membersWithEmail.length > 0) {
         try {
-          console.log('Sending invitation emails...');
           const emailPayload = {
             members: membersWithEmail,
             tripName: name,
@@ -423,7 +411,6 @@ class TripGroupsPage {
             creatorEmail: currentUser.email,
             groupId: result.groupId
           };
-          console.log('Email payload:', emailPayload);
 
           const emailResponse = await fetch('/api/send-trip-invitation', {
             method: 'POST',

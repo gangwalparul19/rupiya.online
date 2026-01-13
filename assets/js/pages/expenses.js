@@ -8,7 +8,9 @@ import smartCategorizationService from '../services/smart-categorization-service
 import encryptionService from '../services/encryption-service.js';
 import loadingService from '../services/loading-service.js';
 import toast from '../components/toast.js';
-import confirmationModal from '../components/confirmation-modal.js';
+// Lazy load confirmation modal - only loaded when delete is clicked
+// import confirmationModal from '../components/confirmation-modal.js';
+import lazyLoader from '../utils/lazy-loader.js';
 import themeManager from '../utils/theme-manager.js';
 import Pagination from '../components/pagination.js';
 import { Validator } from '../utils/validation.js';
@@ -346,11 +348,17 @@ async function loadExpenses() {
     const kpiSummary = await firestoreService.getExpenseKPISummary();
     state.totalCount = kpiSummary.totalCount;
     
-    // Load paginated expenses for display
+    // Build filters array for Firestore query
+    const filters = buildFirestoreFilters();
+    
+    // Load paginated expenses with server-side filtering
     const result = await firestoreService.getExpensesPaginated({ 
-      pageSize: state.itemsPerPage * 5 // Load 5 pages worth for filtering
+      pageSize: state.itemsPerPage, // Only load what we need (not 5x)
+      filters: filters
     });
     state.expenses = result.data;
+    state.lastDoc = result.lastDoc;
+    state.hasMore = result.hasMore;
     
     // Update KPI cards
     updateExpenseKPIsFromSummary(kpiSummary);
@@ -366,9 +374,10 @@ async function loadExpenses() {
     
     pagination.setTotal(state.totalCount);
     
+    // Apply only client-side filters (search, family member, date range)
+    // These can't be done in Firestore efficiently
     state.filteredExpenses = [...state.expenses];
-    
-    applyFilters();
+    applyClientSideFilters();
     
   } catch (error) {
     console.error('Error loading expenses:', error);
@@ -530,33 +539,43 @@ function updateFilteredExpenseKPIs() {
   }
 }
 
-// Apply filters
-function applyFilters() {
+// Build Firestore filters from current filter state
+// Only includes filters that can be efficiently done in Firestore
+function buildFirestoreFilters() {
+  const filters = [];
+  
+  // Category filter - can be done in Firestore with index
+  if (state.filters.category) {
+    filters.push({ field: 'category', operator: '==', value: state.filters.category });
+  }
+  
+  // Payment method filter - can be done in Firestore with index
+  if (state.filters.paymentMethod) {
+    filters.push({ field: 'paymentMethod', operator: '==', value: state.filters.paymentMethod });
+  }
+  
+  // Specific payment method filter
+  if (state.filters.specificPaymentMethod) {
+    filters.push({ field: 'specificPaymentMethodId', operator: '==', value: state.filters.specificPaymentMethod });
+  }
+  
+  // Note: Date range, search, and family member filters are applied client-side
+  // because they require complex logic or don't have indexes
+  
+  return filters;
+}
+
+// Apply only client-side filters (search, family member, date range)
+function applyClientSideFilters() {
   let filtered = [...state.expenses];
   
-  // Category filter
-  if (state.filters.category) {
-    filtered = filtered.filter(e => e.category === state.filters.category);
-  }
-  
-  // Payment method type filter
-  if (state.filters.paymentMethod) {
-    filtered = filtered.filter(e => e.paymentMethod === state.filters.paymentMethod);
-  }
-  
-  // Specific payment method filter (e.g., specific card, UPI ID)
-  if (state.filters.specificPaymentMethod) {
-    filtered = filtered.filter(e => e.specificPaymentMethodId === state.filters.specificPaymentMethod);
-  }
-  
-  // Family member filter
+  // Family member filter - complex logic, must be client-side
   if (state.filters.familyMember) {
     console.log('[Filter] Filtering by family member:', state.filters.familyMember);
     filtered = filtered.filter(e => {
       // Check if expense has split details
       if (e.hasSplit && e.splitDetails && e.splitDetails.length > 0) {
         // Check if the selected member has any amount in this expense
-        // Use loose equality to handle string/number comparison issues
         const hasMatch = e.splitDetails.some(split => {
           const splitMemberId = String(split.memberId).trim();
           const filterMemberId = String(state.filters.familyMember).trim();
@@ -573,12 +592,12 @@ function applyFilters() {
         });
         return hasMatch;
       }
-      return false; // If no split details, exclude from family member filter
+      return false;
     });
     console.log('[Filter] Filtered expenses count:', filtered.length);
   }
   
-  // Date range filter
+  // Date range filter - client-side for now (could be moved to Firestore)
   if (state.filters.dateFrom) {
     const fromDate = timezoneService.parseInputDate(state.filters.dateFrom);
     const fromStart = timezoneService.startOfDay(fromDate);
@@ -597,7 +616,7 @@ function applyFilters() {
     });
   }
   
-  // Search filter
+  // Search filter - must be client-side (no full-text search in Firestore)
   if (state.filters.search) {
     const searchLower = state.filters.search.toLowerCase();
     filtered = filtered.filter(e => 
@@ -617,6 +636,12 @@ function applyFilters() {
   updateCounts();
   updateFilteredExpenseKPIs();
   renderExpenses();
+}
+
+// Apply filters - now reloads data with server-side filters
+async function applyFilters() {
+  // Reload expenses with new filters applied at Firestore level
+  await loadExpenses();
 }
 
 // Update counts
@@ -832,6 +857,9 @@ function updateBulkActionsBar() {
 // Bulk delete selected expenses
 async function bulkDeleteExpenses() {
   if (state.selectedExpenses.size === 0) return;
+  
+  // Lazy load confirmation modal
+  const confirmationModal = await lazyLoader.component('confirmation-modal');
   
   const confirmed = await confirmationModal.show({
     title: 'Delete Expenses',

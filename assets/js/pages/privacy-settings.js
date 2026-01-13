@@ -37,8 +37,6 @@ async function init() {
 
 // Initialize page after auth
 function initPage() {
-  console.log('[Privacy Settings] Initializing page...');
-  
   // Update user profile in sidebar
   updateUserProfile();
   

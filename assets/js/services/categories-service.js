@@ -102,14 +102,11 @@ class CategoriesService {
   async initializeCategories() {
     try {
       const userId = this.getUserId();
-      console.log('[CategoriesService] Initializing categories for user:', userId);
       
       const docRef = doc(db, this.collectionName, userId);
       const docSnap = await getDoc(docRef);
 
       if (!docSnap.exists()) {
-        console.log('[CategoriesService] No categories found, creating defaults...');
-        
         // Create default categories for new user
         await setDoc(docRef, {
           expenseCategories: this.defaultExpenseCategories,

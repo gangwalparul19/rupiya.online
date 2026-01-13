@@ -39,7 +39,6 @@ class GoogleSheetsPriceService {
     if (this.preloadStarted) return;
     this.preloadStarted = true;
     
-    console.log('[GoogleSheets] Preloading data in background...');
     // Fire and forget - don't await, let it load in background
     this.getAllData().catch(err => {
       console.warn('[GoogleSheets] Background preload failed:', err.message);
@@ -139,8 +138,6 @@ class GoogleSheetsPriceService {
           credentials: 'omit'
         });
         
-        console.log(`[GoogleSheets] Response status: ${response.status}`);
-        
         if (!response.ok) {
           // Try to get error details from response
           let errorMessage = `Failed to fetch sheet: ${response.status}`;
@@ -158,7 +155,6 @@ class GoogleSheetsPriceService {
         }
 
         const text = await response.text();
-        console.log(`[GoogleSheets] Received ${text.length} bytes`);
         
         const data = this.parseGoogleSheetsResponse(text);
 
@@ -319,8 +315,6 @@ class GoogleSheetsPriceService {
    * - Date: NAV date
    */
   extractPriceData(row, symbol) {
-    console.log('Extracting price data from row:', row);
-    
     // Extract price from Live_Price (stocks) or Net Asset Value (mutual funds)
     const price = parseFloat(
       row.Live_Price || row.live_price || row['Live Price'] || row.LivePrice ||
@@ -373,8 +367,6 @@ class GoogleSheetsPriceService {
 
     // Detect currency based on category and exchange
     const currency = this.detectCurrency(row, symbol);
-
-    console.log('Extracted data:', { symbol, name, exchange, type, price, currency });
 
     return {
       symbol: symbol,

@@ -13,8 +13,6 @@ Disallow: /email-template-preview.html
 Disallow: /env-config.html
 Disallow: /find-sheet-gid.html
 Disallow: /force-relogin.html
-Disallow: /family-test.html
-Disallow: /family-modals.html
 Disallow: /test-*.html
 
 # Disallow API endpoints

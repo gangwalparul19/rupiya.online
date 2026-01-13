@@ -14,11 +14,30 @@ import logger from '../utils/logger.js';
 import kpiEnhancer from '../utils/kpi-enhancements.js';
 import TransactionListEnhancer from '../utils/transaction-list-enhancements.js';
 import { setupAutoCacheClear } from '../utils/cache-buster.js';
+import lazyLoader from '../utils/lazy-loader.js';
 
 const log = logger.create('Dashboard');
 
 // Setup automatic cache clearing on version change
 setupAutoCacheClear();
+
+// Preload commonly used modules during idle time
+if ('requestIdleCallback' in window) {
+  requestIdleCallback(() => {
+    lazyLoader.preload([
+      { type: 'service', name: 'investment-analytics-service' },
+      { type: 'util', name: 'ai-insights-engine' }
+    ]);
+  }, { timeout: 2000 });
+} else {
+  // Fallback for browsers without requestIdleCallback
+  setTimeout(() => {
+    lazyLoader.preload([
+      { type: 'service', name: 'investment-analytics-service' },
+      { type: 'util', name: 'ai-insights-engine' }
+    ]);
+  }, 2000);
+}
 
 // Check authentication
 async function checkAuth() {

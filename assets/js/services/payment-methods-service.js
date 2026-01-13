@@ -77,7 +77,6 @@ class PaymentMethodsService {
       
       // If no methods exist, create default cash method
       if (methods.length === 0) {
-        console.log('[PaymentMethodsService] No methods found, initializing defaults...');
         await this.initializeDefaultMethods();
         return await this.getPaymentMethods();
       }

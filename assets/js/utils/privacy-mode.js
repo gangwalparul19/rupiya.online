@@ -193,15 +193,12 @@ class PrivacyModeManager {
      * AUTO-DETECTS financial data without requiring HTML changes
      */
     applyPrivacyMode() {
-        console.log('Applying Privacy Mode:', this.isPrivacyMode);
-        
         // Skip privacy mode on admin.html and privacy-settings page
         const pathname = window.location.pathname.toLowerCase();
         const href = window.location.href.toLowerCase();
         const isAdminPage = pathname.includes('admin') || href.includes('admin');
         
         if (isAdminPage) {
-            console.log('Privacy Mode: Skipping admin page');
             return;
         }
         
@@ -219,7 +216,6 @@ class PrivacyModeManager {
             window.dispatchEvent(new CustomEvent('privacyModeChanged', {
                 detail: { isPrivacyMode: this.isPrivacyMode }
             }));
-            console.log('Privacy Mode: Skipping ALL effects on privacy-settings page');
             return;
         }
         
@@ -267,8 +263,6 @@ class PrivacyModeManager {
         window.dispatchEvent(new CustomEvent('privacyModeChanged', {
             detail: { isPrivacyMode: this.isPrivacyMode }
         }));
-        
-        console.log('Privacy Mode Applied:', this.isPrivacyMode);
     }
 
     /**
@@ -788,8 +782,6 @@ class PrivacyModeManager {
         // Try to use existing toast system
         if (window.showToast) {
             window.showToast(msg, this.isPrivacyMode ? 'success' : 'info');
-        } else {
-            console.log(msg);
         }
     }
 
@@ -812,7 +804,6 @@ class PrivacyModeManager {
                 
                 if (this.isPrivacyMode) {
                     // Reapply privacy mode to newly added elements
-                    console.log('[PrivacyMode] Reapplying privacy mode to new content');
                     this.hideKPICards();
                     this.autoHideAmounts();
                     this.autoHidePercentages();
