@@ -1,23 +1,36 @@
 // Admin Dashboard - Enhanced with better pagination and user details
 import '../services/services-init.js';
 import authService from '../services/auth-service.js';
-import adminService from '../services/admin-service.js';
-import confirmationModal from '../components/confirmation-modal.js';
+// Lazy load admin service - only used on admin page
+// import adminService from '../services/admin-service.js';
+import lazyLoader from '../utils/lazy-loader.js';
+// Lazy load confirmation modal
+// import confirmationModal from '../components/confirmation-modal.js';
 
-// Monitoring Services
-import performanceMonitoring from '../services/performance-monitoring-service.js';
-import userAnalytics from '../services/user-analytics-service.js';
-import pushNotifications from '../services/push-notifications-service.js';
-import offlineSync from '../services/offline-sync-service.js';
-import encryptionAtRest from '../services/encryption-at-rest-service.js';
-import dataValidation from '../services/data-validation-service.js';
-import backupService from '../services/backup-service.js';
+// Lazy load monitoring services - only used on admin page
+// import performanceMonitoring from '../services/performance-monitoring-service.js';
+// import userAnalytics from '../services/user-analytics-service.js';
+// import pushNotifications from '../services/push-notifications-service.js';
+// import offlineSync from '../services/offline-sync-service.js';
+// import encryptionAtRest from '../services/encryption-at-rest-service.js';
+// import dataValidation from '../services/data-validation-service.js';
+// import backupService from '../services/backup-service.js';
 
 // State
 let currentPage = 1;
 let pageSize = 10;
 let hasMoreUsers = true;
 let totalUsers = 0;
+
+// Lazy loaded services
+let adminService = null;
+let performanceMonitoring = null;
+let userAnalytics = null;
+let pushNotifications = null;
+let offlineSync = null;
+let encryptionAtRest = null;
+let dataValidation = null;
+let backupService = null;
 let allUsersCache = [];
 let filteredUsers = [];
 let searchQuery = '';
@@ -46,6 +59,21 @@ async function init() {
   
   document.getElementById('adminUserAvatar').textContent = initials;
   document.getElementById('adminUserEmail').textContent = email;
+
+  // Lazy load admin service
+  adminService = await lazyLoader.service('admin-service');
+  
+  // Lazy load monitoring services in parallel
+  [performanceMonitoring, userAnalytics, pushNotifications, offlineSync, 
+   encryptionAtRest, dataValidation, backupService] = await Promise.all([
+    lazyLoader.service('performance-monitoring-service'),
+    lazyLoader.service('user-analytics-service'),
+    lazyLoader.service('push-notifications-service'),
+    lazyLoader.service('offline-sync-service'),
+    lazyLoader.service('encryption-at-rest-service'),
+    lazyLoader.service('data-validation-service'),
+    lazyLoader.service('backup-service')
+  ]);
 
   // Check admin access
   const isAdmin = await adminService.isAdmin();

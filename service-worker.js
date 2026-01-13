@@ -2,40 +2,109 @@
 // Provides offline support and caching
 
 // CACHE_VERSION is injected by build.js during deployment
-const CACHE_VERSION = '1.2.172';
+const CACHE_VERSION = '1.2.173';
 const CACHE_NAME = `rupiya-v${CACHE_VERSION}`;
 const RUNTIME_CACHE = `rupiya-runtime-v${CACHE_VERSION}`;
 
-// Assets to cache on install
-const STATIC_ASSETS = [
-  // HTML Pages
+// Assets to cache on install (CRITICAL ONLY)
+const CRITICAL_ASSETS = [
+  // Core HTML Pages (most frequently accessed)
   '/',
   '/index.html',
+  '/login.html',
+  '/signup.html',
+  '/dashboard.html',
+  '/expenses.html',
+  '/income.html',
+  '/offline.html',
+  
+  // CSS Bundles (Optimized) - Core only
+  '/assets/css/bundles/core.bundle.css',
+  '/assets/css/bundles/dashboard.bundle.css',
+  '/assets/css/bundles/auth.bundle.css',
+  
+  // Critical page-specific CSS
+  '/assets/css/expenses.css',
+  '/assets/css/expenses-kpi-override.css',
+  '/assets/css/income.css',
+  '/assets/css/income-kpi-override.css',
+  '/assets/css/dashboard-kpi-override.css',
+  
+  // Config JS (required for app to function)
+  '/assets/js/config/env.js',
+  '/assets/js/config/firebase-config.js',
+  '/assets/js/config/privacy-config.js',
+  '/assets/js/config/version.js',
+  
+  // Core Services JS (required for basic functionality)
+  '/assets/js/services/auth-service.js',
+  '/assets/js/services/encryption-service.js',
+  '/assets/js/services/firestore-service.js',
+  '/assets/js/services/services-init.js',
+  '/assets/js/services/user-service.js',
+  '/assets/js/services/categories-service.js',
+  '/assets/js/services/payment-methods-service.js',
+  
+  // Core Components JS
+  '/assets/js/components/loading.js',
+  '/assets/js/components/sidebar.js',
+  '/assets/js/components/toast.js',
+  '/assets/js/components/pagination.js',
+  
+  // Core Utils JS
+  '/assets/js/utils/auth-guard.js',
+  '/assets/js/utils/helpers.js',
+  '/assets/js/utils/timezone.js',
+  '/assets/js/utils/theme-manager.js',
+  '/assets/js/utils/error-handler.js',
+  
+  // Core Pages JS
+  '/assets/js/pages/login.js',
+  '/assets/js/pages/signup.js',
+  '/assets/js/pages/dashboard.js',
+  '/assets/js/pages/expenses.js',
+  '/assets/js/pages/income.js',
+  '/assets/js/pages/landing.js',
+  
+  // PWA
+  '/assets/js/pwa-setup.js',
+  
+  // Images (critical only)
+  '/assets/images/logo.png',
+  '/logo.png',
+  '/favicon.ico',
+  '/favicon-16x16.png',
+  '/favicon-32x32.png',
+  '/android-chrome-192x192.png',
+  '/android-chrome-512x512.png',
+  
+  // Manifest
+  '/manifest.json'
+];
+
+// Assets to cache on first visit (LAZY CACHE)
+// These will be cached when the user first visits the page
+const LAZY_CACHE_PAGES = [
+  // Secondary HTML Pages
   '/about-us.html',
   '/admin.html',
   '/ai-insights.html',
   '/budgets.html',
   '/contact-us.html',
-  '/dashboard.html',
   '/data-protection.html',
   '/demo.html',
   '/disclaimer.html',
   '/documents.html',
-  '/expenses.html',
   '/feedback.html',
   '/goals.html',
   '/house-help.html',
   '/houses.html',
-  '/income.html',
   '/investments.html',
   '/loans.html',
-  '/login.html',
   '/notes.html',
-  '/offline.html',
   '/privacy-policy.html',
   '/profile.html',
   '/recurring.html',
-  '/signup.html',
   '/split-expense.html',
   '/terms-of-service.html',
   '/trip-group-detail.html',
@@ -43,18 +112,11 @@ const STATIC_ASSETS = [
   '/user-guide.html',
   '/vehicles.html',
   
-  // CSS Bundles (Optimized)
-  '/assets/css/bundles/core.bundle.css',
-  '/assets/css/bundles/dashboard.bundle.css',
-  '/assets/css/bundles/auth.bundle.css',
+  // Secondary CSS Bundles
   '/assets/css/bundles/landing.bundle.css',
   '/assets/css/bundles/legal.bundle.css',
   
-  // Page-specific CSS (not bundled)
-  '/assets/css/expenses.css',
-  '/assets/css/expenses-kpi-override.css',
-  '/assets/css/income.css',
-  '/assets/css/income-kpi-override.css',
+  // Page-specific CSS (lazy loaded)
   '/assets/css/budgets.css',
   '/assets/css/investments.css',
   '/assets/css/investments-mobile.css',
@@ -82,22 +144,11 @@ const STATIC_ASSETS = [
   '/assets/css/feature-details.css',
   '/assets/css/user-guide.css',
   '/assets/css/onboarding.css',
-  '/assets/css/dashboard-kpi-override.css',
   
-  // Config JS
-  '/assets/js/config/env.js',
-  '/assets/js/config/firebase-config.js',
-  '/assets/js/config/privacy-config.js',
-  '/assets/js/config/version.js',
-  
-  // Services JS
+  // Secondary Services JS
   '/assets/js/services/admin-service.js',
-  '/assets/js/services/auth-service.js',
-  '/assets/js/services/categories-service.js',
   '/assets/js/services/cross-feature-integration-service.js',
-  '/assets/js/services/encryption-service.js',
   '/assets/js/services/expense-templates-service.js',
-  '/assets/js/services/firestore-service.js',
   '/assets/js/services/fuel-service.js',
   '/assets/js/services/google-sheets-price-service.js',
   '/assets/js/services/investment-analytics-service.js',
@@ -106,9 +157,7 @@ const STATIC_ASSETS = [
   '/assets/js/services/location-service.js',
   '/assets/js/services/notification-service.js',
   '/assets/js/services/onboarding-service.js',
-  '/assets/js/services/payment-methods-service.js',
   '/assets/js/services/recurring-processor.js',
-  '/assets/js/services/services-init.js',
   '/assets/js/services/smart-categorization-service.js',
   '/assets/js/services/smart-document-service.js',
   '/assets/js/services/split-service.js',
@@ -117,94 +166,65 @@ const STATIC_ASSETS = [
   '/assets/js/services/trip-budget-service.js',
   '/assets/js/services/trip-groups-service.js',
   '/assets/js/services/trip-settlement-service.js',
-  '/assets/js/services/user-service.js',
   
-  // Components JS
+  // Secondary Components JS
   '/assets/js/components/encryption-reauth-modal.js',
-  '/assets/js/components/loading.js',
   '/assets/js/components/logout-modal.js',
   '/assets/js/components/onboarding-ui.js',
-  '/assets/js/components/pagination.js',
   '/assets/js/components/setup-wizard.js',
-  '/assets/js/components/sidebar.js',
-  '/assets/js/components/toast.js',
   
-  // Utils JS
+  // Secondary Utils JS
   '/assets/js/utils/ai-insights-engine.js',
   '/assets/js/utils/auth-encryption-helper.js',
-  '/assets/js/utils/auth-guard.js',
   '/assets/js/utils/button-reset-fix.js',
   '/assets/js/utils/button-state-manager.js',
   '/assets/js/utils/button-state.js',
   '/assets/js/utils/daily-tips.js',
   '/assets/js/utils/encryption-check.js',
-  '/assets/js/utils/error-handler.js',
-  '/assets/js/utils/helpers.js',
   '/assets/js/utils/logout-handler.js',
   '/assets/js/utils/performance.js',
   '/assets/js/utils/pwa-install.js',
   '/assets/js/utils/sample-data.js',
   '/assets/js/utils/scroll-animations.js',
-  '/assets/js/utils/theme-manager.js',
-  '/assets/js/utils/timezone.js',
   '/assets/js/utils/ux-enhancements.js',
   '/assets/js/utils/validation.js',
   
-  // Pages JS
+  // Secondary Pages JS
   '/assets/js/pages/admin.js',
   '/assets/js/pages/ai-insights.js',
   '/assets/js/pages/analytics.js',
   '/assets/js/pages/budgets.js',
-  '/assets/js/pages/dashboard.js',
   '/assets/js/pages/documents.js',
-  '/assets/js/pages/expenses.js',
   '/assets/js/pages/feedback.js',
   '/assets/js/pages/goals.js',
   '/assets/js/pages/house-help.js',
   '/assets/js/pages/houses.js',
-  '/assets/js/pages/income.js',
   '/assets/js/pages/investments.js',
-  '/assets/js/pages/landing.js',
   '/assets/js/pages/loans.js',
-  '/assets/js/pages/login.js',
   '/assets/js/pages/notes.js',
   '/assets/js/pages/profile.js',
   '/assets/js/pages/recurring.js',
-  '/assets/js/pages/signup.js',
   '/assets/js/pages/split-expense.js',
   '/assets/js/pages/trip-group-detail.js',
   '/assets/js/pages/trip-groups.js',
   '/assets/js/pages/user-guide.js',
-  '/assets/js/pages/vehicles.js',
-  
-  // PWA
-  '/assets/js/pwa-setup.js',
-  
-  // Images
-  '/assets/images/logo.png',
-  '/logo.png',
-  '/favicon.ico',
-  '/favicon-16x16.png',
-  '/favicon-32x32.png',
-  '/android-chrome-192x192.png',
-  '/android-chrome-512x512.png',
-  
-  // Manifest
-  '/manifest.json'
+  '/assets/js/pages/vehicles.js'
 ];
 
-// Install event - cache static assets
+// Install event - cache critical assets only
 self.addEventListener('install', (event) => {
   console.log('[Service Worker] Installing...');
 
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
-        console.log('[Service Worker] Caching static assets');
-        return cache.addAll(STATIC_ASSETS);
+        console.log('[Service Worker] Caching critical assets only');
+        console.log(`[Service Worker] Critical assets: ${CRITICAL_ASSETS.length} files`);
+        console.log(`[Service Worker] Lazy cache pages: ${LAZY_CACHE_PAGES.length} files (cached on first visit)`);
+        return cache.addAll(CRITICAL_ASSETS);
       })
       .then(() => {
-        console.log('[Service Worker] Installed successfully');
+        console.log('[Service Worker] Installed successfully - Fast install with lazy caching');
         return self.skipWaiting();
       })
       .catch((error) => {
@@ -323,10 +343,16 @@ self.addEventListener('fetch', (event) => {
             // Clone response (can only be consumed once)
             const responseToCache = response.clone();
 
+            // Determine which cache to use
+            const cacheName = isLazyCachePage(url.pathname) ? RUNTIME_CACHE : CACHE_NAME;
+
             // Cache the response
-            caches.open(RUNTIME_CACHE)
+            caches.open(cacheName)
               .then((cache) => {
                 cache.put(request, responseToCache);
+                if (isLazyCachePage(url.pathname)) {
+                  console.log('[Service Worker] Lazy cached:', url.pathname);
+                }
               });
 
             return response;
@@ -351,6 +377,11 @@ self.addEventListener('fetch', (event) => {
       })
   );
 });
+
+// Check if a path should be lazy cached
+function isLazyCachePage(pathname) {
+  return LAZY_CACHE_PAGES.some(page => pathname === page || pathname.endsWith(page));
+}
 
 // Update cache in background
 function updateCache(request) {

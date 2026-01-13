@@ -173,7 +173,7 @@ class FirestoreService {
     }
   }
 
-  async getAll(collectionName, orderByField = 'createdAt', orderDirection = 'desc', maxLimit = null) {
+  async getAll(collectionName, orderByField = 'createdAt', orderDirection = 'desc', maxLimit = 100) {
     try {
       const userId = this.getUserId();
       if (!userId) {
@@ -196,7 +196,11 @@ class FirestoreService {
         orderBy(orderByField, orderDirection)
       );
       
-      if (maxLimit) q = query(q, limit(maxLimit));
+      // Always enforce a reasonable limit to prevent loading thousands of records
+      // Pass null explicitly to bypass this limit if absolutely necessary
+      if (maxLimit !== null) {
+        q = query(q, limit(maxLimit));
+      }
       
       const querySnapshot = await getDocs(q);
       const data = [];
@@ -379,10 +383,9 @@ class FirestoreService {
     });
   }
 
-  async getExpenses(pageSize = null) {
-    return pageSize 
-      ? this.getAll(this.collections.expenses, 'date', 'desc', pageSize)
-      : this.getAll(this.collections.expenses, 'date', 'desc');
+  async getExpenses(pageSize = 50) {
+    // Default to 50 most recent expenses instead of ALL
+    return this.getAll(this.collections.expenses, 'date', 'desc', pageSize);
   }
 
   async getExpensesPaginated(options = {}) {
@@ -414,10 +417,9 @@ class FirestoreService {
     });
   }
 
-  async getIncome(pageSize = null) {
-    return pageSize
-      ? this.getAll(this.collections.income, 'date', 'desc', pageSize)
-      : this.getAll(this.collections.income, 'date', 'desc');
+  async getIncome(pageSize = 50) {
+    // Default to 50 most recent income instead of ALL
+    return this.getAll(this.collections.income, 'date', 'desc', pageSize);
   }
 
   async getIncomePaginated(options = {}) {

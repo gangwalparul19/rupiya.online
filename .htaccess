@@ -1,0 +1,54 @@
+# Apache Configuration for Rupiya
+# Ensures proper MIME types for CSS and JS files
+
+<IfModule mod_mime.c>
+  # CSS
+  AddType text/css .css
+  
+  # JavaScript
+  AddType application/javascript .js
+  AddType application/javascript .mjs
+  
+  # JSON
+  AddType application/json .json
+  
+  # Images
+  AddType image/svg+xml .svg
+  AddType image/webp .webp
+</IfModule>
+
+# Enable compression
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json
+</IfModule>
+
+# Cache control
+<IfModule mod_expires.c>
+  ExpiresActive On
+  
+  # CSS and JavaScript
+  ExpiresByType text/css "access plus 1 year"
+  ExpiresByType application/javascript "access plus 1 year"
+  
+  # Images
+  ExpiresByType image/jpeg "access plus 1 year"
+  ExpiresByType image/png "access plus 1 year"
+  ExpiresByType image/svg+xml "access plus 1 year"
+  ExpiresByType image/webp "access plus 1 year"
+  
+  # HTML
+  ExpiresByType text/html "access plus 0 seconds"
+</IfModule>
+
+# Security headers
+<IfModule mod_headers.c>
+  # Force UTF-8 for CSS
+  <FilesMatch "\\.css$">
+    Header set Content-Type "text/css; charset=utf-8"
+  </FilesMatch>
+  
+  # Force UTF-8 for JS
+  <FilesMatch "\\.js$">
+    Header set Content-Type "application/javascript; charset=utf-8"
+  </FilesMatch>
+</IfModule>

@@ -7,12 +7,15 @@ import investmentHistoryService from '../services/investment-history-service.js'
 import googleSheetsPriceService from '../services/google-sheets-price-service.js'; // Changed from livePriceService
 import symbolSearchService from '../services/symbol-search-service.js';
 import crossFeatureIntegrationService from '../services/cross-feature-integration-service.js';
-import investmentAnalyticsService from '../services/investment-analytics-service.js';
+// Lazy load analytics service - only loaded when analytics tab is clicked
+// import investmentAnalyticsService from '../services/investment-analytics-service.js';
+import lazyLoader from '../utils/lazy-loader.js';
 import toast from '../components/toast.js';
 import { formatCurrency, formatDate, escapeHtml, formatDateForInput } from '../utils/helpers.js';
 import timezoneService from '../utils/timezone.js';
 import encryptionReauthModal from '../components/encryption-reauth-modal.js';
-import confirmationModal from '../components/confirmation-modal.js';
+// Lazy load confirmation modal - only loaded when delete is clicked
+// import confirmationModal from '../components/confirmation-modal.js';
 
 // Helper function for toast
 const showToast = (message, type) => toast.show(message, type);
@@ -1593,6 +1596,9 @@ async function loadAndRenderAnalytics(forceRefresh = false) {
   try {
     // Show loading state
     showAnalyticsLoading();
+    
+    // Lazy load analytics service
+    const investmentAnalyticsService = await lazyLoader.service('investment-analytics-service');
     
     // Get analytics data
     analyticsData = await investmentAnalyticsService.getPortfolioAnalytics();

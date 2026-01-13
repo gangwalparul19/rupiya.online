@@ -7,6 +7,7 @@
     "build": "node build.js",
     "build:css": "node build-css-bundles.js",
     "build:full": "node build-css-bundles.js && node build.js",
+    "verify:bundles": "node verify-bundles.js",
     "vercel-build": "node update-cache-version.js && node build-css-bundles.js && node build.js",
     "update-cache": "node update-cache-version.js",
     "deploy": "node scripts/increment-version.cjs && npm run update-cache && npm run build:full",

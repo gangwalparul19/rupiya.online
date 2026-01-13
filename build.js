@@ -42,11 +42,9 @@ const htmlFiles = [
   'trip-groups.html',
   'trip-group-detail.html',
   'admin.html',
-  'sync-encryption-salt.html',
-  'clear-encrypted-family-data.html',
   'transfers.html',
   'net-worth.html',
-   'privacy-settings.html',
+  'privacy-settings.html',
   'feature-details.html'
 ];
 
