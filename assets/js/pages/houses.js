@@ -165,7 +165,7 @@ function loadUserProfile(user) {
 
 // Show add form
 function showAddForm() {
-  editingHouseId = null;
+  state.editingHouseId = null;
   formTitle.textContent = 'Add House';
   saveFormBtn.textContent = 'Save House';
   houseForm.reset();
@@ -181,12 +181,12 @@ function showAddForm() {
 function hideForm() {
   addHouseSection.classList.remove('show');
   houseForm.reset();
-  editingHouseId = null;
+  state.editingHouseId = null;
 }
 
 // Show edit form
 function showEditForm(house) {
-  editingHouseId = house.id;
+  state.editingHouseId = house.id;
   formTitle.textContent = 'Edit House';
   saveFormBtn.textContent = 'Update House';
 
@@ -242,9 +242,9 @@ async function handleSubmit(e) {
 
   try {
     let result;
-    if (editingHouseId) {
+    if (state.editingHouseId) {
       // Update existing house
-      result = await firestoreService.update('houses', editingHouseId, formData);
+      result = await firestoreService.update('houses', state.editingHouseId, formData);
       if (result.success) {
         showToast('Property updated successfully', 'success');
       }

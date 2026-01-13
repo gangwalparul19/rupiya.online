@@ -702,6 +702,21 @@ function showAddForm(loanId = null) {
   addLoanSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
+// Hide form
+function hideForm() {
+  const addLoanSection = document.getElementById('addLoanSection');
+  const form = document.getElementById('loanForm');
+  
+  addLoanSection.classList.remove('show');
+  form.reset();
+  editingLoanId = null;
+  
+  // Reset button state
+  const saveFormBtn = document.getElementById('saveFormBtn');
+  saveFormBtn.disabled = false;
+  saveFormBtn.textContent = 'Save Loan';
+}
+
 // Save loan
 async function saveLoan(e) {
   e.preventDefault();
