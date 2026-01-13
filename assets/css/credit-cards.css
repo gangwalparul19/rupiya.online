@@ -127,17 +127,19 @@
 
 .card-item {
   background: var(--bg-card);
-  border-radius: var(--border-radius-lg);
+  border: 2px solid var(--primary-blue);
+  border-radius: 12px;
   padding: 1.5rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
 }
 
 .card-item:hover {
   transform: translateY(-4px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 24px rgba(74, 144, 226, 0.2);
+  border-color: var(--accent-teal);
 }
 
 .card-item::before {

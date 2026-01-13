@@ -120,6 +120,18 @@ service firebase.storage {
     }
     
     // ============================================
+    // INSURANCE POLICY DOCUMENTS
+    // ============================================
+    match /users/{userId}/insurance-policies/{fileName} {
+      // Users can only upload/read/delete their own insurance policy documents
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId) && 
+                     isValidDocumentType() && 
+                     isValidSize();
+      allow delete: if isOwner(userId);
+    }
+    
+    // ============================================
     // GENERAL USER FILES
     // ============================================
     match /users/{userId}/files/{allPaths=**} {

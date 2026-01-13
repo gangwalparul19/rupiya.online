@@ -4,7 +4,7 @@ import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
 import storageService from '../services/storage-service.js';
 import toast from '../components/toast.js';
-import { formatCurrency, formatDate } from '../utils/helpers.js';
+import { formatCurrency, formatCurrencyCompact, formatDate } from '../utils/helpers.js';
 import encryptionReauthModal from '../components/encryption-reauth-modal.js';
 
 // State
@@ -89,10 +89,6 @@ function setupEventListeners() {
   document.getElementById('closeDeleteModal')?.addEventListener('click', closeDeleteModal);
   document.getElementById('cancelDeleteBtn')?.addEventListener('click', closeDeleteModal);
   document.getElementById('confirmDeleteBtn')?.addEventListener('click', confirmDelete);
-
-  // Filters
-  document.getElementById('categoryFilter')?.addEventListener('change', filterExpenses);
-  document.getElementById('searchInput')?.addEventListener('input', filterExpenses);
 }
 
 // Switch tab
@@ -231,7 +227,10 @@ function updatePolicyKPIs() {
   const policyDocumentsEl = document.getElementById('policyDocuments');
 
   if (activePoliciesEl) activePoliciesEl.textContent = activePolicies;
-  if (totalCoverageEl) totalCoverageEl.textContent = formatCurrency(totalCoverage);
+  if (totalCoverageEl) {
+    totalCoverageEl.textContent = formatCurrencyCompact(totalCoverage);
+    totalCoverageEl.title = formatCurrency(totalCoverage); // Tooltip with full amount
+  }
   if (policyDocumentsEl) policyDocumentsEl.textContent = policiesWithDocuments;
 }
 
@@ -331,11 +330,13 @@ function updateExpenseKPIs() {
   const thisYearEl = document.getElementById('thisYearExpenses');
   const totalEl = document.getElementById('totalExpenses');
 
-  if (thisMonthEl) thisMonthEl.textContent = formatCurrency(thisMonth);
-  if (lastMonthEl) lastMonthEl.textContent = formatCurrency(lastMonth);
-  if (thisYearEl) thisYearEl.textContent = formatCurrency(thisYear);
-  if (totalEl) totalEl.textContent = formatCurrency(total);
-  document.getElementById('totalExpenses').textContent = formatCurrency(total);
+  if (thisMonthEl) thisMonthEl.textContent = formatCurrencyCompact(thisMonth);
+  if (lastMonthEl) lastMonthEl.textContent = formatCurrencyCompact(lastMonth);
+  if (thisYearEl) thisYearEl.textContent = formatCurrencyCompact(thisYear);
+  if (totalEl) {
+    totalEl.textContent = formatCurrencyCompact(total);
+    totalEl.title = formatCurrency(total); // Tooltip with full amount
+  }
 }
 
 // Filter expenses
@@ -647,7 +648,7 @@ window.deletePolicy = function(policyId, policyName) {
   document.getElementById('deleteModalTitle').textContent = 'Delete Insurance Policy';
   document.getElementById('deleteMessage').textContent = 'Are you sure you want to delete this insurance policy?';
   document.getElementById('deleteItemName').textContent = policyName;
-  document.getElementById('deleteModal').classList.add('active');
+  document.getElementById('deleteModal').classList.add('show');
 };
 
 window.editExpense = function(expenseId) {
@@ -660,11 +661,11 @@ window.deleteExpense = function(expenseId, description) {
   document.getElementById('deleteModalTitle').textContent = 'Delete Medical Expense';
   document.getElementById('deleteMessage').textContent = 'Are you sure you want to delete this medical expense?';
   document.getElementById('deleteItemName').textContent = description;
-  document.getElementById('deleteModal').classList.add('active');
+  document.getElementById('deleteModal').classList.add('show');
 };
 
 function closeDeleteModal() {
-  document.getElementById('deleteModal').classList.remove('active');
+  document.getElementById('deleteModal').classList.remove('show');
   deleteItemId = null;
   deleteItemType = null;
 }

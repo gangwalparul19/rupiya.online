@@ -515,6 +515,28 @@ service cloud.firestore {
     }
     
     // ============================================
+    // INSURANCE POLICIES
+    // ============================================
+    match /insurancePolicies/{policyId} {
+      // Users can only access their own insurance policies
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && hasValidUserId();
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
+    }
+    
+    // ============================================
+    // HEALTHCARE EXPENSES
+    // ============================================
+    match /healthcareExpenses/{expenseId} {
+      // Users can only access their own healthcare expenses
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && hasValidUserId();
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
+    }
+    
+    // ============================================
     // DENY ALL OTHER COLLECTIONS
     // ============================================
     // Explicitly deny access to any other collections

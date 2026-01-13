@@ -3,7 +3,7 @@ import '../services/services-init.js';
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
 import toast from '../components/toast.js';
-import { formatCurrency, formatDate } from '../utils/helpers.js';
+import { formatCurrency, formatCurrencyCompact, formatDate } from '../utils/helpers.js';
 import encryptionReauthModal from '../components/encryption-reauth-modal.js';
 
 // State
@@ -173,8 +173,14 @@ function updateKPIs() {
   const totalRewardsEl = document.getElementById('totalRewards');
 
   if (totalCardsEl) totalCardsEl.textContent = totalCards;
-  if (totalLimitEl) totalLimitEl.textContent = formatCurrency(totalLimit);
-  if (totalSpentEl) totalSpentEl.textContent = formatCurrency(totalSpent);
+  if (totalLimitEl) {
+    totalLimitEl.textContent = formatCurrencyCompact(totalLimit);
+    totalLimitEl.title = formatCurrency(totalLimit); // Tooltip with full amount
+  }
+  if (totalSpentEl) {
+    totalSpentEl.textContent = formatCurrencyCompact(totalSpent);
+    totalSpentEl.title = formatCurrency(totalSpent); // Tooltip with full amount
+  }
   if (totalRewardsEl) totalRewardsEl.textContent = totalRewards.toLocaleString();
 }
 
