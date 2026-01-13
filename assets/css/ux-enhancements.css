@@ -95,11 +95,15 @@
   border-radius: 0 0 8px 0;
   pointer-events: none;
   text-decoration: none;
+  opacity: 0;
+  visibility: hidden;
 }
 
 .skip-link:focus {
   top: 0;
   pointer-events: auto;
+  opacity: 1;
+  visibility: visible;
 }
 
 /* Enhanced focus ring */
@@ -747,4 +751,81 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .mobile-header-actions .privacy-mode-btn {
   z-index: 10003 !important;
   position: relative !important;
+}
+
+
+/* ============================================
+   MOBILE SIDEBAR OPEN - HIDE MOBILE HEADER
+   Prevents duplicate headers on mobile
+   ============================================ */
+
+@media (max-width: 768px) {
+  /* When sidebar is open, hide the mobile header to prevent duplication */
+  .sidebar.open ~ * .mobile-header,
+  body:has(.sidebar.open) .mobile-header {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+  
+  /* Ensure sidebar overlay covers everything */
+  .sidebar-overlay.show,
+  .sidebar-overlay.active {
+    z-index: 1000 !important;
+    display: block !important;
+  }
+  
+  /* Sidebar should be above overlay */
+  .sidebar.open {
+    z-index: 1001 !important;
+  }
+  
+  /* Prevent body scroll when sidebar is open */
+  body:has(.sidebar.open) {
+    overflow: hidden;
+  }
+}
+
+
+/* ============================================
+   SKIP LINK - ADDITIONAL SAFEGUARDS
+   Ensure skip link is never visible unless focused
+   ============================================ */
+
+/* Force skip link to be hidden by default */
+a.skip-link:not(:focus) {
+  position: fixed !important;
+  top: -200px !important;
+  left: -200px !important;
+  width: 1px !important;
+  height: 1px !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+}
+
+/* Only show when focused via keyboard */
+a.skip-link:focus {
+  position: fixed !important;
+  top: 10px !important;
+  left: 10px !important;
+  width: auto !important;
+  height: auto !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  overflow: visible !important;
+  clip: auto !important;
+  white-space: normal !important;
+  z-index: 99999 !important;
+  padding: 12px 20px !important;
+  background: var(--primary-blue, #4A90E2) !important;
+  color: white !important;
+  text-decoration: none !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
 }

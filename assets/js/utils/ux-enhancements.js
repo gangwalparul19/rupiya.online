@@ -37,17 +37,28 @@ class UXEnhancements {
 
     mainContent.id = mainContent.id || 'main-content';
 
-    // Check if skip link already exists
-    if (document.querySelector('.skip-link')) return;
+    // Check if skip link already exists - prevent duplicates
+    const existingSkipLink = document.querySelector('.skip-link');
+    if (existingSkipLink) {
+      console.log('[UX] Skip link already exists, skipping creation');
+      return;
+    }
 
     const skipLink = document.createElement('a');
     skipLink.href = `#${mainContent.id}`;
     skipLink.className = 'skip-link';
     skipLink.textContent = 'Skip to main content';
     skipLink.setAttribute('tabindex', '0');
+    skipLink.setAttribute('aria-label', 'Skip to main content');
     
-    // Insert after body opening, not prepend to avoid layout issues
-    document.body.insertBefore(skipLink, document.body.firstChild);
+    // Insert at the very beginning of body
+    if (document.body.firstChild) {
+      document.body.insertBefore(skipLink, document.body.firstChild);
+    } else {
+      document.body.appendChild(skipLink);
+    }
+    
+    console.log('[UX] Skip link created');
   }
 
   // Smooth scrolling for anchor links
