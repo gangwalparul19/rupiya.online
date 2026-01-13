@@ -291,33 +291,10 @@ export async function initSidebar() {
   }
 
   // Initialize feature config (will always load from Firestore now)
+  // This will use defaults if encryption is not ready yet
   await featureConfig.init();
   
-  // CRITICAL: Wait for encryption to be ready before rendering sidebar
-  // This ensures features are properly decrypted and available
-  console.log('[Sidebar] Waiting for encryption to be ready...');
-  const encryptionService = (await import('../services/encryption-service.js')).default;
-  
-  let encryptionReady = false;
-  let waitTime = 0;
-  const maxWaitTime = 15000; // 15 seconds max
-  const checkInterval = 200; // Check every 200ms
-  
-  while (!encryptionReady && waitTime < maxWaitTime) {
-    if (encryptionService.isReady && encryptionService.isReady()) {
-      encryptionReady = true;
-      console.log('[Sidebar] Encryption is ready');
-      break;
-    }
-    await new Promise(resolve => setTimeout(resolve, checkInterval));
-    waitTime += checkInterval;
-  }
-  
-  if (!encryptionReady) {
-    console.warn('[Sidebar] Encryption not ready after', maxWaitTime, 'ms, proceeding anyway');
-  }
-  
-  // Add a small delay to ensure features are fully loaded and cached
+  // Add a small delay to ensure features are fully loaded
   await new Promise(resolve => setTimeout(resolve, 100));
 
   // Check if user is admin

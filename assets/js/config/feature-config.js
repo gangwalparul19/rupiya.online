@@ -342,26 +342,11 @@ class FeatureConfigManager {
               
               if (!decryptionSucceeded) {
                 console.warn('[FeatureConfig] Decryption failed after', maxDecryptRetries, 'retries, using fallback...');
-                // Try to extract features from the encrypted string if possible
-                if (savedData._encrypted && savedData._encrypted.features) {
-                  try {
-                    console.log('[FeatureConfig] Attempting to decrypt _encrypted.features directly...');
-                    const encryptedFeatures = savedData._encrypted.features;
-                    const decryptedFeatures = await encryptionService.decryptValue(encryptedFeatures);
-                    decryptedData = { features: decryptedFeatures };
-                    console.log('[FeatureConfig] Successfully extracted features from _encrypted.features');
-                  } catch (e) {
-                    console.warn('[FeatureConfig] Failed to extract from _encrypted.features:', e.message);
-                  }
-                } else if (savedData.features && typeof savedData.features === 'string') {
-                  try {
-                    const parsed = JSON.parse(savedData.features);
-                    decryptedData = { features: parsed };
-                    console.log('[FeatureConfig] Extracted features from plain features field');
-                  } catch (e) {
-                    console.warn('[FeatureConfig] Failed to parse features string:', e.message);
-                  }
-                }
+                // Encryption is not initialized - this is expected on first load
+                // The sidebar will reload features once encryption is ready
+                console.log('[FeatureConfig] Encryption not initialized yet, will reload after encryptionReady event');
+                this.userFeatures = JSON.parse(JSON.stringify(DEFAULT_FEATURES));
+                return;
               }
             }
           } else {
@@ -369,6 +354,14 @@ class FeatureConfigManager {
           }
         } catch (decryptError) {
           console.error('[FeatureConfig] Decryption error:', decryptError);
+          
+          // Check if error is "Encryption not initialized" - this is expected
+          if (decryptError.message && decryptError.message.includes('Encryption not initialized')) {
+            console.log('[FeatureConfig] Encryption not initialized yet, will reload after encryptionReady event');
+            this.userFeatures = JSON.parse(JSON.stringify(DEFAULT_FEATURES));
+            return;
+          }
+          
           // Try to extract features from the encrypted string as fallback
           if (savedData.features && typeof savedData.features === 'string') {
             try {

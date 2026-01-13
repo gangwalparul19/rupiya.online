@@ -348,6 +348,87 @@ class AdminService {
       return 0;
     }
   }
+
+  // Get detailed user statistics from users collection
+  async getUserStats() {
+    const cacheKey = 'userStats';
+    const cached = this.getFromCache(cacheKey);
+    if (cached) return cached;
+
+    try {
+      // Fetch all users (limited to 5000 for performance)
+      const usersSnap = await getDocs(
+        query(collection(db, 'users'), limit(5000))
+      );
+
+      let usersFromIndia = 0;
+      let usersOutsideIndia = 0;
+      let usersWithLocation = 0;
+      let usersWithDisplayName = 0;
+      let usersWithPhone = 0;
+      let activeThisMonth = 0;
+
+      const now = new Date();
+      const monthAgo = Timestamp.fromDate(new Date(now - 30 * 24 * 60 * 60 * 1000));
+
+      usersSnap.forEach(doc => {
+        const data = doc.data();
+
+        // Count users with display name
+        if (data.displayName && data.displayName.trim()) {
+          usersWithDisplayName++;
+        }
+
+        // Count users with phone
+        if (data.phoneNumber && data.phoneNumber.trim()) {
+          usersWithPhone++;
+        }
+
+        // Count users with location data
+        if ((data.country && data.country.trim()) || (data.city && data.city.trim())) {
+          usersWithLocation++;
+
+          // Count by country
+          if (data.country) {
+            const country = data.country.toLowerCase().trim();
+            if (country === 'india' || country === 'in') {
+              usersFromIndia++;
+            } else if (country) {
+              usersOutsideIndia++;
+            }
+          }
+        }
+
+        // Count active users (last login in last 30 days)
+        if (data.lastLoginAt && data.lastLoginAt >= monthAgo) {
+          activeThisMonth++;
+        }
+      });
+
+      const stats = {
+        usersFromIndia,
+        usersOutsideIndia,
+        usersWithLocation,
+        usersWithDisplayName,
+        usersWithPhone,
+        activeThisMonth
+      };
+
+      this.setCache(cacheKey, stats);
+      return stats;
+    } catch (error) {
+      console.error('Error getting user stats:', error);
+      // Return default stats on error
+      return {
+        usersFromIndia: 0,
+        usersOutsideIndia: 0,
+        usersWithLocation: 0,
+        usersWithDisplayName: 0,
+        usersWithPhone: 0,
+        activeThisMonth: 0
+      };
+    }
+  }
 }
 
 const adminService = new AdminService();

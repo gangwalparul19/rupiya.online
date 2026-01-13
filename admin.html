@@ -90,9 +90,10 @@
       </div>
     </div>
 
-    <!-- Platform Stats -->
+    <!-- Platform Stats - User Collection KPIs -->
     <section class="admin-section">
       <div class="admin-stats-grid">
+        <!-- Total Users -->
         <div class="admin-stat-card highlight">
           <div class="stat-icon-wrapper">
             <span class="stat-icon">👥</span>
@@ -103,31 +104,88 @@
             <div class="stat-trend positive" id="usersTrend">--</div>
           </div>
         </div>
+
+        <!-- Users from India -->
         <div class="admin-stat-card">
           <div class="stat-icon-wrapper blue">
-            <span class="stat-icon">📊</span>
+            <span class="stat-icon">🇮🇳</span>
           </div>
           <div class="stat-content">
-            <div class="stat-value" id="totalTransactions">-</div>
-            <div class="stat-label">Total Records</div>
+            <div class="stat-value" id="usersFromIndia">-</div>
+            <div class="stat-label">From India</div>
+            <div class="stat-percentage" id="indiaPercentage">--%</div>
           </div>
         </div>
+
+        <!-- Users from Outside India -->
         <div class="admin-stat-card">
           <div class="stat-icon-wrapper green">
-            <span class="stat-icon">👨‍👩‍👧‍👦</span>
+            <span class="stat-icon">🌍</span>
           </div>
           <div class="stat-content">
-            <div class="stat-value" id="totalFamilyGroups">-</div>
-            <div class="stat-label">Family Groups</div>
+            <div class="stat-value" id="usersOutsideIndia">-</div>
+            <div class="stat-label">Outside India</div>
+            <div class="stat-percentage" id="outsideIndiaPercentage">--%</div>
           </div>
         </div>
+
+        <!-- Active Users (Last 30 Days) -->
         <div class="admin-stat-card">
           <div class="stat-icon-wrapper orange">
-            <span class="stat-icon">✈️</span>
+            <span class="stat-icon">🟢</span>
           </div>
           <div class="stat-content">
-            <div class="stat-value" id="totalTripGroups">-</div>
-            <div class="stat-label">Trip Groups</div>
+            <div class="stat-value" id="activeUsersMonth">-</div>
+            <div class="stat-label">Active (30d)</div>
+            <div class="stat-percentage" id="activePercentage">--%</div>
+          </div>
+        </div>
+
+        <!-- Inactive Users (30+ Days) -->
+        <div class="admin-stat-card">
+          <div class="stat-icon-wrapper red">
+            <span class="stat-icon">😴</span>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value" id="inactiveUsersCount">-</div>
+            <div class="stat-label">Inactive (30d+)</div>
+            <div class="stat-percentage" id="inactivePercentage">--%</div>
+          </div>
+        </div>
+
+        <!-- Users with Location Data -->
+        <div class="admin-stat-card">
+          <div class="stat-icon-wrapper purple">
+            <span class="stat-icon">📍</span>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value" id="usersWithLocation">-</div>
+            <div class="stat-label">With Location</div>
+            <div class="stat-percentage" id="locationPercentage">--%</div>
+          </div>
+        </div>
+
+        <!-- Users with Display Name -->
+        <div class="admin-stat-card">
+          <div class="stat-icon-wrapper teal">
+            <span class="stat-icon">📝</span>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value" id="usersWithName">-</div>
+            <div class="stat-label">With Display Name</div>
+            <div class="stat-percentage" id="namePercentage">--%</div>
+          </div>
+        </div>
+
+        <!-- Users with Phone -->
+        <div class="admin-stat-card">
+          <div class="stat-icon-wrapper pink">
+            <span class="stat-icon">📱</span>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value" id="usersWithPhone">-</div>
+            <div class="stat-label">With Phone</div>
+            <div class="stat-percentage" id="phonePercentage">--%</div>
           </div>
         </div>
       </div>

@@ -137,11 +137,47 @@ async function loadAllData() {
 async function loadPlatformStats() {
   try {
     const stats = await adminService.getPlatformStats();
+    const userStats = await adminService.getUserStats();
+    
+    // Total Users
     document.getElementById('totalUsers').textContent = stats.totalUsers.toLocaleString();
-    document.getElementById('totalTransactions').textContent = stats.totalTransactions.toLocaleString();
-    document.getElementById('totalFamilyGroups').textContent = stats.totalFamilyGroups.toLocaleString();
-    document.getElementById('totalTripGroups').textContent = stats.totalTripGroups.toLocaleString();
     totalUsers = stats.totalUsers;
+    
+    // Users from India
+    document.getElementById('usersFromIndia').textContent = userStats.usersFromIndia.toLocaleString();
+    const indiaPercentage = stats.totalUsers > 0 ? ((userStats.usersFromIndia / stats.totalUsers) * 100).toFixed(1) : 0;
+    document.getElementById('indiaPercentage').textContent = `${indiaPercentage}%`;
+    
+    // Users from Outside India
+    document.getElementById('usersOutsideIndia').textContent = userStats.usersOutsideIndia.toLocaleString();
+    const outsideIndiaPercentage = stats.totalUsers > 0 ? ((userStats.usersOutsideIndia / stats.totalUsers) * 100).toFixed(1) : 0;
+    document.getElementById('outsideIndiaPercentage').textContent = `${outsideIndiaPercentage}%`;
+    
+    // Active Users (Last 30 Days)
+    document.getElementById('activeUsersMonth').textContent = userStats.activeThisMonth.toLocaleString();
+    const activePercentage = stats.totalUsers > 0 ? ((userStats.activeThisMonth / stats.totalUsers) * 100).toFixed(1) : 0;
+    document.getElementById('activePercentage').textContent = `${activePercentage}%`;
+    
+    // Inactive Users (30+ Days)
+    const inactiveCount = stats.totalUsers - userStats.activeThisMonth;
+    document.getElementById('inactiveUsersCount').textContent = inactiveCount.toLocaleString();
+    const inactivePercentage = stats.totalUsers > 0 ? ((inactiveCount / stats.totalUsers) * 100).toFixed(1) : 0;
+    document.getElementById('inactivePercentage').textContent = `${inactivePercentage}%`;
+    
+    // Users with Location Data
+    document.getElementById('usersWithLocation').textContent = userStats.usersWithLocation.toLocaleString();
+    const locationPercentage = stats.totalUsers > 0 ? ((userStats.usersWithLocation / stats.totalUsers) * 100).toFixed(1) : 0;
+    document.getElementById('locationPercentage').textContent = `${locationPercentage}%`;
+    
+    // Users with Display Name
+    document.getElementById('usersWithName').textContent = userStats.usersWithDisplayName.toLocaleString();
+    const namePercentage = stats.totalUsers > 0 ? ((userStats.usersWithDisplayName / stats.totalUsers) * 100).toFixed(1) : 0;
+    document.getElementById('namePercentage').textContent = `${namePercentage}%`;
+    
+    // Users with Phone
+    document.getElementById('usersWithPhone').textContent = userStats.usersWithPhone.toLocaleString();
+    const phonePercentage = stats.totalUsers > 0 ? ((userStats.usersWithPhone / stats.totalUsers) * 100).toFixed(1) : 0;
+    document.getElementById('phonePercentage').textContent = `${phonePercentage}%`;
     
     // Calculate trend (mock - would need historical data)
     const trendEl = document.getElementById('usersTrend');
