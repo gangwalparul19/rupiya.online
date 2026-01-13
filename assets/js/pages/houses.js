@@ -12,8 +12,18 @@ import confirmationModal from '../components/confirmation-modal.js';
 const showToast = (message, type) => toast.show(message, type);
 
 // State
-let houses = [];
-let editingHouseId = null;
+const state = {
+  houses: [],
+  filteredHouses: [],
+  editingHouseId: null,
+  currentPage: 1,
+  itemsPerPage: 10,
+  totalCount: 0,
+  allDataKPI: {
+    totalHouses: 0,
+    totalValue: 0
+  }
+};
 
 // DOM Elements
 let addHouseBtn, addHouseSection, closeFormBtn, cancelFormBtn;
@@ -115,6 +125,29 @@ function setupEventListeners() {
   closeDeleteModalBtn?.addEventListener('click', hideDeleteModal);
   cancelDeleteBtn?.addEventListener('click', hideDeleteModal);
   confirmDeleteBtn?.addEventListener('click', handleDelete);
+  
+  // Pagination buttons
+  const prevPageBtn = document.getElementById('prevPageBtn');
+  const nextPageBtn = document.getElementById('nextPageBtn');
+
+  if (prevPageBtn) {
+    prevPageBtn.addEventListener('click', () => {
+      if (state.currentPage > 1) {
+        goToPage(state.currentPage - 1);
+      }
+    });
+  }
+
+  if (nextPageBtn) {
+    nextPageBtn.addEventListener('click', () => {
+      const totalRecords = state.filteredHouses.length;
+      const totalPages = Math.ceil(totalRecords / state.itemsPerPage);
+      
+      if (state.currentPage < totalPages) {
+        goToPage(state.currentPage + 1);
+      }
+    });
+  }
 }
 
 // Load user profile
@@ -245,9 +278,17 @@ async function loadHouses() {
   emptyState.style.display = 'none';
 
   try {
-    houses = await firestoreService.getAll('houses', 'createdAt', 'desc');
+    const allHouses = await firestoreService.getAll('houses', 'createdAt', 'desc');
     
-    if (houses.length === 0) {
+    state.houses = allHouses;
+    state.filteredHouses = [...allHouses];
+    state.totalCount = allHouses.length;
+    
+    calculateKPISummary();
+    
+    state.currentPage = 1;
+    
+    if (state.filteredHouses.length === 0) {
       emptyState.style.display = 'block';
     } else {
       renderHouses();
@@ -263,9 +304,39 @@ async function loadHouses() {
   }
 }
 
+// Calculate KPI summary
+function calculateKPISummary() {
+  const totalValue = state.houses.reduce((sum, h) => sum + (h.currentValue || 0), 0);
+  
+  state.allDataKPI = {
+    totalHouses: state.houses.length,
+    totalValue: totalValue
+  };
+}
+
 // Render houses
 function renderHouses() {
-  housesList.innerHTML = houses.map(house => {
+  const paginationContainer = document.getElementById('paginationContainer');
+  
+  if (state.filteredHouses.length === 0) {
+    housesList.style.display = 'none';
+    emptyState.style.display = 'block';
+    if (paginationContainer) paginationContainer.style.display = 'none';
+    return;
+  }
+  
+  housesList.style.display = 'grid';
+  emptyState.style.display = 'none';
+  
+  // Calculate pagination
+  const totalRecords = state.filteredHouses.length;
+  const totalPages = Math.ceil(totalRecords / state.itemsPerPage);
+  
+  const startIndex = (state.currentPage - 1) * state.itemsPerPage;
+  const endIndex = startIndex + state.itemsPerPage;
+  const pageHouses = state.filteredHouses.slice(startIndex, endIndex);
+  
+  housesList.innerHTML = pageHouses.map(house => {
     const escapedName = escapeHtml(house.name);
     const escapedAddress = escapeHtml(house.address);
     const escapedOwnership = house.ownership ? escapeHtml(house.ownership) : '';
@@ -325,11 +396,92 @@ function renderHouses() {
       </div>
     `;
   }).join('');
+  
+  // Render pagination
+  renderPagination(totalPages);
+}
+
+// Render pagination with numbered pages
+function renderPagination(totalPages) {
+  const paginationContainer = document.getElementById('paginationContainer');
+  const paginationNumbers = document.getElementById('paginationNumbers');
+  const prevBtn = document.getElementById('prevPageBtn');
+  const nextBtn = document.getElementById('nextPageBtn');
+  
+  if (!paginationContainer || !paginationNumbers) return;
+  
+  if (totalPages <= 1) {
+    paginationContainer.style.display = 'none';
+    return;
+  }
+  
+  paginationContainer.style.display = 'flex';
+  
+  if (prevBtn) prevBtn.disabled = state.currentPage === 1;
+  if (nextBtn) nextBtn.disabled = state.currentPage === totalPages;
+  
+  const pageNumbers = generatePageNumbers(state.currentPage, totalPages);
+  
+  paginationNumbers.innerHTML = pageNumbers.map(page => {
+    if (page === '...') {
+      return '<span class="ellipsis">...</span>';
+    }
+    
+    const isActive = page === state.currentPage;
+    return `<button class="page-number ${isActive ? 'active' : ''}" data-page="${page}">${page}</button>`;
+  }).join('');
+  
+  paginationNumbers.querySelectorAll('.page-number').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const page = parseInt(btn.dataset.page);
+      goToPage(page);
+    });
+  });
+}
+
+// Generate page numbers with ellipsis
+function generatePageNumbers(currentPage, totalPages) {
+  const pages = [];
+  const maxVisible = 7;
+  
+  if (totalPages <= maxVisible) {
+    for (let i = 1; i <= totalPages; i++) {
+      pages.push(i);
+    }
+  } else {
+    pages.push(1);
+    
+    if (currentPage > 3) {
+      pages.push('...');
+    }
+    
+    const start = Math.max(2, currentPage - 1);
+    const end = Math.min(totalPages - 1, currentPage + 1);
+    
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    
+    if (currentPage < totalPages - 2) {
+      pages.push('...');
+    }
+    
+    pages.push(totalPages);
+  }
+  
+  return pages;
+}
+
+// Go to specific page
+function goToPage(page) {
+  state.currentPage = page;
+  renderHouses();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // Update summary
 async function updateSummary() {
-  const totalHouses = houses.length;
+  const totalHouses = state.houses.length;
   
   // Get house-related expenses and income
   const houseExpenses = await firestoreService.getTotalExpensesByLinkedType('house');
@@ -342,7 +494,7 @@ async function updateSummary() {
 
 // Show delete confirmation
 function showDeleteConfirmation(id) {
-  const house = houses.find(h => h.id === id);
+  const house = state.houses.find(h => h.id === id);
   if (!house) return;
 
   deleteHouseId = id;
@@ -386,7 +538,7 @@ async function handleDelete() {
 
 // Edit house
 function editHouse(id) {
-  const house = houses.find(h => h.id === id);
+  const house = state.houses.find(h => h.id === id);
   if (house) {
     showEditForm(house);
   }

@@ -12,6 +12,9 @@ const state = {
   transfers: [],
   filteredTransfers: [],
   editingTransferId: null,
+  currentPage: 1,
+  itemsPerPage: 10,
+  totalCount: 0,
   filters: {
     type: '',
     dateFrom: '',
@@ -21,6 +24,10 @@ const state = {
     investments: [],
     loans: [],
     goals: []
+  },
+  allDataKPI: {
+    totalTransfers: 0,
+    totalAmount: 0
   }
 };
 
@@ -82,6 +89,84 @@ async function initPage() {
   }
 }
 
+// Render pagination with numbered pages
+function renderPagination(totalPages) {
+  const paginationContainer = document.getElementById('paginationContainer');
+  const paginationNumbers = document.getElementById('paginationNumbers');
+  const prevBtn = document.getElementById('prevPageBtn');
+  const nextBtn = document.getElementById('nextPageBtn');
+  
+  if (!paginationContainer || !paginationNumbers) return;
+  
+  if (totalPages <= 1) {
+    paginationContainer.style.display = 'none';
+    return;
+  }
+  
+  paginationContainer.style.display = 'flex';
+  
+  if (prevBtn) prevBtn.disabled = state.currentPage === 1;
+  if (nextBtn) nextBtn.disabled = state.currentPage === totalPages;
+  
+  const pageNumbers = generatePageNumbers(state.currentPage, totalPages);
+  
+  paginationNumbers.innerHTML = pageNumbers.map(page => {
+    if (page === '...') {
+      return '<span class="ellipsis">...</span>';
+    }
+    
+    const isActive = page === state.currentPage;
+    return `<button class="page-number ${isActive ? 'active' : ''}" data-page="${page}">${page}</button>`;
+  }).join('');
+  
+  paginationNumbers.querySelectorAll('.page-number').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const page = parseInt(btn.dataset.page);
+      goToPage(page);
+    });
+  });
+}
+
+// Generate page numbers with ellipsis
+function generatePageNumbers(currentPage, totalPages) {
+  const pages = [];
+  const maxVisible = 7;
+  
+  if (totalPages <= maxVisible) {
+    for (let i = 1; i <= totalPages; i++) {
+      pages.push(i);
+    }
+  } else {
+    pages.push(1);
+    
+    if (currentPage > 3) {
+      pages.push('...');
+    }
+    
+    const start = Math.max(2, currentPage - 1);
+    const end = Math.min(totalPages - 1, currentPage + 1);
+    
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    
+    if (currentPage < totalPages - 2) {
+      pages.push('...');
+    }
+    
+    pages.push(totalPages);
+  }
+  
+  return pages;
+}
+
+// Go to specific page
+function goToPage(page) {
+  state.currentPage = page;
+  renderTransfers();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 // Setup event listeners
 function setupEventListeners() {
   // Sidebar toggle
@@ -136,6 +221,29 @@ function setupEventListeners() {
   document.getElementById('closeDeleteModalBtn')?.addEventListener('click', closeDeleteModal);
   document.getElementById('cancelDeleteBtn')?.addEventListener('click', closeDeleteModal);
   document.getElementById('confirmDeleteBtn')?.addEventListener('click', confirmDelete);
+  
+  // Pagination buttons
+  const prevPageBtn = document.getElementById('prevPageBtn');
+  const nextPageBtn = document.getElementById('nextPageBtn');
+
+  if (prevPageBtn) {
+    prevPageBtn.addEventListener('click', () => {
+      if (state.currentPage > 1) {
+        goToPage(state.currentPage - 1);
+      }
+    });
+  }
+
+  if (nextPageBtn) {
+    nextPageBtn.addEventListener('click', () => {
+      const totalRecords = state.filteredTransfers.length;
+      const totalPages = Math.ceil(totalRecords / state.itemsPerPage);
+      
+      if (state.currentPage < totalPages) {
+        goToPage(state.currentPage + 1);
+      }
+    });
+  }
 }
 
 // Load linked entities (investments, loans, goals)
@@ -164,7 +272,13 @@ async function loadTransfers() {
     document.getElementById('transfersList').style.display = 'none';
     document.getElementById('emptyState').style.display = 'none';
     
-    state.transfers = await transfersService.getTransfers();
+    const allTransfers = await transfersService.getTransfers();
+    state.transfers = allTransfers;
+    state.totalCount = allTransfers.length;
+    
+    calculateKPISummary();
+    
+    state.currentPage = 1;
     applyFilters();
     updateSummary();
     
@@ -174,6 +288,16 @@ async function loadTransfers() {
   } finally {
     document.getElementById('loadingState').style.display = 'none';
   }
+}
+
+// Calculate KPI summary
+function calculateKPISummary() {
+  const totalAmount = state.transfers.reduce((sum, t) => sum + (t.amount || 0), 0);
+  
+  state.allDataKPI = {
+    totalTransfers: state.transfers.length,
+    totalAmount: totalAmount
+  };
 }
 
 // Apply filters
@@ -258,17 +382,27 @@ function updateSummary() {
 function renderTransfers() {
   const container = document.getElementById('transfersList');
   const emptyState = document.getElementById('emptyState');
+  const paginationContainer = document.getElementById('paginationContainer');
   
   if (state.filteredTransfers.length === 0) {
     container.style.display = 'none';
     emptyState.style.display = 'flex';
+    if (paginationContainer) paginationContainer.style.display = 'none';
     return;
   }
   
   container.style.display = 'grid';
   emptyState.style.display = 'none';
   
-  container.innerHTML = state.filteredTransfers.map(transfer => {
+  // Calculate pagination
+  const totalRecords = state.filteredTransfers.length;
+  const totalPages = Math.ceil(totalRecords / state.itemsPerPage);
+  
+  const startIndex = (state.currentPage - 1) * state.itemsPerPage;
+  const endIndex = startIndex + state.itemsPerPage;
+  const pageTransfers = state.filteredTransfers.slice(startIndex, endIndex);
+  
+  container.innerHTML = pageTransfers.map(transfer => {
     const categoryInfo = transfersService.getCategoryInfo(transfer.type);
     const date = transfer.date?.toDate ? transfer.date.toDate() : new Date(transfer.date);
     
@@ -313,6 +447,9 @@ function renderTransfers() {
       </div>
     `;
   }).join('');
+  
+  // Render pagination
+  renderPagination(totalPages);
   
   // Attach event listeners
   container.querySelectorAll('.btn-edit').forEach(btn => {

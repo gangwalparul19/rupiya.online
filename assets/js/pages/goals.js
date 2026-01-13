@@ -11,8 +11,17 @@ import encryptionReauthModal from '../components/encryption-reauth-modal.js';
 // State management
 const state = {
   goals: [],
+  filteredGoals: [],
   editingGoalId: null,
-  contributingGoalId: null
+  contributingGoalId: null,
+  currentPage: 1,
+  itemsPerPage: 10,
+  totalCount: 0,
+  allDataKPI: {
+    totalGoals: 0,
+    activeGoals: 0,
+    completedGoals: 0
+  }
 };
 
 // Check authentication
@@ -140,8 +149,15 @@ async function loadGoals() {
     emptyState.style.display = 'none';
     goalsList.style.display = 'none';
     
-    state.goals = await firestoreService.getGoals();
+    const allGoals = await firestoreService.getGoals();
     
+    state.goals = allGoals;
+    state.filteredGoals = [...allGoals];
+    state.totalCount = allGoals.length;
+    
+    calculateKPISummary();
+    
+    state.currentPage = 1;
     updateSummary();
     renderGoals();
     
@@ -152,15 +168,27 @@ async function loadGoals() {
   }
 }
 
-// Update summary cards
-function updateSummary() {
+// Calculate KPI summary
+function calculateKPISummary() {
   const active = state.goals.filter(g => g.currentAmount < g.targetAmount).length;
+  const completed = state.goals.filter(g => g.currentAmount >= g.targetAmount).length;
   const target = state.goals.reduce((sum, g) => sum + g.targetAmount, 0);
   const saved = state.goals.reduce((sum, g) => sum + g.currentAmount, 0);
   
-  activeGoals.textContent = active;
-  totalTarget.textContent = formatCurrency(target);
-  totalSaved.textContent = formatCurrency(saved);
+  state.allDataKPI = {
+    totalGoals: state.goals.length,
+    activeGoals: active,
+    completedGoals: completed,
+    totalTarget: target,
+    totalSaved: saved
+  };
+}
+
+// Update summary cards
+function updateSummary() {
+  activeGoals.textContent = state.allDataKPI.activeGoals;
+  totalTarget.textContent = formatCurrency(state.allDataKPI.totalTarget);
+  totalSaved.textContent = formatCurrency(state.allDataKPI.totalSaved);
 }
 
 // Calculate days remaining
@@ -176,9 +204,11 @@ function calculateDaysRemaining(targetDate) {
 function renderGoals() {
   loadingState.style.display = 'none';
   
-  if (state.goals.length === 0) {
+  if (state.filteredGoals.length === 0) {
     emptyState.style.display = 'flex';
     goalsList.style.display = 'none';
+    const paginationContainer = document.getElementById('paginationContainer');
+    if (paginationContainer) paginationContainer.style.display = 'none';
     return;
   }
   
@@ -186,14 +216,25 @@ function renderGoals() {
   goalsList.style.display = 'grid';
   
   // Sort goals by target date (ascending)
-  const sortedGoals = [...state.goals].sort((a, b) => {
+  const sortedGoals = [...state.filteredGoals].sort((a, b) => {
     const dateA = a.targetDate.toDate ? a.targetDate.toDate() : new Date(a.targetDate);
     const dateB = b.targetDate.toDate ? b.targetDate.toDate() : new Date(b.targetDate);
     return dateA - dateB;
   });
   
+  // Calculate pagination
+  const totalRecords = sortedGoals.length;
+  const totalPages = Math.ceil(totalRecords / state.itemsPerPage);
+  
+  const startIndex = (state.currentPage - 1) * state.itemsPerPage;
+  const endIndex = startIndex + state.itemsPerPage;
+  const pageGoals = sortedGoals.slice(startIndex, endIndex);
+  
   // Render goal cards
-  goalsList.innerHTML = sortedGoals.map(goal => createGoalCard(goal)).join('');
+  goalsList.innerHTML = pageGoals.map(goal => createGoalCard(goal)).join('');
+  
+  // Render pagination
+  renderPagination(totalPages);
   
   // Attach event listeners to cards
   attachCardEventListeners();
@@ -323,6 +364,84 @@ function createGoalCard(goal) {
   `;
 }
 
+// Render pagination with numbered pages
+function renderPagination(totalPages) {
+  const paginationContainer = document.getElementById('paginationContainer');
+  const paginationNumbers = document.getElementById('paginationNumbers');
+  const prevBtn = document.getElementById('prevPageBtn');
+  const nextBtn = document.getElementById('nextPageBtn');
+  
+  if (!paginationContainer || !paginationNumbers) return;
+  
+  if (totalPages <= 1) {
+    paginationContainer.style.display = 'none';
+    return;
+  }
+  
+  paginationContainer.style.display = 'flex';
+  
+  if (prevBtn) prevBtn.disabled = state.currentPage === 1;
+  if (nextBtn) nextBtn.disabled = state.currentPage === totalPages;
+  
+  const pageNumbers = generatePageNumbers(state.currentPage, totalPages);
+  
+  paginationNumbers.innerHTML = pageNumbers.map(page => {
+    if (page === '...') {
+      return '<span class="ellipsis">...</span>';
+    }
+    
+    const isActive = page === state.currentPage;
+    return `<button class="page-number ${isActive ? 'active' : ''}" data-page="${page}">${page}</button>`;
+  }).join('');
+  
+  paginationNumbers.querySelectorAll('.page-number').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const page = parseInt(btn.dataset.page);
+      goToPage(page);
+    });
+  });
+}
+
+// Generate page numbers with ellipsis
+function generatePageNumbers(currentPage, totalPages) {
+  const pages = [];
+  const maxVisible = 7;
+  
+  if (totalPages <= maxVisible) {
+    for (let i = 1; i <= totalPages; i++) {
+      pages.push(i);
+    }
+  } else {
+    pages.push(1);
+    
+    if (currentPage > 3) {
+      pages.push('...');
+    }
+    
+    const start = Math.max(2, currentPage - 1);
+    const end = Math.min(totalPages - 1, currentPage + 1);
+    
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    
+    if (currentPage < totalPages - 2) {
+      pages.push('...');
+    }
+    
+    pages.push(totalPages);
+  }
+  
+  return pages;
+}
+
+// Go to specific page
+function goToPage(page) {
+  state.currentPage = page;
+  renderGoals();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 // Attach event listeners to goal cards
 function attachCardEventListeners() {
   // Contribute buttons
@@ -402,6 +521,29 @@ function setupEventListeners() {
       closeDeleteConfirmModal();
     }
   });
+  
+  // Pagination buttons
+  const prevPageBtn = document.getElementById('prevPageBtn');
+  const nextPageBtn = document.getElementById('nextPageBtn');
+
+  if (prevPageBtn) {
+    prevPageBtn.addEventListener('click', () => {
+      if (state.currentPage > 1) {
+        goToPage(state.currentPage - 1);
+      }
+    });
+  }
+
+  if (nextPageBtn) {
+    nextPageBtn.addEventListener('click', () => {
+      const totalRecords = state.filteredGoals.length;
+      const totalPages = Math.ceil(totalRecords / state.itemsPerPage);
+      
+      if (state.currentPage < totalPages) {
+        goToPage(state.currentPage + 1);
+      }
+    });
+  }
 }
 
 // Open add form

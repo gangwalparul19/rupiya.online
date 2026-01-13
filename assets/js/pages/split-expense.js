@@ -12,7 +12,15 @@ const state = {
   filteredSplits: [],
   currentTab: 'active',
   editingSplitId: null,
-  participants: [{ name: 'Me', amount: 0 }]
+  participants: [{ name: 'Me', amount: 0 }],
+  currentPage: 1,
+  itemsPerPage: 10,
+  totalCount: 0,
+  allDataKPI: {
+    totalOwed: 0,
+    totalOwedToYou: 0,
+    activeSplits: 0
+  }
 };
 
 // Check authentication
@@ -123,7 +131,12 @@ async function loadSplits() {
     splitsList.style.display = 'none';
     
     state.splits = await splitService.getSplits();
+    state.totalCount = state.splits.length;
+    
+    calculateKPISummary();
     filterSplits();
+    state.currentPage = 1;
+    
     renderSplits();
     updateSummary();
     
@@ -132,6 +145,33 @@ async function loadSplits() {
     toast.error('Failed to load splits');
     loadingState.style.display = 'none';
   }
+}
+
+// Calculate KPI summary
+function calculateKPISummary() {
+  const activeSplits = state.splits.filter(s => s.status === 'active');
+  
+  let totalOwed = 0;
+  let totalOwedToYou = 0;
+  
+  activeSplits.forEach(split => {
+    if (split.paidBy === 'me') {
+      const othersTotal = split.participants
+        .filter(p => p.name !== 'Me')
+        .reduce((sum, p) => sum + p.amount, 0);
+      totalOwedToYou += othersTotal;
+    } else {
+      const yourAmount = split.participants
+        .find(p => p.name === 'Me')?.amount || 0;
+      totalOwed += yourAmount;
+    }
+  });
+  
+  state.allDataKPI = {
+    totalOwed,
+    totalOwedToYou,
+    activeSplits: activeSplits.length
+  };
 }
 
 // Filter splits by tab
@@ -143,6 +183,7 @@ function filterSplits() {
   } else {
     state.filteredSplits = state.splits;
   }
+  state.currentPage = 1;
 }
 
 // Render splits
@@ -152,14 +193,26 @@ function renderSplits() {
   if (state.filteredSplits.length === 0) {
     emptyState.style.display = 'flex';
     splitsList.style.display = 'none';
+    const paginationContainer = document.getElementById('paginationContainer');
+    if (paginationContainer) paginationContainer.style.display = 'none';
     return;
   }
   
   emptyState.style.display = 'none';
   splitsList.style.display = 'grid';
   
-  splitsList.innerHTML = state.filteredSplits.map(split => createSplitCard(split)).join('');
+  // Calculate pagination
+  const totalRecords = state.filteredSplits.length;
+  const totalPages = Math.ceil(totalRecords / state.itemsPerPage);
+  
+  const startIndex = (state.currentPage - 1) * state.itemsPerPage;
+  const endIndex = startIndex + state.itemsPerPage;
+  const pageSplits = state.filteredSplits.slice(startIndex, endIndex);
+  
+  splitsList.innerHTML = pageSplits.map(split => createSplitCard(split)).join('');
   attachCardEventListeners();
+  
+  renderPagination(totalPages);
 }
 
 // Create split card HTML
@@ -256,29 +309,87 @@ function attachCardEventListeners() {
 
 // Update summary cards
 function updateSummary() {
-  const activeSplits = state.splits.filter(s => s.status === 'active');
+  totalOwedEl.textContent = formatCurrency(state.allDataKPI.totalOwed);
+  totalOwedToYouEl.textContent = formatCurrency(state.allDataKPI.totalOwedToYou);
+  activeSplitsEl.textContent = state.allDataKPI.activeSplits;
+}
+
+// Render pagination
+function renderPagination(totalPages) {
+  const paginationContainer = document.getElementById('paginationContainer');
+  const paginationNumbers = document.getElementById('paginationNumbers');
+  const prevBtn = document.getElementById('prevPageBtn');
+  const nextBtn = document.getElementById('nextPageBtn');
   
-  let totalOwed = 0;
-  let totalOwedToYou = 0;
+  if (!paginationContainer || !paginationNumbers) return;
   
-  activeSplits.forEach(split => {
-    if (split.paidBy === 'me') {
-      // You paid, others owe you
-      const othersTotal = split.participants
-        .filter(p => p.name !== 'Me')
-        .reduce((sum, p) => sum + p.amount, 0);
-      totalOwedToYou += othersTotal;
-    } else {
-      // Someone else paid, you owe them
-      const yourAmount = split.participants
-        .find(p => p.name === 'Me')?.amount || 0;
-      totalOwed += yourAmount;
+  if (totalPages <= 1) {
+    paginationContainer.style.display = 'none';
+    return;
+  }
+  
+  paginationContainer.style.display = 'flex';
+  
+  if (prevBtn) prevBtn.disabled = state.currentPage === 1;
+  if (nextBtn) nextBtn.disabled = state.currentPage === totalPages;
+  
+  const pageNumbers = generatePageNumbers(state.currentPage, totalPages);
+  
+  paginationNumbers.innerHTML = pageNumbers.map(page => {
+    if (page === '...') {
+      return '<span class="ellipsis">...</span>';
     }
-  });
+    
+    const isActive = page === state.currentPage;
+    return `<button class="page-number ${isActive ? 'active' : ''}" data-page="${page}">${page}</button>`;
+  }).join('');
   
-  totalOwedEl.textContent = formatCurrency(totalOwed);
-  totalOwedToYouEl.textContent = formatCurrency(totalOwedToYou);
-  activeSplitsEl.textContent = activeSplits.length;
+  paginationNumbers.querySelectorAll('.page-number').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const page = parseInt(btn.dataset.page);
+      goToPage(page);
+    });
+  });
+}
+
+// Generate page numbers
+function generatePageNumbers(currentPage, totalPages) {
+  const pages = [];
+  const maxVisible = 7;
+  
+  if (totalPages <= maxVisible) {
+    for (let i = 1; i <= totalPages; i++) {
+      pages.push(i);
+    }
+  } else {
+    pages.push(1);
+    
+    if (currentPage > 3) {
+      pages.push('...');
+    }
+    
+    const start = Math.max(2, currentPage - 1);
+    const end = Math.min(totalPages - 1, currentPage + 1);
+    
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    
+    if (currentPage < totalPages - 2) {
+      pages.push('...');
+    }
+    
+    pages.push(totalPages);
+  }
+  
+  return pages;
+}
+
+// Go to page
+function goToPage(page) {
+  state.currentPage = page;
+  renderSplits();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // Calculate split amounts
@@ -666,4 +777,27 @@ function setupEventListeners() {
       closeSettleModal();
     }
   });
+  
+  // Pagination buttons
+  const prevPageBtn = document.getElementById('prevPageBtn');
+  const nextPageBtn = document.getElementById('nextPageBtn');
+  
+  if (prevPageBtn) {
+    prevPageBtn.addEventListener('click', () => {
+      if (state.currentPage > 1) {
+        goToPage(state.currentPage - 1);
+      }
+    });
+  }
+  
+  if (nextPageBtn) {
+    nextPageBtn.addEventListener('click', () => {
+      const totalRecords = state.filteredSplits.length;
+      const totalPages = Math.ceil(totalRecords / state.itemsPerPage);
+      
+      if (state.currentPage < totalPages) {
+        goToPage(state.currentPage + 1);
+      }
+    });
+  }
 }

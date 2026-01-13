@@ -13,8 +13,17 @@ import encryptionReauthModal from '../components/encryption-reauth-modal.js';
 // State management
 const state = {
   budgets: [],
+  filteredBudgets: [],
   expenses: [],
-  editingBudgetId: null
+  editingBudgetId: null,
+  currentPage: 1,
+  itemsPerPage: 10,
+  totalCount: 0,
+  allDataKPI: {
+    totalBudget: 0,
+    totalSpent: 0,
+    totalRemaining: 0
+  }
 };
 
 // Check authentication
@@ -168,9 +177,15 @@ async function loadData() {
     ]);
     
     state.budgets = budgets;
+    state.filteredBudgets = [...budgets];
+    state.totalCount = budgets.length;
     state.expenses = currentMonthExpenses; // Only current month expenses needed
     state.categoryTotals = categoryTotals; // Pre-calculated totals
     
+    // Calculate KPI summary
+    calculateKPISummary();
+    
+    state.currentPage = 1;
     updateSummary();
     renderBudgets();
     
@@ -181,18 +196,17 @@ async function loadData() {
   }
 }
 
-// Update summary cards
-function updateSummary() {
+// Calculate KPI summary
+function calculateKPISummary() {
   const now = new Date();
   const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   
   // Filter budgets for current month
   const currentBudgets = state.budgets.filter(b => b.month === currentMonth);
   
-  // Calculate totals (ensure amounts are numbers)
+  // Calculate totals
   const budgetTotal = currentBudgets.reduce((sum, b) => sum + (parseFloat(b.amount) || 0), 0);
   
-  // Calculate spent for each budget
   let spentTotal = 0;
   currentBudgets.forEach(budget => {
     const spent = calculateSpent(budget);
@@ -201,14 +215,23 @@ function updateSummary() {
   
   const remaining = budgetTotal - spentTotal;
   
-  totalBudget.textContent = formatCurrency(budgetTotal);
-  totalSpent.textContent = formatCurrency(spentTotal);
-  totalRemaining.textContent = formatCurrency(remaining);
+  state.allDataKPI = {
+    totalBudget: budgetTotal,
+    totalSpent: spentTotal,
+    totalRemaining: remaining
+  };
+}
+
+// Update summary cards
+function updateSummary() {
+  totalBudget.textContent = formatCurrency(state.allDataKPI.totalBudget);
+  totalSpent.textContent = formatCurrency(state.allDataKPI.totalSpent);
+  totalRemaining.textContent = formatCurrency(state.allDataKPI.totalRemaining);
   
   // Color code remaining
-  if (remaining < 0) {
+  if (state.allDataKPI.totalRemaining < 0) {
     totalRemaining.style.color = 'var(--accent-red)';
-  } else if (remaining < budgetTotal * 0.2) {
+  } else if (state.allDataKPI.totalRemaining < state.allDataKPI.totalBudget * 0.2) {
     totalRemaining.style.color = 'var(--accent-orange)';
   } else {
     totalRemaining.style.color = 'var(--accent-green)';
@@ -237,9 +260,11 @@ function calculateSpent(budget) {
 function renderBudgets() {
   loadingState.style.display = 'none';
   
-  if (state.budgets.length === 0) {
+  if (state.filteredBudgets.length === 0) {
     emptyState.style.display = 'flex';
     budgetsList.style.display = 'none';
+    const paginationContainer = document.getElementById('paginationContainer');
+    if (paginationContainer) paginationContainer.style.display = 'none';
     return;
   }
   
@@ -247,10 +272,21 @@ function renderBudgets() {
   budgetsList.style.display = 'grid';
   
   // Sort budgets by month (descending)
-  const sortedBudgets = [...state.budgets].sort((a, b) => b.month.localeCompare(a.month));
+  const sortedBudgets = [...state.filteredBudgets].sort((a, b) => b.month.localeCompare(a.month));
+  
+  // Calculate pagination
+  const totalRecords = sortedBudgets.length;
+  const totalPages = Math.ceil(totalRecords / state.itemsPerPage);
+  
+  const startIndex = (state.currentPage - 1) * state.itemsPerPage;
+  const endIndex = startIndex + state.itemsPerPage;
+  const pageBudgets = sortedBudgets.slice(startIndex, endIndex);
   
   // Render budget cards
-  budgetsList.innerHTML = sortedBudgets.map(budget => createBudgetCard(budget)).join('');
+  budgetsList.innerHTML = pageBudgets.map(budget => createBudgetCard(budget)).join('');
+  
+  // Render pagination
+  renderPagination(totalPages);
   
   // Attach event listeners to cards
   attachCardEventListeners();
@@ -353,6 +389,84 @@ function createBudgetCard(budget) {
   `;
 }
 
+// Render pagination with numbered pages
+function renderPagination(totalPages) {
+  const paginationContainer = document.getElementById('paginationContainer');
+  const paginationNumbers = document.getElementById('paginationNumbers');
+  const prevBtn = document.getElementById('prevPageBtn');
+  const nextBtn = document.getElementById('nextPageBtn');
+  
+  if (!paginationContainer || !paginationNumbers) return;
+  
+  if (totalPages <= 1) {
+    paginationContainer.style.display = 'none';
+    return;
+  }
+  
+  paginationContainer.style.display = 'flex';
+  
+  if (prevBtn) prevBtn.disabled = state.currentPage === 1;
+  if (nextBtn) nextBtn.disabled = state.currentPage === totalPages;
+  
+  const pageNumbers = generatePageNumbers(state.currentPage, totalPages);
+  
+  paginationNumbers.innerHTML = pageNumbers.map(page => {
+    if (page === '...') {
+      return '<span class="ellipsis">...</span>';
+    }
+    
+    const isActive = page === state.currentPage;
+    return `<button class="page-number ${isActive ? 'active' : ''}" data-page="${page}">${page}</button>`;
+  }).join('');
+  
+  paginationNumbers.querySelectorAll('.page-number').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const page = parseInt(btn.dataset.page);
+      goToPage(page);
+    });
+  });
+}
+
+// Generate page numbers with ellipsis
+function generatePageNumbers(currentPage, totalPages) {
+  const pages = [];
+  const maxVisible = 7;
+  
+  if (totalPages <= maxVisible) {
+    for (let i = 1; i <= totalPages; i++) {
+      pages.push(i);
+    }
+  } else {
+    pages.push(1);
+    
+    if (currentPage > 3) {
+      pages.push('...');
+    }
+    
+    const start = Math.max(2, currentPage - 1);
+    const end = Math.min(totalPages - 1, currentPage + 1);
+    
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    
+    if (currentPage < totalPages - 2) {
+      pages.push('...');
+    }
+    
+    pages.push(totalPages);
+  }
+  
+  return pages;
+}
+
+// Go to specific page
+function goToPage(page) {
+  state.currentPage = page;
+  renderBudgets();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 // Attach event listeners to budget cards
 function attachCardEventListeners() {
   // Edit buttons
@@ -413,6 +527,29 @@ function setupEventListeners() {
       closeDeleteConfirmModal();
     }
   });
+  
+  // Pagination buttons
+  const prevPageBtn = document.getElementById('prevPageBtn');
+  const nextPageBtn = document.getElementById('nextPageBtn');
+
+  if (prevPageBtn) {
+    prevPageBtn.addEventListener('click', () => {
+      if (state.currentPage > 1) {
+        goToPage(state.currentPage - 1);
+      }
+    });
+  }
+
+  if (nextPageBtn) {
+    nextPageBtn.addEventListener('click', () => {
+      const totalRecords = state.filteredBudgets.length;
+      const totalPages = Math.ceil(totalRecords / state.itemsPerPage);
+      
+      if (state.currentPage < totalPages) {
+        goToPage(state.currentPage + 1);
+      }
+    });
+  }
 }
 
 // Open add form

@@ -16,7 +16,21 @@ import confirmationModal from '../components/confirmation-modal.js';
 const showToast = (message, type) => toast.show(message, type);
 
 // State
-let recurringTransactions = [];
+const state = {
+  recurringTransactions: [],
+  filteredRecurring: [],
+  currentPage: 1,
+  itemsPerPage: 10,
+  totalCount: 0,
+  lastDoc: null,
+  hasMore: true,
+  loadingMore: false,
+  allDataKPI: {
+    monthlyExpenses: 0,
+    monthlyIncome: 0,
+    activeCount: 0
+  }
+};
 let editingRecurringId = null;
 let userPaymentMethods = [];
 
@@ -259,6 +273,29 @@ function setupEventListeners() {
   closeDeleteModalBtn.addEventListener('click', hideDeleteModal);
   cancelDeleteBtn.addEventListener('click', hideDeleteModal);
   confirmDeleteBtn.addEventListener('click', handleDelete);
+  
+  // Pagination buttons
+  const prevPageBtn = document.getElementById('prevPageBtn');
+  const nextPageBtn = document.getElementById('nextPageBtn');
+
+  if (prevPageBtn) {
+    prevPageBtn.addEventListener('click', () => {
+      if (state.currentPage > 1) {
+        goToPage(state.currentPage - 1);
+      }
+    });
+  }
+
+  if (nextPageBtn) {
+    nextPageBtn.addEventListener('click', () => {
+      const totalRecords = state.filteredRecurring.length;
+      const totalPages = Math.ceil(totalRecords / state.itemsPerPage);
+      
+      if (state.currentPage < totalPages) {
+        goToPage(state.currentPage + 1);
+      }
+    });
+  }
 }
 
 // Handle process now button click
@@ -466,15 +503,24 @@ async function loadRecurringTransactions() {
   recurringList.innerHTML = '';
 
   try {
-    recurringTransactions = await firestoreService.getAll('recurringTransactions', 'startDate', 'desc');
+    // Get all recurring transactions (usually small dataset)
+    const allRecurring = await firestoreService.getAll('recurringTransactions', 'startDate', 'desc');
+    
+    state.recurringTransactions = allRecurring;
+    state.filteredRecurring = [...allRecurring];
+    state.totalCount = allRecurring.length;
+    
+    // Calculate KPI for all data
+    calculateKPISummary();
 
-    if (recurringTransactions.length === 0) {
+    if (state.filteredRecurring.length === 0) {
       loadingState.style.display = 'none';
       emptyState.style.display = 'flex';
       updateSummary();
       return;
     }
 
+    state.currentPage = 1;
     renderRecurringTransactions();
     updateSummary();
     loadingState.style.display = 'none';
@@ -486,14 +532,142 @@ async function loadRecurringTransactions() {
   }
 }
 
-// Render recurring transactions
-function renderRecurringTransactions() {
-  recurringList.innerHTML = '';
+// Calculate KPI summary
+function calculateKPISummary() {
+  let monthlyExpenses = 0;
+  let monthlyIncome = 0;
+  let activeCount = 0;
 
-  recurringTransactions.forEach(recurring => {
+  state.recurringTransactions.forEach(recurring => {
+    if (recurring.status === 'active') {
+      activeCount++;
+      const monthlyAmount = calculateMonthlyAmount(recurring);
+      
+      if (recurring.type === 'expense') {
+        monthlyExpenses += monthlyAmount;
+      } else {
+        monthlyIncome += monthlyAmount;
+      }
+    }
+  });
+
+  state.allDataKPI = {
+    monthlyExpenses,
+    monthlyIncome,
+    activeCount
+  };
+}
+
+// Render recurring transactions with pagination
+function renderRecurringTransactions() {
+  loadingState.style.display = 'none';
+  
+  if (state.filteredRecurring.length === 0) {
+    emptyState.style.display = 'flex';
+    recurringList.style.display = 'none';
+    const paginationContainer = document.getElementById('paginationContainer');
+    if (paginationContainer) paginationContainer.style.display = 'none';
+    return;
+  }
+  
+  emptyState.style.display = 'none';
+  recurringList.style.display = 'grid';
+  
+  // Calculate pagination
+  const totalRecords = state.filteredRecurring.length;
+  const totalPages = Math.ceil(totalRecords / state.itemsPerPage);
+  
+  const startIndex = (state.currentPage - 1) * state.itemsPerPage;
+  const endIndex = startIndex + state.itemsPerPage;
+  const pageRecurring = state.filteredRecurring.slice(startIndex, endIndex);
+  
+  // Render cards
+  recurringList.innerHTML = '';
+  pageRecurring.forEach(recurring => {
     const card = createRecurringCard(recurring);
     recurringList.appendChild(card);
   });
+  
+  // Render pagination
+  renderPagination(totalPages);
+}
+
+// Render pagination with numbered pages
+function renderPagination(totalPages) {
+  const paginationContainer = document.getElementById('paginationContainer');
+  const paginationNumbers = document.getElementById('paginationNumbers');
+  const prevBtn = document.getElementById('prevPageBtn');
+  const nextBtn = document.getElementById('nextPageBtn');
+  
+  if (!paginationContainer || !paginationNumbers) return;
+  
+  if (totalPages <= 1) {
+    paginationContainer.style.display = 'none';
+    return;
+  }
+  
+  paginationContainer.style.display = 'flex';
+  
+  if (prevBtn) prevBtn.disabled = state.currentPage === 1;
+  if (nextBtn) nextBtn.disabled = state.currentPage === totalPages;
+  
+  const pageNumbers = generatePageNumbers(state.currentPage, totalPages);
+  
+  paginationNumbers.innerHTML = pageNumbers.map(page => {
+    if (page === '...') {
+      return '<span class="ellipsis">...</span>';
+    }
+    
+    const isActive = page === state.currentPage;
+    return `<button class="page-number ${isActive ? 'active' : ''}" data-page="${page}">${page}</button>`;
+  }).join('');
+  
+  paginationNumbers.querySelectorAll('.page-number').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const page = parseInt(btn.dataset.page);
+      goToPage(page);
+    });
+  });
+}
+
+// Generate page numbers with ellipsis
+function generatePageNumbers(currentPage, totalPages) {
+  const pages = [];
+  const maxVisible = 7;
+  
+  if (totalPages <= maxVisible) {
+    for (let i = 1; i <= totalPages; i++) {
+      pages.push(i);
+    }
+  } else {
+    pages.push(1);
+    
+    if (currentPage > 3) {
+      pages.push('...');
+    }
+    
+    const start = Math.max(2, currentPage - 1);
+    const end = Math.min(totalPages - 1, currentPage + 1);
+    
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    
+    if (currentPage < totalPages - 2) {
+      pages.push('...');
+    }
+    
+    pages.push(totalPages);
+  }
+  
+  return pages;
+}
+
+// Go to specific page
+function goToPage(page) {
+  state.currentPage = page;
+  renderRecurringTransactions();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // Create recurring card
@@ -626,31 +800,14 @@ function calculateMonthlyAmount(recurring) {
 
 // Update summary
 function updateSummary() {
-  let monthlyExpenses = 0;
-  let monthlyIncome = 0;
-  let activeCount = 0;
-
-  recurringTransactions.forEach(recurring => {
-    if (recurring.status === 'active') {
-      activeCount++;
-      const monthlyAmount = calculateMonthlyAmount(recurring);
-      
-      if (recurring.type === 'expense') {
-        monthlyExpenses += monthlyAmount;
-      } else {
-        monthlyIncome += monthlyAmount;
-      }
-    }
-  });
-
-  monthlyExpensesEl.textContent = formatCurrency(monthlyExpenses);
-  monthlyIncomeEl.textContent = formatCurrency(monthlyIncome);
-  activeCountEl.textContent = activeCount;
+  monthlyExpensesEl.textContent = formatCurrency(state.allDataKPI.monthlyExpenses);
+  monthlyIncomeEl.textContent = formatCurrency(state.allDataKPI.monthlyIncome);
+  activeCountEl.textContent = state.allDataKPI.activeCount;
 }
 
 // Show delete confirmation
 function showDeleteConfirmation(id) {
-  const recurring = recurringTransactions.find(r => r.id === id);
+  const recurring = state.recurringTransactions.find(r => r.id === id);
   if (!recurring) return;
 
   deleteRecurringId = id;
@@ -700,7 +857,7 @@ function capitalizeFirst(str) {
 
 // Make functions available globally for onclick handlers
 window.editRecurring = (id) => {
-  const recurring = recurringTransactions.find(r => r.id === id);
+  const recurring = state.recurringTransactions.find(r => r.id === id);
   if (recurring) showEditForm(recurring);
 };
 

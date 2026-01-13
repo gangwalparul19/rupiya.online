@@ -11,9 +11,19 @@ import confirmationModal from '../components/confirmation-modal.js';
 // Helper function for toast
 const showToast = (message, type) => toast.show(message, type);
 
-let staff = [];
-let staffPayments = {}; // Store payments by staff ID
-let editingHelpId = null;
+const state = {
+  staff: [],
+  filteredStaff: [],
+  staffPayments: {},
+  editingHelpId: null,
+  currentPage: 1,
+  itemsPerPage: 10,
+  totalCount: 0,
+  allDataKPI: {
+    totalStaff: 0,
+    activeStaff: 0
+  }
+};
 
 let addHelpBtn, addHelpSection, closeFormBtn, cancelFormBtn;
 let helpForm, formTitle, saveFormBtn;
@@ -150,6 +160,29 @@ function setupEventListeners() {
   closeDeletePaymentModalBtn?.addEventListener('click', hideDeletePaymentModal);
   cancelDeletePaymentBtn?.addEventListener('click', hideDeletePaymentModal);
   confirmDeletePaymentBtn?.addEventListener('click', handleDeletePayment);
+  
+  // Pagination buttons
+  const prevPageBtn = document.getElementById('prevPageBtn');
+  const nextPageBtn = document.getElementById('nextPageBtn');
+  
+  if (prevPageBtn) {
+    prevPageBtn.addEventListener('click', () => {
+      if (state.currentPage > 1) {
+        goToPage(state.currentPage - 1);
+      }
+    });
+  }
+  
+  if (nextPageBtn) {
+    nextPageBtn.addEventListener('click', () => {
+      const totalRecords = state.filteredStaff.length;
+      const totalPages = Math.ceil(totalRecords / state.itemsPerPage);
+      
+      if (state.currentPage < totalPages) {
+        goToPage(state.currentPage + 1);
+      }
+    });
+  }
 }
 
 function loadUserProfile(user) {
@@ -295,9 +328,14 @@ async function loadStaff() {
       loadAllPayments()
     ]);
     
-    staff = staffData;
+    state.staff = staffData;
+    state.filteredStaff = [...staffData];
+    state.totalCount = staffData.length;
     
-    if (staff.length === 0) {
+    calculateKPISummary();
+    state.currentPage = 1;
+    
+    if (state.filteredStaff.length === 0) {
       emptyState.style.display = 'block';
     } else {
       renderStaff();
@@ -313,11 +351,39 @@ async function loadStaff() {
   }
 }
 
+function calculateKPISummary() {
+  const activeStaff = state.staff.filter(s => s.status === 'Active').length;
+  
+  state.allDataKPI = {
+    totalStaff: state.staff.length,
+    activeStaff: activeStaff
+  };
+}
+
 function renderStaff() {
-  helpList.innerHTML = staff.map(help => {
+  const paginationContainer = document.getElementById('paginationContainer');
+  
+  if (state.filteredStaff.length === 0) {
+    helpList.style.display = 'none';
+    emptyState.style.display = 'block';
+    if (paginationContainer) paginationContainer.style.display = 'none';
+    return;
+  }
+  
+  helpList.style.display = 'grid';
+  emptyState.style.display = 'none';
+  
+  const totalRecords = state.filteredStaff.length;
+  const totalPages = Math.ceil(totalRecords / state.itemsPerPage);
+  
+  const startIndex = (state.currentPage - 1) * state.itemsPerPage;
+  const endIndex = startIndex + state.itemsPerPage;
+  const pageStaff = state.filteredStaff.slice(startIndex, endIndex);
+  
+  helpList.innerHTML = pageStaff.map(help => {
     const statusClass = help.status === 'Active' ? 'active' : 'inactive';
     const joinDuration = calculateDuration(help.joinDate);
-    const payments = staffPayments[help.id] || [];
+    const payments = state.staffPayments[help.id] || [];
     const paidThisMonth = calculatePaidThisMonth(payments);
     const monthlySalary = parseFloat(help.monthlySalary) || 0;
     const remaining = Math.max(0, monthlySalary - paidThisMonth);
@@ -395,11 +461,88 @@ function renderStaff() {
       </div>
     `;
   }).join('');
+  
+  renderPagination(totalPages);
+}
+
+function renderPagination(totalPages) {
+  const paginationContainer = document.getElementById('paginationContainer');
+  const paginationNumbers = document.getElementById('paginationNumbers');
+  const prevBtn = document.getElementById('prevPageBtn');
+  const nextBtn = document.getElementById('nextPageBtn');
+  
+  if (!paginationContainer || !paginationNumbers) return;
+  
+  if (totalPages <= 1) {
+    paginationContainer.style.display = 'none';
+    return;
+  }
+  
+  paginationContainer.style.display = 'flex';
+  
+  if (prevBtn) prevBtn.disabled = state.currentPage === 1;
+  if (nextBtn) nextBtn.disabled = state.currentPage === totalPages;
+  
+  const pageNumbers = generatePageNumbers(state.currentPage, totalPages);
+  
+  paginationNumbers.innerHTML = pageNumbers.map(page => {
+    if (page === '...') {
+      return '<span class="ellipsis">...</span>';
+    }
+    
+    const isActive = page === state.currentPage;
+    return `<button class="page-number ${isActive ? 'active' : ''}" data-page="${page}">${page}</button>`;
+  }).join('');
+  
+  paginationNumbers.querySelectorAll('.page-number').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const page = parseInt(btn.dataset.page);
+      goToPage(page);
+    });
+  });
+}
+
+function generatePageNumbers(currentPage, totalPages) {
+  const pages = [];
+  const maxVisible = 7;
+  
+  if (totalPages <= maxVisible) {
+    for (let i = 1; i <= totalPages; i++) {
+      pages.push(i);
+    }
+  } else {
+    pages.push(1);
+    
+    if (currentPage > 3) {
+      pages.push('...');
+    }
+    
+    const start = Math.max(2, currentPage - 1);
+    const end = Math.min(totalPages - 1, currentPage + 1);
+    
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    
+    if (currentPage < totalPages - 2) {
+      pages.push('...');
+    }
+    
+    pages.push(totalPages);
+  }
+  
+  return pages;
+}
+
+function goToPage(page) {
+  state.currentPage = page;
+  renderStaff();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function updateSummary() {
-  const totalStaff = staff.filter(h => h.status === 'Active').length;
-  const monthlySalary = staff
+  const totalStaff = state.staff.filter(h => h.status === 'Active').length;
+  const monthlySalary = state.staff
     .filter(h => h.status === 'Active')
     .reduce((sum, help) => {
       const salary = parseFloat(help.monthlySalary) || 0;
@@ -408,8 +551,8 @@ function updateSummary() {
 
   // Calculate total paid this month across all staff
   let totalPaidThisMonth = 0;
-  staff.forEach(help => {
-    const payments = staffPayments[help.id] || [];
+  state.staff.forEach(help => {
+    const payments = state.staffPayments[help.id] || [];
     totalPaidThisMonth += calculatePaidThisMonth(payments);
   });
 
@@ -456,21 +599,21 @@ async function loadAllPayments() {
   try {
     const payments = await firestoreService.getAll('houseHelpPayments', 'date', 'desc');
     // Group payments by staff ID
-    staffPayments = {};
+    state.staffPayments = {};
     payments.forEach(payment => {
-      if (!staffPayments[payment.staffId]) {
-        staffPayments[payment.staffId] = [];
+      if (!state.staffPayments[payment.staffId]) {
+        state.staffPayments[payment.staffId] = [];
       }
-      staffPayments[payment.staffId].push(payment);
+      state.staffPayments[payment.staffId].push(payment);
     });
   } catch (error) {
     console.error('Error loading all payments:', error);
-    staffPayments = {};
+    state.staffPayments = {};
   }
 }
 
 async function showPaymentModal(staffId) {
-  const help = staff.find(h => h.id === staffId);
+  const help = state.staff.find(h => h.id === staffId);
   if (!help) return;
 
   currentPaymentStaffId = staffId;
@@ -484,7 +627,7 @@ async function showPaymentModal(staffId) {
   
   // Load payments for this staff
   const payments = await loadPaymentsForStaff(staffId);
-  staffPayments[staffId] = payments;
+  state.staffPayments[staffId] = payments;
   
   const paidThisMonth = calculatePaidThisMonth(payments);
   const remaining = Math.max(0, monthlySalary - paidThisMonth);
@@ -558,7 +701,7 @@ async function handleSavePayment() {
   
   try {
     // Get staff details for expense description
-    const help = staff.find(h => h.id === currentPaymentStaffId);
+    const help = state.staff.find(h => h.id === currentPaymentStaffId);
     const staffName = help ? help.name : 'House Help';
     const staffRole = help ? help.role : 'Staff';
     
@@ -593,7 +736,7 @@ async function handleSavePayment() {
       
       // Update the modal with new data
       if (help) {
-        const payments = staffPayments[currentPaymentStaffId] || [];
+        const payments = state.staffPayments[currentPaymentStaffId] || [];
         const monthlySalary = parseFloat(help.monthlySalary) || 0;
         const paidThisMonth = calculatePaidThisMonth(payments);
         const remaining = Math.max(0, monthlySalary - paidThisMonth);
@@ -626,8 +769,8 @@ async function handleSavePayment() {
 function showDeletePaymentConfirmation(paymentId) {
   // Find the payment
   let payment = null;
-  for (const staffId in staffPayments) {
-    const found = staffPayments[staffId].find(p => p.id === paymentId);
+  for (const staffId in state.staffPayments) {
+    const found = state.staffPayments[staffId].find(p => p.id === paymentId);
     if (found) {
       payment = found;
       break;
@@ -675,9 +818,9 @@ async function handleDeletePayment() {
       
       // Update the payment modal if it's open
       if (currentPaymentStaffId) {
-        const help = staff.find(h => h.id === currentPaymentStaffId);
+        const help = state.staff.find(h => h.id === currentPaymentStaffId);
         if (help) {
-          const payments = staffPayments[currentPaymentStaffId] || [];
+          const payments = state.staffPayments[currentPaymentStaffId] || [];
           const monthlySalary = parseFloat(help.monthlySalary) || 0;
           const paidThisMonth = calculatePaidThisMonth(payments);
           const remaining = Math.max(0, monthlySalary - paidThisMonth);
@@ -720,7 +863,7 @@ function calculateDuration(joinDate) {
 }
 
 function showDeleteConfirmation(id) {
-  const help = staff.find(h => h.id === id);
+  const help = state.staff.find(h => h.id === id);
   if (!help) return;
 
   deleteHelpId = id;
@@ -761,7 +904,7 @@ async function handleDelete() {
 }
 
 function editHelp(id) {
-  const help = staff.find(h => h.id === id);
+  const help = state.staff.find(h => h.id === id);
   if (help) showEditForm(help);
 }
 

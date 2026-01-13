@@ -965,3 +965,107 @@
     padding: 0.4rem 0.2rem;
   }
 }
+
+/* Pagination */
+.pagination-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-xl);
+  padding: var(--spacing-lg);
+  flex-wrap: wrap;
+  max-width: 100%;
+}
+
+.pagination-numbers {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.pagination-numbers button {
+  min-width: 40px;
+  height: 40px;
+  padding: 0.5rem;
+  border: 2px solid var(--border-color);
+  background: white;
+  color: var(--text-primary);
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.pagination-numbers button:hover:not(.active):not(:disabled) {
+  border-color: var(--primary-blue);
+  color: var(--primary-blue);
+  background: rgba(74, 144, 226, 0.05);
+}
+
+.pagination-numbers button.active {
+  background: var(--primary-blue);
+  color: white;
+  border-color: var(--primary-blue);
+  cursor: default;
+}
+
+.pagination-numbers button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination-numbers .ellipsis {
+  padding: 0.5rem;
+  color: var(--text-secondary);
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.btn-pagination {
+  min-width: 100px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+/* Mobile Responsive Pagination */
+@media (max-width: 768px) {
+  .pagination-container {
+    gap: 0.25rem;
+    padding: var(--spacing-md);
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .btn-pagination {
+    min-width: 60px;
+    font-size: 0.75rem;
+    padding: 0.4rem 0.5rem;
+    flex-shrink: 0;
+  }
+  
+  .pagination-numbers {
+    gap: 0.25rem;
+    flex-wrap: nowrap;
+    flex-shrink: 0;
+  }
+  
+  .pagination-numbers button {
+    min-width: 32px;
+    height: 32px;
+    font-size: 0.75rem;
+    padding: 0.25rem;
+    flex-shrink: 0;
+  }
+  
+  .pagination-numbers .ellipsis {
+    padding: 0.25rem;
+    font-size: 0.75rem;
+  }
+}

@@ -6,9 +6,17 @@ import authService from '../services/auth-service.js';
 class TripGroupsPage {
   constructor() {
     this.groups = [];
+    this.filteredGroups = [];
     this.currentTab = 'active';
     this.pendingMembers = [];
     this.editingGroupId = null;
+    this.currentPage = 1;
+    this.itemsPerPage = 10;
+    this.totalCount = 0;
+    this.allDataKPI = {
+      activeGroups: 0,
+      totalExpenses: 0
+    };
 
     this.init();
   }
@@ -72,6 +80,29 @@ class TripGroupsPage {
     document.getElementById('deleteGroupModal')?.addEventListener('click', (e) => {
       if (e.target.id === 'deleteGroupModal') this.closeDeleteModal();
     });
+    
+    // Pagination buttons
+    const prevPageBtn = document.getElementById('prevPageBtn');
+    const nextPageBtn = document.getElementById('nextPageBtn');
+    
+    if (prevPageBtn) {
+      prevPageBtn.addEventListener('click', () => {
+        if (this.currentPage > 1) {
+          this.goToPage(this.currentPage - 1);
+        }
+      });
+    }
+    
+    if (nextPageBtn) {
+      nextPageBtn.addEventListener('click', () => {
+        const totalRecords = this.filteredGroups.length;
+        const totalPages = Math.ceil(totalRecords / this.itemsPerPage);
+        
+        if (this.currentPage < totalPages) {
+          this.goToPage(this.currentPage + 1);
+        }
+      });
+    }
   }
 
   async loadGroups() {
@@ -79,6 +110,12 @@ class TripGroupsPage {
 
     try {
       this.groups = await tripGroupsService.getUserGroups();
+      this.totalCount = this.groups.length;
+      
+      this.calculateKPISummary();
+      this.filterGroups();
+      this.currentPage = 1;
+      
       this.updateSummary();
       this.renderGroups();
     } catch (error) {
@@ -88,39 +125,56 @@ class TripGroupsPage {
       this.showLoading(false);
     }
   }
-
-  updateSummary() {
+  
+  calculateKPISummary() {
     const activeGroups = this.groups.filter(g => g.status === 'active');
     const totalExpenses = this.groups.reduce((sum, g) => sum + (g.totalExpenses || 0), 0);
+    
+    this.allDataKPI = {
+      activeGroups: activeGroups.length,
+      totalExpenses
+    };
+  }
+  
+  filterGroups() {
+    if (this.currentTab === 'active') {
+      this.filteredGroups = this.groups.filter(g => g.status === 'active');
+    } else if (this.currentTab === 'archived') {
+      this.filteredGroups = this.groups.filter(g => g.status === 'archived' || g.status === 'completed');
+    } else {
+      this.filteredGroups = this.groups;
+    }
+  }
 
-    document.getElementById('activeTrips').textContent = activeGroups.length;
-    document.getElementById('totalTripExpenses').textContent = `₹${totalExpenses.toLocaleString('en-IN')}`;
-
-    // Calculate user's total balance across all groups
-    // This would need async calculation, so we'll show a placeholder for now
+  updateSummary() {
+    document.getElementById('activeTrips').textContent = this.allDataKPI.activeGroups;
+    document.getElementById('totalTripExpenses').textContent = `₹${this.allDataKPI.totalExpenses.toLocaleString('en-IN')}`;
     document.getElementById('yourBalance').textContent = '₹0';
   }
 
   renderGroups() {
     const container = document.getElementById('groupsList');
     const emptyState = document.getElementById('emptyState');
+    const paginationContainer = document.getElementById('paginationContainer');
 
-    // Filter groups by current tab
-    let filteredGroups = this.groups;
-    if (this.currentTab === 'active') {
-      filteredGroups = this.groups.filter(g => g.status === 'active');
-    } else if (this.currentTab === 'archived') {
-      filteredGroups = this.groups.filter(g => g.status === 'archived' || g.status === 'completed');
-    }
-
-    if (filteredGroups.length === 0) {
+    if (this.filteredGroups.length === 0) {
       container.innerHTML = '';
       emptyState.style.display = 'block';
+      if (paginationContainer) paginationContainer.style.display = 'none';
       return;
     }
 
     emptyState.style.display = 'none';
-    container.innerHTML = filteredGroups.map(group => this.renderGroupCard(group)).join('');
+    
+    // Calculate pagination
+    const totalRecords = this.filteredGroups.length;
+    const totalPages = Math.ceil(totalRecords / this.itemsPerPage);
+    
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    const pageGroups = this.filteredGroups.slice(startIndex, endIndex);
+    
+    container.innerHTML = pageGroups.map(group => this.renderGroupCard(group)).join('');
 
     // Bind card click events
     container.querySelectorAll('.group-card').forEach(card => {
@@ -130,6 +184,83 @@ class TripGroupsPage {
         }
       });
     });
+    
+    this.renderPagination(totalPages);
+  }
+  
+  renderPagination(totalPages) {
+    const paginationContainer = document.getElementById('paginationContainer');
+    const paginationNumbers = document.getElementById('paginationNumbers');
+    const prevBtn = document.getElementById('prevPageBtn');
+    const nextBtn = document.getElementById('nextPageBtn');
+    
+    if (!paginationContainer || !paginationNumbers) return;
+    
+    if (totalPages <= 1) {
+      paginationContainer.style.display = 'none';
+      return;
+    }
+    
+    paginationContainer.style.display = 'flex';
+    
+    if (prevBtn) prevBtn.disabled = this.currentPage === 1;
+    if (nextBtn) nextBtn.disabled = this.currentPage === totalPages;
+    
+    const pageNumbers = this.generatePageNumbers(this.currentPage, totalPages);
+    
+    paginationNumbers.innerHTML = pageNumbers.map(page => {
+      if (page === '...') {
+        return '<span class="ellipsis">...</span>';
+      }
+      
+      const isActive = page === this.currentPage;
+      return `<button class="page-number ${isActive ? 'active' : ''}" data-page="${page}">${page}</button>`;
+    }).join('');
+    
+    paginationNumbers.querySelectorAll('.page-number').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const page = parseInt(btn.dataset.page);
+        this.goToPage(page);
+      });
+    });
+  }
+  
+  generatePageNumbers(currentPage, totalPages) {
+    const pages = [];
+    const maxVisible = 7;
+    
+    if (totalPages <= maxVisible) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      pages.push(1);
+      
+      if (currentPage > 3) {
+        pages.push('...');
+      }
+      
+      const start = Math.max(2, currentPage - 1);
+      const end = Math.min(totalPages - 1, currentPage + 1);
+      
+      for (let i = start; i <= end; i++) {
+        pages.push(i);
+      }
+      
+      if (currentPage < totalPages - 2) {
+        pages.push('...');
+      }
+      
+      pages.push(totalPages);
+    }
+    
+    return pages;
+  }
+  
+  goToPage(page) {
+    this.currentPage = page;
+    this.renderGroups();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
 
@@ -203,6 +334,8 @@ class TripGroupsPage {
       btn.classList.toggle('active', btn.dataset.tab === tab);
     });
 
+    this.filterGroups();
+    this.currentPage = 1;
     this.renderGroups();
   }
 

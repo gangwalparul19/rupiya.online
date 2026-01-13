@@ -7,7 +7,19 @@ import { formatCurrency, formatCurrencyCompact, formatDate } from '../utils/help
 import encryptionReauthModal from '../components/encryption-reauth-modal.js';
 
 // State
-let creditCards = [];
+const state = {
+  creditCards: [],
+  filteredCards: [],
+  currentPage: 1,
+  itemsPerPage: 10,
+  totalCount: 0,
+  allDataKPI: {
+    totalCards: 0,
+    totalLimit: 0,
+    totalSpent: 0,
+    totalRewards: 0
+  }
+};
 let editingCardId = null;
 let currentUser = null;
 
@@ -88,6 +100,29 @@ function setupEventListeners() {
   document.getElementById('closeDeleteModal')?.addEventListener('click', closeDeleteModal);
   document.getElementById('cancelDeleteBtn')?.addEventListener('click', closeDeleteModal);
   document.getElementById('confirmDeleteBtn')?.addEventListener('click', confirmDelete);
+  
+  // Pagination buttons
+  const prevPageBtn = document.getElementById('prevPageBtn');
+  const nextPageBtn = document.getElementById('nextPageBtn');
+  
+  if (prevPageBtn) {
+    prevPageBtn.addEventListener('click', () => {
+      if (state.currentPage > 1) {
+        goToPage(state.currentPage - 1);
+      }
+    });
+  }
+  
+  if (nextPageBtn) {
+    nextPageBtn.addEventListener('click', () => {
+      const totalRecords = state.filteredCards.length;
+      const totalPages = Math.ceil(totalRecords / state.itemsPerPage);
+      
+      if (state.currentPage < totalPages) {
+        goToPage(state.currentPage + 1);
+      }
+    });
+  }
 }
 
 // Load credit cards
@@ -101,9 +136,16 @@ async function loadCreditCards() {
     emptyState.style.display = 'none';
     cardsGrid.style.display = 'none';
 
-    creditCards = await firestoreService.getAll('creditCards', 'createdAt', 'desc');
+    const allCards = await firestoreService.getAll('creditCards', 'createdAt', 'desc');
+    
+    state.creditCards = allCards;
+    state.filteredCards = [...allCards];
+    state.totalCount = allCards.length;
+    
+    calculateKPISummary();
+    state.currentPage = 1;
 
-    if (creditCards.length === 0) {
+    if (state.filteredCards.length === 0) {
       loadingState.style.display = 'none';
       emptyState.style.display = 'flex';
     } else {
@@ -119,12 +161,41 @@ async function loadCreditCards() {
   }
 }
 
+// Calculate KPI summary
+function calculateKPISummary() {
+  const totalLimit = state.creditCards.reduce((sum, card) => sum + (card.creditLimit || 0), 0);
+  const totalSpent = state.creditCards.reduce((sum, card) => sum + (card.currentBalance || 0), 0);
+  const totalRewards = state.creditCards.reduce((sum, card) => sum + (card.rewardsBalance || 0), 0);
+  
+  state.allDataKPI = {
+    totalCards: state.creditCards.length,
+    totalLimit,
+    totalSpent,
+    totalRewards
+  };
+}
+
 // Render credit cards
 function renderCreditCards() {
   const cardsGrid = document.getElementById('cardsGrid');
+  const paginationContainer = document.getElementById('paginationContainer');
   if (!cardsGrid) return;
+  
+  if (state.filteredCards.length === 0) {
+    cardsGrid.innerHTML = '';
+    if (paginationContainer) paginationContainer.style.display = 'none';
+    return;
+  }
+  
+  // Calculate pagination
+  const totalRecords = state.filteredCards.length;
+  const totalPages = Math.ceil(totalRecords / state.itemsPerPage);
+  
+  const startIndex = (state.currentPage - 1) * state.itemsPerPage;
+  const endIndex = startIndex + state.itemsPerPage;
+  const pageCards = state.filteredCards.slice(startIndex, endIndex);
 
-  cardsGrid.innerHTML = creditCards.map(card => {
+  cardsGrid.innerHTML = pageCards.map(card => {
     const utilization = (card.currentBalance / card.creditLimit) * 100;
     const utilizationClass = utilization > 70 ? 'high' : '';
     const cardTypeClass = `card-type-${card.cardType.toLowerCase().replace(' ', '')}`;
@@ -179,117 +250,105 @@ function renderCreditCards() {
       </div>
     `;
   }).join('');
+  
+  renderPagination(totalPages);
+}
+
+// Render pagination
+function renderPagination(totalPages) {
+  const paginationContainer = document.getElementById('paginationContainer');
+  const paginationNumbers = document.getElementById('paginationNumbers');
+  const prevBtn = document.getElementById('prevPageBtn');
+  const nextBtn = document.getElementById('nextPageBtn');
+  
+  if (!paginationContainer || !paginationNumbers) return;
+  
+  if (totalPages <= 1) {
+    paginationContainer.style.display = 'none';
+    return;
+  }
+  
+  paginationContainer.style.display = 'flex';
+  
+  if (prevBtn) prevBtn.disabled = state.currentPage === 1;
+  if (nextBtn) nextBtn.disabled = state.currentPage === totalPages;
+  
+  const pageNumbers = generatePageNumbers(state.currentPage, totalPages);
+  
+  paginationNumbers.innerHTML = pageNumbers.map(page => {
+    if (page === '...') {
+      return '<span class="ellipsis">...</span>';
+    }
+    
+    const isActive = page === state.currentPage;
+    return `<button class="page-number ${isActive ? 'active' : ''}" data-page="${page}">${page}</button>`;
+  }).join('');
+  
+  paginationNumbers.querySelectorAll('.page-number').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const page = parseInt(btn.dataset.page);
+      goToPage(page);
+    });
+  });
+}
+
+// Generate page numbers
+function generatePageNumbers(currentPage, totalPages) {
+  const pages = [];
+  const maxVisible = 7;
+  
+  if (totalPages <= maxVisible) {
+    for (let i = 1; i <= totalPages; i++) {
+      pages.push(i);
+    }
+  } else {
+    pages.push(1);
+    
+    if (currentPage > 3) {
+      pages.push('...');
+    }
+    
+    const start = Math.max(2, currentPage - 1);
+    const end = Math.min(totalPages - 1, currentPage + 1);
+    
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    
+    if (currentPage < totalPages - 2) {
+      pages.push('...');
+    }
+    
+    pages.push(totalPages);
+  }
+  
+  return pages;
+}
+
+// Go to page
+function goToPage(page) {
+  state.currentPage = page;
+  renderCreditCards();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // Update KPIs
 function updateKPIs() {
-  const totalCards = creditCards.length;
-  const totalLimit = creditCards.reduce((sum, card) => sum + (card.creditLimit || 0), 0);
-  const totalSpent = creditCards.reduce((sum, card) => sum + (card.currentBalance || 0), 0);
-  const totalRewards = creditCards.reduce((sum, card) => sum + (card.rewardsBalance || 0), 0);
-
   const totalCardsEl = document.getElementById('totalCards');
   const totalLimitEl = document.getElementById('totalLimit');
   const totalSpentEl = document.getElementById('totalSpent');
   const totalRewardsEl = document.getElementById('totalRewards');
 
-  if (totalCardsEl) totalCardsEl.textContent = totalCards;
+  if (totalCardsEl) totalCardsEl.textContent = state.allDataKPI.totalCards;
   if (totalLimitEl) {
-    totalLimitEl.textContent = formatCurrencyCompact(totalLimit);
-    totalLimitEl.title = formatCurrency(totalLimit); // Tooltip with full amount
+    totalLimitEl.textContent = formatCurrencyCompact(state.allDataKPI.totalLimit);
+    totalLimitEl.title = formatCurrency(state.allDataKPI.totalLimit);
   }
   if (totalSpentEl) {
-    totalSpentEl.textContent = formatCurrencyCompact(totalSpent);
-    totalSpentEl.title = formatCurrency(totalSpent); // Tooltip with full amount
+    totalSpentEl.textContent = formatCurrencyCompact(state.allDataKPI.totalSpent);
+    totalSpentEl.title = formatCurrency(state.allDataKPI.totalSpent);
   }
-  if (totalRewardsEl) totalRewardsEl.textContent = totalRewards.toLocaleString();
-}
-
-// Open card form
-function openCardForm(cardId = null) {
-  const formSection = document.getElementById('addCardSection');
-  const formTitle = document.getElementById('formTitle');
-  const form = document.getElementById('cardForm');
-
-  editingCardId = cardId;
-
-  if (cardId) {
-    const card = creditCards.find(c => c.id === cardId);
-    if (card) {
-      formTitle.textContent = 'Edit Credit Card';
-      document.getElementById('cardName').value = card.cardName || '';
-      document.getElementById('bankName').value = card.bankName || '';
-      document.getElementById('cardType').value = card.cardType || '';
-      document.getElementById('lastFourDigits').value = card.lastFourDigits || '';
-      document.getElementById('creditLimit').value = card.creditLimit || '';
-      document.getElementById('currentBalance').value = card.currentBalance || 0;
-      document.getElementById('billingDate').value = card.billingDate || '';
-      document.getElementById('dueDate').value = card.dueDate || '';
-      document.getElementById('rewardsProgram').value = card.rewardsProgram || '';
-      document.getElementById('rewardsBalance').value = card.rewardsBalance || 0;
-      document.getElementById('annualFee').value = card.annualFee || 0;
-      document.getElementById('notes').value = card.notes || '';
-    }
-  } else {
-    formTitle.textContent = 'Add Credit Card';
-    form.reset();
-  }
-
-  formSection.classList.add('show');
-  formSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-}
-
-// Close card form
-function closeCardForm() {
-  document.getElementById('addCardSection').classList.remove('show');
-  document.getElementById('cardForm').reset();
-  editingCardId = null;
-}
-
-// Handle card submit
-async function handleCardSubmit(e) {
-  e.preventDefault();
-
-  const saveBtn = document.getElementById('saveBtn');
-  const originalText = saveBtn.textContent;
-
-  try {
-    saveBtn.disabled = true;
-    saveBtn.textContent = 'Saving...';
-
-    const cardData = {
-      cardName: document.getElementById('cardName').value,
-      bankName: document.getElementById('bankName').value,
-      cardType: document.getElementById('cardType').value,
-      lastFourDigits: document.getElementById('lastFourDigits').value,
-      creditLimit: parseFloat(document.getElementById('creditLimit').value),
-      currentBalance: parseFloat(document.getElementById('currentBalance').value) || 0,
-      billingDate: parseInt(document.getElementById('billingDate').value) || null,
-      dueDate: parseInt(document.getElementById('dueDate').value) || null,
-      rewardsProgram: document.getElementById('rewardsProgram').value || null,
-      rewardsBalance: parseFloat(document.getElementById('rewardsBalance').value) || 0,
-      annualFee: parseFloat(document.getElementById('annualFee').value) || 0,
-      notes: document.getElementById('notes').value || null,
-      userId: currentUser.uid
-    };
-
-    if (editingCardId) {
-      await firestoreService.update('creditCards', editingCardId, cardData);
-      toast.success('Credit card updated successfully');
-    } else {
-      await firestoreService.add('creditCards', cardData);
-      toast.success('Credit card added successfully');
-    }
-
-    closeCardForm();
-    await loadCreditCards();
-  } catch (error) {
-    console.error('Error saving credit card:', error);
-    toast.error('Failed to save credit card');
-  } finally {
-    saveBtn.disabled = false;
-    saveBtn.textContent = originalText;
-  }
+  if (totalRewardsEl) totalRewardsEl.textContent = state.allDataKPI.totalRewards.toLocaleString();
 }
 
 // Edit card
@@ -332,6 +391,40 @@ async function confirmDelete() {
     confirmBtn.disabled = false;
     confirmBtn.textContent = originalText;
   }
+}
+
+// Open card form
+function openCardForm(cardId = null) {
+  const formSection = document.getElementById('addCardSection');
+  const formTitle = document.getElementById('formTitle');
+  const form = document.getElementById('cardForm');
+
+  editingCardId = cardId;
+
+  if (cardId) {
+    const card = state.creditCards.find(c => c.id === cardId);
+    if (card) {
+      formTitle.textContent = 'Edit Credit Card';
+      document.getElementById('cardName').value = card.cardName || '';
+      document.getElementById('bankName').value = card.bankName || '';
+      document.getElementById('cardType').value = card.cardType || '';
+      document.getElementById('lastFourDigits').value = card.lastFourDigits || '';
+      document.getElementById('creditLimit').value = card.creditLimit || '';
+      document.getElementById('currentBalance').value = card.currentBalance || 0;
+      document.getElementById('billingDate').value = card.billingDate || '';
+      document.getElementById('dueDate').value = card.dueDate || '';
+      document.getElementById('rewardsProgram').value = card.rewardsProgram || '';
+      document.getElementById('rewardsBalance').value = card.rewardsBalance || 0;
+      document.getElementById('annualFee').value = card.annualFee || 0;
+      document.getElementById('notes').value = card.notes || '';
+    }
+  } else {
+    formTitle.textContent = 'Add Credit Card';
+    form.reset();
+  }
+
+  formSection.classList.add('show');
+  formSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 // Initialize on page load

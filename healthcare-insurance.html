@@ -431,6 +431,25 @@
 
           <!-- Policies Grid -->
           <div class="policies-grid" id="policiesGrid"></div>
+
+          <!-- Pagination for Insurance Policies -->
+          <div class="pagination-container" id="policiesPaginationContainer" style="display: none;">
+            <button class="btn btn-outline btn-pagination" id="policiesPrevPageBtn" disabled>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+              </svg>
+              Prev
+            </button>
+            <div class="pagination-numbers" id="policiesPaginationNumbers">
+              <!-- Page numbers will be dynamically generated -->
+            </div>
+            <button class="btn btn-outline btn-pagination" id="policiesNextPageBtn">
+              Next
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -463,10 +482,22 @@
           <!-- Expenses List -->
           <div class="expenses-list" id="expensesList"></div>
           
-          <!-- Load More Button -->
-          <div style="text-align: center; margin-top: 2rem;">
-            <button class="btn btn-outline" id="loadMoreExpensesBtn" style="display: none;">
-              Load More
+          <!-- Pagination for Medical Expenses -->
+          <div class="pagination-container" id="expensesPaginationContainer" style="display: none;">
+            <button class="btn btn-outline btn-pagination" id="expensesPrevPageBtn" disabled>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+              </svg>
+              Prev
+            </button>
+            <div class="pagination-numbers" id="expensesPaginationNumbers">
+              <!-- Page numbers will be dynamically generated -->
+            </div>
+            <button class="btn btn-outline btn-pagination" id="expensesNextPageBtn">
+              Next
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
             </button>
           </div>
         </div>

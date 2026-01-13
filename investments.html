@@ -471,6 +471,25 @@
           <div class="spinner-lg"></div>
           <p>Loading investments...</p>
         </div>
+
+        <!-- Pagination -->
+        <div class="pagination-container" id="paginationContainer" style="display: none;">
+          <button class="btn btn-outline btn-pagination" id="prevPageBtn" disabled>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+            Prev
+          </button>
+          <div class="pagination-numbers" id="paginationNumbers">
+            <!-- Page numbers will be dynamically generated -->
+          </div>
+          <button class="btn btn-outline btn-pagination" id="nextPageBtn">
+            Next
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+          </button>
+        </div>
       </div>
     </main>
   </div>

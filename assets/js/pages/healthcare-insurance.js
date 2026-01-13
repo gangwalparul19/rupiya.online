@@ -8,8 +8,24 @@ import { formatCurrency, formatCurrencyCompact, formatDate } from '../utils/help
 import encryptionReauthModal from '../components/encryption-reauth-modal.js';
 
 // State
-let policies = [];
-let expenses = [];
+const state = {
+  policies: [],
+  filteredPolicies: [],
+  policiesCurrentPage: 1,
+  policiesItemsPerPage: 10,
+  policiesTotalCount: 0,
+  expenses: [],
+  filteredExpenses: [],
+  expensesCurrentPage: 1,
+  expensesItemsPerPage: 10,
+  expensesTotalCount: 0,
+  allDataKPI: {
+    totalPolicies: 0,
+    activePolicies: 0,
+    totalPremium: 0,
+    totalExpenses: 0
+  }
+};
 let currentUser = null;
 let editingPolicyId = null;
 let editingExpenseId = null;
@@ -116,6 +132,52 @@ function setupEventListeners() {
   document.getElementById('closeDeleteModal')?.addEventListener('click', closeDeleteModal);
   document.getElementById('cancelDeleteBtn')?.addEventListener('click', closeDeleteModal);
   document.getElementById('confirmDeleteBtn')?.addEventListener('click', confirmDelete);
+  
+  // Policies pagination buttons
+  const policiesPrevBtn = document.getElementById('policiesPrevPageBtn');
+  const policiesNextBtn = document.getElementById('policiesNextPageBtn');
+  
+  if (policiesPrevBtn) {
+    policiesPrevBtn.addEventListener('click', () => {
+      if (state.policiesCurrentPage > 1) {
+        goToPoliciesPage(state.policiesCurrentPage - 1);
+      }
+    });
+  }
+  
+  if (policiesNextBtn) {
+    policiesNextBtn.addEventListener('click', () => {
+      const totalRecords = state.filteredPolicies.length;
+      const totalPages = Math.ceil(totalRecords / state.policiesItemsPerPage);
+      
+      if (state.policiesCurrentPage < totalPages) {
+        goToPoliciesPage(state.policiesCurrentPage + 1);
+      }
+    });
+  }
+  
+  // Expenses pagination buttons
+  const expensesPrevBtn = document.getElementById('expensesPrevPageBtn');
+  const expensesNextBtn = document.getElementById('expensesNextPageBtn');
+  
+  if (expensesPrevBtn) {
+    expensesPrevBtn.addEventListener('click', () => {
+      if (state.expensesCurrentPage > 1) {
+        goToExpensesPage(state.expensesCurrentPage - 1);
+      }
+    });
+  }
+  
+  if (expensesNextBtn) {
+    expensesNextBtn.addEventListener('click', () => {
+      const totalRecords = state.filteredExpenses.length;
+      const totalPages = Math.ceil(totalRecords / state.expensesItemsPerPage);
+      
+      if (state.expensesCurrentPage < totalPages) {
+        goToExpensesPage(state.expensesCurrentPage + 1);
+      }
+    });
+  }
 }
 
 // Switch tab
@@ -130,6 +192,22 @@ function switchTab(tabName) {
 // Load data
 async function loadData() {
   await Promise.all([loadPolicies(), loadExpenses(true)]);
+  calculateKPISummary();
+  updateKPIs();
+}
+
+// Calculate KPI summary
+function calculateKPISummary() {
+  const activePolicies = state.policies.filter(p => p.status === 'active').length;
+  const totalPremium = state.policies.reduce((sum, p) => sum + (parseFloat(p.premiumAmount) || 0), 0);
+  const totalExpenses = state.expenses.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+  
+  state.allDataKPI = {
+    totalPolicies: state.policies.length,
+    activePolicies,
+    totalPremium,
+    totalExpenses
+  };
 }
 
 // Load policies
@@ -143,9 +221,14 @@ async function loadPolicies() {
     emptyState.style.display = 'none';
     policiesGrid.style.display = 'none';
 
-    policies = await firestoreService.getAll('insurancePolicies', 'createdAt', 'desc');
+    const allPolicies = await firestoreService.getAll('insurancePolicies', 'createdAt', 'desc');
+    
+    state.policies = allPolicies;
+    state.filteredPolicies = [...allPolicies];
+    state.policiesTotalCount = allPolicies.length;
+    state.policiesCurrentPage = 1;
 
-    if (policies.length === 0) {
+    if (state.filteredPolicies.length === 0) {
       loadingState.style.display = 'none';
       emptyState.style.display = 'flex';
     } else {
@@ -164,11 +247,26 @@ async function loadPolicies() {
 // Render policies
 function renderPolicies() {
   const policiesGrid = document.getElementById('policiesGrid');
+  const policiesPaginationContainer = document.getElementById('policiesPaginationContainer');
   if (!policiesGrid) return;
 
-  const now = new Date();
+  if (state.filteredPolicies.length === 0) {
+    policiesGrid.innerHTML = '';
+    if (policiesPaginationContainer) policiesPaginationContainer.style.display = 'none';
+    return;
+  }
 
-  policiesGrid.innerHTML = policies.map(policy => {
+  const now = new Date();
+  
+  // Calculate pagination
+  const totalRecords = state.filteredPolicies.length;
+  const totalPages = Math.ceil(totalRecords / state.policiesItemsPerPage);
+  
+  const startIndex = (state.policiesCurrentPage - 1) * state.policiesItemsPerPage;
+  const endIndex = startIndex + state.policiesItemsPerPage;
+  const pagePolicies = state.filteredPolicies.slice(startIndex, endIndex);
+
+  policiesGrid.innerHTML = pagePolicies.map(policy => {
     const endDate = new Date(policy.endDate);
     const daysUntilExpiry = Math.ceil((endDate - now) / (1000 * 60 * 60 * 24));
     const isExpiringSoon = daysUntilExpiry <= 30 && daysUntilExpiry > 0;
@@ -240,14 +338,61 @@ function renderPolicies() {
       </div>
     `;
   }).join('');
+  
+  renderPoliciesPagination(totalPages);
+}
+
+// Render policies pagination
+function renderPoliciesPagination(totalPages) {
+  const paginationContainer = document.getElementById('policiesPaginationContainer');
+  const paginationNumbers = document.getElementById('policiesPaginationNumbers');
+  const prevBtn = document.getElementById('policiesPrevPageBtn');
+  const nextBtn = document.getElementById('policiesNextPageBtn');
+  
+  if (!paginationContainer || !paginationNumbers) return;
+  
+  if (totalPages <= 1) {
+    paginationContainer.style.display = 'none';
+    return;
+  }
+  
+  paginationContainer.style.display = 'flex';
+  
+  if (prevBtn) prevBtn.disabled = state.policiesCurrentPage === 1;
+  if (nextBtn) nextBtn.disabled = state.policiesCurrentPage === totalPages;
+  
+  const pageNumbers = generatePageNumbers(state.policiesCurrentPage, totalPages);
+  
+  paginationNumbers.innerHTML = pageNumbers.map(page => {
+    if (page === '...') {
+      return '<span class="ellipsis">...</span>';
+    }
+    
+    const isActive = page === state.policiesCurrentPage;
+    return `<button class="page-number ${isActive ? 'active' : ''}" data-page="${page}">${page}</button>`;
+  }).join('');
+  
+  paginationNumbers.querySelectorAll('.page-number').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const page = parseInt(btn.dataset.page);
+      goToPoliciesPage(page);
+    });
+  });
+}
+
+// Go to policies page
+function goToPoliciesPage(page) {
+  state.policiesCurrentPage = page;
+  renderPolicies();
+  document.getElementById('policiesTab')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // Update policy KPIs
 function updatePolicyKPIs() {
   const now = new Date();
-  const activePolicies = policies.filter(p => new Date(p.endDate) > now).length;
-  const totalCoverage = policies.reduce((sum, p) => sum + (p.coverageAmount || 0), 0);
-  const policiesWithDocuments = policies.filter(p => p.fileUrl).length;
+  const activePolicies = state.policies.filter(p => new Date(p.endDate) > now).length;
+  const totalCoverage = state.policies.reduce((sum, p) => sum + (p.coverageAmount || 0), 0);
+  const policiesWithDocuments = state.policies.filter(p => p.fileUrl).length;
 
   const activePoliciesEl = document.getElementById('activePolicies');
   const totalCoverageEl = document.getElementById('totalCoverage');
@@ -270,53 +415,41 @@ async function loadExpenses(reset = true) {
     const loadingState = document.getElementById('expensesLoadingState');
     const emptyState = document.getElementById('expensesEmptyState');
     const expensesList = document.getElementById('expensesList');
-    const loadMoreBtn = document.getElementById('loadMoreExpensesBtn');
 
     if (reset) {
       // Initial load
       loadingState.style.display = 'flex';
       emptyState.style.display = 'none';
       expensesList.style.display = 'none';
-      if (loadMoreBtn) loadMoreBtn.style.display = 'none';
       
-      expenses = [];
+      state.expenses = [];
+      state.filteredExpenses = [];
       lastExpenseDoc = null;
       hasMoreExpenses = true;
-    } else {
-      // Loading more - show loading indicator on button
-      if (loadMoreBtn) {
-        loadMoreBtn.disabled = true;
-        loadMoreBtn.textContent = 'Loading...';
-      }
+      state.expensesCurrentPage = 1;
     }
 
     const result = await firestoreService.getPaginated('healthcareExpenses', {
       orderByField: 'date',
       orderDirection: 'desc',
-      pageSize: 20,
+      pageSize: 50, // Load more at once for pagination
       lastDoc: lastExpenseDoc
     });
 
     if (result.data.length > 0) {
-      expenses = reset ? result.data : [...expenses, ...result.data];
+      state.expenses = reset ? result.data : [...state.expenses, ...result.data];
+      state.filteredExpenses = [...state.expenses];
+      state.expensesTotalCount = state.expenses.length;
       lastExpenseDoc = result.lastDoc;
       hasMoreExpenses = result.hasMore;
       
       loadingState.style.display = 'none';
       expensesList.style.display = 'block';
       renderExpenses();
-      
-      // Show/hide load more button
-      if (loadMoreBtn) {
-        loadMoreBtn.style.display = hasMoreExpenses ? 'block' : 'none';
-        loadMoreBtn.disabled = false;
-        loadMoreBtn.textContent = 'Load More';
-      }
     } else if (reset) {
       // No expenses at all
       loadingState.style.display = 'none';
       emptyState.style.display = 'flex';
-      if (loadMoreBtn) loadMoreBtn.style.display = 'none';
     }
 
     if (reset) {
@@ -333,7 +466,14 @@ async function loadExpenses(reset = true) {
 // Render expenses
 function renderExpenses() {
   const expensesList = document.getElementById('expensesList');
+  const expensesPaginationContainer = document.getElementById('expensesPaginationContainer');
   if (!expensesList) return;
+
+  if (state.filteredExpenses.length === 0) {
+    expensesList.innerHTML = '';
+    if (expensesPaginationContainer) expensesPaginationContainer.style.display = 'none';
+    return;
+  }
 
   const categoryIcons = {
     'Doctor Visit': '👨‍⚕️',
@@ -345,8 +485,16 @@ function renderExpenses() {
     'Therapy': '🧘',
     'Other': '📋'
   };
+  
+  // Calculate pagination
+  const totalRecords = state.filteredExpenses.length;
+  const totalPages = Math.ceil(totalRecords / state.expensesItemsPerPage);
+  
+  const startIndex = (state.expensesCurrentPage - 1) * state.expensesItemsPerPage;
+  const endIndex = startIndex + state.expensesItemsPerPage;
+  const pageExpenses = state.filteredExpenses.slice(startIndex, endIndex);
 
-  expensesList.innerHTML = expenses.map(expense => `
+  expensesList.innerHTML = pageExpenses.map(expense => `
     <div class="expense-item">
       <div class="expense-info">
         <div class="expense-header">
@@ -375,17 +523,17 @@ function updateExpenseKPIs() {
   const currentMonth = now.getMonth();
   const currentYear = now.getFullYear();
 
-  const thisMonth = expenses.filter(e => {
+  const thisMonth = state.expenses.filter(e => {
     const date = new Date(e.date);
     return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
   }).reduce((sum, e) => sum + e.amount, 0);
 
-  const lastMonth = expenses.filter(e => {
+  const lastMonth = state.expenses.filter(e => {
     const date = new Date(e.date);
     return date.getMonth() === currentMonth - 1 && date.getFullYear() === currentYear;
   }).reduce((sum, e) => sum + e.amount, 0);
 
-  const thisYear = expenses.filter(e => {
+  const thisYear = state.expenses.filter(e => {
     const date = new Date(e.date);
     return date.getFullYear() === currentYear;
   }).reduce((sum, e) => sum + e.amount, 0);
@@ -471,7 +619,7 @@ function openPolicyForm(policyId = null) {
   editingPolicyId = policyId;
 
   if (policyId) {
-    const policy = policies.find(p => p.id === policyId);
+    const policy = state.policies.find(p => p.id === policyId);
     if (policy) {
       formTitle.textContent = 'Edit Insurance Policy';
       document.getElementById('policyName').value = policy.policyName || '';
@@ -587,7 +735,7 @@ async function handlePolicySubmit(e) {
     if (editingPolicyId) {
       // If editing and new file uploaded, delete old file
       if (fileUrl) {
-        const oldPolicy = policies.find(p => p.id === editingPolicyId);
+        const oldPolicy = state.policies.find(p => p.id === editingPolicyId);
         if (oldPolicy && oldPolicy.filePath) {
           await storageService.deleteFile(oldPolicy.filePath);
         }
@@ -631,7 +779,7 @@ function openExpenseForm(expenseId = null) {
   editingExpenseId = expenseId;
 
   if (expenseId) {
-    const expense = expenses.find(e => e.id === expenseId);
+    const expense = state.expenses.find(e => e.id === expenseId);
     if (expense) {
       formTitle.textContent = 'Edit Medical Expense';
       document.getElementById('expenseCategory').value = expense.category || '';

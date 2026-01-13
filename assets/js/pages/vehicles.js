@@ -14,9 +14,19 @@ import encryptionReauthModal from '../components/encryption-reauth-modal.js';
 const showToast = (message, type) => toast.show(message, type);
 
 // State
-let vehicles = [];
-let fuelLogs = [];
-let editingVehicleId = null;
+const state = {
+  vehicles: [],
+  filteredVehicles: [],
+  fuelLogs: [],
+  editingVehicleId: null,
+  currentPage: 1,
+  itemsPerPage: 10,
+  totalCount: 0,
+  allDataKPI: {
+    totalVehicles: 0,
+    avgMileage: 0
+  }
+};
 
 // DOM Elements
 let addVehicleBtn, addVehicleSection, closeFormBtn, cancelFormBtn;
@@ -158,6 +168,29 @@ function setupEventListeners() {
   document.getElementById('closeVehicleIncomeModalBtn')?.addEventListener('click', hideVehicleIncomeModal);
   document.getElementById('cancelVehicleIncomeBtn')?.addEventListener('click', hideVehicleIncomeModal);
   document.getElementById('saveVehicleIncomeBtn')?.addEventListener('click', handleSaveVehicleIncome);
+  
+  // Pagination buttons
+  const prevPageBtn = document.getElementById('prevPageBtn');
+  const nextPageBtn = document.getElementById('nextPageBtn');
+
+  if (prevPageBtn) {
+    prevPageBtn.addEventListener('click', () => {
+      if (state.currentPage > 1) {
+        goToPage(state.currentPage - 1);
+      }
+    });
+  }
+
+  if (nextPageBtn) {
+    nextPageBtn.addEventListener('click', () => {
+      const totalRecords = state.filteredVehicles.length;
+      const totalPages = Math.ceil(totalRecords / state.itemsPerPage);
+      
+      if (state.currentPage < totalPages) {
+        goToPage(state.currentPage + 1);
+      }
+    });
+  }
 }
 
 function loadUserProfile(user) {
@@ -266,9 +299,17 @@ async function loadVehicles() {
   try {
     // Load both vehicles and fuel logs
     await loadFuelLogs();
-    vehicles = await firestoreService.getAll('vehicles', 'createdAt', 'desc');
+    const allVehicles = await firestoreService.getAll('vehicles', 'createdAt', 'desc');
     
-    if (vehicles.length === 0) {
+    state.vehicles = allVehicles;
+    state.filteredVehicles = [...allVehicles];
+    state.totalCount = allVehicles.length;
+    
+    calculateKPISummary();
+    
+    state.currentPage = 1;
+    
+    if (state.filteredVehicles.length === 0) {
       emptyState.style.display = 'block';
     } else {
       renderVehicles();
@@ -284,8 +325,38 @@ async function loadVehicles() {
   }
 }
 
+function calculateKPISummary() {
+  const totalMileage = state.fuelLogs.reduce((sum, log) => sum + (log.mileage || 0), 0);
+  const avgMileage = state.fuelLogs.length > 0 ? totalMileage / state.fuelLogs.length : 0;
+  
+  state.allDataKPI = {
+    totalVehicles: state.vehicles.length,
+    avgMileage: avgMileage
+  };
+}
+
 function renderVehicles() {
-  vehiclesList.innerHTML = vehicles.map(vehicle => {
+  const paginationContainer = document.getElementById('paginationContainer');
+  
+  if (state.filteredVehicles.length === 0) {
+    vehiclesList.style.display = 'none';
+    emptyState.style.display = 'block';
+    if (paginationContainer) paginationContainer.style.display = 'none';
+    return;
+  }
+  
+  vehiclesList.style.display = 'grid';
+  emptyState.style.display = 'none';
+  
+  // Calculate pagination
+  const totalRecords = state.filteredVehicles.length;
+  const totalPages = Math.ceil(totalRecords / state.itemsPerPage);
+  
+  const startIndex = (state.currentPage - 1) * state.itemsPerPage;
+  const endIndex = startIndex + state.itemsPerPage;
+  const pageVehicles = state.filteredVehicles.slice(startIndex, endIndex);
+  
+  vehiclesList.innerHTML = pageVehicles.map(vehicle => {
     // Check insurance expiry
     let insuranceStatus = '';
     if (vehicle.insuranceExpiry) {
@@ -303,7 +374,7 @@ function renderVehicles() {
     }
 
     // Get vehicle mileage stats
-    const vehicleFuelLogs = fuelLogs.filter(log => log.vehicleId === vehicle.id);
+    const vehicleFuelLogs = state.fuelLogs.filter(log => log.vehicleId === vehicle.id);
     const mileageStats = calculateVehicleMileage(vehicleFuelLogs);
 
     // Escape user-provided data (handle undefined/null values from decryption failures)
@@ -382,10 +453,91 @@ function renderVehicles() {
       </div>
     `;
   }).join('');
+  
+  // Render pagination
+  renderPagination(totalPages);
+}
+
+// Render pagination with numbered pages
+function renderPagination(totalPages) {
+  const paginationContainer = document.getElementById('paginationContainer');
+  const paginationNumbers = document.getElementById('paginationNumbers');
+  const prevBtn = document.getElementById('prevPageBtn');
+  const nextBtn = document.getElementById('nextPageBtn');
+  
+  if (!paginationContainer || !paginationNumbers) return;
+  
+  if (totalPages <= 1) {
+    paginationContainer.style.display = 'none';
+    return;
+  }
+  
+  paginationContainer.style.display = 'flex';
+  
+  if (prevBtn) prevBtn.disabled = state.currentPage === 1;
+  if (nextBtn) nextBtn.disabled = state.currentPage === totalPages;
+  
+  const pageNumbers = generatePageNumbers(state.currentPage, totalPages);
+  
+  paginationNumbers.innerHTML = pageNumbers.map(page => {
+    if (page === '...') {
+      return '<span class="ellipsis">...</span>';
+    }
+    
+    const isActive = page === state.currentPage;
+    return `<button class="page-number ${isActive ? 'active' : ''}" data-page="${page}">${page}</button>`;
+  }).join('');
+  
+  paginationNumbers.querySelectorAll('.page-number').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const page = parseInt(btn.dataset.page);
+      goToPage(page);
+    });
+  });
+}
+
+// Generate page numbers with ellipsis
+function generatePageNumbers(currentPage, totalPages) {
+  const pages = [];
+  const maxVisible = 7;
+  
+  if (totalPages <= maxVisible) {
+    for (let i = 1; i <= totalPages; i++) {
+      pages.push(i);
+    }
+  } else {
+    pages.push(1);
+    
+    if (currentPage > 3) {
+      pages.push('...');
+    }
+    
+    const start = Math.max(2, currentPage - 1);
+    const end = Math.min(totalPages - 1, currentPage + 1);
+    
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    
+    if (currentPage < totalPages - 2) {
+      pages.push('...');
+    }
+    
+    pages.push(totalPages);
+  }
+  
+  return pages;
+}
+
+// Go to specific page
+function goToPage(page) {
+  state.currentPage = page;
+  renderVehicles();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function updateSummary() {
-  const totalVehicles = vehicles.length;
+  const totalVehicles = state.vehicles.length;
   totalVehiclesEl.textContent = totalVehicles;
   
   // Calculate overall stats from fuel logs
@@ -496,7 +648,7 @@ function calculateOverallMileageStats() {
 async function calculateVehicleExpenses(vehicleId) {
   try {
     // Get fuel expenses for this vehicle
-    const vehicleFuelLogs = fuelLogs.filter(log => log.vehicleId === vehicleId);
+    const vehicleFuelLogs = state.fuelLogs.filter(log => log.vehicleId === vehicleId);
     const fuelStats = calculateVehicleMileage(vehicleFuelLogs);
     let totalExpense = fuelStats.totalFuelCost;
     
@@ -540,7 +692,7 @@ async function loadFuelLogs() {
     const rawFuelLogs = await firestoreService.getAll('fuelLogs', 'createdAt', 'desc');
     
     // Decrypt vehicleId for each fuel log
-    fuelLogs = await Promise.all(rawFuelLogs.map(async (log) => {
+    state.fuelLogs = await Promise.all(rawFuelLogs.map(async (log) => {
       try {
         // Decrypt the vehicleId if it's encrypted
         const decryptedVehicleId = await encryptionService.decryptValue(log.vehicleId);
@@ -556,7 +708,7 @@ async function loadFuelLogs() {
     }));
   } catch (error) {
     console.error('Error loading fuel logs:', error);
-    fuelLogs = [];
+    state.fuelLogs = [];
   }
 }
 
@@ -614,7 +766,7 @@ async function handleSaveFuelLog() {
   }
 
   // Check odometer is greater than vehicle's current reading
-  const vehicle = vehicles.find(v => v.id === vehicleId);
+  const vehicle = state.vehicles.find(v => v.id === vehicleId);
   if (vehicle && odometerReading < vehicle.currentMileage) {
     showToast('Odometer reading must be greater than current reading', 'error');
     return;
@@ -696,7 +848,7 @@ async function showMileageHistory(vehicleId, vehicleName) {
   await loadFuelLogs();
   
   // Get fuel logs for this vehicle
-  const vehicleFuelLogs = fuelLogs.filter(log => log.vehicleId === vehicleId);
+  const vehicleFuelLogs = state.fuelLogs.filter(log => log.vehicleId === vehicleId);
   const stats = calculateVehicleMileage(vehicleFuelLogs);
   
   // Calculate total expenses for this vehicle (fuel + maintenance + income)
@@ -952,7 +1104,7 @@ async function handleSaveVehicleIncome() {
 }
 
 function showDeleteConfirmation(id) {
-  const vehicle = vehicles.find(v => v.id === id);
+  const vehicle = state.vehicles.find(v => v.id === id);
   if (!vehicle) return;
 
   deleteVehicleId = id;
@@ -994,7 +1146,7 @@ async function handleDelete() {
 }
 
 function editVehicle(id) {
-  const vehicle = vehicles.find(v => v.id === id);
+  const vehicle = state.vehicles.find(v => v.id === id);
   if (vehicle) showEditForm(vehicle);
 }
 

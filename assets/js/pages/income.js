@@ -36,9 +36,15 @@ const state = {
   selectedIncome: new Set(),
   bulkMode: false,
   totalCount: 0,
+  filteredCount: 0,
   lastDoc: null,
   hasMore: true,
-  loadingMore: false
+  loadingMore: false,
+  allIncomeKPI: {
+    thisMonth: 0,
+    lastMonth: 0,
+    total: 0
+  }
 };
 
 // Pagination instance
@@ -326,42 +332,71 @@ async function loadIncome() {
     emptyState.style.display = 'none';
     incomeList.style.display = 'none';
     
-    // Personal mode only - family mode has been removed
-    const isFamilyMode = false;
+    console.log('[LoadIncome] Starting to load income');
     
-    // Fetch user's income
+    // Get KPI summary for ALL income (unfiltered)
     const kpiSummary = await firestoreService.getIncomeKPISummary();
+    state.allIncomeKPI = {
+      thisMonth: kpiSummary.thisMonth,
+      lastMonth: kpiSummary.lastMonth,
+      total: kpiSummary.totalCount
+    };
+    
     state.totalCount = kpiSummary.totalCount;
+    
+    console.log('[LoadIncome] Total income in DB:', state.totalCount);
+    
+    // Update KPI cards with all income
+    updateIncomeKPIsFromSummary(kpiSummary);
     
     // Build filters array for Firestore query
     const filters = buildFirestoreFilters();
     
-    // Load paginated income with server-side filtering
-    const result = await firestoreService.getIncomePaginated({ 
-      pageSize: state.itemsPerPage, // Only load what we need (not 5x)
-      filters: filters
-    });
-    state.income = result.data;
-    state.lastDoc = result.lastDoc;
-    state.hasMore = result.hasMore;
+    // Check if filters are applied
+    const hasFilters = filters.length > 0 || 
+                       state.filters.search || 
+                       state.filters.familyMember || 
+                       state.filters.dateFrom || 
+                       state.filters.dateTo;
     
-    // Update KPI cards
-    updateIncomeKPIsFromSummary(kpiSummary);
+    console.log('[LoadIncome] Has filters:', hasFilters);
     
-    // Initialize pagination if not already done
-    if (!pagination) {
-      pagination = new Pagination({
-        pageSize: state.itemsPerPage,
-        containerId: 'paginationContainer',
-        onPageChange: handlePageChange
+    if (hasFilters) {
+      // With filters: Load ALL filtered data (usually smaller dataset)
+      const result = await firestoreService.getIncomePaginated({ 
+        pageSize: 1000,
+        filters: filters
       });
+      
+      state.income = result.data;
+      state.filteredIncome = [...state.income];
+      applyClientSideFilters();
+      state.filteredCount = state.filteredIncome.length;
+      updateFilteredIncomeKPIs();
+    } else {
+      // No filters: Load initial batch (50 records for first 5 pages)
+      const initialBatchSize = state.itemsPerPage * 5; // 50 records
+      const result = await firestoreService.getIncomePaginated({ 
+        pageSize: initialBatchSize,
+        filters: filters
+      });
+      
+      console.log('[LoadIncome] Loaded initial batch:', result.data.length);
+      
+      state.income = result.data;
+      state.lastDoc = result.lastDoc;
+      state.hasMore = result.hasMore;
+      state.filteredIncome = [...state.income];
+      state.filteredCount = state.totalCount;
     }
     
-    pagination.setTotal(state.totalCount);
+    console.log('[LoadIncome] Income in memory:', state.income.length);
     
-    // Apply only client-side filters (search, family member, date range)
-    state.filteredIncome = [...state.income];
-    applyClientSideFilters();
+    // Reset to page 1
+    state.currentPage = 1;
+    
+    // Render income
+    renderIncome();
     
   } catch (error) {
     console.error('Error loading income:', error);
@@ -370,27 +405,115 @@ async function loadIncome() {
   }
 }
 
-// Load more income when user scrolls or filters require more data
-async function loadMoreIncome() {
-  if (state.loadingMore) return;
+// Load more income when user navigates to a page that needs more data
+async function loadMoreIncomeIfNeeded(targetPage) {
+  const requiredIndex = targetPage * state.itemsPerPage;
+  
+  // Check if we have enough data loaded
+  if (requiredIndex <= state.income.length) {
+    console.log('[LoadMore] Already have enough data');
+    return true; // We have enough data
+  }
+  
+  // Check if there's more data to load
+  if (!state.hasMore) {
+    console.log('[LoadMore] No more data available');
+    return false; // No more data available
+  }
+  
+  // Check if already loading
+  if (state.loadingMore) {
+    console.log('[LoadMore] Already loading');
+    return false;
+  }
   
   try {
     state.loadingMore = true;
+    console.log('[LoadMore] Loading more data...');
+    
+    // Show loading indicator
+    const loadingToast = toast.info('Loading more income...', { duration: 0 });
+    
+    // Load next batch (50 more records)
+    const batchSize = state.itemsPerPage * 5; // 50 records
     const result = await firestoreService.getIncomePaginated({
-      pageSize: state.itemsPerPage * 3,
-      lastDoc: state.lastDoc
+      pageSize: batchSize,
+      lastDoc: state.lastDoc,
+      filters: buildFirestoreFilters()
+    });
+    
+    console.log('[LoadMore] Loaded additional:', result.data.length);
+    
+    // Append new data
+    state.income = [...state.income, ...result.data];
+    state.lastDoc = result.lastDoc;
+    state.hasMore = result.hasMore;
+    state.filteredIncome = [...state.income];
+    
+    // Dismiss loading toast
+    if (loadingToast && loadingToast.dismiss) {
+      loadingToast.dismiss();
+    }
+    
+    return true;
+  } catch (error) {
+    console.error('[LoadMore] Error loading more income:', error);
+    toast.error('Failed to load more income');
+    return false;
+  } finally {
+    state.loadingMore = false;
+  }
+}
+
+// Load more income when user clicks "Load More" button
+async function loadMoreIncome() {
+  if (state.loadingMore || !state.hasMore || state.allDataLoaded) return;
+  
+  try {
+    state.loadingMore = true;
+    
+    // Show loading indicator on button
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+    if (loadMoreBtn) {
+      loadMoreBtn.disabled = true;
+      loadMoreBtn.innerHTML = '<span class="spinner"></span> Loading...';
+    }
+    
+    // Build filters array for Firestore query
+    const filters = buildFirestoreFilters();
+    
+    const result = await firestoreService.getIncomePaginated({
+      pageSize: state.itemsPerPage,
+      lastDoc: state.lastDoc,
+      filters: filters
     });
     
     if (result.data.length > 0) {
       state.income = [...state.income, ...result.data];
       state.lastDoc = result.lastDoc;
       state.hasMore = result.hasMore;
-      applyFilters();
+      
+      // Check if all data is loaded
+      if (!result.hasMore || state.income.length >= state.totalCount) {
+        state.allDataLoaded = true;
+      }
+      
+      // Apply client-side filters and re-render
+      state.filteredIncome = [...state.income];
+      applyClientSideFilters();
     }
   } catch (error) {
     console.error('Error loading more income:', error);
+    toast.error('Failed to load more income');
   } finally {
     state.loadingMore = false;
+    
+    // Reset button state
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+    if (loadMoreBtn) {
+      loadMoreBtn.disabled = false;
+      loadMoreBtn.innerHTML = 'Load More';
+    }
   }
 }
 
@@ -420,10 +543,37 @@ function updateIncomeKPIsFromSummary(summary) {
 }
 
 // Handle page change from pagination component
-function handlePageChange(page) {
+async function handlePageChange(page) {
+  await goToPage(page);
+}
+
+// Go to specific page
+async function goToPage(page) {
+  console.log('[GoToPage] Navigating to page:', page);
+  
+  // Check if we need to load more data
+  const hasEnoughData = await loadMoreIncomeIfNeeded(page);
+  
+  if (!hasEnoughData && page > Math.ceil(state.income.length / state.itemsPerPage)) {
+    console.log('[GoToPage] Not enough data for page', page);
+    toast.warning('No more income to load');
+    return;
+  }
+  
   state.currentPage = page;
   renderIncome();
   window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Check if any filters are active
+function hasActiveFilters() {
+  return state.filters.source || 
+         state.filters.paymentMethod || 
+         state.filters.specificPaymentMethod || 
+         state.filters.familyMember || 
+         state.filters.dateFrom || 
+         state.filters.dateTo || 
+         state.filters.search;
 }
 
 // Update Income KPI Cards
@@ -595,16 +745,23 @@ function applyClientSideFilters() {
   }
   
   state.filteredIncome = filtered;
+  state.filteredCount = filtered.length;
   state.currentPage = 1;
   
-  // Update pagination with filtered count
-  if (pagination) {
-    pagination.setTotal(filtered.length);
-    pagination.currentPage = 1;
+  updateCounts();
+  
+  // Update KPI cards based on filtered data
+  if (hasActiveFilters()) {
+    updateFilteredIncomeKPIs();
+  } else {
+    // No filters - show all income KPI
+    updateIncomeKPIsFromSummary({
+      thisMonth: state.allIncomeKPI.thisMonth,
+      lastMonth: state.allIncomeKPI.lastMonth,
+      totalCount: state.allIncomeKPI.total
+    });
   }
   
-  updateCounts();
-  updateFilteredIncomeKPIs();
   renderIncome();
 }
 
@@ -616,42 +773,160 @@ async function applyFilters() {
 
 // Update counts
 function updateCounts() {
-  totalCount.textContent = state.income.length;
+  totalCount.textContent = state.allIncomeKPI.total;
   displayedCount.textContent = state.filteredIncome.length;
 }
 
 // Render income
 function renderIncome() {
+  console.log('[Render] Starting render with:', {
+    incomeInMemory: state.income.length,
+    filteredCount: state.filteredIncome.length,
+    totalCount: state.totalCount,
+    currentPage: state.currentPage,
+    itemsPerPage: state.itemsPerPage
+  });
+  
   loadingState.style.display = 'none';
   
   if (state.filteredIncome.length === 0) {
+    console.log('[Render] No income to show');
     emptyState.style.display = 'flex';
     incomeList.style.display = 'none';
-    if (pagination) {
-      const container = document.getElementById('paginationContainer');
-      if (container) container.style.display = 'none';
-    }
+    const paginationContainer = document.getElementById('paginationContainer');
+    if (paginationContainer) paginationContainer.style.display = 'none';
     return;
   }
   
   emptyState.style.display = 'none';
   incomeList.style.display = 'grid';
   
-  // Calculate pagination
+  // Calculate pagination based on total count (not just loaded data)
+  const hasFilters = state.filters.source || 
+                     state.filters.paymentMethod || 
+                     state.filters.specificPaymentMethod || 
+                     state.filters.familyMember || 
+                     state.filters.dateFrom || 
+                     state.filters.dateTo || 
+                     state.filters.search;
+  
+  // Use filtered count if filters applied, otherwise use total from DB
+  const totalRecords = hasFilters ? state.filteredIncome.length : state.totalCount;
+  const totalPages = Math.ceil(totalRecords / state.itemsPerPage);
+  
   const startIndex = (state.currentPage - 1) * state.itemsPerPage;
   const endIndex = startIndex + state.itemsPerPage;
   const pageIncome = state.filteredIncome.slice(startIndex, endIndex);
   
+  console.log('[Render] Pagination calculated:', {
+    totalRecords,
+    totalPages,
+    startIndex,
+    endIndex,
+    pageIncomeCount: pageIncome.length,
+    hasFilters
+  });
+  
   // Render income cards
   incomeList.innerHTML = pageIncome.map(income => createIncomeCard(income)).join('');
   
-  // Render pagination using the component
-  if (pagination) {
-    pagination.render();
-  }
+  // Render pagination
+  renderPagination(totalPages);
   
   // Attach event listeners to cards
   attachCardEventListeners();
+}
+
+// Render pagination with numbered pages
+function renderPagination(totalPages) {
+  const paginationContainer = document.getElementById('paginationContainer');
+  const paginationNumbers = document.getElementById('paginationNumbers');
+  const prevBtn = document.getElementById('prevPageBtn');
+  const nextBtn = document.getElementById('nextPageBtn');
+  
+  console.log('[Pagination] Rendering pagination:', { 
+    totalPages, 
+    currentPage: state.currentPage,
+    filteredCount: state.filteredIncome.length,
+    itemsPerPage: state.itemsPerPage
+  });
+  
+  if (!paginationContainer || !paginationNumbers) {
+    console.error('[Pagination] Container or numbers div not found');
+    return;
+  }
+  
+  if (totalPages <= 1) {
+    console.log('[Pagination] Only 1 page, hiding pagination');
+    paginationContainer.style.display = 'none';
+    return;
+  }
+  
+  console.log('[Pagination] Showing pagination with', totalPages, 'pages');
+  paginationContainer.style.display = 'flex';
+  
+  // Update prev/next buttons
+  if (prevBtn) prevBtn.disabled = state.currentPage === 1;
+  if (nextBtn) nextBtn.disabled = state.currentPage === totalPages;
+  
+  // Generate page numbers
+  const pageNumbers = generatePageNumbers(state.currentPage, totalPages);
+  console.log('[Pagination] Generated page numbers:', pageNumbers);
+  
+  paginationNumbers.innerHTML = pageNumbers.map(page => {
+    if (page === '...') {
+      return '<span class="ellipsis">...</span>';
+    }
+    
+    const isActive = page === state.currentPage;
+    return `<button class="page-number ${isActive ? 'active' : ''}" data-page="${page}">${page}</button>`;
+  }).join('');
+  
+  // Attach event listeners to page numbers
+  paginationNumbers.querySelectorAll('.page-number').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const page = parseInt(btn.dataset.page);
+      console.log('[Pagination] Page button clicked:', page);
+      goToPage(page);
+    });
+  });
+}
+
+// Generate page numbers with ellipsis
+function generatePageNumbers(currentPage, totalPages) {
+  const pages = [];
+  const maxVisible = 7; // Maximum number of page buttons to show
+  
+  if (totalPages <= maxVisible) {
+    // Show all pages
+    for (let i = 1; i <= totalPages; i++) {
+      pages.push(i);
+    }
+  } else {
+    // Always show first page
+    pages.push(1);
+    
+    if (currentPage > 3) {
+      pages.push('...');
+    }
+    
+    // Show pages around current page
+    const start = Math.max(2, currentPage - 1);
+    const end = Math.min(totalPages - 1, currentPage + 1);
+    
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    
+    if (currentPage < totalPages - 2) {
+      pages.push('...');
+    }
+    
+    // Always show last page
+    pages.push(totalPages);
+  }
+  
+  return pages;
 }
 
 // Create income card HTML
@@ -1078,8 +1353,32 @@ function setupEventListeners() {
     applyFilters();
   }, 300));
   
-  // Pagination is now handled by the Pagination component
-  // Old manual pagination listeners removed - using pagination.onPageChange callback
+  // Pagination buttons
+  if (prevPageBtn) {
+    prevPageBtn.addEventListener('click', async () => {
+      if (state.currentPage > 1) {
+        await goToPage(state.currentPage - 1);
+      }
+    });
+  }
+  
+  if (nextPageBtn) {
+    nextPageBtn.addEventListener('click', async () => {
+      const hasFilters = state.filters.source || 
+                         state.filters.paymentMethod || 
+                         state.filters.specificPaymentMethod || 
+                         state.filters.familyMember || 
+                         state.filters.dateFrom || 
+                         state.filters.dateTo || 
+                         state.filters.search;
+      const totalRecords = hasFilters ? state.filteredIncome.length : state.totalCount;
+      const totalPages = Math.ceil(totalRecords / state.itemsPerPage);
+      
+      if (state.currentPage < totalPages) {
+        await goToPage(state.currentPage + 1);
+      }
+    });
+  }
   
   // Form close buttons
   closeFormBtn.addEventListener('click', closeIncomeForm);

@@ -26,7 +26,19 @@ const loanTypeIcons = {
 };
 
 // State
-let loans = [];
+const state = {
+  loans: [],
+  filteredLoans: [],
+  currentPage: 1,
+  itemsPerPage: 10,
+  totalCount: 0,
+  allDataKPI: {
+    totalOutstanding: 0,
+    totalMonthlyEmi: 0,
+    totalPaid: 0,
+    activeLoansCount: 0
+  }
+};
 let currentCalendarDate = new Date();
 let editingLoanId = null;
 
@@ -155,7 +167,10 @@ function setupEventListeners() {
   });
   
   // Loan filter
-  document.getElementById('loanFilter')?.addEventListener('change', renderLoans);
+  document.getElementById('loanFilter')?.addEventListener('change', () => {
+    filterLoans();
+    renderLoans();
+  });
   
   // EMI Calculator inputs
   const principalInput = document.getElementById('principalAmount');
@@ -180,13 +195,44 @@ function setupEventListeners() {
   document.getElementById('closeEmiAlert')?.addEventListener('click', () => {
     document.getElementById('upcomingEmiAlert').style.display = 'none';
   });
+  
+  // Pagination buttons
+  const prevPageBtn = document.getElementById('prevPageBtn');
+  const nextPageBtn = document.getElementById('nextPageBtn');
+  
+  if (prevPageBtn) {
+    prevPageBtn.addEventListener('click', () => {
+      if (state.currentPage > 1) {
+        goToPage(state.currentPage - 1);
+      }
+    });
+  }
+  
+  if (nextPageBtn) {
+    nextPageBtn.addEventListener('click', () => {
+      const totalRecords = state.filteredLoans.length;
+      const totalPages = Math.ceil(totalRecords / state.itemsPerPage);
+      
+      if (state.currentPage < totalPages) {
+        goToPage(state.currentPage + 1);
+      }
+    });
+  }
 }
 
 
 // Load loans from Firestore
 async function loadLoans() {
   try {
-    loans = await firestoreService.getLoans() || [];
+    const allLoans = await firestoreService.getLoans() || [];
+    
+    state.loans = allLoans;
+    state.totalCount = allLoans.length;
+    
+    calculateKPISummary();
+    filterLoans();
+    state.currentPage = 1;
+    
     updateSummary();
     renderLoans();
     updateCalculatorDropdown();
@@ -197,35 +243,51 @@ async function loadLoans() {
   }
 }
 
-// Update summary cards
-function updateSummary() {
-  const activeLoans = loans.filter(l => l.status !== 'closed');
+// Calculate KPI summary
+function calculateKPISummary() {
+  const activeLoans = state.loans.filter(l => l.status !== 'closed');
   
-  // Parse amounts as numbers (may be strings after decryption)
   const totalOutstanding = activeLoans.reduce((sum, l) => sum + (parseFloat(l.outstandingAmount) || 0), 0);
   const totalMonthlyEmi = activeLoans.reduce((sum, l) => sum + (parseFloat(l.emiAmount) || 0), 0);
-  const totalPaid = loans.reduce((sum, l) => sum + ((parseFloat(l.emisPaid) || 0) * (parseFloat(l.emiAmount) || 0)), 0);
+  const totalPaid = state.loans.reduce((sum, l) => sum + ((parseFloat(l.emisPaid) || 0) * (parseFloat(l.emiAmount) || 0)), 0);
   
-  document.getElementById('totalOutstanding').textContent = formatCurrency(totalOutstanding);
-  document.getElementById('totalMonthlyEmi').textContent = formatCurrency(totalMonthlyEmi);
-  document.getElementById('totalPaid').textContent = formatCurrency(totalPaid);
-  document.getElementById('activeLoansCount').textContent = activeLoans.length;
+  state.allDataKPI = {
+    totalOutstanding,
+    totalMonthlyEmi,
+    totalPaid,
+    activeLoansCount: activeLoans.length
+  };
+}
+
+// Filter loans
+function filterLoans() {
+  const filter = document.getElementById('loanFilter')?.value || 'all';
+  
+  if (filter === 'active') {
+    state.filteredLoans = state.loans.filter(l => l.status !== 'closed');
+  } else if (filter === 'closed') {
+    state.filteredLoans = state.loans.filter(l => l.status === 'closed');
+  } else {
+    state.filteredLoans = [...state.loans];
+  }
+  state.currentPage = 1;
+}
+
+// Update summary cards
+function updateSummary() {
+  document.getElementById('totalOutstanding').textContent = formatCurrency(state.allDataKPI.totalOutstanding);
+  document.getElementById('totalMonthlyEmi').textContent = formatCurrency(state.allDataKPI.totalMonthlyEmi);
+  document.getElementById('totalPaid').textContent = formatCurrency(state.allDataKPI.totalPaid);
+  document.getElementById('activeLoansCount').textContent = state.allDataKPI.activeLoansCount;
 }
 
 // Render loans grid
 function renderLoans() {
   const container = document.getElementById('loansGrid');
-  const filter = document.getElementById('loanFilter')?.value || 'all';
+  const paginationContainer = document.getElementById('paginationContainer');
   let emptyState = document.getElementById('emptyState');
   
-  let filteredLoans = loans;
-  if (filter === 'active') {
-    filteredLoans = loans.filter(l => l.status !== 'closed');
-  } else if (filter === 'closed') {
-    filteredLoans = loans.filter(l => l.status === 'closed');
-  }
-  
-  if (filteredLoans.length === 0) {
+  if (state.filteredLoans.length === 0) {
     // Create empty state if it doesn't exist
     if (!emptyState) {
       emptyState = document.createElement('div');
@@ -241,6 +303,7 @@ function renderLoans() {
     container.innerHTML = '';
     container.appendChild(emptyState);
     emptyState.style.display = 'block';
+    if (paginationContainer) paginationContainer.style.display = 'none';
     
     // Re-attach event listener for add first loan button
     document.getElementById('addFirstLoanBtn')?.addEventListener('click', () => showAddForm());
@@ -251,7 +314,15 @@ function renderLoans() {
     emptyState.style.display = 'none';
   }
   
-  container.innerHTML = filteredLoans.map(loan => {
+  // Calculate pagination
+  const totalRecords = state.filteredLoans.length;
+  const totalPages = Math.ceil(totalRecords / state.itemsPerPage);
+  
+  const startIndex = (state.currentPage - 1) * state.itemsPerPage;
+  const endIndex = startIndex + state.itemsPerPage;
+  const pageLoans = state.filteredLoans.slice(startIndex, endIndex);
+  
+  container.innerHTML = pageLoans.map(loan => {
     const icon = loanTypeIcons[loan.loanType] || '📋';
     const tenure = parseFloat(loan.tenure) || 0;
     const emisPaid = parseFloat(loan.emisPaid) || 0;
@@ -319,6 +390,86 @@ function renderLoans() {
       </div>
     `;
   }).join('');
+  
+  renderPagination(totalPages);
+}
+
+// Render pagination
+function renderPagination(totalPages) {
+  const paginationContainer = document.getElementById('paginationContainer');
+  const paginationNumbers = document.getElementById('paginationNumbers');
+  const prevBtn = document.getElementById('prevPageBtn');
+  const nextBtn = document.getElementById('nextPageBtn');
+  
+  if (!paginationContainer || !paginationNumbers) return;
+  
+  if (totalPages <= 1) {
+    paginationContainer.style.display = 'none';
+    return;
+  }
+  
+  paginationContainer.style.display = 'flex';
+  
+  if (prevBtn) prevBtn.disabled = state.currentPage === 1;
+  if (nextBtn) nextBtn.disabled = state.currentPage === totalPages;
+  
+  const pageNumbers = generatePageNumbers(state.currentPage, totalPages);
+  
+  paginationNumbers.innerHTML = pageNumbers.map(page => {
+    if (page === '...') {
+      return '<span class="ellipsis">...</span>';
+    }
+    
+    const isActive = page === state.currentPage;
+    return `<button class="page-number ${isActive ? 'active' : ''}" data-page="${page}">${page}</button>`;
+  }).join('');
+  
+  paginationNumbers.querySelectorAll('.page-number').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const page = parseInt(btn.dataset.page);
+      goToPage(page);
+    });
+  });
+}
+
+// Generate page numbers
+function generatePageNumbers(currentPage, totalPages) {
+  const pages = [];
+  const maxVisible = 7;
+  
+  if (totalPages <= maxVisible) {
+    for (let i = 1; i <= totalPages; i++) {
+      pages.push(i);
+    }
+  } else {
+    pages.push(1);
+    
+    if (currentPage > 3) {
+      pages.push('...');
+    }
+    
+    const start = Math.max(2, currentPage - 1);
+    const end = Math.min(totalPages - 1, currentPage + 1);
+    
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    
+    if (currentPage < totalPages - 2) {
+      pages.push('...');
+    }
+    
+    pages.push(totalPages);
+  }
+  
+  return pages;
+}
+
+// Go to page
+function goToPage(page) {
+  state.currentPage = page;
+  renderLoans();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // Render EMI Calendar
@@ -340,7 +491,7 @@ function renderCalendar() {
   
   // Get EMI dates for this month
   const emiDates = {};
-  loans.filter(l => l.status !== 'closed').forEach(loan => {
+  state.loans.filter(l => l.status !== 'closed').forEach(loan => {
     const emiDay = loan.emiDate || 1;
     if (!emiDates[emiDay]) {
       emiDates[emiDay] = [];
@@ -392,7 +543,7 @@ function checkUpcomingEMIs() {
   const today = new Date();
   const upcoming = [];
   
-  loans.filter(l => l.status !== 'closed').forEach(loan => {
+  state.loans.filter(l => l.status !== 'closed').forEach(loan => {
     const emiDay = loan.emiDate || 1;
     const daysUntil = emiDay - today.getDate();
     
@@ -497,44 +648,6 @@ function calculateEndDate(loan) {
   return formatDate(end);
 }
 
-// Show add form (inline)
-function showAddForm(loanId = null) {
-  const addLoanSection = document.getElementById('addLoanSection');
-  const title = document.getElementById('formTitle');
-  const form = document.getElementById('loanForm');
-  const saveFormBtn = document.getElementById('saveFormBtn');
-  
-  editingLoanId = loanId;
-  
-  // Reset button state
-  saveFormBtn.disabled = false;
-  saveFormBtn.textContent = loanId ? 'Update Loan' : 'Save Loan';
-  
-  if (loanId) {
-    const loan = loans.find(l => l.id === loanId);
-    if (loan) {
-      title.textContent = 'Edit Loan';
-      populateLoanForm(loan);
-    }
-  } else {
-    title.textContent = 'Add New Loan';
-    form.reset();
-    document.getElementById('startDate').value = new Date().toISOString().split('T')[0];
-    document.getElementById('emiPreview').style.display = 'none';
-  }
-  
-  addLoanSection.classList.add('show');
-  addLoanSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-// Hide form (inline)
-function hideForm() {
-  const addLoanSection = document.getElementById('addLoanSection');
-  addLoanSection.classList.remove('show');
-  document.getElementById('loanForm').reset();
-  editingLoanId = null;
-}
-
 // Populate loan form for editing
 function populateLoanForm(loan) {
   document.getElementById('loanName').value = loan.loanName || '';
@@ -557,6 +670,36 @@ function populateLoanForm(loan) {
   }
   
   calculateEMI();
+}
+
+// Show add form (inline)
+function showAddForm(loanId = null) {
+  const addLoanSection = document.getElementById('addLoanSection');
+  const title = document.getElementById('formTitle');
+  const form = document.getElementById('loanForm');
+  const saveFormBtn = document.getElementById('saveFormBtn');
+  
+  editingLoanId = loanId;
+  
+  // Reset button state
+  saveFormBtn.disabled = false;
+  saveFormBtn.textContent = loanId ? 'Update Loan' : 'Save Loan';
+  
+  if (loanId) {
+    const loan = state.loans.find(l => l.id === loanId);
+    if (loan) {
+      title.textContent = 'Edit Loan';
+      populateLoanForm(loan);
+    }
+  } else {
+    title.textContent = 'Add New Loan';
+    form.reset();
+    document.getElementById('startDate').value = new Date().toISOString().split('T')[0];
+    document.getElementById('emiPreview').style.display = 'none';
+  }
+  
+  addLoanSection.classList.add('show');
+  addLoanSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // Save loan
@@ -706,7 +849,7 @@ function calculatePaidPrincipal(loan) {
 
 // Record payment modal
 function recordPayment(loanId) {
-  const loan = loans.find(l => l.id === loanId);
+  const loan = state.loans.find(l => l.id === loanId);
   if (!loan) return;
   
   document.getElementById('paymentLoanId').value = loanId;
@@ -728,7 +871,7 @@ async function savePayment(e) {
   e.preventDefault();
   
   const loanId = document.getElementById('paymentLoanId').value;
-  const loan = loans.find(l => l.id === loanId);
+  const loan = state.loans.find(l => l.id === loanId);
   if (!loan) return;
   
   const paymentType = document.getElementById('paymentType').value;
@@ -811,7 +954,7 @@ function editLoan(loanId) {
 
 // Delete loan
 async function deleteLoan(loanId) {
-  const loan = loans.find(l => l.id === loanId);
+  const loan = state.loans.find(l => l.id === loanId);
   const loanName = loan ? loan.loanName : 'this loan';
   
   const confirmed = await confirmationModal.confirmDelete(loanName);
@@ -832,7 +975,7 @@ async function deleteLoan(loanId) {
 function updateCalculatorDropdown() {
   const select = document.getElementById('calcLoanSelect');
   select.innerHTML = '<option value="">Choose a loan</option>' +
-    loans.filter(l => l.status !== 'closed').map(loan => 
+    state.loans.filter(l => l.status !== 'closed').map(loan => 
       `<option value="${loan.id}">${escapeHtml(loan.loanName)} - ${formatCurrency(loan.outstandingAmount)}</option>`
     ).join('');
 }

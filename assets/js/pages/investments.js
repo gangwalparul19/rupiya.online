@@ -21,7 +21,19 @@ import encryptionReauthModal from '../components/encryption-reauth-modal.js';
 const showToast = (message, type) => toast.show(message, type);
 
 // State
-let investments = [];
+const state = {
+  investments: [],
+  filteredInvestments: [],
+  currentPage: 1,
+  itemsPerPage: 10,
+  totalCount: 0,
+  allDataKPI: {
+    totalInvested: 0,
+    currentValue: 0,
+    totalReturns: 0,
+    returnsPercentage: 0
+  }
+};
 let editingInvestmentId = null;
 
 // Symbol search state
@@ -173,6 +185,29 @@ function setupEventListeners() {
       // Only hide the dropdown when type changes, don't clear the symbol
       const dropdown = document.getElementById('symbolDropdown');
       if (dropdown) dropdown.style.display = 'none';
+    });
+  }
+  
+  // Pagination buttons
+  const prevPageBtn = document.getElementById('prevPageBtn');
+  const nextPageBtn = document.getElementById('nextPageBtn');
+  
+  if (prevPageBtn) {
+    prevPageBtn.addEventListener('click', () => {
+      if (state.currentPage > 1) {
+        goToPage(state.currentPage - 1);
+      }
+    });
+  }
+  
+  if (nextPageBtn) {
+    nextPageBtn.addEventListener('click', () => {
+      const totalRecords = state.filteredInvestments.length;
+      const totalPages = Math.ceil(totalRecords / state.itemsPerPage);
+      
+      if (state.currentPage < totalPages) {
+        goToPage(state.currentPage + 1);
+      }
     });
   }
 }
@@ -341,13 +376,19 @@ async function loadInvestments() {
   emptyState.style.display = 'none';
 
   try {
-    investments = await firestoreService.getInvestments();
+    state.investments = await firestoreService.getInvestments();
+    state.totalCount = state.investments.length;
 
-    if (investments.length === 0) {
+    if (state.investments.length === 0) {
       emptyState.style.display = 'block';
     } else {
       // Fetch live prices for all investments
       await updateLivePrices();
+      
+      calculateKPISummary();
+      filterInvestments();
+      state.currentPage = 1;
+      
       renderInvestments();
       investmentsList.style.display = 'grid';
     }
@@ -363,7 +404,7 @@ async function loadInvestments() {
 
 // Update live prices for all investments
 async function updateLivePrices() {
-  for (const investment of investments) {
+  for (const investment of state.investments) {
     if (investment.symbol) {
       try {
         const priceData = await googleSheetsPriceService.getLivePrice(investment.symbol);
@@ -398,26 +439,56 @@ async function updateLivePrices() {
 // Current active tab
 let activeTab = 'all';
 
-// Get filtered investments based on active tab
-function getFilteredInvestments() {
-  if (activeTab === 'all') {
-    return investments;
-  }
-  
-  const typeMap = {
-    'stocks': 'Stocks',
-    'mf': 'Mutual Funds',
-    'crypto': 'Cryptocurrency',
-    'other': ['Real Estate', 'Gold', 'Fixed Deposit', 'Other']
+// Calculate KPI summary
+function calculateKPISummary() {
+  let totalInvested = 0;
+  let currentValue = 0;
+
+  state.investments.forEach(investment => {
+    const investPurchasePrice = investment.purchasePrice;
+    const investCurrentPrice = investment.livePrice || investment.currentPrice;
+
+    totalInvested += investment.quantity * investPurchasePrice;
+    currentValue += investment.quantity * investCurrentPrice;
+  });
+
+  const totalReturns = currentValue - totalInvested;
+  const returnsPercentage = totalInvested > 0 ? ((totalReturns / totalInvested) * 100).toFixed(2) : 0;
+
+  state.allDataKPI = {
+    totalInvested,
+    currentValue,
+    totalReturns,
+    returnsPercentage
   };
-  
-  const filterType = typeMap[activeTab];
-  
-  if (Array.isArray(filterType)) {
-    return investments.filter(inv => filterType.includes(inv.type));
+}
+
+// Filter investments based on active tab
+function filterInvestments() {
+  if (activeTab === 'all') {
+    state.filteredInvestments = [...state.investments];
   } else {
-    return investments.filter(inv => inv.type === filterType);
+    const typeMap = {
+      'stocks': 'Stocks',
+      'mf': 'Mutual Funds',
+      'crypto': 'Cryptocurrency',
+      'other': ['Real Estate', 'Gold', 'Fixed Deposit', 'Other']
+    };
+    
+    const filterType = typeMap[activeTab];
+    
+    if (Array.isArray(filterType)) {
+      state.filteredInvestments = state.investments.filter(inv => filterType.includes(inv.type));
+    } else {
+      state.filteredInvestments = state.investments.filter(inv => inv.type === filterType);
+    }
   }
+  state.currentPage = 1;
+}
+
+// Get filtered investments based on active tab (for backward compatibility)
+function getFilteredInvestments() {
+  return state.filteredInvestments;
 }
 
 // Handle tab click
@@ -432,14 +503,15 @@ function handleTabClick(tabName) {
     }
   });
   
-  // Re-render investments
+  // Re-filter and render investments
+  filterInvestments();
   renderInvestments();
   updateSummaryForTab();
 }
 
 // Update summary for current tab
 function updateSummaryForTab() {
-  const filteredInvestments = getFilteredInvestments();
+  const filteredInvestments = state.filteredInvestments;
   let totalInvested = 0;
   let currentValue = 0;
 
@@ -465,19 +537,28 @@ function updateSummaryForTab() {
 
 // Render investments
 function renderInvestments() {
-  const filteredInvestments = getFilteredInvestments();
+  const paginationContainer = document.getElementById('paginationContainer');
   
-  if (filteredInvestments.length === 0) {
+  if (state.filteredInvestments.length === 0) {
     investmentsList.innerHTML = '';
     investmentsList.style.display = 'none';
     emptyState.style.display = 'block';
+    if (paginationContainer) paginationContainer.style.display = 'none';
     return;
   }
   
   investmentsList.style.display = 'grid';
   emptyState.style.display = 'none';
   
-  investmentsList.innerHTML = filteredInvestments.map(investment => {
+  // Calculate pagination
+  const totalRecords = state.filteredInvestments.length;
+  const totalPages = Math.ceil(totalRecords / state.itemsPerPage);
+  
+  const startIndex = (state.currentPage - 1) * state.itemsPerPage;
+  const endIndex = startIndex + state.itemsPerPage;
+  const pageInvestments = state.filteredInvestments.slice(startIndex, endIndex);
+  
+  investmentsList.innerHTML = pageInvestments.map(investment => {
     // Use live price if available, otherwise use stored current price
     const currentPrice = investment.livePrice || investment.currentPrice;
     const totalInvested = investment.quantity * investment.purchasePrice;
@@ -597,37 +678,103 @@ function renderInvestments() {
       </div>
     `;
   }).join('');
+  
+  renderPagination(totalPages);
+}
+
+// Render pagination
+function renderPagination(totalPages) {
+  const paginationContainer = document.getElementById('paginationContainer');
+  const paginationNumbers = document.getElementById('paginationNumbers');
+  const prevBtn = document.getElementById('prevPageBtn');
+  const nextBtn = document.getElementById('nextPageBtn');
+  
+  if (!paginationContainer || !paginationNumbers) return;
+  
+  if (totalPages <= 1) {
+    paginationContainer.style.display = 'none';
+    return;
+  }
+  
+  paginationContainer.style.display = 'flex';
+  
+  if (prevBtn) prevBtn.disabled = state.currentPage === 1;
+  if (nextBtn) nextBtn.disabled = state.currentPage === totalPages;
+  
+  const pageNumbers = generatePageNumbers(state.currentPage, totalPages);
+  
+  paginationNumbers.innerHTML = pageNumbers.map(page => {
+    if (page === '...') {
+      return '<span class="ellipsis">...</span>';
+    }
+    
+    const isActive = page === state.currentPage;
+    return `<button class="page-number ${isActive ? 'active' : ''}" data-page="${page}">${page}</button>`;
+  }).join('');
+  
+  paginationNumbers.querySelectorAll('.page-number').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const page = parseInt(btn.dataset.page);
+      goToPage(page);
+    });
+  });
+}
+
+// Generate page numbers
+function generatePageNumbers(currentPage, totalPages) {
+  const pages = [];
+  const maxVisible = 7;
+  
+  if (totalPages <= maxVisible) {
+    for (let i = 1; i <= totalPages; i++) {
+      pages.push(i);
+    }
+  } else {
+    pages.push(1);
+    
+    if (currentPage > 3) {
+      pages.push('...');
+    }
+    
+    const start = Math.max(2, currentPage - 1);
+    const end = Math.min(totalPages - 1, currentPage + 1);
+    
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    
+    if (currentPage < totalPages - 2) {
+      pages.push('...');
+    }
+    
+    pages.push(totalPages);
+  }
+  
+  return pages;
+}
+
+// Go to page
+function goToPage(page) {
+  state.currentPage = page;
+  renderInvestments();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // Update summary
 async function updateSummary() {
-  let totalInvested = 0;
-  let currentValue = 0;
+  const returnsClass = state.allDataKPI.totalReturns >= 0 ? 'positive' : 'negative';
+  const returnsSign = state.allDataKPI.totalReturns >= 0 ? '+' : '';
 
-  // All prices are now stored in INR, so no conversion needed
-  investments.forEach(investment => {
-    const investPurchasePrice = investment.purchasePrice;
-    const investCurrentPrice = investment.livePrice || investment.currentPrice;
-
-    totalInvested += investment.quantity * investPurchasePrice;
-    currentValue += investment.quantity * investCurrentPrice;
-  });
-
-  const totalReturns = currentValue - totalInvested;
-  const returnsPercentage = totalInvested > 0 ? ((totalReturns / totalInvested) * 100).toFixed(2) : 0;
-  const returnsClass = totalReturns >= 0 ? 'positive' : 'negative';
-  const returnsSign = totalReturns >= 0 ? '+' : '';
-
-  totalInvestedEl.textContent = formatCurrency(totalInvested, '₹');
-  currentValueEl.textContent = formatCurrency(currentValue, '₹');
-  totalReturnsEl.textContent = `${returnsSign}${formatCurrency(Math.abs(totalReturns), '₹')}`;
-  returnsPercentageEl.textContent = `${returnsSign}${returnsPercentage}%`;
+  totalInvestedEl.textContent = formatCurrency(state.allDataKPI.totalInvested, '₹');
+  currentValueEl.textContent = formatCurrency(state.allDataKPI.currentValue, '₹');
+  totalReturnsEl.textContent = `${returnsSign}${formatCurrency(Math.abs(state.allDataKPI.totalReturns), '₹')}`;
+  returnsPercentageEl.textContent = `${returnsSign}${state.allDataKPI.returnsPercentage}%`;
   returnsPercentageEl.className = `summary-change ${returnsClass}`;
 }
 
 // Show delete confirmation
 function showDeleteConfirmation(id) {
-  const investment = investments.find(i => i.id === id);
+  const investment = state.investments.find(i => i.id === id);
   if (!investment) return;
 
   deleteInvestmentId = id;
@@ -671,7 +818,7 @@ async function handleDelete() {
 
 // Edit investment
 function editInvestment(id) {
-  const investment = investments.find(i => i.id === id);
+  const investment = state.investments.find(i => i.id === id);
   if (investment) {
     showEditForm(investment);
   }
