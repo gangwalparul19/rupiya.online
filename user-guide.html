@@ -857,10 +857,21 @@
         import { initLogoutHandler } from './assets/js/utils/logout-handler.js';
         
         // Initialize sidebar navigation
-        initSidebar();
-        
-        // Initialize logout handler
-        initLogoutHandler();
+        (async () => {
+            try {
+                await initSidebar();
+                console.log('[User Guide] Sidebar initialized');
+            } catch (error) {
+                console.error('[User Guide] Error initializing sidebar:', error);
+            }
+            
+            try {
+                initLogoutHandler();
+                console.log('[User Guide] Logout handler initialized');
+            } catch (error) {
+                console.error('[User Guide] Error initializing logout handler:', error);
+            }
+        })();
     </script>
     <script type="module" src="assets/js/pages/user-guide.js">
         loadUserProfile();

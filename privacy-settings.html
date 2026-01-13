@@ -15,6 +15,41 @@
         .page-header h1 { color: #4A90E2; font-size: 2em; margin-bottom: 10px; }
         .page-header p { color: #666; font-size: 1.05em; }
         
+        /* Desktop layout - ensure sidebar is visible */
+        @media (min-width: 769px) {
+            .sidebar {
+                display: flex !important;
+                position: fixed !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 280px !important;
+                height: 100vh !important;
+                background: white !important;
+                border-right: 1px solid #e5e7eb !important;
+                z-index: 1000 !important;
+                flex-direction: column !important;
+                transform: none !important;
+            }
+            
+            .sidebar-nav {
+                flex: 1 !important;
+                overflow-y: auto !important;
+            }
+            
+            .main-content {
+                margin-left: 280px !important;
+                width: calc(100% - 280px) !important;
+            }
+            
+            .mobile-header {
+                display: none !important;
+            }
+            
+            .sidebar-overlay {
+                display: none !important;
+            }
+        }
+        
         /* Ensure page is never grayed out */
         html.privacy-settings-page,
         html.privacy-settings-page body,
@@ -289,8 +324,21 @@
         import authService from './assets/js/services/auth-service.js';
 
         // Initialize components
-        initSidebar();
-        initLogoutHandler();
+        (async () => {
+            try {
+                await initSidebar();
+                console.log('[Privacy Settings] Sidebar initialized');
+            } catch (error) {
+                console.error('[Privacy Settings] Error initializing sidebar:', error);
+            }
+            
+            try {
+                initLogoutHandler();
+                console.log('[Privacy Settings] Logout handler initialized');
+            } catch (error) {
+                console.error('[Privacy Settings] Error initializing logout handler:', error);
+            }
+        })();
 
         // Load user profile
         async function loadUserProfile() {
