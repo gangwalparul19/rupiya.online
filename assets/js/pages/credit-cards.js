@@ -427,5 +427,58 @@ function openCardForm(cardId = null) {
   formSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
+// Close card form
+function closeCardForm() {
+  document.getElementById('addCardSection').classList.remove('show');
+  document.getElementById('cardForm').reset();
+  editingCardId = null;
+}
+
+// Handle card submit
+async function handleCardSubmit(e) {
+  e.preventDefault();
+
+  const saveBtn = document.getElementById('saveBtn');
+  const originalText = saveBtn.textContent;
+
+  try {
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Saving...';
+
+    const cardData = {
+      cardName: document.getElementById('cardName').value,
+      bankName: document.getElementById('bankName').value,
+      cardType: document.getElementById('cardType').value,
+      lastFourDigits: document.getElementById('lastFourDigits').value,
+      creditLimit: parseFloat(document.getElementById('creditLimit').value),
+      currentBalance: parseFloat(document.getElementById('currentBalance').value) || 0,
+      billingDate: parseInt(document.getElementById('billingDate').value) || null,
+      dueDate: parseInt(document.getElementById('dueDate').value) || null,
+      rewardsProgram: document.getElementById('rewardsProgram').value || null,
+      rewardsBalance: parseFloat(document.getElementById('rewardsBalance').value) || 0,
+      annualFee: parseFloat(document.getElementById('annualFee').value) || 0,
+      notes: document.getElementById('notes').value || null,
+      userId: currentUser.uid
+    };
+
+    if (editingCardId) {
+      await firestoreService.update('creditCards', editingCardId, cardData);
+      toast.success('Credit card updated successfully');
+    } else {
+      await firestoreService.add('creditCards', cardData);
+      toast.success('Credit card added successfully');
+    }
+
+    closeCardForm();
+    await loadCreditCards();
+  } catch (error) {
+    console.error('Error saving credit card:', error);
+    toast.error('Failed to save credit card');
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.textContent = originalText;
+  }
+}
+
 // Initialize on page load
 init();

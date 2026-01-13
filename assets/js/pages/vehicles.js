@@ -206,7 +206,7 @@ function loadUserProfile(user) {
 }
 
 function showAddForm() {
-  editingVehicleId = null;
+  state.editingVehicleId = null;
   formTitle.textContent = 'Add Vehicle';
   saveFormBtn.textContent = 'Save Vehicle';
   vehicleForm.reset();
@@ -221,14 +221,14 @@ function showAddForm() {
 function hideForm() {
   addVehicleSection.classList.remove('show');
   vehicleForm.reset();
-  editingVehicleId = null;
+  state.editingVehicleId = null;
   // Reset button state
   saveFormBtn.disabled = false;
   saveFormBtn.textContent = 'Save Vehicle';
 }
 
 function showEditForm(vehicle) {
-  editingVehicleId = vehicle.id;
+  state.editingVehicleId = vehicle.id;
   formTitle.textContent = 'Edit Vehicle';
   saveFormBtn.textContent = 'Update Vehicle';
 
@@ -263,12 +263,12 @@ async function handleSubmit(e) {
   // Show loading
   const originalText = saveFormBtn.textContent;
   saveFormBtn.disabled = true;
-  saveFormBtn.textContent = editingVehicleId ? 'Updating...' : 'Saving...';
+  saveFormBtn.textContent = state.editingVehicleId ? 'Updating...' : 'Saving...';
 
   try {
     let result;
-    if (editingVehicleId) {
-      result = await firestoreService.update('vehicles', editingVehicleId, formData);
+    if (state.editingVehicleId) {
+      result = await firestoreService.update('vehicles', state.editingVehicleId, formData);
       if (result.success) showToast('Vehicle updated successfully', 'success');
     } else {
       result = await firestoreService.add('vehicles', formData);
@@ -626,8 +626,8 @@ function calculateOverallMileageStats() {
   let totalDistance = 0;
   let totalFuel = 0;
 
-  vehicles.forEach(vehicle => {
-    const vehicleLogs = fuelLogs.filter(log => log.vehicleId === vehicle.id);
+  state.vehicles.forEach(vehicle => {
+    const vehicleLogs = state.fuelLogs.filter(log => log.vehicleId === vehicle.id);
     const stats = calculateVehicleMileage(vehicleLogs);
     totalFuelCost += stats.totalFuelCost;
     totalDistance += stats.totalDistance;
@@ -949,7 +949,7 @@ async function deleteFuelLog(logId) {
   
   try {
     // Find the log before deleting to get vehicleId
-    const logToDelete = fuelLogs.find(l => l.id === logId);
+    const logToDelete = state.fuelLogs.find(l => l.id === logId);
     const vehicleId = logToDelete?.vehicleId;
     
     const result = await firestoreService.delete('fuelLogs', logId);
@@ -1007,7 +1007,7 @@ async function handleSaveMaintenance() {
   saveBtn.textContent = 'Saving...';
 
   try {
-    const vehicle = vehicles.find(v => v.id === vehicleId);
+    const vehicle = state.vehicles.find(v => v.id === vehicleId);
     
     // Use cross-feature integration to create expense
     const result = await crossFeatureIntegrationService.createVehicleMaintenanceExpense(
@@ -1072,7 +1072,7 @@ async function handleSaveVehicleIncome() {
   saveBtn.textContent = 'Saving...';
 
   try {
-    const vehicle = vehicles.find(v => v.id === vehicleId);
+    const vehicle = state.vehicles.find(v => v.id === vehicleId);
     
     // Use cross-feature integration to create income
     const result = await crossFeatureIntegrationService.createVehicleIncome(

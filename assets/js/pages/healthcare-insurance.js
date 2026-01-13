@@ -193,7 +193,8 @@ function switchTab(tabName) {
 async function loadData() {
   await Promise.all([loadPolicies(), loadExpenses(true)]);
   calculateKPISummary();
-  updateKPIs();
+  updatePolicyKPIs();
+  updateExpenseKPIs();
 }
 
 // Calculate KPI summary
@@ -538,7 +539,7 @@ function updateExpenseKPIs() {
     return date.getFullYear() === currentYear;
   }).reduce((sum, e) => sum + e.amount, 0);
 
-  const total = expenses.reduce((sum, e) => sum + e.amount, 0);
+  const total = state.expenses.reduce((sum, e) => sum + e.amount, 0);
 
   const thisMonthEl = document.getElementById('thisMonthExpenses');
   const lastMonthEl = document.getElementById('lastMonthExpenses');
@@ -559,7 +560,7 @@ function filterExpenses() {
   const category = document.getElementById('categoryFilter').value;
   const search = document.getElementById('searchInput').value.toLowerCase();
 
-  const filtered = expenses.filter(expense => {
+  state.filteredExpenses = state.expenses.filter(expense => {
     const matchesCategory = !category || expense.category === category;
     const matchesSearch = !search || 
       expense.description.toLowerCase().includes(search) ||
@@ -567,26 +568,9 @@ function filterExpenses() {
     return matchesCategory && matchesSearch;
   });
 
-  // Re-render with filtered expenses
-  const expensesList = document.getElementById('expensesList');
-  if (!expensesList) return;
-
-  const categoryIcons = {
-    'Doctor Visit': '👨‍⚕️',
-    'Medicines': '💊',
-    'Lab Tests': '🔬',
-    'Hospital': '🏥',
-    'Dental': '🦷',
-    'Eye Care': '👁️',
-    'Therapy': '🧘',
-    'Other': '📋'
-  };
-
-  expensesList.innerHTML = filtered.map(expense => `
-    <div class="expense-item">
-      <div class="expense-info">
-        <div class="expense-header">
-          <span class="expense-icon">${categoryIcons[expense.category] || '📋'}</span>
+  state.expensesCurrentPage = 1;
+  renderExpenses();
+}
           <span class="expense-title">${expense.description}</span>
           <span class="expense-category">${expense.category}</span>
           ${expense.claimable ? '<span class="claimable-badge">Claimable</span>' : ''}
@@ -774,7 +758,7 @@ function openExpenseForm(expenseId = null) {
   // Populate policy select
   const policySelect = document.getElementById('policyId');
   policySelect.innerHTML = '<option value="">Select Policy</option>' +
-    policies.map(p => `<option value="${p.id}">${p.policyName}</option>`).join('');
+    state.policies.map(p => `<option value="${p.id}">${p.policyName}</option>`).join('');
 
   editingExpenseId = expenseId;
 

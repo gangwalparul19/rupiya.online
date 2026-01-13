@@ -198,7 +198,7 @@ function loadUserProfile(user) {
 }
 
 function showAddForm() {
-  editingHelpId = null;
+  state.editingHelpId = null;
   formTitle.textContent = 'Add Staff';
   saveFormBtn.textContent = 'Save Staff';
   helpForm.reset();
@@ -220,11 +220,11 @@ function showAddForm() {
 function hideForm() {
   addHelpSection.classList.remove('show');
   helpForm.reset();
-  editingHelpId = null;
+  state.editingHelpId = null;
 }
 
 function showEditForm(help) {
-  editingHelpId = help.id;
+  state.editingHelpId = help.id;
   formTitle.textContent = 'Edit Staff';
   saveFormBtn.textContent = 'Update Staff';
 
@@ -293,8 +293,8 @@ async function handleSubmit(e) {
 
   try {
     let result;
-    if (editingHelpId) {
-      result = await firestoreService.update('houseHelps', editingHelpId, formData);
+    if (state.editingHelpId) {
+      result = await firestoreService.update('houseHelps', state.editingHelpId, formData);
       if (result.success) showToast('Staff updated successfully', 'success');
     } else {
       result = await firestoreService.add('houseHelps', formData);
