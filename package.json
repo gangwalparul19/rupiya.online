@@ -5,14 +5,17 @@
   "type": "module",
   "scripts": {
     "build": "node build.js",
-    "vercel-build": "node update-cache-version.js && node build.js",
+    "build:css": "node build-css-bundles.js",
+    "build:full": "node build-css-bundles.js && node build.js",
+    "vercel-build": "node update-cache-version.js && node build-css-bundles.js && node build.js",
     "update-cache": "node update-cache-version.js",
-    "deploy": "node scripts/increment-version.cjs && npm run update-cache && npm run build",
+    "deploy": "node scripts/increment-version.cjs && npm run update-cache && npm run build:full",
     "version:increment": "node scripts/increment-version.cjs",
     "precommit": "node scripts/increment-version.cjs && git add assets/js/config/version.js service-worker.js",
     "prepare": "git config core.hooksPath .git/hooks",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
-    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch"
+    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
+    "analyze:css": "node build-css-bundles.js"
   },
   "keywords": [
     "finance",
