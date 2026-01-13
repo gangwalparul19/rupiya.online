@@ -24,7 +24,6 @@ setupAutoCacheClear();
 // Preload commonly used modules during idle time
 if ('requestIdleCallback' in window) {
   requestIdleCallback(() => {
-    log.log('Preloading commonly used modules...');
     lazyLoader.preload([
       { type: 'service', name: 'investment-analytics-service' },
       { type: 'util', name: 'ai-insights-engine' }
@@ -33,7 +32,6 @@ if ('requestIdleCallback' in window) {
 } else {
   // Fallback for browsers without requestIdleCallback
   setTimeout(() => {
-    log.log('Preloading commonly used modules...');
     lazyLoader.preload([
       { type: 'service', name: 'investment-analytics-service' },
       { type: 'util', name: 'ai-insights-engine' }

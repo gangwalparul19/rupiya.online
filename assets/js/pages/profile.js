@@ -254,9 +254,9 @@ async function loadAuthMethods() {
         return `
           <button 
             type="button"
-            class="btn btn-primary"
-            onclick="addAuthMethod('${method}')"
-            style="width: 100%; margin-bottom: 8px;"
+            class="btn btn-sm btn-primary"
+            onclick="window.addAuthMethod('${method}')"
+            style="margin-bottom: 8px; margin-right: 8px;"
           >
             Add ${displayName}
           </button>
@@ -266,7 +266,9 @@ async function loadAuthMethods() {
       availableList.innerHTML = `
         <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #e0e0e0;">
           <h4 style="margin-bottom: 12px;">Add Another Authentication Method</h4>
-          ${availableHtml}
+          <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+            ${availableHtml}
+          </div>
         </div>
       `;
     }
@@ -296,31 +298,46 @@ async function addAuthMethod(providerId) {
 // Show dialog for adding password
 function showAddPasswordDialog() {
   const dialog = document.createElement('div');
-  dialog.className = 'modal';
+  dialog.className = 'modal-overlay show';
   dialog.id = 'addPasswordModal';
   dialog.innerHTML = `
-    <div class="modal-content" style="max-width: 400px;">
-      <h3>Add Password Authentication</h3>
-      <p>Set a password for your account to enable password-based login</p>
-      
-      <div class="form-group">
-        <label for="newPassword">New Password</label>
-        <input type="password" id="newPassword" placeholder="New password" required minlength="6">
+    <div class="modal-container modal-sm">
+      <div class="modal-header">
+        <h3 class="modal-title">Add Password Authentication</h3>
+        <button type="button" class="modal-close" onclick="window.closeAddPasswordDialog()">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
       </div>
-      
-      <div class="form-group">
-        <label for="confirmPassword">Confirm Password</label>
-        <input type="password" id="confirmPassword" placeholder="Confirm password" required minlength="6">
+      <div class="modal-body">
+        <p style="margin-bottom: 1.5rem; color: #5a6c7d;">Set a password for your account to enable password-based login</p>
+        
+        <div class="form-group">
+          <label for="addPasswordNew">New Password</label>
+          <input type="password" id="addPasswordNew" placeholder="Enter new password" required minlength="6">
+        </div>
+        
+        <div class="form-group">
+          <label for="addPasswordConfirm">Confirm Password</label>
+          <input type="password" id="addPasswordConfirm" placeholder="Confirm new password" required minlength="6">
+        </div>
       </div>
-      
-      <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px;">
-        <button type="button" class="btn btn-outline" onclick="closeAddPasswordDialog()">Cancel</button>
-        <button type="button" class="btn btn-primary" onclick="confirmAddPassword()">Add Password</button>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="window.closeAddPasswordDialog()">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="window.confirmAddPassword()">Add Password</button>
       </div>
     </div>
   `;
   
   document.body.appendChild(dialog);
+  
+  // Close on overlay click
+  dialog.addEventListener('click', (e) => {
+    if (e.target === dialog) {
+      closeAddPasswordDialog();
+    }
+  });
 }
 
 // Close add password dialog
@@ -333,8 +350,8 @@ function closeAddPasswordDialog() {
 
 // Confirm add password
 async function confirmAddPassword() {
-  const password = document.getElementById('newPassword').value;
-  const confirmPassword = document.getElementById('confirmPassword').value;
+  const password = document.getElementById('addPasswordNew').value;
+  const confirmPassword = document.getElementById('addPasswordConfirm').value;
   
   if (!password || !confirmPassword) {
     showToast('Please fill in all fields', 'error');
@@ -758,18 +775,12 @@ async function handleDeleteAccount() {
 // Categories Management
 async function loadCategories() {
   try {
-    console.log('[Profile] Loading categories...');
-    
     // Initialize categories if needed
     const initResult = await categoriesService.initializeCategories();
-    console.log('[Profile] Initialize result:', initResult);
     
     // Load categories
     expenseCategories = await categoriesService.getExpenseCategories();
     incomeCategories = await categoriesService.getIncomeCategories();
-    
-    console.log('[Profile] Loaded expense categories:', expenseCategories);
-    console.log('[Profile] Loaded income categories:', incomeCategories);
     
     // Render categories
     renderExpenseCategories();
@@ -1471,21 +1482,7 @@ function handlePaymentTypeChange() {
 // Load payment methods
 async function loadPaymentMethods() {
   try {
-    console.log('[Profile] Loading payment methods...');
     paymentMethods = await paymentMethodsService.getPaymentMethods();
-    console.log('[Profile] Loaded payment methods:', paymentMethods);
-    
-    // Log first method details for debugging
-    if (paymentMethods.length > 0) {
-      console.log('[Profile] First payment method details:', {
-        id: paymentMethods[0].id,
-        name: paymentMethods[0].name,
-        type: paymentMethods[0].type,
-        cardType: paymentMethods[0].cardType,
-        cardNumber: paymentMethods[0].cardNumber,
-        bankName: paymentMethods[0].bankName
-      });
-    }
     
     renderPaymentMethods();
   } catch (error) {

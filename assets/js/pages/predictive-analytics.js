@@ -119,7 +119,6 @@ async function loadData() {
   const skeleton = loadingService.showLoading(loadingState, 'dashboard');
 
   try {
-    console.log('[PredictiveAnalytics] Loading prediction data...');
     
     // Load all prediction data in parallel
     const [forecasts, warnings, goals, anomalies, patterns] = await Promise.all([
@@ -130,9 +129,7 @@ async function loadData() {
       predictionService.analyzeSpendingPatterns()
     ]);
 
-    console.log('[PredictiveAnalytics] Data loaded:', {
-      forecasts: forecasts?.length || 0,
-      warnings: warnings?.length || 0,
+    const hasAnyData = (forecasts && forecasts.length > 0) ||
       goals: goals?.length || 0,
       anomalies: anomalies?.length || 0,
       patterns: patterns?.length || 0

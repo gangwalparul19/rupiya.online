@@ -103,7 +103,6 @@ class LazyLoader {
 
     try {
       await Promise.all(promises);
-      console.log(`[LazyLoader] Preloaded ${modules.length} modules`);
     } catch (error) {
       console.error('[LazyLoader] Preload failed:', error);
     }

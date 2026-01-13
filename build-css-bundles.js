@@ -172,8 +172,12 @@ function createBundles() {
       const filePath = path.join(CSS_DIR, file);
       
       if (fs.existsSync(filePath)) {
-        const content = fs.readFileSync(filePath, 'utf8');
+        let content = fs.readFileSync(filePath, 'utf8');
         originalSize += content.length;
+        
+        // Fix relative @import paths for bundle subdirectory
+        // Change @import url('file.css') to @import url('../file.css')
+        content = content.replace(/@import\s+url\(['"](?!\.\.\/|https?:\/\/)([^'"]+)['"]\)/g, "@import url('../$1')");
         
         // Add file separator comment
         bundleContent += `/* ========== ${file} ========== */\n`;

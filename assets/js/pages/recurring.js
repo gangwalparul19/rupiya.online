@@ -95,7 +95,6 @@ async function loadCategoryDropdown() {
 async function loadUserPaymentMethods() {
   try {
     userPaymentMethods = await paymentMethodsService.getPaymentMethods();
-    console.log('Loaded payment methods:', userPaymentMethods);
   } catch (error) {
     console.error('Error loading payment methods:', error);
     userPaymentMethods = [];
