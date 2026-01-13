@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Primary Meta Tags -->
+  <title>Spending Patterns & Heatmap - Visualize Your Spending Habits | Rupiya</title>
+  <meta name="title" content="Spending Patterns & Heatmap - Visualize Your Spending Habits | Rupiya">
+  <meta name="description" content="Discover your spending patterns with interactive heatmaps. Analyze daily, weekly, and monthly trends. Identify spending habits and optimize your budget with visual insights.">
+  <meta name="keywords" content="spending heatmap, spending patterns, expense analysis, spending trends, budget visualization, spending habits, expense patterns India">
+  <meta name="author" content="Rupiya">
+  <meta name="robots" content="index, follow">
+  <meta name="language" content="English">
+  <meta name="theme-color" content="#4A90E2">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://rupiya.online/spending-patterns.html">
+  <meta property="og:title" content="Spending Patterns & Heatmap - Visualize Your Spending">
+  <meta property="og:description" content="Discover spending patterns with interactive heatmaps and trend analysis">
+  <meta property="og:image" content="https://rupiya.online/assets/images/og-image.png">
+  <meta property="og:site_name" content="Rupiya">
+  <meta property="og:locale" content="en_IN">
+  
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://rupiya.online/spending-patterns.html">
+  <meta property="twitter:title" content="Spending Patterns & Heatmap">
+  <meta property="twitter:description" content="Discover spending patterns with interactive heatmaps and trend analysis">
+  <meta property="twitter:image" content="https://rupiya.online/assets/images/og-image.png">
+  <meta property="twitter:site" content="@RupiyaApp">
+  
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://rupiya.online/spending-patterns.html">
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="assets/images/logo.png" type="image/png">
+  <link rel="apple-touch-icon" href="/android-chrome-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="assets/css/bundles/core.bundle.css">
+  <link rel="stylesheet" href="assets/css/bundles/dashboard.bundle.css">
+  <link rel="stylesheet" href="assets/css/spending-patterns.css">
+  <link rel="stylesheet" href="assets/css/sidebar.css">
+
+  <!-- Auth Guard -->
+  <script src="assets/js/utils/auth-guard.js"></script>
+  <script src="assets/js/utils/button-reset-fix.js"></script>
+  
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Spending Patterns & Heatmap",
+    "description": "Discover your spending patterns with interactive heatmaps and trend analysis",
+    "url": "https://rupiya.online/spending-patterns.html",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Rupiya",
+      "url": "https://rupiya.online"
+    }
+  }
+  </script>
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-header">
+      <img src="assets/images/logo.png" alt="Rupiya Logo" class="sidebar-logo">
+      <h2>Rupiya</h2>
+      <button id="sidebarClose" class="sidebar-close" aria-label="Close sidebar">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+    <nav id="sidebarNav" class="sidebar-nav">
+      <!-- Navigation will be injected by sidebar.js -->
+    </nav>
+    <div class="sidebar-footer">
+      <button id="logoutBtn" class="btn-logout">
+        <span class="material-icons">logout</span>
+        Logout
+      </button>
+    </div>
+  </aside>
+
+  <!-- Sidebar Overlay (for mobile) -->
+  <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Mobile Header -->
+    <header class="mobile-header">
+      <button id="sidebarOpen" class="sidebar-toggle" aria-label="Open sidebar">
+        <span class="material-icons">menu</span>
+      </button>
+      <h1>Spending Patterns</h1>
+      <div class="header-actions">
+        <button id="mobileExportBtn" class="btn-icon" title="Export Data">
+          <span class="material-icons">download</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="page-title-section">
+        <h1>📊 Spending Patterns & Heatmap</h1>
+        <p class="page-subtitle">Visualize your spending habits and discover patterns</p>
+      </div>
+      <div class="page-actions">
+        <button id="exportBtn" class="btn btn-secondary">
+          <span class="material-icons">download</span>
+          Export Report
+        </button>
+      </div>
+    </div>
+
+    <!-- Date Range Selector -->
+    <div class="filters-section">
+      <div class="filter-group">
+        <label for="dateRange">Time Period:</label>
+        <select id="dateRange" class="form-control">
+          <option value="30">Last 30 Days</option>
+          <option value="90" selected>Last 3 Months</option>
+          <option value="180">Last 6 Months</option>
+          <option value="365">Last Year</option>
+          <option value="custom">Custom Range</option>
+        </select>
+      </div>
+      <div id="customDateRange" class="filter-group" style="display: none;">
+        <label for="startDate">From:</label>
+        <input type="date" id="startDate" class="form-control">
+        <label for="endDate">To:</label>
+        <input type="date" id="endDate" class="form-control">
+        <button id="applyCustomRange" class="btn btn-primary">Apply</button>
+      </div>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-icon">📅</div>
+        <div class="kpi-content">
+          <div class="kpi-label">Avg Daily Spending</div>
+          <div class="kpi-value" id="avgDailySpending">₹0</div>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon">📊</div>
+        <div class="kpi-content">
+          <div class="kpi-label">Most Active Day</div>
+          <div class="kpi-value" id="mostActiveDay">-</div>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon">🔥</div>
+        <div class="kpi-content">
+          <div class="kpi-label">Spending Streak</div>
+          <div class="kpi-value" id="spendingStreak">0 days</div>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon">💰</div>
+        <div class="kpi-content">
+          <div class="kpi-label">Peak Spending Day</div>
+          <div class="kpi-value" id="peakSpendingDay">₹0</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Calendar Heatmap -->
+    <div class="card">
+      <div class="card-header">
+        <h2>📅 Daily Spending Heatmap</h2>
+        <p class="card-subtitle">Darker colors indicate higher spending</p>
+      </div>
+      <div class="card-body">
+        <div id="calendarHeatmap" class="heatmap-container">
+          <!-- Heatmap will be generated here -->
+        </div>
+        <div class="heatmap-legend">
+          <span>Less</span>
+          <div class="legend-scale">
+            <div class="legend-box" style="background: #ebedf0;"></div>
+            <div class="legend-box" style="background: #c6e48b;"></div>
+            <div class="legend-box" style="background: #7bc96f;"></div>
+            <div class="legend-box" style="background: #239a3b;"></div>
+            <div class="legend-box" style="background: #196127;"></div>
+          </div>
+          <span>More</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Day of Week Pattern -->
+    <div class="card">
+      <div class="card-header">
+        <h2>📊 Spending by Day of Week</h2>
+        <p class="card-subtitle">Which days do you spend the most?</p>
+      </div>
+      <div class="card-body">
+        <canvas id="dayOfWeekChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Category Heatmap -->
+    <div class="card">
+      <div class="card-header">
+        <h2>🎯 Category Spending Patterns</h2>
+        <p class="card-subtitle">Track spending trends across categories</p>
+      </div>
+      <div class="card-body">
+        <div id="categoryHeatmap" class="category-heatmap">
+          <!-- Category heatmap will be generated here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Monthly Trend -->
+    <div class="card">
+      <div class="card-header">
+        <h2>📈 Monthly Spending Trend</h2>
+        <p class="card-subtitle">Compare spending across months</p>
+      </div>
+      <div class="card-body">
+        <canvas id="monthlyTrendChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Insights Section -->
+    <div class="card">
+      <div class="card-header">
+        <h2>💡 Pattern Insights</h2>
+        <p class="card-subtitle">AI-powered spending pattern analysis</p>
+      </div>
+      <div class="card-body">
+        <div id="insightsContainer" class="insights-container">
+          <!-- Insights will be generated here -->
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Scripts -->
+  <script src="assets/js/components/sidebar.js" type="module"></script>
+  <script src="assets/js/pages/spending-patterns.js" type="module"></script>
+</body>
+</html>

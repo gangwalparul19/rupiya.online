@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Primary Meta Tags -->
+  <title>Credit Card Management - Track Rewards & Payments | Rupiya</title>
+  <meta name="title" content="Credit Card Management - Track Rewards & Payments | Rupiya">
+  <meta name="description" content="Manage credit cards, track rewards, monitor payments, and optimize credit utilization. Smart credit card management for better financial health.">
+  <meta name="keywords" content="credit card tracker, credit card management, rewards tracker, credit utilization, payment tracker, credit card app India">
+  <meta name="author" content="Rupiya">
+  <meta name="robots" content="index, follow">
+  <meta name="language" content="English">
+  <meta name="theme-color" content="#4A90E2">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://rupiya.online/credit-cards.html">
+  <meta property="og:title" content="Credit Card Management - Track Rewards & Payments">
+  <meta property="og:description" content="Manage credit cards, track rewards, monitor payments, and optimize credit utilization">
+  <meta property="og:image" content="https://rupiya.online/assets/images/og-image.png">
+  <meta property="og:site_name" content="Rupiya">
+  <meta property="og:locale" content="en_IN">
+  
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://rupiya.online/credit-cards.html">
+  <meta property="twitter:title" content="Credit Card Management - Track Rewards & Payments">
+  <meta property="twitter:description" content="Manage credit cards, track rewards, monitor payments, and optimize credit utilization">
+  <meta property="twitter:image" content="https://rupiya.online/assets/images/og-image.png">
+  <meta property="twitter:site" content="@RupiyaApp">
+  
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://rupiya.online/credit-cards.html">
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="assets/images/logo.png" type="image/png">
+  <link rel="apple-touch-icon" href="/android-chrome-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="assets/css/bundles/core.bundle.css">
+  <link rel="stylesheet" href="assets/css/bundles/dashboard.bundle.css">
+  <!-- Page-specific styles -->
+  <link rel="stylesheet" href="assets/css/credit-cards.css">
+  <link rel="stylesheet" href="assets/css/sidebar.css">
+
+  <!-- Auth Guard - Must be loaded early to prevent flash of protected content -->
+  <script src="assets/js/utils/auth-guard.js"></script>
+  <!-- Button Reset Fix - Prevents buttons from getting stuck -->
+  <script src="assets/js/utils/button-reset-fix.js"></script>
+
+  <!-- Structured Data - WebPage -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Credit Card Management - Track Rewards & Payments | Rupiya",
+    "description": "Manage credit cards, track rewards, monitor payments, and optimize credit utilization. Smart credit card management for better financial health.",
+    "url": "https://rupiya.online/credit-cards.html",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Rupiya",
+      "url": "https://rupiya.online"
+    }
+  }
+  </script>
+
+  <!-- Structured Data - Breadcrumb -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://rupiya.online/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Credit Cards",
+        "item": "https://rupiya.online/credit-cards.html"
+      }
+    ]
+  }
+  </script>
+
+  <script src="assets/js/utils/privacy-mode-preload.js"></script>
+</head>
+<body>
+  <div class="dashboard-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <img src="assets/images/logo.png" alt="Rupiya">
+        </div>
+        <button class="sidebar-toggle" id="sidebarClose">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <nav class="sidebar-nav">
+        <!-- Navigation is dynamically generated by sidebar.js -->
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-profile" id="userProfile">
+          <div class="user-avatar" id="userAvatar">U</div>
+          <div class="user-info">
+            <div class="user-name" id="userName">Loading...</div>
+            <div class="user-email" id="userEmail">Loading...</div>
+          </div>
+        </div>
+        <button class="btn btn-sm btn-outline w-100 mt-3" id="logoutBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+          </svg>
+          Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- Sidebar Overlay (Mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Mobile Header -->
+      <div class="mobile-header">
+        <a href="dashboard.html" class="mobile-brand">
+          <img src="assets/images/logo.png" alt="Rupiya">
+        </a>
+        <div class="mobile-header-actions">
+          <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle theme">
+            <svg class="theme-icon-light" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <circle cx="12" cy="12" r="5"/>
+              <line x1="12" y1="1" x2="12" y2="3"/>
+              <line x1="12" y1="21" x2="12" y2="23"/>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+              <line x1="1" y1="12" x2="3" y2="12"/>
+              <line x1="21" y1="12" x2="23" y2="12"/>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+            </svg>
+            <svg class="theme-icon-dark" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="display: none;">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
+          </button>
+          <button class="sidebar-toggle" id="sidebarOpen">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Page Header -->
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">💳 Credit Cards</h1>
+          <p class="page-subtitle">Manage cards, track rewards, and optimize credit utilization</p>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-primary" id="addCardBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Add Card
+          </button>
+        </div>
+      </div>
+
+      <!-- KPI Summary Cards -->
+      <div class="kpi-summary">
+        <div class="kpi-card">
+          <div class="kpi-icon">💳</div>
+          <div class="kpi-content">
+            <div class="kpi-label">Total Cards</div>
+            <div class="kpi-value" id="totalCards">0</div>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon">💰</div>
+          <div class="kpi-content">
+            <div class="kpi-label">Total Credit Limit</div>
+            <div class="kpi-value" id="totalLimit">₹0</div>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon">📊</div>
+          <div class="kpi-content">
+            <div class="kpi-label">Credit Utilization</div>
+            <div class="kpi-value" id="utilization">0%</div>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon">🎁</div>
+          <div class="kpi-content">
+            <div class="kpi-label">Total Rewards</div>
+            <div class="kpi-value" id="totalRewards">0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Credit Cards List -->
+      <div class="content-section">
+        <div class="section-header">
+          <h2 class="section-title">Your Credit Cards</h2>
+        </div>
+
+        <!-- Loading State -->
+        <div class="loading-state" id="loadingState">
+          <div class="spinner"></div>
+          <p>Loading credit cards...</p>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" id="emptyState" style="display: none;">
+          <div class="empty-state-icon">💳</div>
+          <h3>No Credit Cards Yet</h3>
+          <p>Add your first credit card to start tracking rewards and payments</p>
+          <button class="btn btn-primary" id="addCardBtnEmpty">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Add Credit Card
+          </button>
+        </div>
+
+        <!-- Cards Grid -->
+        <div class="cards-grid" id="cardsGrid"></div>
+      </div>
+
+      <!-- Add/Edit Card Modal -->
+      <div class="modal" id="cardModal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 id="modalTitle">Add Credit Card</h3>
+            <button class="modal-close" id="closeModalBtn">&times;</button>
+          </div>
+          <div class="modal-body">
+            <form id="cardForm">
+              <div class="form-group">
+                <label for="cardName">Card Name *</label>
+                <input type="text" id="cardName" class="form-input" placeholder="e.g., HDFC Regalia" required>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="bankName">Bank Name *</label>
+                  <input type="text" id="bankName" class="form-input" placeholder="e.g., HDFC Bank" required>
+                </div>
+                <div class="form-group">
+                  <label for="cardType">Card Type *</label>
+                  <select id="cardType" class="form-input" required>
+                    <option value="">Select Type</option>
+                    <option value="visa">Visa</option>
+                    <option value="mastercard">Mastercard</option>
+                    <option value="rupay">RuPay</option>
+                    <option value="amex">American Express</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="lastFourDigits">Last 4 Digits *</label>
+                <input type="text" id="lastFourDigits" class="form-input" placeholder="1234" maxlength="4" pattern="[0-9]{4}" required>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="creditLimit">Credit Limit (₹) *</label>
+                  <input type="number" id="creditLimit" class="form-input" placeholder="100000" min="0" step="1000" required>
+                </div>
+                <div class="form-group">
+                  <label for="currentBalance">Current Balance (₹)</label>
+                  <input type="number" id="currentBalance" class="form-input" placeholder="0" min="0" step="100">
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="billingDate">Billing Date</label>
+                  <input type="number" id="billingDate" class="form-input" placeholder="1-31" min="1" max="31">
+                </div>
+                <div class="form-group">
+                  <label for="dueDate">Payment Due Date</label>
+                  <input type="number" id="dueDate" class="form-input" placeholder="1-31" min="1" max="31">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="rewardsProgram">Rewards Program</label>
+                <input type="text" id="rewardsProgram" class="form-input" placeholder="e.g., Cashback, Points, Miles">
+              </div>
+
+              <div class="form-group">
+                <label for="rewardsBalance">Rewards Balance</label>
+                <input type="number" id="rewardsBalance" class="form-input" placeholder="0" min="0" step="1">
+              </div>
+
+              <div class="form-group">
+                <label for="annualFee">Annual Fee (₹)</label>
+                <input type="number" id="annualFee" class="form-input" placeholder="0" min="0" step="100">
+              </div>
+
+              <div class="form-group">
+                <label for="notes">Notes</label>
+                <textarea id="notes" class="form-input" rows="3" placeholder="Additional notes about this card"></textarea>
+              </div>
+
+              <div class="form-actions">
+                <button type="button" class="btn btn-outline" id="cancelBtn">Cancel</button>
+                <button type="submit" class="btn btn-primary" id="saveBtn">Save Card</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="assets/js/utils/ux-enhancements.js"></script>
+  <script type="module" src="assets/js/components/sidebar.js"></script>
+  <script type="module" src="assets/js/pages/credit-cards.js"></script>
+  <script type="module" src="assets/js/pwa-setup.js"></script>
+</body>
+</html>

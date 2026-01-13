@@ -45,7 +45,10 @@ const htmlFiles = [
   'transfers.html',
   'net-worth.html',
   'privacy-settings.html',
-  'feature-details.html'
+  'feature-details.html',
+  'credit-cards.html',
+  'healthcare-insurance.html',
+  'spending-patterns.html'
 ];
 
 // Pages that have the dashboard layout with sidebar
@@ -74,7 +77,10 @@ const pagesWithSidebar = [
   'transfers.html',
   'net-worth.html',
   'privacy-settings.html',
-  'feature-details.html'
+  'feature-details.html',
+  'credit-cards.html',
+  'healthcare-insurance.html',
+  'spending-patterns.html'
 ];
 
 // Environment variable injection script (only inject if values are present)

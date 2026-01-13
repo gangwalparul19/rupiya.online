@@ -1,0 +1,405 @@
+/* Healthcare & Insurance Page Styles */
+
+.header-tabs {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.tab-btn {
+  padding: 0.5rem 1rem;
+  background: transparent;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.tab-btn:hover {
+  background: var(--bg-hover);
+}
+
+.tab-btn.active {
+  background: var(--primary-blue);
+  border-color: var(--primary-blue);
+  color: white;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* Insurance Cards */
+.items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.insurance-card {
+  background: white;
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.insurance-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.insurance-card.active {
+  border-color: var(--accent-green);
+}
+
+.insurance-card.expired {
+  border-color: var(--accent-red);
+  opacity: 0.7;
+}
+
+.insurance-card .card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.insurance-card h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.status-badge.active {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.status-badge.expired {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.insurance-card .company {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0.25rem 0;
+}
+
+.insurance-card .policy-number {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-family: 'Courier New', monospace;
+  margin: 0.25rem 0;
+}
+
+.policy-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin: 1rem 0;
+  padding: 1rem;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+}
+
+.policy-stats .stat {
+  text-align: center;
+}
+
+.policy-stats .label {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.policy-stats .value {
+  display: block;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.expiry-info {
+  font-size: 0.875rem;
+  color: var(--accent-orange);
+  margin: 0.5rem 0;
+}
+
+.members {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0.5rem 0;
+}
+
+/* Medical Records & Expenses */
+.items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.record-item,
+.expense-item {
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.record-item:hover,
+.expense-item:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.record-header,
+.expense-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.record-type-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: var(--bg-secondary);
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.record-type-badge.consultation {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.record-type-badge.prescription {
+  background: #fce7f3;
+  color: #9f1239;
+}
+
+.record-type-badge.test {
+  background: #e0e7ff;
+  color: #3730a3;
+}
+
+.record-type-badge.vaccination {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.record-type-badge.surgery {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.record-date,
+.expense-date {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.doctor-name {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0.5rem 0;
+}
+
+.diagnosis,
+.treatment {
+  font-size: 0.875rem;
+  margin: 0.5rem 0;
+  line-height: 1.5;
+}
+
+.notes {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0.5rem 0;
+  font-style: italic;
+}
+
+.expense-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.expense-info h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 0.25rem 0;
+}
+
+.expense-category {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  font-size: 0.75rem;
+  text-transform: capitalize;
+}
+
+.expense-amount {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--accent-red);
+}
+
+.claim-info {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin: 0.5rem 0;
+  padding: 0.5rem;
+  background: var(--bg-secondary);
+  border-radius: 6px;
+  font-size: 0.875rem;
+}
+
+.claim-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.claim-badge.pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.claim-badge.submitted {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.claim-badge.approved {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.claim-badge.rejected {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.record-actions,
+.expense-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+/* Form specific */
+#claimDetails {
+  padding: 1rem;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  margin-top: 1rem;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .header-tabs {
+    flex-direction: column;
+  }
+
+  .tab-btn {
+    width: 100%;
+  }
+
+  .items-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .policy-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .expense-header {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .expense-amount {
+    align-self: flex-start;
+  }
+}
+
+
+/* ============================================
+   PRIVACY MODE SUPPORT
+   ============================================ */
+
+/* Blur sensitive information in privacy mode */
+body.privacy-mode-enabled .kpi-value,
+body.privacy-mode-enabled .stat-value,
+body.privacy-mode-enabled .policy-number,
+body.privacy-mode-enabled .premium-amount,
+body.privacy-mode-enabled .coverage-amount,
+body.privacy-mode-enabled .user-email,
+body.privacy-mode-enabled .provider-contact {
+  filter: blur(8px);
+  transition: filter 0.3s ease;
+}
+
+/* Show on hover in privacy mode */
+body.privacy-mode-enabled .kpi-value:hover,
+body.privacy-mode-enabled .stat-value:hover,
+body.privacy-mode-enabled .policy-number:hover,
+body.privacy-mode-enabled .premium-amount:hover,
+body.privacy-mode-enabled .coverage-amount:hover {
+  filter: blur(0);
+}
+
+/* Privacy mode indicator */
+body.privacy-mode-enabled::before {
+  content: '🔒 Privacy Mode Active';
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+/* Hide sensitive data completely in privacy mode (optional) */
+body.privacy-mode-enabled.privacy-mode-strict .kpi-value,
+body.privacy-mode-enabled.privacy-mode-strict .stat-value,
+body.privacy-mode-enabled.privacy-mode-strict .policy-number,
+body.privacy-mode-enabled.privacy-mode-strict .premium-amount {
+  visibility: hidden;
+}
+
+body.privacy-mode-enabled.privacy-mode-strict .kpi-value::after,
+body.privacy-mode-enabled.privacy-mode-strict .stat-value::after {
+  content: '••••';
+  visibility: visible;
+  display: block;
+}

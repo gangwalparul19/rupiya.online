@@ -1,0 +1,201 @@
+/* Credit Cards Page Styles */
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.card-item {
+  background: var(--bg-card);
+  border-radius: var(--border-radius-lg);
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.card-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #4A90E2, #27AE60);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.card-info h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.card-bank {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.card-type-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--border-radius);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.card-type-visa {
+  background: #1A1F71;
+  color: white;
+}
+
+.card-type-mastercard {
+  background: #EB001B;
+  color: white;
+}
+
+.card-type-rupay {
+  background: #097939;
+  color: white;
+}
+
+.card-type-amex {
+  background: #006FCF;
+  color: white;
+}
+
+.card-number {
+  font-family: 'Courier New', monospace;
+  font-size: 1.125rem;
+  letter-spacing: 2px;
+  margin: 1rem 0;
+  color: var(--text-primary);
+}
+
+.card-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin: 1rem 0;
+  padding: 1rem;
+  background: var(--bg-secondary);
+  border-radius: var(--border-radius);
+}
+
+.card-stat {
+  text-align: center;
+}
+
+.card-stat-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.card-stat-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.card-progress {
+  margin: 1rem 0;
+}
+
+.card-progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
+.progress-bar {
+  height: 8px;
+  background: var(--bg-secondary);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #27AE60, #F39C12);
+  transition: width 0.3s;
+}
+
+.progress-fill.high {
+  background: linear-gradient(90deg, #E74C3C, #C0392B);
+}
+
+.card-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.card-actions .btn {
+  flex: 1;
+  font-size: 0.875rem;
+}
+
+.card-rewards {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: var(--bg-secondary);
+  border-radius: var(--border-radius);
+  margin-top: 1rem;
+}
+
+.card-rewards-icon {
+  font-size: 1.5rem;
+}
+
+.card-rewards-info {
+  flex: 1;
+}
+
+.card-rewards-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.card-rewards-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .card-stats {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Privacy Mode */
+.privacy-mode .card-number,
+.privacy-mode .card-stat-value,
+.privacy-mode .card-rewards-value {
+  filter: blur(8px);
+  user-select: none;
+}

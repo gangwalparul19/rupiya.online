@@ -115,6 +115,24 @@ const DEFAULT_FEATURES = {
     description: 'Track staff payments',
     category: 'assets'
   },
+  creditCards: {
+    enabled: false,
+    label: 'Credit Cards',
+    description: 'Manage cards & track rewards',
+    category: 'planning'
+  },
+  healthcareInsurance: {
+    enabled: false,
+    label: 'Healthcare & Insurance',
+    description: 'Track medical expenses & policies',
+    category: 'planning'
+  },
+  spendingPatterns: {
+    enabled: false,
+    label: 'Spending Patterns',
+    description: 'Visualize spending with heatmaps',
+    category: 'analytics'
+  },
   tripGroups: {
     enabled: false,
     label: 'Trip Groups',

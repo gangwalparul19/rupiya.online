@@ -509,6 +509,96 @@ const FEATURE_DETAILS = {
     ],
     whyEnable: 'Useful for households with staff. Organized tracking ensures timely payments and maintains good records.'
   },
+  creditCards: {
+    label: 'Credit Cards',
+    icon: '💳',
+    category: 'planning',
+    shortDescription: 'Manage credit cards and track rewards',
+    longDescription: 'Track all your credit cards, monitor spending, manage rewards points, and optimize credit utilization. Get alerts for payment due dates and track credit card benefits.',
+    benefits: [
+      'Track all credit cards in one place',
+      'Monitor credit utilization ratio',
+      'Track rewards points and cashback',
+      'Get payment due date reminders',
+      'Optimize credit card usage for maximum benefits'
+    ],
+    useCases: [
+      'Track multiple credit cards',
+      'Monitor monthly spending per card',
+      'Track rewards and redeem points',
+      'Get alerts before payment due dates',
+      'Analyze spending patterns by card'
+    ],
+    features: [
+      'Multi-card management',
+      'Credit utilization tracking',
+      'Rewards points tracker',
+      'Payment due date alerts',
+      'Spending analysis by card',
+      'Annual fee tracking'
+    ],
+    whyEnable: 'Essential for credit card users. Helps optimize rewards, avoid late fees, and maintain healthy credit utilization.'
+  },
+  healthcareInsurance: {
+    label: 'Healthcare & Insurance',
+    icon: '🏥',
+    category: 'planning',
+    shortDescription: 'Track medical expenses and insurance policies',
+    longDescription: 'Manage all your healthcare expenses and insurance policies in one place. Track medical bills, insurance claims, policy renewals, and healthcare budget.',
+    benefits: [
+      'Track all medical expenses',
+      'Manage multiple insurance policies',
+      'Monitor policy renewals and premiums',
+      'Track insurance claims',
+      'Plan healthcare budget effectively'
+    ],
+    useCases: [
+      'Record doctor visits and medical bills',
+      'Track health insurance policies',
+      'Monitor policy renewal dates',
+      'Track insurance claims and reimbursements',
+      'Analyze healthcare spending patterns'
+    ],
+    features: [
+      'Medical expense tracking',
+      'Insurance policy management',
+      'Renewal date reminders',
+      'Claims tracking',
+      'Healthcare budget planning',
+      'Family member wise tracking'
+    ],
+    whyEnable: 'Important for healthcare planning. Helps manage medical costs, track insurance coverage, and ensure timely policy renewals.'
+  },
+  spendingPatterns: {
+    label: 'Spending Patterns',
+    icon: '📊',
+    category: 'analytics',
+    shortDescription: 'Visualize spending habits with interactive heatmaps',
+    longDescription: 'Discover your spending patterns through interactive visualizations. Calendar heatmaps, day-of-week analysis, and category trends help you understand when and where you spend the most.',
+    benefits: [
+      'Visualize daily spending with calendar heatmaps',
+      'Identify peak spending days and times',
+      'Discover spending patterns by category',
+      'Compare spending across months',
+      'Get AI-powered pattern insights'
+    ],
+    useCases: [
+      'Identify which days you spend the most',
+      'Discover seasonal spending trends',
+      'Find categories with increasing spending',
+      'Understand spending streaks and habits',
+      'Compare current vs previous periods'
+    ],
+    features: [
+      'Interactive calendar heatmap',
+      'Day-of-week spending analysis',
+      'Category spending patterns',
+      'Monthly trend comparison',
+      'AI-powered insights',
+      'Pattern-based recommendations'
+    ],
+    whyEnable: 'Perfect for visual learners. Heatmaps and charts make it easy to spot spending patterns that are hard to see in raw data.'
+  },
   tripGroups: {
     label: 'Trip Groups',
     icon: '✈️',

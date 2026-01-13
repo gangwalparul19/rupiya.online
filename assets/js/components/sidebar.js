@@ -62,7 +62,8 @@ const navigationConfig = {
       items: [
         { href: 'dashboard.html', icon: '📊', label: 'Dashboard', featureKey: 'dashboard' },
         { href: 'predictive-analytics.html', icon: '🔮', label: 'Predictive Analytics', featureKey: 'predictiveAnalytics' },
-        { href: 'ai-insights.html', icon: '🤖', label: 'AI Insights', featureKey: 'aiInsights' }
+        { href: 'ai-insights.html', icon: '🤖', label: 'AI Insights', featureKey: 'aiInsights' },
+        { href: 'spending-patterns.html', icon: '📊', label: 'Spending Patterns', featureKey: 'spendingPatterns' }
       ]
     },
     {
@@ -88,7 +89,9 @@ const navigationConfig = {
         { href: 'investments.html', icon: '📈', label: 'Investments', featureKey: 'investments' },
         { href: 'loans.html', icon: '🏦', label: 'Loans & EMI', featureKey: 'loans' },
         { href: 'transfers.html', icon: '🔄', label: 'Transfers', featureKey: 'transfers' },
-        { href: 'net-worth.html', icon: '💎', label: 'Net Worth', featureKey: 'netWorth' }
+        { href: 'net-worth.html', icon: '💎', label: 'Net Worth', featureKey: 'netWorth' },
+        { href: 'credit-cards.html', icon: '💳', label: 'Credit Cards', featureKey: 'creditCards' },
+        { href: 'healthcare-insurance.html', icon: '🏥', label: 'Healthcare & Insurance', featureKey: 'healthcareInsurance' }
       ]
     },
     {

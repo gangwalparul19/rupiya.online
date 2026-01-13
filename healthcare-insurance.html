@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Primary Meta Tags -->
+  <title>Healthcare & Insurance Tracker - Manage Medical Expenses | Rupiya</title>
+  <meta name="title" content="Healthcare & Insurance Tracker - Manage Medical Expenses | Rupiya">
+  <meta name="description" content="Track medical expenses, manage insurance policies, monitor health costs, and plan healthcare budget. Complete healthcare financial management.">
+  <meta name="keywords" content="healthcare tracker, insurance tracker, medical expenses, health insurance India, medical cost tracker, healthcare budget">
+  <meta name="author" content="Rupiya">
+  <meta name="robots" content="index, follow">
+  <meta name="language" content="English">
+  <meta name="theme-color" content="#4A90E2">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://rupiya.online/healthcare-insurance.html">
+  <meta property="og:title" content="Healthcare & Insurance Tracker - Manage Medical Expenses">
+  <meta property="og:description" content="Track medical expenses, manage insurance policies, monitor health costs">
+  <meta property="og:image" content="https://rupiya.online/assets/images/og-image.png">
+  <meta property="og:site_name" content="Rupiya">
+  <meta property="og:locale" content="en_IN">
+  
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://rupiya.online/healthcare-insurance.html">
+  <meta property="twitter:title" content="Healthcare & Insurance Tracker - Manage Medical Expenses">
+  <meta property="twitter:description" content="Track medical expenses, manage insurance policies, monitor health costs">
+  <meta property="twitter:image" content="https://rupiya.online/assets/images/og-image.png">
+  <meta property="twitter:site" content="@RupiyaApp">
+  
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://rupiya.online/healthcare-insurance.html">
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="assets/images/logo.png" type="image/png">
+  <link rel="apple-touch-icon" href="/android-chrome-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="assets/css/bundles/core.bundle.css">
+  <link rel="stylesheet" href="assets/css/bundles/dashboard.bundle.css">
+  <!-- Page-specific styles -->
+  <link rel="stylesheet" href="assets/css/healthcare-insurance.css">
+  <link rel="stylesheet" href="assets/css/sidebar.css">
+
+  <!-- Auth Guard - Must be loaded early to prevent flash of protected content -->
+  <script src="assets/js/utils/auth-guard.js"></script>
+  <!-- Button Reset Fix - Prevents buttons from getting stuck -->
+  <script src="assets/js/utils/button-reset-fix.js"></script>
+
+  <!-- Structured Data - WebPage -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Healthcare & Insurance Tracker - Manage Medical Expenses | Rupiya",
+    "description": "Track medical expenses, manage insurance policies, monitor health costs, and plan healthcare budget. Complete healthcare financial management.",
+    "url": "https://rupiya.online/healthcare-insurance.html",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Rupiya",
+      "url": "https://rupiya.online"
+    }
+  }
+  </script>
+
+  <!-- Structured Data - Breadcrumb -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://rupiya.online/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Healthcare & Insurance",
+        "item": "https://rupiya.online/healthcare-insurance.html"
+      }
+    ]
+  }
+  </script>
+
+  <script src="assets/js/utils/privacy-mode-preload.js"></script>
+</head>
+<body>
+  <div class="dashboard-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <img src="assets/images/logo.png" alt="Rupiya">
+        </div>
+        <button class="sidebar-toggle" id="sidebarClose">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <nav class="sidebar-nav">
+        <!-- Navigation is dynamically generated by sidebar.js -->
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-profile" id="userProfile">
+          <div class="user-avatar" id="userAvatar">U</div>
+          <div class="user-info">
+            <div class="user-name" id="userName">Loading...</div>
+            <div class="user-email" id="userEmail">Loading...</div>
+          </div>
+        </div>
+        <button class="btn btn-sm btn-outline w-100 mt-3" id="logoutBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+          </svg>
+          Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- Sidebar Overlay (Mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Mobile Header -->
+      <div class="mobile-header">
+        <a href="dashboard.html" class="mobile-brand">
+          <img src="assets/images/logo.png" alt="Rupiya">
+        </a>
+        <div class="mobile-header-actions">
+          <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle theme">
+            <svg class="theme-icon-light" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <circle cx="12" cy="12" r="5"/>
+              <line x1="12" y1="1" x2="12" y2="3"/>
+              <line x1="12" y1="21" x2="12" y2="23"/>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+              <line x1="1" y1="12" x2="3" y2="12"/>
+              <line x1="21" y1="12" x2="23" y2="12"/>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+            </svg>
+            <svg class="theme-icon-dark" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="display: none;">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
+          </button>
+          <button class="sidebar-toggle" id="sidebarOpen">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Page Header -->
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">🏥 Healthcare & Insurance</h1>
+          <p class="page-subtitle">Track medical expenses and manage insurance policies</p>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-outline" id="addExpenseBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Add Expense
+          </button>
+          <button class="btn btn-primary" id="addPolicyBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Add Policy
+          </button>
+        </div>
+      </div>
+
+      <!-- KPI Summary Cards -->
+      <div class="kpi-summary">
+        <div class="kpi-card">
+          <div class="kpi-icon">🏥</div>
+          <div class="kpi-content">
+            <div class="kpi-label">Total Medical Expenses</div>
+            <div class="kpi-value" id="totalExpenses">₹0</div>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon">🛡️</div>
+          <div class="kpi-content">
+            <div class="kpi-label">Active Policies</div>
+            <div class="kpi-value" id="activePolicies">0</div>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon">💰</div>
+          <div class="kpi-content">
+            <div class="kpi-label">Total Coverage</div>
+            <div class="kpi-value" id="totalCoverage">₹0</div>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon">📅</div>
+          <div class="kpi-content">
+            <div class="kpi-label">Upcoming Renewals</div>
+            <div class="kpi-value" id="upcomingRenewals">0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="policies">Insurance Policies</button>
+        <button class="tab-btn" data-tab="expenses">Medical Expenses</button>
+      </div>
+
+      <!-- Insurance Policies Tab -->
+      <div class="tab-content active" id="policiesTab">
+        <div class="content-section">
+          <div class="section-header">
+            <h2 class="section-title">Your Insurance Policies</h2>
+          </div>
+
+          <!-- Loading State -->
+          <div class="loading-state" id="policiesLoadingState">
+            <div class="spinner"></div>
+            <p>Loading insurance policies...</p>
+          </div>
+
+          <!-- Empty State -->
+          <div class="empty-state" id="policiesEmptyState" style="display: none;">
+            <div class="empty-state-icon">🛡️</div>
+            <h3>No Insurance Policies Yet</h3>
+            <p>Add your first insurance policy to start tracking coverage and renewals</p>
+            <button class="btn btn-primary" id="addPolicyBtnEmpty">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+              </svg>
+              Add Insurance Policy
+            </button>
+          </div>
+
+          <!-- Policies Grid -->
+          <div class="policies-grid" id="policiesGrid"></div>
+        </div>
+      </div>
+
+      <!-- Medical Expenses Tab -->
+      <div class="tab-content" id="expensesTab">
+        <div class="content-section">
+          <div class="section-header">
+            <h2 class="section-title">Medical Expenses</h2>
+          </div>
+
+          <!-- Loading State -->
+          <div class="loading-state" id="expensesLoadingState">
+            <div class="spinner"></div>
+            <p>Loading medical expenses...</p>
+          </div>
+
+          <!-- Empty State -->
+          <div class="empty-state" id="expensesEmptyState" style="display: none;">
+            <div class="empty-state-icon">🏥</div>
+            <h3>No Medical Expenses Yet</h3>
+            <p>Add your first medical expense to start tracking healthcare costs</p>
+            <button class="btn btn-primary" id="addExpenseBtnEmpty">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+              </svg>
+              Add Medical Expense
+            </button>
+          </div>
+
+          <!-- Expenses List -->
+          <div class="expenses-list" id="expensesList"></div>
+        </div>
+      </div>
+
+      <!-- Add/Edit Policy Modal -->
+      <div class="modal" id="policyModal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 id="policyModalTitle">Add Insurance Policy</h3>
+            <button class="modal-close" id="closePolicyModalBtn">&times;</button>
+          </div>
+          <div class="modal-body">
+            <form id="policyForm">
+              <div class="form-group">
+                <label for="policyName">Policy Name *</label>
+                <input type="text" id="policyName" class="form-input" placeholder="e.g., Family Health Insurance" required>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="policyType">Policy Type *</label>
+                  <select id="policyType" class="form-input" required>
+                    <option value="">Select Type</option>
+                    <option value="health">Health Insurance</option>
+                    <option value="life">Life Insurance</option>
+                    <option value="critical">Critical Illness</option>
+                    <option value="accident">Accident Insurance</option>
+                    <option value="dental">Dental Insurance</option>
+                    <option value="vision">Vision Insurance</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="provider">Insurance Provider *</label>
+                  <input type="text" id="provider" class="form-input" placeholder="e.g., HDFC ERGO" required>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="policyNumber">Policy Number *</label>
+                <input type="text" id="policyNumber" class="form-input" placeholder="Policy number" required>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="coverageAmount">Coverage Amount (₹) *</label>
+                  <input type="number" id="coverageAmount" class="form-input" placeholder="500000" min="0" step="10000" required>
+                </div>
+                <div class="form-group">
+                  <label for="premium">Annual Premium (₹) *</label>
+                  <input type="number" id="premium" class="form-input" placeholder="10000" min="0" step="100" required>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="startDate">Start Date *</label>
+                  <input type="date" id="startDate" class="form-input" required>
+                </div>
+                <div class="form-group">
+                  <label for="renewalDate">Renewal Date *</label>
+                  <input type="date" id="renewalDate" class="form-input" required>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="coveredMembers">Covered Members</label>
+                <input type="text" id="coveredMembers" class="form-input" placeholder="e.g., Self, Spouse, Children">
+              </div>
+
+              <div class="form-group">
+                <label for="policyNotes">Notes</label>
+                <textarea id="policyNotes" class="form-input" rows="3" placeholder="Additional notes about this policy"></textarea>
+              </div>
+
+              <div class="form-actions">
+                <button type="button" class="btn btn-outline" id="cancelPolicyBtn">Cancel</button>
+                <button type="submit" class="btn btn-primary" id="savePolicyBtn">Save Policy</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add/Edit Expense Modal -->
+      <div class="modal" id="expenseModal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 id="expenseModalTitle">Add Medical Expense</h3>
+            <button class="modal-close" id="closeExpenseModalBtn">&times;</button>
+          </div>
+          <div class="modal-body">
+            <form id="expenseForm">
+              <div class="form-group">
+                <label for="expenseType">Expense Type *</label>
+                <select id="expenseType" class="form-input" required>
+                  <option value="">Select Type</option>
+                  <option value="consultation">Doctor Consultation</option>
+                  <option value="medicine">Medicine</option>
+                  <option value="test">Lab Test</option>
+                  <option value="surgery">Surgery</option>
+                  <option value="hospitalization">Hospitalization</option>
+                  <option value="dental">Dental</option>
+                  <option value="vision">Vision/Eye Care</option>
+                  <option value="therapy">Therapy</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="expenseDescription">Description *</label>
+                <input type="text" id="expenseDescription" class="form-input" placeholder="e.g., Annual health checkup" required>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="expenseAmount">Amount (₹) *</label>
+                  <input type="number" id="expenseAmount" class="form-input" placeholder="1000" min="0" step="10" required>
+                </div>
+                <div class="form-group">
+                  <label for="expenseDate">Date *</label>
+                  <input type="date" id="expenseDate" class="form-input" required>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="familyMember">Family Member</label>
+                <input type="text" id="familyMember" class="form-input" placeholder="e.g., Self, Spouse, Child">
+              </div>
+
+              <div class="form-group">
+                <label for="claimable">
+                  <input type="checkbox" id="claimable">
+                  Claimable from Insurance
+                </label>
+              </div>
+
+              <div class="form-group" id="policySelectGroup" style="display: none;">
+                <label for="relatedPolicy">Related Policy</label>
+                <select id="relatedPolicy" class="form-input">
+                  <option value="">Select Policy</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="expenseNotes">Notes</label>
+                <textarea id="expenseNotes" class="form-input" rows="3" placeholder="Additional notes"></textarea>
+              </div>
+
+              <div class="form-actions">
+                <button type="button" class="btn btn-outline" id="cancelExpenseBtn">Cancel</button>
+                <button type="submit" class="btn btn-primary" id="saveExpenseBtn">Save Expense</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="assets/js/utils/ux-enhancements.js"></script>
+  <script type="module" src="assets/js/components/sidebar.js"></script>
+  <script type="module" src="assets/js/pages/healthcare-insurance.js"></script>
+  <script type="module" src="assets/js/pwa-setup.js"></script>
+</body>
+</html>
