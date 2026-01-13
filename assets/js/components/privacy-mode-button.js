@@ -26,21 +26,23 @@ export function initPrivacyModeButton() {
  * Create and attach privacy button to header
  */
 function createAndAttachPrivacyButton() {
-    // Only add privacy button to dashboard and privacy-settings pages
+    // Add privacy button to dashboard, privacy-settings, and ai-insights pages
     const pathname = window.location.pathname.toLowerCase();
     const href = window.location.href.toLowerCase();
     
-    // Check if we're on dashboard or privacy-settings
+    // Check if we're on dashboard, privacy-settings, or ai-insights
     const isDashboard = pathname.includes('dashboard') || href.includes('dashboard');
     const isPrivacySettings = pathname.includes('privacy-settings') || href.includes('privacy-settings');
+    const isAIInsights = pathname.includes('ai-insights') || href.includes('ai-insights');
     
-    // Skip adding button if not on dashboard or privacy-settings
-    if (!isDashboard && !isPrivacySettings) {
+    // Skip adding button if not on these pages
+    if (!isDashboard && !isPrivacySettings && !isAIInsights) {
         console.log('[PrivacyModeButton] Skipping privacy button on:', pathname);
         return;
     }
     
-    console.log('[PrivacyModeButton] Adding privacy button to:', isDashboard ? 'dashboard' : 'privacy-settings');
+    console.log('[PrivacyModeButton] Adding privacy button to:', 
+        isDashboard ? 'dashboard' : isPrivacySettings ? 'privacy-settings' : 'ai-insights');
     
     // Try to add to mobile header first
     const mobileHeaderActions = document.querySelector('.mobile-header-actions');
