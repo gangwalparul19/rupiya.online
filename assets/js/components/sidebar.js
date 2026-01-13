@@ -502,13 +502,13 @@ function setupMobileSidebar() {
   const overlay = document.getElementById('sidebarOverlay');
 
   function openSidebar() {
-    sidebar?.classList.add('open');
+    sidebar?.classList.add('active');
     overlay?.classList.add('active');
     document.body.style.overflow = 'hidden';
   }
 
   function closeSidebar() {
-    sidebar?.classList.remove('open');
+    sidebar?.classList.remove('active');
     overlay?.classList.remove('active');
     document.body.style.overflow = '';
   }

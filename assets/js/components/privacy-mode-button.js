@@ -26,6 +26,13 @@ export function initPrivacyModeButton() {
  * Create and attach privacy button to header
  */
 function createAndAttachPrivacyButton() {
+    // Don't add privacy button to user-guide or privacy-settings pages
+    const pathname = window.location.pathname.toLowerCase();
+    if (pathname.includes('user-guide') || pathname.includes('privacy-settings') || pathname.includes('feature-details')) {
+        console.log('[PrivacyModeButton] Skipping privacy button on:', pathname);
+        return;
+    }
+    
     // Try to add to mobile header first
     const mobileHeaderActions = document.querySelector('.mobile-header-actions');
     if (mobileHeaderActions && !document.getElementById('privacyModeBtn')) {

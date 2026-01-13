@@ -48,9 +48,41 @@
             pointer-events: auto;
         }
         
+        /* Ensure all interactive elements are clickable */
+        .privacy-toggle,
+        .btn,
+        button,
+        input,
+        select,
+        textarea,
+        a {
+            pointer-events: auto !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+        
         @media (max-width: 768px) {
             .page-container { padding: 20px 15px; }
             .page-header h1 { font-size: 1.5em; }
+            
+            /* Ensure mobile header is visible */
+            .mobile-header {
+                display: flex !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+                pointer-events: auto !important;
+            }
+            
+            /* Ensure main content takes full width on mobile */
+            .main-content {
+                margin-left: 0 !important;
+                width: 100% !important;
+            }
+            
+            /* Ensure sidebar is hidden on mobile */
+            .sidebar {
+                display: none !important;
+            }
         }
         
         @media (max-width: 480px) {
@@ -253,12 +285,12 @@
     <script type="module">
         import { initSidebar } from './assets/js/components/sidebar.js';
         import { initLogoutHandler } from './assets/js/utils/logout-handler.js';
+        import privacyMode from './assets/js/utils/privacy-mode.js';
+        import authService from './assets/js/services/auth-service.js';
 
         // Initialize components
         initSidebar();
         initLogoutHandler();
-    </script>
-    <script type="module" src="assets/js/pages/privacy-settings.js">
 
         // Load user profile
         async function loadUserProfile() {
@@ -287,21 +319,6 @@
         
         loadUserProfile();
 
-        // Mobile sidebar toggle
-        const sidebar = document.getElementById('sidebar');
-        const sidebarOverlay = document.getElementById('sidebarOverlay');
-        const sidebarOpen = document.getElementById('sidebarOpen');
-        const sidebarClose = document.getElementById('sidebarClose');
-
-        function toggleSidebar() {
-            sidebar.classList.toggle('active');
-            sidebarOverlay.classList.toggle('active');
-        }
-
-        sidebarOpen?.addEventListener('click', toggleSidebar);
-        sidebarClose?.addEventListener('click', toggleSidebar);
-        sidebarOverlay?.addEventListener('click', toggleSidebar);
-
         // Privacy mode controls
         const mainToggle = document.getElementById('mainPrivacyToggle');
         const enableBtn = document.getElementById('enablePrivacyBtn');
@@ -309,9 +326,9 @@
 
         function updateToggleState() {
             if (privacyMode.isEnabled()) {
-                mainToggle.classList.add('active');
+                mainToggle?.classList.add('active');
             } else {
-                mainToggle.classList.remove('active');
+                mainToggle?.classList.remove('active');
             }
         }
 

@@ -238,29 +238,28 @@
             </div>
 
             <div class="guide-container">
-        <div class="guide-header">
-            <h1>📚 Rupiya User Guide</h1>
-            <p>Master your personal finances with our comprehensive tutorial</p>
-        </div>
+                <div class="guide-header">
+                    <h1>📚 Rupiya User Guide</h1>
+                    <p>Master your personal finances with our comprehensive tutorial</p>
+                </div>
 
-        <div class="toc">
-            <h2>📖 Table of Contents</h2>
-            <div class="toc-list">
-                <div class="toc-item"><a href="#getting-started">🚀 Getting Started</a></div>
-                <div class="toc-item"><a href="#dashboard">📊 Dashboard</a></div>
-                <div class="toc-item"><a href="#expenses">💸 Expenses</a></div>
-                <div class="toc-item"><a href="#income">💰 Income</a></div>
-                <div class="toc-item"><a href="#budgets">📈 Budgets</a></div>
-                <div class="toc-item"><a href="#family">👨‍👩‍👧‍👦 Family</a></div>
-                <div class="toc-item"><a href="#investments">📊 Investments</a></div>
-                <div class="toc-item"><a href="#goals">🎯 Goals</a></div>
-                <div class="toc-item"><a href="#reports">📋 Reports</a></div>
-                <div class="toc-item"><a href="#faq">❓ FAQ</a></div>
+                <div class="toc">
+                    <h2>📖 Table of Contents</h2>
+                    <div class="toc-list">
+                        <div class="toc-item"><a href="#getting-started">🚀 Getting Started</a></div>
+                        <div class="toc-item"><a href="#dashboard">📊 Dashboard</a></div>
+                        <div class="toc-item"><a href="#expenses">💸 Expenses</a></div>
+                        <div class="toc-item"><a href="#income">💰 Income</a></div>
+                        <div class="toc-item"><a href="#budgets">📈 Budgets</a></div>
+                        <div class="toc-item"><a href="#family">👨‍👩‍👧‍👦 Family</a></div>
+                        <div class="toc-item"><a href="#investments">📊 Investments</a></div>
+                        <div class="toc-item"><a href="#goals">🎯 Goals</a></div>
+                        <div class="toc-item"><a href="#reports">📋 Reports</a></div>
+                        <div class="toc-item"><a href="#faq">❓ FAQ</a></div>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-</body>
-</html>
+
 
         <!-- Getting Started Section -->
         <div id="getting-started" class="section">
@@ -449,7 +448,7 @@
             <h3>Creating a Budget</h3>
             <div class="step">
                 <span class="step-number">1</span>
-                <strong>Open Budgets</strong> - Click "Budgets" in the sidebar
+                 <strong>Open Budgets</strong> - Click "Budgets" in the sidebar
             </div>
             <div class="step">
                 <span class="step-number">2</span>
@@ -866,31 +865,6 @@
     <script type="module" src="assets/js/pages/user-guide.js">
         loadUserProfile();
         
-        // Mobile sidebar toggle
-        const sidebar = document.getElementById('sidebar');
-        const sidebarOverlay = document.getElementById('sidebarOverlay');
-        const sidebarOpen = document.getElementById('sidebarOpen');
-        const sidebarClose = document.getElementById('sidebarClose');
-        
-        function toggleSidebar() {
-            sidebar.classList.toggle('active');
-            sidebarOverlay.classList.toggle('active');
-        }
-        
-        sidebarOpen?.addEventListener('click', toggleSidebar);
-        sidebarClose?.addEventListener('click', toggleSidebar);
-        sidebarOverlay?.addEventListener('click', toggleSidebar);
-        
-        // Close sidebar when clicking on a link
-        document.querySelectorAll('.sidebar-nav a').forEach(link => {
-            link.addEventListener('click', () => {
-                if (window.innerWidth <= 768) {
-                    sidebar.classList.remove('active');
-                    sidebarOverlay.classList.remove('active');
-                }
-            });
-        });
-        
         // Smooth scrolling for TOC links
         document.querySelectorAll('.toc-item a').forEach(link => {
             link.addEventListener('click', (e) => {
@@ -902,12 +876,18 @@
             });
         });
         
-        // Close sidebar on window resize
-        window.addEventListener('resize', () => {
-            if (window.innerWidth > 768) {
-                sidebar.classList.remove('active');
-                sidebarOverlay.classList.remove('active');
-            }
+        // Close sidebar when clicking on a sidebar link (mobile)
+        document.querySelectorAll('.sidebar-nav a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    const sidebar = document.getElementById('sidebar');
+                    const sidebarOverlay = document.getElementById('sidebarOverlay');
+                    if (sidebar && sidebarOverlay) {
+                        sidebar.classList.remove('active');
+                        sidebarOverlay.classList.remove('active');
+                    }
+                }
+            });
         });
     </script>
 </body>
