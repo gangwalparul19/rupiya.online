@@ -415,6 +415,35 @@ class PrivacyModeManager {
             this.hideElement(element, 'amount');
         });
 
+        // Specifically target summary values (budget cards, etc.)
+        const summaryValues = document.querySelectorAll('.summary-value');
+        summaryValues.forEach(element => {
+            this.hideElement(element, 'amount');
+        });
+
+        // Specifically target AI insights stat values
+        const aiStatValues = document.querySelectorAll('.ai-stat-value');
+        aiStatValues.forEach(element => {
+            this.hideElement(element, 'amount');
+        });
+
+        // Specifically target AI insights score numbers
+        const scoreNumbers = document.querySelectorAll('.score-number');
+        scoreNumbers.forEach(element => {
+            if (this.isPrivacyMode) {
+                if (!this.originalValues.has(element)) {
+                    this.originalValues.set(element, element.textContent);
+                }
+                element.textContent = '••';
+                element.classList.add('privacy-hidden');
+            } else {
+                if (this.originalValues.has(element)) {
+                    element.textContent = this.originalValues.get(element);
+                }
+                element.classList.remove('privacy-hidden');
+            }
+        });
+
         // Target transaction amounts (income and expense cards)
         const transactionAmounts = document.querySelectorAll(
             '.income-amount, .expense-amount, .transaction-amount, .bill-amount, .detail-value, ' +
@@ -443,7 +472,7 @@ class PrivacyModeManager {
     autoHidePercentages() {
         // Target specific percentage elements
         const percentageElements = document.querySelectorAll(
-            '.savings-rate-value, .goal-progress-percent, [class*="percent"], [class*="rate"]'
+            '.savings-rate-value, .goal-progress-percent, .factor-value, [class*="percent"], [class*="rate"]'
         );
         
         percentageElements.forEach(element => {
@@ -620,12 +649,20 @@ class PrivacyModeManager {
             
             element.textContent = maskedValue;
             element.classList.add('privacy-hidden');
+            
+            // Make element visible after masking
+            element.style.visibility = 'visible';
+            element.style.opacity = '1';
         } else {
             // Restore original value
             if (this.originalValues.has(element)) {
                 element.textContent = this.originalValues.get(element);
             }
             element.classList.remove('privacy-hidden');
+            
+            // Ensure element is visible
+            element.style.visibility = 'visible';
+            element.style.opacity = '1';
         }
     }
 

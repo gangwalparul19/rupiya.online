@@ -730,3 +730,50 @@ html:not(.privacy-settings-page) .mobile-header {
     pointer-events: auto !important;
     filter: none !important;
 }
+
+
+/* ============================================
+   PRIVACY MODE - PREVENT FLASH OF CONTENT
+   Hide sensitive data immediately on page load
+   ============================================ */
+
+/* Check if privacy mode is enabled via localStorage and hide content immediately */
+@supports (selector(:has(*))) {
+  /* Modern browsers with :has() support */
+  html:has(body[data-privacy-mode="true"]) .kpi-value,
+  html:has(body[data-privacy-mode="true"]) .summary-value,
+  html:has(body[data-privacy-mode="true"]) .ai-stat-value,
+  html:has(body[data-privacy-mode="true"]) .score-number,
+  html:has(body[data-privacy-mode="true"]) .factor-value,
+  html:has(body[data-privacy-mode="true"]) .amount,
+  html:has(body[data-privacy-mode="true"]) .balance,
+  html:has(body[data-privacy-mode="true"]) .total,
+  html:has(body[data-privacy-mode="true"]) [class*="amount"],
+  html:has(body[data-privacy-mode="true"]) [class*="value"] {
+    visibility: hidden !important;
+    opacity: 0 !important;
+  }
+}
+
+/* Fallback for browsers without :has() support */
+body[data-privacy-mode="true"] .kpi-value,
+body[data-privacy-mode="true"] .summary-value,
+body[data-privacy-mode="true"] .ai-stat-value,
+body[data-privacy-mode="true"] .score-number,
+body[data-privacy-mode="true"] .factor-value,
+body[data-privacy-mode="true"] .amount,
+body[data-privacy-mode="true"] .balance,
+body[data-privacy-mode="true"] .total,
+body[data-privacy-mode="true"] [class*="amount"],
+body[data-privacy-mode="true"] [class*="value"] {
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* Show content after JavaScript has processed it */
+body[data-privacy-mode="true"] .privacy-hidden,
+body[data-privacy-mode="true"] .privacy-hidden-percent,
+body[data-privacy-mode="true"] .privacy-hidden-email {
+  visibility: visible !important;
+  opacity: 1 !important;
+}

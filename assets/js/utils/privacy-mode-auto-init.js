@@ -18,6 +18,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // Apply privacy mode if it was previously enabled
     if (privacyMode.isEnabled()) {
         privacyMode.applyPrivacyMode();
+        
+        // Re-apply after a short delay to catch dynamically loaded content
+        setTimeout(() => {
+            privacyMode.applyPrivacyMode();
+            console.log('✅ Privacy Mode re-applied for dynamic content');
+        }, 500);
+        
+        // Re-apply again after 1 second for slower loading content
+        setTimeout(() => {
+            privacyMode.applyPrivacyMode();
+            console.log('✅ Privacy Mode re-applied (final)');
+        }, 1000);
     }
     
     console.log('✅ Privacy Mode initialized automatically');
