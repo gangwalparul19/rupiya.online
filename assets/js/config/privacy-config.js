@@ -69,7 +69,10 @@ export const privacyConfig = {
     'netWorthSnapshots',     // Net worth history snapshots
     'notifications',         // EMI reminders and alerts
     'familyMembers',          // Family member names and roles
-    'features'               // User feature preferences
+    'features',               // User feature preferences
+    'creditCards',            // Credit card information
+    'insurancePolicies',      // Insurance policy details
+    'healthcareExpenses'      // Healthcare expense records
     // NOTE: familyGroups and familyInvitations are NOT encrypted because:
     // - They are shared across multiple users
     // - Each user has a different encryption key (derived from their userId)
@@ -128,7 +131,45 @@ export const privacyConfig = {
     tripGroupMembers: ['name', 'email', 'phone'],  // Member personal information
     notifications: ['title', 'message', 'data'],   // EMI reminders contain loan amounts
     familyMembers: ['name', 'role'],  // Family member personal information
-    features: ['features']  // User feature configuration
+    features: ['features'],  // User feature configuration
+    creditCards: [
+      'cardName',
+      'bankName',
+      'lastFourDigits',
+      'creditLimit',
+      'currentBalance',
+      'billingDate',
+      'dueDate',
+      'rewardsProgram',
+      'rewardsBalance',
+      'annualFee',
+      'notes'
+    ],
+    insurancePolicies: [
+      'policyName',
+      'provider',
+      'policyNumber',
+      'coverageAmount',
+      'premiumAmount',
+      'startDate',
+      'endDate',
+      'coveredMembers',
+      'notes',
+      'fileUrl',
+      'fileName',
+      'filePath',
+      'fileSize',
+      'fileType'
+    ],
+    healthcareExpenses: [
+      'category',
+      'description',
+      'amount',
+      'provider',
+      'claimable',
+      'policyId',
+      'notes'
+    ]
     // NOTE: familyGroups and familyInvitations are NOT in sensitiveFields
     // because they are shared across users and cannot use per-user encryption
   }

@@ -110,23 +110,43 @@ function setupEventListeners() {
 // Load expense data
 async function loadData() {
   try {
-    toast.info('Loading spending data...');
+    console.log('Loading spending data...');
 
     // Calculate date range
     const endDate = new Date();
+    endDate.setHours(23, 59, 59, 999); // End of today
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - dateRange);
+    startDate.setHours(0, 0, 0, 0); // Start of day
+
+    console.log('Date range:', startDate, 'to', endDate);
 
     // Fetch all expenses and filter by date range
     const allExpensesData = await firestoreService.getAll('expenses', 'date', 'desc');
+    console.log('Total expenses fetched:', allExpensesData.length);
     
     allExpenses = allExpensesData.filter(exp => {
-      const expDate = new Date(exp.date);
-      return expDate >= startDate && expDate <= endDate;
+      // Handle both Firestore Timestamp and string dates
+      let expDate;
+      if (exp.date && exp.date.toDate) {
+        // Firestore Timestamp
+        expDate = exp.date.toDate();
+      } else if (exp.date) {
+        // String date
+        expDate = new Date(exp.date);
+      } else {
+        return false;
+      }
+      
+      const isInRange = expDate >= startDate && expDate <= endDate;
+      return isInRange;
     });
+
+    console.log('Filtered expenses:', allExpenses.length);
 
     if (allExpenses.length === 0) {
       showEmptyState();
+      toast.warning('No expenses found in the selected date range');
       return;
     }
 
@@ -138,7 +158,7 @@ async function loadData() {
     generateMonthlyTrendChart();
     generateInsights();
 
-    toast.success('Data loaded successfully');
+    toast.success(`Loaded ${allExpenses.length} expenses`);
   } catch (error) {
     console.error('Error loading data:', error);
     toast.error('Failed to load spending data');
@@ -153,13 +173,27 @@ function updateKPIs() {
   // Most active day
   const dayCount = {};
   allExpenses.forEach(exp => {
-    const day = new Date(exp.date).toLocaleDateString('en-US', { weekday: 'long' });
+    let expDate;
+    if (exp.date && exp.date.toDate) {
+      expDate = exp.date.toDate();
+    } else {
+      expDate = new Date(exp.date);
+    }
+    const day = expDate.toLocaleDateString('en-US', { weekday: 'long' });
     dayCount[day] = (dayCount[day] || 0) + 1;
   });
   const mostActiveDay = Object.entries(dayCount).sort((a, b) => b[1] - a[1])[0];
 
   // Spending streak
-  const dates = allExpenses.map(exp => new Date(exp.date).toDateString());
+  const dates = allExpenses.map(exp => {
+    let expDate;
+    if (exp.date && exp.date.toDate) {
+      expDate = exp.date.toDate();
+    } else {
+      expDate = new Date(exp.date);
+    }
+    return expDate.toDateString();
+  });
   const uniqueDates = [...new Set(dates)].sort();
   let streak = 1;
   let maxStreak = 1;
@@ -176,7 +210,13 @@ function updateKPIs() {
   // Peak spending day
   const dailySpending = {};
   allExpenses.forEach(exp => {
-    const date = new Date(exp.date).toDateString();
+    let expDate;
+    if (exp.date && exp.date.toDate) {
+      expDate = exp.date.toDate();
+    } else {
+      expDate = new Date(exp.date);
+    }
+    const date = expDate.toDateString();
     dailySpending[date] = (dailySpending[date] || 0) + exp.amount;
   });
   const peakDay = Object.entries(dailySpending).sort((a, b) => b[1] - a[1])[0];
@@ -196,12 +236,18 @@ function generateCalendarHeatmap() {
   // Group expenses by date
   const dailySpending = {};
   allExpenses.forEach(exp => {
-    const date = new Date(exp.date).toISOString().split('T')[0];
+    let expDate;
+    if (exp.date && exp.date.toDate) {
+      expDate = exp.date.toDate();
+    } else {
+      expDate = new Date(exp.date);
+    }
+    const date = expDate.toISOString().split('T')[0];
     dailySpending[date] = (dailySpending[date] || 0) + exp.amount;
   });
 
   // Calculate max spending for color scale
-  const maxSpending = Math.max(...Object.values(dailySpending));
+  const maxSpending = Math.max(...Object.values(dailySpending), 1);
 
   // Generate heatmap
   const heatmapDiv = document.createElement('div');
@@ -285,7 +331,13 @@ function generateDayOfWeekChart() {
     };
 
     allExpenses.forEach(exp => {
-      const day = new Date(exp.date).toLocaleDateString('en-US', { weekday: 'long' });
+      let expDate;
+      if (exp.date && exp.date.toDate) {
+        expDate = exp.date.toDate();
+      } else {
+        expDate = new Date(exp.date);
+      }
+      const day = expDate.toLocaleDateString('en-US', { weekday: 'long' });
       daySpending[day] += exp.amount;
     });
 
@@ -330,7 +382,13 @@ function generateCategoryHeatmap() {
   // Group by category and month
   const categoryMonthly = {};
   allExpenses.forEach(exp => {
-    const month = new Date(exp.date).toLocaleDateString('en-US', { month: 'short' });
+    let expDate;
+    if (exp.date && exp.date.toDate) {
+      expDate = exp.date.toDate();
+    } else {
+      expDate = new Date(exp.date);
+    }
+    const month = expDate.toLocaleDateString('en-US', { month: 'short' });
     if (!categoryMonthly[exp.category]) {
       categoryMonthly[exp.category] = {};
     }
@@ -338,9 +396,15 @@ function generateCategoryHeatmap() {
   });
 
   // Get unique months
-  const months = [...new Set(allExpenses.map(exp => 
-    new Date(exp.date).toLocaleDateString('en-US', { month: 'short' })
-  ))].sort();
+  const months = [...new Set(allExpenses.map(exp => {
+    let expDate;
+    if (exp.date && exp.date.toDate) {
+      expDate = exp.date.toDate();
+    } else {
+      expDate = new Date(exp.date);
+    }
+    return expDate.toLocaleDateString('en-US', { month: 'short' });
+  }))].sort();
 
   // Create rows for each category
   Object.entries(categoryMonthly).forEach(([category, monthData]) => {
@@ -355,7 +419,7 @@ function generateCategoryHeatmap() {
     const cellsDiv = document.createElement('div');
     cellsDiv.className = 'category-cells';
 
-    const maxAmount = Math.max(...Object.values(monthData));
+    const maxAmount = Math.max(...Object.values(monthData), 1);
 
     months.forEach(month => {
       const amount = monthData[month] || 0;
@@ -383,7 +447,13 @@ function generateMonthlyTrendChart() {
 
     const monthlySpending = {};
     allExpenses.forEach(exp => {
-      const month = new Date(exp.date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+      let expDate;
+      if (exp.date && exp.date.toDate) {
+        expDate = exp.date.toDate();
+      } else {
+        expDate = new Date(exp.date);
+      }
+      const month = expDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
       monthlySpending[month] = (monthlySpending[month] || 0) + exp.amount;
     });
 
