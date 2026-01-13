@@ -5,8 +5,8 @@
 
 import '../services/services-init.js';
 import authService from '../services/auth-service.js';
-import expenseService from '../services/expense-service.js';
-import encryptionService from '../services/encryption-service.js';
+import firestoreService from '../services/firestore-service.js';
+import encryptionReauthModal from '../components/encryption-reauth-modal.js';
 import toast from '../components/toast.js';
 
 // Chart.js CDN
@@ -29,20 +29,13 @@ async function init() {
       return;
     }
 
-    // Check encryption reauth
-    const needsReauth = await encryptionService.checkReauthNeeded();
-    if (needsReauth) {
-      const password = prompt('Please re-enter your password to decrypt data:');
-      if (!password) {
-        toast.error('Password required to view data');
-        return;
-      }
-      const success = await encryptionService.reauthenticate(password);
-      if (!success) {
-        toast.error('Invalid password');
-        return;
-      }
-    }
+    // Load user profile
+    loadUserProfile();
+
+    // Check if encryption reauth is needed
+    await encryptionReauthModal.checkAndPrompt(async () => {
+      await loadData();
+    });
 
     // Setup event listeners
     setupEventListeners();
@@ -52,6 +45,30 @@ async function init() {
   } catch (error) {
     console.error('Initialization error:', error);
     toast.error('Failed to initialize page');
+  }
+}
+
+// Load user profile
+function loadUserProfile() {
+  const userName = document.getElementById('userName');
+  const userEmail = document.getElementById('userEmail');
+  const userAvatar = document.getElementById('userAvatar');
+
+  if (userName) {
+    userName.textContent = currentUser.displayName || currentUser.email?.split('@')[0] || 'User';
+  }
+
+  if (userEmail) {
+    userEmail.textContent = currentUser.email || '';
+  }
+
+  if (userAvatar) {
+    if (currentUser.photoURL) {
+      userAvatar.innerHTML = `<img src="${currentUser.photoURL}" alt="User Avatar">`;
+    } else {
+      const initial = (currentUser.displayName || currentUser.email || 'U')[0].toUpperCase();
+      userAvatar.textContent = initial;
+    }
   }
 }
 
@@ -100,11 +117,13 @@ async function loadData() {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - dateRange);
 
-    // Fetch expenses
-    allExpenses = await expenseService.getExpensesByDateRange(
-      startDate.toISOString(),
-      endDate.toISOString()
-    );
+    // Fetch all expenses and filter by date range
+    const allExpensesData = await firestoreService.getAll('expenses', 'date', 'desc');
+    
+    allExpenses = allExpensesData.filter(exp => {
+      const expDate = new Date(exp.date);
+      return expDate >= startDate && expDate <= endDate;
+    });
 
     if (allExpenses.length === 0) {
       showEmptyState();

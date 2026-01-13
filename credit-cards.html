@@ -335,6 +335,33 @@
       </div>
 
     </main>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal-overlay" id="deleteModal">
+      <div class="modal-container modal-sm">
+        <div class="modal-header">
+          <h2 class="modal-title">Delete Credit Card</h2>
+          <button class="modal-close" id="closeDeleteModal">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <p>Are you sure you want to delete this credit card?</p>
+          <div class="delete-info">
+            <strong id="deleteCardName"></strong>
+          </div>
+          <p class="text-danger">This action cannot be undone.</p>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" id="cancelDeleteBtn">Cancel</button>
+          <button type="submit" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Scripts -->

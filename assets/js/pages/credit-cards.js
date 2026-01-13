@@ -230,13 +230,11 @@ async function handleCardSubmit(e) {
   e.preventDefault();
 
   const saveBtn = document.getElementById('saveBtn');
-  const btnText = saveBtn.querySelector('.btn-text');
-  const btnSpinner = saveBtn.querySelector('.btn-spinner');
+  const originalText = saveBtn.textContent;
 
   try {
     saveBtn.disabled = true;
-    btnText.style.display = 'none';
-    btnSpinner.style.display = 'inline-block';
+    saveBtn.textContent = 'Saving...';
 
     const cardData = {
       cardName: document.getElementById('cardName').value,
@@ -269,8 +267,7 @@ async function handleCardSubmit(e) {
     toast.error('Failed to save credit card');
   } finally {
     saveBtn.disabled = false;
-    btnText.style.display = 'inline';
-    btnSpinner.style.display = 'none';
+    saveBtn.textContent = originalText;
   }
 }
 
@@ -281,23 +278,28 @@ window.editCard = function(cardId) {
 
 // Delete card
 let deleteCardId = null;
+
 window.deleteCard = function(cardId, cardName) {
   deleteCardId = cardId;
   document.getElementById('deleteCardName').textContent = cardName;
-  document.getElementById('deleteModal').classList.add('active');
+  document.getElementById('deleteModal').classList.add('show');
 };
 
-// Close delete modal
 function closeDeleteModal() {
-  document.getElementById('deleteModal').classList.remove('active');
+  document.getElementById('deleteModal').classList.remove('show');
   deleteCardId = null;
 }
 
-// Confirm delete
 async function confirmDelete() {
   if (!deleteCardId) return;
 
+  const confirmBtn = document.getElementById('confirmDeleteBtn');
+  const originalText = confirmBtn.textContent;
+
   try {
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = 'Deleting...';
+
     await firestoreService.delete('creditCards', deleteCardId);
     toast.success('Credit card deleted successfully');
     closeDeleteModal();
@@ -305,6 +307,9 @@ async function confirmDelete() {
   } catch (error) {
     console.error('Error deleting credit card:', error);
     toast.error('Failed to delete credit card');
+  } finally {
+    confirmBtn.disabled = false;
+    confirmBtn.textContent = originalText;
   }
 }
 
