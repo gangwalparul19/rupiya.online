@@ -205,7 +205,8 @@ function showUpdateNotification(onUpdate) {
     justify-content: space-between;
     gap: 12px;
     font-size: 14px;
-    z-index: 10000;
+    z-index: 100000;
+    pointer-events: auto;
   `;
   
   updateBanner.innerHTML = `
@@ -220,6 +221,7 @@ function showUpdateNotification(onUpdate) {
         cursor: pointer;
         font-weight: 600;
         font-size: 13px;
+        pointer-events: auto;
       ">Update Now</button>
       <button id="updateLater" style="
         background: rgba(255, 255, 255, 0.2);
@@ -229,24 +231,39 @@ function showUpdateNotification(onUpdate) {
         border-radius: 4px;
         cursor: pointer;
         font-size: 13px;
+        pointer-events: auto;
       ">Later</button>
     </div>
   `;
   
   document.body.appendChild(updateBanner);
   
-  document.getElementById('updateNow').addEventListener('click', () => {
-    onUpdate();
-    updateBanner.remove();
-    // Reload after user clicks update
-    setTimeout(() => {
-      window.location.reload();
-    }, 500);
-  });
+  // Add click handlers with proper event handling
+  const updateNowBtn = document.getElementById('updateNow');
+  const updateLaterBtn = document.getElementById('updateLater');
   
-  document.getElementById('updateLater').addEventListener('click', () => {
-    updateBanner.remove();
-  });
+  if (updateNowBtn) {
+    updateNowBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log('[PWA] Update Now clicked');
+      onUpdate();
+      updateBanner.remove();
+      // Reload after user clicks update
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+    });
+  }
+  
+  if (updateLaterBtn) {
+    updateLaterBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log('[PWA] Update Later clicked');
+      updateBanner.remove();
+    });
+  }
 }
 
 console.log(`[PWA] Setup loaded - Version ${APP_VERSION}`);

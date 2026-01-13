@@ -56,9 +56,13 @@ function loadUserProfile() {
 
 // Setup event listeners
 function setupEventListeners() {
+  // Ensure modal is hidden on init
+  document.getElementById('cardModal')?.classList.remove('active');
+  document.getElementById('deleteModal')?.classList.remove('active');
+
   document.getElementById('addCardBtn')?.addEventListener('click', () => openCardModal());
   document.getElementById('addCardBtnEmpty')?.addEventListener('click', () => openCardModal());
-  document.getElementById('closeModal')?.addEventListener('click', closeCardModal);
+  document.getElementById('closeModalBtn')?.addEventListener('click', closeCardModal);
   document.getElementById('cancelBtn')?.addEventListener('click', closeCardModal);
   document.getElementById('cardForm')?.addEventListener('submit', handleCardSubmit);
   
@@ -66,6 +70,14 @@ function setupEventListeners() {
   document.getElementById('closeDeleteModal')?.addEventListener('click', closeDeleteModal);
   document.getElementById('cancelDeleteBtn')?.addEventListener('click', closeDeleteModal);
   document.getElementById('confirmDeleteBtn')?.addEventListener('click', confirmDelete);
+
+  // Close modal on backdrop click
+  document.getElementById('cardModal')?.addEventListener('click', (e) => {
+    if (e.target.id === 'cardModal') closeCardModal();
+  });
+  document.getElementById('deleteModal')?.addEventListener('click', (e) => {
+    if (e.target.id === 'deleteModal') closeDeleteModal();
+  });
 }
 
 // Load credit cards
@@ -166,10 +178,15 @@ function updateKPIs() {
   const totalSpent = creditCards.reduce((sum, card) => sum + (card.currentBalance || 0), 0);
   const totalRewards = creditCards.reduce((sum, card) => sum + (card.rewardsBalance || 0), 0);
 
-  document.getElementById('totalCards').textContent = totalCards;
-  document.getElementById('totalLimit').textContent = formatCurrency(totalLimit);
-  document.getElementById('totalSpent').textContent = formatCurrency(totalSpent);
-  document.getElementById('totalRewards').textContent = totalRewards.toLocaleString();
+  const totalCardsEl = document.getElementById('totalCards');
+  const totalLimitEl = document.getElementById('totalLimit');
+  const totalSpentEl = document.getElementById('totalSpent');
+  const totalRewardsEl = document.getElementById('totalRewards');
+
+  if (totalCardsEl) totalCardsEl.textContent = totalCards;
+  if (totalLimitEl) totalLimitEl.textContent = formatCurrency(totalLimit);
+  if (totalSpentEl) totalSpentEl.textContent = formatCurrency(totalSpent);
+  if (totalRewardsEl) totalRewardsEl.textContent = totalRewards.toLocaleString();
 }
 
 // Open card modal

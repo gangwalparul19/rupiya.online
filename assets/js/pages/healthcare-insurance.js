@@ -1,7 +1,7 @@
 // Healthcare & Insurance Page Logic
 import '../services/services-init.js';
 import authService from '../services/auth-service.js';
-import firestoreService from '../services/firestore.js';
+import firestoreService from '../services/firestore-service.js';
 import toast from '../components/toast.js';
 import { formatCurrency, formatDate } from '../utils/helpers.js';
 import encryptionReauthModal from '../components/encryption-reauth-modal.js';
@@ -60,6 +60,11 @@ function loadUserProfile() {
 
 // Setup event listeners
 function setupEventListeners() {
+  // Ensure all modals are hidden on init
+  document.getElementById('policyModal')?.classList.remove('active');
+  document.getElementById('expenseModal')?.classList.remove('active');
+  document.getElementById('deleteModal')?.classList.remove('active');
+
   // Tab switching
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => switchTab(btn.dataset.tab));
@@ -70,6 +75,7 @@ function setupEventListeners() {
   document.getElementById('addPolicyBtnEmpty')?.addEventListener('click', () => openPolicyModal());
   document.getElementById('closePolicyModal')?.addEventListener('click', closePolicyModal);
   document.getElementById('cancelPolicyBtn')?.addEventListener('click', closePolicyModal);
+  document.getElementById('closePolicyModalBtn')?.addEventListener('click', closePolicyModal);
   document.getElementById('policyForm')?.addEventListener('submit', handlePolicySubmit);
 
   // Expense buttons
@@ -77,6 +83,7 @@ function setupEventListeners() {
   document.getElementById('addExpenseBtnEmpty')?.addEventListener('click', () => openExpenseModal());
   document.getElementById('closeExpenseModal')?.addEventListener('click', closeExpenseModal);
   document.getElementById('cancelExpenseBtn')?.addEventListener('click', closeExpenseModal);
+  document.getElementById('closeExpenseModalBtn')?.addEventListener('click', closeExpenseModal);
   document.getElementById('expenseForm')?.addEventListener('submit', handleExpenseSubmit);
 
   // Claimable checkbox
@@ -92,6 +99,17 @@ function setupEventListeners() {
   // Filters
   document.getElementById('categoryFilter')?.addEventListener('change', filterExpenses);
   document.getElementById('searchInput')?.addEventListener('input', filterExpenses);
+
+  // Close modal on backdrop click
+  document.getElementById('policyModal')?.addEventListener('click', (e) => {
+    if (e.target.id === 'policyModal') closePolicyModal();
+  });
+  document.getElementById('expenseModal')?.addEventListener('click', (e) => {
+    if (e.target.id === 'expenseModal') closeExpenseModal();
+  });
+  document.getElementById('deleteModal')?.addEventListener('click', (e) => {
+    if (e.target.id === 'deleteModal') closeDeleteModal();
+  });
 }
 
 // Switch tab
@@ -218,10 +236,15 @@ function updatePolicyKPIs() {
     return daysUntilExpiry <= 30 && daysUntilExpiry > 0;
   }).length;
 
-  document.getElementById('activePolicies').textContent = activePolicies;
-  document.getElementById('totalCoverage').textContent = formatCurrency(totalCoverage);
-  document.getElementById('annualPremium').textContent = formatCurrency(annualPremium);
-  document.getElementById('expiringSoon').textContent = expiringSoon;
+  const activePoliciesEl = document.getElementById('activePolicies');
+  const totalCoverageEl = document.getElementById('totalCoverage');
+  const annualPremiumEl = document.getElementById('annualPremium');
+  const expiringSoonEl = document.getElementById('expiringSoon');
+
+  if (activePoliciesEl) activePoliciesEl.textContent = activePolicies;
+  if (totalCoverageEl) totalCoverageEl.textContent = formatCurrency(totalCoverage);
+  if (annualPremiumEl) annualPremiumEl.textContent = formatCurrency(annualPremium);
+  if (expiringSoonEl) expiringSoonEl.textContent = expiringSoon;
 }
 
 // Load expenses
@@ -315,9 +338,15 @@ function updateExpenseKPIs() {
 
   const total = expenses.reduce((sum, e) => sum + e.amount, 0);
 
-  document.getElementById('thisMonthExpenses').textContent = formatCurrency(thisMonth);
-  document.getElementById('lastMonthExpenses').textContent = formatCurrency(lastMonth);
-  document.getElementById('thisYearExpenses').textContent = formatCurrency(thisYear);
+  const thisMonthEl = document.getElementById('thisMonthExpenses');
+  const lastMonthEl = document.getElementById('lastMonthExpenses');
+  const thisYearEl = document.getElementById('thisYearExpenses');
+  const totalEl = document.getElementById('totalExpenses');
+
+  if (thisMonthEl) thisMonthEl.textContent = formatCurrency(thisMonth);
+  if (lastMonthEl) lastMonthEl.textContent = formatCurrency(lastMonth);
+  if (thisYearEl) thisYearEl.textContent = formatCurrency(thisYear);
+  if (totalEl) totalEl.textContent = formatCurrency(total);
   document.getElementById('totalExpenses').textContent = formatCurrency(total);
 }
 
