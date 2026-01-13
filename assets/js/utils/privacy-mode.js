@@ -341,13 +341,23 @@ class PrivacyModeManager {
 
         // Target transaction amounts (income and expense cards)
         const transactionAmounts = document.querySelectorAll(
-            '.income-amount, .expense-amount, .transaction-amount, .bill-amount, .detail-value'
+            '.income-amount, .expense-amount, .transaction-amount, .bill-amount, .detail-value, ' +
+            '.amount, .price, .balance, .total, .value, ' +
+            '[class*="amount"], [class*="price"], [class*="balance"], [class*="total"], [class*="value"]'
         );
         transactionAmounts.forEach(element => {
-            this.hideElement(element, 'amount');
+            // Skip if already processed
+            if (element.dataset.privacyProcessed === 'true') return;
+            
+            const text = element.textContent.trim();
+            // Check if element contains currency symbol or numbers that look like amounts
+            if (/₹[\d,]+|₹\d+|\$[\d,]+|\$\d+|[\d,]+\.\d{2}/.test(text)) {
+                this.hideElement(element, 'amount');
+                element.dataset.privacyProcessed = 'true';
+            }
         });
 
-        // Find text nodes containing currency amounts (limited scope)
+        // Find text nodes containing currency amounts in common containers
         this.hideTextNodesWithPattern(/₹[\d,]+|₹\d+/, 'amount');
     }
 
@@ -547,12 +557,22 @@ class PrivacyModeManager {
      * Hide text nodes matching a pattern
      */
     hideTextNodesWithPattern(pattern, type = 'amount') {
-        // Limit to specific containers to avoid scanning entire DOM
+        // Expand containers to include all common financial data containers
         const containers = document.querySelectorAll(
-            '.kpi-card, .transaction-item, .card-body, .dashboard-header, .widgets-row'
+            '.kpi-card, .transaction-item, .card-body, .dashboard-header, .widgets-row, ' +
+            '.card, .transaction, .expense-card, .income-card, .bill-card, ' +
+            '[class*="card"], [class*="transaction"], [class*="expense"], [class*="income"], ' +
+            '.main-content, .page-container'
         );
         
+        if (containers.length === 0) {
+            // If no specific containers found, scan the entire body
+            containers.push(document.body);
+        }
+        
         containers.forEach(container => {
+            if (!container) return;
+            
             const walker = document.createTreeWalker(
                 container,
                 NodeFilter.SHOW_TEXT,
@@ -563,6 +583,9 @@ class PrivacyModeManager {
             const nodesToProcess = [];
             let node;
             while (node = walker.nextNode()) {
+                // Skip if already processed
+                if (node.parentElement?.dataset.privacyProcessed === 'true') continue;
+                
                 if (pattern.test(node.textContent)) {
                     nodesToProcess.push(node);
                 }
@@ -590,12 +613,14 @@ class PrivacyModeManager {
                     
                     node.textContent = maskedValue;
                     parent.classList.add('privacy-hidden');
+                    parent.dataset.privacyProcessed = 'true';
                 } else {
                     // Restore original value
                     if (this.originalValues.has(parent)) {
                         node.textContent = this.originalValues.get(parent);
                     }
                     parent.classList.remove('privacy-hidden');
+                    parent.dataset.privacyProcessed = 'false';
                 }
             });
         });
@@ -670,21 +695,23 @@ class PrivacyModeManager {
                 
                 if (this.isPrivacyMode) {
                     // Reapply privacy mode to newly added elements
+                    console.log('[PrivacyMode] Reapplying privacy mode to new content');
                     this.autoHideAmounts();
                     this.autoHidePercentages();
                     this.autoHideEmails();
                     this.autoHideCharts();
                     this.hideTooltips();
+                    this.hideTransactionDescriptions();
                 }
-            }, 500);
+            }, 300); // Reduced debounce time for faster response
         });
 
         observer.observe(document.body, {
             childList: true,
             subtree: true,
-            characterData: false,
+            characterData: true, // Also watch for text changes
             attributes: true,
-            attributeFilter: ['title', 'data-tooltip', 'aria-label']
+            attributeFilter: ['title', 'data-tooltip', 'aria-label', 'class']
         });
     }
 

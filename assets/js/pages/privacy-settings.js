@@ -3,40 +3,126 @@
  * Manages privacy mode and data visibility settings
  */
 
-import '../services/services-init.js'; // Initialize services first (includes encryption)
+import '../services/services-init.js'; // Initialize services first
 import authService from '../services/auth-service.js';
 import privacyMode from '../utils/privacy-mode.js';
-import initPrivacyModeButton from '../components/privacy-mode-button.js';
 
-// Load user profile
-async function loadUserProfile() {
+let currentUser = null;
+
+// Initialize
+async function init() {
+  console.log('[Privacy Settings] Starting init...');
+  
   try {
-    const user = await authService.waitForAuth();
-    if (user) {
-      const userAvatar = document.getElementById('userAvatar');
-      const userName = document.getElementById('userName');
-      const userEmail = document.getElementById('userEmail');
-      
-      if (userAvatar) {
-        const initials = user.displayName 
-          ? user.displayName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
-          : user.email[0].toUpperCase();
-        userAvatar.textContent = initials;
-      }
-      if (userName) userName.textContent = user.displayName || 'User';
-      if (userEmail) userEmail.textContent = user.email;
-    } else {
+    // Add a small delay to ensure Firebase is ready
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    currentUser = await authService.waitForAuth();
+    console.log('[Privacy Settings] Auth result:', currentUser ? currentUser.email : 'null');
+    
+    if (!currentUser) {
+      console.log('[Privacy Settings] No user, redirecting...');
       window.location.href = 'login.html';
+      return;
     }
+    
+    // User is authenticated, initialize page
+    initPage();
+    
   } catch (error) {
-    console.error('Error loading user profile:', error);
+    console.error('[Privacy Settings] Init error:', error);
+    window.location.href = 'login.html';
   }
 }
 
-// Initialize page
-async function init() {
-  await loadUserProfile();
-  initPrivacyModeButton();
+// Initialize page after auth
+function initPage() {
+  console.log('[Privacy Settings] Initializing page...');
+  
+  // Update user profile in sidebar
+  updateUserProfile();
+  
+  // Setup event listeners
+  setupEventListeners();
+  
+  console.log('[Privacy Settings] Page initialized successfully');
+}
+
+// Update user profile
+function updateUserProfile() {
+  const userAvatar = document.getElementById('userAvatar');
+  const userName = document.getElementById('userName');
+  const userEmail = document.getElementById('userEmail');
+
+  if (userAvatar) {
+    const initials = currentUser.displayName 
+      ? currentUser.displayName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
+      : currentUser.email[0].toUpperCase();
+    userAvatar.textContent = initials;
+  }
+
+  if (userName) userName.textContent = currentUser.displayName || 'User';
+  if (userEmail) userEmail.textContent = currentUser.email;
+}
+
+// Setup event listeners
+function setupEventListeners() {
+  // Sidebar toggle
+  const sidebarOpen = document.getElementById('sidebarOpen');
+  const sidebarClose = document.getElementById('sidebarClose');
+  const sidebar = document.getElementById('sidebar');
+  const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+  sidebarOpen?.addEventListener('click', () => {
+    sidebar.classList.add('open');
+    sidebarOverlay.classList.add('show');
+  });
+
+  sidebarClose?.addEventListener('click', () => {
+    sidebar.classList.remove('open');
+    sidebarOverlay.classList.remove('show');
+  });
+
+  sidebarOverlay?.addEventListener('click', () => {
+    sidebar.classList.remove('open');
+    sidebarOverlay.classList.remove('show');
+  });
+
+  // Privacy mode controls
+  const mainToggle = document.getElementById('mainPrivacyToggle');
+  const enableBtn = document.getElementById('enablePrivacyBtn');
+  const disableBtn = document.getElementById('disablePrivacyBtn');
+
+  function updateToggleState() {
+    if (privacyMode.isEnabled()) {
+      mainToggle?.classList.add('active');
+    } else {
+      mainToggle?.classList.remove('active');
+    }
+  }
+
+  mainToggle?.addEventListener('click', () => {
+    privacyMode.toggle();
+    updateToggleState();
+  });
+
+  enableBtn?.addEventListener('click', () => {
+    privacyMode.enable();
+    updateToggleState();
+  });
+
+  disableBtn?.addEventListener('click', () => {
+    privacyMode.disable();
+    updateToggleState();
+  });
+
+  // Initialize toggle state
+  updateToggleState();
+
+  // Listen for privacy mode changes
+  window.addEventListener('privacyModeChanged', () => {
+    updateToggleState();
+  });
 }
 
 // Start initialization when DOM is ready

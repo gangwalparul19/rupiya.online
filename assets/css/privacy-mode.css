@@ -52,6 +52,9 @@
     letter-spacing: 2px !important;
     user-select: none !important;
     cursor: default !important;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%) !important;
+    background-size: 200% 100% !important;
+    animation: shimmer 1.5s infinite !important;
 }
 
 .privacy-hidden-percent {
@@ -60,6 +63,9 @@
     letter-spacing: 1px !important;
     user-select: none !important;
     cursor: default !important;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%) !important;
+    background-size: 200% 100% !important;
+    animation: shimmer 1.5s infinite !important;
 }
 
 .privacy-hidden-email {
@@ -68,6 +74,9 @@
     letter-spacing: 1px !important;
     user-select: none !important;
     cursor: default !important;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%) !important;
+    background-size: 200% 100% !important;
+    animation: shimmer 1.5s infinite !important;
 }
 
 .privacy-hidden-chart {
@@ -335,6 +344,15 @@
     }
     to {
         opacity: 1;
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
     }
 }
 
