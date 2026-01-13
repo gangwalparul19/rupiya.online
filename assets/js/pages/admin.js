@@ -4,6 +4,15 @@ import authService from '../services/auth-service.js';
 import adminService from '../services/admin-service.js';
 import confirmationModal from '../components/confirmation-modal.js';
 
+// Monitoring Services
+import performanceMonitoring from '../services/performance-monitoring-service.js';
+import userAnalytics from '../services/user-analytics-service.js';
+import pushNotifications from '../services/push-notifications-service.js';
+import offlineSync from '../services/offline-sync-service.js';
+import encryptionAtRest from '../services/encryption-at-rest-service.js';
+import dataValidation from '../services/data-validation-service.js';
+import backupService from '../services/backup-service.js';
+
 // State
 let currentPage = 1;
 let pageSize = 10;
@@ -566,27 +575,24 @@ init();
 // MONITORING FEATURES - Performance, Analytics, Notifications, Sync, Encryption, Validation, Backup
 // ============================================
 
-import performanceMonitoring from '../services/performance-monitoring-service.js';
-import userAnalytics from '../services/user-analytics-service.js';
-import pushNotifications from '../services/push-notifications-service.js';
-import offlineSync from '../services/offline-sync-service.js';
-import encryptionAtRest from '../services/encryption-at-rest-service.js';
-import dataValidation from '../services/data-validation-service.js';
-import backupService from '../services/backup-service.js';
+// Initialize monitoring services
+try {
+  // Make services globally available
+  window.performanceMonitoring = performanceMonitoring;
+  window.userAnalytics = userAnalytics;
+  window.pushNotifications = pushNotifications;
+  window.offlineSync = offlineSync;
+  window.encryptionAtRest = encryptionAtRest;
+  window.dataValidation = dataValidation;
+  window.backupService = backupService;
 
-// Make services globally available
-window.performanceMonitoring = performanceMonitoring;
-window.userAnalytics = userAnalytics;
-window.pushNotifications = pushNotifications;
-window.offlineSync = offlineSync;
-window.encryptionAtRest = encryptionAtRest;
-window.dataValidation = dataValidation;
-window.backupService = backupService;
-
-// Initialize monitoring
-performanceMonitoring.startMonitoring();
-userAnalytics.initSession('admin-user', { role: 'admin' });
-offlineSync.loadQueue();
+  // Initialize monitoring (with suppressed initial alerts)
+  performanceMonitoring.startMonitoring();
+  userAnalytics.initSession('admin-user', { role: 'admin' });
+  offlineSync.loadQueue();
+} catch (error) {
+  console.warn('Monitoring services initialization warning (non-critical):', error.message);
+}
 
 // Tab Switching
 function switchMonitoringTab(tabName) {

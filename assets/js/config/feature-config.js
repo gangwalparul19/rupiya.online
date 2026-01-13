@@ -441,7 +441,10 @@ class FeatureConfigManager {
               }
             }
           });
-          console.log('[FeatureConfig] Features loaded and merged with defaults');
+          
+          const enabledCount = Object.values(this.userFeatures).filter(f => f.enabled).length;
+          console.log('[FeatureConfig] Features loaded and merged with defaults. Enabled count:', enabledCount);
+          console.log('[FeatureConfig] Enabled features:', Object.entries(this.userFeatures).filter(([_, f]) => f.enabled).map(([k, _]) => k));
         } else {
           console.log('[FeatureConfig] No valid saved features, using defaults');
           this.userFeatures = JSON.parse(JSON.stringify(DEFAULT_FEATURES));
@@ -456,14 +459,29 @@ class FeatureConfigManager {
       console.error('[FeatureConfig] Error initializing feature config:', error);
       this.userFeatures = JSON.parse(JSON.stringify(DEFAULT_FEATURES));
     }
+    
+    // Log final state
+    const finalEnabledCount = Object.values(this.userFeatures).filter(f => f.enabled).length;
+    console.log('[FeatureConfig] Initialization complete. Total enabled features:', finalEnabledCount);
   }
 
   /**
    * Check if a feature is enabled
    */
   isEnabled(featureKey) {
-    if (!this.userFeatures) return DEFAULT_FEATURES[featureKey]?.enabled ?? false;
-    return this.userFeatures[featureKey]?.enabled ?? false;
+    if (!this.userFeatures) {
+      console.warn('[FeatureConfig] userFeatures not loaded, returning default for', featureKey);
+      return DEFAULT_FEATURES[featureKey]?.enabled ?? false;
+    }
+    
+    const isEnabled = this.userFeatures[featureKey]?.enabled ?? false;
+    
+    // Log if feature is not found (might indicate a mismatch between sidebar and config)
+    if (!this.userFeatures[featureKey]) {
+      console.warn('[FeatureConfig] Feature not found:', featureKey, 'Available features:', Object.keys(this.userFeatures));
+    }
+    
+    return isEnabled;
   }
 
   /**
@@ -663,6 +681,17 @@ class FeatureConfigManager {
     }
     
     return this.userFeatures;
+  }
+
+  /**
+   * Get count of enabled features (for debugging)
+   */
+  getEnabledCount() {
+    if (!this.userFeatures) {
+      return Object.values(DEFAULT_FEATURES).filter(f => f.enabled).length;
+    }
+    
+    return Object.values(this.userFeatures).filter(f => f.enabled).length;
   }
   
   /**

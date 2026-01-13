@@ -180,6 +180,8 @@ function generateSidebarHTML(isAdmin = false) {
 
   let navHTML = '';
   let sectionCount = 0;
+  let totalItems = 0;
+  let visibleItemsCount = 0;
   
   navigationConfig.sections.forEach(section => {
     // Skip admin-only sections for non-admin users
@@ -195,8 +197,18 @@ function generateSidebarHTML(isAdmin = false) {
       }
       // Show items if their feature is enabled
       const isEnabled = featureConfig.isEnabled(item.featureKey);
+      
+      // Log feature filtering for debugging
+      if (!isEnabled) {
+        console.log('[Sidebar] Feature disabled, hiding:', item.label, '(key:', item.featureKey + ')');
+      }
+      
       return isEnabled;
     });
+
+    // Count items for debugging
+    totalItems += section.items.length;
+    visibleItemsCount += visibleItems.length;
 
     // Skip section if no visible items
     if (visibleItems.length === 0) {
@@ -240,6 +252,8 @@ function generateSidebarHTML(isAdmin = false) {
     `;
   });
   
+  console.log('[Sidebar] Generated navigation. Sections:', sectionCount, 'Total items:', totalItems, 'Visible items:', visibleItemsCount);
+  
   return navHTML;
 }
 
@@ -278,6 +292,30 @@ export async function initSidebar() {
 
   // Initialize feature config (will always load from Firestore now)
   await featureConfig.init();
+  
+  // CRITICAL: Wait for encryption to be ready before rendering sidebar
+  // This ensures features are properly decrypted and available
+  console.log('[Sidebar] Waiting for encryption to be ready...');
+  const encryptionService = (await import('../services/encryption-service.js')).default;
+  
+  let encryptionReady = false;
+  let waitTime = 0;
+  const maxWaitTime = 15000; // 15 seconds max
+  const checkInterval = 200; // Check every 200ms
+  
+  while (!encryptionReady && waitTime < maxWaitTime) {
+    if (encryptionService.isReady && encryptionService.isReady()) {
+      encryptionReady = true;
+      console.log('[Sidebar] Encryption is ready');
+      break;
+    }
+    await new Promise(resolve => setTimeout(resolve, checkInterval));
+    waitTime += checkInterval;
+  }
+  
+  if (!encryptionReady) {
+    console.warn('[Sidebar] Encryption not ready after', maxWaitTime, 'ms, proceeding anyway');
+  }
   
   // Add a small delay to ensure features are fully loaded and cached
   await new Promise(resolve => setTimeout(resolve, 100));
@@ -321,7 +359,14 @@ export async function initSidebar() {
   // Re-initialize features after encryption is ready (for page refresh scenarios)
   // This handles the case where sidebar loads before encryption is initialized
   window.addEventListener('encryptionReady', async () => {
-    await featureConfig.reinitialize();
+    console.log('[Sidebar] Encryption ready event received, reloading features...');
+    
+    // Reload features from Firestore now that encryption is ready
+    if (featureConfig.reloadFromFirestore) {
+      await featureConfig.reloadFromFirestore();
+    }
+    
+    // Refresh sidebar with newly loaded features
     await refreshSidebar();
   });
 }

@@ -25,8 +25,10 @@ class PerformanceMonitoringService {
     // Monitor page load
     this.monitorPageLoad();
     
-    // Monitor long tasks
-    this.monitorLongTasks();
+    // Monitor long tasks (with initial grace period to avoid startup alerts)
+    setTimeout(() => {
+      this.monitorLongTasks();
+    }, 2000);
     
     // Monitor memory usage
     this.monitorMemory();
