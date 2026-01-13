@@ -39,7 +39,8 @@ const state = {
   totalCount: 0,
   lastDoc: null,
   hasMore: true,
-  loadingMore: false
+  loadingMore: false,
+  allDataLoaded: false
 };
 
 // Current user reference
@@ -337,12 +338,21 @@ function checkURLParameters() {
 }
 
 // Load expenses from Firestore
-async function loadExpenses() {
+async function loadExpenses(resetData = true) {
   try {
     // Show skeleton screen instead of spinner
     const skeleton = loadingService.showLoading(loadingState, 'list');
     emptyState.style.display = 'none';
     expensesList.style.display = 'none';
+    
+    if (resetData) {
+      // Reset state when loading fresh data
+      state.expenses = [];
+      state.lastDoc = null;
+      state.hasMore = true;
+      state.allDataLoaded = false;
+      state.currentPage = 1;
+    }
     
     // Family group feature removed - fetch only user's expenses
     const kpiSummary = await firestoreService.getExpenseKPISummary();
@@ -353,12 +363,24 @@ async function loadExpenses() {
     
     // Load paginated expenses with server-side filtering
     const result = await firestoreService.getExpensesPaginated({ 
-      pageSize: state.itemsPerPage, // Only load what we need (not 5x)
-      filters: filters
+      pageSize: state.itemsPerPage,
+      filters: filters,
+      lastDoc: resetData ? null : state.lastDoc
     });
-    state.expenses = result.data;
+    
+    if (resetData) {
+      state.expenses = result.data;
+    } else {
+      state.expenses = [...state.expenses, ...result.data];
+    }
+    
     state.lastDoc = result.lastDoc;
     state.hasMore = result.hasMore;
+    
+    // Check if all data is loaded
+    if (!result.hasMore || state.expenses.length >= state.totalCount) {
+      state.allDataLoaded = true;
+    }
     
     // Update KPI cards
     updateExpenseKPIsFromSummary(kpiSummary);
@@ -386,27 +408,55 @@ async function loadExpenses() {
   }
 }
 
-// Load more expenses when user scrolls or filters require more data
+// Load more expenses when user clicks "Load More" button
 async function loadMoreExpenses() {
-  if (state.loadingMore) return;
+  if (state.loadingMore || !state.hasMore || state.allDataLoaded) return;
   
   try {
     state.loadingMore = true;
+    
+    // Show loading indicator on button
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+    if (loadMoreBtn) {
+      loadMoreBtn.disabled = true;
+      loadMoreBtn.innerHTML = '<span class="spinner"></span> Loading...';
+    }
+    
+    // Build filters array for Firestore query
+    const filters = buildFirestoreFilters();
+    
     const result = await firestoreService.getExpensesPaginated({
-      pageSize: state.itemsPerPage * 3,
-      lastDoc: state.lastDoc
+      pageSize: state.itemsPerPage,
+      lastDoc: state.lastDoc,
+      filters: filters
     });
     
     if (result.data.length > 0) {
       state.expenses = [...state.expenses, ...result.data];
       state.lastDoc = result.lastDoc;
       state.hasMore = result.hasMore;
-      applyFilters();
+      
+      // Check if all data is loaded
+      if (!result.hasMore || state.expenses.length >= state.totalCount) {
+        state.allDataLoaded = true;
+      }
+      
+      // Apply client-side filters and re-render
+      state.filteredExpenses = [...state.expenses];
+      applyClientSideFilters();
     }
   } catch (error) {
     console.error('Error loading more expenses:', error);
+    toast.error('Failed to load more expenses');
   } finally {
     state.loadingMore = false;
+    
+    // Reset button state
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+    if (loadMoreBtn) {
+      loadMoreBtn.disabled = false;
+      loadMoreBtn.innerHTML = 'Load More';
+    }
   }
 }
 
@@ -657,6 +707,8 @@ async function renderExpenses() {
   if (state.filteredExpenses.length === 0) {
     emptyState.style.display = 'flex';
     expensesList.style.display = 'none';
+    const loadMoreContainer = document.getElementById('loadMoreContainer');
+    if (loadMoreContainer) loadMoreContainer.style.display = 'none';
     if (pagination) {
       const container = document.getElementById('paginationContainer');
       if (container) container.style.display = 'none';
@@ -681,8 +733,31 @@ async function renderExpenses() {
     pagination.render();
   }
   
+  // Show/hide Load More button
+  updateLoadMoreButton();
+  
   // Attach event listeners to cards
   attachCardEventListeners();
+}
+
+// Update Load More button visibility and state
+function updateLoadMoreButton() {
+  const loadMoreContainer = document.getElementById('loadMoreContainer');
+  const loadMoreBtn = document.getElementById('loadMoreBtn');
+  const loadMoreInfo = document.getElementById('loadMoreInfo');
+  
+  if (!loadMoreContainer || !loadMoreBtn) return;
+  
+  // Show button if there's more data to load
+  if (state.hasMore && !state.allDataLoaded && state.expenses.length < state.totalCount) {
+    loadMoreContainer.style.display = 'flex';
+    const remaining = state.totalCount - state.expenses.length;
+    if (loadMoreInfo) {
+      loadMoreInfo.textContent = `Showing ${state.expenses.length} of ${state.totalCount} expenses`;
+    }
+  } else {
+    loadMoreContainer.style.display = 'none';
+  }
 }
 
 // Create expense card HTML
@@ -1526,6 +1601,12 @@ function setupEventListeners() {
   
   // Pull to refresh
   initPullToRefresh();
+  
+  // Load More button
+  const loadMoreBtn = document.getElementById('loadMoreBtn');
+  if (loadMoreBtn) {
+    loadMoreBtn.addEventListener('click', loadMoreExpenses);
+  }
 }
 
 // Initialize pull to refresh

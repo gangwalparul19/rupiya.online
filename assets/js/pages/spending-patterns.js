@@ -321,7 +321,7 @@ function generateCalendarHeatmap() {
 
 // Generate day of week chart
 function generateDayOfWeekChart() {
-  chartScript.addEventListener('load', () => {
+  const createChart = () => {
     const ctx = document.getElementById('dayOfWeekChart');
     if (!ctx) return;
 
@@ -343,35 +343,45 @@ function generateDayOfWeekChart() {
 
     if (charts.dayOfWeek) charts.dayOfWeek.destroy();
 
-    charts.dayOfWeek = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: Object.keys(daySpending),
-        datasets: [{
-          label: 'Total Spending',
-          data: Object.values(daySpending),
-          backgroundColor: 'rgba(74, 144, 226, 0.6)',
-          borderColor: 'rgba(74, 144, 226, 1)',
-          borderWidth: 1
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: true,
-        plugins: {
-          legend: { display: false }
+    // Check if Chart is available
+    if (typeof Chart !== 'undefined') {
+      charts.dayOfWeek = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: Object.keys(daySpending),
+          datasets: [{
+            label: 'Total Spending',
+            data: Object.values(daySpending),
+            backgroundColor: 'rgba(74, 144, 226, 0.6)',
+            borderColor: 'rgba(74, 144, 226, 1)',
+            borderWidth: 1
+          }]
         },
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: {
-              callback: value => `₹${value.toFixed(0)}`
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: value => `₹${value.toFixed(0)}`
+              }
             }
           }
         }
-      }
-    });
-  });
+      });
+    }
+  };
+
+  // Check if Chart.js is already loaded
+  if (typeof Chart !== 'undefined') {
+    createChart();
+  } else {
+    chartScript.addEventListener('load', createChart);
+  }
 }
 
 // Generate category heatmap
@@ -441,7 +451,7 @@ function generateCategoryHeatmap() {
 
 // Generate monthly trend chart
 function generateMonthlyTrendChart() {
-  chartScript.addEventListener('load', () => {
+  const createChart = () => {
     const ctx = document.getElementById('monthlyTrendChart');
     if (!ctx) return;
 
@@ -459,36 +469,46 @@ function generateMonthlyTrendChart() {
 
     if (charts.monthlyTrend) charts.monthlyTrend.destroy();
 
-    charts.monthlyTrend = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: Object.keys(monthlySpending),
-        datasets: [{
-          label: 'Monthly Spending',
-          data: Object.values(monthlySpending),
-          borderColor: 'rgba(74, 144, 226, 1)',
-          backgroundColor: 'rgba(74, 144, 226, 0.1)',
-          tension: 0.4,
-          fill: true
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: true,
-        plugins: {
-          legend: { display: false }
+    // Check if Chart is available
+    if (typeof Chart !== 'undefined') {
+      charts.monthlyTrend = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: Object.keys(monthlySpending),
+          datasets: [{
+            label: 'Monthly Spending',
+            data: Object.values(monthlySpending),
+            borderColor: 'rgba(74, 144, 226, 1)',
+            backgroundColor: 'rgba(74, 144, 226, 0.1)',
+            tension: 0.4,
+            fill: true
+          }]
         },
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: {
-              callback: value => `₹${(value/1000).toFixed(1)}k`
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: value => `₹${(value/1000).toFixed(1)}k`
+              }
             }
           }
         }
-      }
-    });
-  });
+      });
+    }
+  };
+
+  // Check if Chart.js is already loaded
+  if (typeof Chart !== 'undefined') {
+    createChart();
+  } else {
+    chartScript.addEventListener('load', createChart);
+  }
 }
 
 // Generate insights

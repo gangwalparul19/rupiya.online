@@ -15,6 +15,9 @@ let editingPolicyId = null;
 let editingExpenseId = null;
 let deleteItemId = null;
 let deleteItemType = null;
+let lastExpenseDoc = null;
+let hasMoreExpenses = true;
+let isLoadingExpenses = false;
 
 // Initialize
 async function init() {
@@ -100,6 +103,9 @@ function setupEventListeners() {
   document.getElementById('closeExpenseFormBtn')?.addEventListener('click', closeExpenseForm);
   document.getElementById('cancelExpenseBtn')?.addEventListener('click', closeExpenseForm);
   document.getElementById('expenseForm')?.addEventListener('submit', handleExpenseSubmit);
+  
+  // Load more expenses button
+  document.getElementById('loadMoreExpensesBtn')?.addEventListener('click', () => loadExpenses(false));
 
   // Claimable checkbox
   document.getElementById('claimable')?.addEventListener('change', (e) => {
@@ -123,7 +129,7 @@ function switchTab(tabName) {
 
 // Load data
 async function loadData() {
-  await Promise.all([loadPolicies(), loadExpenses()]);
+  await Promise.all([loadPolicies(), loadExpenses(true)]);
 }
 
 // Load policies
@@ -255,32 +261,72 @@ function updatePolicyKPIs() {
   if (policyDocumentsEl) policyDocumentsEl.textContent = policiesWithDocuments;
 }
 
-// Load expenses
-async function loadExpenses() {
+// Load expenses with pagination
+async function loadExpenses(reset = true) {
+  if (isLoadingExpenses) return;
+  
   try {
+    isLoadingExpenses = true;
     const loadingState = document.getElementById('expensesLoadingState');
     const emptyState = document.getElementById('expensesEmptyState');
     const expensesList = document.getElementById('expensesList');
+    const loadMoreBtn = document.getElementById('loadMoreExpensesBtn');
 
-    loadingState.style.display = 'flex';
-    emptyState.style.display = 'none';
-    expensesList.style.display = 'none';
-
-    expenses = await firestoreService.getAll('healthcareExpenses', 'date', 'desc');
-
-    if (expenses.length === 0) {
-      loadingState.style.display = 'none';
-      emptyState.style.display = 'flex';
+    if (reset) {
+      // Initial load
+      loadingState.style.display = 'flex';
+      emptyState.style.display = 'none';
+      expensesList.style.display = 'none';
+      if (loadMoreBtn) loadMoreBtn.style.display = 'none';
+      
+      expenses = [];
+      lastExpenseDoc = null;
+      hasMoreExpenses = true;
     } else {
+      // Loading more - show loading indicator on button
+      if (loadMoreBtn) {
+        loadMoreBtn.disabled = true;
+        loadMoreBtn.textContent = 'Loading...';
+      }
+    }
+
+    const result = await firestoreService.getPaginated('healthcareExpenses', {
+      orderByField: 'date',
+      orderDirection: 'desc',
+      pageSize: 20,
+      lastDoc: lastExpenseDoc
+    });
+
+    if (result.data.length > 0) {
+      expenses = reset ? result.data : [...expenses, ...result.data];
+      lastExpenseDoc = result.lastDoc;
+      hasMoreExpenses = result.hasMore;
+      
       loadingState.style.display = 'none';
       expensesList.style.display = 'block';
       renderExpenses();
+      
+      // Show/hide load more button
+      if (loadMoreBtn) {
+        loadMoreBtn.style.display = hasMoreExpenses ? 'block' : 'none';
+        loadMoreBtn.disabled = false;
+        loadMoreBtn.textContent = 'Load More';
+      }
+    } else if (reset) {
+      // No expenses at all
+      loadingState.style.display = 'none';
+      emptyState.style.display = 'flex';
+      if (loadMoreBtn) loadMoreBtn.style.display = 'none';
     }
 
-    updateExpenseKPIs();
+    if (reset) {
+      updateExpenseKPIs();
+    }
   } catch (error) {
     console.error('Error loading expenses:', error);
     toast.error('Failed to load medical expenses');
+  } finally {
+    isLoadingExpenses = false;
   }
 }
 
@@ -647,7 +693,7 @@ async function handleExpenseSubmit(e) {
     }
 
     closeExpenseForm();
-    await loadExpenses();
+    await loadExpenses(true); // Reset and reload from beginning
   } catch (error) {
     console.error('Error saving expense:', error);
     toast.error('Failed to save expense');
@@ -702,7 +748,7 @@ async function confirmDelete() {
     } else {
       await firestoreService.delete('healthcareExpenses', deleteItemId);
       toast.success('Expense deleted successfully');
-      await loadExpenses();
+      await loadExpenses(true); // Reset and reload from beginning
     }
     closeDeleteModal();
   } catch (error) {
