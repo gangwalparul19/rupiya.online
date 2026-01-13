@@ -107,7 +107,8 @@ function createPrivacyButton() {
 
 /**
  * Update privacy button appearance
- * Hide button when privacy mode is ON (can only disable from settings)
+ * When privacy mode is ON, show button as indicator but make it non-clickable
+ * Users must go to settings page to disable privacy mode
  */
 function updatePrivacyButton() {
     const btn = document.getElementById('privacyModeBtn');
@@ -117,14 +118,22 @@ function updatePrivacyButton() {
     
     buttons.forEach(button => {
         if (privacyMode.isEnabled()) {
-            // Hide the toggle button when privacy mode is ON
-            // Users must go to settings to disable privacy mode
-            button.style.display = 'none';
+            // Show button as indicator but make it non-clickable
+            button.style.display = '';
+            button.classList.add('active', 'privacy-mode-locked');
+            button.setAttribute('title', 'Privacy Mode: ON - Go to Settings to disable');
+            button.setAttribute('aria-pressed', 'true');
+            button.style.pointerEvents = 'none';
+            button.style.cursor = 'not-allowed';
+            button.style.opacity = '0.7';
         } else {
             button.style.display = '';
-            button.classList.remove('active');
+            button.classList.remove('active', 'privacy-mode-locked');
             button.setAttribute('title', 'Privacy Mode: OFF - Click to enable');
             button.setAttribute('aria-pressed', 'false');
+            button.style.pointerEvents = 'auto';
+            button.style.cursor = 'pointer';
+            button.style.opacity = '1';
         }
     });
 }

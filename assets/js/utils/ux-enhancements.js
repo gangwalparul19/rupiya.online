@@ -37,11 +37,17 @@ class UXEnhancements {
 
     mainContent.id = mainContent.id || 'main-content';
 
+    // Check if skip link already exists
+    if (document.querySelector('.skip-link')) return;
+
     const skipLink = document.createElement('a');
     skipLink.href = `#${mainContent.id}`;
     skipLink.className = 'skip-link';
     skipLink.textContent = 'Skip to main content';
-    document.body.prepend(skipLink);
+    skipLink.setAttribute('tabindex', '0');
+    
+    // Insert after body opening, not prepend to avoid layout issues
+    document.body.insertBefore(skipLink, document.body.firstChild);
   }
 
   // Smooth scrolling for anchor links

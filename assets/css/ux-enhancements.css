@@ -84,8 +84,8 @@
 
 /* Skip to main content link */
 .skip-link {
-  position: absolute;
-  top: -40px;
+  position: fixed;
+  top: -100px;
   left: 0;
   background: var(--primary-blue);
   color: white;
@@ -93,10 +93,13 @@
   z-index: 10000;
   transition: top 0.3s;
   border-radius: 0 0 8px 0;
+  pointer-events: none;
+  text-decoration: none;
 }
 
 .skip-link:focus {
   top: 0;
+  pointer-events: auto;
 }
 
 /* Enhanced focus ring */
@@ -339,6 +342,7 @@
   background: linear-gradient(90deg, var(--primary-blue), var(--accent-cyan));
   z-index: 9999;
   transition: width 0.1s ease;
+  pointer-events: none;
 }
 
 /* ============================================
@@ -706,4 +710,41 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     box-shadow: none;
     border: 1px solid #ddd;
   }
+}
+
+
+/* ============================================
+   GLOBAL MOBILE HEADER Z-INDEX FIX
+   Ensures mobile headers are always clickable
+   ============================================ */
+
+/* Global mobile header z-index - above scroll progress and skip link */
+.mobile-header {
+  z-index: 10001 !important;
+  position: sticky !important;
+  pointer-events: auto !important;
+}
+
+/* Ensure mobile header actions are clickable */
+.mobile-header-actions {
+  z-index: 10002 !important;
+  position: relative !important;
+  pointer-events: auto !important;
+}
+
+/* Ensure hamburger menu is always clickable */
+.mobile-header .sidebar-toggle,
+.mobile-header-actions .sidebar-toggle,
+#sidebarOpen {
+  z-index: 10003 !important;
+  position: relative !important;
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
+/* Ensure privacy mode button in header is properly layered */
+.mobile-header .privacy-mode-btn,
+.mobile-header-actions .privacy-mode-btn {
+  z-index: 10003 !important;
+  position: relative !important;
 }

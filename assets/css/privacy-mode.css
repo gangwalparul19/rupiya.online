@@ -23,6 +23,8 @@
     min-height: 44px;
     -webkit-appearance: none;
     appearance: none;
+    position: relative;
+    z-index: 10002;
 }
 
 .privacy-mode-btn:hover {
@@ -38,6 +40,21 @@
     background: #e8f1ff;
     color: #4A90E2;
     border: 1px solid #4A90E2;
+}
+
+/* Locked state - when privacy mode is ON */
+.privacy-mode-btn.privacy-mode-locked {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffc107;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.privacy-mode-btn.privacy-mode-locked:hover {
+    background: #fff3cd;
+    color: #856404;
+    transform: none;
 }
 
 .privacy-mode-btn svg {

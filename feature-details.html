@@ -214,7 +214,7 @@
                 border-bottom: 2px solid #4A90E2;
                 position: sticky;
                 top: 0;
-                z-index: 100;
+                z-index: 10001;
             }
             
             .mobile-brand {
@@ -233,6 +233,9 @@
             .mobile-header-actions {
                 display: flex !important;
                 align-items: center;
+                position: relative;
+                z-index: 10002;
+                pointer-events: auto;
             }
             
             .mobile-header .sidebar-toggle {
@@ -245,6 +248,9 @@
                 border: none;
                 cursor: pointer;
                 border-radius: 8px;
+                position: relative;
+                z-index: 10002;
+                pointer-events: auto;
             }
             
             .mobile-header .sidebar-toggle:hover {
