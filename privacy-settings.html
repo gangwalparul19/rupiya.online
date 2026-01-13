@@ -220,30 +220,12 @@
     <script type="module">
         import { initSidebar } from './assets/js/components/sidebar.js';
         import { initLogoutHandler } from './assets/js/utils/logout-handler.js';
-        import privacyMode from './assets/js/utils/privacy-mode.js';
-        import initPrivacyModeButton from './assets/js/components/privacy-mode-button.js';
-        import authService from './assets/js/services/auth-service.js';
-        import { featureConfig } from './assets/js/config/feature-config.js';
 
-        // Initialize components - wait for features to load first
-        (async () => {
-            try {
-                // Initialize feature config first to ensure features are loaded from Firestore
-                await featureConfig.init();
-                console.log('[PrivacySettings] Features loaded, initializing sidebar');
-                
-                // Now initialize sidebar with loaded features
-                await initSidebar();
-                initLogoutHandler();
-                initPrivacyModeButton();
-            } catch (error) {
-                console.error('[PrivacySettings] Error during initialization:', error);
-                // Still initialize sidebar even if features fail to load
-                await initSidebar();
-                initLogoutHandler();
-                initPrivacyModeButton();
-            }
-        })();
+        // Initialize components
+        initSidebar();
+        initLogoutHandler();
+    </script>
+    <script type="module" src="assets/js/pages/privacy-settings.js"></script>
 
         // Load user profile
         async function loadUserProfile() {

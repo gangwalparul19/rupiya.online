@@ -2,6 +2,8 @@
  * User Guide Page - Interactive documentation for Rupiya
  */
 
+import '../services/services-init.js'; // Initialize services first (includes encryption)
+
 // Guide sections content
 const guideContent = {
   'getting-started': {
@@ -646,11 +648,46 @@ function initSmoothScroll() {
   });
 }
 
+// Load user profile
+async function loadUserProfile() {
+  try {
+    const { default: authService } = await import('../services/auth-service.js');
+    const user = await authService.waitForAuth();
+    const userNameEl = document.getElementById('userName');
+    const userEmailEl = document.getElementById('userEmail');
+    const userAvatarEl = document.getElementById('userAvatar');
+    
+    if (user) {
+      const displayName = user.displayName || 'User';
+      const email = user.email || '';
+      const initials = displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'U';
+      
+      if (userNameEl) userNameEl.textContent = displayName;
+      if (userEmailEl) userEmailEl.textContent = email;
+      if (userAvatarEl) userAvatarEl.textContent = initials;
+    } else {
+      if (userNameEl) userNameEl.textContent = 'Guest';
+      if (userEmailEl) userEmailEl.textContent = 'Not signed in';
+      if (userAvatarEl) userAvatarEl.textContent = 'G';
+    }
+  } catch (error) {
+    console.error('Error loading user profile:', error);
+    const userNameEl = document.getElementById('userName');
+    const userEmailEl = document.getElementById('userEmail');
+    const userAvatarEl = document.getElementById('userAvatar');
+    
+    if (userNameEl) userNameEl.textContent = 'Guest';
+    if (userEmailEl) userEmailEl.textContent = '';
+    if (userAvatarEl) userAvatarEl.textContent = 'G';
+  }
+}
+
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
   renderGuideContent();
   initScrollSpy();
   initSmoothScroll();
+  loadUserProfile();
 });
 
 // Add styles dynamically

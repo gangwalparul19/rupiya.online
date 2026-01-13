@@ -290,6 +290,48 @@ export async function initSidebar() {
     console.log('[Sidebar] Auth not ready, using defaults');
   }
 
+  // Wait for encryption to be ready BEFORE initializing features
+  // This is critical to ensure features are properly decrypted
+  console.log('[Sidebar] Waiting for encryption to be ready...');
+  
+  // Check if encryption is already ready
+  let encryptionReady = false;
+  try {
+    // Try to import encryption service to check status
+    const encryptionService = await import('../services/encryption-service.js').then(m => m.default);
+    
+    // Wait for encryption to be ready with timeout
+    const maxWaitTime = 15000; // 15 seconds
+    const startTime = Date.now();
+    
+    while (!encryptionReady && (Date.now() - startTime) < maxWaitTime) {
+      if (encryptionService.isReady && encryptionService.isReady()) {
+        encryptionReady = true;
+        console.log('[Sidebar] Encryption is ready');
+        break;
+      }
+      
+      if (encryptionService.waitForInitialization) {
+        try {
+          await Promise.race([
+            encryptionService.waitForInitialization(),
+            new Promise(resolve => setTimeout(resolve, 500))
+          ]);
+        } catch (e) {
+          // Ignore timeout
+        }
+      }
+      
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    
+    if (!encryptionReady) {
+      console.warn('[Sidebar] Encryption not ready after timeout, proceeding anyway');
+    }
+  } catch (error) {
+    console.warn('[Sidebar] Error checking encryption status:', error.message);
+  }
+
   // Initialize feature config (will always load from Firestore now)
   // This will use defaults if encryption is not ready yet
   console.log('[Sidebar] Initializing feature config...');
@@ -343,11 +385,21 @@ export async function initSidebar() {
     
     // Reload features from Firestore now that encryption is ready
     if (featureConfig.reloadFromFirestore) {
-      await featureConfig.reloadFromFirestore();
+      try {
+        await featureConfig.reloadFromFirestore();
+        console.log('[Sidebar] Features reloaded after encryption ready');
+      } catch (error) {
+        console.error('[Sidebar] Error reloading features:', error);
+      }
     }
     
     // Refresh sidebar with newly loaded features
-    await refreshSidebar();
+    try {
+      await refreshSidebar();
+      console.log('[Sidebar] Sidebar refreshed with newly loaded features');
+    } catch (error) {
+      console.error('[Sidebar] Error refreshing sidebar:', error);
+    }
   });
 }
 

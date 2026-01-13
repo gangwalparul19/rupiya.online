@@ -436,53 +436,13 @@
     <!-- Scripts -->
     <script type="module">
         import { initSidebar } from './assets/js/components/sidebar.js';
-        import { FeatureDetailsPage } from './assets/js/pages/feature-details.js';
         import { initLogoutHandler } from './assets/js/utils/logout-handler.js';
-        import authService from './assets/js/services/auth-service.js';
-        import { featureConfig } from './assets/js/config/feature-config.js';
 
-        // Initialize components - wait for features to load first
-        (async () => {
-            try {
-                // Initialize feature config first to ensure features are loaded from Firestore
-                await featureConfig.init();
-                console.log('[FeatureDetails] Features loaded, initializing sidebar');
-                
-                // Now initialize sidebar with loaded features
-                await initSidebar();
-                
-                // Initialize logout handler
-                initLogoutHandler();
-
-                // Load user profile
-                const user = await authService.waitForAuth();
-                if (user) {
-                    const userAvatar = document.getElementById('userAvatar');
-                    const userName = document.getElementById('userName');
-                    const userEmail = document.getElementById('userEmail');
-                    
-                    if (userAvatar) {
-                        const initials = user.displayName 
-                            ? user.displayName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
-                            : user.email[0].toUpperCase();
-                        userAvatar.textContent = initials;
-                    }
-                    if (userName) userName.textContent = user.displayName || 'User';
-                    if (userEmail) userEmail.textContent = user.email;
-                }
-
-                // Initialize feature details page
-                const featureDetailsPage = new FeatureDetailsPage();
-                featureDetailsPage.init();
-            } catch (error) {
-                console.error('[FeatureDetails] Error during initialization:', error);
-                // Still initialize sidebar even if features fail to load
-                await initSidebar();
-                initLogoutHandler();
-                const featureDetailsPage = new FeatureDetailsPage();
-                featureDetailsPage.init();
-            }
-        })();
+        // Initialize components
+        initSidebar();
+        initLogoutHandler();
+    </script>
+    <script type="module" src="assets/js/pages/feature-details.js"></script>
     </script>
 </body>
 </html>

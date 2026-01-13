@@ -3,6 +3,7 @@
  * Displays detailed information about each feature with benefits and use cases
  */
 
+import '../services/services-init.js'; // Initialize services first (includes encryption)
 import { featureConfig, FEATURE_CATEGORIES } from '../config/feature-config.js';
 import toast from '../components/toast.js';
 
@@ -938,3 +939,14 @@ class FeatureDetailsPage {
 }
 
 export { FeatureDetailsPage };
+
+// Initialize page when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    const featureDetailsPage = new FeatureDetailsPage();
+    featureDetailsPage.init();
+  });
+} else {
+  const featureDetailsPage = new FeatureDetailsPage();
+  featureDetailsPage.init();
+}
