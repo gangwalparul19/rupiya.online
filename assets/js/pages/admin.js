@@ -494,6 +494,9 @@ function switchMonitoringTab(tabName) {
   if (tabName === 'encryption') displayEncryptionStatus();
 }
 
+// Expose to global scope for HTML onclick handlers
+window.switchMonitoringTab = switchMonitoringTab;
+
 // Performance Monitoring Functions
 function refreshPerformanceMetrics() {
   const metrics = performanceMonitoring.getAllMetrics();
@@ -706,3 +709,25 @@ function addLog(message, containerId) {
   container.appendChild(entry);
   container.scrollTop = container.scrollHeight;
 }
+
+// Expose functions to global scope for HTML onclick handlers
+window.refreshPerformanceMetrics = refreshPerformanceMetrics;
+window.generateTestAnalytics = generateTestAnalytics;
+window.requestNotificationPermission = requestNotificationPermission;
+window.subscribeNotifications = subscribeNotifications;
+window.testBudgetNotification = testBudgetNotification;
+window.testGoalNotification = testGoalNotification;
+window.testEMINotification = testEMINotification;
+window.refreshSyncStatus = refreshSyncStatus;
+window.queueTestOperation = queueTestOperation;
+window.syncAll = syncAll;
+window.retryFailed = retryFailed;
+window.clearQueue = clearQueue;
+window.initializeEncryption = initializeEncryption;
+window.testEncryption = testEncryption;
+window.testFieldEncryption = testFieldEncryption;
+window.testExpenseValidation = testExpenseValidation;
+window.testInvalidData = testInvalidData;
+window.testSanitization = testSanitization;
+window.exportAllData = exportAllData;
+window.estimateBackupSize = estimateBackupSize;

@@ -604,6 +604,7 @@ class FeatureDetailsPage {
     this.allFeatures = FEATURE_DETAILS;
     this.filteredFeatures = FEATURE_DETAILS;
     this.categories = FEATURE_CATEGORIES;
+    this.currentUser = null;
   }
 
   async init() {
@@ -613,6 +614,18 @@ class FeatureDetailsPage {
     
     // Mark as initialized immediately to prevent concurrent calls
     this.initialized = true;
+    
+    // Wait for auth and get current user
+    const { default: authService } = await import('../services/auth-service.js');
+    this.currentUser = await authService.waitForAuth();
+    
+    if (!this.currentUser) {
+      window.location.href = 'login.html';
+      return;
+    }
+    
+    // Load user profile in sidebar
+    this.loadUserProfile();
     
     // Wait for features to load from Firebase BEFORE rendering
     // This ensures we have the correct feature data
@@ -628,6 +641,31 @@ class FeatureDetailsPage {
     this.renderStats();
     this.renderFeatures();
     this.populateCategoryFilter();
+  }
+
+  loadUserProfile() {
+    if (!this.currentUser) return;
+    
+    const userName = document.getElementById('userName');
+    const userEmail = document.getElementById('userEmail');
+    const userAvatar = document.getElementById('userAvatar');
+    
+    if (userName) {
+      userName.textContent = this.currentUser.displayName || this.currentUser.email?.split('@')[0] || 'User';
+    }
+    
+    if (userEmail) {
+      userEmail.textContent = this.currentUser.email || '';
+    }
+    
+    if (userAvatar) {
+      if (this.currentUser.photoURL) {
+        userAvatar.innerHTML = `<img src="${this.currentUser.photoURL}" alt="User Avatar">`;
+      } else {
+        const initial = (this.currentUser.displayName || this.currentUser.email || 'U')[0].toUpperCase();
+        userAvatar.textContent = initial;
+      }
+    }
   }
 
   renderStats() {
