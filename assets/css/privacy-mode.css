@@ -17,11 +17,19 @@
     transition: all 0.3s ease;
     color: #666;
     font-size: 1.2em;
+    min-width: 44px;
+    min-height: 44px;
+    -webkit-appearance: none;
+    appearance: none;
 }
 
 .privacy-mode-btn:hover {
     background: #f3f4f6;
     color: #4A90E2;
+}
+
+.privacy-mode-btn:active {
+    transform: scale(0.95);
 }
 
 .privacy-mode-btn.active {
@@ -33,6 +41,8 @@
 .privacy-mode-btn svg {
     width: 20px;
     height: 20px;
+    display: block;
+    flex-shrink: 0;
 }
 
 /* Auto-Hidden Elements */
@@ -483,10 +493,60 @@ html.privacy-settings-page .sidebar {
     pointer-events: auto !important;
     background: white !important;
     border-right: 1px solid #e0e0e0 !important;
+    flex-direction: column !important;
+    opacity: 1 !important;
 }
 
 html.privacy-settings-page .sidebar.open {
     transform: none !important;
+}
+
+/* Ensure sidebar nav is visible and scrollable */
+html.privacy-settings-page .sidebar-nav {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    display: block !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    opacity: 1 !important;
+}
+
+/* Ensure all sidebar sections are visible */
+html.privacy-settings-page .nav-section {
+    display: block !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    opacity: 1 !important;
+}
+
+html.privacy-settings-page .nav-section-items {
+    display: block !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    opacity: 1 !important;
+    max-height: none !important;
+}
+
+html.privacy-settings-page .nav-section.collapsed .nav-section-items {
+    max-height: none !important;
+    opacity: 1 !important;
+    display: block !important;
+}
+
+/* Ensure sidebar header and footer are visible */
+html.privacy-settings-page .sidebar-header {
+    display: flex !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    opacity: 1 !important;
+}
+
+html.privacy-settings-page .sidebar-footer {
+    display: flex !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    opacity: 1 !important;
 }
 
 html.privacy-settings-page .main-content {
@@ -495,12 +555,17 @@ html.privacy-settings-page .main-content {
     visibility: visible !important;
     pointer-events: auto !important;
     flex: 1 !important;
+    width: calc(100% - 280px) !important;
+    opacity: 1 !important;
 }
 
 html.privacy-settings-page .dashboard-layout {
     display: flex !important;
     visibility: visible !important;
     pointer-events: auto !important;
+    opacity: 1 !important;
+    width: 100% !important;
+    height: 100vh !important;
 }
 
 html.privacy-settings-page .mobile-header,
@@ -525,11 +590,15 @@ html.privacy-settings-page a,
 html.privacy-settings-page .btn,
 html.privacy-settings-page .sidebar-toggle,
 html.privacy-settings-page .privacy-toggle,
-html.privacy-settings-page .privacy-setting-item {
+html.privacy-settings-page .privacy-setting-item,
+html.privacy-settings-page .nav-item,
+html.privacy-settings-page .nav-section-header,
+html.privacy-settings-page .quick-search-input {
     visibility: visible !important;
     pointer-events: auto !important;
     cursor: pointer !important;
     filter: none !important;
+    opacity: 1 !important;
 }
 
 /* On privacy-settings page, disable ALL privacy mode visual effects */
@@ -585,13 +654,23 @@ html.privacy-settings-page .privacy-blur {
 /* Desktop: Optimize layout for better content width */
 @media (min-width: 769px) {
     html.privacy-settings-page .page-container {
-        max-width: 1000px !important;
-        margin: 0 auto !important;
+        max-width: 100% !important;
+        margin: 0 !important;
         padding: 30px 20px !important;
+        width: 100% !important;
     }
     
     html.privacy-settings-page .main-content {
         padding: 0 !important;
+        overflow-y: auto !important;
+    }
+    
+    html.privacy-settings-page .sidebar {
+        display: flex !important;
+    }
+    
+    html.privacy-settings-page .mobile-header {
+        display: none !important;
     }
 }
 
