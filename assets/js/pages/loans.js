@@ -588,6 +588,74 @@ async function saveLoan(e) {
     status: 'active'
   };
   
+  // Validate required fields
+  if (!loanData.loanName) {
+    toast.error('Loan name is required');
+    saveFormBtn.disabled = false;
+    saveFormBtn.textContent = originalText;
+    return;
+  }
+  if (!loanData.loanType) {
+    toast.error('Loan type is required');
+    saveFormBtn.disabled = false;
+    saveFormBtn.textContent = originalText;
+    return;
+  }
+  if (!loanData.lender) {
+    toast.error('Lender/Bank name is required');
+    saveFormBtn.disabled = false;
+    saveFormBtn.textContent = originalText;
+    return;
+  }
+  if (loanData.principalAmount <= 0) {
+    toast.error('Principal amount must be greater than 0');
+    saveFormBtn.disabled = false;
+    saveFormBtn.textContent = originalText;
+    return;
+  }
+  if (loanData.interestRate < 0) {
+    toast.error('Interest rate cannot be negative');
+    saveFormBtn.disabled = false;
+    saveFormBtn.textContent = originalText;
+    return;
+  }
+  if (loanData.tenure <= 0) {
+    toast.error('Tenure must be greater than 0');
+    saveFormBtn.disabled = false;
+    saveFormBtn.textContent = originalText;
+    return;
+  }
+  if (loanData.emiAmount <= 0) {
+    toast.error('EMI amount must be greater than 0');
+    saveFormBtn.disabled = false;
+    saveFormBtn.textContent = originalText;
+    return;
+  }
+  if (!loanData.startDate) {
+    toast.error('Start date is required');
+    saveFormBtn.disabled = false;
+    saveFormBtn.textContent = originalText;
+    return;
+  }
+  if (loanData.emiDate < 1 || loanData.emiDate > 28) {
+    toast.error('EMI due date must be between 1 and 28');
+    saveFormBtn.disabled = false;
+    saveFormBtn.textContent = originalText;
+    return;
+  }
+  if (loanData.emisPaid < 0) {
+    toast.error('EMIs paid cannot be negative');
+    saveFormBtn.disabled = false;
+    saveFormBtn.textContent = originalText;
+    return;
+  }
+  if (loanData.emisPaid > loanData.tenure) {
+    toast.error('EMIs paid cannot exceed tenure');
+    saveFormBtn.disabled = false;
+    saveFormBtn.textContent = originalText;
+    return;
+  }
+  
   // Calculate outstanding if not provided
   if (!loanData.outstandingAmount && loanData.principalAmount) {
     const paidPrincipal = calculatePaidPrincipal(loanData);

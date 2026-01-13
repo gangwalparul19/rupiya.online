@@ -165,8 +165,6 @@ function showEditForm(house) {
   document.getElementById('type').value = house.type;
   document.getElementById('address').value = house.address;
   document.getElementById('ownership').value = house.ownership || 'Owned';
-  document.getElementById('ownerName').value = house.ownerName || '';  // ADD THIS
-  document.getElementById('tenantName').value = house.tenantName || '';  // ADD THIS
   document.getElementById('notes').value = house.notes || '';
 
   addHouseSection.classList.add('show');
@@ -183,10 +181,26 @@ async function handleSubmit(e) {
     type: document.getElementById('type').value,
     address: document.getElementById('address').value.trim(),
     ownership: document.getElementById('ownership').value,
-    ownerName: document.getElementById('ownerName').value.trim(),  // ADD THIS
-    tenantName: document.getElementById('tenantName').value.trim(),  // ADD THIS
     notes: document.getElementById('notes').value.trim()
   };
+
+  // Validate required fields
+  if (!formData.name) {
+    showToast('Property name is required', 'error');
+    return;
+  }
+  if (!formData.type) {
+    showToast('Property type is required', 'error');
+    return;
+  }
+  if (!formData.address) {
+    showToast('Address is required', 'error');
+    return;
+  }
+  if (!formData.ownership) {
+    showToast('Ownership status is required', 'error');
+    return;
+  }
 
   // Show loading
   const originalText = saveFormBtn.textContent;

@@ -125,6 +125,9 @@ class FirestoreService {
     try {
       const userId = this.getUserId();
       
+      // Wait for encryption to be ready before saving data
+      await encryptionService.waitForInitialization();
+      
       // Encrypt data before saving
       const dataToSave = await encryptionService.encryptObject(data, collectionName);
       
@@ -278,6 +281,9 @@ class FirestoreService {
 
   async update(collectionName, docId, data) {
     try {
+      // Wait for encryption to be ready before updating data
+      await encryptionService.waitForInitialization();
+      
       // Encrypt data before updating
       const dataToUpdate = await encryptionService.encryptObject(data, collectionName);
       
