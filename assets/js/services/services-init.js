@@ -14,6 +14,7 @@ import userService from './user-service.js';
 import encryptionService from './encryption-service.js';
 import authEncryptionHelper from '../utils/auth-encryption-helper.js';
 import logger from '../utils/logger.js';
+import initPrivacyModeButton from '../components/privacy-mode-button.js';
 
 const log = logger.create('Services');
 
@@ -96,3 +97,13 @@ export default {
   encryption: encryptionService,
   authEncryption: authEncryptionHelper
 };
+
+// Initialize privacy mode button globally (works on all pages)
+// This single button controls privacy mode across the entire application
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    initPrivacyModeButton();
+  });
+} else {
+  initPrivacyModeButton();
+}

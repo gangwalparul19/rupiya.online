@@ -204,8 +204,22 @@
       </div>
     </section>
 
-    <!-- User Registration Trends -->
+    <!-- Monitoring Tabs -->
     <section class="admin-section">
+      <div class="monitoring-tabs">
+        <button class="monitoring-tab-btn active" onclick="switchMonitoringTab('registration')">📈 Registration</button>
+        <button class="monitoring-tab-btn" onclick="switchMonitoringTab('performance')">⚡ Performance</button>
+        <button class="monitoring-tab-btn" onclick="switchMonitoringTab('analytics')">📊 Analytics</button>
+        <button class="monitoring-tab-btn" onclick="switchMonitoringTab('notifications')">🔔 Notifications</button>
+        <button class="monitoring-tab-btn" onclick="switchMonitoringTab('sync')">📡 Sync</button>
+        <button class="monitoring-tab-btn" onclick="switchMonitoringTab('encryption')">🔐 Encryption</button>
+        <button class="monitoring-tab-btn" onclick="switchMonitoringTab('validation')">✓ Validation</button>
+        <button class="monitoring-tab-btn" onclick="switchMonitoringTab('backup')">💾 Backup</button>
+      </div>
+    </section>
+
+    <!-- User Registration Trends -->
+    <section class="admin-section monitoring-tab-content" id="registration-tab">
       <div class="section-header-enhanced">
         <h2 class="section-title">📈 User Registration Trends</h2>
         <span class="section-badge">Last 6 months</span>
@@ -213,6 +227,178 @@
       <div class="admin-chart-card full-width">
         <div class="chart-container chart-container-lg">
           <canvas id="registrationTrendChart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- Performance Monitoring Tab -->
+    <section class="admin-section monitoring-tab-content" id="performance-tab" style="display: none;">
+      <div class="section-header-enhanced">
+        <h2 class="section-title">⚡ Performance Monitoring</h2>
+        <button class="btn btn-sm" onclick="refreshPerformanceMetrics()">Refresh</button>
+      </div>
+      <div class="monitoring-grid">
+        <div class="monitoring-card">
+          <h3>Performance Metrics</h3>
+          <div id="performanceMetrics" class="metrics-list"></div>
+        </div>
+        <div class="monitoring-card">
+          <h3>Performance Alerts</h3>
+          <div id="performanceAlerts" class="alerts-list"></div>
+        </div>
+      </div>
+      <div class="monitoring-card full-width">
+        <h3>Performance Report</h3>
+        <div id="performanceReport" class="report-content"></div>
+      </div>
+    </section>
+
+    <!-- Analytics Tab -->
+    <section class="admin-section monitoring-tab-content" id="analytics-tab" style="display: none;">
+      <div class="section-header-enhanced">
+        <h2 class="section-title">📊 User Analytics</h2>
+        <button class="btn btn-sm" onclick="generateTestAnalytics()">Generate Test Data</button>
+      </div>
+      <div class="monitoring-grid">
+        <div class="monitoring-card">
+          <h3>Session Analytics</h3>
+          <div id="sessionAnalytics" class="metrics-list"></div>
+        </div>
+        <div class="monitoring-card">
+          <h3>Feature Usage</h3>
+          <div id="featureUsageStats" class="metrics-list"></div>
+        </div>
+        <div class="monitoring-card">
+          <h3>Error Statistics</h3>
+          <div id="errorStats" class="metrics-list"></div>
+        </div>
+        <div class="monitoring-card">
+          <h3>Conversion Funnel</h3>
+          <div id="conversionFunnel" class="metrics-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Notifications Tab -->
+    <section class="admin-section monitoring-tab-content" id="notifications-tab" style="display: none;">
+      <div class="section-header-enhanced">
+        <h2 class="section-title">🔔 Push Notifications</h2>
+      </div>
+      <div class="monitoring-grid">
+        <div class="monitoring-card">
+          <h3>Notification Status</h3>
+          <div id="notificationStatus" class="metrics-list"></div>
+          <div class="button-group">
+            <button class="btn btn-sm" onclick="requestNotificationPermission()">Request Permission</button>
+            <button class="btn btn-sm" onclick="subscribeNotifications()">Subscribe</button>
+          </div>
+        </div>
+        <div class="monitoring-card">
+          <h3>Send Test Notifications</h3>
+          <div class="button-group">
+            <button class="btn btn-sm" onclick="testBudgetNotification()">Budget Alert</button>
+            <button class="btn btn-sm" onclick="testGoalNotification()">Goal Milestone</button>
+            <button class="btn btn-sm" onclick="testEMINotification()">EMI Due</button>
+          </div>
+        </div>
+      </div>
+      <div class="monitoring-card full-width">
+        <h3>Notification History</h3>
+        <div id="notificationHistory" class="log-container"></div>
+      </div>
+    </section>
+
+    <!-- Offline Sync Tab -->
+    <section class="admin-section monitoring-tab-content" id="sync-tab" style="display: none;">
+      <div class="section-header-enhanced">
+        <h2 class="section-title">📡 Offline Data Sync</h2>
+      </div>
+      <div class="monitoring-grid">
+        <div class="monitoring-card">
+          <h3>Sync Status</h3>
+          <div id="syncStatus" class="metrics-list"></div>
+          <button class="btn btn-sm" onclick="refreshSyncStatus()">Refresh</button>
+        </div>
+        <div class="monitoring-card">
+          <h3>Sync Queue</h3>
+          <div id="syncQueue" class="metrics-list"></div>
+        </div>
+      </div>
+      <div class="monitoring-card full-width">
+        <h3>Sync Operations</h3>
+        <div class="button-group">
+          <button class="btn btn-sm" onclick="queueTestOperation()">Queue Test</button>
+          <button class="btn btn-sm" onclick="syncAll()">Sync All</button>
+          <button class="btn btn-sm" onclick="retryFailed()">Retry Failed</button>
+          <button class="btn btn-sm btn-danger-outline" onclick="clearQueue()">Clear Queue</button>
+        </div>
+        <div id="syncLog" class="log-container"></div>
+      </div>
+    </section>
+
+    <!-- Encryption Tab -->
+    <section class="admin-section monitoring-tab-content" id="encryption-tab" style="display: none;">
+      <div class="section-header-enhanced">
+        <h2 class="section-title">🔐 Encryption at Rest</h2>
+      </div>
+      <div class="monitoring-card">
+        <h3>Encryption Setup</h3>
+        <input type="password" id="masterPassword" placeholder="Enter master password" class="form-input">
+        <button class="btn btn-sm" onclick="initializeEncryption()">Initialize Encryption</button>
+      </div>
+      <div class="monitoring-grid">
+        <div class="monitoring-card">
+          <h3>Encryption Status</h3>
+          <div id="encryptionStatus" class="metrics-list"></div>
+        </div>
+        <div class="monitoring-card">
+          <h3>Encryption Statistics</h3>
+          <div id="encryptionStats" class="metrics-list"></div>
+        </div>
+      </div>
+      <div class="monitoring-card full-width">
+        <h3>Test Encryption</h3>
+        <div class="button-group">
+          <button class="btn btn-sm" onclick="testEncryption()">Test Encrypt/Decrypt</button>
+          <button class="btn btn-sm" onclick="testFieldEncryption()">Test Field Encryption</button>
+        </div>
+        <div id="encryptionLog" class="log-container"></div>
+      </div>
+    </section>
+
+    <!-- Validation Tab -->
+    <section class="admin-section monitoring-tab-content" id="validation-tab" style="display: none;">
+      <div class="section-header-enhanced">
+        <h2 class="section-title">✓ Data Validation</h2>
+      </div>
+      <div class="monitoring-card full-width">
+        <h3>Test Data Validation</h3>
+        <div class="button-group">
+          <button class="btn btn-sm" onclick="testExpenseValidation()">Test Expense Validation</button>
+          <button class="btn btn-sm" onclick="testInvalidData()">Test Invalid Data</button>
+          <button class="btn btn-sm" onclick="testSanitization()">Test XSS Sanitization</button>
+        </div>
+        <div id="validationLog" class="log-container"></div>
+      </div>
+    </section>
+
+    <!-- Backup Tab -->
+    <section class="admin-section monitoring-tab-content" id="backup-tab" style="display: none;">
+      <div class="section-header-enhanced">
+        <h2 class="section-title">💾 Backup & Export</h2>
+      </div>
+      <div class="monitoring-grid">
+        <div class="monitoring-card">
+          <h3>Backup Operations</h3>
+          <div class="button-group">
+            <button class="btn btn-sm" onclick="exportAllData()">Export All Data</button>
+            <button class="btn btn-sm" onclick="estimateBackupSize()">Estimate Size</button>
+          </div>
+          <div id="backupStatus" class="metrics-list"></div>
+        </div>
+        <div class="monitoring-card">
+          <h3>Backup History</h3>
+          <div id="backupHistory" class="metrics-list"></div>
         </div>
       </div>
     </section>

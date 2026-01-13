@@ -560,3 +560,261 @@ function escapeHtml(text) {
 
 // Start
 init();
+
+
+// ============================================
+// MONITORING FEATURES - Performance, Analytics, Notifications, Sync, Encryption, Validation, Backup
+// ============================================
+
+import performanceMonitoring from '../services/performance-monitoring-service.js';
+import userAnalytics from '../services/user-analytics-service.js';
+import pushNotifications from '../services/push-notifications-service.js';
+import offlineSync from '../services/offline-sync-service.js';
+import encryptionAtRest from '../services/encryption-at-rest-service.js';
+import dataValidation from '../services/data-validation-service.js';
+import backupService from '../services/backup-service.js';
+
+// Make services globally available
+window.performanceMonitoring = performanceMonitoring;
+window.userAnalytics = userAnalytics;
+window.pushNotifications = pushNotifications;
+window.offlineSync = offlineSync;
+window.encryptionAtRest = encryptionAtRest;
+window.dataValidation = dataValidation;
+window.backupService = backupService;
+
+// Initialize monitoring
+performanceMonitoring.startMonitoring();
+userAnalytics.initSession('admin-user', { role: 'admin' });
+offlineSync.loadQueue();
+
+// Tab Switching
+function switchMonitoringTab(tabName) {
+  document.querySelectorAll('.monitoring-tab-content').forEach(tab => tab.style.display = 'none');
+  document.querySelectorAll('.monitoring-tab-btn').forEach(btn => btn.classList.remove('active'));
+  
+  const tab = document.getElementById(tabName + '-tab');
+  if (tab) tab.style.display = 'block';
+  
+  event.target.classList.add('active');
+  
+  // Refresh data when tab opens
+  if (tabName === 'performance') refreshPerformanceMetrics();
+  if (tabName === 'analytics') displayAnalytics();
+  if (tabName === 'notifications') displayNotificationStatus();
+  if (tabName === 'sync') refreshSyncStatus();
+  if (tabName === 'encryption') displayEncryptionStatus();
+}
+
+// Performance Monitoring Functions
+function refreshPerformanceMetrics() {
+  const metrics = performanceMonitoring.getAllMetrics();
+  const html = Object.entries(metrics).map(([name, stats]) => {
+    if (stats.count) {
+      return `<div class="metric"><span class="metric-label">${name}</span><span class="metric-value">${stats.avg?.toFixed(2) || stats.count} ms</span></div>`;
+    }
+    return '';
+  }).join('');
+  document.getElementById('performanceMetrics').innerHTML = html || '<p>No metrics recorded yet</p>';
+  
+  const alerts = performanceMonitoring.getAlerts();
+  const alertsHtml = alerts.slice(-5).map(alert => `<div class="alert warning"><strong>${new Date(alert.timestamp).toLocaleTimeString()}:</strong> ${alert.message}</div>`).join('');
+  document.getElementById('performanceAlerts').innerHTML = alertsHtml || '<p>No alerts</p>';
+  
+  const report = performanceMonitoring.getPerformanceReport();
+  const reportHtml = `<div class="metric"><span class="metric-label">Total Metrics</span><span class="metric-value">${report.summary.totalMetrics}</span></div><div class="metric"><span class="metric-label">Total Alerts</span><span class="metric-value">${report.summary.totalAlerts}</span></div><div class="metric"><span class="metric-label">Monitoring Active</span><span class="metric-value">${report.summary.isMonitoring ? '✅' : '❌'}</span></div>`;
+  document.getElementById('performanceReport').innerHTML = reportHtml;
+}
+
+// Analytics Functions
+function generateTestAnalytics() {
+  const userId = 'test-user-' + Date.now();
+  userAnalytics.initSession(userId, { device: 'desktop' });
+  userAnalytics.logPageView('expenses');
+  userAnalytics.logFeatureUsage('budget_alert');
+  userAnalytics.logEvent('expense_added', { amount: 100, category: 'Food' });
+  userAnalytics.logConversion('premium_upgrade', 99);
+  userAnalytics.logTiming('encryption_operation', 150);
+  displayAnalytics();
+  addLog('✅ Test analytics generated', 'validationLog');
+}
+
+function displayAnalytics() {
+  const report = userAnalytics.getAnalyticsReport();
+  document.getElementById('sessionAnalytics').innerHTML = `<div class="metric"><span class="metric-label">Total Events</span><span class="metric-value">${report.summary.totalEvents}</span></div><div class="metric"><span class="metric-label">Total Sessions</span><span class="metric-value">${report.summary.totalSessions}</span></div><div class="metric"><span class="metric-label">Total Users</span><span class="metric-value">${report.summary.totalUsers}</span></div>`;
+  
+  const featureStats = userAnalytics.getFeatureUsageStats();
+  const featureHtml = Object.entries(featureStats).map(([feature, data]) => `<div class="metric"><span class="metric-label">${feature}</span><span class="metric-value">${data.count} uses</span></div>`).join('');
+  document.getElementById('featureUsageStats').innerHTML = featureHtml || '<p>No feature usage yet</p>';
+  
+  const errorStats = userAnalytics.getErrorStats();
+  const errorHtml = Object.entries(errorStats).map(([type, data]) => `<div class="metric"><span class="metric-label">${type}</span><span class="metric-value">${data.count} errors</span></div>`).join('');
+  document.getElementById('errorStats').innerHTML = errorHtml || '<p>No errors recorded</p>';
+}
+
+// Notification Functions
+function displayNotificationStatus() {
+  const status = pushNotifications.getSubscriptionStatus();
+  document.getElementById('notificationStatus').innerHTML = `<div class="metric"><span class="metric-label">Supported</span><span class="metric-value">${status.isSupported ? '✅' : '❌'}</span></div><div class="metric"><span class="metric-label">Subscribed</span><span class="metric-value">${status.isSubscribed ? '✅' : '❌'}</span></div><div class="metric"><span class="metric-label">Permission</span><span class="metric-value">${status.permission}</span></div>`;
+}
+
+async function requestNotificationPermission() {
+  const permission = await pushNotifications.requestPermission();
+  addLog(`Permission: ${permission}`, 'syncLog');
+  displayNotificationStatus();
+}
+
+async function subscribeNotifications() {
+  const success = await pushNotifications.subscribe();
+  addLog(`Subscription: ${success ? 'Success' : 'Failed'}`, 'syncLog');
+  displayNotificationStatus();
+}
+
+function testBudgetNotification() {
+  pushNotifications.notifyBudgetExceeded('Food', 500, 400);
+  addLog('Budget notification sent', 'syncLog');
+}
+
+function testGoalNotification() {
+  pushNotifications.notifyGoalMilestone('Vacation', 75);
+  addLog('Goal notification sent', 'syncLog');
+}
+
+function testEMINotification() {
+  pushNotifications.notifyEMIDue('Home Loan', 50000, '2024-02-15');
+  addLog('EMI notification sent', 'syncLog');
+}
+
+// Offline Sync Functions
+function refreshSyncStatus() {
+  const status = offlineSync.getSyncStatus();
+  document.getElementById('syncStatus').innerHTML = `<div class="metric"><span class="metric-label">Online</span><span class="metric-value"><span class="status ${status.isOnline ? 'online' : 'offline'}">${status.isOnline ? 'Online' : 'Offline'}</span></span></div><div class="metric"><span class="metric-label">Syncing</span><span class="metric-value">${status.isSyncing ? '⏳' : '✅'}</span></div><div class="metric"><span class="metric-label">Pending</span><span class="metric-value">${status.pendingCount}</span></div><div class="metric"><span class="metric-label">Failed</span><span class="metric-value">${status.failedCount}</span></div>`;
+  
+  const queue = offlineSync.getSyncQueue();
+  const queueHtml = queue.slice(-5).map(item => `<div class="metric"><span class="metric-label">${item.operation} ${item.collection}</span><span class="metric-value">${item.status}</span></div>`).join('');
+  document.getElementById('syncQueue').innerHTML = queueHtml || '<p>Queue empty</p>';
+}
+
+function queueTestOperation() {
+  offlineSync.queueOperation('add', 'expenses', 'test-' + Date.now(), { amount: 100, description: 'Test expense', category: 'Testing' });
+  addLog('✅ Test operation queued', 'syncLog');
+  refreshSyncStatus();
+}
+
+async function syncAll() {
+  const result = await offlineSync.syncAll();
+  addLog(`Sync result: ${result.synced} synced, ${result.failed} failed`, 'syncLog');
+  refreshSyncStatus();
+}
+
+async function retryFailed() {
+  const result = await offlineSync.retryFailed();
+  addLog(`Retry result: ${result.synced} synced, ${result.failed} failed`, 'syncLog');
+  refreshSyncStatus();
+}
+
+function clearQueue() {
+  offlineSync.clearQueue();
+  addLog('✅ Queue cleared', 'syncLog');
+  refreshSyncStatus();
+}
+
+// Encryption Functions
+async function initializeEncryption() {
+  const password = document.getElementById('masterPassword').value;
+  if (!password) {
+    addLog('❌ Please enter a password', 'encryptionLog');
+    return;
+  }
+  const success = await encryptionAtRest.initialize(password);
+  addLog(success ? '✅ Encryption initialized' : '❌ Initialization failed', 'encryptionLog');
+  displayEncryptionStatus();
+}
+
+function displayEncryptionStatus() {
+  const status = encryptionAtRest.getStatus();
+  document.getElementById('encryptionStatus').innerHTML = `<div class="metric"><span class="metric-label">Initialized</span><span class="metric-value">${status.isInitialized ? '✅' : '❌'}</span></div><div class="metric"><span class="metric-label">Algorithm</span><span class="metric-value">${status.algorithm}</span></div><div class="metric"><span class="metric-label">Key Length</span><span class="metric-value">${status.keyLength} bits</span></div>`;
+  
+  const stats = encryptionAtRest.getStats();
+  document.getElementById('encryptionStats').innerHTML = `<div class="metric"><span class="metric-label">Items Encrypted</span><span class="metric-value">${stats.itemsEncrypted}</span></div><div class="metric"><span class="metric-label">Total Size</span><span class="metric-value">${(stats.totalSize / 1024).toFixed(2)} KB</span></div>`;
+}
+
+async function testEncryption() {
+  try {
+    const testData = 'This is sensitive data';
+    const encrypted = await encryptionAtRest.encrypt(testData);
+    const decrypted = await encryptionAtRest.decrypt(encrypted);
+    addLog(`✅ Encryption test passed`, 'encryptionLog');
+    addLog(`Original: ${testData}`, 'encryptionLog');
+    addLog(`Decrypted: ${decrypted}`, 'encryptionLog');
+  } catch (error) {
+    addLog(`❌ Encryption test failed: ${error.message}`, 'encryptionLog');
+  }
+}
+
+async function testFieldEncryption() {
+  try {
+    const data = { name: 'John', email: 'john@example.com', phone: '9876543210' };
+    const encrypted = await encryptionAtRest.encryptFields(data, ['email', 'phone']);
+    const decrypted = await encryptionAtRest.decryptFields(encrypted, ['email', 'phone']);
+    addLog(`✅ Field encryption test passed`, 'encryptionLog');
+    addLog(`Original email: ${data.email}`, 'encryptionLog');
+    addLog(`Decrypted email: ${decrypted.email}`, 'encryptionLog');
+  } catch (error) {
+    addLog(`❌ Field encryption test failed: ${error.message}`, 'encryptionLog');
+  }
+}
+
+// Validation Functions
+function testExpenseValidation() {
+  const validData = { amount: 100, description: 'Lunch', category: 'Food', date: new Date() };
+  const result = dataValidation.validate(validData, 'expenses');
+  addLog(result.isValid ? '✅ Valid expense data' : '❌ Invalid expense data', 'validationLog');
+  if (!result.isValid) addLog(JSON.stringify(result.errors), 'validationLog');
+}
+
+function testInvalidData() {
+  const invalidData = { amount: -100, description: '', category: 'Food', date: 'invalid-date' };
+  const result = dataValidation.validate(invalidData, 'expenses');
+  addLog(result.isValid ? '✅ Valid' : '✅ Correctly rejected invalid data', 'validationLog');
+  addLog(JSON.stringify(result.errors), 'validationLog');
+}
+
+function testSanitization() {
+  const maliciousData = '<script>alert("XSS")</script>';
+  const sanitized = dataValidation.sanitize({ description: maliciousData }, ['description']);
+  addLog('✅ XSS sanitization test', 'validationLog');
+  addLog(`Original: ${maliciousData}`, 'validationLog');
+  addLog(`Sanitized: ${sanitized.description}`, 'validationLog');
+}
+
+// Backup Functions
+async function exportAllData() {
+  try {
+    const data = await backupService.exportUserData();
+    addLog(`✅ Export successful: ${data.metadata.totalDocuments} documents`, 'syncLog');
+  } catch (error) {
+    addLog(`❌ Export failed: ${error.message}`, 'syncLog');
+  }
+}
+
+async function estimateBackupSize() {
+  try {
+    const size = await backupService.getBackupSizeEstimate();
+    addLog(`✅ Backup size: ${size.mb} MB (${size.documents} documents)`, 'syncLog');
+  } catch (error) {
+    addLog(`❌ Size estimation failed: ${error.message}`, 'syncLog');
+  }
+}
+
+// Utility Functions
+function addLog(message, containerId) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  const timestamp = new Date().toLocaleTimeString();
+  const entry = document.createElement('div');
+  entry.className = 'log-entry';
+  entry.innerHTML = `<span class="log-time">[${timestamp}]</span> ${message}`;
+  container.appendChild(entry);
+  container.scrollTop = container.scrollHeight;
+}

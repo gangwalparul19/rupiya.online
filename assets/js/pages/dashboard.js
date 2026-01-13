@@ -14,7 +14,6 @@ import logger from '../utils/logger.js';
 import kpiEnhancer from '../utils/kpi-enhancements.js';
 import TransactionListEnhancer from '../utils/transaction-list-enhancements.js';
 import { setupAutoCacheClear } from '../utils/cache-buster.js';
-import initPrivacyModeButton from '../components/privacy-mode-button.js';
 
 const log = logger.create('Dashboard');
 
@@ -74,13 +73,9 @@ async function init() {
       await initDashboard();
       // Check for first-time setup after dashboard loads
       await checkFirstTimeSetup();
-      // Initialize privacy mode button after dashboard is ready
-      setTimeout(() => initPrivacyModeButton(), 1000);
     } else {
       // Show basic UI while waiting for reauth
       await initDashboard();
-      // Initialize privacy mode button after dashboard is ready
-      setTimeout(() => initPrivacyModeButton(), 1000);
     }
   }
 }
