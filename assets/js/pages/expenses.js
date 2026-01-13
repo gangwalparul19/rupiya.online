@@ -350,6 +350,8 @@ async function loadExpenses() {
     emptyState.style.display = 'none';
     expensesList.style.display = 'none';
     
+    console.log('[LoadExpenses] Starting to load expenses');
+    
     // Get KPI summary for ALL expenses (unfiltered)
     const kpiSummary = await firestoreService.getExpenseKPISummary();
     state.allExpensesKPI = {
@@ -357,6 +359,10 @@ async function loadExpenses() {
       lastMonth: kpiSummary.lastMonth,
       total: kpiSummary.totalCount
     };
+    
+    state.totalCount = kpiSummary.totalCount;
+    
+    console.log('[LoadExpenses] Total expenses in DB:', state.totalCount);
     
     // Update KPI cards with all expenses
     updateExpenseKPIsFromSummary(kpiSummary);
@@ -371,37 +377,38 @@ async function loadExpenses() {
                        state.filters.dateFrom || 
                        state.filters.dateTo;
     
+    console.log('[LoadExpenses] Has filters:', hasFilters);
+    
     if (hasFilters) {
-      // Load ALL filtered data for accurate pagination
+      // With filters: Load ALL filtered data (usually smaller dataset)
       const result = await firestoreService.getExpensesPaginated({ 
-        pageSize: 1000, // Load more to handle filters
+        pageSize: 1000,
         filters: filters
       });
       
       state.expenses = result.data;
-      
-      // Apply client-side filters
       state.filteredExpenses = [...state.expenses];
       applyClientSideFilters();
-      
       state.filteredCount = state.filteredExpenses.length;
-      
-      // Update KPI cards with filtered data
       updateFilteredExpenseKPIs();
     } else {
-      // No filters - use server-side pagination
+      // No filters: Load initial batch (50 records for first 5 pages)
+      const initialBatchSize = state.itemsPerPage * 1; // 10 records
       const result = await firestoreService.getExpensesPaginated({ 
-        pageSize: state.itemsPerPage,
+        pageSize: initialBatchSize,
         filters: filters
       });
+      
+      console.log('[LoadExpenses] Loaded initial batch:', result.data.length);
       
       state.expenses = result.data;
       state.lastDoc = result.lastDoc;
       state.hasMore = result.hasMore;
       state.filteredExpenses = [...state.expenses];
-      state.filteredCount = kpiSummary.totalCount;
-      state.totalCount = kpiSummary.totalCount;
+      state.filteredCount = state.totalCount;
     }
+    
+    console.log('[LoadExpenses] Expenses in memory:', state.expenses.length);
     
     // Reset to page 1
     state.currentPage = 1;
@@ -413,6 +420,66 @@ async function loadExpenses() {
     console.error('Error loading expenses:', error);
     toast.error('Failed to load expenses');
     loadingState.style.display = 'none';
+  }
+}
+
+// Load more expenses when user navigates to a page that needs more data
+async function loadMoreExpensesIfNeeded(targetPage) {
+  const requiredIndex = targetPage * state.itemsPerPage;
+  
+  // Check if we have enough data loaded
+  if (requiredIndex <= state.expenses.length) {
+    console.log('[LoadMore] Already have enough data');
+    return true; // We have enough data
+  }
+  
+  // Check if there's more data to load
+  if (!state.hasMore) {
+    console.log('[LoadMore] No more data available');
+    return false; // No more data available
+  }
+  
+  // Check if already loading
+  if (state.loadingMore) {
+    console.log('[LoadMore] Already loading');
+    return false;
+  }
+  
+  try {
+    state.loadingMore = true;
+    console.log('[LoadMore] Loading more data...');
+    
+    // Show loading indicator
+    const loadingToast = toast.info('Loading more expenses...', { duration: 0 });
+    
+    // Load next batch (50 more records)
+    const batchSize = state.itemsPerPage * 1; // 10 records
+    const result = await firestoreService.getExpensesPaginated({
+      pageSize: batchSize,
+      lastDoc: state.lastDoc,
+      filters: buildFirestoreFilters()
+    });
+    
+    console.log('[LoadMore] Loaded additional:', result.data.length);
+    
+    // Append new data
+    state.expenses = [...state.expenses, ...result.data];
+    state.lastDoc = result.lastDoc;
+    state.hasMore = result.hasMore;
+    state.filteredExpenses = [...state.expenses];
+    
+    // Dismiss loading toast
+    if (loadingToast && loadingToast.dismiss) {
+      loadingToast.dismiss();
+    }
+    
+    return true;
+  } catch (error) {
+    console.error('[LoadMore] Error loading more expenses:', error);
+    toast.error('Failed to load more expenses');
+    return false;
+  } finally {
+    state.loadingMore = false;
   }
 }
 
@@ -726,9 +793,18 @@ function updateCounts() {
 
 // Render expenses
 async function renderExpenses() {
+  console.log('[Render] Starting render with:', {
+    expensesInMemory: state.expenses.length,
+    filteredCount: state.filteredExpenses.length,
+    totalCount: state.totalCount,
+    currentPage: state.currentPage,
+    itemsPerPage: state.itemsPerPage
+  });
+  
   loadingState.style.display = 'none';
   
   if (state.filteredExpenses.length === 0) {
+    console.log('[Render] No expenses to show');
     emptyState.style.display = 'flex';
     expensesList.style.display = 'none';
     const paginationContainer = document.getElementById('paginationContainer');
@@ -739,11 +815,31 @@ async function renderExpenses() {
   emptyState.style.display = 'none';
   expensesList.style.display = 'grid';
   
-  // Calculate pagination
-  const totalPages = Math.ceil(state.filteredExpenses.length / state.itemsPerPage);
+  // Calculate pagination based on total count (not just loaded data)
+  const hasFilters = state.filters.category || 
+                     state.filters.paymentMethod || 
+                     state.filters.specificPaymentMethod || 
+                     state.filters.familyMember || 
+                     state.filters.dateFrom || 
+                     state.filters.dateTo || 
+                     state.filters.search;
+  
+  // Use filtered count if filters applied, otherwise use total from DB
+  const totalRecords = hasFilters ? state.filteredExpenses.length : state.totalCount;
+  const totalPages = Math.ceil(totalRecords / state.itemsPerPage);
+  
   const startIndex = (state.currentPage - 1) * state.itemsPerPage;
   const endIndex = startIndex + state.itemsPerPage;
   const pageExpenses = state.filteredExpenses.slice(startIndex, endIndex);
+  
+  console.log('[Render] Pagination calculated:', {
+    totalRecords,
+    totalPages,
+    startIndex,
+    endIndex,
+    pageExpensesCount: pageExpenses.length,
+    hasFilters
+  });
   
   // Render expense cards (async to handle decryption)
   const cardsHTML = await Promise.all(pageExpenses.map(expense => createExpenseCard(expense)));
@@ -763,21 +859,34 @@ function renderPagination(totalPages) {
   const prevBtn = document.getElementById('prevPageBtn');
   const nextBtn = document.getElementById('nextPageBtn');
   
-  if (!paginationContainer || !paginationNumbers) return;
+  console.log('[Pagination] Rendering pagination:', { 
+    totalPages, 
+    currentPage: state.currentPage,
+    filteredCount: state.filteredExpenses.length,
+    itemsPerPage: state.itemsPerPage
+  });
+  
+  if (!paginationContainer || !paginationNumbers) {
+    console.error('[Pagination] Container or numbers div not found');
+    return;
+  }
   
   if (totalPages <= 1) {
+    console.log('[Pagination] Only 1 page, hiding pagination');
     paginationContainer.style.display = 'none';
     return;
   }
   
+  console.log('[Pagination] Showing pagination with', totalPages, 'pages');
   paginationContainer.style.display = 'flex';
   
   // Update prev/next buttons
-  prevBtn.disabled = state.currentPage === 1;
-  nextBtn.disabled = state.currentPage === totalPages;
+  if (prevBtn) prevBtn.disabled = state.currentPage === 1;
+  if (nextBtn) nextBtn.disabled = state.currentPage === totalPages;
   
   // Generate page numbers
   const pageNumbers = generatePageNumbers(state.currentPage, totalPages);
+  console.log('[Pagination] Generated page numbers:', pageNumbers);
   
   paginationNumbers.innerHTML = pageNumbers.map(page => {
     if (page === '...') {
@@ -792,6 +901,7 @@ function renderPagination(totalPages) {
   paginationNumbers.querySelectorAll('.page-number').forEach(btn => {
     btn.addEventListener('click', () => {
       const page = parseInt(btn.dataset.page);
+      console.log('[Pagination] Page button clicked:', page);
       goToPage(page);
     });
   });
@@ -835,9 +945,20 @@ function generatePageNumbers(currentPage, totalPages) {
 }
 
 // Go to specific page
-function goToPage(page) {
+async function goToPage(page) {
+  console.log('[GoToPage] Navigating to page:', page);
+  
+  // Check if we need to load more data
+  const hasEnoughData = await loadMoreExpensesIfNeeded(page);
+  
+  if (!hasEnoughData && page > Math.ceil(state.expenses.length / state.itemsPerPage)) {
+    console.log('[GoToPage] Not enough data for page', page);
+    toast.warning('No more expenses to load');
+    return;
+  }
+  
   state.currentPage = page;
-  renderExpenses();
+  await renderExpenses();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -1688,18 +1809,28 @@ function setupEventListeners() {
   const nextPageBtn = document.getElementById('nextPageBtn');
   
   if (prevPageBtn) {
-    prevPageBtn.addEventListener('click', () => {
+    prevPageBtn.addEventListener('click', async () => {
       if (state.currentPage > 1) {
-        goToPage(state.currentPage - 1);
+        await goToPage(state.currentPage - 1);
       }
     });
   }
   
   if (nextPageBtn) {
-    nextPageBtn.addEventListener('click', () => {
-      const totalPages = Math.ceil(state.filteredExpenses.length / state.itemsPerPage);
+    nextPageBtn.addEventListener('click', async () => {
+      const hasFilters = state.filters.category || 
+                         state.filters.paymentMethod || 
+                         state.filters.specificPaymentMethod || 
+                         state.filters.familyMember || 
+                         state.filters.dateFrom || 
+                         state.filters.dateTo || 
+                         state.filters.search;
+      
+      const totalRecords = hasFilters ? state.filteredExpenses.length : state.totalCount;
+      const totalPages = Math.ceil(totalRecords / state.itemsPerPage);
+      
       if (state.currentPage < totalPages) {
-        goToPage(state.currentPage + 1);
+        await goToPage(state.currentPage + 1);
       }
     });
   }
