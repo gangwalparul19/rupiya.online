@@ -449,27 +449,21 @@
 
       <!-- Pagination -->
       <div class="pagination-container" id="paginationContainer" style="display: none;">
-        <button class="btn btn-outline" id="prevPageBtn" disabled>
+        <button class="btn btn-outline btn-pagination" id="prevPageBtn" disabled>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
           </svg>
-          Previous
+          Prev
         </button>
-        <div class="pagination-info">
-          Page <span id="currentPage">1</span> of <span id="totalPages">1</span>
+        <div class="pagination-numbers" id="paginationNumbers">
+          <!-- Page numbers will be dynamically generated -->
         </div>
-        <button class="btn btn-outline" id="nextPageBtn">
+        <button class="btn btn-outline btn-pagination" id="nextPageBtn">
           Next
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
           </svg>
         </button>
-      </div>
-
-      <!-- Load More Button -->
-      <div class="load-more-container" id="loadMoreContainer" style="display: none;">
-        <div class="load-more-info" id="loadMoreInfo">Showing income records</div>
-        <button class="btn btn-primary" id="loadMoreBtn">Load More</button>
       </div>
     </main>
   </div>

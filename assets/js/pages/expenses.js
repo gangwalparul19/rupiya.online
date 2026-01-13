@@ -37,10 +37,15 @@ const state = {
   selectedExpenses: new Set(),
   bulkMode: false,
   totalCount: 0,
+  filteredCount: 0,
   lastDoc: null,
   hasMore: true,
   loadingMore: false,
-  allDataLoaded: false
+  allExpensesKPI: {
+    thisMonth: 0,
+    lastMonth: 0,
+    total: 0
+  }
 };
 
 // Current user reference
@@ -338,68 +343,71 @@ function checkURLParameters() {
 }
 
 // Load expenses from Firestore
-async function loadExpenses(resetData = true) {
+async function loadExpenses() {
   try {
     // Show skeleton screen instead of spinner
     const skeleton = loadingService.showLoading(loadingState, 'list');
     emptyState.style.display = 'none';
     expensesList.style.display = 'none';
     
-    if (resetData) {
-      // Reset state when loading fresh data
-      state.expenses = [];
-      state.lastDoc = null;
-      state.hasMore = true;
-      state.allDataLoaded = false;
-      state.currentPage = 1;
-    }
-    
-    // Family group feature removed - fetch only user's expenses
+    // Get KPI summary for ALL expenses (unfiltered)
     const kpiSummary = await firestoreService.getExpenseKPISummary();
-    state.totalCount = kpiSummary.totalCount;
+    state.allExpensesKPI = {
+      thisMonth: kpiSummary.thisMonth,
+      lastMonth: kpiSummary.lastMonth,
+      total: kpiSummary.totalCount
+    };
+    
+    // Update KPI cards with all expenses
+    updateExpenseKPIsFromSummary(kpiSummary);
     
     // Build filters array for Firestore query
     const filters = buildFirestoreFilters();
     
-    // Load paginated expenses with server-side filtering
-    const result = await firestoreService.getExpensesPaginated({ 
-      pageSize: state.itemsPerPage,
-      filters: filters,
-      lastDoc: resetData ? null : state.lastDoc
-    });
+    // Check if filters are applied
+    const hasFilters = filters.length > 0 || 
+                       state.filters.search || 
+                       state.filters.familyMember || 
+                       state.filters.dateFrom || 
+                       state.filters.dateTo;
     
-    if (resetData) {
-      state.expenses = result.data;
-    } else {
-      state.expenses = [...state.expenses, ...result.data];
-    }
-    
-    state.lastDoc = result.lastDoc;
-    state.hasMore = result.hasMore;
-    
-    // Check if all data is loaded
-    if (!result.hasMore || state.expenses.length >= state.totalCount) {
-      state.allDataLoaded = true;
-    }
-    
-    // Update KPI cards
-    updateExpenseKPIsFromSummary(kpiSummary);
-    
-    // Initialize pagination if not already done
-    if (!pagination) {
-      pagination = new Pagination({
-        pageSize: state.itemsPerPage,
-        containerId: 'paginationContainer',
-        onPageChange: handlePageChange
+    if (hasFilters) {
+      // Load ALL filtered data for accurate pagination
+      const result = await firestoreService.getExpensesPaginated({ 
+        pageSize: 1000, // Load more to handle filters
+        filters: filters
       });
+      
+      state.expenses = result.data;
+      
+      // Apply client-side filters
+      state.filteredExpenses = [...state.expenses];
+      applyClientSideFilters();
+      
+      state.filteredCount = state.filteredExpenses.length;
+      
+      // Update KPI cards with filtered data
+      updateFilteredExpenseKPIs();
+    } else {
+      // No filters - use server-side pagination
+      const result = await firestoreService.getExpensesPaginated({ 
+        pageSize: state.itemsPerPage,
+        filters: filters
+      });
+      
+      state.expenses = result.data;
+      state.lastDoc = result.lastDoc;
+      state.hasMore = result.hasMore;
+      state.filteredExpenses = [...state.expenses];
+      state.filteredCount = kpiSummary.totalCount;
+      state.totalCount = kpiSummary.totalCount;
     }
     
-    pagination.setTotal(state.totalCount);
+    // Reset to page 1
+    state.currentPage = 1;
     
-    // Apply only client-side filters (search, family member, date range)
-    // These can't be done in Firestore efficiently
-    state.filteredExpenses = [...state.expenses];
-    applyClientSideFilters();
+    // Render expenses
+    await renderExpenses();
     
   } catch (error) {
     console.error('Error loading expenses:', error);
@@ -487,9 +495,7 @@ function updateExpenseKPIsFromSummary(summary) {
 
 // Handle page change from pagination component
 function handlePageChange(page) {
-  state.currentPage = page;
-  renderExpenses();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  goToPage(page);
 }
 
 // Update Expense KPI Cards
@@ -675,17 +681,35 @@ function applyClientSideFilters() {
   }
   
   state.filteredExpenses = filtered;
+  state.filteredCount = filtered.length;
   state.currentPage = 1;
   
-  // Update pagination with filtered count
-  if (pagination) {
-    pagination.setTotal(filtered.length);
-    pagination.currentPage = 1;
+  updateCounts();
+  
+  // Update KPI cards based on filtered data
+  if (hasActiveFilters()) {
+    updateFilteredExpenseKPIs();
+  } else {
+    // No filters - show all expenses KPI
+    updateExpenseKPIsFromSummary({
+      thisMonth: state.allExpensesKPI.thisMonth,
+      lastMonth: state.allExpensesKPI.lastMonth,
+      totalCount: state.allExpensesKPI.total
+    });
   }
   
-  updateCounts();
-  updateFilteredExpenseKPIs();
   renderExpenses();
+}
+
+// Check if any filters are active
+function hasActiveFilters() {
+  return state.filters.category || 
+         state.filters.paymentMethod || 
+         state.filters.specificPaymentMethod || 
+         state.filters.familyMember || 
+         state.filters.dateFrom || 
+         state.filters.dateTo || 
+         state.filters.search;
 }
 
 // Apply filters - now reloads data with server-side filters
@@ -696,7 +720,7 @@ async function applyFilters() {
 
 // Update counts
 function updateCounts() {
-  totalCount.textContent = state.expenses.length;
+  totalCount.textContent = state.allExpensesKPI.total;
   displayedCount.textContent = state.filteredExpenses.length;
 }
 
@@ -707,12 +731,8 @@ async function renderExpenses() {
   if (state.filteredExpenses.length === 0) {
     emptyState.style.display = 'flex';
     expensesList.style.display = 'none';
-    const loadMoreContainer = document.getElementById('loadMoreContainer');
-    if (loadMoreContainer) loadMoreContainer.style.display = 'none';
-    if (pagination) {
-      const container = document.getElementById('paginationContainer');
-      if (container) container.style.display = 'none';
-    }
+    const paginationContainer = document.getElementById('paginationContainer');
+    if (paginationContainer) paginationContainer.style.display = 'none';
     return;
   }
   
@@ -720,6 +740,7 @@ async function renderExpenses() {
   expensesList.style.display = 'grid';
   
   // Calculate pagination
+  const totalPages = Math.ceil(state.filteredExpenses.length / state.itemsPerPage);
   const startIndex = (state.currentPage - 1) * state.itemsPerPage;
   const endIndex = startIndex + state.itemsPerPage;
   const pageExpenses = state.filteredExpenses.slice(startIndex, endIndex);
@@ -728,36 +749,96 @@ async function renderExpenses() {
   const cardsHTML = await Promise.all(pageExpenses.map(expense => createExpenseCard(expense)));
   expensesList.innerHTML = cardsHTML.join('');
   
-  // Render pagination using the component
-  if (pagination) {
-    pagination.render();
-  }
-  
-  // Show/hide Load More button
-  updateLoadMoreButton();
+  // Render pagination
+  renderPagination(totalPages);
   
   // Attach event listeners to cards
   attachCardEventListeners();
 }
 
-// Update Load More button visibility and state
-function updateLoadMoreButton() {
-  const loadMoreContainer = document.getElementById('loadMoreContainer');
-  const loadMoreBtn = document.getElementById('loadMoreBtn');
-  const loadMoreInfo = document.getElementById('loadMoreInfo');
+// Render pagination with numbered pages
+function renderPagination(totalPages) {
+  const paginationContainer = document.getElementById('paginationContainer');
+  const paginationNumbers = document.getElementById('paginationNumbers');
+  const prevBtn = document.getElementById('prevPageBtn');
+  const nextBtn = document.getElementById('nextPageBtn');
   
-  if (!loadMoreContainer || !loadMoreBtn) return;
+  if (!paginationContainer || !paginationNumbers) return;
   
-  // Show button if there's more data to load
-  if (state.hasMore && !state.allDataLoaded && state.expenses.length < state.totalCount) {
-    loadMoreContainer.style.display = 'flex';
-    const remaining = state.totalCount - state.expenses.length;
-    if (loadMoreInfo) {
-      loadMoreInfo.textContent = `Showing ${state.expenses.length} of ${state.totalCount} expenses`;
+  if (totalPages <= 1) {
+    paginationContainer.style.display = 'none';
+    return;
+  }
+  
+  paginationContainer.style.display = 'flex';
+  
+  // Update prev/next buttons
+  prevBtn.disabled = state.currentPage === 1;
+  nextBtn.disabled = state.currentPage === totalPages;
+  
+  // Generate page numbers
+  const pageNumbers = generatePageNumbers(state.currentPage, totalPages);
+  
+  paginationNumbers.innerHTML = pageNumbers.map(page => {
+    if (page === '...') {
+      return '<span class="ellipsis">...</span>';
+    }
+    
+    const isActive = page === state.currentPage;
+    return `<button class="page-number ${isActive ? 'active' : ''}" data-page="${page}">${page}</button>`;
+  }).join('');
+  
+  // Attach event listeners to page numbers
+  paginationNumbers.querySelectorAll('.page-number').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const page = parseInt(btn.dataset.page);
+      goToPage(page);
+    });
+  });
+}
+
+// Generate page numbers with ellipsis
+function generatePageNumbers(currentPage, totalPages) {
+  const pages = [];
+  const maxVisible = 7; // Maximum number of page buttons to show
+  
+  if (totalPages <= maxVisible) {
+    // Show all pages
+    for (let i = 1; i <= totalPages; i++) {
+      pages.push(i);
     }
   } else {
-    loadMoreContainer.style.display = 'none';
+    // Always show first page
+    pages.push(1);
+    
+    if (currentPage > 3) {
+      pages.push('...');
+    }
+    
+    // Show pages around current page
+    const start = Math.max(2, currentPage - 1);
+    const end = Math.min(totalPages - 1, currentPage + 1);
+    
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    
+    if (currentPage < totalPages - 2) {
+      pages.push('...');
+    }
+    
+    // Always show last page
+    pages.push(totalPages);
   }
+  
+  return pages;
+}
+
+// Go to specific page
+function goToPage(page) {
+  state.currentPage = page;
+  renderExpenses();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // Create expense card HTML
@@ -1602,10 +1683,25 @@ function setupEventListeners() {
   // Pull to refresh
   initPullToRefresh();
   
-  // Load More button
-  const loadMoreBtn = document.getElementById('loadMoreBtn');
-  if (loadMoreBtn) {
-    loadMoreBtn.addEventListener('click', loadMoreExpenses);
+  // Pagination buttons
+  const prevPageBtn = document.getElementById('prevPageBtn');
+  const nextPageBtn = document.getElementById('nextPageBtn');
+  
+  if (prevPageBtn) {
+    prevPageBtn.addEventListener('click', () => {
+      if (state.currentPage > 1) {
+        goToPage(state.currentPage - 1);
+      }
+    });
+  }
+  
+  if (nextPageBtn) {
+    nextPageBtn.addEventListener('click', () => {
+      const totalPages = Math.ceil(state.filteredExpenses.length / state.itemsPerPage);
+      if (state.currentPage < totalPages) {
+        goToPage(state.currentPage + 1);
+      }
+    });
   }
 }
 

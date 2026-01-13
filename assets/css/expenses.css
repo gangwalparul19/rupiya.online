@@ -480,54 +480,61 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-sm);
   margin-top: var(--spacing-xl);
   padding: var(--spacing-lg);
+  flex-wrap: wrap;
 }
 
-.pagination-info {
-  font-size: var(--font-size-base);
-  color: var(--text-secondary);
-}
-
-.pagination-info span {
-  font-weight: 600;
-  color: var(--primary-blue);
-}
-
-/* Load More Button */
-.load-more-container {
+.pagination-numbers {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: var(--spacing-md);
-  margin-top: var(--spacing-xl);
-  padding: var(--spacing-lg);
+  gap: var(--spacing-xs);
+  flex-wrap: wrap;
 }
 
-.load-more-info {
-  font-size: var(--font-size-sm);
+.pagination-numbers button {
+  min-width: 40px;
+  height: 40px;
+  padding: 0.5rem;
+  border: 2px solid var(--border-color);
+  background: white;
+  color: var(--text-primary);
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.pagination-numbers button:hover:not(.active):not(:disabled) {
+  border-color: var(--primary-blue);
+  color: var(--primary-blue);
+  background: rgba(74, 144, 226, 0.05);
+}
+
+.pagination-numbers button.active {
+  background: var(--primary-blue);
+  color: white;
+  border-color: var(--primary-blue);
+  cursor: default;
+}
+
+.pagination-numbers button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination-numbers .ellipsis {
+  padding: 0.5rem;
   color: var(--text-secondary);
-  text-align: center;
+  user-select: none;
 }
 
-.load-more-container .btn {
-  min-width: 200px;
-}
-
-.load-more-container .spinner {
-  display: inline-block;
-  width: 14px;
-  height: 14px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: white;
-  border-radius: 50%;
-  animation: spin 0.6s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
+.btn-pagination {
+  min-width: 100px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 /* Modal Styles */
@@ -911,6 +918,27 @@
     gap: 3px;
   }
   
+  /* Pagination on mobile */
+  .pagination-container {
+    gap: var(--spacing-xs);
+    padding: var(--spacing-md);
+  }
+  
+  .btn-pagination {
+    min-width: 70px;
+    font-size: 0.875rem;
+    padding: 0.5rem 0.75rem;
+  }
+  
+  .pagination-numbers button {
+    min-width: 36px;
+    height: 36px;
+    font-size: 0.875rem;
+  }
+  
+  .pagination-numbers .ellipsis {
+    padding: 0.25rem;
+  }
   .expense-meta-item svg {
     width: 12px;
     height: 12px;
