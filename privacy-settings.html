@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="privacy-settings-page">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,6 +15,32 @@
         .page-header h1 { color: #4A90E2; font-size: 2em; margin-bottom: 10px; }
         .page-header p { color: #666; font-size: 1.05em; }
         
+        /* Ensure page is never grayed out */
+        html.privacy-settings-page,
+        html.privacy-settings-page body,
+        html.privacy-settings-page .dashboard-layout,
+        html.privacy-settings-page .main-content,
+        html.privacy-settings-page .page-container {
+            opacity: 1 !important;
+            visibility: visible !important;
+            pointer-events: auto !important;
+            filter: none !important;
+        }
+        
+        /* Ensure sidebar overlay works properly */
+        .sidebar-overlay {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+        
         @media (max-width: 768px) {
             .page-container { padding: 20px 15px; }
             .page-header h1 { font-size: 1.5em; }
@@ -27,7 +53,7 @@
         }
     </style>
 </head>
-<body>
+<body class="privacy-settings-page">
     <div class="dashboard-layout">
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
