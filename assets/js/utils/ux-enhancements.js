@@ -180,7 +180,7 @@ class UXEnhancements {
   }
 
   // Show toast notification
-  static showToast(message, type = 'info', duration = 3000) {
+  static showToast(message, type = 'info', duration = 2000) {
     const toast = document.createElement('div');
     toast.className = `toast toast-${type} alert-animated`;
     toast.innerHTML = `
@@ -192,7 +192,7 @@ class UXEnhancements {
     if (!container) {
       container = document.createElement('div');
       container.id = 'toast-container';
-      container.style.cssText = 'position:fixed;top:20px;right:20px;z-index:10000;display:flex;flex-direction:column;gap:8px;';
+      container.style.cssText = 'position:fixed;top:20px;right:20px;z-index:99999;display:flex;flex-direction:column;gap:8px;';
       document.body.appendChild(container);
     }
     

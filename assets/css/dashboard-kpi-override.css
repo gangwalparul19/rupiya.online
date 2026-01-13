@@ -31,27 +31,24 @@
   }
 }
 
-/* Large Desktop: 3 columns (1200px - 1919px) - CENTERED */
+/* Large Desktop: 4 columns (1200px - 1919px) */
 @media (min-width: 1200px) and (max-width: 1919px) {
   .kpi-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(280px, 1fr));
+    grid-template-columns: repeat(4, minmax(240px, 1fr));
     gap: var(--spacing-lg);
     margin-bottom: var(--spacing-xl);
     width: 100%;
     box-sizing: border-box;
-    max-width: 1200px;
-    margin-left: auto;
-    margin-right: auto;
-    justify-content: center;
+    max-width: 100%;
   }
 }
 
-/* Desktop: 3 columns (1025px - 1199px) */
+/* Desktop: 4 columns (1025px - 1199px) */
 @media (min-width: 1025px) and (max-width: 1199px) {
   .kpi-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: var(--spacing-lg);
     margin-bottom: var(--spacing-xl);
     width: 100%;
@@ -59,11 +56,11 @@
   }
 }
 
-/* Tablet: 2 columns (769px - 1024px) */
+/* Tablet: 4 columns (769px - 1024px) */
 @media (min-width: 769px) and (max-width: 1024px) {
   .kpi-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: var(--spacing-md);
     margin-bottom: var(--spacing-lg);
     width: 100%;

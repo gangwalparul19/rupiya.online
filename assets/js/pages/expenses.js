@@ -243,11 +243,13 @@ async function loadFamilyMemberFilter() {
   
   try {
     const familyMembers = await getActiveFamilyMembers();
+    console.log('[FamilyFilter] Loading family members:', familyMembers);
     
     if (familyMembers && familyMembers.length > 0) {
-      const options = familyMembers.map(member => 
-        `<option value="${member.id}">${escapeHtml(member.name)}</option>`
-      ).join('');
+      const options = familyMembers.map(member => {
+        console.log('[FamilyFilter] Adding member to filter:', { id: member.id, name: member.name });
+        return `<option value="${member.id}">${escapeHtml(member.name)}</option>`;
+      }).join('');
       
       familyMemberFilter.innerHTML = '<option value="">All Members</option>' + options;
     }
@@ -549,14 +551,31 @@ function applyFilters() {
   
   // Family member filter
   if (state.filters.familyMember) {
+    console.log('[Filter] Filtering by family member:', state.filters.familyMember);
     filtered = filtered.filter(e => {
       // Check if expense has split details
       if (e.hasSplit && e.splitDetails && e.splitDetails.length > 0) {
         // Check if the selected member has any amount in this expense
-        return e.splitDetails.some(split => split.memberId === state.filters.familyMember && split.amount > 0);
+        // Use loose equality to handle string/number comparison issues
+        const hasMatch = e.splitDetails.some(split => {
+          const splitMemberId = String(split.memberId).trim();
+          const filterMemberId = String(state.filters.familyMember).trim();
+          const matches = splitMemberId === filterMemberId && split.amount > 0;
+          if (matches) {
+            console.log('[Filter] Match found:', { 
+              expenseId: e.id, 
+              splitMemberId, 
+              filterMemberId, 
+              amount: split.amount 
+            });
+          }
+          return matches;
+        });
+        return hasMatch;
       }
       return false; // If no split details, exclude from family member filter
     });
+    console.log('[Filter] Filtered expenses count:', filtered.length);
   }
   
   // Date range filter
@@ -1289,14 +1308,17 @@ function getSplitDetailsData() {
     const input = item.querySelector('.split-amount-input');
     const amount = parseFloat(input.value) || 0;
     if (amount > 0) {
-      splitDetails.push({
+      const splitData = {
         memberId: input.dataset.memberId,
         memberName: input.dataset.memberName,
         amount: amount
-      });
+      };
+      console.log('[SplitDetails] Adding split:', splitData);
+      splitDetails.push(splitData);
     }
   });
   
+  console.log('[SplitDetails] Total splits:', splitDetails);
   return splitDetails.length > 0 ? splitDetails : null;
 }
 

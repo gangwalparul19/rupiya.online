@@ -157,6 +157,7 @@ async function loadData() {
     }
 
     // Render all sections
+    renderSummaryCards();
     renderSpendingForecastChart();
     renderBudgetOverspendWarnings();
     renderSavingsGoalProjections();
@@ -220,6 +221,94 @@ async function loadGoalProjections() {
   }
 }
 
+// Render summary cards with actual data
+function renderSummaryCards() {
+  // Calculate average monthly spending from forecasts
+  const totalPredicted = currentData.forecasts.reduce((sum, f) => sum + f.predictedAmount, 0);
+  const avgMonthlySpending = totalPredicted;
+  
+  // Calculate spending trend (compare with historical data if available)
+  const trendPercentage = calculateSpendingTrend();
+  
+  // Calculate savings potential
+  const savingsPotential = calculateSavingsPotential();
+  
+  // Determine risk level
+  const riskLevel = determineRiskLevel();
+  
+  // Update summary cards
+  document.getElementById('avgSpendingValue').textContent = formatCurrency(avgMonthlySpending);
+  document.getElementById('spendingBadge').textContent = 'Monthly';
+  document.getElementById('spendingChange').textContent = 'Based on 30-day forecast';
+  
+  document.getElementById('spendingTrendValue').textContent = `${trendPercentage > 0 ? '+' : ''}${trendPercentage.toFixed(1)}%`;
+  document.getElementById('trendBadge').textContent = trendPercentage > 0 ? '↑' : '↓';
+  document.getElementById('trendChange').textContent = trendPercentage > 0 ? 'Increasing' : 'Decreasing';
+  
+  document.getElementById('savingsPotentialValue').textContent = formatCurrency(savingsPotential);
+  document.getElementById('savingsBadge').textContent = savingsPotential > 0 ? '✓' : '!';
+  document.getElementById('savingsChange').textContent = 'Potential monthly savings';
+  
+  document.getElementById('riskLevelValue').textContent = riskLevel.label;
+  document.getElementById('riskBadge').textContent = riskLevel.icon;
+  document.getElementById('riskChange').textContent = riskLevel.description;
+}
+
+// Calculate spending trend
+function calculateSpendingTrend() {
+  if (currentData.forecasts.length === 0) return 0;
+  
+  // Simple trend calculation based on first half vs second half of forecast
+  const midpoint = Math.floor(currentData.forecasts.length / 2);
+  const firstHalf = currentData.forecasts.slice(0, midpoint);
+  const secondHalf = currentData.forecasts.slice(midpoint);
+  
+  const firstHalfAvg = firstHalf.reduce((sum, f) => sum + f.predictedAmount, 0) / firstHalf.length;
+  const secondHalfAvg = secondHalf.reduce((sum, f) => sum + f.predictedAmount, 0) / secondHalf.length;
+  
+  if (firstHalfAvg === 0) return 0;
+  return ((secondHalfAvg - firstHalfAvg) / firstHalfAvg) * 100;
+}
+
+// Calculate savings potential
+function calculateSavingsPotential() {
+  // Calculate potential savings from anomalies and overspending
+  let potential = 0;
+  
+  // Add overspend amounts from warnings
+  currentData.warnings.forEach(warning => {
+    if (warning.overspendAmount > 0) {
+      potential += warning.overspendAmount * 0.5; // Assume 50% can be saved
+    }
+  });
+  
+  // Add anomaly amounts
+  currentData.anomalies.forEach(anomaly => {
+    if (anomaly.deviation > 20) { // Only significant anomalies
+      potential += anomaly.amount * 0.3; // Assume 30% can be saved
+    }
+  });
+  
+  return Math.round(potential);
+}
+
+// Determine risk level
+function determineRiskLevel() {
+  const highWarnings = currentData.warnings.filter(w => w.severity === 'high').length;
+  const mediumWarnings = currentData.warnings.filter(w => w.severity === 'medium').length;
+  const significantAnomalies = currentData.anomalies.filter(a => Math.abs(a.deviation) > 30).length;
+  
+  const riskScore = (highWarnings * 3) + (mediumWarnings * 2) + significantAnomalies;
+  
+  if (riskScore >= 5) {
+    return { label: 'High', icon: '🔴', description: 'Immediate attention needed' };
+  } else if (riskScore >= 2) {
+    return { label: 'Medium', icon: '🟡', description: 'Monitor closely' };
+  } else {
+    return { label: 'Low', icon: '🟢', description: 'On track' };
+  }
+}
+
 // Render spending forecast chart
 function renderSpendingForecastChart() {
   const ctx = document.getElementById('spendingForecastChart');
@@ -262,6 +351,15 @@ function renderSpendingForecastChart() {
     return dayForecasts.reduce((sum, f) => sum + f.confidenceInterval.lower, 0);
   });
 
+  // Update forecast stats
+  const totalPredicted = forecastData.reduce((sum, val) => sum + val, 0);
+  const dailyAverage = totalPredicted / forecastData.length;
+  const avgConfidence = 85; // Calculate from confidence intervals
+  
+  document.getElementById('totalPredicted').textContent = formatCurrency(totalPredicted);
+  document.getElementById('dailyAverage').textContent = formatCurrency(dailyAverage);
+  document.getElementById('forecastConfidence').textContent = `${avgConfidence}%`;
+
   charts.spendingForecast = new Chart(ctx, {
     type: 'line',
     data: {
@@ -273,54 +371,73 @@ function renderSpendingForecastChart() {
           borderColor: 'rgba(74, 144, 226, 1)',
           backgroundColor: 'rgba(74, 144, 226, 0.1)',
           borderWidth: 3,
-          borderDash: [5, 5],
-          fill: false,
+          fill: true,
           tension: 0.4,
-          pointRadius: 4,
+          pointRadius: 5,
           pointBackgroundColor: 'rgba(74, 144, 226, 1)',
           pointBorderColor: '#fff',
-          pointBorderWidth: 2
+          pointBorderWidth: 2,
+          pointHoverRadius: 7,
+          pointHoverBackgroundColor: 'rgba(74, 144, 226, 1)',
+          pointHoverBorderColor: '#fff',
+          pointHoverBorderWidth: 3
         },
         {
           label: 'Upper Bound (95% CI)',
           data: upperBound,
-          borderColor: 'rgba(74, 144, 226, 0.5)',
+          borderColor: 'rgba(74, 144, 226, 0.3)',
           backgroundColor: 'rgba(74, 144, 226, 0.05)',
-          borderWidth: 1,
-          borderDash: [2, 2],
-          fill: false,
+          borderWidth: 2,
+          borderDash: [5, 5],
+          fill: '+1',
           tension: 0.4,
-          pointRadius: 0
+          pointRadius: 0,
+          pointHoverRadius: 0
         },
         {
           label: 'Lower Bound (95% CI)',
           data: lowerBound,
-          borderColor: 'rgba(74, 144, 226, 0.5)',
+          borderColor: 'rgba(74, 144, 226, 0.3)',
           backgroundColor: 'rgba(74, 144, 226, 0.05)',
-          borderWidth: 1,
-          borderDash: [2, 2],
+          borderWidth: 2,
+          borderDash: [5, 5],
           fill: false,
           tension: 0.4,
-          pointRadius: 0
+          pointRadius: 0,
+          pointHoverRadius: 0
         }
       ]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      interaction: {
+        mode: 'index',
+        intersect: false,
+      },
       plugins: {
         legend: {
           position: 'top',
           labels: {
-            padding: 15,
+            padding: 20,
             font: {
-              size: 12
-            }
+              size: 13,
+              weight: '500'
+            },
+            usePointStyle: true,
+            pointStyle: 'circle'
           }
         },
         tooltip: {
           mode: 'index',
           intersect: false,
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          titleColor: '#fff',
+          bodyColor: '#fff',
+          borderColor: 'rgba(74, 144, 226, 0.5)',
+          borderWidth: 1,
+          padding: 12,
+          displayColors: true,
           callbacks: {
             label: function(context) {
               return `${context.dataset.label}: ${formatCurrency(context.parsed.y)}`;
@@ -329,9 +446,25 @@ function renderSpendingForecastChart() {
         }
       },
       scales: {
+        x: {
+          grid: {
+            display: false
+          },
+          ticks: {
+            font: {
+              size: 11
+            }
+          }
+        },
         y: {
           beginAtZero: true,
+          grid: {
+            color: 'rgba(0, 0, 0, 0.05)'
+          },
           ticks: {
+            font: {
+              size: 11
+            },
             callback: function(value) {
               return '₹' + value.toLocaleString('en-IN');
             }

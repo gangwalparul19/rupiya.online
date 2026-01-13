@@ -536,10 +536,17 @@ function applyFilters() {
   
   // Family member filter (for split income)
   if (state.filters.familyMember) {
+    console.log('[Filter] Filtering by family member:', state.filters.familyMember);
     filtered = filtered.filter(i => {
       if (!i.hasSplit || !i.splitDetails) return false;
-      return i.splitDetails.some(split => split.memberId === state.filters.familyMember);
+      const hasMatch = i.splitDetails.some(split => {
+        const splitMemberId = String(split.memberId).trim();
+        const filterMemberId = String(state.filters.familyMember).trim();
+        return splitMemberId === filterMemberId;
+      });
+      return hasMatch;
     });
+    console.log('[Filter] Filtered income count:', filtered.length);
   }
   
   // Date range filter

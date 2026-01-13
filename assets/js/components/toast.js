@@ -20,7 +20,7 @@ class ToastManager {
     }
   }
 
-  show(message, type = 'info', duration = 3000) {
+  show(message, type = 'info', duration = 2000) {
     // Enforce max toasts limit
     if (this.activeToasts.length >= this.maxToasts) {
       const oldestToast = this.activeToasts.shift();
@@ -90,7 +90,7 @@ class ToastManager {
     }, 300);
   }
 
-  success(message, duration = 3000) {
+  success(message, duration = 2000) {
     return this.show(message, 'success', duration);
   }
 
@@ -98,11 +98,11 @@ class ToastManager {
     return this.show(message, 'error', duration);
   }
 
-  warning(message, duration = 3500) {
+  warning(message, duration = 3000) {
     return this.show(message, 'warning', duration);
   }
 
-  info(message, duration = 3000) {
+  info(message, duration = 2000) {
     return this.show(message, 'info', duration);
   }
 
@@ -135,6 +135,11 @@ class ToastManager {
 const toast = new ToastManager();
 export default toast;
 
+// Make toast available globally for privacy mode and other utilities
+if (typeof window !== 'undefined') {
+  window.showToast = (message, type, duration) => toast.show(message, type, duration);
+}
+
 // Add toast styles dynamically
 const style = document.createElement('style');
 style.textContent = `
@@ -142,7 +147,7 @@ style.textContent = `
     position: fixed;
     top: 20px;
     right: 20px;
-    z-index: 10000;
+    z-index: 99999;
     display: flex;
     flex-direction: column;
     gap: 12px;

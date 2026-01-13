@@ -159,39 +159,83 @@
 
       <!-- Summary Cards Row -->
       <div class="summary-cards-row">
-        <div class="summary-card">
-          <div class="summary-card-icon">📊</div>
+        <div class="summary-card" data-card="spending">
+          <div class="summary-card-header">
+            <div class="summary-card-icon">📊</div>
+            <div class="summary-card-badge" id="spendingBadge">--</div>
+          </div>
           <div class="summary-card-content">
             <div class="summary-card-label">Avg Monthly Spending</div>
             <div class="summary-card-value" id="avgSpendingValue">₹0</div>
+            <div class="summary-card-change" id="spendingChange">--</div>
           </div>
         </div>
-        <div class="summary-card">
-          <div class="summary-card-icon">📈</div>
+        <div class="summary-card" data-card="trend">
+          <div class="summary-card-header">
+            <div class="summary-card-icon">📈</div>
+            <div class="summary-card-badge trend" id="trendBadge">--</div>
+          </div>
           <div class="summary-card-content">
             <div class="summary-card-label">Spending Trend</div>
             <div class="summary-card-value" id="spendingTrendValue">0%</div>
+            <div class="summary-card-change" id="trendChange">--</div>
           </div>
         </div>
-        <div class="summary-card">
-          <div class="summary-card-icon">🎯</div>
+        <div class="summary-card" data-card="savings">
+          <div class="summary-card-header">
+            <div class="summary-card-icon">🎯</div>
+            <div class="summary-card-badge positive" id="savingsBadge">--</div>
+          </div>
           <div class="summary-card-content">
             <div class="summary-card-label">Savings Potential</div>
             <div class="summary-card-value" id="savingsPotentialValue">₹0</div>
+            <div class="summary-card-change" id="savingsChange">--</div>
           </div>
         </div>
-        <div class="summary-card">
-          <div class="summary-card-icon">⚠️</div>
+        <div class="summary-card" data-card="risk">
+          <div class="summary-card-header">
+            <div class="summary-card-icon">⚠️</div>
+            <div class="summary-card-badge" id="riskBadge">--</div>
+          </div>
           <div class="summary-card-content">
             <div class="summary-card-label">Risk Level</div>
             <div class="summary-card-value" id="riskLevelValue">Low</div>
+            <div class="summary-card-change" id="riskChange">--</div>
           </div>
         </div>
       </div>
 
       <!-- Spending Forecast Section -->
       <section class="forecast-section">
-        <h2 class="section-title">30-Day Spending Forecast</h2>
+        <div class="section-header">
+          <div class="section-header-content">
+            <h2 class="section-title">📊 30-Day Spending Forecast</h2>
+            <p class="section-subtitle">Predicted spending patterns based on historical data</p>
+          </div>
+          <div class="section-header-actions">
+            <button class="btn-icon" id="forecastInfoBtn" title="About this forecast">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="16" x2="12" y2="12"/>
+                <line x1="12" y1="8" x2="12.01" y2="8"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="forecast-stats">
+          <div class="forecast-stat">
+            <span class="forecast-stat-label">Total Predicted</span>
+            <span class="forecast-stat-value" id="totalPredicted">₹0</span>
+          </div>
+          <div class="forecast-stat">
+            <span class="forecast-stat-label">Daily Average</span>
+            <span class="forecast-stat-value" id="dailyAverage">₹0</span>
+          </div>
+          <div class="forecast-stat">
+            <span class="forecast-stat-label">Confidence</span>
+            <span class="forecast-stat-value" id="forecastConfidence">--</span>
+          </div>
+        </div>
         <div class="forecast-chart-container">
           <canvas id="spendingForecastChart"></canvas>
         </div>
