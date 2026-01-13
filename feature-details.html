@@ -439,16 +439,22 @@
         import { FeatureDetailsPage } from './assets/js/pages/feature-details.js';
         import { initLogoutHandler } from './assets/js/utils/logout-handler.js';
         import authService from './assets/js/services/auth-service.js';
+        import { featureConfig } from './assets/js/config/feature-config.js';
 
-        // Initialize sidebar
-        initSidebar();
-        
-        // Initialize logout handler
-        initLogoutHandler();
-
-        // Load user profile
-        async function loadUserProfile() {
+        // Initialize components - wait for features to load first
+        (async () => {
             try {
+                // Initialize feature config first to ensure features are loaded from Firestore
+                await featureConfig.init();
+                console.log('[FeatureDetails] Features loaded, initializing sidebar');
+                
+                // Now initialize sidebar with loaded features
+                await initSidebar();
+                
+                // Initialize logout handler
+                initLogoutHandler();
+
+                // Load user profile
                 const user = await authService.waitForAuth();
                 if (user) {
                     const userAvatar = document.getElementById('userAvatar');
@@ -464,16 +470,19 @@
                     if (userName) userName.textContent = user.displayName || 'User';
                     if (userEmail) userEmail.textContent = user.email;
                 }
-            } catch (error) {
-                console.error('Error loading user profile:', error);
-            }
-        }
-        
-        loadUserProfile();
 
-        // Initialize feature details page
-        const featureDetailsPage = new FeatureDetailsPage();
-        featureDetailsPage.init();
+                // Initialize feature details page
+                const featureDetailsPage = new FeatureDetailsPage();
+                featureDetailsPage.init();
+            } catch (error) {
+                console.error('[FeatureDetails] Error during initialization:', error);
+                // Still initialize sidebar even if features fail to load
+                await initSidebar();
+                initLogoutHandler();
+                const featureDetailsPage = new FeatureDetailsPage();
+                featureDetailsPage.init();
+            }
+        })();
     </script>
 </body>
 </html>

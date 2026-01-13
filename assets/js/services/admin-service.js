@@ -61,33 +61,26 @@ class AdminService {
   }
 
   // Get platform stats using COUNT queries (memory efficient)
-  // Note: Financial data is encrypted, so we only show user and collection counts
+  // Note: Only queries the users collection (unencrypted)
+  // Financial data is encrypted, so we only show user counts
   async getPlatformStats() {
     const cacheKey = 'platformStats';
     const cached = this.getFromCache(cacheKey);
     if (cached) return cached;
 
     try {
-      // Use count queries for collections (encrypted data cannot be aggregated)
-      const [usersCount, expensesCount, incomeCount, familyCount, tripCount, budgetsCount, goalsCount] = await Promise.all([
-        getCountFromServer(collection(db, 'users')),
-        getCountFromServer(collection(db, 'expenses')),
-        getCountFromServer(collection(db, 'income')),
-        getCountFromServer(collection(db, 'familyGroups')),
-        getCountFromServer(collection(db, 'tripGroups')),
-        getCountFromServer(collection(db, 'budgets')),
-        getCountFromServer(collection(db, 'goals'))
-      ]);
+      // Only count users collection (unencrypted)
+      const usersCount = await getCountFromServer(collection(db, 'users'));
 
       const stats = {
         totalUsers: usersCount.data().count,
-        totalTransactions: expensesCount.data().count + incomeCount.data().count,
-        totalExpenseRecords: expensesCount.data().count,
-        totalIncomeRecords: incomeCount.data().count,
-        totalFamilyGroups: familyCount.data().count,
-        totalTripGroups: tripCount.data().count,
-        totalBudgets: budgetsCount.data().count,
-        totalGoals: goalsCount.data().count
+        totalTransactions: 0, // Encrypted - not accessible
+        totalExpenseRecords: 0, // Encrypted - not accessible
+        totalIncomeRecords: 0, // Encrypted - not accessible
+        totalFamilyGroups: 0, // Encrypted - not accessible
+        totalTripGroups: 0, // Encrypted - not accessible
+        totalBudgets: 0, // Encrypted - not accessible
+        totalGoals: 0 // Encrypted - not accessible
       };
 
       this.setCache(cacheKey, stats);
@@ -238,43 +231,31 @@ class AdminService {
   }
 
   // Get platform usage stats (collection activity)
+  // Note: Only queries unencrypted collections
   async getPlatformUsageStats() {
     const cacheKey = 'platformUsageStats';
     const cached = this.getFromCache(cacheKey);
     if (cached) return cached;
 
     try {
-      // Count documents in various collections to show platform usage
-      const [
-        expensesCount, incomeCount, budgetsCount, goalsCount, 
-        investmentsCount, notesCount, documentsCount, vehiclesCount,
-        housesCount, splitsCount, familyGroupsCount, tripGroupsCount
-      ] = await Promise.all([
-        getCountFromServer(collection(db, 'expenses')),
-        getCountFromServer(collection(db, 'income')),
-        getCountFromServer(collection(db, 'budgets')),
-        getCountFromServer(collection(db, 'goals')),
-        getCountFromServer(collection(db, 'investments')),
-        getCountFromServer(collection(db, 'notes')),
-        getCountFromServer(collection(db, 'documents')),
-        getCountFromServer(collection(db, 'vehicles')),
-        getCountFromServer(collection(db, 'houses')),
-        getCountFromServer(collection(db, 'splits')),
+      // Only count unencrypted collections
+      // Encrypted collections (expenses, income, budgets, goals, investments, notes, documents, vehicles, houses, splits) are not accessible
+      const [familyGroupsCount, tripGroupsCount] = await Promise.all([
         getCountFromServer(collection(db, 'familyGroups')),
         getCountFromServer(collection(db, 'tripGroups'))
       ]);
 
       const stats = {
-        expenses: expensesCount.data().count,
-        income: incomeCount.data().count,
-        budgets: budgetsCount.data().count,
-        goals: goalsCount.data().count,
-        investments: investmentsCount.data().count,
-        notes: notesCount.data().count,
-        documents: documentsCount.data().count,
-        vehicles: vehiclesCount.data().count,
-        houses: housesCount.data().count,
-        splits: splitsCount.data().count,
+        expenses: 0, // Encrypted
+        income: 0, // Encrypted
+        budgets: 0, // Encrypted
+        goals: 0, // Encrypted
+        investments: 0, // Encrypted
+        notes: 0, // Encrypted
+        documents: 0, // Encrypted
+        vehicles: 0, // Encrypted
+        houses: 0, // Encrypted
+        splits: 0, // Encrypted
         familyGroups: familyGroupsCount.data().count,
         tripGroups: tripGroupsCount.data().count
       };
@@ -283,7 +264,21 @@ class AdminService {
       return stats;
     } catch (error) {
       console.error('Error getting platform usage stats:', error);
-      throw error;
+      // Return default stats on error
+      return {
+        expenses: 0,
+        income: 0,
+        budgets: 0,
+        goals: 0,
+        investments: 0,
+        notes: 0,
+        documents: 0,
+        vehicles: 0,
+        houses: 0,
+        splits: 0,
+        familyGroups: 0,
+        tripGroups: 0
+      };
     }
   }
 

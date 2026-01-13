@@ -22,11 +22,6 @@ let allUsersCache = [];
 let filteredUsers = [];
 let searchQuery = '';
 
-// Chart instances
-let featureUsageChart = null;
-let collectionActivityChart = null;
-let registrationTrendChart = null;
-
 // DOM Elements
 const loadingState = document.getElementById('loadingState');
 const accessDenied = document.getElementById('accessDenied');
@@ -128,8 +123,6 @@ async function loadAllData() {
     loadPlatformStats(),
     loadActivityStats(),
     loadLocationStats(),
-    loadPlatformUsage(),
-    loadUserRegistrationTrends(),
     loadAllUsers()
   ]);
 }
@@ -238,181 +231,6 @@ async function loadLocationStats() {
     }
   } catch (error) {
     console.error('Error loading location stats:', error);
-  }
-}
-
-async function loadPlatformUsage() {
-  try {
-    const data = await adminService.getPlatformUsageStats();
-    
-    // Feature Usage Chart (doughnut)
-    const featureCtx = document.getElementById('featureUsageChart')?.getContext('2d');
-    if (featureCtx) {
-      if (featureUsageChart) featureUsageChart.destroy();
-
-      const featureData = [
-        { label: 'Expenses', value: data.expenses },
-        { label: 'Income', value: data.income },
-        { label: 'Budgets', value: data.budgets },
-        { label: 'Goals', value: data.goals },
-        { label: 'Investments', value: data.investments },
-        { label: 'Notes', value: data.notes }
-      ].filter(item => item.value > 0);
-
-      const colors = ['#e74c3c','#2ecc71','#3498db','#f39c12','#9b59b6','#1abc9c'];
-
-      featureUsageChart = new Chart(featureCtx, {
-        type: 'doughnut',
-        data: {
-          labels: featureData.map(d => d.label),
-          datasets: [{ 
-            data: featureData.map(d => d.value), 
-            backgroundColor: colors.slice(0, featureData.length), 
-            borderWidth: 0,
-            hoverOffset: 8
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          cutout: '65%',
-          plugins: {
-            legend: { 
-              position: 'right', 
-              labels: { 
-                boxWidth: 12, 
-                padding: 12, 
-                font: { size: 11 },
-                usePointStyle: true
-              } 
-            },
-            tooltip: {
-              callbacks: {
-                label: ctx => `${ctx.label}: ${ctx.raw.toLocaleString()} records`
-              }
-            }
-          }
-        }
-      });
-    }
-
-    // Collection Activity Chart (bar)
-    const collectionCtx = document.getElementById('collectionActivityChart')?.getContext('2d');
-    if (collectionCtx) {
-      if (collectionActivityChart) collectionActivityChart.destroy();
-
-      const collectionData = [
-        { label: 'Documents', value: data.documents },
-        { label: 'Vehicles', value: data.vehicles },
-        { label: 'Houses', value: data.houses },
-        { label: 'Splits', value: data.splits },
-        { label: 'Family', value: data.familyGroups },
-        { label: 'Trips', value: data.tripGroups }
-      ];
-
-      collectionActivityChart = new Chart(collectionCtx, {
-        type: 'bar',
-        data: {
-          labels: collectionData.map(d => d.label),
-          datasets: [{
-            label: 'Records',
-            data: collectionData.map(d => d.value),
-            backgroundColor: 'rgba(74, 144, 226, 0.8)',
-            borderColor: '#4A90E2',
-            borderWidth: 1,
-            borderRadius: 6,
-            borderSkipped: false
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              callbacks: {
-                label: ctx => `${ctx.raw.toLocaleString()} records`
-              }
-            }
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              grid: { color: 'rgba(0,0,0,0.05)' },
-              ticks: { callback: v => v.toLocaleString() }
-            },
-            x: {
-              grid: { display: false }
-            }
-          }
-        }
-      });
-    }
-  } catch (error) {
-    console.error('Error loading platform usage:', error);
-  }
-}
-
-async function loadUserRegistrationTrends() {
-  try {
-    const data = await adminService.getUserRegistrationTrends();
-    const ctx = document.getElementById('registrationTrendChart')?.getContext('2d');
-    if (!ctx || data.length === 0) return;
-
-    if (registrationTrendChart) registrationTrendChart.destroy();
-
-    const labels = data.map(d => {
-      const [year, month] = d.month.split('-');
-      return new Date(year, month - 1).toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
-    });
-
-    registrationTrendChart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels,
-        datasets: [{
-          label: 'New Users',
-          data: data.map(d => d.registrations),
-          borderColor: '#4A90E2',
-          backgroundColor: 'rgba(74, 144, 226, 0.1)',
-          fill: true,
-          tension: 0.4,
-          pointBackgroundColor: '#4A90E2',
-          pointBorderColor: '#fff',
-          pointBorderWidth: 2,
-          pointRadius: 5,
-          pointHoverRadius: 7
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        interaction: { intersect: false, mode: 'index' },
-        plugins: {
-          legend: { 
-            display: true,
-            labels: { boxWidth: 12, padding: 15, usePointStyle: true } 
-          },
-          tooltip: {
-            callbacks: {
-              label: ctx => `${ctx.dataset.label}: ${ctx.raw.toLocaleString()} users`
-            }
-          }
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            grid: { color: 'rgba(0,0,0,0.05)' },
-            ticks: { callback: v => v.toLocaleString() }
-          },
-          x: {
-            grid: { display: false }
-          }
-        }
-      }
-    });
-  } catch (error) {
-    console.error('Error loading user registration trends:', error);
   }
 }
 

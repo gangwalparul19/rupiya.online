@@ -292,10 +292,13 @@ export async function initSidebar() {
 
   // Initialize feature config (will always load from Firestore now)
   // This will use defaults if encryption is not ready yet
+  console.log('[Sidebar] Initializing feature config...');
   await featureConfig.init();
   
-  // Add a small delay to ensure features are fully loaded
-  await new Promise(resolve => setTimeout(resolve, 100));
+  // Add a small delay to ensure features are fully loaded and processed
+  await new Promise(resolve => setTimeout(resolve, 200));
+  
+  console.log('[Sidebar] Features initialized, generating navigation...');
 
   // Check if user is admin
   const isAdmin = await checkIsAdmin();
@@ -465,20 +468,27 @@ function setupMobileSidebar() {
 
 // Auto-initialize sidebar when DOM is ready
 // This ensures sidebar works on all pages, even if initSidebar() is not explicitly called
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
-    // Only initialize if not already initialized
-    if (!window._sidebarInitialized) {
-      window._sidebarInitialized = true;
-      initSidebar();
-    }
+function autoInitSidebar() {
+  // Only initialize if not already initialized
+  if (window._sidebarInitialized) {
+    console.log('[Sidebar] Already initialized, skipping auto-init');
+    return;
+  }
+  
+  window._sidebarInitialized = true;
+  console.log('[Sidebar] Auto-initializing sidebar...');
+  
+  // Initialize sidebar - it will internally wait for features to load
+  initSidebar().catch(error => {
+    console.error('[Sidebar] Error during auto-initialization:', error);
   });
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', autoInitSidebar);
 } else {
   // DOM is already loaded
-  if (!window._sidebarInitialized) {
-    window._sidebarInitialized = true;
-    initSidebar();
-  }
+  autoInitSidebar();
 }
 
 export { navigationConfig };
