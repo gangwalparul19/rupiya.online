@@ -60,30 +60,23 @@ function loadUserProfile() {
 
 // Setup event listeners
 function setupEventListeners() {
-  // Ensure all modals are hidden on init
-  document.getElementById('policyModal')?.classList.remove('active');
-  document.getElementById('expenseModal')?.classList.remove('active');
-  document.getElementById('deleteModal')?.classList.remove('active');
-
   // Tab switching
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => switchTab(btn.dataset.tab));
   });
 
-  // Policy buttons
-  document.getElementById('addPolicyBtn')?.addEventListener('click', () => openPolicyModal());
-  document.getElementById('addPolicyBtnEmpty')?.addEventListener('click', () => openPolicyModal());
-  document.getElementById('closePolicyModal')?.addEventListener('click', closePolicyModal);
-  document.getElementById('cancelPolicyBtn')?.addEventListener('click', closePolicyModal);
-  document.getElementById('closePolicyModalBtn')?.addEventListener('click', closePolicyModal);
+  // Policy form buttons
+  document.getElementById('addPolicyBtn')?.addEventListener('click', () => openPolicyForm());
+  document.getElementById('addPolicyBtnEmpty')?.addEventListener('click', () => openPolicyForm());
+  document.getElementById('closePolicyFormBtn')?.addEventListener('click', closePolicyForm);
+  document.getElementById('cancelPolicyBtn')?.addEventListener('click', closePolicyForm);
   document.getElementById('policyForm')?.addEventListener('submit', handlePolicySubmit);
 
-  // Expense buttons
-  document.getElementById('addExpenseBtn')?.addEventListener('click', () => openExpenseModal());
-  document.getElementById('addExpenseBtnEmpty')?.addEventListener('click', () => openExpenseModal());
-  document.getElementById('closeExpenseModal')?.addEventListener('click', closeExpenseModal);
-  document.getElementById('cancelExpenseBtn')?.addEventListener('click', closeExpenseModal);
-  document.getElementById('closeExpenseModalBtn')?.addEventListener('click', closeExpenseModal);
+  // Expense form buttons
+  document.getElementById('addExpenseBtn')?.addEventListener('click', () => openExpenseForm());
+  document.getElementById('addExpenseBtnEmpty')?.addEventListener('click', () => openExpenseForm());
+  document.getElementById('closeExpenseFormBtn')?.addEventListener('click', closeExpenseForm);
+  document.getElementById('cancelExpenseBtn')?.addEventListener('click', closeExpenseForm);
   document.getElementById('expenseForm')?.addEventListener('submit', handleExpenseSubmit);
 
   // Claimable checkbox
@@ -99,17 +92,6 @@ function setupEventListeners() {
   // Filters
   document.getElementById('categoryFilter')?.addEventListener('change', filterExpenses);
   document.getElementById('searchInput')?.addEventListener('input', filterExpenses);
-
-  // Close modal on backdrop click
-  document.getElementById('policyModal')?.addEventListener('click', (e) => {
-    if (e.target.id === 'policyModal') closePolicyModal();
-  });
-  document.getElementById('expenseModal')?.addEventListener('click', (e) => {
-    if (e.target.id === 'expenseModal') closeExpenseModal();
-  });
-  document.getElementById('deleteModal')?.addEventListener('click', (e) => {
-    if (e.target.id === 'deleteModal') closeDeleteModal();
-  });
 }
 
 // Switch tab
@@ -401,10 +383,10 @@ function filterExpenses() {
   `).join('');
 }
 
-// Policy modal functions
-function openPolicyModal(policyId = null) {
-  const modal = document.getElementById('policyModal');
-  const modalTitle = document.getElementById('policyModalTitle');
+// Policy form functions
+function openPolicyForm(policyId = null) {
+  const formSection = document.getElementById('addPolicySection');
+  const formTitle = document.getElementById('policyFormTitle');
   const form = document.getElementById('policyForm');
 
   editingPolicyId = policyId;
@@ -412,7 +394,7 @@ function openPolicyModal(policyId = null) {
   if (policyId) {
     const policy = policies.find(p => p.id === policyId);
     if (policy) {
-      modalTitle.textContent = 'Edit Insurance Policy';
+      formTitle.textContent = 'Edit Insurance Policy';
       document.getElementById('policyName').value = policy.policyName || '';
       document.getElementById('policyType').value = policy.policyType || '';
       document.getElementById('provider').value = policy.provider || '';
@@ -425,15 +407,16 @@ function openPolicyModal(policyId = null) {
       document.getElementById('policyNotes').value = policy.notes || '';
     }
   } else {
-    modalTitle.textContent = 'Add Insurance Policy';
+    formTitle.textContent = 'Add Insurance Policy';
     form.reset();
   }
 
-  modal.classList.add('active');
+  formSection.classList.add('show');
+  formSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
-function closePolicyModal() {
-  document.getElementById('policyModal').classList.remove('active');
+function closePolicyForm() {
+  document.getElementById('addPolicySection').classList.remove('show');
   document.getElementById('policyForm').reset();
   editingPolicyId = null;
 }
@@ -472,7 +455,7 @@ async function handlePolicySubmit(e) {
       toast.success('Policy added successfully');
     }
 
-    closePolicyModal();
+    closePolicyForm();
     await loadPolicies();
   } catch (error) {
     console.error('Error saving policy:', error);
@@ -484,14 +467,14 @@ async function handlePolicySubmit(e) {
   }
 }
 
-// Expense modal functions
-function openExpenseModal(expenseId = null) {
-  const modal = document.getElementById('expenseModal');
-  const modalTitle = document.getElementById('expenseModalTitle');
+// Expense form functions
+function openExpenseForm(expenseId = null) {
+  const formSection = document.getElementById('addExpenseSection');
+  const formTitle = document.getElementById('expenseFormTitle');
   const form = document.getElementById('expenseForm');
 
   // Populate policy select
-  const policySelect = document.getElementById('relatedPolicy');
+  const policySelect = document.getElementById('policyId');
   policySelect.innerHTML = '<option value="">Select Policy</option>' +
     policies.map(p => `<option value="${p.id}">${p.policyName}</option>`).join('');
 
@@ -500,28 +483,29 @@ function openExpenseModal(expenseId = null) {
   if (expenseId) {
     const expense = expenses.find(e => e.id === expenseId);
     if (expense) {
-      modalTitle.textContent = 'Edit Medical Expense';
+      formTitle.textContent = 'Edit Medical Expense';
       document.getElementById('expenseCategory').value = expense.category || '';
       document.getElementById('expenseDescription').value = expense.description || '';
       document.getElementById('expenseAmount').value = expense.amount || '';
       document.getElementById('expenseDate').value = expense.date || '';
-      document.getElementById('familyMember').value = expense.familyMember || '';
+      document.getElementById('provider').value = expense.provider || '';
       document.getElementById('claimable').checked = expense.claimable || false;
-      document.getElementById('relatedPolicy').value = expense.relatedPolicy || '';
+      document.getElementById('policyId').value = expense.policyId || '';
       document.getElementById('expenseNotes').value = expense.notes || '';
       document.getElementById('policySelectGroup').style.display = expense.claimable ? 'block' : 'none';
     }
   } else {
-    modalTitle.textContent = 'Add Medical Expense';
+    formTitle.textContent = 'Add Medical Expense';
     form.reset();
     document.getElementById('expenseDate').valueAsDate = new Date();
   }
 
-  modal.classList.add('active');
+  formSection.classList.add('show');
+  formSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
-function closeExpenseModal() {
-  document.getElementById('expenseModal').classList.remove('active');
+function closeExpenseForm() {
+  document.getElementById('addExpenseSection').classList.remove('show');
   document.getElementById('expenseForm').reset();
   editingExpenseId = null;
 }
@@ -558,7 +542,7 @@ async function handleExpenseSubmit(e) {
       toast.success('Expense added successfully');
     }
 
-    closeExpenseModal();
+    closeExpenseForm();
     await loadExpenses();
   } catch (error) {
     console.error('Error saving expense:', error);
@@ -572,7 +556,7 @@ async function handleExpenseSubmit(e) {
 
 // Delete functions
 window.editPolicy = function(policyId) {
-  openPolicyModal(policyId);
+  openPolicyForm(policyId);
 };
 
 window.deletePolicy = function(policyId, policyName) {
@@ -585,7 +569,7 @@ window.deletePolicy = function(policyId, policyName) {
 };
 
 window.editExpense = function(expenseId) {
-  openExpenseModal(expenseId);
+  openExpenseForm(expenseId);
 };
 
 window.deleteExpense = function(expenseId, description) {

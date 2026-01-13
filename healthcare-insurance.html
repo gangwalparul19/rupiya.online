@@ -224,6 +224,159 @@
         </div>
       </div>
 
+      <!-- Add/Edit Policy Form (Inline) -->
+      <div class="add-policy-section" id="addPolicySection">
+        <div class="add-policy-header">
+          <h2 class="add-policy-title" id="policyFormTitle">Add Insurance Policy</h2>
+          <button class="modal-close" id="closePolicyFormBtn">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <form id="policyForm">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="policyName">Policy Name *</label>
+              <input type="text" id="policyName" class="form-input" placeholder="e.g., Family Health Insurance" required>
+            </div>
+
+            <div class="form-group">
+              <label for="policyType">Policy Type *</label>
+              <select id="policyType" class="form-input" required>
+                <option value="">Select Type</option>
+                <option value="health">Health Insurance</option>
+                <option value="life">Life Insurance</option>
+                <option value="vehicle">Vehicle Insurance</option>
+                <option value="home">Home Insurance</option>
+                <option value="travel">Travel Insurance</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="provider">Insurance Provider *</label>
+              <input type="text" id="provider" class="form-input" placeholder="e.g., HDFC ERGO" required>
+            </div>
+
+            <div class="form-group">
+              <label for="policyNumber">Policy Number *</label>
+              <input type="text" id="policyNumber" class="form-input" placeholder="Policy number" required>
+            </div>
+
+            <div class="form-group">
+              <label for="coverageAmount">Coverage Amount (₹) *</label>
+              <input type="number" id="coverageAmount" class="form-input" placeholder="500000" min="0" step="1000" required>
+            </div>
+
+            <div class="form-group">
+              <label for="premiumAmount">Annual Premium (₹) *</label>
+              <input type="number" id="premiumAmount" class="form-input" placeholder="10000" min="0" step="100" required>
+            </div>
+
+            <div class="form-group">
+              <label for="startDate">Start Date *</label>
+              <input type="date" id="startDate" class="form-input" required>
+            </div>
+
+            <div class="form-group">
+              <label for="endDate">End Date *</label>
+              <input type="date" id="endDate" class="form-input" required>
+            </div>
+
+            <div class="form-group form-group-full">
+              <label for="coveredMembers">Covered Members</label>
+              <input type="text" id="coveredMembers" class="form-input" placeholder="e.g., Self, Spouse, Children">
+            </div>
+
+            <div class="form-group form-group-full">
+              <label for="policyNotes">Notes</label>
+              <textarea id="policyNotes" class="form-input" rows="3" placeholder="Additional notes about this policy"></textarea>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-outline" id="cancelPolicyBtn">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="savePolicyBtn">Save Policy</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Add/Edit Expense Form (Inline) -->
+      <div class="add-expense-section" id="addExpenseSection">
+        <div class="add-expense-header">
+          <h2 class="add-expense-title" id="expenseFormTitle">Add Medical Expense</h2>
+          <button class="modal-close" id="closeExpenseFormBtn">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <form id="expenseForm">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="expenseDate">Date *</label>
+              <input type="date" id="expenseDate" class="form-input" required>
+            </div>
+
+            <div class="form-group">
+              <label for="expenseCategory">Category *</label>
+              <select id="expenseCategory" class="form-input" required>
+                <option value="">Select Category</option>
+                <option value="consultation">Consultation</option>
+                <option value="medicine">Medicine</option>
+                <option value="tests">Tests/Diagnostics</option>
+                <option value="hospitalization">Hospitalization</option>
+                <option value="surgery">Surgery</option>
+                <option value="dental">Dental</option>
+                <option value="optical">Optical</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="expenseAmount">Amount (₹) *</label>
+              <input type="number" id="expenseAmount" class="form-input" placeholder="0" min="0" step="1" required>
+            </div>
+
+            <div class="form-group">
+              <label for="provider">Provider/Hospital</label>
+              <input type="text" id="provider" class="form-input" placeholder="e.g., Apollo Hospital">
+            </div>
+
+            <div class="form-group form-group-full">
+              <label for="expenseDescription">Description *</label>
+              <input type="text" id="expenseDescription" class="form-input" placeholder="Brief description" required>
+            </div>
+
+            <div class="form-group form-group-full">
+              <label class="checkbox-label">
+                <input type="checkbox" id="claimable">
+                <span>Claimable from insurance</span>
+              </label>
+            </div>
+
+            <div class="form-group" id="policySelectGroup" style="display: none;">
+              <label for="policyId">Select Policy</label>
+              <select id="policyId" class="form-input">
+                <option value="">Select policy</option>
+              </select>
+            </div>
+
+            <div class="form-group form-group-full">
+              <label for="expenseNotes">Notes</label>
+              <textarea id="expenseNotes" class="form-input" rows="3" placeholder="Additional notes"></textarea>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-outline" id="cancelExpenseBtn">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="saveExpenseBtn">Save Expense</button>
+          </div>
+        </form>
+      </div>
+
       <!-- Tabs -->
       <div class="tabs">
         <button class="tab-btn active" data-tab="policies">Insurance Policies</button>

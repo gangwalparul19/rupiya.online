@@ -56,28 +56,17 @@ function loadUserProfile() {
 
 // Setup event listeners
 function setupEventListeners() {
-  // Ensure modal is hidden on init
-  document.getElementById('cardModal')?.classList.remove('active');
-  document.getElementById('deleteModal')?.classList.remove('active');
-
-  document.getElementById('addCardBtn')?.addEventListener('click', () => openCardModal());
-  document.getElementById('addCardBtnEmpty')?.addEventListener('click', () => openCardModal());
-  document.getElementById('closeModalBtn')?.addEventListener('click', closeCardModal);
-  document.getElementById('cancelBtn')?.addEventListener('click', closeCardModal);
+  // Form section buttons
+  document.getElementById('addCardBtn')?.addEventListener('click', () => openCardForm());
+  document.getElementById('addCardBtnEmpty')?.addEventListener('click', () => openCardForm());
+  document.getElementById('closeFormBtn')?.addEventListener('click', closeCardForm);
+  document.getElementById('cancelBtn')?.addEventListener('click', closeCardForm);
   document.getElementById('cardForm')?.addEventListener('submit', handleCardSubmit);
   
   // Delete modal
   document.getElementById('closeDeleteModal')?.addEventListener('click', closeDeleteModal);
   document.getElementById('cancelDeleteBtn')?.addEventListener('click', closeDeleteModal);
   document.getElementById('confirmDeleteBtn')?.addEventListener('click', confirmDelete);
-
-  // Close modal on backdrop click
-  document.getElementById('cardModal')?.addEventListener('click', (e) => {
-    if (e.target.id === 'cardModal') closeCardModal();
-  });
-  document.getElementById('deleteModal')?.addEventListener('click', (e) => {
-    if (e.target.id === 'deleteModal') closeDeleteModal();
-  });
 }
 
 // Load credit cards
@@ -189,10 +178,10 @@ function updateKPIs() {
   if (totalRewardsEl) totalRewardsEl.textContent = totalRewards.toLocaleString();
 }
 
-// Open card modal
-function openCardModal(cardId = null) {
-  const modal = document.getElementById('cardModal');
-  const modalTitle = document.getElementById('modalTitle');
+// Open card form
+function openCardForm(cardId = null) {
+  const formSection = document.getElementById('addCardSection');
+  const formTitle = document.getElementById('formTitle');
   const form = document.getElementById('cardForm');
 
   editingCardId = cardId;
@@ -200,7 +189,7 @@ function openCardModal(cardId = null) {
   if (cardId) {
     const card = creditCards.find(c => c.id === cardId);
     if (card) {
-      modalTitle.textContent = 'Edit Credit Card';
+      formTitle.textContent = 'Edit Credit Card';
       document.getElementById('cardName').value = card.cardName || '';
       document.getElementById('bankName').value = card.bankName || '';
       document.getElementById('cardType').value = card.cardType || '';
@@ -215,16 +204,17 @@ function openCardModal(cardId = null) {
       document.getElementById('notes').value = card.notes || '';
     }
   } else {
-    modalTitle.textContent = 'Add Credit Card';
+    formTitle.textContent = 'Add Credit Card';
     form.reset();
   }
 
-  modal.classList.add('active');
+  formSection.classList.add('show');
+  formSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
-// Close card modal
-function closeCardModal() {
-  document.getElementById('cardModal').classList.remove('active');
+// Close card form
+function closeCardForm() {
+  document.getElementById('addCardSection').classList.remove('show');
   document.getElementById('cardForm').reset();
   editingCardId = null;
 }
@@ -266,7 +256,7 @@ async function handleCardSubmit(e) {
       toast.success('Credit card added successfully');
     }
 
-    closeCardModal();
+    closeCardForm();
     await loadCreditCards();
   } catch (error) {
     console.error('Error saving credit card:', error);
@@ -280,7 +270,7 @@ async function handleCardSubmit(e) {
 
 // Edit card
 window.editCard = function(cardId) {
-  openCardModal(cardId);
+  openCardForm(cardId);
 };
 
 // Delete card
