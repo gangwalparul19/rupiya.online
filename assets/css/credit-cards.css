@@ -455,3 +455,71 @@
     padding: 0;
   }
 }
+
+/* Mobile Header Fixes */
+@media (max-width: 768px) {
+  .mobile-header {
+    display: flex !important;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+  }
+
+  .mobile-brand {
+    display: flex;
+    align-items: center;
+  }
+
+  .mobile-brand img {
+    height: 32px;
+    width: auto;
+  }
+
+  .mobile-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .sidebar-toggle,
+  .theme-toggle-btn {
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+  }
+
+  .sidebar-toggle:hover,
+  .theme-toggle-btn:hover {
+    background: rgba(74, 144, 226, 0.1);
+    border-radius: 8px;
+  }
+
+  .sidebar-toggle svg,
+  .theme-toggle-btn svg {
+    display: block;
+  }
+
+  /* Page header adjustments for mobile */
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .page-actions {
+    width: 100%;
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .page-actions .btn {
+    flex: 1;
+  }
+}

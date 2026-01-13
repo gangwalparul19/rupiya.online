@@ -56,6 +56,27 @@ function loadUserProfile() {
 
 // Setup event listeners
 function setupEventListeners() {
+  // Sidebar toggle
+  const sidebarOpen = document.getElementById('sidebarOpen');
+  const sidebarClose = document.getElementById('sidebarClose');
+  const sidebarOverlay = document.getElementById('sidebarOverlay');
+  const sidebar = document.getElementById('sidebar');
+
+  sidebarOpen?.addEventListener('click', () => {
+    sidebar.classList.add('open');
+    sidebarOverlay.classList.add('show');
+  });
+
+  sidebarClose?.addEventListener('click', () => {
+    sidebar.classList.remove('open');
+    sidebarOverlay.classList.remove('show');
+  });
+
+  sidebarOverlay?.addEventListener('click', () => {
+    sidebar.classList.remove('open');
+    sidebarOverlay.classList.remove('show');
+  });
+
   // Form section buttons
   document.getElementById('addCardBtn')?.addEventListener('click', () => openCardForm());
   document.getElementById('addCardBtnEmpty')?.addEventListener('click', () => openCardForm());
