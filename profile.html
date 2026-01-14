@@ -378,10 +378,11 @@
                   <label>Weekly Financial Report</label>
                   <div class="preference-toggle">
                     <label class="toggle-switch">
-                      <input type="checkbox" id="weeklyReportEnabled">
+                      <input type="checkbox" id="weeklyReportEnabled" disabled>
                       <span class="toggle-slider"></span>
                     </label>
                     <span class="toggle-label">Receive weekly email report</span>
+                    <span class="coming-soon-badge">Coming Soon</span>
                   </div>
                   <small class="form-help">Get a summary of your expenses and income every Sunday with a CSV attachment</small>
                 </div>
@@ -390,10 +391,11 @@
                   <label>Monthly Financial Report</label>
                   <div class="preference-toggle">
                     <label class="toggle-switch">
-                      <input type="checkbox" id="monthlyReportEnabled">
+                      <input type="checkbox" id="monthlyReportEnabled" disabled>
                       <span class="toggle-slider"></span>
                     </label>
                     <span class="toggle-label">Receive monthly email report</span>
+                    <span class="coming-soon-badge">Coming Soon</span>
                   </div>
                   <small class="form-help">Get a comprehensive monthly summary on the 1st of each month</small>
                 </div>
@@ -526,6 +528,37 @@
                   <div class="form-group">
                     <label for="cardBankName">Bank Name</label>
                     <input type="text" id="cardBankName" placeholder="e.g., HDFC Bank">
+                  </div>
+                  
+                  <!-- Credit Card Specific Fields (shown only for credit cards) -->
+                  <div id="creditCardFields" style="display: none;">
+                    <div class="form-group">
+                      <label for="creditLimit">Credit Limit (₹)</label>
+                      <input type="number" id="creditLimit" placeholder="100000" min="0" step="1">
+                      <small class="form-text">Your card's credit limit</small>
+                    </div>
+                    <div class="form-group">
+                      <label for="billingDate">Billing Date</label>
+                      <input type="number" id="billingDate" placeholder="1-31" min="1" max="31">
+                      <small class="form-text">Day of month when billing cycle starts</small>
+                    </div>
+                    <div class="form-group">
+                      <label for="dueDate">Payment Due Date</label>
+                      <input type="number" id="dueDate" placeholder="1-31" min="1" max="31">
+                      <small class="form-text">Day of month when payment is due</small>
+                    </div>
+                    <div class="form-group">
+                      <label for="rewardsProgram">Rewards Program</label>
+                      <input type="text" id="rewardsProgram" placeholder="e.g., Cashback, Points, Miles">
+                    </div>
+                    <div class="form-group">
+                      <label for="annualFee">Annual Fee (₹)</label>
+                      <input type="number" id="annualFee" placeholder="0" min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                      <label for="cardNotes">Notes</label>
+                      <textarea id="cardNotes" placeholder="Additional notes about this card" rows="2"></textarea>
+                    </div>
                   </div>
                 </div>
 

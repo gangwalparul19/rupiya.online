@@ -185,9 +185,52 @@ class PaymentMethodsService {
       // Use firestoreService to handle encryption
       const result = await firestoreService.add(this.collectionName, data);
       
+      // If this is a credit card, also create an entry in creditCards collection
+      if (result.success && methodData.type === this.types.CARD && methodData.cardType === 'credit') {
+        await this.createCreditCardEntry(methodData, userId, result.id);
+      }
+      
       return result;
     } catch (error) {
       console.error('Error adding payment method:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Create a credit card entry in creditCards collection when a credit card payment method is added
+   */
+  async createCreditCardEntry(methodData, userId, paymentMethodId) {
+    try {
+      const creditCardData = {
+        userId,
+        paymentMethodId, // Link to the payment method
+        cardName: methodData.name,
+        bankName: methodData.bankName || '',
+        cardType: 'credit',
+        lastFourDigits: methodData.cardNumber ? methodData.cardNumber.slice(-4) : '',
+        creditLimit: methodData.creditLimit || 0,
+        currentBalance: 0, // Start with 0 balance
+        billingDate: methodData.billingDate || 1,
+        dueDate: methodData.dueDate || 15,
+        rewardsProgram: methodData.rewardsProgram || '',
+        rewardsBalance: 0,
+        annualFee: methodData.annualFee || 0,
+        notes: methodData.notes || '',
+        createdAt: Timestamp.now(),
+        updatedAt: Timestamp.now()
+      };
+      
+      const result = await firestoreService.add('creditCards', creditCardData);
+      
+      if (result.success) {
+        console.log('[PaymentMethodsService] Credit card entry created successfully:', result.id);
+      }
+      
+      return result;
+    } catch (error) {
+      console.error('Error creating credit card entry:', error);
+      // Don't throw error - payment method was already created successfully
       return { success: false, error: error.message };
     }
   }

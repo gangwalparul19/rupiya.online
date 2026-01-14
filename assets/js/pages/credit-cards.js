@@ -2,6 +2,7 @@
 import '../services/services-init.js';
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
+import creditCardService from '../services/credit-card-service.js';
 import toast from '../components/toast.js';
 import { formatCurrency, formatCurrencyCompact, formatDate } from '../utils/helpers.js';
 import encryptionReauthModal from '../components/encryption-reauth-modal.js';
@@ -166,12 +167,14 @@ function calculateKPISummary() {
   const totalLimit = state.creditCards.reduce((sum, card) => sum + (card.creditLimit || 0), 0);
   const totalSpent = state.creditCards.reduce((sum, card) => sum + (card.currentBalance || 0), 0);
   const totalRewards = state.creditCards.reduce((sum, card) => sum + (card.rewardsBalance || 0), 0);
+  const utilization = totalLimit > 0 ? Math.round((totalSpent / totalLimit) * 100) : 0;
   
   state.allDataKPI = {
     totalCards: state.creditCards.length,
     totalLimit,
     totalSpent,
-    totalRewards
+    totalRewards,
+    utilization
   };
 }
 
@@ -336,7 +339,7 @@ function goToPage(page) {
 function updateKPIs() {
   const totalCardsEl = document.getElementById('totalCards');
   const totalLimitEl = document.getElementById('totalLimit');
-  const totalSpentEl = document.getElementById('totalSpent');
+  const utilizationEl = document.getElementById('utilization');
   const totalRewardsEl = document.getElementById('totalRewards');
 
   if (totalCardsEl) totalCardsEl.textContent = state.allDataKPI.totalCards;
@@ -344,9 +347,9 @@ function updateKPIs() {
     totalLimitEl.textContent = formatCurrencyCompact(state.allDataKPI.totalLimit);
     totalLimitEl.title = formatCurrency(state.allDataKPI.totalLimit);
   }
-  if (totalSpentEl) {
-    totalSpentEl.textContent = formatCurrencyCompact(state.allDataKPI.totalSpent);
-    totalSpentEl.title = formatCurrency(state.allDataKPI.totalSpent);
+  if (utilizationEl) {
+    utilizationEl.textContent = state.allDataKPI.utilization + '%';
+    utilizationEl.title = `${formatCurrency(state.allDataKPI.totalSpent)} of ${formatCurrency(state.allDataKPI.totalLimit)}`;
   }
   if (totalRewardsEl) totalRewardsEl.textContent = state.allDataKPI.totalRewards.toLocaleString();
 }

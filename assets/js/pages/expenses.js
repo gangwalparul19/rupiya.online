@@ -4,6 +4,7 @@ import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
 import categoriesService from '../services/categories-service.js';
 import paymentMethodsService from '../services/payment-methods-service.js';
+import creditCardService from '../services/credit-card-service.js';
 import smartCategorizationService from '../services/smart-categorization-service.js';
 import encryptionService from '../services/encryption-service.js';
 import loadingService from '../services/loading-service.js';
@@ -2363,6 +2364,14 @@ async function handleFormSubmit(e) {
       
       if (result.success) {
         toast.success('Expense added successfully');
+        
+        // Update credit card balance if payment method is a credit card
+        if (expenseData.paymentMethod === 'card' && expenseData.specificPaymentMethodId) {
+          await creditCardService.updateCardBalanceOnExpense(
+            expenseData.specificPaymentMethodId,
+            expenseData.amount
+          );
+        }
       }
     }
     

@@ -1460,6 +1460,18 @@ function setupPaymentMethodsListeners() {
     });
   }
   
+  // Handle card type change to show/hide credit card fields
+  if (cardTypeSelect) {
+    cardTypeSelect.addEventListener('change', () => {
+      const creditCardFields = document.getElementById('creditCardFields');
+      if (cardTypeSelect.value === 'credit') {
+        creditCardFields.style.display = 'block';
+      } else {
+        creditCardFields.style.display = 'none';
+      }
+    });
+  }
+  
   if (addPaymentMethodForm) {
     addPaymentMethodForm.addEventListener('submit', handleAddPaymentMethod);
     addPaymentMethodForm.addEventListener('reset', cancelEditPaymentMethod);
@@ -1500,6 +1512,13 @@ function handlePaymentTypeChange() {
   switch (type) {
     case 'card':
       cardFields.style.display = 'block';
+      // Show credit card fields only if card type is credit
+      const creditCardFields = document.getElementById('creditCardFields');
+      if (cardTypeSelect.value === 'credit') {
+        creditCardFields.style.display = 'block';
+      } else {
+        creditCardFields.style.display = 'none';
+      }
       break;
     case 'upi':
       upiFields.style.display = 'block';
@@ -1670,6 +1689,16 @@ async function handleAddPaymentMethod(e) {
         methodData.cardNumber = cardNumberInput.value.trim();
         methodData.cardType = cardTypeSelect.value;
         methodData.bankName = cardBankNameInput.value.trim();
+        
+        // Add credit card specific fields if it's a credit card
+        if (cardTypeSelect.value === 'credit') {
+          methodData.creditLimit = parseFloat(document.getElementById('creditLimit').value) || 0;
+          methodData.billingDate = parseInt(document.getElementById('billingDate').value) || 1;
+          methodData.dueDate = parseInt(document.getElementById('dueDate').value) || 15;
+          methodData.rewardsProgram = document.getElementById('rewardsProgram').value.trim();
+          methodData.annualFee = parseFloat(document.getElementById('annualFee').value) || 0;
+          methodData.notes = document.getElementById('cardNotes').value.trim();
+        }
         break;
       case 'upi':
         methodData.upiId = upiIdInput.value.trim();

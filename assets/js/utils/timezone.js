@@ -1,18 +1,20 @@
 // Timezone Utility Service
 // Handles timezone detection and date/time formatting based on user's local timezone
+// IMPORTANT: All dates are stored in UTC in Firestore but displayed in IST (Asia/Kolkata)
 
 class TimezoneService {
   constructor() {
-    this.userTimezone = this.detectTimezone();
-    this.userLocale = this.detectLocale();
+    // Always use IST (Asia/Kolkata) for the application
+    this.userTimezone = 'Asia/Kolkata';
+    this.userLocale = 'en-IN';
   }
 
-  // Detect user's timezone from browser
+  // Detect user's timezone from browser (kept for reference, but we use IST)
   detectTimezone() {
     try {
       return Intl.DateTimeFormat().resolvedOptions().timeZone;
     } catch (e) {
-      console.warn('Could not detect timezone, defaulting to Asia/Kolkata');
+      console.warn('Could not detect timezone, using Asia/Kolkata (IST)');
       return 'Asia/Kolkata'; // Default to IST
     }
   }
@@ -27,7 +29,7 @@ class TimezoneService {
     }
   }
 
-  // Get current timezone
+  // Get current timezone (always IST)
   getTimezone() {
     return this.userTimezone;
   }
@@ -37,18 +39,15 @@ class TimezoneService {
     return this.userLocale;
   }
 
-  // Get timezone offset in minutes
+  // Get timezone offset in minutes (IST is UTC+5:30 = 330 minutes)
   getTimezoneOffset() {
-    return new Date().getTimezoneOffset();
+    // IST offset is -330 (negative because it's ahead of UTC)
+    return -330;
   }
 
-  // Get timezone abbreviation (e.g., IST, EST, PST)
+  // Get timezone abbreviation (IST)
   getTimezoneAbbreviation() {
-    const date = new Date();
-    const options = { timeZoneName: 'short', timeZone: this.userTimezone };
-    const parts = new Intl.DateTimeFormat(this.userLocale, options).formatToParts(date);
-    const tzPart = parts.find(part => part.type === 'timeZoneName');
-    return tzPart ? tzPart.value : '';
+    return 'IST';
   }
 
   // Convert a date to user's local timezone
@@ -176,18 +175,25 @@ class TimezoneService {
     return new Date(now.getFullYear(), now.getMonth(), now.getDate());
   }
 
-  // Get start of day in user's timezone
+  // Get start of day in user's timezone (IST)
   startOfDay(date) {
     const localDate = this.toLocalDate(date);
     if (!localDate) return null;
-    return new Date(localDate.getFullYear(), localDate.getMonth(), localDate.getDate(), 0, 0, 0, 0);
+    
+    // Create a date at midnight IST
+    // We need to account for IST offset (UTC+5:30)
+    const istDate = new Date(localDate.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
+    return new Date(istDate.getFullYear(), istDate.getMonth(), istDate.getDate(), 0, 0, 0, 0);
   }
 
-  // Get end of day in user's timezone
+  // Get end of day in user's timezone (IST)
   endOfDay(date) {
     const localDate = this.toLocalDate(date);
     if (!localDate) return null;
-    return new Date(localDate.getFullYear(), localDate.getMonth(), localDate.getDate(), 23, 59, 59, 999);
+    
+    // Create a date at 23:59:59 IST
+    const istDate = new Date(localDate.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
+    return new Date(istDate.getFullYear(), istDate.getMonth(), istDate.getDate(), 23, 59, 59, 999);
   }
 
   // Get start of month in user's timezone
@@ -271,13 +277,18 @@ class TimezoneService {
     return localDate > new Date();
   }
 
-  // Parse date string from input (YYYY-MM-DD) and create Date in user's timezone
+  // Parse date string from input (YYYY-MM-DD) and create Date in IST timezone
   parseInputDate(dateString) {
     if (!dateString) return null;
     
     const [year, month, day] = dateString.split('-').map(Number);
-    // Create date at noon to avoid timezone issues
-    return new Date(year, month - 1, day, 12, 0, 0, 0);
+    // Create date at noon IST to avoid timezone issues
+    // This ensures the date is interpreted in IST, not the browser's timezone
+    const date = new Date(year, month - 1, day, 12, 0, 0, 0);
+    
+    // Convert to IST representation
+    const istDate = new Date(date.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
+    return istDate;
   }
 
   // Get timezone info for display

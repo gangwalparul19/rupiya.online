@@ -627,6 +627,33 @@
   flex-shrink: 0;
 }
 
+/* Disabled preference toggle */
+.preference-toggle:has(input:disabled) {
+  opacity: 0.6;
+  background: rgba(200, 200, 200, 0.05);
+  border-left-color: #999;
+}
+
+.preference-toggle:has(input:disabled) .toggle-label {
+  color: #999;
+}
+
+/* Coming Soon Badge */
+.coming-soon-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+  color: white;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
 .text-danger {
   color: #E74C3C;
 }
