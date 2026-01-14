@@ -174,13 +174,16 @@ class UserService {
     }
 
     // Extract auth methods from provider data with validation
+    // Note: Cannot use serverTimestamp() inside arrays, so we use Date.now()
     const authMethods = [];
+    const now = Date.now();
+    
     if (user.providerData && Array.isArray(user.providerData)) {
       for (const provider of user.providerData) {
         if (provider && provider.providerId) {
           authMethods.push({
             providerId: provider.providerId,
-            linkedAt: serverTimestamp(),
+            linkedAt: now,
             email: provider.email || user.email
           });
         }
@@ -191,7 +194,7 @@ class UserService {
     if (authMethods.length === 0) {
       authMethods.push({
         providerId: 'password',
-        linkedAt: serverTimestamp(),
+        linkedAt: now,
         email: user.email
       });
     }
@@ -714,10 +717,10 @@ class UserService {
         return { success: false, error: `${providerId} is already linked to this account` };
       }
 
-      // Add new method
+      // Add new method (use Date.now() instead of serverTimestamp() - not allowed in arrays)
       authMethods.push({
         providerId,
-        linkedAt: serverTimestamp(),
+        linkedAt: Date.now(),
         email
       });
 
