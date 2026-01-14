@@ -149,10 +149,30 @@ class EncryptionService {
   // Test encryption key validity
   async _testEncryptionKey() {
     try {
+      // Don't use encryptValue/decryptValue here as they check isReady()
+      // This is called during initialization, so we need to test the key directly
       const testData = 'test_' + Date.now();
-      const encrypted = await this.encryptValue(testData);
-      const decrypted = await this.decryptValue(encrypted);
-      return decrypted === testData;
+      
+      // Generate random IV for encryption test
+      const iv = crypto.getRandomValues(new Uint8Array(12));
+      
+      // Encrypt the test data directly
+      const encodedData = new TextEncoder().encode(testData);
+      const encryptedData = await crypto.subtle.encrypt(
+        { name: 'AES-GCM', iv: iv },
+        this.encryptionKey,
+        encodedData
+      );
+
+      // Decrypt the test data directly
+      const decryptedData = await crypto.subtle.decrypt(
+        { name: 'AES-GCM', iv: iv },
+        this.encryptionKey,
+        encryptedData
+      );
+
+      const decryptedString = new TextDecoder().decode(decryptedData);
+      return decryptedString === testData;
     } catch (error) {
       log.error('Encryption key test failed:', error);
       return false;

@@ -30,15 +30,20 @@ authService.onAuthStateChanged(async (user) => {
     hasSeenLoggedInUser = true;
     // User is signed in, ensure profile exists in Firestore
     try {
+      log.log('🔄 Creating/loading user profile for:', user.uid);
       const result = await userService.getOrCreateUserProfile(user);
+      log.log('📊 User profile result:', result);
+      
       if (result.success) {
         if (result.isNewUser) {
-          log.log('✅ New user profile created');
+          log.log('✅ New user profile created in users collection');
         } else if (result.fromCache) {
           log.log('✅ User profile loaded from cache');
         } else {
           log.log('✅ User profile loaded from Firestore');
         }
+      } else {
+        log.error('❌ Failed to create/load user profile:', result.error);
       }
       
       // Wait for any ongoing initialization to complete

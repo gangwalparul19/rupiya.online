@@ -91,10 +91,12 @@ class UserService {
     const userRef = doc(db, this.collectionName, userId);
 
     try {
+      console.log('[User Service] Fetching user document for:', userId);
       // Try to get existing user document
       const userDoc = await getDoc(userRef);
 
       if (userDoc.exists()) {
+        console.log('[User Service] User document exists in Firestore');
         // User exists, update cache and return
         const userData = { id: userId, ...userDoc.data() };
         this.setCachedUser(userId, userData);
@@ -106,9 +108,18 @@ class UserService {
         
         return { success: true, user: userData, isNewUser: false };
       } else {
+        console.log('[User Service] User document does NOT exist, creating new profile...');
         // User doesn't exist, create new profile with location
         const newUserData = await this._createUserData(user);
+        console.log('[User Service] New user data prepared:', {
+          email: newUserData.email,
+          displayName: newUserData.displayName,
+          hasLocation: !!newUserData.city
+        });
+        
+        console.log('[User Service] Writing to Firestore collection:', this.collectionName, 'document:', userId);
         await setDoc(userRef, newUserData);
+        console.log('[User Service] ✅ User document created successfully in Firestore');
         
         const userData = { id: userId, ...newUserData };
         this.setCachedUser(userId, userData);
@@ -116,7 +127,10 @@ class UserService {
         return { success: true, user: userData, isNewUser: true };
       }
     } catch (error) {
-      console.error('Error in getOrCreateUserProfile:', error);
+      console.error('[User Service] ❌ Error in _fetchOrCreateUser:', error);
+      console.error('[User Service] Error code:', error.code);
+      console.error('[User Service] Error message:', error.message);
+      console.error('[User Service] Full error:', error);
       return { success: false, error: error.message };
     }
   }
@@ -126,6 +140,8 @@ class UserService {
    * Includes automatic location detection
    */
   async _createUserData(user) {
+    console.log('[User Service] Creating user data for:', user.email);
+    
     // Validate user object
     if (!user || typeof user !== 'object') {
       throw new Error('Invalid user object provided');
@@ -138,6 +154,7 @@ class UserService {
     // Fetch location in parallel (don't block user creation)
     let location = null;
     try {
+      console.log('[User Service] Attempting to fetch location...');
       if (locationService && typeof locationService.getUserLocation === 'function') {
         location = await locationService.getUserLocation();
         
@@ -148,9 +165,11 @@ class UserService {
         }
         
         console.log('[User Service] Location detected:', location);
+      } else {
+        console.log('[User Service] Location service not available');
       }
     } catch (error) {
-      console.warn('[User Service] Could not detect location:', error);
+      console.warn('[User Service] Could not detect location (non-blocking):', error);
       location = null;
     }
 
@@ -177,7 +196,9 @@ class UserService {
       });
     }
 
-    return {
+    console.log('[User Service] Auth methods:', authMethods.map(m => m.providerId).join(', '));
+
+    const userData = {
       email: user.email,
       displayName: user.displayName || this._extractNameFromEmail(user.email),
       photoURL: user.photoURL || null,
@@ -217,6 +238,9 @@ class UserService {
       // Account status
       isActive: true
     };
+
+    console.log('[User Service] User data object created successfully');
+    return userData;
   }
 
   /**
