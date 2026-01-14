@@ -1,0 +1,37 @@
+name: Weekly Financial Reports
+
+on:
+  schedule:
+    # TESTING: Runs today at 1:10 PM UTC (6:40 PM IST)
+    # REVERT TO: '30 2 * * 0' (Every Sunday at 8:00 AM IST)
+    - cron: '10 13 * * *'
+  
+  # Allow manual trigger for testing
+  workflow_dispatch:
+
+jobs:
+  send-weekly-reports:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Send Weekly Reports
+        run: |
+          echo "Triggering weekly reports cron job..."
+          
+          response=$(curl -s -w "\n%{http_code}" -X POST \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json" \
+            https://www.rupiya.online/api/cron/weekly-reports)
+          
+          http_code=$(echo "$response" | tail -n1)
+          body=$(echo "$response" | sed '$d')
+          
+          echo "Response Code: $http_code"
+          echo "Response Body: $body"
+          
+          if [ "$http_code" -eq 200 ]; then
+            echo "✅ Weekly reports sent successfully!"
+          else
+            echo "❌ Failed to send weekly reports"
+            exit 1
+          fi

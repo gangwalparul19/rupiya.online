@@ -1,0 +1,37 @@
+name: Monthly Financial Reports
+
+on:
+  schedule:
+    # TESTING: Runs today at 1:15 PM UTC (6:45 PM IST)
+    # REVERT TO: '30 2 1 * *' (1st of every month at 8:00 AM IST)
+    - cron: '15 13 * * *'
+  
+  # Allow manual trigger for testing
+  workflow_dispatch:
+
+jobs:
+  send-monthly-reports:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Send Monthly Reports
+        run: |
+          echo "Triggering monthly reports cron job..."
+          
+          response=$(curl -s -w "\n%{http_code}" -X POST \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json" \
+            https://www.rupiya.online/api/cron/monthly-reports)
+          
+          http_code=$(echo "$response" | tail -n1)
+          body=$(echo "$response" | sed '$d')
+          
+          echo "Response Code: $http_code"
+          echo "Response Body: $body"
+          
+          if [ "$http_code" -eq 200 ]; then
+            echo "✅ Monthly reports sent successfully!"
+          else
+            echo "❌ Failed to send monthly reports"
+            exit 1
+          fi
