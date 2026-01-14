@@ -373,6 +373,8 @@ async function loadExpenses() {
     // Build filters array for Firestore query
     const filters = buildFirestoreFilters();
     
+    console.log('[LoadExpenses] Built Firestore filters:', JSON.stringify(filters));
+    
     // Check if filters are applied
     const hasFilters = filters.length > 0 || 
                        state.filters.search || 
@@ -381,19 +383,46 @@ async function loadExpenses() {
                        state.filters.dateTo;
     
     console.log('[LoadExpenses] Has filters:', hasFilters);
+    console.log('[LoadExpenses] State filters:', JSON.stringify(state.filters));
     
     if (hasFilters) {
-      // With filters: Load ALL filtered data (usually smaller dataset)
-      const result = await firestoreService.getExpensesPaginated({ 
-        pageSize: 1000,
-        filters: filters
-      });
+      // Check if we have Firestore filters or only client-side filters
+      const hasFirestoreFilters = filters.length > 0;
+      const hasClientSideFilters = state.filters.search || 
+                                    state.filters.familyMember || 
+                                    state.filters.dateFrom || 
+                                    state.filters.dateTo;
       
-      state.expenses = result.data;
-      state.filteredExpenses = [...state.expenses];
-      applyClientSideFilters();
-      state.filteredCount = state.filteredExpenses.length;
-      updateFilteredExpenseKPIs();
+      console.log('[LoadExpenses] Has Firestore filters:', hasFirestoreFilters);
+      console.log('[LoadExpenses] Has client-side filters:', hasClientSideFilters);
+      
+      // If only client-side filters, load all data first
+      if (!hasFirestoreFilters && hasClientSideFilters) {
+        console.log('[LoadExpenses] Loading all data for client-side filtering');
+        const result = await firestoreService.getExpensesPaginated({ 
+          pageSize: 1000,
+          filters: [] // No Firestore filters
+        });
+        
+        state.expenses = result.data;
+        state.filteredExpenses = [...state.expenses];
+        applyClientSideFilters();
+        state.filteredCount = state.filteredExpenses.length;
+        updateFilteredExpenseKPIs();
+      } else {
+        // With Firestore filters: Load filtered data
+        console.log('[LoadExpenses] Loading with Firestore filters');
+        const result = await firestoreService.getExpensesPaginated({ 
+          pageSize: 1000,
+          filters: filters
+        });
+        
+        state.expenses = result.data;
+        state.filteredExpenses = [...state.expenses];
+        applyClientSideFilters();
+        state.filteredCount = state.filteredExpenses.length;
+        updateFilteredExpenseKPIs();
+      }
     } else {
       // No filters: Load initial batch (50 records for first 5 pages)
       const initialBatchSize = state.itemsPerPage * 1; // 10 records

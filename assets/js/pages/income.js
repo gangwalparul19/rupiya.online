@@ -355,6 +355,8 @@ async function loadIncome() {
     // Build filters array for Firestore query
     const filters = buildFirestoreFilters();
     
+    console.log('[LoadIncome] Built Firestore filters:', JSON.stringify(filters));
+    
     // Check if filters are applied
     const hasFilters = filters.length > 0 || 
                        state.filters.search || 
@@ -363,19 +365,46 @@ async function loadIncome() {
                        state.filters.dateTo;
     
     console.log('[LoadIncome] Has filters:', hasFilters);
+    console.log('[LoadIncome] State filters:', JSON.stringify(state.filters));
     
     if (hasFilters) {
-      // With filters: Load ALL filtered data (usually smaller dataset)
-      const result = await firestoreService.getIncomePaginated({ 
-        pageSize: 1000,
-        filters: filters
-      });
+      // Check if we have Firestore filters or only client-side filters
+      const hasFirestoreFilters = filters.length > 0;
+      const hasClientSideFilters = state.filters.search || 
+                                    state.filters.familyMember || 
+                                    state.filters.dateFrom || 
+                                    state.filters.dateTo;
       
-      state.income = result.data;
-      state.filteredIncome = [...state.income];
-      applyClientSideFilters();
-      state.filteredCount = state.filteredIncome.length;
-      updateFilteredIncomeKPIs();
+      console.log('[LoadIncome] Has Firestore filters:', hasFirestoreFilters);
+      console.log('[LoadIncome] Has client-side filters:', hasClientSideFilters);
+      
+      // If only client-side filters, load all data first
+      if (!hasFirestoreFilters && hasClientSideFilters) {
+        console.log('[LoadIncome] Loading all data for client-side filtering');
+        const result = await firestoreService.getIncomePaginated({ 
+          pageSize: 1000,
+          filters: [] // No Firestore filters
+        });
+        
+        state.income = result.data;
+        state.filteredIncome = [...state.income];
+        applyClientSideFilters();
+        state.filteredCount = state.filteredIncome.length;
+        updateFilteredIncomeKPIs();
+      } else {
+        // With Firestore filters: Load filtered data
+        console.log('[LoadIncome] Loading with Firestore filters');
+        const result = await firestoreService.getIncomePaginated({ 
+          pageSize: 1000,
+          filters: filters
+        });
+        
+        state.income = result.data;
+        state.filteredIncome = [...state.income];
+        applyClientSideFilters();
+        state.filteredCount = state.filteredIncome.length;
+        updateFilteredIncomeKPIs();
+      }
     } else {
       // No filters: Load initial batch (50 records for first 5 pages)
       const initialBatchSize = state.itemsPerPage * 5; // 50 records
