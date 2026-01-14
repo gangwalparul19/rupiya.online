@@ -254,8 +254,12 @@ function handlePaymentMethodFilterChange() {
   const selectedType = paymentMethodFilter.value;
   const specificPaymentMethodGroup = document.getElementById('specificPaymentMethodFilterGroup');
   
+  console.log('[PaymentMethodFilter] Selected type:', selectedType);
+  console.log('[PaymentMethodFilter] Current state.filters.paymentMethod:', state.filters.paymentMethod);
+  
   if (!selectedType || selectedType === 'cash') {
     // Hide specific payment method dropdown for cash or no selection
+    console.log('[PaymentMethodFilter] Hiding specific payment method dropdown (cash or empty)');
     specificPaymentMethodGroup.style.display = 'none';
     specificPaymentMethodFilter.value = '';
     state.filters.specificPaymentMethod = '';
@@ -265,9 +269,11 @@ function handlePaymentMethodFilterChange() {
   
   // Filter payment methods by selected type
   const methodsOfType = userPaymentMethods.filter(method => method.type === selectedType);
+  console.log('[PaymentMethodFilter] Found', methodsOfType.length, 'methods of type', selectedType);
   
   if (methodsOfType.length === 0) {
     // No saved methods of this type
+    console.log('[PaymentMethodFilter] No saved methods of type', selectedType, '- hiding dropdown');
     specificPaymentMethodGroup.style.display = 'none';
     specificPaymentMethodFilter.value = '';
     state.filters.specificPaymentMethod = '';
@@ -276,6 +282,7 @@ function handlePaymentMethodFilterChange() {
   }
   
   // Populate specific payment method dropdown
+  console.log('[PaymentMethodFilter] Populating dropdown with', methodsOfType.length, 'methods');
   specificPaymentMethodFilter.innerHTML = '<option value="">All ' + getPaymentTypeLabel(selectedType) + '</option>' +
     methodsOfType.map(method => {
       const displayName = getPaymentMethodDisplayName(method);
@@ -287,6 +294,7 @@ function handlePaymentMethodFilterChange() {
   specificPaymentMethodGroup.style.display = 'block';
   
   // Apply filters when payment method type is selected
+  console.log('[PaymentMethodFilter] Applying filters with paymentMethod =', state.filters.paymentMethod);
   applyFilters();
 }
 
@@ -761,20 +769,24 @@ function buildFirestoreFilters() {
   // Source filter - can be done in Firestore with index
   if (state.filters.source) {
     filters.push({ field: 'source', operator: '==', value: state.filters.source });
+    console.log('[BuildFilters] Added source filter:', state.filters.source);
   }
   
   // Payment method filter - can be done in Firestore with index
   if (state.filters.paymentMethod) {
     filters.push({ field: 'paymentMethod', operator: '==', value: state.filters.paymentMethod });
+    console.log('[BuildFilters] Added paymentMethod filter:', state.filters.paymentMethod);
   }
   
   // Specific payment method filter
   if (state.filters.specificPaymentMethod) {
     filters.push({ field: 'specificPaymentMethodId', operator: '==', value: state.filters.specificPaymentMethod });
+    console.log('[BuildFilters] Added specificPaymentMethodId filter:', state.filters.specificPaymentMethod);
   }
   
   // Note: Date range, search, and family member filters are applied client-side
   
+  console.log('[BuildFilters] Total filters:', filters.length, 'Filters:', JSON.stringify(filters));
   return filters;
 }
 
