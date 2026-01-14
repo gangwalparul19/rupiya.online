@@ -17,6 +17,9 @@ export default async function handler(req, res) {
   }
 
   try {
+    console.log('[SendMonthlyReport] Request received');
+    console.log('[SendMonthlyReport] Body keys:', Object.keys(req.body || {}));
+    
     const { 
       userEmail, 
       userName, 
@@ -32,22 +35,30 @@ export default async function handler(req, res) {
     } = req.body;
 
     if (!userEmail) {
+      console.error('[SendMonthlyReport] Missing user email');
       return res.status(400).json({ error: 'Missing user email' });
     }
+
+    console.log(`[SendMonthlyReport] Processing report for ${userEmail}`);
 
     const gmailUser = process.env.GMAIL_USER;
     const gmailAppPassword = process.env.GMAIL_APP_PASSWORD;
 
     if (!gmailUser || !gmailAppPassword) {
+      console.error('[SendMonthlyReport] Email service not configured');
+      console.error('[SendMonthlyReport] GMAIL_USER:', gmailUser ? 'SET' : 'NOT SET');
+      console.error('[SendMonthlyReport] GMAIL_APP_PASSWORD:', gmailAppPassword ? 'SET' : 'NOT SET');
       return res.status(500).json({ error: 'Email service not configured' });
     }
 
+    console.log('[SendMonthlyReport] Creating transporter...');
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: { user: gmailUser, pass: gmailAppPassword }
     });
 
     // Generate CSV content
+    console.log('[SendMonthlyReport] Generating CSV...');
     const csvContent = generateCSV(transactions, currency);
     
     // Currency symbol
@@ -58,6 +69,7 @@ export default async function handler(req, res) {
     const savingsClass = monthlySavings >= 0 ? 'positive' : 'negative';
     const savingsRate = monthlyIncome > 0 ? ((monthlySavings / monthlyIncome) * 100).toFixed(1) : 0;
 
+    console.log('[SendMonthlyReport] Generating email HTML...');
     const htmlContent = generateEmailHTML({
       userName, monthName, currencySymbol,
       monthlyExpenses, monthlyIncome, monthlySavings, savingsClass, savingsRate,
@@ -71,6 +83,7 @@ export default async function handler(req, res) {
       totalExpenses, totalIncome
     });
 
+    console.log('[SendMonthlyReport] Sending email...');
     await transporter.sendMail({
       from: `"Rupiya" <${gmailUser}>`,
       to: userEmail,
@@ -84,9 +97,12 @@ export default async function handler(req, res) {
       }]
     });
 
+    console.log(`[SendMonthlyReport] Email sent successfully to ${userEmail}`);
     return res.status(200).json({ success: true });
   } catch (error) {
-    console.error('Error sending monthly report:', error);
+    console.error('[SendMonthlyReport] Error:', error);
+    console.error('[SendMonthlyReport] Error message:', error.message);
+    console.error('[SendMonthlyReport] Error stack:', error.stack);
     return res.status(500).json({ error: 'Failed to send report', details: error.message });
   }
 }

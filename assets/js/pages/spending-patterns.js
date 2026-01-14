@@ -246,8 +246,9 @@ function generateCalendarHeatmap() {
     dailySpending[date] = (dailySpending[date] || 0) + exp.amount;
   });
 
-  // Calculate max spending for color scale
-  const maxSpending = Math.max(...Object.values(dailySpending), 1);
+  // Calculate max spending for color scale (only from days with actual spending)
+  const spendingValues = Object.values(dailySpending).filter(v => v > 0);
+  const maxSpending = spendingValues.length > 0 ? Math.max(...spendingValues) : 1;
 
   // Generate heatmap
   const heatmapDiv = document.createElement('div');
@@ -298,14 +299,15 @@ function generateCalendarHeatmap() {
       weekDates.forEach(date => {
         const dateStr = date.toISOString().split('T')[0];
         const spending = dailySpending[dateStr] || 0;
-        const level = spending === 0 ? 0 : Math.min(4, Math.ceil((spending / maxSpending) * 4));
+        // Only assign level if there's actual spending
+        const level = spending === 0 ? 0 : Math.max(1, Math.ceil((spending / maxSpending) * 4));
 
         const dayDiv = document.createElement('div');
         dayDiv.className = 'heatmap-day';
         dayDiv.setAttribute('data-level', level);
         dayDiv.setAttribute('data-date', dateStr);
         dayDiv.setAttribute('data-amount', spending);
-        dayDiv.title = `${date.toLocaleDateString()}: ₹${spending.toFixed(0)}`;
+        dayDiv.title = spending > 0 ? `${date.toLocaleDateString()}: ₹${spending.toFixed(0)}` : `${date.toLocaleDateString()}: No spending`;
 
         weekDiv.appendChild(dayDiv);
       });
@@ -416,6 +418,14 @@ function generateCategoryHeatmap() {
     return expDate.toLocaleDateString('en-US', { month: 'short' });
   }))].sort();
 
+  // Calculate global max for consistent scaling across all categories
+  let globalMax = 0;
+  Object.values(categoryMonthly).forEach(monthData => {
+    const max = Math.max(...Object.values(monthData), 0);
+    globalMax = Math.max(globalMax, max);
+  });
+  if (globalMax === 0) globalMax = 1;
+
   // Create rows for each category
   Object.entries(categoryMonthly).forEach(([category, monthData]) => {
     const rowDiv = document.createElement('div');
@@ -429,11 +439,10 @@ function generateCategoryHeatmap() {
     const cellsDiv = document.createElement('div');
     cellsDiv.className = 'category-cells';
 
-    const maxAmount = Math.max(...Object.values(monthData), 1);
-
     months.forEach(month => {
       const amount = monthData[month] || 0;
-      const intensity = amount === 0 ? 0 : (amount / maxAmount);
+      // Use global max for consistent intensity across all categories
+      const intensity = amount === 0 ? 0 : (amount / globalMax);
       
       const cellDiv = document.createElement('div');
       cellDiv.className = 'category-cell';

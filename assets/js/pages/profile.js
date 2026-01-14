@@ -1226,15 +1226,27 @@ async function addMoreMembers() {
     setTimeout(() => {
       const newSlot = document.querySelector(`[data-member-id="${newMember.id}"]`);
       if (newSlot) {
+        // Add highlight animation
+        newSlot.classList.add('highlight-new-member');
+        
+        // Scroll into view
         newSlot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        
+        // Focus on name input
         const nameInput = newSlot.querySelector('.family-member-name-input');
         if (nameInput) {
           nameInput.focus();
+          nameInput.select();
         }
+        
+        // Remove highlight after animation
+        setTimeout(() => {
+          newSlot.classList.remove('highlight-new-member');
+        }, 3000);
       }
     }, 100);
     
-    toast.success('New member slot added. Fill in the details and click Save.');
+    toast.success('New member slot added! Scroll down to see it.');
   } catch (error) {
     console.error('Error adding family member:', error);
     toast.error('Failed to add family member slot');

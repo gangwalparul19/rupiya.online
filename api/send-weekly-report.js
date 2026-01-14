@@ -17,6 +17,9 @@ export default async function handler(req, res) {
   }
 
   try {
+    console.log('[SendWeeklyReport] Request received');
+    console.log('[SendWeeklyReport] Body keys:', Object.keys(req.body || {}));
+    
     const { 
       userEmail, 
       userName, 
@@ -31,22 +34,30 @@ export default async function handler(req, res) {
     } = req.body;
 
     if (!userEmail) {
+      console.error('[SendWeeklyReport] Missing user email');
       return res.status(400).json({ error: 'Missing user email' });
     }
+
+    console.log(`[SendWeeklyReport] Processing report for ${userEmail}`);
 
     const gmailUser = process.env.GMAIL_USER;
     const gmailAppPassword = process.env.GMAIL_APP_PASSWORD;
 
     if (!gmailUser || !gmailAppPassword) {
+      console.error('[SendWeeklyReport] Email service not configured');
+      console.error('[SendWeeklyReport] GMAIL_USER:', gmailUser ? 'SET' : 'NOT SET');
+      console.error('[SendWeeklyReport] GMAIL_APP_PASSWORD:', gmailAppPassword ? 'SET' : 'NOT SET');
       return res.status(500).json({ error: 'Email service not configured' });
     }
 
+    console.log('[SendWeeklyReport] Creating transporter...');
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: { user: gmailUser, pass: gmailAppPassword }
     });
 
     // Generate CSV content
+    console.log('[SendWeeklyReport] Generating CSV...');
     const csvContent = generateCSV(transactions, currency);
     
     // Get week date range
@@ -90,7 +101,9 @@ export default async function handler(req, res) {
 
     return res.status(200).json({ success: true });
   } catch (error) {
-    console.error('Error sending weekly report:', error);
+    console.error('[SendWeeklyReport] Error:', error);
+    console.error('[SendWeeklyReport] Error message:', error.message);
+    console.error('[SendWeeklyReport] Error stack:', error.stack);
     return res.status(500).json({ error: 'Failed to send report', details: error.message });
   }
 }

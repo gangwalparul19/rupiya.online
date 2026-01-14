@@ -2002,6 +2002,29 @@ ul li {
   box-shadow: 0 4px 12px rgba(255, 152, 0, 0.1);
 }
 
+/* Highlight animation for newly added members */
+@keyframes highlightNewMember {
+  0% {
+    background: rgba(74, 144, 226, 0.15);
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+  }
+  50% {
+    background: rgba(74, 144, 226, 0.1);
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.15);
+  }
+  100% {
+    background: var(--bg-secondary);
+    border-color: var(--border-color);
+    box-shadow: none;
+  }
+}
+
+.family-member-slot.highlight-new-member {
+  animation: highlightNewMember 3s ease-out;
+  border-color: var(--primary-blue);
+}
+
 .family-member-header {
   display: flex;
   align-items: center;

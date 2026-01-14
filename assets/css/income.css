@@ -267,19 +267,35 @@
 #familyMemberFilter {
   min-height: 120px;
   padding: 8px;
+  background: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  font-family: inherit;
+  overflow-y: auto;
 }
 
 #familyMemberFilter option {
-  padding: 8px;
+  padding: 8px 4px;
   font-size: var(--font-size-base);
-  line-height: 1.5;
-  margin-bottom: 4px;
+  line-height: 1.6;
+  margin-bottom: 2px;
+  background: var(--white);
+  color: var(--text-primary);
+}
+
+#familyMemberFilter option:first-child {
+  display: none;
 }
 
 #familyMemberFilter option:checked {
   background: linear-gradient(#4a90e2, #4a90e2);
   background-color: var(--primary-blue) !important;
   color: white;
+  font-weight: 500;
+}
+
+#familyMemberFilter option:hover {
+  background: rgba(74, 144, 226, 0.1);
 }
 
 /* Add Income Form (Inline) */
@@ -883,11 +899,13 @@
   #familyMemberFilter {
     min-height: 100px !important;
     padding: 6px !important;
+    overflow-y: auto;
   }
 
   #familyMemberFilter option {
-    padding: 6px !important;
+    padding: 6px 3px !important;
     font-size: 0.875rem !important;
+    line-height: 1.5;
   }
 
   /* Clear filters button - full width */
