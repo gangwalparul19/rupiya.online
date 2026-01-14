@@ -577,7 +577,24 @@ function updateExpenseKPIs() {
   let totalAll = 0;
   
   state.expenses.forEach(expense => {
-    const amount = Number(expense.amount) || 0;
+    // For split expenses, calculate the user's share based on current filter
+    let amount = Number(expense.amount) || 0;
+    
+    // If expense has family member splits and a family member filter is active
+    if (expense.hasSplit && expense.splitDetails && expense.splitDetails.length > 0 && state.filters.familyMember) {
+      // Find the selected member's share
+      const memberSplit = expense.splitDetails.find(split => 
+        String(split.memberId).trim() === String(state.filters.familyMember).trim()
+      );
+      
+      if (memberSplit) {
+        amount = Number(memberSplit.amount) || 0;
+      } else {
+        // Member not in this split, skip this expense
+        return;
+      }
+    }
+    
     const expenseDate = timezoneService.toLocalDate(expense.date);
     
     totalAll += amount;
@@ -626,7 +643,24 @@ function updateFilteredExpenseKPIs() {
   
   // Use filtered expenses instead of all expenses
   state.filteredExpenses.forEach(expense => {
-    const amount = Number(expense.amount) || 0;
+    // For split expenses, calculate the user's share based on current filter
+    let amount = Number(expense.amount) || 0;
+    
+    // If expense has family member splits and a family member filter is active
+    if (expense.hasSplit && expense.splitDetails && expense.splitDetails.length > 0 && state.filters.familyMember) {
+      // Find the selected member's share
+      const memberSplit = expense.splitDetails.find(split => 
+        String(split.memberId).trim() === String(state.filters.familyMember).trim()
+      );
+      
+      if (memberSplit) {
+        amount = Number(memberSplit.amount) || 0;
+      } else {
+        // Member not in this split, skip this expense
+        return;
+      }
+    }
+    
     const expenseDate = timezoneService.toLocalDate(expense.date);
     
     totalAll += amount;

@@ -131,6 +131,8 @@ async function loadSplits() {
     splitsList.style.display = 'none';
     
     state.splits = await splitService.getSplits();
+    console.log('[Split Expense] Loaded splits:', state.splits);
+    console.log('[Split Expense] First split participants:', state.splits[0]?.participants);
     state.totalCount = state.splits.length;
     
     calculateKPISummary();
@@ -155,15 +157,21 @@ function calculateKPISummary() {
   let totalOwedToYou = 0;
   
   activeSplits.forEach(split => {
+    // Safety check for participants
+    if (!split.participants || !Array.isArray(split.participants)) {
+      console.warn('Split missing participants:', split.id);
+      return;
+    }
+    
     if (split.paidBy === 'me') {
       const othersTotal = split.participants
         .filter(p => p.name !== 'Me')
-        .reduce((sum, p) => sum + p.amount, 0);
+        .reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0);
       totalOwedToYou += othersTotal;
     } else {
       const yourAmount = split.participants
         .find(p => p.name === 'Me')?.amount || 0;
-      totalOwed += yourAmount;
+      totalOwed += parseFloat(yourAmount) || 0;
     }
   });
   
@@ -222,6 +230,9 @@ function createSplitCard(split) {
   const escapedPaidByName = escapeHtml(split.paidByName || '');
   const escapedSettleNotes = split.settleNotes ? escapeHtml(split.settleNotes) : '';
   
+  // Safety check for participants
+  const participants = split.participants || [];
+  
   return `
     <div class="split-card ${split.status}">
       <div class="split-card-header">
@@ -248,7 +259,7 @@ function createSplitCard(split) {
       <div class="split-participants">
         <div class="split-participants-title">Participants</div>
         <div class="split-participants-grid">
-          ${split.participants.map(p => `
+          ${participants.map(p => `
             <div class="split-participant-item">
               <span class="split-participant-name">${escapeHtml(p.name)}</span>
               <span class="split-participant-amount ${p.name === 'Me' ? (split.paidBy === 'me' ? 'owed' : 'owes') : (split.paidBy === 'me' ? 'owes' : 'owed')}">${formatCurrency(p.amount)}</span>

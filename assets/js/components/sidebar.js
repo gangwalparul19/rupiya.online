@@ -200,12 +200,6 @@ function generateSidebarHTML(isAdmin = false) {
       }
       // Show items if their feature is enabled
       const isEnabled = featureConfig.isEnabled(item.featureKey);
-      
-      // Log feature filtering for debugging
-      if (!isEnabled) {
-        console.log('[Sidebar] Feature disabled, hiding:', item.label, '(key:', item.featureKey + ')');
-      }
-      
       return isEnabled;
     });
 
