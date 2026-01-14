@@ -226,6 +226,8 @@ async function loadLoans() {
   try {
     const allLoans = await firestoreService.getLoans() || [];
     
+    console.log('[Loans] Loaded loans:', allLoans.length, 'loans');
+    
     state.loans = allLoans;
     state.totalCount = allLoans.length;
     
@@ -263,6 +265,8 @@ function calculateKPISummary() {
 function filterLoans() {
   const filter = document.getElementById('loanFilter')?.value || 'all';
   
+  console.log('[Loans] Filtering loans with filter:', filter);
+  
   if (filter === 'active') {
     state.filteredLoans = state.loans.filter(l => l.status !== 'closed');
   } else if (filter === 'closed') {
@@ -270,6 +274,8 @@ function filterLoans() {
   } else {
     state.filteredLoans = [...state.loans];
   }
+  
+  console.log('[Loans] Filtered loans:', state.filteredLoans.length, 'loans');
   state.currentPage = 1;
 }
 
@@ -376,9 +382,21 @@ function renderLoans() {
           </div>
         </div>
         
+        <div class="loan-payment-history" id="payment-history-${loan.id}" style="display: none; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <h5 style="margin: 0; font-size: 0.9rem; color: var(--text-secondary);">Payment History</h5>
+          </div>
+          <div id="payment-history-list-${loan.id}" style="max-height: 200px; overflow-y: auto;">
+            <div style="text-align: center; padding: 1rem; color: var(--text-secondary);">Loading...</div>
+          </div>
+        </div>
+        
         <div class="loan-card-footer">
           <button type="button" class="btn btn-sm btn-outline" onclick="window.loansPage.recordPayment('${loan.id}')">
             💰 Pay EMI
+          </button>
+          <button type="button" class="btn btn-sm btn-outline" onclick="window.loansPage.togglePaymentHistory('${loan.id}')">
+            📜 History
           </button>
           <button type="button" class="btn btn-sm btn-outline" onclick="window.loansPage.editLoan('${loan.id}')">
             ✏️ Edit
@@ -893,6 +911,8 @@ async function savePayment(e) {
   const paymentAmount = parseFloat(document.getElementById('paymentAmount').value) || 0;
   const paymentDate = document.getElementById('paymentDate').value;
   
+  console.log('[Loans] Saving payment:', { loanId, paymentType, paymentAmount, paymentDate });
+  
   try {
     // Calculate EMI breakdown
     const breakdown = crossFeatureIntegrationService.calculateEMIBreakdown(
@@ -901,25 +921,34 @@ async function savePayment(e) {
       paymentAmount
     );
     
-    // Update loan
-    const updates = {};
+    console.log('[Loans] EMI breakdown:', breakdown);
     
-    if (paymentType === 'emi') {
-      updates.emisPaid = (loan.emisPaid || 0) + 1;
-    }
-    
-    // Recalculate outstanding
-    updates.outstandingAmount = Math.max(0, (loan.outstandingAmount || 0) - breakdown.principalPaid);
+    // Create a complete loan object with all existing fields plus updates
+    // This prevents losing encrypted data during partial updates
+    const updatedLoan = {
+      ...loan, // Keep all existing fields
+      emisPaid: paymentType === 'emi' ? (loan.emisPaid || 0) + 1 : loan.emisPaid,
+      outstandingAmount: Math.max(0, (loan.outstandingAmount || 0) - breakdown.principalPaid)
+    };
     
     // Check if loan is closed
-    if (updates.emisPaid >= loan.tenure || updates.outstandingAmount <= 0) {
-      updates.status = 'closed';
-      updates.outstandingAmount = 0;
+    if (updatedLoan.emisPaid >= loan.tenure || updatedLoan.outstandingAmount <= 0) {
+      updatedLoan.status = 'closed';
+      updatedLoan.outstandingAmount = 0;
     }
     
-    await firestoreService.updateLoan(loanId, updates);
+    // Remove internal fields that shouldn't be updated
+    delete updatedLoan.id;
+    delete updatedLoan.createdAt;
+    delete updatedLoan.updatedAt;
+    delete updatedLoan._encrypted;
+    delete updatedLoan._encryptionVersion;
+    
+    console.log('[Loans] Updating loan with complete data');
+    await firestoreService.updateLoan(loanId, updatedLoan);
     
     // Use cross-feature integration to create expense with breakdown
+    console.log('[Loans] Creating expense record...');
     await crossFeatureIntegrationService.createLoanEMIExpense(
       loanId,
       loan.loanName,
@@ -935,6 +964,7 @@ async function savePayment(e) {
     
     // Also create a transfer record for net worth tracking
     try {
+      console.log('[Loans] Creating transfer record...');
       const transferType = paymentType === 'prepayment' ? 'loan_prepayment' : 'loan_emi';
       await transfersService.createTransfer({
         type: transferType,
@@ -952,12 +982,13 @@ async function savePayment(e) {
       // Don't fail the whole operation if transfer creation fails
     }
     
+    console.log('[Loans] Payment saved successfully');
     toast.success('Payment recorded successfully');
     closePaymentModal();
     await loadLoans();
     renderCalendar();
   } catch (error) {
-    console.error('Error recording payment:', error);
+    console.error('[Loans] Error recording payment:', error);
     toast.error('Failed to record payment');
   }
 }
@@ -1046,9 +1077,95 @@ function calculatePrepayment() {
   document.getElementById('calculatorResult').style.display = 'block';
 }
 
+// Toggle payment history
+async function togglePaymentHistory(loanId) {
+  const historySection = document.getElementById(`payment-history-${loanId}`);
+  const historyList = document.getElementById(`payment-history-list-${loanId}`);
+  
+  if (historySection.style.display === 'none') {
+    historySection.style.display = 'block';
+    
+    // Load payment history
+    try {
+      historyList.innerHTML = '<div style="text-align: center; padding: 1rem; color: var(--text-secondary);">Loading...</div>';
+      
+      // Get expenses linked to this loan
+      const allExpenses = await firestoreService.getExpenses() || [];
+      const loanPayments = allExpenses.filter(exp => 
+        exp.linkedLoanId === loanId || 
+        (exp.category === 'Loan EMI' && exp.description && exp.description.includes(loanId))
+      );
+      
+      // Get transfers linked to this loan
+      const allTransfers = await transfersService.getTransfers() || [];
+      const loanTransfers = allTransfers.filter(transfer => 
+        transfer.linkedId === loanId && transfer.linkedType === 'loan'
+      );
+      
+      console.log('[Loans] Payment history:', { loanPayments, loanTransfers });
+      
+      // Combine and sort by date
+      const allPayments = [
+        ...loanPayments.map(exp => ({
+          date: exp.date,
+          amount: exp.amount,
+          type: 'expense',
+          description: exp.description || 'EMI Payment',
+          principalPaid: exp.principalPaid || 0,
+          interestPaid: exp.interestPaid || 0
+        })),
+        ...loanTransfers.map(transfer => ({
+          date: transfer.date,
+          amount: transfer.amount,
+          type: 'transfer',
+          description: transfer.description || 'EMI Payment',
+          principalPaid: transfer.principalAmount || 0,
+          interestPaid: transfer.interestAmount || 0
+        }))
+      ].sort((a, b) => {
+        const dateA = a.date.toDate ? a.date.toDate() : new Date(a.date);
+        const dateB = b.date.toDate ? b.date.toDate() : new Date(b.date);
+        return dateB - dateA; // Most recent first
+      });
+      
+      if (allPayments.length === 0) {
+        historyList.innerHTML = '<div style="text-align: center; padding: 1rem; color: var(--text-secondary);">No payment history yet</div>';
+      } else {
+        historyList.innerHTML = allPayments.map(payment => {
+          const date = payment.date.toDate ? payment.date.toDate() : new Date(payment.date);
+          return `
+            <div style="padding: 0.75rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: start;">
+              <div>
+                <div style="font-weight: 500; margin-bottom: 0.25rem;">${formatCurrency(payment.amount)}</div>
+                <div style="font-size: 0.85rem; color: var(--text-secondary);">${formatDate(date)}</div>
+                ${payment.principalPaid > 0 ? `
+                  <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.25rem;">
+                    Principal: ${formatCurrency(payment.principalPaid)} | Interest: ${formatCurrency(payment.interestPaid)}
+                  </div>
+                ` : ''}
+              </div>
+              <div style="text-align: right;">
+                <span style="font-size: 0.75rem; padding: 0.25rem 0.5rem; background: var(--success-bg); color: var(--success-color); border-radius: 4px;">
+                  ${payment.type === 'expense' ? 'Expense' : 'Transfer'}
+                </span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    } catch (error) {
+      console.error('[Loans] Error loading payment history:', error);
+      historyList.innerHTML = '<div style="text-align: center; padding: 1rem; color: var(--error-color);">Failed to load payment history</div>';
+    }
+  } else {
+    historySection.style.display = 'none';
+  }
+}
+
 // Expose functions globally for onclick handlers
 window.loansPage = {
   recordPayment,
   editLoan,
-  deleteLoan
+  deleteLoan,
+  togglePaymentHistory
 };

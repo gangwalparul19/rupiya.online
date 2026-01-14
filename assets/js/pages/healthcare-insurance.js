@@ -571,23 +571,6 @@ function filterExpenses() {
   state.expensesCurrentPage = 1;
   renderExpenses();
 }
-          <span class="expense-title">${expense.description}</span>
-          <span class="expense-category">${expense.category}</span>
-          ${expense.claimable ? '<span class="claimable-badge">Claimable</span>' : ''}
-        </div>
-        <div class="expense-meta">
-          <span>📅 ${formatDate(expense.date)}</span>
-          ${expense.familyMember ? `<span>👤 ${expense.familyMember}</span>` : ''}
-        </div>
-      </div>
-      <div class="expense-amount">${formatCurrency(expense.amount)}</div>
-      <div class="expense-actions">
-        <button class="btn btn-sm btn-outline" onclick="editExpense('${expense.id}')">Edit</button>
-        <button class="btn btn-sm btn-danger-outline" onclick="deleteExpense('${expense.id}', '${expense.description}')">Delete</button>
-      </div>
-    </div>
-  `).join('');
-}
 
 // Policy form functions
 function openPolicyForm(policyId = null) {

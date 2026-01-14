@@ -169,6 +169,28 @@ service cloud.firestore {
     }
     
     // ============================================
+    // VEHICLE MAINTENANCE EXPENSES
+    // ============================================
+    match /vehicleMaintenanceExpenses/{expenseId} {
+      // Users can only access their own vehicle maintenance expenses
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && hasValidUserId();
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
+    }
+    
+    // ============================================
+    // VEHICLE INCOME
+    // ============================================
+    match /vehicleIncome/{incomeId} {
+      // Users can only access their own vehicle income
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && hasValidUserId();
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
+    }
+    
+    // ============================================
     // HOUSE HELPS
     // ============================================
     match /houseHelps/{houseHelpId} {
