@@ -705,13 +705,80 @@ async function handlePolicySubmit(e) {
         const oldPolicy = state.policies.find(p => p.id === editingPolicyId);
         if (oldPolicy && oldPolicy.filePath) {
           await storageService.deleteFile(oldPolicy.filePath);
+          
+          // Also delete the old document entry if it exists
+          if (oldPolicy.documentId) {
+            try {
+              await firestoreService.delete('documents', oldPolicy.documentId);
+            } catch (err) {
+              console.warn('Could not delete old document entry:', err);
+            }
+          }
         }
       }
       
       await firestoreService.update('insurancePolicies', editingPolicyId, policyData);
+      
+      // Create/update document entry if file was uploaded
+      if (fileUrl) {
+        const documentData = {
+          name: `${policyData.policyName} - Policy Document`,
+          category: 'Insurance',
+          description: `Insurance policy document for ${policyData.policyName} (${policyData.provider})`,
+          fileUrl: fileUrl,
+          filePath: filePath,
+          fileName: fileName,
+          fileSize: fileSize,
+          fileType: fileType,
+          uploadDate: new Date(),
+          linkedType: 'insurance',
+          linkedId: editingPolicyId,
+          linkedName: policyData.policyName,
+          expiryDate: policyData.endDate ? new Date(policyData.endDate) : null,
+          tags: ['insurance', 'health', policyData.policyType.toLowerCase()],
+          userId: currentUser.uid
+        };
+        
+        const docResult = await firestoreService.add('documents', documentData);
+        
+        // Update policy with document ID for future reference
+        await firestoreService.update('insurancePolicies', editingPolicyId, {
+          documentId: docResult.id
+        });
+      }
+      
       toast.success('Policy updated successfully');
     } else {
-      await firestoreService.add('insurancePolicies', policyData);
+      const policyResult = await firestoreService.add('insurancePolicies', policyData);
+      
+      // Create document entry if file was uploaded
+      if (fileUrl) {
+        const documentData = {
+          name: `${policyData.policyName} - Policy Document`,
+          category: 'Insurance',
+          description: `Insurance policy document for ${policyData.policyName} (${policyData.provider})`,
+          fileUrl: fileUrl,
+          filePath: filePath,
+          fileName: fileName,
+          fileSize: fileSize,
+          fileType: fileType,
+          uploadDate: new Date(),
+          linkedType: 'insurance',
+          linkedId: policyResult.id,
+          linkedName: policyData.policyName,
+          expiryDate: policyData.endDate ? new Date(policyData.endDate) : null,
+          tags: ['insurance', 'health', policyData.policyType.toLowerCase()],
+          userId: currentUser.uid
+        };
+        
+        const docResult = await firestoreService.add('documents', documentData);
+        
+        // Update policy with document ID for future reference
+        await firestoreService.update('insurancePolicies', policyResult.id, {
+          documentId: docResult.id
+        });
+      }
+      
       toast.success('Policy added successfully');
     }
 
@@ -857,7 +924,30 @@ async function confirmDelete() {
 
   try {
     if (deleteItemType === 'policy') {
+      // Get policy data before deleting
+      const policy = state.policies.find(p => p.id === deleteItemId);
+      
+      // Delete the policy
       await firestoreService.delete('insurancePolicies', deleteItemId);
+      
+      // Delete associated document entry if it exists
+      if (policy && policy.documentId) {
+        try {
+          await firestoreService.delete('documents', policy.documentId);
+        } catch (err) {
+          console.warn('Could not delete document entry:', err);
+        }
+      }
+      
+      // Delete file from storage if it exists
+      if (policy && policy.filePath) {
+        try {
+          await storageService.deleteFile(policy.filePath);
+        } catch (err) {
+          console.warn('Could not delete file from storage:', err);
+        }
+      }
+      
       toast.success('Policy deleted successfully');
       await loadPolicies();
     } else {

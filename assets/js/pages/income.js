@@ -285,6 +285,9 @@ function handlePaymentMethodFilterChange() {
   
   // Show the dropdown
   specificPaymentMethodGroup.style.display = 'block';
+  
+  // Apply filters when payment method type is selected
+  applyFilters();
 }
 
 // Check URL parameters for pre-filled data
