@@ -54,6 +54,48 @@ class FirestoreService {
     this.lastCursors = new Map();
     this.maxCursorSize = 50; // Maximum number of cursor entries
     this.defaultPageSize = 10;
+    
+    // Query timeout configuration
+    this.defaultTimeout = 10000; // 10 seconds default timeout
+    this.longTimeout = 30000; // 30 seconds for complex queries
+    
+    // Start periodic cache cleanup (every 5 minutes)
+    this.cacheCleanupInterval = setInterval(() => {
+      this.cleanupExpiredCache();
+    }, 5 * 60 * 1000);
+    
+    // Cleanup on page unload
+    if (typeof window !== 'undefined') {
+      window.addEventListener('beforeunload', () => {
+        if (this.cacheCleanupInterval) {
+          clearInterval(this.cacheCleanupInterval);
+        }
+      });
+    }
+  }
+
+  /**
+   * Wrap a promise with a timeout
+   * @param {Promise} promise - The promise to wrap
+   * @param {number} timeoutMs - Timeout in milliseconds
+   * @param {string} operationName - Name of the operation for error messages
+   * @returns {Promise} Promise that rejects on timeout
+   */
+  async withTimeout(promise, timeoutMs = this.defaultTimeout, operationName = 'Operation') {
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => {
+        reject(new Error(`${operationName} timed out after ${timeoutMs}ms`));
+      }, timeoutMs);
+    });
+
+    try {
+      return await Promise.race([promise, timeoutPromise]);
+    } catch (error) {
+      if (error.message && error.message.includes('timed out')) {
+        console.error(`[FirestoreService] Timeout: ${error.message}`);
+      }
+      throw error;
+    }
   }
 
   getUserId() {
@@ -68,12 +110,33 @@ class FirestoreService {
   
   getCacheKey(collectionName, params = {}) {
     const userId = this.getUserId();
-    return `${userId}:${collectionName}:${JSON.stringify(params)}`;
+    // Validate inputs
+    if (!collectionName || typeof collectionName !== 'string') {
+      console.warn('Invalid collection name for cache key');
+      return null;
+    }
+    if (!userId) {
+      console.warn('No user ID for cache key');
+      return null;
+    }
+    return `${userId}:${collectionName}:${JSON.stringify(params || {})}`;
   }
   
   getFromCache(key) {
+    if (!key || typeof key !== 'string') {
+      return null;
+    }
+    
     const cached = this.cache.get(key);
     if (!cached) return null;
+    
+    // Validate cached data structure
+    if (!cached.timestamp || typeof cached.timestamp !== 'number') {
+      console.warn('Invalid cache entry, removing:', key);
+      this.cache.delete(key);
+      return null;
+    }
+    
     if (Date.now() - cached.timestamp > this.cacheExpiry) {
       this.cache.delete(key);
       return null;
@@ -82,21 +145,103 @@ class FirestoreService {
   }
   
   setCache(key, data) {
+    if (!key || typeof key !== 'string') {
+      console.warn('Invalid cache key, skipping cache set');
+      return;
+    }
+    
+    // Remove expired entries before adding new one (time-based expiry)
+    const now = Date.now();
+    for (const [k, v] of this.cache.entries()) {
+      if (v && v.timestamp && now - v.timestamp > this.cacheExpiry) {
+        this.cache.delete(k);
+      }
+    }
+    
     // Enforce cache size limit with LRU eviction
     if (this.cache.size >= this.maxCacheSize) {
       // Remove oldest entry (first entry in Map)
       const firstKey = this.cache.keys().next().value;
-      this.cache.delete(firstKey);
+      if (firstKey) {
+        this.cache.delete(firstKey);
+        console.log(`[FirestoreService] Cache LRU eviction: ${firstKey}`);
+      }
     }
-    this.cache.set(key, { data, timestamp: Date.now() });
+    
+    this.cache.set(key, { data, timestamp: now });
+  }
+  
+  /**
+   * Periodic cache cleanup - removes expired entries
+   * Should be called periodically (e.g., every 5 minutes)
+   */
+  cleanupExpiredCache() {
+    const now = Date.now();
+    let removedCount = 0;
+    
+    for (const [key, value] of this.cache.entries()) {
+      if (value && value.timestamp && now - value.timestamp > this.cacheExpiry) {
+        this.cache.delete(key);
+        removedCount++;
+      }
+    }
+    
+    if (removedCount > 0) {
+      console.log(`[FirestoreService] Cleaned up ${removedCount} expired cache entries`);
+    }
+    
+    return removedCount;
+  }
+  
+  /**
+   * Get cache statistics for monitoring
+   */
+  getCacheStats() {
+    const now = Date.now();
+    let expiredCount = 0;
+    let validCount = 0;
+    
+    for (const [key, value] of this.cache.entries()) {
+      if (value && value.timestamp) {
+        if (now - value.timestamp > this.cacheExpiry) {
+          expiredCount++;
+        } else {
+          validCount++;
+        }
+      }
+    }
+    
+    return {
+      totalEntries: this.cache.size,
+      validEntries: validCount,
+      expiredEntries: expiredCount,
+      maxSize: this.maxCacheSize,
+      utilizationPercent: Math.round((this.cache.size / this.maxCacheSize) * 100)
+    };
   }
   
   invalidateCache(collectionName = null) {
     if (collectionName) {
-      const userId = this.getUserId();
-      const prefix = `${userId}:${collectionName}`;
-      for (const key of this.cache.keys()) {
-        if (key.startsWith(prefix)) this.cache.delete(key);
+      if (typeof collectionName !== 'string') {
+        console.warn('Invalid collection name for cache invalidation');
+        return;
+      }
+      
+      try {
+        const userId = this.getUserId();
+        if (!userId) {
+          console.warn('No user ID for cache invalidation');
+          return;
+        }
+        
+        const prefix = `${userId}:${collectionName}`;
+        for (const key of this.cache.keys()) {
+          if (key && key.startsWith(prefix)) {
+            this.cache.delete(key);
+          }
+        }
+      } catch (error) {
+        console.error('Error invalidating cache:', error);
       }
       
       // Also invalidate monthly summary cache if expenses or income changed
@@ -131,15 +276,25 @@ class FirestoreService {
       // Encrypt data before saving
       const dataToSave = await encryptionService.encryptObject(data, collectionName);
       
-      const docRef = await addDoc(collection(db, collectionName), {
-        ...dataToSave,
-        userId,
-        createdAt: Timestamp.now(),
-        updatedAt: Timestamp.now()
-      });
+      // Execute add with timeout
+      const docRef = await this.withTimeout(
+        addDoc(collection(db, collectionName), {
+          ...dataToSave,
+          userId,
+          createdAt: Timestamp.now(),
+          updatedAt: Timestamp.now()
+        }),
+        this.defaultTimeout,
+        `add(${collectionName})`
+      );
+      
       this.invalidateCache(collectionName);
       return { success: true, id: docRef.id };
     } catch (error) {
+      if (error.message.includes('timed out')) {
+        console.error(`[FirestoreService] Add timeout for ${collectionName}`);
+        return { success: false, error: 'Operation timed out. Please try again.' };
+      }
       console.error(`Error adding to ${collectionName}:`, error);
       return { success: false, error: error.message };
     }
@@ -147,15 +302,29 @@ class FirestoreService {
 
   async get(collectionName, docId) {
     try {
+      // Validate inputs
+      if (!collectionName || !docId) {
+        console.error('Invalid collection name or document ID');
+        return { success: false, error: 'Invalid parameters' };
+      }
+      
       const cacheKey = this.getCacheKey(collectionName, { docId });
-      const cached = this.getFromCache(cacheKey);
-      if (cached) return { success: true, data: cached, fromCache: true };
+      if (cacheKey) {
+        const cached = this.getFromCache(cacheKey);
+        if (cached) return { success: true, data: cached, fromCache: true };
+      }
       
       // Wait for encryption to be ready before loading data
       await encryptionService.waitForInitialization();
       
       const docRef = doc(db, collectionName, docId);
-      const docSnap = await getDoc(docRef);
+      
+      // Execute query with timeout
+      const docSnap = await this.withTimeout(
+        getDoc(docRef),
+        this.defaultTimeout,
+        `get(${collectionName}/${docId})`
+      );
       
       if (docSnap.exists()) {
         let data = { id: docSnap.id, ...docSnap.data() };
@@ -163,7 +332,9 @@ class FirestoreService {
         // Decrypt data after reading
         data = await encryptionService.decryptObject(data, collectionName);
         
-        this.setCache(cacheKey, data);
+        if (cacheKey) {
+          this.setCache(cacheKey, data);
+        }
         return { success: true, data };
       }
       return { success: false, error: 'Document not found' };
@@ -175,6 +346,32 @@ class FirestoreService {
 
   async getAll(collectionName, orderByField = 'createdAt', orderDirection = 'desc', maxLimit = 100) {
     try {
+      // Validate inputs
+      if (!collectionName || typeof collectionName !== 'string') {
+        console.error('Invalid collection name provided to getAll');
+        return [];
+      }
+      
+      // Validate orderByField against allowed list
+      const allowedFields = this.getAllowedOrderFields();
+      if (!orderByField || typeof orderByField !== 'string') {
+        console.warn('Invalid orderByField, using default "createdAt"');
+        orderByField = 'createdAt';
+      } else if (!allowedFields.includes(orderByField)) {
+        console.warn(`Invalid orderByField "${orderByField}", using default "createdAt". Allowed: ${allowedFields.join(', ')}`);
+        orderByField = 'createdAt';
+      }
+      
+      if (!['asc', 'desc'].includes(orderDirection)) {
+        console.warn('Invalid orderDirection, using default "desc"');
+        orderDirection = 'desc';
+      }
+      
+      if (typeof maxLimit !== 'number' || maxLimit < 1 || maxLimit > 1000) {
+        console.warn('Invalid maxLimit, using default 100');
+        maxLimit = 100;
+      }
+      
       const userId = this.getUserId();
       if (!userId) {
         console.warn(`[FirestoreService] No userId for getAll ${collectionName}`);
@@ -182,9 +379,11 @@ class FirestoreService {
       }
       
       const cacheKey = this.getCacheKey(collectionName, { orderByField, orderDirection, maxLimit });
-      const cached = this.getFromCache(cacheKey);
-      if (cached) {
-        return cached;
+      if (cacheKey) {
+        const cached = this.getFromCache(cacheKey);
+        if (cached) {
+          return cached;
+        }
       }
       
       // Wait for encryption to be ready before loading data
@@ -202,16 +401,26 @@ class FirestoreService {
         q = query(q, limit(maxLimit));
       }
       
-      const querySnapshot = await getDocs(q);
+      const querySnapshot = await this.withTimeout(
+        getDocs(q),
+        this.defaultTimeout,
+        `getAll(${collectionName})`
+      );
       const data = [];
       querySnapshot.forEach((doc) => data.push({ id: doc.id, ...doc.data() }));
 
       // Decrypt all documents
       const decryptedData = await encryptionService.decryptArray(data, collectionName);
   
-      this.setCache(cacheKey, decryptedData);
+      if (cacheKey) {
+        this.setCache(cacheKey, decryptedData);
+      }
       return decryptedData;
     } catch (error) {
+      if (error.message && error.message.includes('timed out')) {
+        console.error(`[FirestoreService] Query timeout for ${collectionName}`);
+        return []; // Return empty array on timeout
+      }
       console.error(`[FirestoreService] Error getting all from ${collectionName}:`, error);
       return [];
     }
@@ -575,11 +784,133 @@ class FirestoreService {
   }
 
   // ============================================
-  // CUSTOM QUERY METHOD
+  // CUSTOM QUERY METHOD (with input validation)
   // ============================================
+
+  /**
+   * Allowed fields for ordering to prevent NoSQL injection
+   * Add more fields as needed for your application
+   */
+  getAllowedOrderFields() {
+    return [
+      'date',
+      'amount',
+      'category',
+      'createdAt',
+      'updatedAt',
+      'name',
+      'description',
+      'title',
+      'status',
+      'type',
+      'priority',
+      'dueDate',
+      'startDate',
+      'endDate',
+      'purchaseDate',
+      'targetDate',
+      'nextDueDate',
+      'month',
+      'year'
+    ];
+  }
+
+  /**
+   * Allowed operators for queries to prevent NoSQL injection
+   */
+  getAllowedOperators() {
+    return ['==', '!=', '<', '<=', '>', '>=', 'in', 'not-in', 'array-contains', 'array-contains-any'];
+  }
+
+  /**
+   * Validate and sanitize query parameters
+   */
+  validateQueryParams(orderByField, orderDirection, limitCount) {
+    const allowedFields = this.getAllowedOrderFields();
+    const errors = [];
+
+    // Validate orderByField
+    if (orderByField && !allowedFields.includes(orderByField)) {
+      errors.push(`Invalid orderByField: ${orderByField}. Allowed fields: ${allowedFields.join(', ')}`);
+    }
+
+    // Validate orderDirection
+    if (orderDirection && !['asc', 'desc'].includes(orderDirection)) {
+      errors.push(`Invalid orderDirection: ${orderDirection}. Must be 'asc' or 'desc'`);
+    }
+
+    // Validate limitCount
+    if (limitCount !== null && limitCount !== undefined) {
+      if (typeof limitCount !== 'number' || limitCount < 1 || limitCount > 1000) {
+        errors.push(`Invalid limitCount: ${limitCount}. Must be a number between 1 and 1000`);
+      }
+    }
+
+    return errors;
+  }
+
+  /**
+   * Validate filter parameters
+   */
+  validateFilters(filters) {
+    const allowedOperators = this.getAllowedOperators();
+    const errors = [];
+
+    if (!Array.isArray(filters)) {
+      errors.push('Filters must be an array');
+      return errors;
+    }
+
+    filters.forEach((filter, index) => {
+      if (!filter || typeof filter !== 'object') {
+        errors.push(`Filter at index ${index} must be an object`);
+        return;
+      }
+
+      if (!filter.field || typeof filter.field !== 'string') {
+        errors.push(`Filter at index ${index} missing or invalid 'field' property`);
+      }
+
+      if (!filter.operator || !allowedOperators.includes(filter.operator)) {
+        errors.push(`Filter at index ${index} has invalid operator: ${filter.operator}. Allowed: ${allowedOperators.join(', ')}`);
+      }
+
+      if (filter.value === undefined) {
+        errors.push(`Filter at index ${index} missing 'value' property`);
+      }
+
+      // Validate 'in' and 'not-in' operators have array values
+      if (['in', 'not-in', 'array-contains-any'].includes(filter.operator)) {
+        if (!Array.isArray(filter.value)) {
+          errors.push(`Filter at index ${index} with operator '${filter.operator}' must have an array value`);
+        } else if (filter.value.length > 10) {
+          errors.push(`Filter at index ${index} with operator '${filter.operator}' can have maximum 10 values`);
+        }
+      }
+    });
+
+    return errors;
+  }
 
   async query(collectionName, filters = [], orderByField = null, orderDirection = 'asc', limitCount = null) {
     try {
+      // Validate collection name
+      if (!collectionName || typeof collectionName !== 'string') {
+        throw new Error('Invalid collection name');
+      }
+
+      // Validate query parameters
+      const paramErrors = this.validateQueryParams(orderByField, orderDirection, limitCount);
+      if (paramErrors.length > 0) {
+        throw new Error(`Query validation failed: ${paramErrors.join('; ')}`);
+      }
+
+      // Validate filters
+      const filterErrors = this.validateFilters(filters);
+      if (filterErrors.length > 0) {
+        throw new Error(`Filter validation failed: ${filterErrors.join('; ')}`);
+      }
+
       const userId = this.getUserId();
       
       // Wait for encryption to be ready before loading data
@@ -587,19 +918,19 @@ class FirestoreService {
       
       let constraints = [where('userId', '==', userId)];
       
-      // Add filters
+      // Add filters (already validated)
       if (Array.isArray(filters)) {
         filters.forEach(filter => {
           constraints.push(where(filter.field, filter.operator, filter.value));
         });
       }
       
-      // Add ordering
+      // Add ordering (already validated)
       if (orderByField) {
         constraints.push(orderBy(orderByField, orderDirection));
       }
       
-      // Add limit
+      // Add limit (already validated)
       if (limitCount) {
         constraints.push(limit(limitCount));
       }
@@ -618,6 +949,10 @@ class FirestoreService {
       return decryptedData;
     } catch (error) {
       console.error(`Error querying ${collectionName}:`, error);
+      // Re-throw validation errors
+      if (error.message && error.message.includes('validation failed')) {
+        throw error;
+      }
       return [];
     }
   }

@@ -28,11 +28,34 @@ class EncryptionService {
     // Keys will be regenerated on page refresh (requires password for email users)
   }
   
-  // Wait for any ongoing initialization to complete
-  async waitForInitialization() {
-    if (this._initializationLock) {
-      await this._initializationLock;
+  // Wait for any ongoing initialization to complete with timeout
+  async waitForInitialization(timeoutMs = 10000) {
+    if (this.isReady()) {
+      return true;
     }
+
+    if (this._initializationLock) {
+      try {
+        // Create a timeout promise
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Initialization timeout')), timeoutMs)
+        );
+
+        // Race between initialization and timeout
+        await Promise.race([this._initializationLock, timeoutPromise]);
+        
+        return this.isReady();
+      } catch (error) {
+        if (error.message === 'Initialization timeout') {
+          log.error('Encryption initialization timed out after', timeoutMs, 'ms');
+          return false;
+        }
+        log.error('Error waiting for initialization:', error);
+        return false;
+      }
+    }
+
+    return this.isReady();
   }
 
   // Initialize encryption with user's password (or null for Google users)
@@ -42,13 +65,13 @@ class EncryptionService {
       return false;
     }
 
-    // If already initialized for this user, skip
+    // If already initialized for this user, return success immediately
     if (this.isInitialized && this.currentUserId === userId) {
       log.log('Already initialized for this user');
       return true;
     }
 
-    // Prevent concurrent initialization - use lock mechanism with queue
+    // Prevent concurrent initialization - use lock mechanism with proper state tracking
     if (this._initializationLock) {
       log.log('Initialization already in progress, waiting...');
       
@@ -56,11 +79,12 @@ class EncryptionService {
       try {
         await this._initializationLock;
       } catch (e) {
-        // Ignore errors from the other initialization
+        log.error('Concurrent initialization failed:', e);
       }
       
-      // Return current ready state
-      return this.isReady();
+      // Return current state after lock is released
+      // This ensures we return the actual result of initialization
+      return this.isInitialized && this.currentUserId === userId;
     }
 
     // Create initialization lock
@@ -73,6 +97,7 @@ class EncryptionService {
       log.error('Initialization error:', error);
       return false;
     } finally {
+      // Always clear the lock when done
       this._initializationLock = null;
     }
   }
@@ -82,12 +107,28 @@ class EncryptionService {
     try {
       log.log(`Initializing encryption for user: ${userId}`);
       
+      // Validate inputs
+      if (!userId || typeof userId !== 'string') {
+        throw new Error('Invalid userId provided');
+      }
+      
       if (password) {
         // Email/password login - derive key from password and sync to Firestore
         this.encryptionKey = await this._initializeForPasswordUser(password, userId);
       } else {
         // Google login - use Firestore-stored random key (improved security)
         this.encryptionKey = await this._initializeForGoogleUser(userId);
+      }
+      
+      // Validate that key was successfully generated
+      if (!this.encryptionKey) {
+        throw new Error('Failed to generate encryption key');
+      }
+      
+      // Test the key with a simple encrypt/decrypt cycle
+      const testSuccess = await this._testEncryptionKey();
+      if (!testSuccess) {
+        throw new Error('Encryption key validation failed');
       }
       
       this.isInitialized = true;
@@ -101,6 +142,19 @@ class EncryptionService {
       this.isInitialized = false;
       this.encryptionKey = null;
       this.currentUserId = null;
+      throw error; // Re-throw to propagate to caller
+    }
+  }
+
+  // Test encryption key validity
+  async _testEncryptionKey() {
+    try {
+      const testData = 'test_' + Date.now();
+      const encrypted = await this.encryptValue(testData);
+      const decrypted = await this.decryptValue(encrypted);
+      return decrypted === testData;
+    } catch (error) {
+      log.error('Encryption key test failed:', error);
       return false;
     }
   }
@@ -421,30 +475,47 @@ class EncryptionService {
 
   // Encrypt an object (only sensitive fields)
   async encryptObject(data, collectionName) {
-    if (!privacyConfig.encryptionEnabled) {
+    // Validate inputs
+    if (!data || typeof data !== 'object') {
+      log.warn(`[${collectionName}] Invalid data for encryption: ${typeof data}`);
+      return data;
+    }
+    
+    if (!collectionName || typeof collectionName !== 'string') {
+      log.warn('Invalid collection name for encryption');
+      return data;
+    }
+    
+    if (!privacyConfig || !privacyConfig.encryptionEnabled) {
       return data;
     }
 
-    // Wait for any ongoing initialization to complete
-    await this.waitForInitialization();
-
-    if (!this.isReady()) {
+    // Wait for any ongoing initialization to complete with timeout
+    const initReady = await this.waitForInitialization(5000);
+    
+    if (!initReady || !this.isReady()) {
       log.warn(`[${collectionName}] Encryption not ready, storing data unencrypted`);
       log.warn('Encryption status:', {
         isInitialized: this.isInitialized,
-        hasKey: !!this.encryptionKey
+        hasKey: !!this.encryptionKey,
+        currentUserId: this.currentUserId
       });
       return data;
     }
 
     // Check if this collection should be encrypted
+    if (!privacyConfig.encryptedCollections || !Array.isArray(privacyConfig.encryptedCollections)) {
+      log.warn('Invalid encryptedCollections configuration');
+      return data;
+    }
+    
     if (!privacyConfig.encryptedCollections.includes(collectionName)) {
       return data;
     }
 
     try {
       const encryptedData = { ...data };
-      const sensitiveFields = privacyConfig.sensitiveFields[collectionName] || [];
+      const sensitiveFields = privacyConfig.sensitiveFields?.[collectionName] || [];
       const encryptedFields = {};
 
       // Encrypt each sensitive field (skip null, undefined, and empty strings)
@@ -468,8 +539,9 @@ class EncryptionService {
       }
 
       // Also encrypt any field not in unencryptedFields list (skip null, undefined, and empty strings)
+      const unencryptedFields = privacyConfig.unencryptedFields || [];
       for (const [key, value] of Object.entries(data)) {
-        if (!privacyConfig.unencryptedFields.includes(key) && 
+        if (!unencryptedFields.includes(key) && 
             !sensitiveFields.includes(key) &&
             value !== undefined && 
             value !== null &&
@@ -490,7 +562,7 @@ class EncryptionService {
       // Add encrypted data container
       if (Object.keys(encryptedFields).length > 0) {
         encryptedData._encrypted = encryptedFields;
-        encryptedData._encryptionVersion = privacyConfig.encryptionVersion;
+        encryptedData._encryptionVersion = privacyConfig.encryptionVersion || '1.0';
       }
 
       log.log(`[${collectionName}] Encrypted ${Object.keys(encryptedFields).length} fields`);
@@ -513,14 +585,14 @@ class EncryptionService {
       return data;
     }
 
-    // Wait for any ongoing initialization to complete with retries
+    // Wait for any ongoing initialization to complete with retries and timeout
     let retries = 0;
     const maxRetries = 30; // 30 * 200ms = 6 seconds max wait
     
     while (retries < maxRetries) {
-      await this.waitForInitialization();
+      const initReady = await this.waitForInitialization(1000);
       
-      if (this.isReady()) {
+      if (initReady && this.isReady()) {
         break;
       }
       
@@ -586,21 +658,41 @@ class EncryptionService {
   async encryptArray(dataArray, collectionName) {
     if (!Array.isArray(dataArray)) return dataArray;
     
-    // Process all items in parallel for better performance
-    return await Promise.all(
+    // Process all items in parallel with error handling for individual items
+    const results = await Promise.allSettled(
       dataArray.map(item => this.encryptObject(item, collectionName))
     );
+    
+    return results.map((result, index) => {
+      if (result.status === 'fulfilled') {
+        return result.value;
+      } else {
+        log.error(`Failed to encrypt item ${index}:`, result.reason);
+        // Return original unencrypted item if encryption fails
+        return dataArray[index];
+      }
+    });
   }
 
   // Decrypt an array of objects (parallel processing for better performance)
   async decryptArray(dataArray, collectionName) {
     if (!Array.isArray(dataArray)) return dataArray;
     
-    // Process all items in parallel for 10-20x better performance
+    // Process all items in parallel with error handling for individual items
     // For 100 items: Sequential ~2-3s, Parallel ~200-300ms
-    return await Promise.all(
+    const results = await Promise.allSettled(
       dataArray.map(item => this.decryptObject(item, collectionName))
     );
+    
+    return results.map((result, index) => {
+      if (result.status === 'fulfilled') {
+        return result.value;
+      } else {
+        log.error(`Failed to decrypt item ${index}:`, result.reason);
+        // Return original encrypted item if decryption fails
+        return dataArray[index];
+      }
+    });
   }
 
   // Check if data is encrypted

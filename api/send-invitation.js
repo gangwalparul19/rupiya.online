@@ -1,19 +1,95 @@
 import nodemailer from 'nodemailer';
+import { initializeApp, getApps, cert } from 'firebase-admin/app';
+import { getFirestore } from 'firebase-admin/firestore';
 
-// Simple in-memory rate limiting (resets on server restart)
+// Initialize Firebase Admin if not already initialized
+if (getApps().length === 0) {
+  try {
+    // Try to initialize with service account (production)
+    const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT 
+      ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
+      : null;
+    
+    if (serviceAccount) {
+      initializeApp({
+        credential: cert(serviceAccount)
+      });
+    } else {
+      // Fallback to default credentials (development)
+      initializeApp();
+    }
+  } catch (error) {
+    console.error('Firebase Admin initialization error:', error);
+    // Continue without Firebase - will fall back to in-memory rate limiting
+  }
+}
+
+const db = getApps().length > 0 ? getFirestore() : null;
+
+// Fallback in-memory rate limiting (used if Firestore is unavailable)
 const rateLimitStore = new Map();
 
 const RATE_LIMIT_WINDOW = 60 * 60 * 1000; // 1 hour
 const MAX_INVITATIONS_PER_WINDOW = 10; // Max 10 invitations per hour per sender
 
 /**
- * Check rate limit using in-memory store
+ * Check rate limit using Firestore (persistent) or in-memory (fallback)
  */
-function checkRateLimit(senderEmail) {
+async function checkRateLimit(senderEmail) {
+  const key = senderEmail.toLowerCase();
+  const now = Date.now();
+  
+  // Try Firestore first (persistent rate limiting)
+  if (db) {
+    try {
+      const rateLimitRef = db.collection('rateLimits').doc(key);
+      const rateLimitDoc = await rateLimitRef.get();
+      
+      if (!rateLimitDoc.exists) {
+        // First request from this sender
+        await rateLimitRef.set({
+          count: 1,
+          windowStart: now,
+          lastRequest: now,
+          email: senderEmail
+        });
+        return true;
+      }
+      
+      const data = rateLimitDoc.data();
+      
+      // Reset window if expired
+      if (now - data.windowStart > RATE_LIMIT_WINDOW) {
+        await rateLimitRef.set({
+          count: 1,
+          windowStart: now,
+          lastRequest: now,
+          email: senderEmail
+        });
+        return true;
+      }
+      
+      // Check if limit exceeded
+      if (data.count >= MAX_INVITATIONS_PER_WINDOW) {
+        console.warn(`Rate limit exceeded for ${senderEmail}: ${data.count} requests in window`);
+        return false;
+      }
+      
+      // Increment count
+      await rateLimitRef.update({
+        count: data.count + 1,
+        lastRequest: now
+      });
+      
+      return true;
+    } catch (firestoreError) {
+      console.error('Firestore rate limit check failed, falling back to in-memory:', firestoreError);
+      // Fall through to in-memory rate limiting
+    }
+  }
+  
+  // Fallback to in-memory rate limiting
   try {
-    const now = Date.now();
-    const key = senderEmail.toLowerCase();
-    
     const record = rateLimitStore.get(key);
     
     if (!record) {
@@ -36,6 +112,7 @@ function checkRateLimit(senderEmail) {
     
     // Check if limit exceeded
     if (record.count >= MAX_INVITATIONS_PER_WINDOW) {
+      console.warn(`Rate limit exceeded (in-memory) for ${senderEmail}: ${record.count} requests`);
       return false;
     }
     
@@ -71,10 +148,27 @@ function isValidEmail(email) {
 }
 
 export default async function handler(req, res) {
-  // Set CORS headers
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+  // Set CORS headers - restrict to allowed origins only
+  const allowedOrigins = [
+    'https://rupiya.online',
+    'https://www.rupiya.online',
+    'http://localhost:3000',
+    'http://localhost:5000',
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:5000'
+  ];
+  
+  const origin = req.headers.origin;
+  
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+  } else if (origin) {
+    // Log unauthorized origin attempts for security monitoring
+    console.warn(`Unauthorized CORS request from origin: ${origin}`);
+  }
+  
+  res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
   
   // Handle OPTIONS request
@@ -100,8 +194,37 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Invalid email format' });
     }
     
+    // Validate against email header injection (newline characters)
+    if (invitedEmail.includes('\n') || invitedEmail.includes('\r')) {
+      console.warn(`Email injection attempt detected: ${invitedEmail}`);
+      return res.status(400).json({ error: 'Invalid email format' });
+    }
+    
+    // Validate against header injection in names and group name
+    if (invitedByName.includes('\n') || invitedByName.includes('\r')) {
+      console.warn(`Header injection attempt in name: ${invitedByName}`);
+      return res.status(400).json({ error: 'Invalid name format' });
+    }
+    
+    if (groupName.includes('\n') || groupName.includes('\r')) {
+      console.warn(`Header injection attempt in group name: ${groupName}`);
+      return res.status(400).json({ error: 'Invalid group name format' });
+    }
+    
+    // Validate invitedByEmail if provided
+    if (invitedByEmail && (invitedByEmail.includes('\n') || invitedByEmail.includes('\r'))) {
+      console.warn(`Email injection attempt in sender email: ${invitedByEmail}`);
+      return res.status(400).json({ error: 'Invalid sender email format' });
+    }
+    
     // Validate invitationId format (Firebase document IDs are alphanumeric, 20 chars)
     if (!invitationId || typeof invitationId !== 'string' || invitationId.length < 10 || invitationId.length > 50) {
+      return res.status(400).json({ error: 'Invalid invitation ID format' });
+    }
+    
+    // Additional validation: invitationId should only contain safe characters
+    if (!/^[a-zA-Z0-9_-]+$/.test(invitationId)) {
+      console.warn(`Invalid invitation ID format: ${invitationId}`);
       return res.status(400).json({ error: 'Invalid invitation ID format' });
     }
     
@@ -112,7 +235,7 @@ export default async function handler(req, res) {
     
     // Check rate limit (use invitedByEmail if provided, otherwise use a hash of invitedByName)
     const rateLimitKey = invitedByEmail || `name:${invitedByName}`;
-    const isWithinLimit = checkRateLimit(rateLimitKey);
+    const isWithinLimit = await checkRateLimit(rateLimitKey);
     if (!isWithinLimit) {
       return res.status(429).json({ error: 'Too many invitations sent. Please try again later.' });
     }

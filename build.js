@@ -139,8 +139,9 @@ function injectServiceWorkerVersion() {
   const swPath = path.join(__dirname, 'service-worker.js');
   
   if (!fs.existsSync(swPath)) {
-    console.log('⚠️  service-worker.js not found');
-    return;
+    const error = 'service-worker.js not found';
+    console.error('❌', error);
+    throw new Error(error);
   }
 
   try {
@@ -169,18 +170,45 @@ function injectServiceWorkerVersion() {
     }
   } catch (error) {
     console.error('❌ Error injecting service worker version:', error.message);
+    throw error; // Re-throw to fail the build
   }
 }
 
 // Inject service worker version first
-injectServiceWorkerVersion();
+try {
+  injectServiceWorkerVersion();
+} catch (error) {
+  console.error('\n❌ CRITICAL: Service worker injection failed');
+  console.error('Build cannot continue without service worker\n');
+  process.exit(1);
+}
+
+// Critical files that must be processed successfully
+const criticalFiles = [
+  'index.html',
+  'login.html',
+  'signup.html',
+  'dashboard.html'
+];
+
+// Track errors during processing
+const errors = [];
+const warnings = [];
+let successCount = 0;
 
 // Process each HTML file
 htmlFiles.forEach(file => {
   const filePath = path.join(__dirname, file);
   
   if (!fs.existsSync(filePath)) {
-    console.log(`⚠️  Skipping ${file} (not found)`);
+    const message = `${file} not found`;
+    if (criticalFiles.includes(file)) {
+      errors.push({ file, error: message, critical: true });
+      console.error(`❌ CRITICAL: ${message}`);
+    } else {
+      warnings.push({ file, warning: message });
+      console.log(`⚠️  Skipping ${file} (not found)`);
+    }
     return;
   }
 
@@ -194,6 +222,15 @@ htmlFiles.forEach(file => {
         content = content.replace('<head>', `<head>\n  ${envScript}`);
         modified = true;
         console.log(`✓ Injected environment variables into ${file}`);
+      } else {
+        const message = 'No <head> tag found for env injection';
+        if (criticalFiles.includes(file)) {
+          errors.push({ file, error: message, critical: true });
+          console.error(`❌ CRITICAL: ${file} - ${message}`);
+        } else {
+          warnings.push({ file, warning: message });
+          console.log(`⚠️  ${file} - ${message}`);
+        }
       }
     } else if (!envScript && !content.includes('window.__ENV__')) {
       console.log(`⚠️  Skipping env injection for ${file} (no env vars available)`);
@@ -224,12 +261,62 @@ htmlFiles.forEach(file => {
 
     if (modified) {
       fs.writeFileSync(filePath, content, 'utf8');
+      successCount++;
     } else if (content.includes('window.__ENV__')) {
       console.log(`✓ ${file} already configured`);
+      successCount++;
+    } else {
+      successCount++;
     }
   } catch (error) {
-    console.error(`❌ Error processing ${file}:`, error.message);
+    const message = error.message;
+    if (criticalFiles.includes(file)) {
+      errors.push({ file, error: message, critical: true });
+      console.error(`❌ CRITICAL: Error processing ${file}:`, message);
+    } else {
+      errors.push({ file, error: message, critical: false });
+      console.error(`❌ Error processing ${file}:`, message);
+    }
   }
 });
 
-console.log('\n✅ Build process completed!');
+// Print summary
+console.log('\n' + '='.repeat(60));
+console.log('BUILD SUMMARY');
+console.log('='.repeat(60));
+console.log(`✓ Successfully processed: ${successCount}/${htmlFiles.length} files`);
+
+if (warnings.length > 0) {
+  console.log(`⚠️  Warnings: ${warnings.length}`);
+  warnings.forEach(w => console.log(`   - ${w.file}: ${w.warning}`));
+}
+
+if (errors.length > 0) {
+  console.log(`❌ Errors: ${errors.length}`);
+  errors.forEach(e => {
+    const prefix = e.critical ? 'CRITICAL' : 'ERROR';
+    console.log(`   - [${prefix}] ${e.file}: ${e.error}`);
+  });
+}
+
+console.log('='.repeat(60) + '\n');
+
+// Fail build if there are critical errors
+const criticalErrors = errors.filter(e => e.critical);
+if (criticalErrors.length > 0) {
+  console.error('❌ BUILD FAILED: Critical errors detected');
+  console.error(`   ${criticalErrors.length} critical file(s) failed to process\n`);
+  process.exit(1);
+}
+
+// Warn if there are non-critical errors but continue
+if (errors.length > 0 && criticalErrors.length === 0) {
+  console.log('⚠️  BUILD COMPLETED WITH ERRORS');
+  console.log(`   ${errors.length} non-critical file(s) had errors\n`);
+}
+
+if (errors.length === 0 && warnings.length === 0) {
+  console.log('✅ BUILD COMPLETED SUCCESSFULLY!\n');
+} else if (errors.length === 0) {
+  console.log('✅ BUILD COMPLETED WITH WARNINGS\n');
+}

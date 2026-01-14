@@ -842,7 +842,15 @@ async function renderExpenses() {
   });
   
   // Render expense cards (async to handle decryption)
-  const cardsHTML = await Promise.all(pageExpenses.map(expense => createExpenseCard(expense)));
+  const cardResults = await Promise.allSettled(pageExpenses.map(expense => createExpenseCard(expense)));
+  const cardsHTML = cardResults.map((result, index) => {
+    if (result.status === 'fulfilled') {
+      return result.value;
+    } else {
+      console.error(`Failed to render expense card ${index}:`, result.reason);
+      return '<div class="expense-card error">Failed to load expense</div>';
+    }
+  });
   expensesList.innerHTML = cardsHTML.join('');
   
   // Render pagination
@@ -975,10 +983,19 @@ async function createExpenseCard(expense) {
   let splitDetailsHTML = '';
   if (hasSplit) {
     try {
-      const decryptedSplits = await Promise.all(expense.splitDetails.map(async (split) => {
+      const splitResults = await Promise.allSettled(expense.splitDetails.map(async (split) => {
         const memberName = await encryptionService.decryptValue(split.memberName);
         return { ...split, memberName };
       }));
+      
+      const decryptedSplits = splitResults.map((result, index) => {
+        if (result.status === 'fulfilled') {
+          return result.value;
+        } else {
+          console.error(`Failed to decrypt split member ${index}:`, result.reason);
+          return { ...expense.splitDetails[index], memberName: '[Encrypted]' };
+        }
+      });
       
       splitDetailsHTML = `
         <div class="expense-split-details">
@@ -1147,18 +1164,26 @@ async function bulkDeleteExpenses() {
   if (!confirmed) return;
   
   try {
-    const deletePromises = Array.from(state.selectedExpenses).map(id => 
-      firestoreService.deleteExpense(id)
+    const deleteResults = await Promise.allSettled(
+      Array.from(state.selectedExpenses).map(id => firestoreService.deleteExpense(id))
     );
-    await Promise.all(deletePromises);
     
-    toast.success(`${state.selectedExpenses.size} expenses deleted`);
+    const successCount = deleteResults.filter(r => r.status === 'fulfilled').length;
+    const failCount = deleteResults.filter(r => r.status === 'rejected').length;
+    
+    if (failCount > 0) {
+      console.error('Some deletes failed:', deleteResults.filter(r => r.status === 'rejected'));
+      toast.warning(`${successCount} expenses deleted, ${failCount} failed`);
+    } else {
+      toast.success(`${successCount} expenses deleted`);
+    }
+    
     state.selectedExpenses.clear();
     updateBulkActionsBar();
     await loadExpenses();
   } catch (error) {
     console.error('Error bulk deleting:', error);
-    toast.error('Failed to delete some expenses');
+    toast.error('Failed to delete expenses');
   }
 }
 
@@ -1390,7 +1415,7 @@ async function getFamilyMembers() {
       const members = JSON.parse(stored);
       
       // Decrypt family member names and roles
-      const decryptedMembers = await Promise.all(members.map(async (member) => {
+      const memberResults = await Promise.allSettled(members.map(async (member) => {
         try {
           const decryptedName = await encryptionService.decryptValue(member.name);
           const decryptedRole = await encryptionService.decryptValue(member.role);
@@ -1405,6 +1430,15 @@ async function getFamilyMembers() {
           return member;
         }
       }));
+      
+      const decryptedMembers = memberResults.map((result, index) => {
+        if (result.status === 'fulfilled') {
+          return result.value;
+        } else {
+          console.error(`Failed to decrypt family member ${index}:`, result.reason);
+          return members[index]; // Return original if decryption fails
+        }
+      });
       
       return decryptedMembers;
     }

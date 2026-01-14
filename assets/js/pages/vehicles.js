@@ -692,7 +692,7 @@ async function loadFuelLogs() {
     const rawFuelLogs = await firestoreService.getAll('fuelLogs', 'createdAt', 'desc');
     
     // Decrypt vehicleId for each fuel log
-    state.fuelLogs = await Promise.all(rawFuelLogs.map(async (log) => {
+    const logResults = await Promise.allSettled(rawFuelLogs.map(async (log) => {
       try {
         // Decrypt the vehicleId if it's encrypted
         const decryptedVehicleId = await encryptionService.decryptValue(log.vehicleId);
@@ -706,6 +706,15 @@ async function loadFuelLogs() {
         return log;
       }
     }));
+    
+    state.fuelLogs = logResults.map((result, index) => {
+      if (result.status === 'fulfilled') {
+        return result.value;
+      } else {
+        console.error(`Failed to process fuel log ${index}:`, result.reason);
+        return rawFuelLogs[index]; // Return original if processing fails
+      }
+    });
   } catch (error) {
     console.error('Error loading fuel logs:', error);
     state.fuelLogs = [];

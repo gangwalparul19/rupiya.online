@@ -33,6 +33,7 @@ class UserService {
    * Get or create user profile
    * This is called after signup/login to ensure user exists in Firestore
    * Uses caching to minimize Firestore reads
+   * Race condition fixed: ensures only one request per user at a time
    */
   async getOrCreateUserProfile(user) {
     if (!user) {
@@ -48,18 +49,36 @@ class UserService {
     }
 
     // Check if there's already a pending request for this user
+    // If so, wait for it to complete and return its result
     if (this.pendingRequests.has(userId)) {
-      return await this.pendingRequests.get(userId);
+      try {
+        const result = await this.pendingRequests.get(userId);
+        // After the pending request completes, check cache again
+        // This ensures we return the cached result from the completed request
+        const nowCachedUser = this.getCachedUser(userId);
+        if (nowCachedUser) {
+          return { success: true, user: nowCachedUser, fromCache: true };
+        }
+        return result;
+      } catch (error) {
+        // If the pending request failed, we'll try again below
+        console.warn('[User Service] Pending request failed, retrying:', error);
+      }
     }
 
-    // Create new request promise
+    // Create new request promise and store it BEFORE awaiting
+    // This prevents race condition where multiple calls reach this point
     const requestPromise = this._fetchOrCreateUser(user);
     this.pendingRequests.set(userId, requestPromise);
 
     try {
       const result = await requestPromise;
       return result;
+    } catch (error) {
+      console.error('[User Service] Error in getOrCreateUserProfile:', error);
+      throw error;
     } finally {
+      // Clean up pending request after completion
       this.pendingRequests.delete(userId);
     }
   }
@@ -107,30 +126,65 @@ class UserService {
    * Includes automatic location detection
    */
   async _createUserData(user) {
+    // Validate user object
+    if (!user || typeof user !== 'object') {
+      throw new Error('Invalid user object provided');
+    }
+    
+    if (!user.email || typeof user.email !== 'string') {
+      throw new Error('User email is required');
+    }
+    
     // Fetch location in parallel (don't block user creation)
     let location = null;
     try {
-      location = await locationService.getUserLocation();
-      console.log('[User Service] Location detected:', location);
+      if (locationService && typeof locationService.getUserLocation === 'function') {
+        location = await locationService.getUserLocation();
+        
+        // Validate location structure
+        if (location && typeof location !== 'object') {
+          console.warn('[User Service] Invalid location data type:', typeof location);
+          location = null;
+        }
+        
+        console.log('[User Service] Location detected:', location);
+      }
     } catch (error) {
       console.warn('[User Service] Could not detect location:', error);
+      location = null;
     }
 
-    // Extract auth methods from provider data
-    const authMethods = user.providerData.map(provider => ({
-      providerId: provider.providerId,
-      linkedAt: serverTimestamp(),
-      email: provider.email || user.email
-    }));
+    // Extract auth methods from provider data with validation
+    const authMethods = [];
+    if (user.providerData && Array.isArray(user.providerData)) {
+      for (const provider of user.providerData) {
+        if (provider && provider.providerId) {
+          authMethods.push({
+            providerId: provider.providerId,
+            linkedAt: serverTimestamp(),
+            email: provider.email || user.email
+          });
+        }
+      }
+    }
+    
+    // Fallback if no provider data
+    if (authMethods.length === 0) {
+      authMethods.push({
+        providerId: 'password',
+        linkedAt: serverTimestamp(),
+        email: user.email
+      });
+    }
 
     return {
       email: user.email,
       displayName: user.displayName || this._extractNameFromEmail(user.email),
       photoURL: user.photoURL || null,
-      emailVerified: user.emailVerified,
+      emailVerified: user.emailVerified || false,
       phoneNumber: user.phoneNumber || null,
       
-      // Location data (auto-detected from IP)
+      // Location data (auto-detected from IP) with null checks
       city: location?.city || null,
       region: location?.region || null,
       country: location?.country || null,
@@ -139,12 +193,10 @@ class UserService {
       locationDetectedAt: location ? serverTimestamp() : null,
       
       // Provider information - DEPRECATED (kept for backward compatibility)
-      providerId: user.providerData[0]?.providerId || 'password',
+      providerId: user.providerData?.[0]?.providerId || 'password',
       
       // Auth methods - NEW: Track all linked authentication methods
-      authMethods: authMethods.length > 0 ? authMethods : [
-        { providerId: 'password', linkedAt: serverTimestamp(), email: user.email }
-      ],
+      authMethods: authMethods,
       
       // Metadata
       createdAt: serverTimestamp(),

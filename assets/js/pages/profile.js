@@ -966,7 +966,7 @@ async function getFamilyMembers() {
       const settings = await firestoreService.getUserSettings();
       if (settings && settings.familyMembers && Array.isArray(settings.familyMembers)) {
         // Decrypt family member names and roles
-        const decryptedMembers = await Promise.all(settings.familyMembers.map(async (member) => {
+        const memberResults = await Promise.allSettled(settings.familyMembers.map(async (member) => {
           try {
             const decryptedName = await encryptionService.decryptValue(member.name);
             const decryptedRole = await encryptionService.decryptValue(member.role);
@@ -981,6 +981,15 @@ async function getFamilyMembers() {
             return member;
           }
         }));
+        
+        const decryptedMembers = memberResults.map((result, index) => {
+          if (result.status === 'fulfilled') {
+            return result.value;
+          } else {
+            console.error(`Failed to decrypt family member ${index}:`, result.reason);
+            return settings.familyMembers[index]; // Return original if decryption fails
+          }
+        });
         
         // Also update localStorage for offline access
         localStorage.setItem('familyMembers', JSON.stringify(decryptedMembers));

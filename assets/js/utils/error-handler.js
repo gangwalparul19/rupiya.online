@@ -14,11 +14,14 @@ class ErrorHandler {
    * @param {boolean} showToast - Show toast notification
    */
   handle(error, context = '', showToast = true) {
-    // Log error to console
-    console.error(`Error in ${context}:`, error);
+    // Create comprehensive error entry
+    const errorEntry = this.createErrorEntry(error, context);
+
+    // Log error to console with full context
+    console.error('[Error]', errorEntry);
 
     // Add to error log
-    this.logError(error, context);
+    this.logError(errorEntry);
 
     // Get user-friendly message
     const message = this.getUserFriendlyMessage(error);
@@ -32,19 +35,65 @@ class ErrorHandler {
   }
 
   /**
-   * Log error for debugging
+   * Create comprehensive error entry with full context
    * @param {Error} error - Error object
    * @param {string} context - Context where error occurred
+   * @returns {Object} Error entry with full context
    */
-  logError(error, context) {
-    const errorEntry = {
+  createErrorEntry(error, context) {
+    // Get current user ID if available
+    let userId = null;
+    try {
+      // Try to get from auth service if available
+      if (window.authService && typeof window.authService.getCurrentUser === 'function') {
+        const user = window.authService.getCurrentUser();
+        userId = user?.uid || null;
+      }
+    } catch (e) {
+      // Silently fail if auth service not available
+    }
+
+    return {
       timestamp: new Date().toISOString(),
       context,
-      message: error.message,
-      stack: error.stack,
-      code: error.code
+      message: error.message || 'Unknown error',
+      code: error.code || null,
+      stack: error.stack || null,
+      url: window.location.href,
+      userAgent: navigator.userAgent,
+      userId,
+      // Additional browser context
+      viewport: {
+        width: window.innerWidth,
+        height: window.innerHeight
+      },
+      online: navigator.onLine,
+      // Error type classification
+      errorType: this.classifyError(error)
     };
+  }
 
+  /**
+   * Classify error type for better categorization
+   * @param {Error} error - Error object
+   * @returns {string} Error type
+   */
+  classifyError(error) {
+    if (error.code && error.code.startsWith('auth/')) return 'authentication';
+    if (error.code && error.code.startsWith('firestore/')) return 'database';
+    if (error.code && error.code.startsWith('storage/')) return 'storage';
+    if (error.message && error.message.includes('network')) return 'network';
+    if (error.code === 'permission-denied') return 'permission';
+    if (error.name === 'TypeError') return 'type';
+    if (error.name === 'ReferenceError') return 'reference';
+    return 'unknown';
+  }
+
+  /**
+   * Log error for debugging
+   * @param {Object} errorEntry - Error entry with full context
+   */
+  logError(errorEntry) {
     this.errorLog.push(errorEntry);
 
     // Keep log size manageable
@@ -297,14 +346,35 @@ class ErrorHandler {
 
   /**
    * Send error to monitoring service
-   * @param {Object} errorEntry - Error entry
+   * @param {Object} errorEntry - Error entry with full context
    */
   sendToMonitoring(errorEntry) {
     // Implement integration with monitoring service (e.g., Sentry, LogRocket)
     // For now, just log to console in development
     if (window.location.hostname === 'localhost') {
-      console.log('Error logged:', errorEntry);
+      console.log('[Error Monitoring]', {
+        ...errorEntry,
+        // Format for better readability in console
+        formattedTime: new Date(errorEntry.timestamp).toLocaleString()
+      });
     }
+
+    // TODO: Add integration with error monitoring service
+    // Example for Sentry:
+    // if (window.Sentry) {
+    //   window.Sentry.captureException(new Error(errorEntry.message), {
+    //     contexts: {
+    //       error: errorEntry
+    //     }
+    //   });
+    // }
+
+    // Example for LogRocket:
+    // if (window.LogRocket) {
+    //   window.LogRocket.captureException(new Error(errorEntry.message), {
+    //     extra: errorEntry
+    //   });
+    // }
   }
 
   /**
@@ -313,7 +383,13 @@ class ErrorHandler {
    */
   handleUnhandledRejection(event) {
     event.preventDefault();
-    this.handle(event.reason, 'Unhandled Promise Rejection');
+    
+    // Create error object from rejection reason
+    const error = event.reason instanceof Error 
+      ? event.reason 
+      : new Error(String(event.reason));
+    
+    this.handle(error, 'Unhandled Promise Rejection');
   }
 
   /**
@@ -322,7 +398,12 @@ class ErrorHandler {
    */
   handleGlobalError(event) {
     event.preventDefault();
-    this.handle(event.error, 'Global Error');
+    
+    // Create error object with additional context
+    const error = event.error || new Error(event.message);
+    const context = `Global Error${event.filename ? ` in ${event.filename}:${event.lineno}:${event.colno}` : ''}`;
+    
+    this.handle(error, context);
   }
 
   /**

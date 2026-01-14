@@ -2,7 +2,7 @@
 // Provides offline support and caching
 
 // CACHE_VERSION is injected by build.js during deployment
-const CACHE_VERSION = '1.2.189';
+const CACHE_VERSION = '1.2.190';
 const CACHE_NAME = `rupiya-v${CACHE_VERSION}`;
 const RUNTIME_CACHE = `rupiya-runtime-v${CACHE_VERSION}`;
 
@@ -285,9 +285,13 @@ self.addEventListener('fetch', (event) => {
         .then((response) => {
           if (response && response.status === 200) {
             const responseToCache = response.clone();
-            caches.open(RUNTIME_CACHE).then((cache) => {
-              cache.put(request, responseToCache);
-            });
+            caches.open(RUNTIME_CACHE)
+              .then((cache) => {
+                return cache.put(request, responseToCache);
+              })
+              .catch((error) => {
+                console.warn('[Service Worker] Failed to cache JS file:', error.message);
+              });
           }
           return response;
         })
@@ -306,9 +310,13 @@ self.addEventListener('fetch', (event) => {
         .then((response) => {
           if (response && response.status === 200) {
             const responseToCache = response.clone();
-            caches.open(RUNTIME_CACHE).then((cache) => {
-              cache.put(request, responseToCache);
-            });
+            caches.open(RUNTIME_CACHE)
+              .then((cache) => {
+                return cache.put(request, responseToCache);
+              })
+              .catch((error) => {
+                console.warn('[Service Worker] Failed to cache HTML file:', error.message);
+              });
           }
           return response;
         })
@@ -349,10 +357,15 @@ self.addEventListener('fetch', (event) => {
             // Cache the response
             caches.open(cacheName)
               .then((cache) => {
-                cache.put(request, responseToCache);
+                return cache.put(request, responseToCache);
+              })
+              .then(() => {
                 if (isLazyCachePage(url.pathname)) {
                   console.log('[Service Worker] Lazy cached:', url.pathname);
                 }
+              })
+              .catch((error) => {
+                console.warn('[Service Worker] Failed to cache asset:', error.message);
               });
 
             return response;
@@ -383,20 +396,20 @@ function isLazyCachePage(pathname) {
   return LAZY_CACHE_PAGES.some(page => pathname === page || pathname.endsWith(page));
 }
 
-// Update cache in background
-function updateCache(request) {
-  fetch(request)
-    .then((response) => {
-      if (response && response.status === 200) {
-        caches.open(CACHE_NAME)
-          .then((cache) => {
-            cache.put(request, response);
-          });
-      }
-    })
-    .catch(() => {
-      // Silently fail - we're already serving from cache
-    });
+// Update cache in background (with proper error handling)
+async function updateCache(request) {
+  try {
+    const response = await fetch(request);
+    if (response && response.status === 200) {
+      const cache = await caches.open(CACHE_NAME);
+      await cache.put(request, response);
+      console.log('[Service Worker] Cache updated:', request.url);
+    }
+  } catch (error) {
+    // Silently fail - we're already serving from cache
+    // Log error for debugging but don't throw
+    console.warn('[Service Worker] Cache update failed:', error.message);
+  }
 }
 
 // Background sync for offline actions

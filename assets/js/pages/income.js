@@ -1084,18 +1084,26 @@ async function bulkDeleteIncome() {
   if (!confirmed) return;
   
   try {
-    const deletePromises = Array.from(state.selectedIncome).map(id => 
-      firestoreService.deleteIncome(id)
+    const deleteResults = await Promise.allSettled(
+      Array.from(state.selectedIncome).map(id => firestoreService.deleteIncome(id))
     );
-    await Promise.all(deletePromises);
     
-    toast.success(`${state.selectedIncome.size} income entries deleted`);
+    const successCount = deleteResults.filter(r => r.status === 'fulfilled').length;
+    const failCount = deleteResults.filter(r => r.status === 'rejected').length;
+    
+    if (failCount > 0) {
+      console.error('Some deletes failed:', deleteResults.filter(r => r.status === 'rejected'));
+      toast.warning(`${successCount} income entries deleted, ${failCount} failed`);
+    } else {
+      toast.success(`${successCount} income entries deleted`);
+    }
+    
     state.selectedIncome.clear();
     updateBulkActionsBar();
     await loadIncome();
   } catch (error) {
     console.error('Error bulk deleting:', error);
-    toast.error('Failed to delete some entries');
+    toast.error('Failed to delete income entries');
   }
 }
 
@@ -1657,7 +1665,7 @@ async function getFamilyMembers() {
       const members = JSON.parse(stored);
       
       // Decrypt family member names and roles
-      const decryptedMembers = await Promise.all(members.map(async (member) => {
+      const memberResults = await Promise.allSettled(members.map(async (member) => {
         try {
           const decryptedName = await encryptionService.decryptValue(member.name);
           const decryptedRole = await encryptionService.decryptValue(member.role);
@@ -1672,6 +1680,15 @@ async function getFamilyMembers() {
           return member;
         }
       }));
+      
+      const decryptedMembers = memberResults.map((result, index) => {
+        if (result.status === 'fulfilled') {
+          return result.value;
+        } else {
+          console.error(`Failed to decrypt family member ${index}:`, result.reason);
+          return members[index]; // Return original if decryption fails
+        }
+      });
       
       return decryptedMembers;
     }
@@ -1988,12 +2005,21 @@ async function handleFormSubmit(e) {
     const splitDetails = getSplitIncomeDetailsData();
     if (splitDetails) {
       // Encrypt member names in split details
-      const encryptedSplitDetails = await Promise.all(splitDetails.map(async (split) => {
+      const splitResults = await Promise.allSettled(splitDetails.map(async (split) => {
         return {
           ...split,
           memberName: await encryptionService.encryptValue(split.memberName)
         };
       }));
+      
+      const encryptedSplitDetails = splitResults.map((result, index) => {
+        if (result.status === 'fulfilled') {
+          return result.value;
+        } else {
+          console.error(`Failed to encrypt split detail ${index}:`, result.reason);
+          return splitDetails[index]; // Return unencrypted if encryption fails
+        }
+      });
       
       incomeData.splitDetails = encryptedSplitDetails;
       incomeData.hasSplit = true;
