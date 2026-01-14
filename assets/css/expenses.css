@@ -246,10 +246,31 @@
   background: rgba(74, 144, 226, 0.03);
 }
 
-/* Family member filter special styling */
+/* Family member filter special styling - Multi-select */
+#familyMemberFilter {
+  min-height: 120px;
+  padding: 8px;
+}
+
 #familyMemberFilter option {
   padding: 8px;
   font-size: var(--font-size-base);
+  line-height: 1.5;
+  margin-bottom: 4px;
+}
+
+#familyMemberFilter option:checked {
+  background: linear-gradient(#4a90e2, #4a90e2);
+  background-color: var(--primary-blue) !important;
+  color: white;
+}
+
+/* Helper text for multi-select */
+#familyMemberFilter + .filter-hint {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-top: 4px;
+  display: block;
 }
 
 .search-row {
@@ -844,6 +865,17 @@
   .filter-select,
   .filter-input {
     padding: 0.5rem 0.625rem !important;
+    font-size: 0.875rem !important;
+  }
+
+  /* Family member filter - mobile optimization */
+  #familyMemberFilter {
+    min-height: 100px !important;
+    padding: 6px !important;
+  }
+
+  #familyMemberFilter option {
+    padding: 6px !important;
     font-size: 0.875rem !important;
   }
 

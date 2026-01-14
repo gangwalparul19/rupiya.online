@@ -237,13 +237,44 @@ async function loadSourceDropdowns() {
 // Populate family member filter
 async function populateFamilyMemberFilter() {
   try {
+    // Get family members from both localStorage and actual income data
     const familyMembers = await getActiveFamilyMembers();
+    const incomeFamilyMembers = await extractFamilyMembersFromIncome();
     const familyMemberFilter = document.getElementById('familyMemberFilter');
     
-    if (!familyMemberFilter || !familyMembers) return;
+    if (!familyMemberFilter) return;
     
-    familyMemberFilter.innerHTML = '<option value="">All Members</option>' +
-      familyMembers.map(member => `<option value="${member.id}">${member.icon} ${escapeHtml(member.name)}</option>`).join('');
+    // Combine and deduplicate family members
+    const allMembers = new Map();
+    
+    // Add members from localStorage
+    if (familyMembers && familyMembers.length > 0) {
+      familyMembers.forEach(member => {
+        allMembers.set(member.id, member);
+      });
+    }
+    
+    // Add members from income (these might have different names/IDs)
+    if (incomeFamilyMembers && incomeFamilyMembers.length > 0) {
+      incomeFamilyMembers.forEach(member => {
+        const key = member.id || member.name;
+        if (!allMembers.has(key)) {
+          allMembers.set(key, member);
+        }
+      });
+    }
+    
+    const uniqueMembers = Array.from(allMembers.values());
+    
+    if (uniqueMembers && uniqueMembers.length > 0) {
+      familyMemberFilter.innerHTML = '<option value="">All Members</option>' +
+        uniqueMembers.map(member => {
+          const memberId = member.id || member.name;
+          const memberName = member.name || member.memberName;
+          const icon = member.icon || '';
+          return `<option value="${memberId}">${icon} ${escapeHtml(memberName)}</option>`;
+        }).join('');
+    }
   } catch (error) {
     console.error('Error populating family member filter:', error);
   }
@@ -1842,6 +1873,51 @@ function getDefaultFamilyMembers() {
 async function getActiveFamilyMembers() {
   const members = await getFamilyMembers();
   return members.filter(m => m.active);
+}
+
+// Extract unique family members from actual income data
+async function extractFamilyMembersFromIncome() {
+  try {
+    const uniqueMembers = new Map();
+    
+    // Extract from state.income if available
+    if (state.income && state.income.length > 0) {
+      for (const income of state.income) {
+        // Check if income has split details
+        if (income.hasSplit && income.splitDetails && income.splitDetails.length > 0) {
+          for (const split of income.splitDetails) {
+            // Use memberName as the key to avoid duplicates
+            const memberName = split.memberName || split.name;
+            const memberId = split.memberId || split.id;
+            
+            if (memberName && !uniqueMembers.has(memberName)) {
+              // Try to decrypt the member name if it's encrypted
+              try {
+                const decryptedName = await encryptionService.decryptValue(memberName);
+                uniqueMembers.set(decryptedName, {
+                  id: memberId,
+                  name: decryptedName,
+                  memberName: decryptedName
+                });
+              } catch (e) {
+                // If decryption fails, use the name as-is
+                uniqueMembers.set(memberName, {
+                  id: memberId,
+                  name: memberName,
+                  memberName: memberName
+                });
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    return Array.from(uniqueMembers.values());
+  } catch (error) {
+    console.error('Error extracting family members from income:', error);
+    return [];
+  }
 }
 
 // ============================================

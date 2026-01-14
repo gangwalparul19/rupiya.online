@@ -250,13 +250,40 @@ async function loadFamilyMemberFilter() {
   if (!familyMemberFilter) return;
   
   try {
+    // Get family members from both localStorage and actual expenses data
     const familyMembers = await getActiveFamilyMembers();
-    console.log('[FamilyFilter] Loading family members:', familyMembers);
+    const expenseFamilyMembers = await extractFamilyMembersFromExpenses();
     
+    // Combine and deduplicate family members
+    const allMembers = new Map();
+    
+    // Add members from localStorage
     if (familyMembers && familyMembers.length > 0) {
-      const options = familyMembers.map(member => {
-        console.log('[FamilyFilter] Adding member to filter:', { id: member.id, name: member.name });
-        return `<option value="${member.id}">${escapeHtml(member.name)}</option>`;
+      familyMembers.forEach(member => {
+        allMembers.set(member.id, member);
+      });
+    }
+    
+    // Add members from expenses (these might have different names/IDs)
+    if (expenseFamilyMembers && expenseFamilyMembers.length > 0) {
+      expenseFamilyMembers.forEach(member => {
+        // Use memberName as key if no ID, to avoid duplicates
+        const key = member.id || member.name;
+        if (!allMembers.has(key)) {
+          allMembers.set(key, member);
+        }
+      });
+    }
+    
+    const uniqueMembers = Array.from(allMembers.values());
+    console.log('[FamilyFilter] Loading family members:', uniqueMembers);
+    
+    if (uniqueMembers && uniqueMembers.length > 0) {
+      const options = uniqueMembers.map(member => {
+        const memberId = member.id || member.name;
+        const memberName = member.name || member.memberName;
+        console.log('[FamilyFilter] Adding member to filter:', { id: memberId, name: memberName });
+        return `<option value="${memberId}">${escapeHtml(memberName)}</option>`;
       }).join('');
       
       familyMemberFilter.innerHTML = '<option value="">All Members</option>' + options;
@@ -1602,6 +1629,51 @@ function initializeFamilyMembers() {
 async function getActiveFamilyMembers() {
   const members = await getFamilyMembers();
   return members.filter(m => m.active);
+}
+
+// Extract unique family members from actual expenses data
+async function extractFamilyMembersFromExpenses() {
+  try {
+    const uniqueMembers = new Map();
+    
+    // Extract from state.expenses if available
+    if (state.expenses && state.expenses.length > 0) {
+      for (const expense of state.expenses) {
+        // Check if expense has split details
+        if (expense.hasSplit && expense.splitDetails && expense.splitDetails.length > 0) {
+          for (const split of expense.splitDetails) {
+            // Use memberName as the key to avoid duplicates
+            const memberName = split.memberName || split.name;
+            const memberId = split.memberId || split.id;
+            
+            if (memberName && !uniqueMembers.has(memberName)) {
+              // Try to decrypt the member name if it's encrypted
+              try {
+                const decryptedName = await encryptionService.decryptValue(memberName);
+                uniqueMembers.set(decryptedName, {
+                  id: memberId,
+                  name: decryptedName,
+                  memberName: decryptedName
+                });
+              } catch (e) {
+                // If decryption fails, use the name as-is
+                uniqueMembers.set(memberName, {
+                  id: memberId,
+                  name: memberName,
+                  memberName: memberName
+                });
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    return Array.from(uniqueMembers.values());
+  } catch (error) {
+    console.error('Error extracting family members from expenses:', error);
+    return [];
+  }
 }
 
 // Update family member
