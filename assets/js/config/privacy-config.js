@@ -35,9 +35,6 @@ export const privacyConfig = {
     'isActive',
     'isRecurring',
     'tags',
-    'paymentMethod',
-    'specificPaymentMethodId',
-    'source',
     '_encrypted',
     '_encryptionVersion'
   ],
@@ -94,8 +91,8 @@ export const privacyConfig = {
   
   // Sensitive fields that MUST be encrypted in each collection
   sensitiveFields: {
-    expenses: ['amount', 'description', 'notes', 'merchant', 'location'],
-    income: ['amount', 'description', 'notes'],
+    expenses: ['amount', 'description', 'paymentMethod', 'notes', 'merchant', 'location'],
+    income: ['amount', 'description', 'source', 'paymentMethod', 'notes'],
     budgets: ['amount', 'notes', 'spent'],
     investments: ['name', 'quantity', 'purchasePrice', 'currentPrice', 'notes', 'symbol', 'broker', 'accountNumber', 'brokerageUsername', 'dividendDetails'],
     investmentPriceHistory: ['price', 'quantity', 'totalValue', 'notes'],
@@ -105,7 +102,7 @@ export const privacyConfig = {
     vehicles: ['name', 'registrationNumber', 'purchasePrice', 'currentValue', 'notes', 'insuranceDetails', 'ownerName', 'driverName'],
     notes: ['title', 'content'],
     documents: ['name', 'description', 'fileUrl', 'fileName'],
-    recurringTransactions: ['amount', 'description', 'notes', 'recipientName'],
+    recurringTransactions: ['amount', 'description', 'paymentMethod', 'notes', 'recipientName'],
     houseHelps: ['name', 'phone', 'monthlySalary', 'notes', 'address'],
     houseHelpPayments: ['amount', 'notes'],
     fuelLogs: ['fuelPrice', 'totalCost', 'fuelStation', 'notes', 'odometer', 'quantity'],

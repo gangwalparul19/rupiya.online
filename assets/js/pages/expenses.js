@@ -384,7 +384,10 @@ async function loadExpenses() {
     console.log('[LoadExpenses] Built Firestore filters:', JSON.stringify(filters));
     
     // Check if filters are applied
+    // NOTE: Payment method filters are encrypted, so they're applied client-side
     const hasFilters = filters.length > 0 || 
+                       state.filters.paymentMethod ||
+                       state.filters.specificPaymentMethod ||
                        state.filters.search || 
                        state.filters.familyMember || 
                        state.filters.dateFrom || 
@@ -396,7 +399,9 @@ async function loadExpenses() {
     if (hasFilters) {
       // Check if we have Firestore filters or only client-side filters
       const hasFirestoreFilters = filters.length > 0;
-      const hasClientSideFilters = state.filters.search || 
+      const hasClientSideFilters = state.filters.paymentMethod ||
+                                    state.filters.specificPaymentMethod ||
+                                    state.filters.search || 
                                     state.filters.familyMember || 
                                     state.filters.dateFrom || 
                                     state.filters.dateTo;
@@ -761,17 +766,9 @@ function buildFirestoreFilters() {
     console.log('[BuildFilters] Added category filter:', state.filters.category);
   }
   
-  // Payment method filter - can be done in Firestore with index
-  if (state.filters.paymentMethod) {
-    filters.push({ field: 'paymentMethod', operator: '==', value: state.filters.paymentMethod });
-    console.log('[BuildFilters] Added paymentMethod filter:', state.filters.paymentMethod);
-  }
-  
-  // Specific payment method filter
-  if (state.filters.specificPaymentMethod) {
-    filters.push({ field: 'specificPaymentMethodId', operator: '==', value: state.filters.specificPaymentMethod });
-    console.log('[BuildFilters] Added specificPaymentMethodId filter:', state.filters.specificPaymentMethod);
-  }
+  // NOTE: Payment method and specific payment method filters are encrypted fields
+  // They cannot be filtered at Firestore level, so they are applied client-side
+  // See applyClientSideFilters() for payment method filtering
   
   // Note: Date range, search, and family member filters are applied client-side
   // because they require complex logic or don't have indexes
@@ -780,10 +777,25 @@ function buildFirestoreFilters() {
   return filters;
 }
 
-// Apply only client-side filters (search, family member, date range)
-// Note: Category, payment method, and specific payment method are already filtered at Firestore level
+// Apply only client-side filters (search, family member, date range, payment method)
+// Note: Category is filtered at Firestore level
+// Note: Payment method and specific payment method are encrypted, so they must be filtered client-side
 function applyClientSideFilters() {
   let filtered = [...state.expenses];
+  
+  // Payment method filter - encrypted field, must be client-side
+  if (state.filters.paymentMethod) {
+    console.log('[Filter] Filtering by payment method:', state.filters.paymentMethod);
+    filtered = filtered.filter(e => e.paymentMethod === state.filters.paymentMethod);
+    console.log('[Filter] After payment method filter:', filtered.length, 'expenses');
+  }
+  
+  // Specific payment method filter - encrypted field, must be client-side
+  if (state.filters.specificPaymentMethod) {
+    console.log('[Filter] Filtering by specific payment method:', state.filters.specificPaymentMethod);
+    filtered = filtered.filter(e => e.specificPaymentMethodId === state.filters.specificPaymentMethod);
+    console.log('[Filter] After specific payment method filter:', filtered.length, 'expenses');
+  }
   
   // Family member filter - complex logic, must be client-side
   if (state.filters.familyMember) {
