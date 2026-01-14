@@ -1208,10 +1208,10 @@ async function addMoreMembers() {
       return;
     }
 
-    // Create new member
+    // Create new member slot
     const newMember = {
       id: 'member-' + Date.now(),
-      name: `Member ${members.length + 1}`,
+      name: '',
       icon: '👤',
       role: 'Family Member',
       active: false
@@ -1221,10 +1221,23 @@ async function addMoreMembers() {
     localStorage.setItem('familyMembers', JSON.stringify(members));
     
     await loadFamilyMembersUI();
-    toast.success('New family member added');
+    
+    // Scroll to the new member slot and focus on name input
+    setTimeout(() => {
+      const newSlot = document.querySelector(`[data-member-id="${newMember.id}"]`);
+      if (newSlot) {
+        newSlot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const nameInput = newSlot.querySelector('.family-member-name-input');
+        if (nameInput) {
+          nameInput.focus();
+        }
+      }
+    }, 100);
+    
+    toast.success('New member slot added. Fill in the details and click Save.');
   } catch (error) {
     console.error('Error adding family member:', error);
-    toast.error('Failed to add family member');
+    toast.error('Failed to add family member slot');
   }
 }
 

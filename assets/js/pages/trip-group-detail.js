@@ -48,7 +48,25 @@ class TripGroupDetailPage {
       return null;
     }
 
+    // Load user profile in sidebar
+    this.loadUserProfile(user);
+
     return user;
+  }
+
+  loadUserProfile(user) {
+    const userName = document.getElementById('userName');
+    const userEmail = document.getElementById('userEmail');
+    const userAvatar = document.getElementById('userAvatar');
+
+    if (userName) userName.textContent = user.displayName || 'User';
+    if (userEmail) userEmail.textContent = user.email;
+    if (userAvatar) {
+      const initials = user.displayName 
+        ? user.displayName.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)
+        : user.email[0].toUpperCase();
+      userAvatar.textContent = initials;
+    }
   }
 
   bindEvents() {
@@ -647,7 +665,7 @@ class TripGroupDetailPage {
   openSettlementSection() {
     // Check if section is already open
     const section = document.getElementById('addSettlementSection');
-    if (section.classList.contains('show')) return;
+    if (section.style.display === 'block' || section.classList.contains('show')) return;
 
     document.getElementById('settlementForm').reset();
 
@@ -655,18 +673,20 @@ class TripGroupDetailPage {
     this.closeExpenseModal();
     this.closeMemberSection();
 
+    section.style.display = 'block';
     section.classList.add('show');
     section.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   closeSettlementSection() {
     const section = document.getElementById('addSettlementSection');
+    section.style.display = 'none';
     section.classList.remove('show');
   }
 
   toggleSettlementSection() {
     const section = document.getElementById('addSettlementSection');
-    const isVisible = section.classList.contains('show');
+    const isVisible = section.style.display === 'block' || section.classList.contains('show');
 
     if (isVisible) {
       this.closeSettlementSection();
@@ -677,7 +697,7 @@ class TripGroupDetailPage {
 
   openMemberSection() {
     const section = document.getElementById('addMemberSection');
-    if (section.classList.contains('show')) return;
+    if (section.style.display === 'block' || section.classList.contains('show')) return;
 
     document.getElementById('memberForm').reset();
 
@@ -685,18 +705,20 @@ class TripGroupDetailPage {
     this.closeExpenseModal();
     this.closeSettlementSection();
 
+    section.style.display = 'block';
     section.classList.add('show');
     section.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   closeMemberSection() {
     const section = document.getElementById('addMemberSection');
+    section.style.display = 'none';
     section.classList.remove('show');
   }
 
   toggleMemberSection() {
     const section = document.getElementById('addMemberSection');
-    const isVisible = section.classList.contains('show');
+    const isVisible = section.style.display === 'block' || section.classList.contains('show');
 
     if (isVisible) {
       this.closeMemberSection();

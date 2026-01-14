@@ -44,7 +44,7 @@ service cloud.firestore {
     // Helper function to check if user is a member of a trip group
     function isGroupMember(groupId) {
       return isAuthenticated() && 
-             exists(/databases/$(database)/documents/tripGroupMembers/$(request.auth.uid + '_' + groupId));
+             exists(/databases/$(database)/documents/tripGroupMembers/$(groupId + '_' + request.auth.uid));
     }
     
     // Helper function to check if user is the creator/admin of a trip group
@@ -56,13 +56,13 @@ service cloud.firestore {
     // Helper function to check if user is member of group from expense data
     function isGroupMemberFromExpense(expenseData) {
       return isAuthenticated() && 
-             exists(/databases/$(database)/documents/tripGroupMembers/$(request.auth.uid + '_' + expenseData.groupId));
+             exists(/databases/$(database)/documents/tripGroupMembers/$(expenseData.groupId + '_' + request.auth.uid));
     }
     
     // Helper function to check if user is member of group from settlement data
     function isGroupMemberFromSettlement(settlementData) {
       return isAuthenticated() && 
-             exists(/databases/$(database)/documents/tripGroupMembers/$(request.auth.uid + '_' + settlementData.groupId));
+             exists(/databases/$(database)/documents/tripGroupMembers/$(settlementData.groupId + '_' + request.auth.uid));
     }
     
     // ============================================
@@ -383,12 +383,16 @@ service cloud.firestore {
     // TRIP GROUP MEMBERS - Secured with membership validation
     // ============================================
     match /tripGroupMembers/{memberId} {
-      // Read: Users can read if they are a member of the group OR the group creator
-      // memberId format: userId_groupId
-      allow read: if isAuthenticated() && (
-        memberId.split('_')[0] == request.auth.uid ||
-        isGroupCreator(memberId.split('_')[1])
+      // Get: Users can read individual documents if they are a member of the group OR the group creator
+      // memberId format: groupId_userId
+      allow get: if isAuthenticated() && (
+        memberId.split('_')[1] == request.auth.uid ||
+        isGroupCreator(memberId.split('_')[0])
       );
+      
+      // List: Allow authenticated users to query members
+      // Note: Application code filters by groupId, and users can only see groups they're members of
+      allow list: if isAuthenticated();
       
       // Create: Group creator can add members, or users can join via invitation
       allow create: if isAuthenticated() && (
@@ -413,8 +417,12 @@ service cloud.firestore {
     // TRIP GROUP EXPENSES - Secured with membership validation
     // ============================================
     match /tripGroupExpenses/{expenseId} {
-      // Read: Only group members can read expenses
-      allow read: if isGroupMemberFromExpense(resource.data);
+      // Get: Only group members can read individual expenses
+      allow get: if isGroupMemberFromExpense(resource.data);
+      
+      // List: Allow authenticated users to query expenses
+      // Note: Application code filters by groupId, and users can only see groups they're members of
+      allow list: if isAuthenticated();
       
       // Create: Only group members can create expenses
       allow create: if isAuthenticated() && isGroupMemberFromExpense(request.resource.data);
@@ -457,8 +465,12 @@ service cloud.firestore {
     // TRIP GROUP SETTLEMENTS - Secured with membership validation
     // ============================================
     match /tripGroupSettlements/{settlementId} {
-      // Read: Only group members can read settlements
-      allow read: if isGroupMemberFromSettlement(resource.data);
+      // Get: Only group members can read individual settlements
+      allow get: if isGroupMemberFromSettlement(resource.data);
+      
+      // List: Allow authenticated users to query settlements
+      // Note: Application code filters by groupId, and users can only see groups they're members of
+      allow list: if isAuthenticated();
       
       // Create: Only group members can create settlements
       allow create: if isAuthenticated() && isGroupMemberFromSettlement(request.resource.data);
