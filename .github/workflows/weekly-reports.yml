@@ -2,9 +2,9 @@ name: Weekly Financial Reports
 
 on:
   schedule:
-    # TESTING: Runs today at 1:10 PM UTC (6:40 PM IST)
+    # TESTING: Runs today at 3:30 PM UTC (9:00 PM IST)
     # REVERT TO: '30 2 * * 0' (Every Sunday at 8:00 AM IST)
-    - cron: '10 13 * * *'
+    - cron: '30 15 * * *'
   
   # Allow manual trigger for testing
   workflow_dispatch:

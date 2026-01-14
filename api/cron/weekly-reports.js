@@ -86,9 +86,16 @@ export default async function handler(req, res) {
 
         // Send the report
         const baseUrl = process.env.APP_URL || 'https://www.rupiya.online';
-        const response = await fetch(`${baseUrl}/api/send-weekly-report`, {
+        const reportUrl = `${baseUrl}/api/send-weekly-report`;
+        
+        console.log(`Sending weekly report to ${reportUrl} for user ${userEmail}`);
+        
+        const response = await fetch(reportUrl, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${process.env.CRON_SECRET}`
+          },
           body: JSON.stringify({
             userEmail,
             userName: userData.displayName || userData.name || 'User',
@@ -103,13 +110,16 @@ export default async function handler(req, res) {
           })
         });
 
-        if (response.ok) {
-          results.success++;
-          console.log(`Report sent to ${userEmail}`);
-        } else {
+        if (!response.ok) {
           results.failed++;
-          results.errors.push({ userId, error: await response.text() });
+          const error = await response.text();
+          results.errors.push({ userId, email: userEmail, error, statusCode: response.status });
+          console.error(`Failed to send report to ${userEmail}: ${response.status} - ${error}`);
+          continue;
         }
+
+        results.success++;
+        console.log(`Report sent to ${userEmail}`);
       } catch (userError) {
         results.failed++;
         results.errors.push({ userId, error: userError.message });

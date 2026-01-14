@@ -27,7 +27,7 @@ const state = {
     source: '',
     paymentMethod: '',
     specificPaymentMethod: '',
-    familyMember: '',
+    familyMembers: [], // Changed to array for multi-select
     dateFrom: '',
     dateTo: '',
     search: ''
@@ -370,8 +370,8 @@ async function loadIncome() {
     const hasFilters = filters.length > 0 || 
                        state.filters.paymentMethod ||
                        state.filters.specificPaymentMethod ||
+                       (state.filters.familyMembers && state.filters.familyMembers.length > 0) ||
                        state.filters.search || 
-                       state.filters.familyMember || 
                        state.filters.dateFrom || 
                        state.filters.dateTo;
     
@@ -383,8 +383,8 @@ async function loadIncome() {
       const hasFirestoreFilters = filters.length > 0;
       const hasClientSideFilters = state.filters.paymentMethod ||
                                     state.filters.specificPaymentMethod ||
+                                    (state.filters.familyMembers && state.filters.familyMembers.length > 0) ||
                                     state.filters.search || 
-                                    state.filters.familyMember || 
                                     state.filters.dateFrom || 
                                     state.filters.dateTo;
       
@@ -629,7 +629,7 @@ function hasActiveFilters() {
   return state.filters.source || 
          state.filters.paymentMethod || 
          state.filters.specificPaymentMethod || 
-         state.filters.familyMember || 
+         (state.filters.familyMembers && state.filters.familyMembers.length > 0) ||
          state.filters.dateFrom || 
          state.filters.dateTo || 
          state.filters.search;
@@ -809,14 +809,17 @@ function applyClientSideFilters() {
   }
   
   // Family member filter (for split income) - complex logic, must be client-side
-  if (state.filters.familyMember) {
-    console.log('[Filter] Filtering by family member:', state.filters.familyMember);
+  // Now supports multi-select: show income where ANY selected member is involved
+  if (state.filters.familyMembers && state.filters.familyMembers.length > 0) {
+    console.log('[Filter] Filtering by family members:', state.filters.familyMembers);
     filtered = filtered.filter(i => {
       if (!i.hasSplit || !i.splitDetails) return false;
       const hasMatch = i.splitDetails.some(split => {
         const splitMemberId = String(split.memberId).trim();
-        const filterMemberId = String(state.filters.familyMember).trim();
-        return splitMemberId === filterMemberId;
+        const isSelected = state.filters.familyMembers.some(selectedId => 
+          String(selectedId).trim() === splitMemberId
+        );
+        return isSelected;
       });
       return hasMatch;
     });
@@ -845,9 +848,22 @@ function applyClientSideFilters() {
   // Search filter - must be client-side
   if (state.filters.search) {
     const searchLower = state.filters.search.toLowerCase();
-    filtered = filtered.filter(i => 
-      (i.description || '').toLowerCase().includes(searchLower)
-    );
+    filtered = filtered.filter(i => {
+      // Search in description
+      const descriptionMatch = (i.description || '').toLowerCase().includes(searchLower);
+      
+      // Search in family member names (for split income)
+      let memberMatch = false;
+      if (i.hasSplit && i.splitDetails && i.splitDetails.length > 0) {
+        memberMatch = i.splitDetails.some(split => {
+          const memberName = (split.memberName || '').toLowerCase();
+          return memberName.includes(searchLower);
+        });
+      }
+      
+      // Return true if matches either description or member name
+      return descriptionMatch || memberMatch;
+    });
   }
   
   state.filteredIncome = filtered;
@@ -1444,7 +1460,11 @@ function setupEventListeners() {
   const familyMemberFilter = document.getElementById('familyMemberFilter');
   if (familyMemberFilter) {
     familyMemberFilter.addEventListener('change', () => {
-      state.filters.familyMember = familyMemberFilter.value;
+      // Get all selected values (multi-select)
+      const selectedOptions = Array.from(familyMemberFilter.selectedOptions).map(option => option.value);
+      // Remove empty string if present (from "All Members" option)
+      state.filters.familyMembers = selectedOptions.filter(val => val !== '');
+      console.log('[Filter] Selected family members:', state.filters.familyMembers);
       applyFilters();
     });
   }
@@ -1595,7 +1615,7 @@ function clearFilters() {
     source: '',
     paymentMethod: '',
     specificPaymentMethod: '',
-    familyMember: '',
+    familyMembers: [],
     dateFrom: '',
     dateTo: '',
     search: ''
@@ -1612,7 +1632,8 @@ function clearFilters() {
   }
   const familyMemberFilter = document.getElementById('familyMemberFilter');
   if (familyMemberFilter) {
-    familyMemberFilter.value = '';
+    // Clear all selected options for multi-select
+    Array.from(familyMemberFilter.options).forEach(option => option.selected = false);
   }
   dateFromFilter.value = '';
   dateToFilter.value = '';

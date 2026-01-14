@@ -120,9 +120,16 @@ export default async function handler(req, res) {
 
         // Send the report
         const appUrl = process.env.APP_URL || 'https://www.rupiya.online';
-        const reportResponse = await fetch(`${appUrl}/api/send-monthly-report`, {
+        const reportUrl = `${appUrl}/api/send-monthly-report`;
+        
+        console.log(`Sending report to ${reportUrl} for user ${userEmail}`);
+        
+        const reportResponse = await fetch(reportUrl, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${process.env.CRON_SECRET}`
+          },
           body: JSON.stringify({
             userEmail,
             userName,
@@ -138,14 +145,15 @@ export default async function handler(req, res) {
           })
         });
 
-        if (reportResponse.ok) {
-          results.push({ userId, email: userEmail, status: 'sent' });
-          console.log(`Monthly report sent to ${userEmail}`);
-        } else {
+        if (!reportResponse.ok) {
           const error = await reportResponse.text();
-          results.push({ userId, email: userEmail, status: 'failed', error });
-          console.error(`Failed to send report to ${userEmail}:`, error);
+          results.push({ userId, email: userEmail, status: 'failed', error, statusCode: reportResponse.status });
+          console.error(`Failed to send report to ${userEmail}: ${reportResponse.status} - ${error}`);
+          continue;
         }
+
+        results.push({ userId, email: userEmail, status: 'sent' });
+        console.log(`Monthly report sent to ${userEmail}`);
 
       } catch (userError) {
         console.error(`Error processing user ${userId}:`, userError);

@@ -28,7 +28,7 @@ const state = {
     category: '',
     paymentMethod: '',
     specificPaymentMethod: '',
-    familyMember: '',
+    familyMembers: [], // Changed to array for multi-select
     dateFrom: '',
     dateTo: '',
     search: ''
@@ -388,8 +388,8 @@ async function loadExpenses() {
     const hasFilters = filters.length > 0 || 
                        state.filters.paymentMethod ||
                        state.filters.specificPaymentMethod ||
+                       (state.filters.familyMembers && state.filters.familyMembers.length > 0) ||
                        state.filters.search || 
-                       state.filters.familyMember || 
                        state.filters.dateFrom || 
                        state.filters.dateTo;
     
@@ -401,8 +401,8 @@ async function loadExpenses() {
       const hasFirestoreFilters = filters.length > 0;
       const hasClientSideFilters = state.filters.paymentMethod ||
                                     state.filters.specificPaymentMethod ||
+                                    (state.filters.familyMembers && state.filters.familyMembers.length > 0) ||
                                     state.filters.search || 
-                                    state.filters.familyMember || 
                                     state.filters.dateFrom || 
                                     state.filters.dateTo;
       
@@ -798,25 +798,28 @@ function applyClientSideFilters() {
   }
   
   // Family member filter - complex logic, must be client-side
-  if (state.filters.familyMember) {
-    console.log('[Filter] Filtering by family member:', state.filters.familyMember);
+  // Now supports multi-select: show expenses where ANY selected member is involved
+  if (state.filters.familyMembers && state.filters.familyMembers.length > 0) {
+    console.log('[Filter] Filtering by family members:', state.filters.familyMembers);
     filtered = filtered.filter(e => {
       // Check if expense has split details
       if (e.hasSplit && e.splitDetails && e.splitDetails.length > 0) {
-        // Check if the selected member has any amount in this expense
+        // Check if ANY of the selected members has any amount in this expense
         const hasMatch = e.splitDetails.some(split => {
           const splitMemberId = String(split.memberId).trim();
-          const filterMemberId = String(state.filters.familyMember).trim();
-          const matches = splitMemberId === filterMemberId && split.amount > 0;
-          if (matches) {
+          const isSelected = state.filters.familyMembers.some(selectedId => 
+            String(selectedId).trim() === splitMemberId
+          );
+          const hasAmount = split.amount > 0;
+          
+          if (isSelected && hasAmount) {
             console.log('[Filter] Match found:', { 
               expenseId: e.id, 
               splitMemberId, 
-              filterMemberId, 
               amount: split.amount 
             });
           }
-          return matches;
+          return isSelected && hasAmount;
         });
         return hasMatch;
       }
@@ -847,9 +850,22 @@ function applyClientSideFilters() {
   // Search filter - must be client-side (no full-text search in Firestore)
   if (state.filters.search) {
     const searchLower = state.filters.search.toLowerCase();
-    filtered = filtered.filter(e => 
-      (e.description || '').toLowerCase().includes(searchLower)
-    );
+    filtered = filtered.filter(e => {
+      // Search in description
+      const descriptionMatch = (e.description || '').toLowerCase().includes(searchLower);
+      
+      // Search in family member names (for split expenses)
+      let memberMatch = false;
+      if (e.hasSplit && e.splitDetails && e.splitDetails.length > 0) {
+        memberMatch = e.splitDetails.some(split => {
+          const memberName = (split.memberName || '').toLowerCase();
+          return memberName.includes(searchLower);
+        });
+      }
+      
+      // Return true if matches either description or member name
+      return descriptionMatch || memberMatch;
+    });
   }
   
   state.filteredExpenses = filtered;
@@ -878,7 +894,7 @@ function hasActiveFilters() {
   return state.filters.category || 
          state.filters.paymentMethod || 
          state.filters.specificPaymentMethod || 
-         state.filters.familyMember || 
+         (state.filters.familyMembers && state.filters.familyMembers.length > 0) ||
          state.filters.dateFrom || 
          state.filters.dateTo || 
          state.filters.search;
@@ -1853,7 +1869,11 @@ function setupEventListeners() {
   
   if (familyMemberFilter) {
     familyMemberFilter.addEventListener('change', () => {
-      state.filters.familyMember = familyMemberFilter.value;
+      // Get all selected values (multi-select)
+      const selectedOptions = Array.from(familyMemberFilter.selectedOptions).map(option => option.value);
+      // Remove empty string if present (from "All Members" option)
+      state.filters.familyMembers = selectedOptions.filter(val => val !== '');
+      console.log('[Filter] Selected family members:', state.filters.familyMembers);
       applyFilters();
     });
   }
@@ -2021,7 +2041,7 @@ function clearFilters() {
     category: '',
     paymentMethod: '',
     specificPaymentMethod: '',
-    familyMember: '',
+    familyMembers: [],
     dateFrom: '',
     dateTo: '',
     search: ''
@@ -2030,7 +2050,10 @@ function clearFilters() {
   if (categoryFilter) categoryFilter.value = '';
   if (paymentMethodFilter) paymentMethodFilter.value = '';
   if (specificPaymentMethodFilter) specificPaymentMethodFilter.value = '';
-  if (familyMemberFilter) familyMemberFilter.value = '';
+  if (familyMemberFilter) {
+    // Clear all selected options for multi-select
+    Array.from(familyMemberFilter.options).forEach(option => option.selected = false);
+  }
   if (dateFromFilter) dateFromFilter.value = '';
   if (dateToFilter) dateToFilter.value = '';
   if (searchInput) searchInput.value = '';
