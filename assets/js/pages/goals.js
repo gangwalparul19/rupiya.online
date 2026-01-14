@@ -150,6 +150,8 @@ async function loadGoals() {
     goalsList.style.display = 'none';
     
     const allGoals = await firestoreService.getGoals();
+    console.log('[Goals] Loaded goals:', allGoals);
+    console.log('[Goals] First goal:', allGoals[0]);
     
     state.goals = allGoals;
     state.filteredGoals = [...allGoals];
@@ -575,6 +577,11 @@ function openEditForm(id) {
   const goal = state.goals.find(g => g.id === id);
   if (!goal) return;
   
+  console.log('[Goals] Editing goal:', goal);
+  console.log('[Goals] Goal name:', goal.name);
+  console.log('[Goals] Goal targetAmount:', goal.targetAmount);
+  console.log('[Goals] Goal currentAmount:', goal.currentAmount);
+  
   state.editingGoalId = id;
   formTitle.textContent = 'Edit Goal';
   saveFormBtn.textContent = 'Update Goal';
@@ -583,9 +590,9 @@ function openEditForm(id) {
   saveFormBtn.disabled = false;
   
   // Populate form
-  nameInput.value = goal.name;
-  targetAmountInput.value = goal.targetAmount;
-  currentAmountInput.value = goal.currentAmount;
+  nameInput.value = goal.name || '';
+  targetAmountInput.value = goal.targetAmount || 0;
+  currentAmountInput.value = goal.currentAmount || 0;
   const date = goal.targetDate.toDate ? goal.targetDate.toDate() : new Date(goal.targetDate);
   targetDateInput.value = formatDateForInput(date);
   descriptionInput.value = goal.description || '';

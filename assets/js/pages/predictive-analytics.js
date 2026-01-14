@@ -129,12 +129,6 @@ async function loadData() {
       predictionService.analyzeSpendingPatterns()
     ]);
 
-    const hasAnyData = (forecasts && forecasts.length > 0) ||
-      goals: goals?.length || 0,
-      anomalies: anomalies?.length || 0,
-      patterns: patterns?.length || 0
-    });
-
     currentData = {
       forecasts,
       warnings,

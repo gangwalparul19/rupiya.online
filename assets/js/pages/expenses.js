@@ -726,6 +726,20 @@ function buildFirestoreFilters() {
 function applyClientSideFilters() {
   let filtered = [...state.expenses];
   
+  // Payment method filter - apply client-side for already loaded data
+  if (state.filters.paymentMethod) {
+    console.log('[Filter] Filtering by payment method:', state.filters.paymentMethod);
+    filtered = filtered.filter(e => e.paymentMethod === state.filters.paymentMethod);
+    console.log('[Filter] After payment method filter:', filtered.length);
+  }
+  
+  // Specific payment method filter
+  if (state.filters.specificPaymentMethod) {
+    console.log('[Filter] Filtering by specific payment method:', state.filters.specificPaymentMethod);
+    filtered = filtered.filter(e => e.specificPaymentMethodId === state.filters.specificPaymentMethod);
+    console.log('[Filter] After specific payment method filter:', filtered.length);
+  }
+  
   // Family member filter - complex logic, must be client-side
   if (state.filters.familyMember) {
     console.log('[Filter] Filtering by family member:', state.filters.familyMember);

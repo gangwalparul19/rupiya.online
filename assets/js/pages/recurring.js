@@ -412,7 +412,7 @@ function showEditForm(recurring) {
   document.getElementById('startDate').value = formatDateForInput(recurring.startDate);
   document.getElementById('endDate').value = recurring.endDate ? formatDateForInput(recurring.endDate) : '';
   document.getElementById('status').value = recurring.status;
-  document.getElementById('paymentMethod').value = recurring.paymentMethod || 'cash';
+  if (paymentMethodInput) paymentMethodInput.value = recurring.paymentMethod || 'cash';
   document.getElementById('notes').value = recurring.notes || '';
 
   // Handle specific payment method
@@ -444,7 +444,7 @@ async function handleSubmit(e) {
     startDate: timezoneService.parseInputDate(document.getElementById('startDate').value),
     endDate: document.getElementById('endDate').value ? timezoneService.parseInputDate(document.getElementById('endDate').value) : null,
     status: document.getElementById('status').value,
-    paymentMethod: document.getElementById('paymentMethod')?.value || 'cash',
+    paymentMethod: paymentMethodInput?.value || 'cash',
     paymentMethodId: specificMethodId || null,
     paymentMethodName: specificMethod ? getPaymentMethodDisplayName(specificMethod) : null,
     notes: document.getElementById('notes').value
