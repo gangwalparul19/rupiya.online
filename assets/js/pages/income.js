@@ -407,10 +407,10 @@ async function loadIncome() {
 
 // Load more income when user navigates to a page that needs more data
 async function loadMoreIncomeIfNeeded(targetPage) {
-  const requiredIndex = targetPage * state.itemsPerPage;
+  const requiredRecords = targetPage * state.itemsPerPage;
   
   // Check if we have enough data loaded
-  if (requiredIndex <= state.income.length) {
+  if (requiredRecords <= state.income.length) {
     console.log('[LoadMore] Already have enough data');
     return true; // We have enough data
   }
@@ -430,13 +430,18 @@ async function loadMoreIncomeIfNeeded(targetPage) {
   let loadingToast = null;
   try {
     state.loadingMore = true;
-    console.log('[LoadMore] Loading more data...');
+    console.log('[LoadMore] Loading more data for page', targetPage);
     
     // Show loading indicator
     loadingToast = toast.info('Loading more income...', 0);
     
-    // Load next batch (50 more records)
-    const batchSize = state.itemsPerPage * 5; // 50 records
+    // Calculate how many records we need to load
+    const recordsNeeded = requiredRecords - state.income.length;
+    // Load in batches of 50, or exactly what we need (whichever is larger)
+    const batchSize = Math.max(50, recordsNeeded);
+    
+    console.log('[LoadMore] Need', recordsNeeded, 'more records, loading batch of', batchSize);
+    
     const result = await firestoreService.getIncomePaginated({
       pageSize: batchSize,
       lastDoc: state.lastDoc,
@@ -451,7 +456,16 @@ async function loadMoreIncomeIfNeeded(targetPage) {
     state.hasMore = result.hasMore;
     state.filteredIncome = [...state.income];
     
-    return true;
+    // Check if we have enough data now
+    if (state.income.length >= requiredRecords) {
+      return true;
+    } else if (!state.hasMore) {
+      // No more data available, but we don't have enough
+      return false;
+    } else {
+      // Still need more data, but we loaded what we could
+      return true;
+    }
   } catch (error) {
     console.error('[LoadMore] Error loading more income:', error);
     toast.error('Failed to load more income');
@@ -733,22 +747,9 @@ function buildFirestoreFilters() {
 }
 
 // Apply only client-side filters (search, family member, date range)
+// Note: Source, payment method, and specific payment method are already filtered at Firestore level
 function applyClientSideFilters() {
   let filtered = [...state.income];
-  
-  // Payment method filter - apply client-side for already loaded data
-  if (state.filters.paymentMethod) {
-    console.log('[Filter] Filtering by payment method:', state.filters.paymentMethod);
-    filtered = filtered.filter(i => i.paymentMethod === state.filters.paymentMethod);
-    console.log('[Filter] After payment method filter:', filtered.length);
-  }
-  
-  // Specific payment method filter
-  if (state.filters.specificPaymentMethod) {
-    console.log('[Filter] Filtering by specific payment method:', state.filters.specificPaymentMethod);
-    filtered = filtered.filter(i => i.specificPaymentMethodId === state.filters.specificPaymentMethod);
-    console.log('[Filter] After specific payment method filter:', filtered.length);
-  }
   
   // Family member filter (for split income) - complex logic, must be client-side
   if (state.filters.familyMember) {
@@ -810,7 +811,7 @@ function applyClientSideFilters() {
     });
   }
   
-  renderIncome();
+  // Don't call renderIncome() here - it's called by loadIncome()
 }
 
 // Apply filters - now reloads data with server-side filters

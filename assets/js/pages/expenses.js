@@ -425,10 +425,10 @@ async function loadExpenses() {
 
 // Load more expenses when user navigates to a page that needs more data
 async function loadMoreExpensesIfNeeded(targetPage) {
-  const requiredIndex = targetPage * state.itemsPerPage;
+  const requiredRecords = targetPage * state.itemsPerPage;
   
   // Check if we have enough data loaded
-  if (requiredIndex <= state.expenses.length) {
+  if (requiredRecords <= state.expenses.length) {
     console.log('[LoadMore] Already have enough data');
     return true; // We have enough data
   }
@@ -448,13 +448,18 @@ async function loadMoreExpensesIfNeeded(targetPage) {
   let loadingToast = null;
   try {
     state.loadingMore = true;
-    console.log('[LoadMore] Loading more data...');
+    console.log('[LoadMore] Loading more data for page', targetPage);
     
     // Show loading indicator
     loadingToast = toast.info('Loading more expenses...', 0);
     
-    // Load next batch (50 more records)
-    const batchSize = state.itemsPerPage * 1; // 10 records
+    // Calculate how many records we need to load
+    const recordsNeeded = requiredRecords - state.expenses.length;
+    // Load in batches of 50, or exactly what we need (whichever is larger)
+    const batchSize = Math.max(50, recordsNeeded);
+    
+    console.log('[LoadMore] Need', recordsNeeded, 'more records, loading batch of', batchSize);
+    
     const result = await firestoreService.getExpensesPaginated({
       pageSize: batchSize,
       lastDoc: state.lastDoc,
@@ -469,7 +474,16 @@ async function loadMoreExpensesIfNeeded(targetPage) {
     state.hasMore = result.hasMore;
     state.filteredExpenses = [...state.expenses];
     
-    return true;
+    // Check if we have enough data now
+    if (state.expenses.length >= requiredRecords) {
+      return true;
+    } else if (!state.hasMore) {
+      // No more data available, but we don't have enough
+      return false;
+    } else {
+      // Still need more data, but we loaded what we could
+      return true;
+    }
   } catch (error) {
     console.error('[LoadMore] Error loading more expenses:', error);
     toast.error('Failed to load more expenses');
@@ -723,22 +737,9 @@ function buildFirestoreFilters() {
 }
 
 // Apply only client-side filters (search, family member, date range)
+// Note: Category, payment method, and specific payment method are already filtered at Firestore level
 function applyClientSideFilters() {
   let filtered = [...state.expenses];
-  
-  // Payment method filter - apply client-side for already loaded data
-  if (state.filters.paymentMethod) {
-    console.log('[Filter] Filtering by payment method:', state.filters.paymentMethod);
-    filtered = filtered.filter(e => e.paymentMethod === state.filters.paymentMethod);
-    console.log('[Filter] After payment method filter:', filtered.length);
-  }
-  
-  // Specific payment method filter
-  if (state.filters.specificPaymentMethod) {
-    console.log('[Filter] Filtering by specific payment method:', state.filters.specificPaymentMethod);
-    filtered = filtered.filter(e => e.specificPaymentMethodId === state.filters.specificPaymentMethod);
-    console.log('[Filter] After specific payment method filter:', filtered.length);
-  }
   
   // Family member filter - complex logic, must be client-side
   if (state.filters.familyMember) {
@@ -813,7 +814,7 @@ function applyClientSideFilters() {
     });
   }
   
-  renderExpenses();
+  // Don't call renderExpenses() here - it's called by loadExpenses()
 }
 
 // Check if any filters are active
