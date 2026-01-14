@@ -27,7 +27,7 @@ const state = {
     source: '',
     paymentMethod: '',
     specificPaymentMethod: '',
-    familyMembers: [], // Changed to array for multi-select
+    familyMember: '', // Single select
     dateFrom: '',
     dateTo: '',
     search: ''
@@ -401,7 +401,7 @@ async function loadIncome() {
     const hasFilters = filters.length > 0 || 
                        state.filters.paymentMethod ||
                        state.filters.specificPaymentMethod ||
-                       (state.filters.familyMembers && state.filters.familyMembers.length > 0) ||
+                       state.filters.familyMember ||
                        state.filters.search || 
                        state.filters.dateFrom || 
                        state.filters.dateTo;
@@ -414,7 +414,7 @@ async function loadIncome() {
       const hasFirestoreFilters = filters.length > 0;
       const hasClientSideFilters = state.filters.paymentMethod ||
                                     state.filters.specificPaymentMethod ||
-                                    (state.filters.familyMembers && state.filters.familyMembers.length > 0) ||
+                                    state.filters.familyMember ||
                                     state.filters.search || 
                                     state.filters.dateFrom || 
                                     state.filters.dateTo;
@@ -660,7 +660,7 @@ function hasActiveFilters() {
   return state.filters.source || 
          state.filters.paymentMethod || 
          state.filters.specificPaymentMethod || 
-         (state.filters.familyMembers && state.filters.familyMembers.length > 0) ||
+         state.filters.familyMember ||
          state.filters.dateFrom || 
          state.filters.dateTo || 
          state.filters.search;
@@ -839,17 +839,14 @@ function applyClientSideFilters() {
     console.log('[Filter] After specific payment method filter:', filtered.length, 'income');
   }
   
-  // Family member filter (for split income) - complex logic, must be client-side
-  // Now supports multi-select: show income where ANY selected member is involved
-  if (state.filters.familyMembers && state.filters.familyMembers.length > 0) {
-    console.log('[Filter] Filtering by family members:', state.filters.familyMembers);
+  // Family member filter (for split income) - single select
+  if (state.filters.familyMember) {
+    console.log('[Filter] Filtering by family member:', state.filters.familyMember);
     filtered = filtered.filter(i => {
       if (!i.hasSplit || !i.splitDetails) return false;
       const hasMatch = i.splitDetails.some(split => {
         const splitMemberId = String(split.memberId).trim();
-        const isSelected = state.filters.familyMembers.some(selectedId => 
-          String(selectedId).trim() === splitMemberId
-        );
+        const isSelected = String(state.filters.familyMember).trim() === splitMemberId;
         return isSelected;
       });
       return hasMatch;
@@ -1491,11 +1488,8 @@ function setupEventListeners() {
   const familyMemberFilter = document.getElementById('familyMemberFilter');
   if (familyMemberFilter) {
     familyMemberFilter.addEventListener('change', () => {
-      // Get all selected values (multi-select)
-      const selectedOptions = Array.from(familyMemberFilter.selectedOptions).map(option => option.value);
-      // Remove empty string if present (from "All Members" option)
-      state.filters.familyMembers = selectedOptions.filter(val => val !== '');
-      console.log('[Filter] Selected family members:', state.filters.familyMembers);
+      state.filters.familyMember = familyMemberFilter.value;
+      console.log('[Filter] Selected family member:', state.filters.familyMember);
       applyFilters();
     });
   }
@@ -1663,8 +1657,7 @@ function clearFilters() {
   }
   const familyMemberFilter = document.getElementById('familyMemberFilter');
   if (familyMemberFilter) {
-    // Clear all selected options for multi-select
-    Array.from(familyMemberFilter.options).forEach(option => option.selected = false);
+    familyMemberFilter.value = '';
   }
   dateFromFilter.value = '';
   dateToFilter.value = '';

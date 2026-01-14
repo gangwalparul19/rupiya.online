@@ -29,7 +29,7 @@ const state = {
     category: '',
     paymentMethod: '',
     specificPaymentMethod: '',
-    familyMembers: [], // Changed to array for multi-select
+    familyMember: '', // Single select
     dateFrom: '',
     dateTo: '',
     search: ''
@@ -416,7 +416,7 @@ async function loadExpenses() {
     const hasFilters = filters.length > 0 || 
                        state.filters.paymentMethod ||
                        state.filters.specificPaymentMethod ||
-                       (state.filters.familyMembers && state.filters.familyMembers.length > 0) ||
+                       state.filters.familyMember ||
                        state.filters.search || 
                        state.filters.dateFrom || 
                        state.filters.dateTo;
@@ -429,7 +429,7 @@ async function loadExpenses() {
       const hasFirestoreFilters = filters.length > 0;
       const hasClientSideFilters = state.filters.paymentMethod ||
                                     state.filters.specificPaymentMethod ||
-                                    (state.filters.familyMembers && state.filters.familyMembers.length > 0) ||
+                                    state.filters.familyMember ||
                                     state.filters.search || 
                                     state.filters.dateFrom || 
                                     state.filters.dateTo;
@@ -825,19 +825,16 @@ function applyClientSideFilters() {
     console.log('[Filter] After specific payment method filter:', filtered.length, 'expenses');
   }
   
-  // Family member filter - complex logic, must be client-side
-  // Now supports multi-select: show expenses where ANY selected member is involved
-  if (state.filters.familyMembers && state.filters.familyMembers.length > 0) {
-    console.log('[Filter] Filtering by family members:', state.filters.familyMembers);
+  // Family member filter - single select
+  if (state.filters.familyMember) {
+    console.log('[Filter] Filtering by family member:', state.filters.familyMember);
     filtered = filtered.filter(e => {
       // Check if expense has split details
       if (e.hasSplit && e.splitDetails && e.splitDetails.length > 0) {
-        // Check if ANY of the selected members has any amount in this expense
+        // Check if the selected member has any amount in this expense
         const hasMatch = e.splitDetails.some(split => {
           const splitMemberId = String(split.memberId).trim();
-          const isSelected = state.filters.familyMembers.some(selectedId => 
-            String(selectedId).trim() === splitMemberId
-          );
+          const isSelected = String(state.filters.familyMember).trim() === splitMemberId;
           const hasAmount = split.amount > 0;
           
           if (isSelected && hasAmount) {
@@ -922,7 +919,7 @@ function hasActiveFilters() {
   return state.filters.category || 
          state.filters.paymentMethod || 
          state.filters.specificPaymentMethod || 
-         (state.filters.familyMembers && state.filters.familyMembers.length > 0) ||
+         state.filters.familyMember ||
          state.filters.dateFrom || 
          state.filters.dateTo || 
          state.filters.search;
@@ -1942,11 +1939,8 @@ function setupEventListeners() {
   
   if (familyMemberFilter) {
     familyMemberFilter.addEventListener('change', () => {
-      // Get all selected values (multi-select)
-      const selectedOptions = Array.from(familyMemberFilter.selectedOptions).map(option => option.value);
-      // Remove empty string if present (from "All Members" option)
-      state.filters.familyMembers = selectedOptions.filter(val => val !== '');
-      console.log('[Filter] Selected family members:', state.filters.familyMembers);
+      state.filters.familyMember = familyMemberFilter.value;
+      console.log('[Filter] Selected family member:', state.filters.familyMember);
       applyFilters();
     });
   }
@@ -2123,10 +2117,7 @@ function clearFilters() {
   if (categoryFilter) categoryFilter.value = '';
   if (paymentMethodFilter) paymentMethodFilter.value = '';
   if (specificPaymentMethodFilter) specificPaymentMethodFilter.value = '';
-  if (familyMemberFilter) {
-    // Clear all selected options for multi-select
-    Array.from(familyMemberFilter.options).forEach(option => option.selected = false);
-  }
+  if (familyMemberFilter) familyMemberFilter.value = '';
   if (dateFromFilter) dateFromFilter.value = '';
   if (dateToFilter) dateToFilter.value = '';
   if (searchInput) searchInput.value = '';
