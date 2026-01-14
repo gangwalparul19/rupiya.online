@@ -427,12 +427,13 @@ async function loadMoreIncomeIfNeeded(targetPage) {
     return false;
   }
   
+  let loadingToast = null;
   try {
     state.loadingMore = true;
     console.log('[LoadMore] Loading more data...');
     
     // Show loading indicator
-    const loadingToast = toast.info('Loading more income...', { duration: 0 });
+    loadingToast = toast.info('Loading more income...', 0);
     
     // Load next batch (50 more records)
     const batchSize = state.itemsPerPage * 5; // 50 records
@@ -450,17 +451,16 @@ async function loadMoreIncomeIfNeeded(targetPage) {
     state.hasMore = result.hasMore;
     state.filteredIncome = [...state.income];
     
-    // Dismiss loading toast
-    if (loadingToast && loadingToast.dismiss) {
-      loadingToast.dismiss();
-    }
-    
     return true;
   } catch (error) {
     console.error('[LoadMore] Error loading more income:', error);
     toast.error('Failed to load more income');
     return false;
   } finally {
+    // Always dismiss loading toast
+    if (loadingToast) {
+      toast.removeToast(loadingToast);
+    }
     state.loadingMore = false;
   }
 }

@@ -7,8 +7,7 @@
   "crons": [
     {
       "path": "/api/cron/weekly-reports",
-      "schedule": "30 12 * * *",
-      "comment": "TESTING: Daily at 6:00 PM IST (12:30 UTC) - REVERT TO: 0 8 * * 0 (Sunday 8 AM IST)"
+      "schedule": "30 12 * * *"
     },
     {
       "path": "/api/cron/monthly-reports",

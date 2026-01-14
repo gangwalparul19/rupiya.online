@@ -445,12 +445,13 @@ async function loadMoreExpensesIfNeeded(targetPage) {
     return false;
   }
   
+  let loadingToast = null;
   try {
     state.loadingMore = true;
     console.log('[LoadMore] Loading more data...');
     
     // Show loading indicator
-    const loadingToast = toast.info('Loading more expenses...', { duration: 0 });
+    loadingToast = toast.info('Loading more expenses...', 0);
     
     // Load next batch (50 more records)
     const batchSize = state.itemsPerPage * 1; // 10 records
@@ -468,17 +469,16 @@ async function loadMoreExpensesIfNeeded(targetPage) {
     state.hasMore = result.hasMore;
     state.filteredExpenses = [...state.expenses];
     
-    // Dismiss loading toast
-    if (loadingToast && loadingToast.dismiss) {
-      loadingToast.dismiss();
-    }
-    
     return true;
   } catch (error) {
     console.error('[LoadMore] Error loading more expenses:', error);
     toast.error('Failed to load more expenses');
     return false;
   } finally {
+    // Always dismiss loading toast
+    if (loadingToast) {
+      toast.removeToast(loadingToast);
+    }
     state.loadingMore = false;
   }
 }
