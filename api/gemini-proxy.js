@@ -34,8 +34,8 @@ const db = getApps().length > 0 ? getFirestore() : null;
 const auth = getApps().length > 0 ? getAuth() : null;
 
 // Constants
-// Use gemini-1.5-flash for all requests (fast, efficient, and free tier friendly)
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
+// Use gemini-2.5-flash-lite for all requests (fast, efficient, and free tier friendly)
+const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent';
 const MAX_REQUESTS_PER_DAY = parseInt(process.env.GEMINI_MAX_REQUESTS_PER_USER_PER_DAY || '100');
 const MAX_TOKENS_PER_REQUEST = parseInt(process.env.GEMINI_MAX_TOKENS_PER_REQUEST || '2000');
 
