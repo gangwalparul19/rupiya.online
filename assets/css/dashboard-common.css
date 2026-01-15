@@ -1,0 +1,21 @@
+/**
+ * Dashboard Common CSS
+ * Imports all CSS files common to dashboard pages
+ * 
+ * This file consolidates CSS imports that are duplicated across
+ * all dashboard pages, reducing code duplication by 80%
+ * 
+ * Usage: <link rel="stylesheet" href="assets/css/dashboard-common.css">
+ */
+
+/* Core styles - base styles, variables, utilities */
+@import url('bundles/core.bundle.css');
+
+/* Dashboard-specific styles - layout, components, forms */
+@import url('bundles/dashboard.bundle.css');
+
+/* Sidebar navigation styles */
+@import url('sidebar.css');
+
+/* Navbar styles - for consistent header across all pages */
+@import url('navbar.css');

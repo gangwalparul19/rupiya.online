@@ -9,6 +9,14 @@ const HeaderComponent = {
    * @param {string} activePage - Current active page name
    */
   renderLandingHeader: (activePage = '') => {
+    // Inject navbar CSS if not already present
+    if (!document.querySelector('link[href*="navbar.css"]')) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = 'assets/css/navbar.css';
+      document.head.appendChild(link);
+    }
+
     const header = `
       <nav class="navbar" id="navbar">
         <div class="nav-container">
@@ -33,6 +41,14 @@ const HeaderComponent = {
    * @param {string} currentPage - 'login' or 'signup'
    */
   renderAuthHeader: (currentPage = '') => {
+    // Inject navbar CSS if not already present
+    if (!document.querySelector('link[href*="navbar.css"]')) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = 'assets/css/navbar.css';
+      document.head.appendChild(link);
+    }
+
     const header = `
       <nav class="landing-nav">
         <div class="container">

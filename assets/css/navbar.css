@@ -1,0 +1,268 @@
+/**
+ * Navbar Component Styles
+ * Centralized styles for navigation header across all public pages
+ * 
+ * This file ensures consistent navbar styling across:
+ * - index.html, features.html, user-guide.html (landing pages)
+ * - login.html, signup.html (auth pages)
+ */
+
+/* Navbar Container - Full Width */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  padding: 0; /* Remove any default padding */
+  margin: 0; /* Remove any default margin */
+}
+
+.navbar.scrolled {
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.15);
+}
+
+/* Nav Container - Content Width with Padding */
+.nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Logo */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.logo img {
+  width: 120px;
+  height: auto;
+}
+
+/* Navigation Links */
+.nav-links {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: var(--dark);
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+.nav-links a:hover {
+  color: var(--primary);
+}
+
+/* Mobile Toggle Button */
+.mobile-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--dark);
+  padding: 0.5rem;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .nav-container {
+    justify-content: center;
+    position: relative;
+    padding: 1rem 1.5rem;
+  }
+
+  .logo {
+    margin: 0 auto;
+  }
+
+  .logo img {
+    width: 140px;
+  }
+
+  .mobile-toggle {
+    display: block;
+    position: absolute;
+    right: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .nav-links {
+    position: fixed;
+    top: 70px;
+    left: 0;
+    right: 0;
+    width: 100%;
+    background: white;
+    flex-direction: column;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transform: translateY(-150%);
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 999;
+  }
+
+  .nav-links.active {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-container {
+    padding: 1rem 1rem;
+  }
+
+  .logo img {
+    width: 120px;
+  }
+
+  .mobile-toggle {
+    right: 1rem;
+  }
+}
+
+/* Auth Page Specific Styles */
+.auth-page .landing-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  padding: 0;
+  margin: 0;
+}
+
+.auth-page .landing-nav .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.auth-page .landing-logo a {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.auth-page .landing-logo img {
+  height: 40px;
+  width: auto;
+  transition: transform 0.3s ease;
+}
+
+.auth-page .landing-logo img:hover {
+  transform: scale(1.05);
+}
+
+.auth-page .landing-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.auth-page .landing-nav-links a {
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  padding: 10px 20px;
+  border-radius: 50px;
+  font-size: 0.9375rem;
+}
+
+.auth-page .landing-nav-links a:not(.btn) {
+  color: var(--primary-blue);
+}
+
+.auth-page .landing-nav-links a:not(.btn):hover {
+  color: var(--primary-dark);
+  background: rgba(102, 126, 234, 0.1);
+}
+
+/* Auth Page Mobile Styles */
+@media (max-width: 768px) {
+  .auth-page .landing-nav .container {
+    padding: 12px 16px;
+    position: relative;
+    justify-content: center;
+  }
+
+  .auth-page .landing-logo {
+    margin: 0 auto;
+  }
+
+  .auth-page .landing-nav-links {
+    position: fixed;
+    top: 70px;
+    left: 0;
+    right: 0;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    flex-direction: column;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    transform: translateY(-150%);
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 999;
+    gap: 12px;
+  }
+
+  .auth-page .landing-nav-links.active {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .auth-page .landing-nav-links a {
+    width: 100%;
+    text-align: center;
+    color: var(--text-primary);
+  }
+
+  .auth-page .landing-nav-links a:not(.btn) {
+    display: block;
+    color: var(--text-primary);
+  }
+
+  .auth-page .landing-nav-links a:not(.btn):hover {
+    color: var(--primary-blue);
+    background: rgba(74, 144, 226, 0.1);
+  }
+}

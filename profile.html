@@ -50,8 +50,8 @@
   <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
   
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="assets/css/bundles/core.bundle.css">
-  <link rel="stylesheet" href="assets/css/bundles/dashboard.bundle.css">
+  
+  
   <!-- Page-specific styles -->
   <link rel="stylesheet" href="assets/css/profile.css">
 <!-- Page-specific styles -->
@@ -60,8 +60,9 @@
   <link rel="stylesheet" href="assets/css/feature-settings.css">
   
   <!-- Logout Modal -->
+  <link rel="stylesheet" href="assets/css/dashboard-common.css">
   <link rel="stylesheet" href="assets/css/logout-modal.css">
-  <link rel="stylesheet" href="assets/css/sidebar.css">
+  
   
   <!-- Auth Guard - Must be loaded early to prevent flash of protected content -->
   <script src="assets/js/utils/auth-guard.js"></script>
@@ -783,8 +784,8 @@
   </div>
 
   <!-- Scripts -->
-  <script type="module" src="assets/js/utils/ux-enhancements.js"></script>
-  <script type="module" src="assets/js/components/sidebar.js"></script>
+  
+  
   <script type="module" src="assets/js/pages/profile.js"></script>
   <script type="module" src="assets/js/pwa-setup.js"></script>
 
@@ -793,5 +794,6 @@
     import { featureSettings } from './assets/js/components/feature-settings.js';
     featureSettings.init('featureSettingsContainer');
   </script>
+  <script type="module" src="assets/js/utils/dashboard-common.js"></script>
 </body>
 </html>
