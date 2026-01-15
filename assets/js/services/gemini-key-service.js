@@ -79,6 +79,11 @@ class GeminiKeyService {
   /**
    * Retrieve and decrypt user's Gemini API key
    * Only the authenticated user can retrieve their own key
+   * 
+   * IMPORTANT: This method automatically decrypts the stored encrypted key
+   * The key is stored encrypted in Firestore for security
+   * This method returns the DECRYPTED key ready to use
+   * 
    * @returns {Promise<string|null>} - Decrypted API key or null if not found
    */
   async getUserKey() {
@@ -112,7 +117,9 @@ class GeminiKeyService {
         return null;
       }
 
-      // Decrypt the API key
+      // Decrypt the API key from encrypted storage
+      // data.encryptedKey is the encrypted base64 string stored in Firestore
+      // decryptValue() returns the original plain-text API key
       const decryptedKey = await encryptionService.decryptValue(data.encryptedKey);
 
       if (!decryptedKey) {
@@ -301,10 +308,11 @@ class GeminiKeyService {
 
       log.log('Validating Gemini API key...');
 
-      // First, get and decrypt the user's API key
-      const encryptedKey = await this.getUserKey();
+      // Get and decrypt the user's API key from Firestore
+      // getUserKey() handles decryption automatically
+      const decryptedApiKey = await this.getUserKey();
       
-      if (!encryptedKey) {
+      if (!decryptedApiKey) {
         throw new Error('No API key found');
       }
 
@@ -312,6 +320,7 @@ class GeminiKeyService {
       const idToken = await auth.currentUser.getIdToken();
 
       // Call backend validation endpoint with decrypted key
+      // Backend will test this key with Gemini API
       const response = await fetch('/api/gemini-validate-key', {
         method: 'POST',
         headers: {
@@ -319,16 +328,30 @@ class GeminiKeyService {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          apiKey: encryptedKey
+          apiKey: decryptedApiKey
         })
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Validation failed');
+        let errorMessage = 'Validation failed';
+        
+        try {
+          const error = await response.json();
+          errorMessage = error.message || error.error || errorMessage;
+        } catch (parseError) {
+          // If response is not JSON, use status text
+          errorMessage = response.statusText || `HTTP ${response.status}`;
+        }
+        
+        throw new Error(errorMessage);
       }
 
-      const result = await response.json();
+      let result;
+      try {
+        result = await response.json();
+      } catch (parseError) {
+        throw new Error('Invalid response from server');
+      }
 
       if (result.valid) {
         // Update last validated timestamp

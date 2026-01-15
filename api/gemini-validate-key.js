@@ -82,6 +82,10 @@ async function getUserApiKey(userId) {
  */
 async function testGeminiApi(apiKey) {
   try {
+    if (!apiKey || typeof apiKey !== 'string') {
+      throw new Error('Invalid API key format');
+    }
+
     const response = await fetch(GEMINI_API_URL, {
       method: 'POST',
       headers: {
@@ -107,11 +111,18 @@ async function testGeminiApi(apiKey) {
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      const errorMessage = error.error?.message || 'API validation failed';
+      let errorMessage = 'API validation failed';
+      
+      try {
+        const error = await response.json();
+        errorMessage = error.error?.message || error.message || errorMessage;
+      } catch (parseError) {
+        // If response is not JSON, use status text
+        errorMessage = response.statusText || errorMessage;
+      }
       
       // Check for specific error types
-      if (errorMessage.includes('API key not valid')) {
+      if (errorMessage.includes('API key not valid') || errorMessage.includes('invalid')) {
         throw new Error('Invalid API key');
       } else if (errorMessage.includes('quota')) {
         throw new Error('API quota exceeded');
@@ -140,18 +151,18 @@ async function testGeminiApi(apiKey) {
  * Main handler
  */
 export default async function handler(req, res) {
-  // Enable CORS
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Origin', process.env.APP_URL || '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token,X-Requested-With,Accept,Accept-Version,Content-Length,Content-MD5,Content-Type,Date,X-Api-Version,Authorization');
-
-  if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
-  }
-
   try {
+    // Enable CORS
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Origin', process.env.APP_URL || '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+    res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token,X-Requested-With,Accept,Accept-Version,Content-Length,Content-MD5,Content-Type,Date,X-Api-Version,Authorization');
+
+    if (req.method === 'OPTIONS') {
+      res.status(200).end();
+      return;
+    }
+
     // Verify request method
     if (req.method !== 'POST') {
       return res.status(405).json({ error: 'Method not allowed' });
@@ -164,9 +175,19 @@ export default async function handler(req, res) {
     }
 
     const token = authHeader.substring(7);
-    const decodedToken = await verifyToken(token);
-    const userId = decodedToken.uid;
+    let decodedToken;
+    
+    try {
+      decodedToken = await verifyToken(token);
+    } catch (tokenError) {
+      console.error('Token verification failed:', tokenError);
+      return res.status(401).json({
+        valid: false,
+        message: 'Invalid or expired token'
+      });
+    }
 
+    const userId = decodedToken.uid;
     console.log(`Validating Gemini API key for user: ${userId}`);
 
     // Get the API key from request body (decrypted by client)
@@ -180,7 +201,15 @@ export default async function handler(req, res) {
     }
 
     // Test the API key
-    await testGeminiApi(apiKey);
+    try {
+      await testGeminiApi(apiKey);
+    } catch (testError) {
+      console.error('API key test failed:', testError);
+      return res.status(400).json({
+        valid: false,
+        message: testError.message || 'API key validation failed'
+      });
+    }
 
     console.log(`✅ API key validated for user: ${userId}`);
 
@@ -189,11 +218,12 @@ export default async function handler(req, res) {
       message: 'API key is valid and working'
     });
   } catch (error) {
-    console.error('Validation error:', error);
-
-    return res.status(400).json({
+    console.error('Unexpected validation error:', error);
+    
+    // Ensure we always return JSON
+    return res.status(500).json({
       valid: false,
-      message: error.message || 'API key validation failed'
+      message: error.message || 'Internal server error'
     });
   }
 }

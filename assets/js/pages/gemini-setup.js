@@ -13,6 +13,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
+        // Load user profile in sidebar
+        loadUserProfile(user);
+
         // Initialize encryption for the user
         try {
             const encryptionReady = await authEncryptionHelper.initializeForGoogleUser(user.uid);
@@ -30,6 +33,31 @@ document.addEventListener('DOMContentLoaded', async () => {
         setupEventListeners();
     });
 });
+
+/**
+ * Load and display user profile in sidebar
+ */
+function loadUserProfile(user) {
+    const userName = document.getElementById('userName');
+    const userEmail = document.getElementById('userEmail');
+    const userAvatar = document.getElementById('userAvatar');
+
+    if (userName) {
+        userName.textContent = user.displayName || user.email || 'User';
+    }
+
+    if (userEmail) {
+        userEmail.textContent = user.email || 'user@example.com';
+    }
+
+    if (userAvatar) {
+        // Get first letter of display name or email
+        const initials = user.displayName 
+            ? user.displayName[0].toUpperCase()
+            : user.email[0].toUpperCase();
+        userAvatar.textContent = initials;
+    }
+}
 
 /**
  * Load and display key status
