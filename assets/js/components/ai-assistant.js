@@ -396,10 +396,17 @@ class AIAssistant {
     this.showLoadingMessage();
 
     try {
+      // Get decrypted API key from key service
+      const apiKey = await geminiKeyService.getUserKey();
+      
+      if (!apiKey) {
+        throw new Error('No API key found. Please configure your Gemini API key in settings.');
+      }
+
       // Get Firebase token
       const token = await auth.currentUser.getIdToken();
 
-      // Call backend
+      // Call backend with decrypted API key
       const response = await fetch('/api/gemini-proxy', {
         method: 'POST',
         headers: {
@@ -410,7 +417,8 @@ class AIAssistant {
           action: 'chat',
           data: {
             message: message
-          }
+          },
+          apiKey: apiKey // Send decrypted key to backend
         })
       });
 

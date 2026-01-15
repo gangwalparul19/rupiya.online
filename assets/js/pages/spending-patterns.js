@@ -8,7 +8,6 @@ import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
 import encryptionReauthModal from '../components/encryption-reauth-modal.js';
 import toast from '../components/toast.js';
-import { initSidebar } from '../components/sidebar.js';
 
 // Chart.js CDN
 const chartScript = document.createElement('script');
@@ -23,8 +22,7 @@ let charts = {};
 // Initialize page
 async function init() {
   try {
-    // Initialize sidebar first
-    await initSidebar();
+    // Sidebar auto-initializes, no need to call it manually
     
     // Wait for auth
     currentUser = await authService.waitForAuth();

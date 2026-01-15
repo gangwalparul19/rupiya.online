@@ -3,18 +3,11 @@ import { auth } from '../config/firebase-config.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
 import geminiKeyService from '../services/gemini-key-service.js';
 import authEncryptionHelper from '../utils/auth-encryption-helper.js';
-import { initSidebar } from '../components/sidebar.js';
 
 // Initialize page
 document.addEventListener('DOMContentLoaded', async () => {
-    // Initialize sidebar first
-    try {
-        await initSidebar();
-        console.log('[Gemini Setup] Sidebar initialized');
-    } catch (error) {
-        console.error('[Gemini Setup] Error initializing sidebar:', error);
-    }
-
+    // Sidebar auto-initializes, no need to call it manually
+    
     // Check authentication
     onAuthStateChanged(auth, async (user) => {
         if (!user) {

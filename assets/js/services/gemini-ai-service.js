@@ -37,6 +37,13 @@ class GeminiAIService {
         throw new Error('User not authenticated');
       }
 
+      // Get decrypted API key from key service
+      const apiKey = await geminiKeyService.getUserKey();
+      
+      if (!apiKey) {
+        throw new Error('No API key found. Please configure your Gemini API key in settings.');
+      }
+
       const token = await auth.currentUser.getIdToken();
       
       const response = await fetch('/api/gemini-proxy', {
@@ -45,7 +52,11 @@ class GeminiAIService {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ action, data })
+        body: JSON.stringify({ 
+          action, 
+          data,
+          apiKey // Send decrypted key to backend
+        })
       });
 
       if (!response.ok) {

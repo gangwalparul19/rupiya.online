@@ -439,20 +439,13 @@ export default async function handler(req, res) {
     // Check rate limit
     await checkRateLimit(userId);
 
-    // Get user's API key
-    const encryptedKeyData = await getUserApiKey(userId);
+    // Get API key from request body (client sends decrypted key)
+    // Client-side encryption service decrypts the key before sending
+    const { action, data, apiKey } = req.body;
 
-    // In production, decrypt using secure key management
-    // For now, we'll need to implement proper decryption
-    // This is a placeholder - actual implementation would use KMS or similar
-    let apiKey = encryptedKeyData.encryptedKey;
-
-    // TODO: Implement proper decryption using master key from secure storage
-    // For development, you might store the master key in environment variables
-    // In production, use Google Cloud KMS or similar
-
-    // Extract request data
-    const { action, data } = req.body;
+    if (!apiKey) {
+      return res.status(400).json({ error: 'API key not provided' });
+    }
 
     if (!action) {
       return res.status(400).json({ error: 'Missing action' });
