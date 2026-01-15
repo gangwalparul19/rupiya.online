@@ -108,85 +108,79 @@
         <h1>🤖 Gemini AI Setup - 100% FREE</h1>
         <p>Enable AI-powered financial insights and suggestions - No credit card required!</p>
         <div class="free-tier-banner">
-          <strong style="color: var(--success-color); font-size: 1.1em;">✅ Completely Free - No Charges Ever</strong>
+          <strong>✅ Completely Free - No Charges Ever</strong>
           <p>Rupiya uses Google's free Gemini API tier. You will never be charged for using AI features.</p>
         </div>
       </div>
 
       <!-- Setup Steps -->
       <div class="setup-steps">
-        <!-- Step 1: Create Google Cloud Project -->
+        <!-- Step 1: Get Your Free API Key -->
         <div class="step-card" id="step1">
           <div class="step-title">
             <span class="step-number">1</span>
-            Create a Google Cloud Project
+            Get Your Free API Key (2 Minutes)
           </div>
           <div class="step-content">
             <p class="step-description">
-              You'll need a Google Cloud project to access the Gemini API. This is free and takes just a few minutes.
+              Getting your free API key is simple and takes just 2 minutes. No technical knowledge needed!
             </p>
-            <ol style="margin-left: 20px; color: var(--text-secondary);">
-              <li>Go to <a href="https://console.cloud.google.com" target="_blank" class="link-button">Google Cloud Console</a></li>
-              <li>Click "Select a Project" at the top</li>
-              <li>Click "NEW PROJECT"</li>
-              <li>Enter a project name (e.g., "Rupiya AI")</li>
-              <li>Click "CREATE"</li>
-            </ol>
+            
+            <div class="simple-steps">
+              <div class="simple-step">
+                <div class="step-icon">🔗</div>
+                <div class="step-text">
+                  <strong>Step 1:</strong> Click this link to open Google AI Studio
+                  <br>
+                  <a href="https://aistudio.google.com/app/apikey" target="_blank" class="link-button">
+                    → Open Google AI Studio (Free)
+                  </a>
+                </div>
+              </div>
+
+              <div class="simple-step">
+                <div class="step-icon">🔑</div>
+                <div class="step-text">
+                  <strong>Step 2:</strong> Click the blue "Create API Key" button
+                </div>
+              </div>
+
+              <div class="simple-step">
+                <div class="step-icon">📋</div>
+                <div class="step-text">
+                  <strong>Step 3:</strong> A popup will appear. Click "Create API key in new project"
+                </div>
+              </div>
+
+              <div class="simple-step">
+                <div class="step-icon">✂️</div>
+                <div class="step-text">
+                  <strong>Step 4:</strong> Your API key will appear. Copy it (it starts with "AIza")
+                </div>
+              </div>
+
+              <div class="simple-step">
+                <div class="step-icon">⬇️</div>
+                <div class="step-text">
+                  <strong>Step 5:</strong> Paste it below in the "Add Your API Key" section
+                </div>
+              </div>
+            </div>
+
             <div class="security-info">
-              <strong>🔒 Security Note:</strong> Your Google Cloud project is private and only you can access it. No one else can see your API key.
+              <strong>✅ 100% FREE:</strong> No credit card needed. No charges ever. This is completely free and will always remain free for Rupiya users.
+            </div>
+
+            <div class="warning-box">
+              <strong>🔒 Keep It Private:</strong> Your API key is like a password. Don't share it with anyone. When you paste it below, it will be encrypted and stored securely.
             </div>
           </div>
         </div>
 
-        <!-- Step 2: Enable Gemini API -->
+        <!-- Step 2: Add API Key to Rupiya -->
         <div class="step-card" id="step2">
           <div class="step-title">
             <span class="step-number">2</span>
-            Enable the Gemini API
-          </div>
-          <div class="step-content">
-            <p class="step-description">
-              Enable the Generative Language API in your Google Cloud project.
-            </p>
-            <ol style="margin-left: 20px; color: var(--text-secondary);">
-              <li>Make sure your new project is selected</li>
-              <li>Go to <a href="https://console.cloud.google.com/apis/library/generativelanguage.googleapis.com" target="_blank" class="link-button">Generative Language API</a></li>
-              <li>Click "ENABLE"</li>
-              <li>Wait for the API to be enabled (usually takes a few seconds)</li>
-            </ol>
-          </div>
-        </div>
-
-        <!-- Step 3: Create API Key -->
-        <div class="step-card" id="step3">
-          <div class="step-title">
-            <span class="step-number">3</span>
-            Create a FREE API Key
-          </div>
-          <div class="step-content">
-            <p class="step-description">
-              Generate a FREE API key to authenticate your requests to the Gemini API. No credit card required!
-            </p>
-            <ol style="margin-left: 20px; color: var(--text-secondary);">
-              <li>Go to <a href="https://aistudio.google.com/app/apikey" target="_blank" class="link-button">Google AI Studio (Free)</a></li>
-              <li>Click "Create API Key"</li>
-              <li>Select your Google Cloud project (or create a new one)</li>
-              <li>Copy the generated API key</li>
-              <li>Keep it safe - you'll paste it below</li>
-            </ol>
-            <div class="security-info">
-              <strong>✅ 100% FREE:</strong> The Gemini API free tier includes 60 requests per minute with no credit card required. This is completely free and will always remain free for Rupiya users.
-            </div>
-            <div class="warning-box">
-              <strong>🔒 Important:</strong> Keep your API key private. Never share it with anyone. You'll paste it below and it will be encrypted and stored securely. Only you can use your key.
-            </div>
-          </div>
-        </div>
-
-        <!-- Step 4: Add API Key to Rupiya -->
-        <div class="step-card" id="step4">
-          <div class="step-title">
-            <span class="step-number">4</span>
             Add Your API Key to Rupiya
           </div>
           <div class="step-content">
@@ -196,13 +190,13 @@
             
             <div class="api-key-input-section">
               <label for="apiKeyInput" style="display: block; margin-bottom: 10px; font-weight: 600;">
-                Gemini API Key
+                Your API Key
               </label>
               <div class="api-key-input-group">
                 <input 
                   type="password" 
                   id="apiKeyInput" 
-                  placeholder="Paste your API key here (AIza...)"
+                  placeholder="Paste your API key here (starts with AIza...)"
                   autocomplete="off"
                 >
                 <button class="btn btn-secondary" id="toggleKeyVisibility" title="Show/Hide">
@@ -215,7 +209,7 @@
                   Save API Key
                 </button>
                 <button class="btn btn-secondary" id="validateKeyBtn" disabled>
-                  Validate Key
+                  Test Key
                 </button>
               </div>
 
@@ -223,21 +217,21 @@
             </div>
 
             <div class="security-info" style="margin-top: 20px;">
-              <strong>� How Your Key is Protected:</strong>
+              <strong>🔐 Your Key is Safe:</strong>
               <ul style="margin: 10px 0 0 20px;">
-                <li>Your API key is encrypted using military-grade AES-256 encryption</li>
-                <li>Only you can decrypt and use your key</li>
-                <li>The key is never sent to Rupiya's servers in plain text</li>
-                <li>You can delete your key anytime from this page</li>
+                <li>Encrypted with military-grade security</li>
+                <li>Only you can use your key</li>
+                <li>Never shared with anyone</li>
+                <li>You can delete it anytime</li>
               </ul>
             </div>
           </div>
         </div>
 
-        <!-- Step 5: Key Status -->
-        <div class="step-card" id="step5">
+        <!-- Step 3: Key Status -->
+        <div class="step-card" id="step3">
           <div class="step-title">
-            <span class="step-number">5</span>
+            <span class="step-number">3</span>
             Your API Key Status
           </div>
           <div class="step-content">
@@ -252,77 +246,85 @@
 
       <!-- Features Section -->
       <div class="step-card">
-        <h2 style="margin-top: 0;">✨ What You Can Do With Gemini AI</h2>
+        <h2 style="margin-top: 0;">✨ What Your AI Assistant Can Do</h2>
         <ul class="feature-list">
-          <li>Get automatic expense categorization suggestions</li>
-          <li>Receive budget optimization recommendations</li>
-          <li>Analyze your spending patterns and trends</li>
-          <li>Get personalized financial insights</li>
-          <li>Chat with AI about your finances</li>
-          <li>Detect unusual spending patterns</li>
-          <li>Get goal achievement recommendations</li>
+          <li>📝 Automatically suggest categories for your expenses</li>
+          <li>💡 Give you tips to save more money</li>
+          <li>📊 Analyze your spending patterns</li>
+          <li>🎯 Help you reach your financial goals</li>
+          <li>💬 Answer questions about your finances</li>
+          <li>⚠️ Alert you about unusual spending</li>
+          <li>🤖 Chat with AI about money management</li>
         </ul>
       </div>
 
       <!-- FAQ Section -->
       <div class="step-card">
-        <h2 style="margin-top: 0;">❓ Frequently Asked Questions</h2>
+        <h2 style="margin-top: 0;">❓ Common Questions</h2>
         
         <div class="faq-item highlight">
           <h3>💰 Will this cost me money?</h3>
           <p>
-            <strong>No! It's completely free.</strong> Rupiya uses Google's free Gemini API tier which includes 60 requests per minute at no cost. You will never be charged for using AI features in Rupiya. No credit card required, no hidden fees, no surprises.
+            <strong>No! It's completely free.</strong> You don't need a credit card. No charges now, no charges ever. This is a promise from Rupiya.
           </p>
         </div>
 
         <div class="faq-item">
           <h3>🔐 Is my API key safe?</h3>
           <p>
-            Yes! Your API key is encrypted using military-grade AES-256 encryption before being stored. Only you can decrypt it. Rupiya never stores your key in plain text. Your key is completely private and secure.
+            Yes! Your key is encrypted (like a secret code) before being stored. Only you can use it. Rupiya never sees your key in plain form.
           </p>
         </div>
 
         <div class="faq-item">
           <h3>🗑️ Can I delete my API key?</h3>
           <p>
-            Yes! You can delete your API key anytime from this page. You can also delete it from your Google account. If you delete it, AI features will be disabled until you add a new key.
+            Yes! You can delete it anytime from this page. If you delete it, AI features will stop working until you add a new key.
           </p>
         </div>
 
         <div class="faq-item">
-          <h3>📊 What's the free tier limit?</h3>
+          <h3>📊 What's the limit?</h3>
           <p>
-            The free tier allows 60 requests per minute. For typical usage (5-10 requests per day), you'll never hit this limit. It's more than enough for personal financial management.
+            The free tier allows 60 requests per minute. For normal use (5-10 requests per day), you'll never hit this limit.
           </p>
         </div>
 
         <div class="faq-item">
-          <h3>🔑 How do I get a free API key?</h3>
+          <h3>🔑 I'm stuck getting the API key. What do I do?</h3>
           <p>
-            Follow Step 3 above. Go to <a href="https://aistudio.google.com/app/apikey" target="_blank" class="link-button">Google AI Studio</a>, click "Create API Key", and copy it. No credit card needed. It takes 30 seconds.
+            Just click the link in Step 1 above. It will take you directly to Google AI Studio. Click "Create API Key" and follow the simple steps. If you still need help, contact our support team.
           </p>
         </div>
 
         <div class="faq-item">
           <h3>📊 What data is sent to Google?</h3>
           <p>
-            Only the data you explicitly ask the AI to analyze (e.g., expense descriptions, budget amounts). Your personal information like passwords, email, or full financial data is never sent.
+            Only the data you ask the AI to analyze (like "categorize this expense"). Your passwords, email, and full financial data are never sent.
           </p>
         </div>
 
         <div class="faq-item">
-          <h3>❌ What if I don't have an API key?</h3>
+          <h3>❌ What if I don't add an API key?</h3>
           <p>
-            The app works perfectly fine without it. All core features (expenses, budgets, investments, etc.) work normally. AI features just won't be available. You can add your key anytime.
+            Rupiya works perfectly fine without it. All features (expenses, budgets, investments, etc.) work normally. AI features just won't be available.
           </p>
         </div>
 
         <div class="faq-item highlight">
           <h3>🚀 Will I ever be charged?</h3>
           <p>
-            <strong>Never.</strong> Rupiya is committed to keeping AI features free for all users. We use Google's free tier and will never charge you for AI features. If you ever see a charge, it's an error - contact us immediately.
+            <strong>Never.</strong> Rupiya is committed to keeping AI features free forever. If you ever see a charge, it's an error - contact us immediately.
           </p>
         </div>
+      </div>
+
+      <!-- Help Section -->
+      <div class="step-card" style="background: rgba(33, 150, 243, 0.05); border-left: 4px solid var(--primary-color);">
+        <h2 style="margin-top: 0; color: var(--primary-color);">💬 Need Help?</h2>
+        <p style="color: var(--text-secondary); margin: 0;">
+          If you're having trouble getting your API key or have any questions, please contact our support team. We're here to help!
+        </p>
       </div>
     </div>
   </main>

@@ -15,11 +15,13 @@
     font-size: 2.5em;
     margin-bottom: 10px;
     color: var(--primary-color);
+    word-wrap: break-word;
 }
 
 .setup-header p {
     font-size: 1.1em;
     color: var(--text-secondary);
+    margin-bottom: 20px;
 }
 
 .free-tier-banner {
@@ -34,11 +36,14 @@
 .free-tier-banner strong {
     color: var(--success-color);
     font-size: 1.1em;
+    display: block;
+    margin-bottom: 8px;
 }
 
 .free-tier-banner p {
-    margin: 10px 0 0 0;
+    margin: 0;
     color: var(--text-secondary);
+    font-size: 0.95em;
 }
 
 .setup-steps {
@@ -54,6 +59,7 @@
     border-radius: 8px;
     padding: 25px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
 }
 
 .step-card.completed {
@@ -62,17 +68,18 @@
 }
 
 .step-number {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     width: 40px;
     height: 40px;
     background: var(--primary-color);
     color: white;
     border-radius: 50%;
-    text-align: center;
-    line-height: 40px;
     font-weight: bold;
     margin-right: 15px;
     font-size: 1.2em;
+    flex-shrink: 0;
 }
 
 .step-card.completed .step-number {
@@ -85,29 +92,56 @@
     margin-bottom: 15px;
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
 }
 
 .step-content {
-    margin-left: 55px;
-    margin-top: -40px;
+    margin-left: 0;
+    margin-top: 0;
 }
 
 .step-description {
     color: var(--text-secondary);
-    margin-bottom: 15px;
+    margin-bottom: 20px;
     line-height: 1.6;
+    font-size: 0.95em;
 }
 
-.code-block {
-    background: var(--bg-dark);
-    border-left: 4px solid var(--primary-color);
+/* Simple Steps Styling */
+.simple-steps {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.simple-step {
+    display: flex;
+    gap: 15px;
     padding: 15px;
-    border-radius: 4px;
-    font-family: 'Courier New', monospace;
-    font-size: 0.9em;
-    overflow-x: auto;
-    margin: 15px 0;
+    background: var(--bg-light);
+    border-radius: 6px;
+    border-left: 4px solid var(--primary-color);
+}
+
+.step-icon {
+    font-size: 1.5em;
+    flex-shrink: 0;
+    width: 30px;
+    text-align: center;
+}
+
+.step-text {
+    flex: 1;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    font-size: 0.95em;
+}
+
+.step-text strong {
     color: var(--text-primary);
+    display: block;
+    margin-bottom: 5px;
 }
 
 .api-key-input-section {
@@ -127,6 +161,7 @@
     border-radius: 4px;
     font-size: 1em;
     font-family: 'Courier New', monospace;
+    min-width: 0;
 }
 
 .api-key-input-group input:focus {
@@ -139,6 +174,7 @@
     display: flex;
     gap: 10px;
     margin-top: 15px;
+    flex-wrap: wrap;
 }
 
 .btn {
@@ -149,11 +185,14 @@
     cursor: pointer;
     transition: all 0.3s ease;
     font-weight: 600;
+    white-space: nowrap;
 }
 
 .btn-primary {
     background: var(--primary-color);
     color: white;
+    flex: 1;
+    min-width: 150px;
 }
 
 .btn-primary:hover {
@@ -166,6 +205,8 @@
     background: var(--bg-light);
     color: var(--text-primary);
     border: 1px solid var(--border-color);
+    flex: 1;
+    min-width: 100px;
 }
 
 .btn-secondary:hover {
@@ -175,6 +216,8 @@
 .btn-danger {
     background: var(--danger-color);
     color: white;
+    flex: 1;
+    min-width: 150px;
 }
 
 .btn-danger:hover {
@@ -191,6 +234,7 @@
     border-radius: 4px;
     margin-top: 15px;
     display: none;
+    word-wrap: break-word;
 }
 
 .status-message.show {
@@ -234,6 +278,8 @@
     justify-content: space-between;
     padding: 10px 0;
     border-bottom: 1px solid var(--border-color);
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
 .key-status-item:last-child {
@@ -243,10 +289,14 @@
 .key-status-label {
     font-weight: 600;
     color: var(--text-secondary);
+    min-width: 150px;
 }
 
 .key-status-value {
     color: var(--text-primary);
+    text-align: right;
+    flex: 1;
+    min-width: 100px;
 }
 
 .key-status-value.active {
@@ -270,6 +320,18 @@
 
 .security-info strong {
     color: var(--primary-color);
+    display: block;
+    margin-bottom: 8px;
+}
+
+.security-info ul {
+    margin: 10px 0 0 20px;
+    padding: 0;
+}
+
+.security-info li {
+    margin: 5px 0;
+    color: var(--text-secondary);
 }
 
 .link-button {
@@ -280,25 +342,11 @@
     border: none;
     background: none;
     padding: 0;
+    display: inline;
 }
 
 .link-button:hover {
     text-decoration: underline;
-}
-
-.loading-spinner {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    border: 3px solid rgba(63, 81, 181, 0.3);
-    border-radius: 50%;
-    border-top-color: var(--primary-color);
-    animation: spin 1s ease-in-out infinite;
-    margin-right: 10px;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
 }
 
 .feature-list {
@@ -308,10 +356,11 @@
 }
 
 .feature-list li {
-    padding: 8px 0;
-    padding-left: 25px;
+    padding: 10px 0;
+    padding-left: 30px;
     position: relative;
     color: var(--text-secondary);
+    line-height: 1.5;
 }
 
 .feature-list li:before {
@@ -320,6 +369,7 @@
     left: 0;
     color: var(--success-color);
     font-weight: bold;
+    font-size: 1.2em;
 }
 
 .warning-box {
@@ -333,21 +383,34 @@
 
 .warning-box strong {
     color: #ff9800;
+    display: block;
+    margin-bottom: 8px;
 }
 
 .faq-item {
     margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.faq-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
 }
 
 .faq-item h3 {
     color: var(--primary-color);
     margin-bottom: 8px;
     margin-top: 0;
+    font-size: 1.05em;
 }
 
 .faq-item p {
     color: var(--text-secondary);
     margin: 0;
+    line-height: 1.6;
+    font-size: 0.95em;
 }
 
 .faq-item.highlight {
@@ -355,6 +418,8 @@
     background: rgba(76, 175, 80, 0.1);
     border-left: 4px solid var(--success-color);
     border-radius: 4px;
+    border-bottom: none;
+    margin-bottom: 20px;
 }
 
 .faq-item.highlight h3 {
@@ -370,8 +435,20 @@
         font-size: 1.8em;
     }
 
+    .setup-header p {
+        font-size: 0.95em;
+    }
+
+    .step-title {
+        font-size: 1.1em;
+    }
+
     .api-key-input-group {
         flex-direction: column;
+    }
+
+    .api-key-input-group input {
+        width: 100%;
     }
 
     .btn-group {
@@ -380,20 +457,90 @@
 
     .btn {
         width: 100%;
+        min-width: auto;
     }
 
-    .step-content {
-        margin-left: 0;
-        margin-top: 10px;
-    }
-
-    .step-title {
+    .simple-step {
         flex-direction: column;
-        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .step-icon {
+        width: auto;
+        text-align: left;
+    }
+
+    .key-status-item {
+        flex-direction: column;
+    }
+
+    .key-status-label {
+        min-width: auto;
+    }
+
+    .key-status-value {
+        text-align: left;
+    }
+
+    .step-card {
+        padding: 15px;
     }
 
     .step-number {
-        margin-right: 0;
-        margin-bottom: 10px;
+        width: 35px;
+        height: 35px;
+        font-size: 1em;
+        margin-right: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .gemini-setup-container {
+        padding: 10px;
+    }
+
+    .setup-header h1 {
+        font-size: 1.5em;
+    }
+
+    .setup-header p {
+        font-size: 0.9em;
+    }
+
+    .step-card {
+        padding: 12px;
+    }
+
+    .step-title {
+        font-size: 1em;
+    }
+
+    .step-description {
+        font-size: 0.9em;
+    }
+
+    .simple-step {
+        padding: 12px;
+    }
+
+    .step-icon {
+        font-size: 1.2em;
+    }
+
+    .step-text {
+        font-size: 0.9em;
+    }
+
+    .btn {
+        padding: 10px 16px;
+        font-size: 0.9em;
+    }
+
+    .faq-item h3 {
+        font-size: 1em;
+    }
+
+    .faq-item p {
+        font-size: 0.9em;
     }
 }
