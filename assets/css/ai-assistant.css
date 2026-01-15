@@ -52,7 +52,7 @@
 }
 
 .ai-assistant-chat {
-  position: absolute;
+  position: fixed;
   bottom: 80px;
   right: 0;
   width: 400px;
@@ -67,6 +67,7 @@
   overflow: hidden;
   animation: slideUp 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   border: 2px solid #667eea;
+  z-index: 9998; /* Below button but above other content */
 }
 
 .ai-assistant-chat.open {
@@ -184,6 +185,8 @@
   font-size: 14px;
   line-height: 1.5;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  display: block; /* Ensure block display */
+  width: 100%; /* Full width within max-width */
 }
 
 .ai-message.assistant p {
@@ -191,6 +194,7 @@
   color: #333;
   border-bottom-left-radius: 4px;
   border: 1px solid #e0e0e0;
+  max-width: 90%; /* Wider for assistant messages */
 }
 
 .ai-message.user p {
@@ -204,6 +208,7 @@
   padding-left: 20px;
   font-size: 13px;
   color: #555;
+  list-style-type: disc;
 }
 
 .ai-message li {
@@ -313,16 +318,19 @@
   background: linear-gradient(135deg, #f0f4ff 0%, #e8f0fe 100%);
   border: 2px solid #667eea;
   font-weight: 500;
+  max-width: 95%;
+  white-space: pre-line; /* Preserve line breaks */
 }
 
 /* Mobile responsive */
 @media (max-width: 480px) {
   .ai-assistant-chat {
     width: calc(100vw - 20px);
-    height: calc(100vh - 100px);
-    bottom: 70px;
+    height: calc(100vh - 140px); /* More space from top */
+    bottom: 80px;
     right: 10px;
     border-radius: 16px;
+    max-height: calc(100vh - 140px);
   }
 
   .ai-chat-header {
@@ -340,6 +348,10 @@
   .ai-message p {
     max-width: 90%;
     font-size: 13px;
+  }
+  
+  .ai-message.assistant p {
+    max-width: 95%;
   }
 
   .ai-chat-input {

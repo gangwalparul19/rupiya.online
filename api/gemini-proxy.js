@@ -228,7 +228,7 @@ async function callGeminiApi(apiKey, prompt, maxTokens = 500) {
         ],
         generationConfig: {
           maxOutputTokens: Math.min(maxTokens, MAX_TOKENS_PER_REQUEST),
-          temperature: 0.3,
+          temperature: 0.7, // Increased for more conversational responses
           topP: 0.95
         },
         safetySettings: [
@@ -301,37 +301,44 @@ function sanitizePrompt(prompt) {
  */
 async function handleGeminiRequest(userId, action, data, apiKey) {
   let prompt = '';
+  let maxTokens = 500; // Default
 
   switch (action) {
     case 'categorizeExpense':
       prompt = buildCategorizeExpensePrompt(data);
+      maxTokens = 300;
       break;
 
     case 'analyzeBudget':
       prompt = buildAnalyzeBudgetPrompt(data);
+      maxTokens = 800;
       break;
 
     case 'spendingInsights':
       prompt = buildSpendingInsightsPrompt(data);
+      maxTokens = 800;
       break;
 
     case 'investmentAnalysis':
       prompt = buildInvestmentAnalysisPrompt(data);
+      maxTokens = 800;
       break;
 
     case 'goalRecommendation':
       prompt = buildGoalRecommendationPrompt(data);
+      maxTokens = 800;
       break;
 
     case 'chat':
-      prompt = sanitizePrompt(data.message);
+      prompt = buildChatPrompt(data);
+      maxTokens = 1000; // Higher limit for conversational responses
       break;
 
     default:
       throw new Error('Unknown action');
   }
 
-  return await callGeminiApi(apiKey, prompt);
+  return await callGeminiApi(apiKey, prompt, maxTokens);
 }
 
 /**
@@ -357,6 +364,194 @@ Respond ONLY with a JSON object (no markdown, no extra text):
   "confidence": 85,
   "reasoning": "brief explanation"
 }
+  `);
+}
+
+function buildChatPrompt(data) {
+  const { message, financialContext } = data;
+  
+  // Build comprehensive context summary
+  let contextSummary = '';
+  
+  if (financialContext) {
+    contextSummary = '\n\n=== USER\'S COMPLETE FINANCIAL PROFILE ===\n';
+    
+    // Expenses
+    if (financialContext.expenses && financialContext.expenses.length > 0) {
+      const totalExpenses = financialContext.expenses.reduce((sum, e) => sum + (e.amount || 0), 0);
+      const expensesByCategory = {};
+      financialContext.expenses.forEach(e => {
+        expensesByCategory[e.category] = (expensesByCategory[e.category] || 0) + e.amount;
+      });
+      
+      contextSummary += `\n📊 EXPENSES (Last 3 Months):\n`;
+      contextSummary += `- Total: ₹${totalExpenses.toFixed(2)}\n`;
+      contextSummary += `- Transaction Count: ${financialContext.expenses.length}\n`;
+      contextSummary += `- By Category:\n`;
+      Object.entries(expensesByCategory).forEach(([cat, amt]) => {
+        contextSummary += `  * ${cat}: ₹${amt.toFixed(2)}\n`;
+      });
+      
+      contextSummary += `\n- Recent Transactions:\n`;
+      financialContext.expenses.slice(0, 20).forEach(e => {
+        contextSummary += `  ${e.date}: ₹${e.amount} - ${e.category} - ${e.description}\n`;
+      });
+    }
+    
+    // Income
+    if (financialContext.income && financialContext.income.length > 0) {
+      const totalIncome = financialContext.income.reduce((sum, i) => sum + (i.amount || 0), 0);
+      contextSummary += `\n💰 INCOME (Last 3 Months):\n`;
+      contextSummary += `- Total: ₹${totalIncome.toFixed(2)}\n`;
+      contextSummary += `- Transaction Count: ${financialContext.income.length}\n`;
+    }
+    
+    // Budgets
+    if (financialContext.budgets && financialContext.budgets.length > 0) {
+      contextSummary += `\n📋 BUDGETS (${financialContext.budgets.length} active):\n`;
+      financialContext.budgets.forEach(b => {
+        contextSummary += `- ${b.category}: ₹${b.amount} per ${b.period}\n`;
+      });
+    }
+    
+    // Goals
+    if (financialContext.goals && financialContext.goals.length > 0) {
+      contextSummary += `\n🎯 FINANCIAL GOALS (${financialContext.goals.length} total):\n`;
+      financialContext.goals.forEach(g => {
+        const progress = g.targetAmount > 0 ? ((g.currentAmount / g.targetAmount) * 100).toFixed(1) : 0;
+        contextSummary += `- ${g.name}: ₹${g.currentAmount} / ₹${g.targetAmount} (${progress}%) - ${g.status || 'Active'}\n`;
+      });
+    }
+    
+    // Investments
+    if (financialContext.investments && financialContext.investments.length > 0) {
+      const totalInvested = financialContext.investments.reduce((sum, i) => sum + (i.investedAmount || 0), 0);
+      const totalCurrent = financialContext.investments.reduce((sum, i) => sum + (i.currentValue || 0), 0);
+      const returns = totalCurrent - totalInvested;
+      const returnPct = totalInvested > 0 ? ((returns / totalInvested) * 100).toFixed(2) : 0;
+      
+      contextSummary += `\n📈 INVESTMENTS (${financialContext.investments.length} holdings):\n`;
+      contextSummary += `- Total Invested: ₹${totalInvested.toFixed(2)}\n`;
+      contextSummary += `- Current Value: ₹${totalCurrent.toFixed(2)}\n`;
+      contextSummary += `- Returns: ₹${returns.toFixed(2)} (${returnPct}%)\n`;
+    }
+    
+    // Credit Cards
+    if (financialContext.creditCards && financialContext.creditCards.length > 0) {
+      const totalLimit = financialContext.creditCards.reduce((sum, c) => sum + (c.creditLimit || 0), 0);
+      const totalBalance = financialContext.creditCards.reduce((sum, c) => sum + (c.currentBalance || 0), 0);
+      
+      contextSummary += `\n💳 CREDIT CARDS (${financialContext.creditCards.length} cards):\n`;
+      contextSummary += `- Total Credit Limit: ₹${totalLimit.toFixed(2)}\n`;
+      contextSummary += `- Total Outstanding: ₹${totalBalance.toFixed(2)}\n`;
+      financialContext.creditCards.forEach(c => {
+        contextSummary += `  * ${c.bankName} ${c.cardName}: ₹${c.currentBalance} / ₹${c.creditLimit}\n`;
+      });
+    }
+    
+    // Loans
+    if (financialContext.loans && financialContext.loans.length > 0) {
+      const totalOutstanding = financialContext.loans.reduce((sum, l) => sum + (l.outstandingAmount || 0), 0);
+      const totalEMI = financialContext.loans.reduce((sum, l) => sum + (l.emiAmount || 0), 0);
+      
+      contextSummary += `\n🏦 LOANS (${financialContext.loans.length} active):\n`;
+      contextSummary += `- Total Outstanding: ₹${totalOutstanding.toFixed(2)}\n`;
+      contextSummary += `- Total Monthly EMI: ₹${totalEMI.toFixed(2)}\n`;
+      financialContext.loans.forEach(l => {
+        contextSummary += `  * ${l.loanType} (${l.lender}): ₹${l.outstandingAmount} @ ${l.interestRate}%\n`;
+      });
+    }
+    
+    // Properties
+    if (financialContext.houses && financialContext.houses.length > 0) {
+      const totalValue = financialContext.houses.reduce((sum, h) => sum + (h.currentValue || 0), 0);
+      contextSummary += `\n🏠 PROPERTIES (${financialContext.houses.length} properties):\n`;
+      contextSummary += `- Total Value: ₹${totalValue.toFixed(2)}\n`;
+      financialContext.houses.forEach(h => {
+        contextSummary += `  * ${h.propertyName} (${h.propertyType}): ₹${h.currentValue}\n`;
+      });
+    }
+    
+    // Vehicles
+    if (financialContext.vehicles && financialContext.vehicles.length > 0) {
+      const totalValue = financialContext.vehicles.reduce((sum, v) => sum + (v.currentValue || 0), 0);
+      contextSummary += `\n🚗 VEHICLES (${financialContext.vehicles.length} vehicles):\n`;
+      contextSummary += `- Total Value: ₹${totalValue.toFixed(2)}\n`;
+      financialContext.vehicles.forEach(v => {
+        contextSummary += `  * ${v.vehicleName} (${v.vehicleType}): ₹${v.currentValue}\n`;
+      });
+    }
+    
+    // Recurring Transactions
+    if (financialContext.recurringTransactions && financialContext.recurringTransactions.length > 0) {
+      contextSummary += `\n🔄 RECURRING TRANSACTIONS (${financialContext.recurringTransactions.length} active):\n`;
+      financialContext.recurringTransactions.forEach(r => {
+        contextSummary += `- ${r.description}: ₹${r.amount} ${r.frequency} (${r.type})\n`;
+      });
+    }
+    
+    // Family Members
+    if (financialContext.familyMembers && financialContext.familyMembers.length > 0) {
+      contextSummary += `\n👨‍👩‍👧‍👦 FAMILY MEMBERS (${financialContext.familyMembers.length} members):\n`;
+      financialContext.familyMembers.forEach(m => {
+        contextSummary += `- ${m.name} (${m.relationship})\n`;
+      });
+    }
+    
+    // Trip Groups
+    if (financialContext.tripGroups && financialContext.tripGroups.length > 0) {
+      contextSummary += `\n✈️ TRIP GROUPS (${financialContext.tripGroups.length} groups):\n`;
+      financialContext.tripGroups.forEach(t => {
+        contextSummary += `- ${t.name}: ₹${t.totalSpent} / ₹${t.totalBudget} (${t.memberCount} members)\n`;
+      });
+    }
+    
+    // Healthcare Insurance
+    if (financialContext.healthcareInsurance && financialContext.healthcareInsurance.length > 0) {
+      contextSummary += `\n🏥 HEALTHCARE INSURANCE (${financialContext.healthcareInsurance.length} policies):\n`;
+      financialContext.healthcareInsurance.forEach(h => {
+        contextSummary += `- ${h.policyName} (${h.provider}): ₹${h.coverageAmount} coverage, ₹${h.premium} premium\n`;
+      });
+    }
+    
+    // House Help
+    if (financialContext.houseHelp && financialContext.houseHelp.length > 0) {
+      contextSummary += `\n👥 HOUSE HELP (${financialContext.houseHelp.length} staff):\n`;
+      financialContext.houseHelp.forEach(h => {
+        contextSummary += `- ${h.name} (${h.role}): ₹${h.salary} per ${h.paymentFrequency}\n`;
+      });
+    }
+    
+    // Documents & Notes
+    if (financialContext.documents && financialContext.documents.length > 0) {
+      contextSummary += `\n📄 DOCUMENTS: ${financialContext.documents.length} files stored\n`;
+    }
+    
+    if (financialContext.notes && financialContext.notes.length > 0) {
+      contextSummary += `📝 NOTES: ${financialContext.notes.length} notes saved\n`;
+    }
+    
+    contextSummary += '\n=== END OF FINANCIAL PROFILE ===\n';
+  }
+
+  return sanitizePrompt(`
+You are Rupiya AI Assistant, a helpful financial advisor with complete access to the user's financial data.
+
+${contextSummary}
+
+User's Question: ${message}
+
+Instructions:
+- Answer based on the user's actual financial data provided above
+- Be specific with numbers, dates, categories, and names from their data
+- If asked about counts (e.g., "how many credit cards"), provide the exact number
+- If asked about specific dates, search the transaction data for that date
+- Provide actionable insights and personalized recommendations
+- Use Indian Rupee (₹) format for all amounts
+- Be conversational, friendly, and helpful
+- If the data doesn't contain the answer, explain what data IS available and suggest alternatives
+
+Respond in a clear, concise, and helpful manner.
   `);
 }
 

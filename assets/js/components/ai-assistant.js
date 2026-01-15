@@ -50,14 +50,12 @@ class AIAssistant {
         
         <div class="ai-chat-messages" id="aiChatMessages">
           <div class="ai-message assistant">
-            <p>Hi! I'm your financial AI assistant. I can help you with:</p>
-            <ul>
-              <li>Expense categorization</li>
-              <li>Budget analysis</li>
-              <li>Spending insights</li>
-              <li>Financial recommendations</li>
-            </ul>
-            <p>What would you like to know?</p>
+            <p>Hi! I'm your financial AI assistant. I can help you with:<br><br>
+            • Expense categorization<br>
+            • Budget analysis<br>
+            • Spending insights<br>
+            • Financial recommendations<br><br>
+            What would you like to know?</p>
           </div>
         </div>
         
@@ -379,6 +377,406 @@ class AIAssistant {
     document.getElementById('aiAssistantChat').classList.remove('open');
   }
 
+  /**
+   * Gather financial context from Firestore to provide to AI
+   * This allows AI to answer questions about user's actual financial data
+   */
+  async gatherFinancialContext() {
+    try {
+      const userId = auth.currentUser?.uid;
+      if (!userId) {
+        return null;
+      }
+
+      // Import Firestore services
+      const { db } = await import('../config/firebase-config.js');
+      const { collection, query, where, getDocs, orderBy, limit, doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js');
+
+      const context = {
+        expenses: [],
+        income: [],
+        budgets: [],
+        goals: [],
+        investments: [],
+        creditCards: [],
+        loans: [],
+        houses: [],
+        vehicles: [],
+        recurringTransactions: [],
+        transfers: [],
+        familyMembers: [],
+        tripGroups: [],
+        documents: [],
+        notes: [],
+        healthcareInsurance: [],
+        houseHelp: []
+      };
+
+      // Get recent expenses (last 3 months)
+      try {
+        const threeMonthsAgo = new Date();
+        threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+        
+        const expensesQuery = query(
+          collection(db, 'expenses'),
+          where('userId', '==', userId),
+          where('date', '>=', threeMonthsAgo.toISOString().split('T')[0]),
+          orderBy('date', 'desc'),
+          limit(200)
+        );
+        
+        const expensesSnapshot = await getDocs(expensesQuery);
+        context.expenses = expensesSnapshot.docs.map(doc => ({
+          date: doc.data().date,
+          amount: doc.data().amount,
+          category: doc.data().category,
+          description: doc.data().description
+        }));
+      } catch (error) {
+        log.warn('Could not fetch expenses:', error);
+      }
+
+      // Get recent income (last 3 months)
+      try {
+        const threeMonthsAgo = new Date();
+        threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+        
+        const incomeQuery = query(
+          collection(db, 'income'),
+          where('userId', '==', userId),
+          where('date', '>=', threeMonthsAgo.toISOString().split('T')[0]),
+          orderBy('date', 'desc'),
+          limit(100)
+        );
+        
+        const incomeSnapshot = await getDocs(incomeQuery);
+        context.income = incomeSnapshot.docs.map(doc => ({
+          date: doc.data().date,
+          amount: doc.data().amount,
+          source: doc.data().source,
+          description: doc.data().description
+        }));
+      } catch (error) {
+        log.warn('Could not fetch income:', error);
+      }
+
+      // Get active budgets
+      try {
+        const budgetsQuery = query(
+          collection(db, 'budgets'),
+          where('userId', '==', userId),
+          limit(50)
+        );
+        
+        const budgetsSnapshot = await getDocs(budgetsQuery);
+        context.budgets = budgetsSnapshot.docs.map(doc => ({
+          category: doc.data().category,
+          amount: doc.data().amount,
+          period: doc.data().period
+        }));
+      } catch (error) {
+        log.warn('Could not fetch budgets:', error);
+      }
+
+      // Get active goals
+      try {
+        const goalsQuery = query(
+          collection(db, 'goals'),
+          where('userId', '==', userId),
+          limit(20)
+        );
+        
+        const goalsSnapshot = await getDocs(goalsQuery);
+        context.goals = goalsSnapshot.docs.map(doc => ({
+          name: doc.data().name,
+          targetAmount: doc.data().targetAmount,
+          currentAmount: doc.data().currentAmount,
+          targetDate: doc.data().targetDate,
+          status: doc.data().status
+        }));
+      } catch (error) {
+        log.warn('Could not fetch goals:', error);
+      }
+
+      // Get investments
+      try {
+        const investmentsQuery = query(
+          collection(db, 'investments'),
+          where('userId', '==', userId),
+          limit(100)
+        );
+        
+        const investmentsSnapshot = await getDocs(investmentsQuery);
+        context.investments = investmentsSnapshot.docs.map(doc => ({
+          name: doc.data().name,
+          type: doc.data().type,
+          currentValue: doc.data().currentValue,
+          investedAmount: doc.data().investedAmount,
+          quantity: doc.data().quantity
+        }));
+      } catch (error) {
+        log.warn('Could not fetch investments:', error);
+      }
+
+      // Get credit cards
+      try {
+        const creditCardsQuery = query(
+          collection(db, 'creditCards'),
+          where('userId', '==', userId),
+          limit(50)
+        );
+        
+        const creditCardsSnapshot = await getDocs(creditCardsQuery);
+        context.creditCards = creditCardsSnapshot.docs.map(doc => ({
+          bankName: doc.data().bankName,
+          cardName: doc.data().cardName,
+          creditLimit: doc.data().creditLimit,
+          currentBalance: doc.data().currentBalance,
+          dueDate: doc.data().dueDate
+        }));
+      } catch (error) {
+        log.warn('Could not fetch credit cards:', error);
+      }
+
+      // Get loans
+      try {
+        const loansQuery = query(
+          collection(db, 'loans'),
+          where('userId', '==', userId),
+          limit(50)
+        );
+        
+        const loansSnapshot = await getDocs(loansQuery);
+        context.loans = loansSnapshot.docs.map(doc => ({
+          loanType: doc.data().loanType,
+          lender: doc.data().lender,
+          principalAmount: doc.data().principalAmount,
+          outstandingAmount: doc.data().outstandingAmount,
+          interestRate: doc.data().interestRate,
+          emiAmount: doc.data().emiAmount
+        }));
+      } catch (error) {
+        log.warn('Could not fetch loans:', error);
+      }
+
+      // Get houses/properties
+      try {
+        const housesQuery = query(
+          collection(db, 'houses'),
+          where('userId', '==', userId),
+          limit(20)
+        );
+        
+        const housesSnapshot = await getDocs(housesQuery);
+        context.houses = housesSnapshot.docs.map(doc => ({
+          propertyName: doc.data().propertyName,
+          propertyType: doc.data().propertyType,
+          currentValue: doc.data().currentValue,
+          purchaseValue: doc.data().purchaseValue,
+          address: doc.data().address
+        }));
+      } catch (error) {
+        log.warn('Could not fetch houses:', error);
+      }
+
+      // Get vehicles
+      try {
+        const vehiclesQuery = query(
+          collection(db, 'vehicles'),
+          where('userId', '==', userId),
+          limit(20)
+        );
+        
+        const vehiclesSnapshot = await getDocs(vehiclesQuery);
+        context.vehicles = vehiclesSnapshot.docs.map(doc => ({
+          vehicleName: doc.data().vehicleName,
+          vehicleType: doc.data().vehicleType,
+          currentValue: doc.data().currentValue,
+          purchaseValue: doc.data().purchaseValue,
+          registrationNumber: doc.data().registrationNumber
+        }));
+      } catch (error) {
+        log.warn('Could not fetch vehicles:', error);
+      }
+
+      // Get recurring transactions
+      try {
+        const recurringQuery = query(
+          collection(db, 'recurring'),
+          where('userId', '==', userId),
+          where('isActive', '==', true),
+          limit(50)
+        );
+        
+        const recurringSnapshot = await getDocs(recurringQuery);
+        context.recurringTransactions = recurringSnapshot.docs.map(doc => ({
+          description: doc.data().description,
+          amount: doc.data().amount,
+          frequency: doc.data().frequency,
+          category: doc.data().category,
+          type: doc.data().type
+        }));
+      } catch (error) {
+        log.warn('Could not fetch recurring transactions:', error);
+      }
+
+      // Get transfers
+      try {
+        const transfersQuery = query(
+          collection(db, 'transfers'),
+          where('userId', '==', userId),
+          orderBy('date', 'desc'),
+          limit(50)
+        );
+        
+        const transfersSnapshot = await getDocs(transfersQuery);
+        context.transfers = transfersSnapshot.docs.map(doc => ({
+          date: doc.data().date,
+          amount: doc.data().amount,
+          fromAccount: doc.data().fromAccount,
+          toAccount: doc.data().toAccount,
+          description: doc.data().description
+        }));
+      } catch (error) {
+        log.warn('Could not fetch transfers:', error);
+      }
+
+      // Get family members from user profile
+      try {
+        const userDocRef = doc(db, 'users', userId);
+        const userDoc = await getDoc(userDocRef);
+        if (userDoc.exists() && userDoc.data().familyMembers) {
+          context.familyMembers = userDoc.data().familyMembers.map(member => ({
+            name: member.name,
+            relationship: member.relationship,
+            dateOfBirth: member.dateOfBirth
+          }));
+        }
+      } catch (error) {
+        log.warn('Could not fetch family members:', error);
+      }
+
+      // Get trip groups
+      try {
+        const tripGroupsQuery = query(
+          collection(db, 'tripGroups'),
+          where('userId', '==', userId),
+          limit(20)
+        );
+        
+        const tripGroupsSnapshot = await getDocs(tripGroupsQuery);
+        context.tripGroups = tripGroupsSnapshot.docs.map(doc => ({
+          name: doc.data().name,
+          totalBudget: doc.data().totalBudget,
+          totalSpent: doc.data().totalSpent,
+          memberCount: doc.data().members?.length || 0
+        }));
+      } catch (error) {
+        log.warn('Could not fetch trip groups:', error);
+      }
+
+      // Get healthcare insurance
+      try {
+        const healthcareQuery = query(
+          collection(db, 'healthcareInsurance'),
+          where('userId', '==', userId),
+          limit(20)
+        );
+        
+        const healthcareSnapshot = await getDocs(healthcareQuery);
+        context.healthcareInsurance = healthcareSnapshot.docs.map(doc => ({
+          policyName: doc.data().policyName,
+          provider: doc.data().provider,
+          coverageAmount: doc.data().coverageAmount,
+          premium: doc.data().premium,
+          policyNumber: doc.data().policyNumber
+        }));
+      } catch (error) {
+        log.warn('Could not fetch healthcare insurance:', error);
+      }
+
+      // Get house help
+      try {
+        const houseHelpQuery = query(
+          collection(db, 'houseHelp'),
+          where('userId', '==', userId),
+          limit(20)
+        );
+        
+        const houseHelpSnapshot = await getDocs(houseHelpQuery);
+        context.houseHelp = houseHelpSnapshot.docs.map(doc => ({
+          name: doc.data().name,
+          role: doc.data().role,
+          salary: doc.data().salary,
+          paymentFrequency: doc.data().paymentFrequency
+        }));
+      } catch (error) {
+        log.warn('Could not fetch house help:', error);
+      }
+
+      // Get documents count
+      try {
+        const documentsQuery = query(
+          collection(db, 'documents'),
+          where('userId', '==', userId),
+          limit(100)
+        );
+        
+        const documentsSnapshot = await getDocs(documentsQuery);
+        context.documents = documentsSnapshot.docs.map(doc => ({
+          name: doc.data().name,
+          category: doc.data().category,
+          uploadDate: doc.data().uploadDate
+        }));
+      } catch (error) {
+        log.warn('Could not fetch documents:', error);
+      }
+
+      // Get notes count
+      try {
+        const notesQuery = query(
+          collection(db, 'notes'),
+          where('userId', '==', userId),
+          limit(50)
+        );
+        
+        const notesSnapshot = await getDocs(notesQuery);
+        context.notes = notesSnapshot.docs.map(doc => ({
+          title: doc.data().title,
+          category: doc.data().category,
+          createdAt: doc.data().createdAt
+        }));
+      } catch (error) {
+        log.warn('Could not fetch notes:', error);
+      }
+
+      log.log('Comprehensive financial context gathered:', {
+        expenses: context.expenses.length,
+        income: context.income.length,
+        budgets: context.budgets.length,
+        goals: context.goals.length,
+        investments: context.investments.length,
+        creditCards: context.creditCards.length,
+        loans: context.loans.length,
+        houses: context.houses.length,
+        vehicles: context.vehicles.length,
+        recurringTransactions: context.recurringTransactions.length,
+        transfers: context.transfers.length,
+        familyMembers: context.familyMembers.length,
+        tripGroups: context.tripGroups.length,
+        healthcareInsurance: context.healthcareInsurance.length,
+        houseHelp: context.houseHelp.length,
+        documents: context.documents.length,
+        notes: context.notes.length
+      });
+
+      return context;
+    } catch (error) {
+      log.error('Error gathering financial context:', error);
+      return null;
+    }
+  }
+
   async sendMessage() {
     const input = document.getElementById('aiMessageInput');
     const message = input.value.trim();
@@ -403,10 +801,13 @@ class AIAssistant {
         throw new Error('No API key found. Please configure your Gemini API key in settings.');
       }
 
+      // Gather financial context for the AI
+      const financialContext = await this.gatherFinancialContext();
+
       // Get Firebase token
       const token = await auth.currentUser.getIdToken();
 
-      // Call backend with decrypted API key
+      // Call backend with decrypted API key and financial context
       const response = await fetch('/api/gemini-proxy', {
         method: 'POST',
         headers: {
@@ -416,7 +817,8 @@ class AIAssistant {
         body: JSON.stringify({
           action: 'chat',
           data: {
-            message: message
+            message: message,
+            financialContext: financialContext // Include user's financial data
           },
           apiKey: apiKey // Send decrypted key to backend
         })
@@ -447,7 +849,8 @@ class AIAssistant {
     messageEl.className = `ai-message ${sender}`;
     
     const p = document.createElement('p');
-    p.textContent = text;
+    // Convert line breaks to <br> tags for proper display
+    p.innerHTML = text.replace(/\n/g, '<br>');
     messageEl.appendChild(p);
     
     messagesDiv.appendChild(messageEl);
