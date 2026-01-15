@@ -382,6 +382,15 @@
     }
 }
 
+/* Hide duplicate privacy button on mobile when it's already in header */
+@media (max-width: 768px) {
+    /* Hide privacy button in dashboard-header-actions on mobile */
+    .dashboard-header-actions .privacy-mode-btn,
+    .dashboard-header-actions #privacyModeBtnDashboard {
+        display: none !important;
+    }
+}
+
 /* Mobile Responsive */
 @media (max-width: 768px) {
     .privacy-mode-indicator {
