@@ -79,12 +79,12 @@
   left: 0;
   right: 0;
   z-index: 1000;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
 }
 
 .auth-page .landing-nav .container {
@@ -128,12 +128,12 @@
 }
 
 .auth-page .landing-nav-links a:not(.btn) {
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--primary-blue);
 }
 
 .auth-page .landing-nav-links a:not(.btn):hover {
-  color: white;
-  background: rgba(255, 255, 255, 0.1);
+  color: var(--primary-dark);
+  background: rgba(102, 126, 234, 0.1);
 }
 
 .auth-page .landing-nav-links .btn {
@@ -694,14 +694,14 @@
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
-  color: white;
+  color: var(--dark);
   padding: 8px;
   transition: all 0.3s ease;
   border-radius: 8px;
 }
 
 .mobile-toggle:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.05);
 }
 
 /* ============================================

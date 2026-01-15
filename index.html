@@ -115,10 +115,18 @@
       animation: fadeInUp 0.8s ease 0.4s both;
     }
     .hero-buttons {
-      display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
+      display: flex; flex-direction: column; gap: 1rem; justify-content: center;
       animation: fadeInUp 0.8s ease 0.6s both; max-width: 600px; margin: 0 auto;
     }
-    .hero-buttons .btn { font-size: 1rem; padding: 0.875rem 1.75rem; flex: 1; min-width: 180px; }
+    .install-button-row {
+      display: flex; justify-content: center;
+    }
+    .action-buttons-row {
+      display: flex; gap: 1rem; justify-content: center;
+    }
+    .hero-buttons .btn { font-size: 1rem; padding: 0.875rem 1.75rem; }
+    .install-button-row .btn { min-width: 200px; }
+    .action-buttons-row .btn { flex: 1; min-width: 180px; }
     .btn-hero-primary {
       background: white; color: var(--primary); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
     }
@@ -129,10 +137,21 @@
     }
     .btn-hero-outline:hover { background: white; color: var(--primary); }
     .btn-install {
-      background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px);
-      color: white; border: 2px solid rgba(255, 255, 255, 0.3);
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      color: white; border: none;
+      box-shadow: 0 4px 20px rgba(251, 191, 36, 0.5);
+      animation: pulse 2s ease-in-out infinite;
+      font-weight: 700;
     }
-    .btn-install:hover { background: rgba(255, 255, 255, 0.25); border-color: white; }
+    .btn-install:hover { 
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      transform: translateY(-2px); 
+      box-shadow: 0 6px 25px rgba(251, 191, 36, 0.7); 
+    }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 4px 20px rgba(251, 191, 36, 0.5); }
+      50% { box-shadow: 0 4px 30px rgba(251, 191, 36, 0.8); }
+    }
 
     .trust-badges {
       display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
@@ -384,8 +403,10 @@
     }
     @media (max-width: 768px) {
       .hero { padding: 4rem 1rem 2.5rem; min-height: 80vh; }
-      .hero-buttons { flex-direction: column; width: 100%; max-width: 400px; }
-      .hero-buttons .btn { width: 100%; justify-content: center; }
+      .hero-buttons { width: 100%; max-width: 100%; }
+      .install-button-row .btn { width: 100%; max-width: 100%; min-width: 0; }
+      .action-buttons-row { width: 100%; }
+      .action-buttons-row .btn { flex: 1; min-width: 0; font-size: 0.9rem; padding: 0.75rem 1rem; }
       .stats { padding: 2.5rem 1rem; margin-top: -2.5rem; }
       .features, .security, .cta { padding: 4rem 1rem; }
       .cta .hero-buttons { flex-direction: row; max-width: 100%; gap: 0.75rem; }
@@ -393,7 +414,10 @@
     }
     @media (max-width: 480px) {
       .hero { padding: 3.5rem 1rem 2rem; min-height: 75vh; }
-      .hero-buttons .btn { font-size: 0.95rem; padding: 0.8rem 1.5rem; }
+      .hero-buttons { gap: 0.75rem; }
+      .action-buttons-row { gap: 0.5rem; }
+      .action-buttons-row .btn { font-size: 0.85rem; padding: 0.7rem 0.75rem; }
+      .install-button-row .btn { font-size: 0.9rem; padding: 0.75rem 1rem; }
       .cta .hero-buttons { gap: 0.5rem; }
       .cta .hero-buttons .btn { font-size: 0.85rem; padding: 0.75rem 0.75rem; }
       .cta .hero-buttons .btn svg { width: 16px; height: 16px; }
@@ -428,25 +452,29 @@
         The most comprehensive financial management app for modern India. Track expenses, investments, budgets & more with AI-powered insights. 100% encrypted & works offline!
       </p>
       <div class="hero-buttons">
-        <a href="signup.html" class="btn btn-hero-primary">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
-          </svg>
-          Start Free Today
-        </a>
-        <a href="demo.html" class="btn btn-hero-outline">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
-            <path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
-          Try Demo
-        </a>
-        <button class="btn btn-install" id="installAppBtn" style="display: none;">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-          </svg>
-          Install App
-        </button>
+        <div class="install-button-row">
+          <button class="btn btn-install" id="installAppBtn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+            </svg>
+            Install App
+          </button>
+        </div>
+        <div class="action-buttons-row">
+          <a href="signup.html" class="btn btn-hero-primary">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+            </svg>
+            Start Today
+          </a>
+          <a href="demo.html" class="btn btn-hero-outline">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+              <path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            Try Demo
+          </a>
+        </div>
       </div>
       <div class="trust-badges">
         <div class="trust-badge">
@@ -643,7 +671,6 @@
         <ul>
           <li><a href="features.html">All Features</a></li>
           <li><a href="ai-insights.html">AI Insights</a></li>
-          <li><a href="gemini-setup.html">Gemini Setup</a></li>
         </ul>
       </div>
       <div class="footer-section">
@@ -706,17 +733,38 @@
     // PWA Install
     let deferredPrompt;
     const installBtn = document.getElementById('installAppBtn');
+    
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
       installBtn.style.display = 'inline-flex';
     });
+    
     installBtn.addEventListener('click', async () => {
-      if (!deferredPrompt) return;
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      deferredPrompt = null;
-      installBtn.style.display = 'none';
+      if (deferredPrompt) {
+        // PWA install prompt is available
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+          console.log('User accepted the install prompt');
+        }
+        deferredPrompt = null;
+      } else {
+        // Show instructions for manual installation
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        const isAndroid = /Android/.test(navigator.userAgent);
+        
+        let message = 'To install this app:\n\n';
+        if (isIOS) {
+          message += '1. Tap the Share button (square with arrow)\n2. Scroll down and tap "Add to Home Screen"\n3. Tap "Add" to confirm';
+        } else if (isAndroid) {
+          message += '1. Tap the menu (⋮) in your browser\n2. Select "Add to Home screen" or "Install app"\n3. Tap "Install" to confirm';
+        } else {
+          message += '1. Click the install icon in your browser\'s address bar\n2. Or use browser menu > "Install Rupiya"\n3. Follow the prompts to install';
+        }
+        
+        alert(message);
+      }
     });
 
     // Scroll animations
