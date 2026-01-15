@@ -402,18 +402,29 @@ function showEditForm(recurring) {
   // Reset button state
   saveFormBtn.disabled = false;
 
-  // Fill form
-  document.getElementById('type').value = recurring.type;
-  document.getElementById('description').value = recurring.description;
-  document.getElementById('recipientName').value = recurring.recipientName || '';
-  document.getElementById('amount').value = recurring.amount;
-  document.getElementById('category').value = recurring.category;
-  document.getElementById('frequency').value = recurring.frequency;
-  document.getElementById('startDate').value = formatDateForInput(recurring.startDate);
-  document.getElementById('endDate').value = recurring.endDate ? formatDateForInput(recurring.endDate) : '';
-  document.getElementById('status').value = recurring.status;
+  // Fill form with null checks
+  const typeEl = document.getElementById('type');
+  const descriptionEl = document.getElementById('description');
+  const recipientNameEl = document.getElementById('recipientName');
+  const amountEl = document.getElementById('amount');
+  const categoryEl = document.getElementById('category');
+  const frequencyEl = document.getElementById('frequency');
+  const startDateEl = document.getElementById('startDate');
+  const endDateEl = document.getElementById('endDate');
+  const statusEl = document.getElementById('status');
+  const notesEl = document.getElementById('notes');
+
+  if (typeEl) typeEl.value = recurring.type;
+  if (descriptionEl) descriptionEl.value = recurring.description;
+  if (recipientNameEl) recipientNameEl.value = recurring.recipientName || '';
+  if (amountEl) amountEl.value = recurring.amount;
+  if (categoryEl) categoryEl.value = recurring.category;
+  if (frequencyEl) frequencyEl.value = recurring.frequency;
+  if (startDateEl) startDateEl.value = formatDateForInput(recurring.startDate);
+  if (endDateEl) endDateEl.value = recurring.endDate ? formatDateForInput(recurring.endDate) : '';
+  if (statusEl) statusEl.value = recurring.status;
   if (paymentMethodInput) paymentMethodInput.value = recurring.paymentMethod || 'cash';
-  document.getElementById('notes').value = recurring.notes || '';
+  if (notesEl) notesEl.value = recurring.notes || '';
 
   // Handle specific payment method
   handlePaymentMethodChange();
@@ -429,25 +440,43 @@ function showEditForm(recurring) {
 async function handleSubmit(e) {
   e.preventDefault();
 
+  // Validate that all required form elements exist
+  const typeEl = document.getElementById('type');
+  const descriptionEl = document.getElementById('description');
+  const recipientNameEl = document.getElementById('recipientName');
+  const amountEl = document.getElementById('amount');
+  const categoryEl = document.getElementById('category');
+  const frequencyEl = document.getElementById('frequency');
+  const startDateEl = document.getElementById('startDate');
+  const endDateEl = document.getElementById('endDate');
+  const statusEl = document.getElementById('status');
+  const notesEl = document.getElementById('notes');
+
+  if (!typeEl || !descriptionEl || !recipientNameEl || !amountEl || !categoryEl || !frequencyEl || !startDateEl || !statusEl) {
+    console.error('Form elements not found. Form may not be fully loaded.');
+    showToast('Form is not fully loaded. Please refresh the page and try again.', 'error');
+    return;
+  }
+
   // Get specific payment method if selected
   const specificMethodId = specificPaymentMethodInput?.value;
   const specificMethod = specificMethodId ? userPaymentMethods.find(m => m.id === specificMethodId) : null;
 
   // Get form data
   const formData = {
-    type: document.getElementById('type').value,
-    description: document.getElementById('description').value,
-    recipientName: document.getElementById('recipientName').value.trim(),
-    amount: parseFloat(document.getElementById('amount').value),
-    category: document.getElementById('category').value,
-    frequency: document.getElementById('frequency').value,
-    startDate: timezoneService.parseInputDate(document.getElementById('startDate').value),
-    endDate: document.getElementById('endDate').value ? timezoneService.parseInputDate(document.getElementById('endDate').value) : null,
-    status: document.getElementById('status').value,
+    type: typeEl.value,
+    description: descriptionEl.value,
+    recipientName: recipientNameEl.value.trim(),
+    amount: parseFloat(amountEl.value),
+    category: categoryEl.value,
+    frequency: frequencyEl.value,
+    startDate: timezoneService.parseInputDate(startDateEl.value),
+    endDate: endDateEl?.value ? timezoneService.parseInputDate(endDateEl.value) : null,
+    status: statusEl.value,
     paymentMethod: paymentMethodInput?.value || 'cash',
     paymentMethodId: specificMethodId || null,
     paymentMethodName: specificMethod ? getPaymentMethodDisplayName(specificMethod) : null,
-    notes: document.getElementById('notes').value
+    notes: notesEl?.value || ''
   };
 
   // Show loading

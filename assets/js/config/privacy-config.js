@@ -147,6 +147,7 @@ export const privacyConfig = {
     ],
     insurancePolicies: [
       'policyName',
+      'policyType',
       'provider',
       'policyNumber',
       'coverageAmount',

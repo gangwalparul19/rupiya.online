@@ -631,7 +631,7 @@ class EncryptionService {
       // Copy encrypted fields as-is so UI doesn't break completely
       if (data._encrypted) {
         for (const [field, value] of Object.entries(data._encrypted)) {
-          partialData[field] = '[Encrypted]';
+          partialData[field] = '[Encrypted - Key Not Ready]';
         }
       }
       delete partialData._encrypted;
@@ -649,24 +649,29 @@ class EncryptionService {
         try {
           const decrypted = await this.decryptValue(encryptedValue);
           // Sanitize output to prevent XSS after decryption
-          decryptedData[field] = this._sanitizeOutput(decrypted);
+          const sanitized = this._sanitizeOutput(decrypted);
+          decryptedData[field] = sanitized;
+          log.log(`[${collectionName}] Decrypted field: ${field} = ${sanitized ? sanitized.substring(0, 50) : 'empty'}`);
         } catch (fieldError) {
-          log.warn(`Failed to decrypt field ${field}:`, fieldError);
+          log.warn(`Failed to decrypt field ${field} in ${collectionName}:`, fieldError);
           // If decryption fails, try to use the encrypted value as-is
           // (it might be unencrypted data that was stored in _encrypted by mistake)
           if (typeof encryptedValue === 'string' && encryptedValue.length < 100) {
             // Short string - might be unencrypted, use as-is
             decryptedData[field] = encryptedValue;
+            log.log(`[${collectionName}] Using unencrypted value for field: ${field}`);
           } else if (typeof encryptedValue === 'number') {
             // Number - definitely unencrypted
             decryptedData[field] = encryptedValue;
           } else {
             // Show placeholder if we can't recover
             decryptedData[field] = '[Decryption Failed]';
+            log.error(`[${collectionName}] Could not decrypt field: ${field}`);
           }
         }
       }
 
+      log.log(`[${collectionName}] Decrypted object complete. Fields: ${Object.keys(decryptedData).join(', ')}`);
       return decryptedData;
     } catch (error) {
       log.error('Object decryption failed:', error);

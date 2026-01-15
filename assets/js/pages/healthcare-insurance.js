@@ -224,6 +224,9 @@ async function loadPolicies() {
 
     const allPolicies = await firestoreService.getAll('insurancePolicies', 'createdAt', 'desc');
     
+    console.log('[HealthcareInsurance] Loaded policies:', allPolicies);
+    console.log('[HealthcareInsurance] First policy sample:', allPolicies[0]);
+    
     state.policies = allPolicies;
     state.filteredPolicies = [...allPolicies];
     state.policiesTotalCount = allPolicies.length;
@@ -283,6 +286,18 @@ function renderPolicies() {
       statusText = 'Expiring Soon';
     }
 
+    // Debug logging
+    console.log('[RenderPolicies] Policy data:', {
+      id: policy.id,
+      policyName: policy.policyName,
+      provider: policy.provider,
+      coverageAmount: policy.coverageAmount,
+      premiumAmount: policy.premiumAmount,
+      startDate: policy.startDate,
+      endDate: policy.endDate,
+      allKeys: Object.keys(policy)
+    });
+
     // Document badge if file attached
     const documentBadge = policy.fileUrl ? `
       <div style="margin-top: 0.5rem;">
@@ -296,8 +311,8 @@ function renderPolicies() {
       <div class="policy-card ${isExpiringSoon ? 'expiring-soon' : ''}">
         <div class="policy-header">
           <div class="policy-info">
-            <h3>${policy.policyName}</h3>
-            <div class="policy-provider">${policy.provider}</div>
+            <h3>${policy.policyName || 'Unnamed Policy'}</h3>
+            <div class="policy-provider">${policy.provider || 'Unknown Provider'}</div>
           </div>
           <span class="policy-status ${statusClass}">${statusText}</span>
         </div>
@@ -305,22 +320,22 @@ function renderPolicies() {
         <div class="policy-details">
           <div class="policy-detail">
             <div class="policy-detail-label">Coverage</div>
-            <div class="policy-detail-value">${formatCurrency(policy.coverageAmount)}</div>
+            <div class="policy-detail-value">${formatCurrency(policy.coverageAmount || 0)}</div>
           </div>
           <div class="policy-detail">
             <div class="policy-detail-label">Premium</div>
-            <div class="policy-detail-value">${formatCurrency(policy.premiumAmount)}</div>
+            <div class="policy-detail-value">${formatCurrency(policy.premiumAmount || 0)}</div>
           </div>
         </div>
 
         <div class="policy-dates">
           <div class="policy-date">
             <div class="policy-date-label">Start Date</div>
-            <div class="policy-date-value">${formatDate(policy.startDate)}</div>
+            <div class="policy-date-value">${formatDate(policy.startDate) || 'N/A'}</div>
           </div>
           <div class="policy-date">
             <div class="policy-date-label">End Date</div>
-            <div class="policy-date-value">${formatDate(policy.endDate)}</div>
+            <div class="policy-date-value">${formatDate(policy.endDate) || 'N/A'}</div>
           </div>
         </div>
 
@@ -334,7 +349,7 @@ function renderPolicies() {
 
         <div class="policy-actions">
           <button class="btn btn-sm btn-outline" onclick="editPolicy('${policy.id}')">Edit</button>
-          <button class="btn btn-sm btn-danger-outline" onclick="deletePolicy('${policy.id}', '${policy.policyName}')">Delete</button>
+          <button class="btn btn-sm btn-danger-outline" onclick="deletePolicy('${policy.id}', '${policy.policyName || 'Policy'}')">Delete</button>
         </div>
       </div>
     `;
