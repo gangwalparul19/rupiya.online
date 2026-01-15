@@ -374,43 +374,60 @@ function buildChatPrompt(data) {
   let contextSummary = '';
   
   if (financialContext) {
-    contextSummary = '\n\n=== USER\'S COMPLETE FINANCIAL PROFILE ===\n';
+    contextSummary = '\n\n=== YOUR COMPLETE FINANCIAL DATA (ALREADY LOADED) ===\n';
+    contextSummary += 'IMPORTANT: This data is ALREADY available to you. Use it to answer questions.\n\n';
     
     // Expenses
     if (financialContext.expenses && financialContext.expenses.length > 0) {
       const totalExpenses = financialContext.expenses.reduce((sum, e) => sum + (e.amount || 0), 0);
       const expensesByCategory = {};
+      const expensesByDate = {};
+      
       financialContext.expenses.forEach(e => {
         expensesByCategory[e.category] = (expensesByCategory[e.category] || 0) + e.amount;
+        if (!expensesByDate[e.date]) {
+          expensesByDate[e.date] = [];
+        }
+        expensesByDate[e.date].push(e);
       });
       
-      contextSummary += `\n📊 EXPENSES (Last 3 Months):\n`;
-      contextSummary += `- Total: ₹${totalExpenses.toFixed(2)}\n`;
-      contextSummary += `- Transaction Count: ${financialContext.expenses.length}\n`;
-      contextSummary += `- By Category:\n`;
-      Object.entries(expensesByCategory).forEach(([cat, amt]) => {
-        contextSummary += `  * ${cat}: ₹${amt.toFixed(2)}\n`;
+      contextSummary += `📊 EXPENSES (Last 3 Months) - ${financialContext.expenses.length} transactions:\n`;
+      contextSummary += `Total: ₹${totalExpenses.toFixed(2)}\n\n`;
+      
+      contextSummary += `By Category:\n`;
+      Object.entries(expensesByCategory).sort((a, b) => b[1] - a[1]).forEach(([cat, amt]) => {
+        contextSummary += `  ${cat}: ₹${amt.toFixed(2)}\n`;
       });
       
-      contextSummary += `\n- Recent Transactions:\n`;
-      financialContext.expenses.slice(0, 20).forEach(e => {
-        contextSummary += `  ${e.date}: ₹${e.amount} - ${e.category} - ${e.description}\n`;
+      contextSummary += `\nAll Expense Transactions (sorted by date):\n`;
+      Object.entries(expensesByDate).sort((a, b) => b[0].localeCompare(a[0])).forEach(([date, expenses]) => {
+        const dayTotal = expenses.reduce((sum, e) => sum + e.amount, 0);
+        contextSummary += `\n${date} (Total: ₹${dayTotal.toFixed(2)}):\n`;
+        expenses.forEach(e => {
+          contextSummary += `  - ₹${e.amount} | ${e.category} | ${e.description}\n`;
+        });
       });
+    } else {
+      contextSummary += `📊 EXPENSES: No expense data available\n`;
     }
     
     // Income
     if (financialContext.income && financialContext.income.length > 0) {
       const totalIncome = financialContext.income.reduce((sum, i) => sum + (i.amount || 0), 0);
-      contextSummary += `\n💰 INCOME (Last 3 Months):\n`;
-      contextSummary += `- Total: ₹${totalIncome.toFixed(2)}\n`;
-      contextSummary += `- Transaction Count: ${financialContext.income.length}\n`;
+      contextSummary += `\n💰 INCOME (Last 3 Months) - ${financialContext.income.length} transactions:\n`;
+      contextSummary += `Total: ₹${totalIncome.toFixed(2)}\n`;
+      
+      contextSummary += `\nAll Income Transactions:\n`;
+      financialContext.income.forEach(i => {
+        contextSummary += `  ${i.date}: ₹${i.amount} | ${i.source} | ${i.description}\n`;
+      });
     }
     
     // Budgets
     if (financialContext.budgets && financialContext.budgets.length > 0) {
       contextSummary += `\n📋 BUDGETS (${financialContext.budgets.length} active):\n`;
       financialContext.budgets.forEach(b => {
-        contextSummary += `- ${b.category}: ₹${b.amount} per ${b.period}\n`;
+        contextSummary += `  ${b.category}: ₹${b.amount} per ${b.period}\n`;
       });
     }
     
@@ -419,7 +436,7 @@ function buildChatPrompt(data) {
       contextSummary += `\n🎯 FINANCIAL GOALS (${financialContext.goals.length} total):\n`;
       financialContext.goals.forEach(g => {
         const progress = g.targetAmount > 0 ? ((g.currentAmount / g.targetAmount) * 100).toFixed(1) : 0;
-        contextSummary += `- ${g.name}: ₹${g.currentAmount} / ₹${g.targetAmount} (${progress}%) - ${g.status || 'Active'}\n`;
+        contextSummary += `  ${g.name}: ₹${g.currentAmount} / ₹${g.targetAmount} (${progress}%)\n`;
       });
     }
     
@@ -431,9 +448,9 @@ function buildChatPrompt(data) {
       const returnPct = totalInvested > 0 ? ((returns / totalInvested) * 100).toFixed(2) : 0;
       
       contextSummary += `\n📈 INVESTMENTS (${financialContext.investments.length} holdings):\n`;
-      contextSummary += `- Total Invested: ₹${totalInvested.toFixed(2)}\n`;
-      contextSummary += `- Current Value: ₹${totalCurrent.toFixed(2)}\n`;
-      contextSummary += `- Returns: ₹${returns.toFixed(2)} (${returnPct}%)\n`;
+      contextSummary += `  Total Invested: ₹${totalInvested.toFixed(2)}\n`;
+      contextSummary += `  Current Value: ₹${totalCurrent.toFixed(2)}\n`;
+      contextSummary += `  Returns: ₹${returns.toFixed(2)} (${returnPct}%)\n`;
     }
     
     // Credit Cards
@@ -442,10 +459,10 @@ function buildChatPrompt(data) {
       const totalBalance = financialContext.creditCards.reduce((sum, c) => sum + (c.currentBalance || 0), 0);
       
       contextSummary += `\n💳 CREDIT CARDS (${financialContext.creditCards.length} cards):\n`;
-      contextSummary += `- Total Credit Limit: ₹${totalLimit.toFixed(2)}\n`;
-      contextSummary += `- Total Outstanding: ₹${totalBalance.toFixed(2)}\n`;
+      contextSummary += `  Total Limit: ₹${totalLimit.toFixed(2)}\n`;
+      contextSummary += `  Total Outstanding: ₹${totalBalance.toFixed(2)}\n`;
       financialContext.creditCards.forEach(c => {
-        contextSummary += `  * ${c.bankName} ${c.cardName}: ₹${c.currentBalance} / ₹${c.creditLimit}\n`;
+        contextSummary += `    ${c.bankName} ${c.cardName}: ₹${c.currentBalance} / ₹${c.creditLimit}\n`;
       });
     }
     
@@ -455,10 +472,10 @@ function buildChatPrompt(data) {
       const totalEMI = financialContext.loans.reduce((sum, l) => sum + (l.emiAmount || 0), 0);
       
       contextSummary += `\n🏦 LOANS (${financialContext.loans.length} active):\n`;
-      contextSummary += `- Total Outstanding: ₹${totalOutstanding.toFixed(2)}\n`;
-      contextSummary += `- Total Monthly EMI: ₹${totalEMI.toFixed(2)}\n`;
+      contextSummary += `  Total Outstanding: ₹${totalOutstanding.toFixed(2)}\n`;
+      contextSummary += `  Total Monthly EMI: ₹${totalEMI.toFixed(2)}\n`;
       financialContext.loans.forEach(l => {
-        contextSummary += `  * ${l.loanType} (${l.lender}): ₹${l.outstandingAmount} @ ${l.interestRate}%\n`;
+        contextSummary += `    ${l.loanType} (${l.lender}): ₹${l.outstandingAmount} @ ${l.interestRate}%\n`;
       });
     }
     
@@ -466,27 +483,21 @@ function buildChatPrompt(data) {
     if (financialContext.houses && financialContext.houses.length > 0) {
       const totalValue = financialContext.houses.reduce((sum, h) => sum + (h.currentValue || 0), 0);
       contextSummary += `\n🏠 PROPERTIES (${financialContext.houses.length} properties):\n`;
-      contextSummary += `- Total Value: ₹${totalValue.toFixed(2)}\n`;
-      financialContext.houses.forEach(h => {
-        contextSummary += `  * ${h.propertyName} (${h.propertyType}): ₹${h.currentValue}\n`;
-      });
+      contextSummary += `  Total Value: ₹${totalValue.toFixed(2)}\n`;
     }
     
     // Vehicles
     if (financialContext.vehicles && financialContext.vehicles.length > 0) {
       const totalValue = financialContext.vehicles.reduce((sum, v) => sum + (v.currentValue || 0), 0);
       contextSummary += `\n🚗 VEHICLES (${financialContext.vehicles.length} vehicles):\n`;
-      contextSummary += `- Total Value: ₹${totalValue.toFixed(2)}\n`;
-      financialContext.vehicles.forEach(v => {
-        contextSummary += `  * ${v.vehicleName} (${v.vehicleType}): ₹${v.currentValue}\n`;
-      });
+      contextSummary += `  Total Value: ₹${totalValue.toFixed(2)}\n`;
     }
     
     // Recurring Transactions
     if (financialContext.recurringTransactions && financialContext.recurringTransactions.length > 0) {
       contextSummary += `\n🔄 RECURRING TRANSACTIONS (${financialContext.recurringTransactions.length} active):\n`;
       financialContext.recurringTransactions.forEach(r => {
-        contextSummary += `- ${r.description}: ₹${r.amount} ${r.frequency} (${r.type})\n`;
+        contextSummary += `  ${r.description}: ₹${r.amount} ${r.frequency} (${r.type}) - ${r.category}\n`;
       });
     }
     
@@ -494,7 +505,7 @@ function buildChatPrompt(data) {
     if (financialContext.familyMembers && financialContext.familyMembers.length > 0) {
       contextSummary += `\n👨‍👩‍👧‍👦 FAMILY MEMBERS (${financialContext.familyMembers.length} members):\n`;
       financialContext.familyMembers.forEach(m => {
-        contextSummary += `- ${m.name} (${m.relationship})\n`;
+        contextSummary += `  ${m.name} (${m.relationship})\n`;
       });
     }
     
@@ -502,7 +513,7 @@ function buildChatPrompt(data) {
     if (financialContext.tripGroups && financialContext.tripGroups.length > 0) {
       contextSummary += `\n✈️ TRIP GROUPS (${financialContext.tripGroups.length} groups):\n`;
       financialContext.tripGroups.forEach(t => {
-        contextSummary += `- ${t.name}: ₹${t.totalSpent} / ₹${t.totalBudget} (${t.memberCount} members)\n`;
+        contextSummary += `  ${t.name}: ₹${t.totalSpent} / ₹${t.totalBudget} (${t.memberCount} members)\n`;
       });
     }
     
@@ -510,7 +521,7 @@ function buildChatPrompt(data) {
     if (financialContext.healthcareInsurance && financialContext.healthcareInsurance.length > 0) {
       contextSummary += `\n🏥 HEALTHCARE INSURANCE (${financialContext.healthcareInsurance.length} policies):\n`;
       financialContext.healthcareInsurance.forEach(h => {
-        contextSummary += `- ${h.policyName} (${h.provider}): ₹${h.coverageAmount} coverage, ₹${h.premium} premium\n`;
+        contextSummary += `  ${h.policyName} (${h.provider}): ₹${h.coverageAmount} coverage\n`;
       });
     }
     
@@ -518,40 +529,44 @@ function buildChatPrompt(data) {
     if (financialContext.houseHelp && financialContext.houseHelp.length > 0) {
       contextSummary += `\n👥 HOUSE HELP (${financialContext.houseHelp.length} staff):\n`;
       financialContext.houseHelp.forEach(h => {
-        contextSummary += `- ${h.name} (${h.role}): ₹${h.salary} per ${h.paymentFrequency}\n`;
+        contextSummary += `  ${h.name} (${h.role}): ₹${h.salary} per ${h.paymentFrequency}\n`;
       });
     }
     
     // Documents & Notes
     if (financialContext.documents && financialContext.documents.length > 0) {
-      contextSummary += `\n📄 DOCUMENTS: ${financialContext.documents.length} files stored\n`;
+      contextSummary += `\n📄 DOCUMENTS: ${financialContext.documents.length} files\n`;
     }
     
     if (financialContext.notes && financialContext.notes.length > 0) {
-      contextSummary += `📝 NOTES: ${financialContext.notes.length} notes saved\n`;
+      contextSummary += `📝 NOTES: ${financialContext.notes.length} notes\n`;
     }
     
-    contextSummary += '\n=== END OF FINANCIAL PROFILE ===\n';
+    contextSummary += '\n=== END OF FINANCIAL DATA ===\n';
+  } else {
+    contextSummary = '\n\nNO FINANCIAL DATA AVAILABLE - User needs to add data to the app first.\n';
   }
 
   return sanitizePrompt(`
-You are Rupiya AI Assistant, a helpful financial advisor with complete access to the user's financial data.
+You are Rupiya AI Assistant, a helpful financial advisor with COMPLETE ACCESS to the user's financial data.
 
 ${contextSummary}
 
-User's Question: ${message}
+User's Question: "${message}"
 
-Instructions:
-- Answer based on the user's actual financial data provided above
-- Be specific with numbers, dates, categories, and names from their data
-- If asked about counts (e.g., "how many credit cards"), provide the exact number
-- If asked about specific dates, search the transaction data for that date
-- Provide actionable insights and personalized recommendations
-- Use Indian Rupee (₹) format for all amounts
-- Be conversational, friendly, and helpful
-- If the data doesn't contain the answer, explain what data IS available and suggest alternatives
+CRITICAL INSTRUCTIONS:
+1. The financial data above is ALREADY LOADED and AVAILABLE to you
+2. DO NOT say you don't have access to data - YOU DO!
+3. Answer questions using the EXACT data provided above
+4. For date-specific questions, search the transaction list for that date
+5. For "today" questions, use the most recent date in the data
+6. Be specific with numbers, dates, and categories from the data
+7. If asked about counts (e.g., "how many"), count from the data above
+8. Use Indian Rupee (₹) format
+9. Be conversational and helpful
+10. If the specific data requested isn't in the list above, say what IS available
 
-Respond in a clear, concise, and helpful manner.
+Answer the user's question now using the data provided above:
   `);
 }
 

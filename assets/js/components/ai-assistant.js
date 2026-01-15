@@ -380,6 +380,7 @@ class AIAssistant {
   /**
    * Gather financial context from Firestore to provide to AI
    * This allows AI to answer questions about user's actual financial data
+   * IMPORTANT: All data is encrypted in Firestore and must be decrypted before use
    */
   async gatherFinancialContext() {
     try {
@@ -388,9 +389,16 @@ class AIAssistant {
         return null;
       }
 
-      // Import Firestore services
+      // Import Firestore and encryption services
       const { db } = await import('../config/firebase-config.js');
       const { collection, query, where, getDocs, orderBy, limit, doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js');
+      const encryptionService = await import('../services/encryption-service.js').then(m => m.default);
+
+      // Wait for encryption to be ready
+      const encryptionReady = await encryptionService.waitForInitialization(5000);
+      if (!encryptionReady) {
+        log.warn('Encryption not ready, AI may not have access to encrypted data');
+      }
 
       const context = {
         expenses: [],
@@ -412,7 +420,7 @@ class AIAssistant {
         houseHelp: []
       };
 
-      // Get recent expenses (last 3 months)
+      // Get recent expenses (last 3 months) and decrypt
       try {
         const threeMonthsAgo = new Date();
         threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
@@ -426,17 +434,22 @@ class AIAssistant {
         );
         
         const expensesSnapshot = await getDocs(expensesQuery);
-        context.expenses = expensesSnapshot.docs.map(doc => ({
-          date: doc.data().date,
-          amount: doc.data().amount,
-          category: doc.data().category,
-          description: doc.data().description
+        const expensesData = expensesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        
+        // Decrypt expenses
+        const decryptedExpenses = await encryptionService.decryptArray(expensesData, 'expenses');
+        
+        context.expenses = decryptedExpenses.map(doc => ({
+          date: doc.date,
+          amount: doc.amount,
+          category: doc.category,
+          description: doc.description
         }));
       } catch (error) {
         log.warn('Could not fetch expenses:', error);
       }
 
-      // Get recent income (last 3 months)
+      // Get recent income (last 3 months) and decrypt
       try {
         const threeMonthsAgo = new Date();
         threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
@@ -450,17 +463,22 @@ class AIAssistant {
         );
         
         const incomeSnapshot = await getDocs(incomeQuery);
-        context.income = incomeSnapshot.docs.map(doc => ({
-          date: doc.data().date,
-          amount: doc.data().amount,
-          source: doc.data().source,
-          description: doc.data().description
+        const incomeData = incomeSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        
+        // Decrypt income
+        const decryptedIncome = await encryptionService.decryptArray(incomeData, 'income');
+        
+        context.income = decryptedIncome.map(doc => ({
+          date: doc.date,
+          amount: doc.amount,
+          source: doc.source,
+          description: doc.description
         }));
       } catch (error) {
         log.warn('Could not fetch income:', error);
       }
 
-      // Get active budgets
+      // Get active budgets and decrypt
       try {
         const budgetsQuery = query(
           collection(db, 'budgets'),
@@ -469,16 +487,21 @@ class AIAssistant {
         );
         
         const budgetsSnapshot = await getDocs(budgetsQuery);
-        context.budgets = budgetsSnapshot.docs.map(doc => ({
-          category: doc.data().category,
-          amount: doc.data().amount,
-          period: doc.data().period
+        const budgetsData = budgetsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        
+        // Decrypt budgets
+        const decryptedBudgets = await encryptionService.decryptArray(budgetsData, 'budgets');
+        
+        context.budgets = decryptedBudgets.map(doc => ({
+          category: doc.category,
+          amount: doc.amount,
+          period: doc.period
         }));
       } catch (error) {
         log.warn('Could not fetch budgets:', error);
       }
 
-      // Get active goals
+      // Get active goals and decrypt
       try {
         const goalsQuery = query(
           collection(db, 'goals'),
@@ -487,18 +510,23 @@ class AIAssistant {
         );
         
         const goalsSnapshot = await getDocs(goalsQuery);
-        context.goals = goalsSnapshot.docs.map(doc => ({
-          name: doc.data().name,
-          targetAmount: doc.data().targetAmount,
-          currentAmount: doc.data().currentAmount,
-          targetDate: doc.data().targetDate,
-          status: doc.data().status
+        const goalsData = goalsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        
+        // Decrypt goals
+        const decryptedGoals = await encryptionService.decryptArray(goalsData, 'goals');
+        
+        context.goals = decryptedGoals.map(doc => ({
+          name: doc.name,
+          targetAmount: doc.targetAmount,
+          currentAmount: doc.currentAmount,
+          targetDate: doc.targetDate,
+          status: doc.status
         }));
       } catch (error) {
         log.warn('Could not fetch goals:', error);
       }
 
-      // Get investments
+      // Get investments and decrypt
       try {
         const investmentsQuery = query(
           collection(db, 'investments'),
@@ -507,18 +535,23 @@ class AIAssistant {
         );
         
         const investmentsSnapshot = await getDocs(investmentsQuery);
-        context.investments = investmentsSnapshot.docs.map(doc => ({
-          name: doc.data().name,
-          type: doc.data().type,
-          currentValue: doc.data().currentValue,
-          investedAmount: doc.data().investedAmount,
-          quantity: doc.data().quantity
+        const investmentsData = investmentsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        
+        // Decrypt investments
+        const decryptedInvestments = await encryptionService.decryptArray(investmentsData, 'investments');
+        
+        context.investments = decryptedInvestments.map(doc => ({
+          name: doc.name,
+          type: doc.type,
+          currentValue: doc.currentValue,
+          investedAmount: doc.investedAmount,
+          quantity: doc.quantity
         }));
       } catch (error) {
         log.warn('Could not fetch investments:', error);
       }
 
-      // Get credit cards
+      // Get credit cards and decrypt
       try {
         const creditCardsQuery = query(
           collection(db, 'creditCards'),
@@ -527,18 +560,23 @@ class AIAssistant {
         );
         
         const creditCardsSnapshot = await getDocs(creditCardsQuery);
-        context.creditCards = creditCardsSnapshot.docs.map(doc => ({
-          bankName: doc.data().bankName,
-          cardName: doc.data().cardName,
-          creditLimit: doc.data().creditLimit,
-          currentBalance: doc.data().currentBalance,
-          dueDate: doc.data().dueDate
+        const creditCardsData = creditCardsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        
+        // Decrypt credit cards
+        const decryptedCreditCards = await encryptionService.decryptArray(creditCardsData, 'creditCards');
+        
+        context.creditCards = decryptedCreditCards.map(doc => ({
+          bankName: doc.bankName,
+          cardName: doc.cardName,
+          creditLimit: doc.creditLimit,
+          currentBalance: doc.currentBalance,
+          dueDate: doc.dueDate
         }));
       } catch (error) {
         log.warn('Could not fetch credit cards:', error);
       }
 
-      // Get loans
+      // Get loans and decrypt
       try {
         const loansQuery = query(
           collection(db, 'loans'),
@@ -547,19 +585,24 @@ class AIAssistant {
         );
         
         const loansSnapshot = await getDocs(loansQuery);
-        context.loans = loansSnapshot.docs.map(doc => ({
-          loanType: doc.data().loanType,
-          lender: doc.data().lender,
-          principalAmount: doc.data().principalAmount,
-          outstandingAmount: doc.data().outstandingAmount,
-          interestRate: doc.data().interestRate,
-          emiAmount: doc.data().emiAmount
+        const loansData = loansSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        
+        // Decrypt loans
+        const decryptedLoans = await encryptionService.decryptArray(loansData, 'loans');
+        
+        context.loans = decryptedLoans.map(doc => ({
+          loanType: doc.loanType,
+          lender: doc.lender,
+          principalAmount: doc.principalAmount,
+          outstandingAmount: doc.outstandingAmount,
+          interestRate: doc.interestRate,
+          emiAmount: doc.emiAmount
         }));
       } catch (error) {
         log.warn('Could not fetch loans:', error);
       }
 
-      // Get houses/properties
+      // Get houses/properties and decrypt
       try {
         const housesQuery = query(
           collection(db, 'houses'),
@@ -568,18 +611,23 @@ class AIAssistant {
         );
         
         const housesSnapshot = await getDocs(housesQuery);
-        context.houses = housesSnapshot.docs.map(doc => ({
-          propertyName: doc.data().propertyName,
-          propertyType: doc.data().propertyType,
-          currentValue: doc.data().currentValue,
-          purchaseValue: doc.data().purchaseValue,
-          address: doc.data().address
+        const housesData = housesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        
+        // Decrypt houses
+        const decryptedHouses = await encryptionService.decryptArray(housesData, 'houses');
+        
+        context.houses = decryptedHouses.map(doc => ({
+          propertyName: doc.propertyName,
+          propertyType: doc.propertyType,
+          currentValue: doc.currentValue,
+          purchaseValue: doc.purchaseValue,
+          address: doc.address
         }));
       } catch (error) {
         log.warn('Could not fetch houses:', error);
       }
 
-      // Get vehicles
+      // Get vehicles and decrypt
       try {
         const vehiclesQuery = query(
           collection(db, 'vehicles'),
@@ -588,18 +636,23 @@ class AIAssistant {
         );
         
         const vehiclesSnapshot = await getDocs(vehiclesQuery);
-        context.vehicles = vehiclesSnapshot.docs.map(doc => ({
-          vehicleName: doc.data().vehicleName,
-          vehicleType: doc.data().vehicleType,
-          currentValue: doc.data().currentValue,
-          purchaseValue: doc.data().purchaseValue,
-          registrationNumber: doc.data().registrationNumber
+        const vehiclesData = vehiclesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        
+        // Decrypt vehicles
+        const decryptedVehicles = await encryptionService.decryptArray(vehiclesData, 'vehicles');
+        
+        context.vehicles = decryptedVehicles.map(doc => ({
+          vehicleName: doc.vehicleName,
+          vehicleType: doc.vehicleType,
+          currentValue: doc.currentValue,
+          purchaseValue: doc.purchaseValue,
+          registrationNumber: doc.registrationNumber
         }));
       } catch (error) {
         log.warn('Could not fetch vehicles:', error);
       }
 
-      // Get recurring transactions
+      // Get recurring transactions and decrypt
       try {
         const recurringQuery = query(
           collection(db, 'recurring'),
@@ -609,18 +662,23 @@ class AIAssistant {
         );
         
         const recurringSnapshot = await getDocs(recurringQuery);
-        context.recurringTransactions = recurringSnapshot.docs.map(doc => ({
-          description: doc.data().description,
-          amount: doc.data().amount,
-          frequency: doc.data().frequency,
-          category: doc.data().category,
-          type: doc.data().type
+        const recurringData = recurringSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        
+        // Decrypt recurring transactions
+        const decryptedRecurring = await encryptionService.decryptArray(recurringData, 'recurring');
+        
+        context.recurringTransactions = decryptedRecurring.map(doc => ({
+          description: doc.description,
+          amount: doc.amount,
+          frequency: doc.frequency,
+          category: doc.category,
+          type: doc.type
         }));
       } catch (error) {
         log.warn('Could not fetch recurring transactions:', error);
       }
 
-      // Get transfers
+      // Get transfers and decrypt
       try {
         const transfersQuery = query(
           collection(db, 'transfers'),
@@ -630,33 +688,45 @@ class AIAssistant {
         );
         
         const transfersSnapshot = await getDocs(transfersQuery);
-        context.transfers = transfersSnapshot.docs.map(doc => ({
-          date: doc.data().date,
-          amount: doc.data().amount,
-          fromAccount: doc.data().fromAccount,
-          toAccount: doc.data().toAccount,
-          description: doc.data().description
+        const transfersData = transfersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        
+        // Decrypt transfers
+        const decryptedTransfers = await encryptionService.decryptArray(transfersData, 'transfers');
+        
+        context.transfers = decryptedTransfers.map(doc => ({
+          date: doc.date,
+          amount: doc.amount,
+          fromAccount: doc.fromAccount,
+          toAccount: doc.toAccount,
+          description: doc.description
         }));
       } catch (error) {
         log.warn('Could not fetch transfers:', error);
       }
 
-      // Get family members from user profile
+      // Get family members from user profile and decrypt
       try {
         const userDocRef = doc(db, 'users', userId);
         const userDoc = await getDoc(userDocRef);
-        if (userDoc.exists() && userDoc.data().familyMembers) {
-          context.familyMembers = userDoc.data().familyMembers.map(member => ({
-            name: member.name,
-            relationship: member.relationship,
-            dateOfBirth: member.dateOfBirth
-          }));
+        if (userDoc.exists()) {
+          let userData = { id: userDoc.id, ...userDoc.data() };
+          
+          // Decrypt user data
+          userData = await encryptionService.decryptObject(userData, 'users');
+          
+          if (userData.familyMembers) {
+            context.familyMembers = userData.familyMembers.map(member => ({
+              name: member.name,
+              relationship: member.relationship,
+              dateOfBirth: member.dateOfBirth
+            }));
+          }
         }
       } catch (error) {
         log.warn('Could not fetch family members:', error);
       }
 
-      // Get trip groups
+      // Get trip groups and decrypt
       try {
         const tripGroupsQuery = query(
           collection(db, 'tripGroups'),
@@ -665,17 +735,22 @@ class AIAssistant {
         );
         
         const tripGroupsSnapshot = await getDocs(tripGroupsQuery);
-        context.tripGroups = tripGroupsSnapshot.docs.map(doc => ({
-          name: doc.data().name,
-          totalBudget: doc.data().totalBudget,
-          totalSpent: doc.data().totalSpent,
-          memberCount: doc.data().members?.length || 0
+        const tripGroupsData = tripGroupsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        
+        // Decrypt trip groups
+        const decryptedTripGroups = await encryptionService.decryptArray(tripGroupsData, 'tripGroups');
+        
+        context.tripGroups = decryptedTripGroups.map(doc => ({
+          name: doc.name,
+          totalBudget: doc.totalBudget,
+          totalSpent: doc.totalSpent,
+          memberCount: doc.members?.length || 0
         }));
       } catch (error) {
         log.warn('Could not fetch trip groups:', error);
       }
 
-      // Get healthcare insurance
+      // Get healthcare insurance and decrypt
       try {
         const healthcareQuery = query(
           collection(db, 'healthcareInsurance'),
@@ -684,18 +759,23 @@ class AIAssistant {
         );
         
         const healthcareSnapshot = await getDocs(healthcareQuery);
-        context.healthcareInsurance = healthcareSnapshot.docs.map(doc => ({
-          policyName: doc.data().policyName,
-          provider: doc.data().provider,
-          coverageAmount: doc.data().coverageAmount,
-          premium: doc.data().premium,
-          policyNumber: doc.data().policyNumber
+        const healthcareData = healthcareSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        
+        // Decrypt healthcare insurance
+        const decryptedHealthcare = await encryptionService.decryptArray(healthcareData, 'healthcareInsurance');
+        
+        context.healthcareInsurance = decryptedHealthcare.map(doc => ({
+          policyName: doc.policyName,
+          provider: doc.provider,
+          coverageAmount: doc.coverageAmount,
+          premium: doc.premium,
+          policyNumber: doc.policyNumber
         }));
       } catch (error) {
         log.warn('Could not fetch healthcare insurance:', error);
       }
 
-      // Get house help
+      // Get house help and decrypt
       try {
         const houseHelpQuery = query(
           collection(db, 'houseHelp'),
@@ -704,17 +784,22 @@ class AIAssistant {
         );
         
         const houseHelpSnapshot = await getDocs(houseHelpQuery);
-        context.houseHelp = houseHelpSnapshot.docs.map(doc => ({
-          name: doc.data().name,
-          role: doc.data().role,
-          salary: doc.data().salary,
-          paymentFrequency: doc.data().paymentFrequency
+        const houseHelpData = houseHelpSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        
+        // Decrypt house help
+        const decryptedHouseHelp = await encryptionService.decryptArray(houseHelpData, 'houseHelp');
+        
+        context.houseHelp = decryptedHouseHelp.map(doc => ({
+          name: doc.name,
+          role: doc.role,
+          salary: doc.salary,
+          paymentFrequency: doc.paymentFrequency
         }));
       } catch (error) {
         log.warn('Could not fetch house help:', error);
       }
 
-      // Get documents count
+      // Get documents count and decrypt
       try {
         const documentsQuery = query(
           collection(db, 'documents'),
@@ -723,16 +808,21 @@ class AIAssistant {
         );
         
         const documentsSnapshot = await getDocs(documentsQuery);
-        context.documents = documentsSnapshot.docs.map(doc => ({
-          name: doc.data().name,
-          category: doc.data().category,
-          uploadDate: doc.data().uploadDate
+        const documentsData = documentsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        
+        // Decrypt documents
+        const decryptedDocuments = await encryptionService.decryptArray(documentsData, 'documents');
+        
+        context.documents = decryptedDocuments.map(doc => ({
+          name: doc.name,
+          category: doc.category,
+          uploadDate: doc.uploadDate
         }));
       } catch (error) {
         log.warn('Could not fetch documents:', error);
       }
 
-      // Get notes count
+      // Get notes count and decrypt
       try {
         const notesQuery = query(
           collection(db, 'notes'),
@@ -741,16 +831,21 @@ class AIAssistant {
         );
         
         const notesSnapshot = await getDocs(notesQuery);
-        context.notes = notesSnapshot.docs.map(doc => ({
-          title: doc.data().title,
-          category: doc.data().category,
-          createdAt: doc.data().createdAt
+        const notesData = notesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        
+        // Decrypt notes
+        const decryptedNotes = await encryptionService.decryptArray(notesData, 'notes');
+        
+        context.notes = decryptedNotes.map(doc => ({
+          title: doc.title,
+          category: doc.category,
+          createdAt: doc.createdAt
         }));
       } catch (error) {
         log.warn('Could not fetch notes:', error);
       }
 
-      log.log('Comprehensive financial context gathered:', {
+      log.log('Comprehensive financial context gathered (ALL DATA DECRYPTED):', {
         expenses: context.expenses.length,
         income: context.income.length,
         budgets: context.budgets.length,

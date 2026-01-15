@@ -298,8 +298,8 @@ export async function initSidebar() {
     // Try to import encryption service to check status
     const encryptionService = await import('../services/encryption-service.js').then(m => m.default);
     
-    // Wait for encryption to be ready with shorter timeout
-    const maxWaitTime = 3000; // Reduced to 3 seconds
+    // Wait for encryption to be ready with reasonable timeout
+    const maxWaitTime = 8000; // 8 seconds - enough time but not too long
     const startTime = Date.now();
     
     while (!encryptionReady && (Date.now() - startTime) < maxWaitTime) {
@@ -328,7 +328,7 @@ export async function initSidebar() {
         }
       }
       
-      await new Promise(resolve => setTimeout(resolve, 50)); // Reduced from 100ms to 50ms
+      await new Promise(resolve => setTimeout(resolve, 100)); // Check every 100ms
     }
     
     if (!encryptionReady) {
@@ -342,8 +342,6 @@ export async function initSidebar() {
   // This will use defaults if encryption is not ready yet
   console.log('[Sidebar] Initializing feature config...');
   await featureConfig.init();
-  
-  // No need for additional delay - feature config handles its own timing
   
   console.log('[Sidebar] Features initialized, generating navigation...');
 
