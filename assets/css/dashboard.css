@@ -153,6 +153,7 @@
 
 .dashboard-header {
   margin-bottom: var(--spacing-xl);
+  padding-top: 1rem; /* Add padding after mobile header */
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -163,6 +164,18 @@
 .dashboard-header-actions {
   display: flex;
   align-items: center;
+  gap: 0.75rem;
+}
+
+/* Hide privacy toggle on mobile (eye icon already in header) */
+@media (max-width: 768px) {
+  .dashboard-header-actions .privacy-toggle,
+  .dashboard-header-actions button[title*="Privacy"],
+  .dashboard-header-actions button[title*="privacy"],
+  .dashboard-header-actions .btn-icon:has(svg path[d*="M15 12a3 3 0 11-6 0"]) {
+    display: none !important;
+  }
+}
   gap: 12px;
 }
 
