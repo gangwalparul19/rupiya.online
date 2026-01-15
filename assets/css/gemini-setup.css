@@ -73,7 +73,7 @@
     border-radius: 8px;
     padding: 25px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
+    overflow: visible;
 }
 
 .step-card.completed {
@@ -160,12 +160,14 @@
 
 .api-key-input-section {
     margin-top: 20px;
+    overflow: visible;
 }
 
 .api-key-input-group {
     display: flex;
     gap: 10px;
     margin-bottom: 15px;
+    overflow: visible;
 }
 
 .api-key-input-group input {
@@ -190,6 +192,8 @@
     margin-top: 15px;
     flex-wrap: wrap;
     width: 100%;
+    visibility: visible;
+    opacity: 1;
 }
 
 .btn {
@@ -201,8 +205,13 @@
     transition: all 0.3s ease;
     font-weight: 600;
     white-space: nowrap;
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     min-width: 120px;
+    visibility: visible;
+    opacity: 1;
+    z-index: 100;
 }
 
 .btn-primary {
@@ -212,6 +221,8 @@
     min-width: 150px;
     padding: 14px 28px;
     font-size: 1.05em;
+    visibility: visible;
+    opacity: 1;
 }
 
 .btn-primary:hover {
@@ -226,6 +237,8 @@
     border: 1px solid var(--border-color);
     min-width: 100px;
     padding: 12px 20px;
+    visibility: visible;
+    opacity: 1;
 }
 
 .btn-secondary:hover {
@@ -236,12 +249,21 @@
 .btn-danger {
     background: var(--danger-color);
     color: white;
-    flex: 1;
-    min-width: 150px;
+    padding: 12px 24px;
+    font-size: 1em;
+    width: 100%;
+    visibility: visible;
+    opacity: 1;
 }
 
 .btn-danger:hover {
     background: #d32f2f;
+    box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
+    transform: translateY(-2px);
+}
+
+.btn-danger:active {
+    transform: translateY(0);
 }
 
 .btn:disabled {

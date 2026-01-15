@@ -498,9 +498,7 @@ service cloud.firestore {
       
       // Only the user can create their API key
       allow create: if isOwner(userId) && 
-                       request.resource.data.encryptedKey != null &&
-                       request.resource.data.iv != null &&
-                       request.resource.data.salt != null;
+                       request.resource.data.encryptedKey != null;
       
       // Only the user can update their API key
       allow update: if isOwner(userId) && 

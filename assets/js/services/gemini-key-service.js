@@ -199,21 +199,24 @@ class GeminiKeyService {
       const data = keyDoc.data();
       const today = new Date().toISOString().split('T')[0];
 
-      // Get today's usage
-      const usageQuery = query(
-        collection(db, this.USAGE_COLLECTION_NAME),
-        where('userId', '==', userId),
-        where('date', '==', today)
-      );
-
-      const usageDocs = await getDocs(usageQuery);
+      // Get today's usage - read the specific document directly
+      // Document ID format: userId_YYYY-MM-DD
+      const usageDocId = `${userId}_${today}`;
+      const usageDocRef = doc(db, this.USAGE_COLLECTION_NAME, usageDocId);
+      
       let todayUsage = 0;
       let todayTokens = 0;
 
-      usageDocs.forEach(doc => {
-        todayUsage += doc.data().requestCount || 0;
-        todayTokens += doc.data().tokenCount || 0;
-      });
+      try {
+        const usageDoc = await getDoc(usageDocRef);
+        if (usageDoc.exists()) {
+          todayUsage = usageDoc.data().requestCount || 0;
+          todayTokens = usageDoc.data().tokenCount || 0;
+        }
+      } catch (usageError) {
+        // If we can't read usage, just continue with 0 values
+        log.warn('Could not read usage statistics:', usageError);
+      }
 
       return {
         isActive: data.isActive,
