@@ -18,6 +18,8 @@ import { Validator } from '../utils/validation.js';
 import { formatCurrency, formatCurrencyCompact, formatDate, formatDateForInput, debounce, exportToCSV, escapeHtml } from '../utils/helpers.js';
 import timezoneService from '../utils/timezone.js';
 import encryptionReauthModal from '../components/encryption-reauth-modal.js';
+// AI Features
+import '../features/ai-features-init.js';
 
 // State management
 const state = {
@@ -48,6 +50,9 @@ const state = {
     total: 0
   }
 };
+
+// Export state for AI features
+window.expensesState = state;
 
 // Current user reference
 let currentUser = null;

@@ -9,6 +9,8 @@ import themeManager from '../utils/theme-manager.js';
 import { Validator } from '../utils/validation.js';
 import { formatCurrency, formatDate } from '../utils/helpers.js';
 import encryptionReauthModal from '../components/encryption-reauth-modal.js';
+// AI Features
+import '../features/ai-features-init.js';
 
 // State management
 const state = {
@@ -25,6 +27,9 @@ const state = {
     totalRemaining: 0
   }
 };
+
+// Export state for AI features
+window.budgetsState = state;
 
 // Check authentication
 async function checkAuth() {

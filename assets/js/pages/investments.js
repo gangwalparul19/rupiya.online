@@ -16,6 +16,8 @@ import timezoneService from '../utils/timezone.js';
 import encryptionReauthModal from '../components/encryption-reauth-modal.js';
 // Lazy load confirmation modal - only loaded when delete is clicked
 // import confirmationModal from '../components/confirmation-modal.js';
+// AI Features
+import '../features/ai-features-init.js';
 
 // Helper function for toast
 const showToast = (message, type) => toast.show(message, type);
@@ -34,6 +36,10 @@ const state = {
     returnsPercentage: 0
   }
 };
+
+// Export state for AI features
+window.investmentsState = state;
+
 let editingInvestmentId = null;
 
 // Symbol search state

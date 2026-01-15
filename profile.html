@@ -494,133 +494,144 @@
             </div>
             <div class="settings-card-body">
               <form id="addPaymentMethodForm">
-                <div class="form-group">
-                  <label for="paymentType">Payment Type</label>
-                  <select id="paymentType" required>
-                    <option value="">Select type</option>
-                    <option value="cash">💵 Cash</option>
-                    <option value="card">💳 Card (Credit/Debit)</option>
-                    <option value="upi">📱 UPI</option>
-                    <option value="wallet">👛 Digital Wallet</option>
-                    <option value="bank">🏦 Bank Account</option>
-                  </select>
-                </div>
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label for="paymentType">Payment Type</label>
+                    <select id="paymentType" required>
+                      <option value="">Select type</option>
+                      <option value="cash">💵 Cash</option>
+                      <option value="card">💳 Card (Credit/Debit)</option>
+                      <option value="upi">📱 UPI</option>
+                      <option value="wallet">👛 Digital Wallet</option>
+                      <option value="bank">🏦 Bank Account</option>
+                    </select>
+                  </div>
 
-                <div class="form-group">
-                  <label for="paymentMethodName">Name/Label</label>
-                  <input type="text" id="paymentMethodName" placeholder="e.g., HDFC Credit Card" required>
+                  <div class="form-group">
+                    <label for="paymentMethodName">Name/Label</label>
+                    <input type="text" id="paymentMethodName" placeholder="e.g., HDFC Credit Card" required>
+                  </div>
                 </div>
 
                 <!-- Card Fields -->
                 <div id="cardFields" style="display: none;">
-                  <div class="form-group">
-                    <label for="cardNumber">Card Number (Last 4 digits)</label>
-                    <input type="text" id="cardNumber" placeholder="1234" maxlength="4" pattern="[0-9]{4}">
-                    <small class="form-text">Only last 4 digits for security</small>
-                  </div>
-                  <div class="form-group">
-                    <label for="cardType">Card Type</label>
-                    <select id="cardType">
-                      <option value="credit">Credit Card</option>
-                      <option value="debit">Debit Card</option>
-                    </select>
-                  </div>
-                  <div class="form-group">
-                    <label for="cardBankName">Bank Name</label>
-                    <input type="text" id="cardBankName" placeholder="e.g., HDFC Bank">
+                  <div class="form-grid">
+                    <div class="form-group">
+                      <label for="cardNumber">Card Number (Last 4 digits)</label>
+                      <input type="text" id="cardNumber" placeholder="1234" maxlength="4" pattern="[0-9]{4}">
+                      <small class="form-text">Only last 4 digits for security</small>
+                    </div>
+                    <div class="form-group">
+                      <label for="cardType">Card Type</label>
+                      <select id="cardType">
+                        <option value="credit">Credit Card</option>
+                        <option value="debit">Debit Card</option>
+                      </select>
+                    </div>
+                    <div class="form-group form-group-full">
+                      <label for="cardBankName">Bank Name</label>
+                      <input type="text" id="cardBankName" placeholder="e.g., HDFC Bank">
+                    </div>
                   </div>
                   
                   <!-- Credit Card Specific Fields (shown only for credit cards) -->
                   <div id="creditCardFields" style="display: none;">
-                    <div class="form-group">
-                      <label for="creditLimit">Credit Limit (₹)</label>
-                      <input type="number" id="creditLimit" placeholder="100000" min="0" step="1">
-                      <small class="form-text">Your card's credit limit</small>
-                    </div>
-                    <div class="form-group">
-                      <label for="billingDate">Billing Date</label>
-                      <input type="number" id="billingDate" placeholder="1-31" min="1" max="31">
-                      <small class="form-text">Day of month when billing cycle starts</small>
-                    </div>
-                    <div class="form-group">
-                      <label for="dueDate">Payment Due Date</label>
-                      <input type="number" id="dueDate" placeholder="1-31" min="1" max="31">
-                      <small class="form-text">Day of month when payment is due</small>
-                    </div>
-                    <div class="form-group">
-                      <label for="rewardsProgram">Rewards Program</label>
-                      <input type="text" id="rewardsProgram" placeholder="e.g., Cashback, Points, Miles">
-                    </div>
-                    <div class="form-group">
-                      <label for="annualFee">Annual Fee (₹)</label>
-                      <input type="number" id="annualFee" placeholder="0" min="0" step="0.01">
-                    </div>
-                    <div class="form-group">
-                      <label for="cardNotes">Notes</label>
-                      <textarea id="cardNotes" placeholder="Additional notes about this card" rows="2"></textarea>
+                    <div class="form-grid">
+                      <div class="form-group">
+                        <label for="creditLimit">Credit Limit (₹)</label>
+                        <input type="number" id="creditLimit" placeholder="100000" min="0" step="1">
+                        <small class="form-text">Your card's credit limit</small>
+                      </div>
+                      <div class="form-group">
+                        <label for="billingDate">Billing Date</label>
+                        <input type="number" id="billingDate" placeholder="1-31" min="1" max="31">
+                        <small class="form-text">Day of month when billing cycle starts</small>
+                      </div>
+                      <div class="form-group">
+                        <label for="dueDate">Payment Due Date</label>
+                        <input type="number" id="dueDate" placeholder="1-31" min="1" max="31">
+                        <small class="form-text">Day of month when payment is due</small>
+                      </div>
+                      <div class="form-group">
+                        <label for="rewardsProgram">Rewards Program</label>
+                        <input type="text" id="rewardsProgram" placeholder="e.g., Cashback, Points, Miles">
+                      </div>
+                      <div class="form-group">
+                        <label for="annualFee">Annual Fee (₹)</label>
+                        <input type="number" id="annualFee" placeholder="0" min="0" step="0.01">
+                      </div>
+                      <div class="form-group form-group-full">
+                        <label for="cardNotes">Notes</label>
+                        <textarea id="cardNotes" placeholder="Additional notes about this card" rows="2"></textarea>
+                      </div>
                     </div>
                   </div>
                 </div>
 
                 <!-- UPI Fields -->
                 <div id="upiFields" style="display: none;">
-                  <div class="form-group">
-                    <label for="upiId">UPI ID</label>
-                    <input type="text" id="upiId" placeholder="yourname@okhdfc">
-                  </div>
-                  <div class="form-group">
-                    <label for="upiProvider">Provider</label>
-                    <select id="upiProvider">
-                      <option value="gpay">Google Pay</option>
-                      <option value="phonepe">PhonePe</option>
-                      <option value="paytm">Paytm</option>
-                      <option value="amazonpay">Amazon Pay</option>
-                      <option value="bhim">BHIM</option>
-                      <option value="other">Other</option>
-                    </select>
+                  <div class="form-grid">
+                    <div class="form-group">
+                      <label for="upiId">UPI ID</label>
+                      <input type="text" id="upiId" placeholder="yourname@okhdfc">
+                    </div>
+                    <div class="form-group">
+                      <label for="upiProvider">Provider</label>
+                      <select id="upiProvider">
+                        <option value="gpay">Google Pay</option>
+                        <option value="phonepe">PhonePe</option>
+                        <option value="paytm">Paytm</option>
+                        <option value="amazonpay">Amazon Pay</option>
+                        <option value="bhim">BHIM</option>
+                        <option value="other">Other</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
 
                 <!-- Wallet Fields -->
                 <div id="walletFields" style="display: none;">
-                  <div class="form-group">
-                    <label for="walletProvider">Wallet Provider</label>
-                    <select id="walletProvider">
-                      <option value="paytm">Paytm</option>
-                      <option value="phonepe">PhonePe</option>
-                      <option value="amazonpay">Amazon Pay</option>
-                      <option value="mobikwik">Mobikwik</option>
-                      <option value="freecharge">Freecharge</option>
-                      <option value="other">Other</option>
-                    </select>
-                  </div>
-                  <div class="form-group">
-                    <label for="walletNumber">Mobile Number</label>
-                    <input type="tel" id="walletNumber" placeholder="9876543210" maxlength="10">
+                  <div class="form-grid">
+                    <div class="form-group">
+                      <label for="walletProvider">Wallet Provider</label>
+                      <select id="walletProvider">
+                        <option value="paytm">Paytm</option>
+                        <option value="phonepe">PhonePe</option>
+                        <option value="amazonpay">Amazon Pay</option>
+                        <option value="mobikwik">Mobikwik</option>
+                        <option value="freecharge">Freecharge</option>
+                        <option value="other">Other</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="walletNumber">Mobile Number</label>
+                      <input type="tel" id="walletNumber" placeholder="9876543210" maxlength="10">
                   </div>
                 </div>
 
                 <!-- Bank Fields -->
                 <div id="bankFields" style="display: none;">
-                  <div class="form-group">
-                    <label for="bankAccountNumber">Account Number (Last 4 digits)</label>
-                    <input type="text" id="bankAccountNumber" placeholder="1234" maxlength="4" pattern="[0-9]{4}">
-                    <small class="form-text">Only last 4 digits for security</small>
-                  </div>
-                  <div class="form-group">
-                    <label for="bankName">Bank Name</label>
-                    <input type="text" id="bankName" placeholder="e.g., HDFC Bank">
-                  </div>
-                  <div class="form-group">
-                    <label for="ifscCode">IFSC Code</label>
-                    <input type="text" id="ifscCode" placeholder="HDFC0001234" maxlength="11">
-                  </div>
-                  <div class="form-group">
-                    <label for="accountType">Account Type</label>
-                    <select id="accountType">
-                      <option value="savings">Savings</option>
-                      <option value="current">Current</option>
-                    </select>
+                  <div class="form-grid">
+                    <div class="form-group">
+                      <label for="bankAccountNumber">Account Number (Last 4 digits)</label>
+                      <input type="text" id="bankAccountNumber" placeholder="1234" maxlength="4" pattern="[0-9]{4}">
+                      <small class="form-text">Only last 4 digits for security</small>
+                    </div>
+                    <div class="form-group">
+                      <label for="bankName">Bank Name</label>
+                      <input type="text" id="bankName" placeholder="e.g., HDFC Bank">
+                    </div>
+                    <div class="form-group">
+                      <label for="ifscCode">IFSC Code</label>
+                      <input type="text" id="ifscCode" placeholder="HDFC0001234" maxlength="11">
+                    </div>
+                    <div class="form-group">
+                      <label for="accountType">Account Type</label>
+                      <select id="accountType">
+                        <option value="savings">Savings</option>
+                        <option value="current">Current</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
 

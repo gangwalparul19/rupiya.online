@@ -1001,3 +1001,51 @@
         line-height: 1.4;
     }
 }
+
+/* Logout Button Styles */
+.logout-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 10px 16px;
+    margin-top: 12px;
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(231, 76, 60, 0.25);
+}
+
+.logout-btn:hover {
+    background: linear-gradient(135deg, #c0392b, #a93226);
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.35);
+    transform: translateY(-1px);
+}
+
+.logout-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(231, 76, 60, 0.3);
+}
+
+.logout-btn svg {
+    width: 20px;
+    height: 20px;
+    stroke-width: 2;
+}
+
+/* Dark mode support */
+[data-theme="dark"] .logout-btn {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
+}
+
+[data-theme="dark"] .logout-btn:hover {
+    background: linear-gradient(135deg, #c0392b, #a93226);
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
+}

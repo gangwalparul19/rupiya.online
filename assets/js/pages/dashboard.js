@@ -15,6 +15,8 @@ import kpiEnhancer from '../utils/kpi-enhancements.js';
 import TransactionListEnhancer from '../utils/transaction-list-enhancements.js';
 import { setupAutoCacheClear } from '../utils/cache-buster.js';
 import lazyLoader from '../utils/lazy-loader.js';
+// AI Features
+import '../features/ai-features-init.js';
 
 const log = logger.create('Dashboard');
 
@@ -75,6 +77,13 @@ async function checkFirstTimeSetup() {
     log.error('Error checking setup status:', error);
   }
 }
+
+// Dashboard state for AI features
+window.dashboardState = {
+  expenses: [],
+  income: [],
+  previousExpenses: []
+};
 
 // Initialize dashboard only after auth check
 async function init() {
@@ -211,6 +220,14 @@ async function loadDashboardData() {
       firestoreService.getIncome(200),
       firestoreService.getSplits ? firestoreService.getSplits() : Promise.resolve([])
     ]);
+    
+    // Export to global state for AI features
+    window.dashboardState.expenses = expenses;
+    window.dashboardState.income = income;
+    
+    // Get previous month expenses for comparison
+    const previousMonthExpensesList = await firestoreService.getExpensesByMonth(currentYear, currentMonth - 1);
+    window.dashboardState.previousExpenses = previousMonthExpensesList;
     
     log.log('Current month summary:', currentSummary);
     
