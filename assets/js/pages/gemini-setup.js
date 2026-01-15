@@ -2,7 +2,7 @@
 import { auth } from '../config/firebase-config.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
 import geminiKeyService from '../services/gemini-key-service.js';
-import encryptionService from '../services/encryption-service.js';
+import authEncryptionHelper from '../utils/auth-encryption-helper.js';
 
 // Initialize page
 document.addEventListener('DOMContentLoaded', async () => {
@@ -13,8 +13,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        // Initialize encryption
-        await encryptionService.waitForInitialization();
+        // Initialize encryption for the user
+        try {
+            const encryptionReady = await authEncryptionHelper.initializeForGoogleUser(user.uid);
+            if (!encryptionReady) {
+                console.warn('Encryption initialization failed, but continuing...');
+            }
+        } catch (error) {
+            console.error('Error initializing encryption:', error);
+        }
 
         // Load key status
         await loadKeyStatus();

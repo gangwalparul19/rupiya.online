@@ -42,9 +42,9 @@ class GeminiKeyService {
       log.log(`Storing Gemini API key for user: ${userId}`);
 
       // Encrypt the API key
-      const encryptedData = await encryptionService.encrypt(apiKey);
+      const encryptedKey = await encryptionService.encryptValue(apiKey);
       
-      if (!encryptedData) {
+      if (!encryptedKey) {
         throw new Error('Failed to encrypt API key');
       }
 
@@ -53,9 +53,7 @@ class GeminiKeyService {
       
       await setDoc(keyDocRef, {
         userId,
-        encryptedKey: encryptedData.ciphertext,
-        iv: encryptedData.iv,
-        salt: encryptedData.salt,
+        encryptedKey: encryptedKey,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
         isActive: true,
@@ -115,11 +113,7 @@ class GeminiKeyService {
       }
 
       // Decrypt the API key
-      const decryptedKey = await encryptionService.decrypt({
-        ciphertext: data.encryptedKey,
-        iv: data.iv,
-        salt: data.salt
-      });
+      const decryptedKey = await encryptionService.decryptValue(data.encryptedKey);
 
       if (!decryptedKey) {
         throw new Error('Failed to decrypt API key');

@@ -1,5 +1,19 @@
 /* Gemini Setup Page Styles */
 
+/* Mobile Header Integration */
+.mobile-header {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .mobile-header {
+        display: flex !important;
+        position: sticky;
+        top: 0;
+        z-index: 10001;
+    }
+}
+
 .gemini-setup-container {
     max-width: 900px;
     margin: 0 auto;
@@ -175,6 +189,7 @@
     gap: 10px;
     margin-top: 15px;
     flex-wrap: wrap;
+    width: 100%;
 }
 
 .btn {
@@ -186,6 +201,8 @@
     transition: all 0.3s ease;
     font-weight: 600;
     white-space: nowrap;
+    display: inline-block;
+    min-width: 120px;
 }
 
 .btn-primary {
@@ -193,6 +210,8 @@
     color: white;
     flex: 1;
     min-width: 150px;
+    padding: 14px 28px;
+    font-size: 1.05em;
 }
 
 .btn-primary:hover {
@@ -205,12 +224,13 @@
     background: var(--bg-light);
     color: var(--text-primary);
     border: 1px solid var(--border-color);
-    flex: 1;
     min-width: 100px;
+    padding: 12px 20px;
 }
 
 .btn-secondary:hover {
     background: var(--border-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .btn-danger {
@@ -429,118 +449,531 @@
 @media (max-width: 768px) {
     .gemini-setup-container {
         padding: 15px;
+        margin-top: 0;
+    }
+
+    .setup-header {
+        margin-bottom: 30px;
     }
 
     .setup-header h1 {
         font-size: 1.8em;
+        margin-bottom: 8px;
     }
 
     .setup-header p {
         font-size: 0.95em;
+        margin-bottom: 15px;
     }
 
-    .step-title {
-        font-size: 1.1em;
+    .free-tier-banner {
+        padding: 12px;
+        margin-top: 15px;
     }
 
-    .api-key-input-group {
-        flex-direction: column;
+    .free-tier-banner strong {
+        font-size: 1em;
+        margin-bottom: 5px;
     }
 
-    .api-key-input-group input {
-        width: 100%;
+    .free-tier-banner p {
+        font-size: 0.9em;
+        margin: 0;
     }
 
-    .btn-group {
-        flex-direction: column;
-    }
-
-    .btn {
-        width: 100%;
-        min-width: auto;
-    }
-
-    .simple-step {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .step-icon {
-        width: auto;
-        text-align: left;
-    }
-
-    .key-status-item {
-        flex-direction: column;
-    }
-
-    .key-status-label {
-        min-width: auto;
-    }
-
-    .key-status-value {
-        text-align: left;
+    .setup-steps {
+        gap: 20px;
+        margin-bottom: 30px;
     }
 
     .step-card {
         padding: 15px;
+        border-radius: 6px;
+    }
+
+    .step-title {
+        font-size: 1.1em;
+        margin-bottom: 12px;
     }
 
     .step-number {
         width: 35px;
         height: 35px;
-        font-size: 1em;
+        font-size: 0.95em;
         margin-right: 10px;
+    }
+
+    .step-content {
+        margin-left: 0;
+    }
+
+    .step-description {
+        font-size: 0.9em;
+        margin-bottom: 15px;
+    }
+
+    .simple-steps {
+        gap: 12px;
+        margin: 15px 0;
+    }
+
+    .simple-step {
+        gap: 12px;
+        padding: 12px;
+        border-radius: 4px;
+    }
+
+    .step-icon {
+        font-size: 1.3em;
+        width: 25px;
+        text-align: center;
+    }
+
+    .step-text {
+        font-size: 0.9em;
+        line-height: 1.4;
+    }
+
+    .step-text strong {
+        margin-bottom: 3px;
+    }
+
+    .api-key-input-section {
+        margin-top: 15px;
+    }
+
+    .api-key-input-group {
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+
+    .api-key-input-group input {
+        width: 100%;
+        padding: 11px;
+        font-size: 0.95em;
+    }
+
+    .api-key-input-group button {
+        padding: 11px;
+        font-size: 1.2em;
+    }
+
+    .btn-group {
+        flex-direction: column;
+        width: 100%;
+        gap: 8px;
+        margin-top: 12px;
+    }
+
+    .btn {
+        width: 100%;
+        padding: 12px 16px;
+        font-size: 0.95em;
+        min-width: auto;
+    }
+
+    .btn-primary {
+        flex: none;
+        min-width: auto;
+        padding: 13px 20px;
+        font-size: 1em;
+    }
+
+    .btn-secondary {
+        flex: none;
+        min-width: auto;
+        padding: 11px 16px;
+    }
+
+    .security-info {
+        padding: 12px;
+        margin: 12px 0;
+        font-size: 0.9em;
+    }
+
+    .security-info strong {
+        margin-bottom: 6px;
+    }
+
+    .security-info ul {
+        margin: 8px 0 0 16px;
+    }
+
+    .security-info li {
+        margin: 4px 0;
+        font-size: 0.9em;
+    }
+
+    .warning-box {
+        padding: 12px;
+        margin: 12px 0;
+        font-size: 0.9em;
+    }
+
+    .key-status {
+        padding: 15px;
+        margin-top: 15px;
+    }
+
+    .key-status-item {
+        padding: 8px 0;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .key-status-label {
+        font-size: 0.9em;
+        min-width: auto;
+    }
+
+    .key-status-value {
+        font-size: 0.9em;
+        text-align: left;
+    }
+
+    .feature-list {
+        margin: 12px 0;
+    }
+
+    .feature-list li {
+        padding: 8px 0;
+        padding-left: 25px;
+        font-size: 0.9em;
+    }
+
+    .faq-item {
+        margin-bottom: 15px;
+        padding-bottom: 15px;
+    }
+
+    .faq-item h3 {
+        font-size: 1em;
+        margin-bottom: 6px;
+    }
+
+    .faq-item p {
+        font-size: 0.9em;
+        line-height: 1.5;
+    }
+
+    .faq-item.highlight {
+        padding: 12px;
+        margin-bottom: 15px;
     }
 }
 
 @media (max-width: 480px) {
     .gemini-setup-container {
         padding: 10px;
+        margin-top: 0;
+    }
+
+    .setup-header {
+        text-align: center;
+        margin-bottom: 25px;
     }
 
     .setup-header h1 {
-        font-size: 1.5em;
+        font-size: 1.4em;
+        margin-bottom: 6px;
+        word-break: break-word;
     }
 
     .setup-header p {
-        font-size: 0.9em;
+        font-size: 0.85em;
+        margin-bottom: 12px;
+    }
+
+    .free-tier-banner {
+        padding: 10px;
+        margin-top: 12px;
+        border-radius: 6px;
+    }
+
+    .free-tier-banner strong {
+        font-size: 0.95em;
+        display: block;
+        margin-bottom: 4px;
+    }
+
+    .free-tier-banner p {
+        font-size: 0.85em;
+        margin: 0;
+        line-height: 1.3;
+    }
+
+    .setup-steps {
+        gap: 15px;
+        margin-bottom: 25px;
     }
 
     .step-card {
         padding: 12px;
+        border-radius: 6px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
     }
 
     .step-title {
         font-size: 1em;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .step-number {
+        width: 32px;
+        height: 32px;
+        font-size: 0.9em;
+        margin-right: 0;
+        flex-shrink: 0;
+    }
+
+    .step-content {
+        margin-left: 0;
+        margin-top: 0;
     }
 
     .step-description {
-        font-size: 0.9em;
+        font-size: 0.85em;
+        margin-bottom: 12px;
+        line-height: 1.4;
+    }
+
+    .simple-steps {
+        gap: 10px;
+        margin: 12px 0;
     }
 
     .simple-step {
-        padding: 12px;
+        gap: 10px;
+        padding: 10px;
+        border-radius: 4px;
+        border-left-width: 3px;
     }
 
     .step-icon {
-        font-size: 1.2em;
+        font-size: 1.1em;
+        width: 22px;
+        text-align: center;
+        flex-shrink: 0;
     }
 
     .step-text {
+        font-size: 0.85em;
+        line-height: 1.3;
+    }
+
+    .step-text strong {
+        display: block;
+        margin-bottom: 2px;
         font-size: 0.9em;
+    }
+
+    .api-key-input-section {
+        margin-top: 12px;
+    }
+
+    label {
+        font-size: 0.9em !important;
+        margin-bottom: 8px !important;
+    }
+
+    .api-key-input-group {
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 10px;
+    }
+
+    .api-key-input-group input {
+        width: 100%;
+        padding: 10px;
+        font-size: 0.9em;
+        border-radius: 4px;
+    }
+
+    .api-key-input-group button {
+        padding: 10px;
+        font-size: 1.1em;
+        border-radius: 4px;
+    }
+
+    .btn-group {
+        flex-direction: column;
+        width: 100%;
+        gap: 8px;
+        margin-top: 10px;
     }
 
     .btn {
-        padding: 10px 16px;
+        width: 100%;
+        padding: 11px 14px;
         font-size: 0.9em;
+        min-width: auto;
+        border-radius: 4px;
+    }
+
+    .btn-primary {
+        padding: 12px 16px;
+        font-size: 0.95em;
+    }
+
+    .btn-secondary {
+        padding: 10px 14px;
+        font-size: 0.9em;
+    }
+
+    .btn:disabled {
+        opacity: 0.5;
+    }
+
+    .status-message {
+        padding: 12px;
+        margin-top: 10px;
+        font-size: 0.85em;
+        border-radius: 4px;
+    }
+
+    .security-info {
+        padding: 10px;
+        margin: 10px 0;
+        font-size: 0.85em;
+        border-left-width: 3px;
+        border-radius: 4px;
+    }
+
+    .security-info strong {
+        display: block;
+        margin-bottom: 5px;
+        font-size: 0.9em;
+    }
+
+    .security-info ul {
+        margin: 6px 0 0 14px;
+        padding: 0;
+    }
+
+    .security-info li {
+        margin: 3px 0;
+        font-size: 0.85em;
+        line-height: 1.3;
+    }
+
+    .warning-box {
+        padding: 10px;
+        margin: 10px 0;
+        font-size: 0.85em;
+        border-left-width: 3px;
+        border-radius: 4px;
+    }
+
+    .warning-box strong {
+        display: block;
+        margin-bottom: 5px;
+        font-size: 0.9em;
+    }
+
+    .key-status {
+        padding: 12px;
+        margin-top: 12px;
+        border-radius: 4px;
+    }
+
+    .key-status-item {
+        padding: 8px 0;
+        flex-direction: column;
+        gap: 3px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .key-status-item:last-child {
+        border-bottom: none;
+    }
+
+    .key-status-label {
+        font-size: 0.85em;
+        font-weight: 600;
+        min-width: auto;
+    }
+
+    .key-status-value {
+        font-size: 0.85em;
+        text-align: left;
+    }
+
+    .feature-list {
+        list-style: none;
+        padding: 0;
+        margin: 10px 0;
+    }
+
+    .feature-list li {
+        padding: 7px 0;
+        padding-left: 22px;
+        position: relative;
+        font-size: 0.85em;
+        line-height: 1.3;
+    }
+
+    .feature-list li:before {
+        font-size: 1em;
+        left: 0;
+    }
+
+    .faq-item {
+        margin-bottom: 12px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .faq-item:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
     }
 
     .faq-item h3 {
-        font-size: 1em;
+        font-size: 0.95em;
+        margin-bottom: 5px;
+        margin-top: 0;
     }
 
     .faq-item p {
-        font-size: 0.9em;
+        font-size: 0.85em;
+        margin: 0;
+        line-height: 1.4;
+    }
+
+    .faq-item.highlight {
+        padding: 10px;
+        margin-bottom: 12px;
+        border-radius: 4px;
+        border-bottom: none;
+    }
+
+    .faq-item.highlight h3 {
+        font-size: 0.95em;
+    }
+
+    .faq-item.highlight p {
+        font-size: 0.85em;
+    }
+
+    /* Help section */
+    .step-card[style*="background"] {
+        padding: 10px;
+        border-radius: 4px;
+    }
+
+    .step-card[style*="background"] h2 {
+        font-size: 1em;
+        margin-bottom: 8px;
+    }
+
+    .step-card[style*="background"] p {
+        font-size: 0.85em;
+        line-height: 1.4;
     }
 }
