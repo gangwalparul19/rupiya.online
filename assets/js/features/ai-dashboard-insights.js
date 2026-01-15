@@ -37,12 +37,12 @@ class AIDashboardInsights {
    * Add AI insights widget to dashboard
    */
   addInsightsWidget() {
-    // Find a good place to add the widget (after KPI cards)
-    const kpiSection = document.querySelector('.kpi-cards') || 
-                       document.querySelector('.dashboard-grid') ||
-                       document.querySelector('.main-content');
+    // Find the savings rate widget or widgets row to insert after
+    const savingsWidget = document.querySelector('.savings-rate-widget') ||
+                          document.querySelector('.widgets-row') ||
+                          document.querySelector('.kpi-grid');
     
-    if (!kpiSection) return;
+    if (!savingsWidget) return;
 
     // Check if widget already exists
     if (document.getElementById('aiInsightsWidget')) return;
@@ -65,8 +65,15 @@ class AIDashboardInsights {
       </div>
     `;
 
-    // Insert after KPI section
-    kpiSection.parentElement.insertBefore(widget, kpiSection.nextSibling);
+    // Insert after savings widget or widgets row
+    if (savingsWidget.classList.contains('widgets-row')) {
+      // Insert after the entire widgets row
+      savingsWidget.parentElement.insertBefore(widget, savingsWidget.nextSibling);
+    } else {
+      // Insert after the savings widget's parent container
+      const parent = savingsWidget.closest('.widgets-row') || savingsWidget.parentElement;
+      parent.parentElement.insertBefore(widget, parent.nextSibling);
+    }
 
     // Add event listener
     document.getElementById('refreshInsightsBtn').addEventListener('click', () => {

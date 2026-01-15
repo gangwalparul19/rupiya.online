@@ -78,6 +78,13 @@ class AIAssistant {
   }
 
   addStyles() {
+    // Check if external CSS is loaded (preferred)
+    const externalCSS = document.querySelector('link[href*="ai-assistant.css"]');
+    if (externalCSS) {
+      log.log('Using external AI assistant CSS');
+      return; // Use external CSS instead of inline
+    }
+
     if (document.getElementById('ai-assistant-styles')) {
       return; // Styles already added
     }
@@ -341,7 +348,6 @@ class AIAssistant {
     const closeBtn = document.getElementById('aiCloseBtn');
     const sendBtn = document.getElementById('aiSendBtn');
     const input = document.getElementById('aiMessageInput');
-    const chat = document.getElementById('aiAssistantChat');
 
     btn.addEventListener('click', () => this.toggle());
     closeBtn.addEventListener('click', () => this.close());
