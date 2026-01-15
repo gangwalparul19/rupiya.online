@@ -1,939 +1,741 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
-
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <!-- Primary Meta Tags -->
-  <title>Rupiya - Best Investment Tracker & Portfolio Management App India 2026</title>
-  <meta name="title" content="Rupiya - Best Investment Tracker & Portfolio Management App India 2026">
-  <meta name="description" content="Track investments, stocks, mutual funds, crypto & expenses in one app. AI-powered portfolio analysis, real-time tracking, family sharing. #1 investment app for Indian investors. Free forever!">
-  <meta name="keywords" content="investment app India, portfolio tracker, stock tracker, mutual fund tracker, crypto portfolio, investment management app, best investment app, portfolio management, wealth tracker, investment portfolio app, stock portfolio tracker India, investment tracking app">
-  <meta name="author" content="Rupiya">
-  <meta name="robots" content="index, follow">
-  <meta name="language" content="English">
-  <meta name="theme-color" content="#4A90E2">
-  
-  <!-- Open Graph / Facebook -->
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://rupiya.online/">
-  <meta property="og:title" content="Rupiya - India's #1 Investment & Portfolio Tracker App">
-  <meta property="og:description" content="Track all investments, analyze portfolio, get AI insights. Stocks, MF, crypto, real estate - all in one app. Join 10,000+ smart investors!">
-  <meta property="og:image" content="https://rupiya.online/assets/images/og-image.png">
-  <meta property="og:site_name" content="Rupiya">
-  <meta property="og:locale" content="en_IN">
-  
-  <!-- Twitter -->
-  <meta property="twitter:card" content="summary_large_image">
-  <meta property="twitter:url" content="https://rupiya.online/">
-  <meta property="twitter:title" content="Rupiya - India's #1 Investment & Portfolio Tracker App">
-  <meta property="twitter:description" content="Track all investments, analyze portfolio, get AI insights. Stocks, MF, crypto, real estate - all in one app. Join 10,000+ smart investors!">
-  <meta property="twitter:image" content="https://rupiya.online/assets/images/og-image.png">
-  <meta property="twitter:site" content="@RupiyaApp">
-  
-  <!-- Canonical URL -->
+  <title>Rupiya - Smart Money Management for Modern India</title>
+  <meta name="description" content="Transform your financial life with Rupiya - Track expenses, investments, budgets with AI insights. 100% free, encrypted & works offline!">
+  <meta name="theme-color" content="#667eea">
   <link rel="canonical" href="https://rupiya.online/">
-  
-  <!-- PWA Manifest -->
   <link rel="manifest" href="/manifest.json">
-  
-  <!-- Favicon -->
   <link rel="icon" href="assets/images/logo.png" type="image/png">
   <link rel="apple-touch-icon" href="/android-chrome-192x192.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-  
-  <!-- Preconnect for performance -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
-  
-  <!-- Stylesheets -->
   <link rel="stylesheet" href="assets/css/bundles/core.bundle.css">
-  <link rel="stylesheet" href="assets/css/bundles/landing.bundle.css">
-<!-- Structured Data - WebPage -->
-  <script type="application/ld+json">
-  {
-  "@context": "https://schema.org",
-  "@type": "WebPage",
-  "name": "Rupiya - Best Investment Tracker & Portfolio Management App India 2026",
-  "description": "Track investments, stocks, mutual funds, crypto & expenses in one app. AI-powered portfolio analysis, real-time tracking, family sharing. #1 investment app for Indian investors. Free forever!",
-  "url": "https://rupiya.online/",
-  "publisher": {
-    "@type": "Organization",
-    "name": "Rupiya",
-    "url": "https://rupiya.online"
-  }
-}
-  </script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --primary: #667eea; --primary-dark: #5568d3; --secondary: #764ba2;
+      --accent: #f093fb; --success: #4ade80; --warning: #fbbf24;
+      --danger: #f87171; --dark: #1e293b; --light: #f8fafc; --gray: #64748b;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      line-height: 1.6; color: var(--dark); overflow-x: hidden;
+    }
+    .animated-bg {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); overflow: hidden;
+    }
+    .animated-bg::before {
+      content: ''; position: absolute; width: 200%; height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+      background-size: 50px 50px; animation: moveBackground 20s linear infinite;
+    }
+    @keyframes moveBackground {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(50px, 50px); }
+    }
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
+      box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1); transition: all 0.3s ease;
+    }
+    .navbar.scrolled { background: rgba(255, 255, 255, 0.98); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.15); }
+    .nav-container {
+      max-width: 1200px; margin: 0 auto; padding: 1rem 2rem;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .logo {
+      display: flex; align-items: center; gap: 0.75rem;
+      font-size: 1.5rem; font-weight: 700; color: var(--primary); text-decoration: none;
+    }
+    .logo img { width: 120px; height: auto; }
+    @media (max-width: 768px) {
+      .nav-container { justify-content: center; position: relative; }
+      .logo { margin: 0 auto; }
+      .logo img { width: 140px; }
+      .mobile-toggle { position: absolute; right: 2rem; top: 50%; transform: translateY(-50%); }
+    }
+    @media (max-width: 480px) {
+      .logo img { width: 120px; }
+      .mobile-toggle { right: 1rem; }
+    }
+    .nav-links { display: flex; gap: 2rem; align-items: center; }
+    .nav-links a {
+      text-decoration: none; color: var(--dark); font-weight: 500; transition: color 0.3s;
+    }
+    .nav-links a:hover { color: var(--primary); }
+
+    .btn {
+      padding: 0.75rem 1.5rem; border-radius: 12px; font-weight: 600;
+      text-decoration: none; transition: all 0.3s; border: none; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 0.5rem;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6); }
+    .btn-outline { background: transparent; color: var(--primary); border: 2px solid var(--primary); }
+    .btn-outline:hover { background: var(--primary); color: white; }
+    .mobile-toggle { display: none; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--dark); }
+    @media (max-width: 768px) {
+      .nav-links {
+        position: fixed; top: 70px; left: 0; right: 0; background: white;
+        flex-direction: column; padding: 2rem; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        transform: translateY(-150%); opacity: 0; transition: all 0.3s; z-index: 999;
+      }
+      .nav-links.active { transform: translateY(0); opacity: 1; }
+      .mobile-toggle { display: block; }
+    }
+    .hero {
+      min-height: 85vh; display: flex; align-items: center; justify-content: center;
+      padding: 5rem 2rem 3rem; position: relative; overflow: hidden;
+    }
+    .hero-content { max-width: 1200px; margin: 0 auto; text-align: center; position: relative; z-index: 1; }
+    .hero-badge {
+      display: inline-block; padding: 0.5rem 1.5rem;
+      background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px);
+      border-radius: 50px; color: white; font-weight: 600; margin-bottom: 1.5rem;
+      animation: fadeInDown 0.8s ease;
+    }
+    @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+    .hero-title {
+      font-size: clamp(2rem, 8vw, 4rem); font-weight: 800; color: white;
+      margin-bottom: 1rem; line-height: 1.1; animation: fadeInUp 0.8s ease 0.2s both;
+    }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    .gradient-text {
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .hero-subtitle {
+      font-size: clamp(1rem, 3vw, 1.3rem); color: rgba(255, 255, 255, 0.9);
+      margin-bottom: 2rem; max-width: 700px; margin-left: auto; margin-right: auto;
+      animation: fadeInUp 0.8s ease 0.4s both;
+    }
+    .hero-buttons {
+      display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
+      animation: fadeInUp 0.8s ease 0.6s both; max-width: 600px; margin: 0 auto;
+    }
+    .hero-buttons .btn { font-size: 1rem; padding: 0.875rem 1.75rem; flex: 1; min-width: 180px; }
+    .btn-hero-primary {
+      background: white; color: var(--primary); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+    .btn-hero-primary:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3); }
+    .btn-hero-outline {
+      background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);
+      color: white; border: 2px solid white;
+    }
+    .btn-hero-outline:hover { background: white; color: var(--primary); }
+    .btn-install {
+      background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px);
+      color: white; border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+    .btn-install:hover { background: rgba(255, 255, 255, 0.25); border-color: white; }
+
+    .trust-badges {
+      display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
+      margin-top: 2rem; animation: fadeInUp 0.8s ease 0.8s both;
+    }
+    @media (max-width: 768px) {
+      .trust-badges { gap: 0.75rem; margin-top: 1.5rem; }
+    }
+    @media (max-width: 480px) {
+      .trust-badges { gap: 0.5rem; }
+    }
+    .trust-badge { 
+      display: flex; align-items: center; gap: 0.5rem; color: white; font-size: 0.9rem;
+      background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px);
+      padding: 0.5rem 1rem; border-radius: 50px; border: 1px solid rgba(255, 255, 255, 0.3);
+      font-weight: 500;
+    }
+    @media (max-width: 768px) {
+      .trust-badge { font-size: 0.85rem; padding: 0.4rem 0.875rem; }
+    }
+    @media (max-width: 480px) {
+      .trust-badge { font-size: 0.8rem; padding: 0.375rem 0.75rem; gap: 0.4rem; }
+    }
+    .trust-badge svg { width: 18px; height: 18px; flex-shrink: 0; }
+    @media (max-width: 480px) {
+      .trust-badge svg { width: 16px; height: 16px; }
+    }
+    .stats {
+      background: white; padding: 3rem 2rem; margin-top: -3rem; position: relative; z-index: 2;
+    }
+    .stats-container {
+      max-width: 1200px; margin: 0 auto; display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem;
+    }
+    @media (max-width: 1024px) {
+      .stats-container { grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+    }
+    @media (max-width: 768px) {
+      .stats { padding: 3rem 1rem; }
+      .stats-container { grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+    }
+    @media (max-width: 480px) {
+      .stats { padding: 2.5rem 0.75rem; }
+      .stats-container { grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
+    }
+    .stat-card {
+      text-align: center; padding: 2rem; border-radius: 20px;
+      background: linear-gradient(135deg, #f8fafc, #e2e8f0); transition: transform 0.3s;
+    }
+    .stat-card:hover { transform: translateY(-5px); }
+    .stat-icon { font-size: 3rem; margin-bottom: 1rem; }
+    .stat-value { font-size: 2.5rem; font-weight: 800; color: var(--primary); margin-bottom: 0.5rem; }
+    .stat-label { color: var(--gray); font-weight: 500; }
+    @media (max-width: 768px) {
+      .stat-card { padding: 1.25rem; border-radius: 15px; }
+      .stat-icon { font-size: 2.25rem; margin-bottom: 0.5rem; }
+      .stat-value { font-size: 1.75rem; }
+      .stat-label { font-size: 0.85rem; }
+    }
+    @media (max-width: 480px) {
+      .stat-card { padding: 1rem; border-radius: 12px; }
+      .stat-icon { font-size: 1.75rem; margin-bottom: 0.4rem; }
+      .stat-value { font-size: 1.4rem; }
+      .stat-label { font-size: 0.75rem; }
+    }
+    .features { padding: 6rem 2rem; background: var(--light); }
+    .section-header { text-align: center; margin-bottom: 4rem; }
+    .section-badge {
+      display: inline-block; padding: 0.5rem 1.5rem;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white; border-radius: 50px; font-weight: 600; margin-bottom: 1rem;
+    }
+    .section-title {
+      font-size: clamp(2rem, 5vw, 3rem); font-weight: 800;
+      color: var(--dark); margin-bottom: 1rem;
+    }
+    .section-description {
+      font-size: 1.2rem; color: var(--gray); max-width: 600px; margin: 0 auto;
+    }
+    .features-grid {
+      max-width: 1200px; margin: 0 auto; display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem;
+    }
+    @media (max-width: 768px) {
+      .features-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+    }
+    @media (max-width: 480px) {
+      .features-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+    }
+    .feature-card {
+      background: white; padding: 2rem; border-radius: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); transition: all 0.3s;
+      border: 2px solid transparent; display: flex; flex-direction: column; gap: 1rem;
+    }
+    @media (max-width: 768px) {
+      .feature-card { padding: 1.25rem; border-radius: 15px; }
+    }
+    @media (max-width: 480px) {
+      .feature-card { padding: 1rem; border-radius: 12px; }
+    }
+    .feature-card:hover {
+      transform: translateY(-10px); box-shadow: 0 10px 40px rgba(102, 126, 234, 0.2);
+      border-color: var(--primary);
+    }
+    .feature-card-header { display: flex; align-items: flex-start; gap: 1rem; }
+    @media (max-width: 768px) {
+      .feature-card-header { gap: 0.75rem; }
+    }
+    @media (max-width: 480px) {
+      .feature-card-header { gap: 0.5rem; }
+    }
+
+    .feature-icon {
+      font-size: 3rem; margin-bottom: 0; display: block; flex-shrink: 0;
+    }
+    @media (max-width: 768px) {
+      .feature-icon { font-size: 2.5rem; }
+    }
+    @media (max-width: 480px) {
+      .feature-icon { font-size: 2rem; }
+    }
+    .feature-title {
+      font-size: 1.5rem; font-weight: 700; color: var(--dark);
+      margin-bottom: 0; line-height: 1.3;
+    }
+    @media (max-width: 768px) {
+      .feature-title { font-size: 1.1rem; }
+    }
+    @media (max-width: 480px) {
+      .feature-title { font-size: 1rem; }
+    }
+    .feature-description { color: var(--gray); line-height: 1.6; margin: 0; }
+    @media (max-width: 768px) {
+      .feature-description { font-size: 0.9rem; line-height: 1.5; }
+    }
+    @media (max-width: 480px) {
+      .feature-description { font-size: 0.85rem; line-height: 1.4; }
+    }
+    .security {
+      padding: 6rem 2rem; background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+    }
+    .security-grid {
+      max-width: 1200px; margin: 0 auto; display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 3rem;
+    }
+    @media (max-width: 768px) {
+      .security-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+      .security-card:nth-child(3) { grid-column: 1 / -1; max-width: 100%; }
+    }
+    @media (max-width: 480px) {
+      .security-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+      .security-card:nth-child(3) { grid-column: 1 / -1; max-width: 100%; }
+    }
+    .security-card {
+      background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);
+      padding: 2rem; border-radius: 20px; border: 2px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s; display: flex; flex-direction: column; gap: 1rem;
+    }
+    @media (max-width: 768px) {
+      .security-card { padding: 1.5rem; border-radius: 15px; }
+    }
+    @media (max-width: 480px) {
+      .security-card { padding: 1.25rem; border-radius: 12px; }
+    }
+    .security-card:hover { background: rgba(255, 255, 255, 0.15); transform: translateY(-5px); }
+    .security-card-header { display: flex; align-items: flex-start; gap: 1rem; }
+    @media (max-width: 768px) {
+      .security-card-header { gap: 0.75rem; }
+    }
+    @media (max-width: 480px) {
+      .security-card-header { gap: 0.5rem; }
+    }
+    .security-icon { font-size: 3rem; margin-bottom: 0; flex-shrink: 0; }
+    @media (max-width: 768px) {
+      .security-icon { font-size: 2.5rem; }
+    }
+    @media (max-width: 480px) {
+      .security-icon { font-size: 2rem; }
+    }
+    .security-card h3 { margin: 0; font-size: 1.5rem; line-height: 1.3; }
+    @media (max-width: 768px) {
+      .security-card h3 { font-size: 1.15rem; line-height: 1.3; }
+    }
+    @media (max-width: 480px) {
+      .security-card h3 { font-size: 1rem; line-height: 1.3; }
+    }
+    .security-card p { margin: 0; color: rgba(255, 255, 255, 0.9); }
+    @media (max-width: 768px) {
+      .security-card p { font-size: 0.9rem; }
+    }
+    @media (max-width: 480px) {
+      .security-card p { font-size: 0.85rem; }
+    }
+
+    .cta { padding: 6rem 2rem; background: white; text-align: center; }
+    .cta-content { max-width: 800px; margin: 0 auto; }
+    .cta-title {
+      font-size: clamp(2rem, 5vw, 3rem); font-weight: 800;
+      color: var(--dark); margin-bottom: 1.5rem;
+    }
+    .cta-description { font-size: 1.2rem; color: var(--gray); margin-bottom: 2rem; }
+    .footer { background: var(--dark); color: white; padding: 4rem 2rem 2rem; }
+    .footer-content {
+      max-width: 1200px; margin: 0 auto; display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 3rem; margin-bottom: 3rem;
+    }
+    @media (max-width: 1024px) {
+      .footer-content { grid-template-columns: repeat(4, 1fr); gap: 2rem; }
+    }
+    @media (max-width: 768px) {
+      .footer-content { grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
+    }
+    @media (max-width: 480px) {
+      .footer-content { grid-template-columns: repeat(2, 1fr); gap: 2rem; }
+    }
+    .footer-section h4 { margin-bottom: 1rem; font-size: 1.2rem; }
+    @media (max-width: 768px) {
+      .footer-section h4 { font-size: 1rem; margin-bottom: 0.75rem; }
+    }
+    @media (max-width: 480px) {
+      .footer-section h4 { font-size: 0.95rem; margin-bottom: 0.5rem; }
+    }
+    .footer-section ul { list-style: none; }
+    .footer-section ul li { margin-bottom: 0.5rem; }
+    @media (max-width: 768px) {
+      .footer-section ul li { margin-bottom: 0.4rem; }
+    }
+    .footer-section a {
+      color: rgba(255, 255, 255, 0.7); text-decoration: none;
+      transition: color 0.3s; font-size: 0.95rem;
+    }
+    @media (max-width: 768px) {
+      .footer-section a { font-size: 0.85rem; }
+    }
+    @media (max-width: 480px) {
+      .footer-section a { font-size: 0.8rem; }
+    }
+    .footer-section a:hover { color: white; }
+    .footer-bottom {
+      text-align: center; padding-top: 2rem; border-top: 1px solid rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.6);
+    }
+    @media (max-width: 768px) {
+      .footer-bottom { padding-top: 1.5rem; font-size: 0.9rem; }
+    }
+    @media (max-width: 480px) {
+      .footer-bottom { padding-top: 1rem; font-size: 0.85rem; }
+    }
+    @media (max-width: 768px) {
+      .hero { padding: 4rem 1rem 2.5rem; min-height: 80vh; }
+      .hero-buttons { flex-direction: column; width: 100%; max-width: 400px; }
+      .hero-buttons .btn { width: 100%; justify-content: center; }
+      .stats { padding: 2.5rem 1rem; margin-top: -2.5rem; }
+      .features, .security, .cta { padding: 4rem 1rem; }
+      .cta .hero-buttons { flex-direction: row; max-width: 100%; gap: 0.75rem; }
+      .cta .hero-buttons .btn { flex: 1; min-width: 0; font-size: 0.95rem; padding: 0.875rem 1rem; }
+    }
+    @media (max-width: 480px) {
+      .hero { padding: 3.5rem 1rem 2rem; min-height: 75vh; }
+      .hero-buttons .btn { font-size: 0.95rem; padding: 0.8rem 1.5rem; }
+      .cta .hero-buttons { gap: 0.5rem; }
+      .cta .hero-buttons .btn { font-size: 0.85rem; padding: 0.75rem 0.75rem; }
+      .cta .hero-buttons .btn svg { width: 16px; height: 16px; }
+    }
+  </style>
 </head>
 <body>
-  <!-- Landing Page -->
-  <div class="landing-page">
-    <!-- Navigation -->
-    <nav class="landing-nav" id="landingNav">
-      <div class="container">
-        <div class="nav-content">
-          <a href="index.html" class="landing-logo">
-            <img src="assets/images/logo.png" alt="Rupiya Logo">
-            
-          </a>
-          <div class="landing-nav-links">
-            <a href="user-guide.html" class="btn btn-sm btn-nav-signin">User Guide</a>
-            <a href="login.html" class="btn btn-sm btn-nav-signin">Sign In</a>
-            <a href="signup.html" class="btn btn-sm btn-primary">Sign Up</a>
-          </div>
-          <button class="mobile-menu-toggle" id="mobileMenuToggle">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-            </svg>
-          </button>
-        </div>
+  <div class="animated-bg"></div>
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="logo">
+        <img src="logo.png" alt="Rupiya Logo">
+      </a>
+      <div class="nav-links" id="navLinks">
+        <a href="user-guide.html">Guide</a>
+        <a href="features.html">Features</a>
+        <a href="login.html" class="btn btn-outline">Sign In</a>
+        <a href="signup.html" class="btn btn-primary">Get Started</a>
       </div>
-    </nav>
+      <button class="mobile-toggle" id="mobileToggle">&#9776;</button>
+    </div>
+  </nav>
 
-    <!-- Mobile Menu -->
-    <div class="mobile-menu" id="mobileMenu">
-      <div class="mobile-menu-content">
-        <a href="login.html" class="btn btn-nav-signin w-100">Sign In</a>
-        <a href="signup.html" class="btn btn-primary w-100">Sign Up</a>
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">&#128640; AI-Powered Financial Management</div>
+      <h1 class="hero-title">
+        Master Your Money,<br>
+        <span class="gradient-text">Transform Your Life</span>
+      </h1>
+      <p class="hero-subtitle">
+        The most comprehensive financial management app for modern India. Track expenses, investments, budgets & more with AI-powered insights. 100% encrypted & works offline!
+      </p>
+      <div class="hero-buttons">
+        <a href="signup.html" class="btn btn-hero-primary">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+          </svg>
+          Start Free Today
+        </a>
+        <a href="demo.html" class="btn btn-hero-outline">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+            <path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          Try Demo
+        </a>
+        <button class="btn btn-install" id="installAppBtn" style="display: none;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+          </svg>
+          Install App
+        </button>
+      </div>
+      <div class="trust-badges">
+        <div class="trust-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+          </svg>
+          <span>End-to-End Encrypted</span>
+        </div>
+        <div class="trust-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+          </svg>
+          <span>Works Offline</span>
+        </div>
       </div>
     </div>
+  </section>
 
-    <!-- Hero Section -->
-    <section class="hero-section">
-      <div class="container">
-
-        <div class="hero-content">
-          <div class="hero-badge">🚀 AI-Powered Finance Management</div>
-          <h1 class="hero-title">Take Control of Your <span class="gradient-text">Financial Future</span></h1>
-          <p class="hero-subtitle">
-            Smart expense tracking, intelligent budgeting, and AI-powered insights. 
-            Manage your money effortlessly with Rupiya.
-          </p>
-          
-          <div class="hero-cta" id="heroCta">
-            <!-- Row 1: Try Demo (Full Width) - No signup required -->
-            <div class="hero-cta-row full-width">
-              <button class="btn btn-hero-demo" id="tryDemoBtn">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-                Try Demo - No Signup Required
-              </button>
-            </div>
-            
-            <!-- Row 2: Sign In and Sign Up (Side by Side) -->
-            <div class="hero-cta-row">
-              <a href="login.html" class="btn btn-hero-light">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
-                </svg>
-                Sign In
-              </a>
-              <a href="signup.html" class="btn btn-hero-primary">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
-                </svg>
-                Sign Up Free
-              </a>
-            </div>
-            
-            <!-- Row 3: Install App (Full Width) -->
-            <div class="hero-cta-row full-width">
-              <button class="btn btn-hero-install" id="heroInstallBtn">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-                </svg>
-                Install App
-              </button>
-            </div>
-          </div>
-
-          <!-- Trust Indicators -->
-          <div class="trust-indicators">
-            <div class="trust-item">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-              </svg>
-              <span>100% Free</span>
-            </div>
-            <div class="trust-item">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-              </svg>
-              <span>End-to-End Encrypted</span>
-            </div>
-            <div class="trust-item">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
-              </svg>
-              <span>Works Offline</span>
-            </div>
-            <div class="trust-item">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-              </svg>
-              <span>Zero Data Sharing</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Stats Section -->
-        <div class="stats-section">
-          <div class="stat-card">
-            <div class="stat-icon">👥</div>
-            <div class="stat-value">100+</div>
-            <div class="stat-label">Active Users</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon">💰</div>
-            <div class="stat-value">₹1Cr+</div>
-            <div class="stat-label">Money Tracked</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon">⭐</div>
-            <div class="stat-value">4.8/5</div>
-            <div class="stat-label">User Rating</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon">📊</div>
-            <div class="stat-value">2K+</div>
-            <div class="stat-label">Transactions</div>
-          </div>
-        </div>
+  <section class="stats">
+    <div class="stats-container">
+      <div class="stat-card">
+        <div class="stat-icon">&#128101;</div>
+        <div class="stat-value">1000+</div>
+        <div class="stat-label">Active Users</div>
       </div>
-    </section>
-
-    <!-- Trust & Security Highlight Section -->
-    <section class="trust-highlight-section">
-      <div class="container">
-        <div class="section-header">
-          <span class="section-badge">🔐 Your Data, Your Privacy</span>
-          <h2 class="section-title">Why You Can <span class="gradient-text">Trust Us</span></h2>
-          <p class="section-description">
-            We encrypt all your financial data before it leaves your device. Not even we can see it.
-          </p>
-        </div>
-
-        <div class="trust-cards-grid">
-          <div class="trust-card featured">
-            <div class="trust-card-icon">🔐</div>
-            <h3>End-to-End Encryption</h3>
-            <p>Your financial data is protected with end-to-end encryption using AES-256 - the same standard trusted by banks and governments worldwide.</p>
-            <div class="trust-badge">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-              </svg>
-              <span>Military-Grade Security</span>
-            </div>
-          </div>
-
-          <div class="trust-card">
-            <div class="trust-card-icon">🚫</div>
-            <h3>No Data Selling</h3>
-            <p>We never sell, share, or monetize your personal data. Your financial information is yours alone.</p>
-            <div class="trust-badge">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-              </svg>
-              <span>100% Privacy Guaranteed</span>
-            </div>
-          </div>
-
-          <div class="trust-card">
-            <div class="trust-card-icon">🛡️</div>
-            <h3>Open & Transparent</h3>
-            <p>Our security practices are transparent. Export your data anytime, delete your account instantly - you're always in control.</p>
-            <div class="trust-badge">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-              </svg>
-              <span>Full Data Control</span>
-            </div>
-          </div>
-        </div>
-
-        
+      <div class="stat-card">
+        <div class="stat-icon">&#11088;</div>
+        <div class="stat-value">4.9/5</div>
+        <div class="stat-label">User Rating</div>
       </div>
-    </section>
-
-    <!-- Features Section -->
-    <section class="features-section" id="features">
-      <div class="container">
-        <div class="section-header">
-          <span class="section-badge">✨ Features</span>
-          <h2 class="section-title">Everything You Need</h2>
-          <p class="section-description">
-            Powerful tools for complete financial control
-          </p>
-        </div>
-
-        <div class="features-grid compact">
-          <div class="feature-card-compact">
-            <div class="feature-icon-sm">📊</div>
-            <div class="feature-content">
-              <h3>Expense Tracking</h3>
-              <p>Track every rupee with categories & insights</p>
-            </div>
-          </div>
-
-          <div class="feature-card-compact">
-            <div class="feature-icon-sm">💳</div>
-            <div class="feature-content">
-              <h3>Smart Budgets</h3>
-              <p>AI-powered budget recommendations</p>
-            </div>
-          </div>
-
-          <div class="feature-card-compact">
-            <div class="feature-icon-sm">📈</div>
-            <div class="feature-content">
-              <h3>Investments</h3>
-              <p>Track stocks, MFs & portfolio returns</p>
-            </div>
-          </div>
-
-          <div class="feature-card-compact">
-            <div class="feature-icon-sm">🎯</div>
-            <div class="feature-content">
-              <h3>Goals</h3>
-              <p>Set & achieve financial milestones</p>
-            </div>
-          </div>
-
-          <div class="feature-card-compact">
-            <div class="feature-icon-sm">🤖</div>
-            <div class="feature-content">
-              <h3>AI Insights</h3>
-              <p>Personalized spending analysis</p>
-            </div>
-          </div>
-
-          <div class="feature-card-compact">
-            <div class="feature-icon-sm">🤝</div>
-            <div class="feature-content">
-              <h3>Split Bills</h3>
-              <p>Share expenses with friends</p>
-            </div>
-          </div>
-
-          <div class="feature-card-compact">
-            <div class="feature-icon-sm">👨‍👩‍👧‍👦</div>
-            <div class="feature-content">
-              <h3>Family Groups</h3>
-              <p>Manage finances together</p>
-            </div>
-          </div>
-
-          <div class="feature-card-compact">
-            <div class="feature-icon-sm">🏠</div>
-            <div class="feature-content">
-              <h3>House Tracking</h3>
-              <p>Property & maintenance logs</p>
-            </div>
-          </div>
-
-          <div class="feature-card-compact">
-            <div class="feature-icon-sm">🚗</div>
-            <div class="feature-content">
-              <h3>Vehicles</h3>
-              <p>Fuel, service & mileage tracking</p>
-            </div>
-          </div>
-
-          <div class="feature-card-compact">
-            <div class="feature-icon-sm">📧</div>
-            <div class="feature-content">
-              <h3>Weekly Reports</h3>
-              <p>Email summaries with CSV</p>
-            </div>
-          </div>
-
-          <div class="feature-card-compact">
-            <div class="feature-icon-sm">🔄</div>
-            <div class="feature-content">
-              <h3>Recurring</h3>
-              <p>Auto-track subscriptions & EMIs</p>
-            </div>
-          </div>
-
-          <div class="feature-card-compact">
-            <div class="feature-icon-sm">🏦</div>
-            <div class="feature-content">
-              <h3>EMI & Loans</h3>
-              <p>Track loans, EMIs & due dates</p>
-            </div>
-          </div>
-
-          <div class="feature-card-compact">
-            <div class="feature-icon-sm">💳</div>
-            <div class="feature-content">
-              <h3>Payment Methods</h3>
-              <p>Cards, UPI, wallets & accounts</p>
-            </div>
-          </div>
-
-          <div class="feature-card-compact">
-            <div class="feature-icon-sm">💳</div>
-            <div class="feature-content">
-              <h3>Credit Cards</h3>
-              <p>Track rewards, payments & limits</p>
-            </div>
-          </div>
-
-          <div class="feature-card-compact">
-            <div class="feature-icon-sm">🏥</div>
-            <div class="feature-content">
-              <h3>Insurance</h3>
-              <p>Health & policy management</p>
-            </div>
-          </div>
-
-          <div class="feature-card-compact">
-            <div class="feature-icon-sm">🧹</div>
-            <div class="feature-content">
-              <h3>House Help</h3>
-              <p>Track staff payments & schedules</p>
-            </div>
-          </div>
-
-          <div class="feature-card-compact">
-            <div class="feature-icon-sm">📱</div>
-            <div class="feature-content">
-              <h3>Works Offline</h3>
-              <p>PWA with offline support</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Customization Highlight -->
-        <div class="customization-highlight">
-          <div class="customization-content">
-            <div class="customization-icon">⚙️</div>
-            <div class="customization-text">
-              <h3>Use All 22 Features or Customize Your Setup</h3>
-              <p>Rupiya gives you complete control. Enable all features for maximum functionality, or customize your experience by selecting only the features you need. Your financial management, your way.</p>
-              <div class="customization-features">
-                <div class="custom-feature">
-                  <span class="custom-icon">✓</span>
-                  <span>Enable all 22 features for complete control</span>
-                </div>
-                <div class="custom-feature">
-                  <span class="custom-icon">✓</span>
-                  <span>Or pick only what you need</span>
-                </div>
-                <div class="custom-feature">
-                  <span class="custom-icon">✓</span>
-                  <span>Change anytime from Feature Details page</span>
-                </div>
-                <div class="custom-feature">
-                  <span class="custom-icon">✓</span>
-                  <span>No performance impact - only pay for what you use</span>
-                </div>
-              </div>
-              <a href="feature-details.html" class="btn btn-customization">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                </svg>
-                Explore All 22 Features
-              </a>
-            </div>
-          </div>
-        </div>
+      <div class="stat-card">
+        <div class="stat-icon">&#128202;</div>
+        <div class="stat-value">50K+</div>
+        <div class="stat-label">Transactions</div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- New Features Highlight Section -->
-    <section class="new-features-section">
-      <div class="container">
-        <div class="section-header">
-          <span class="section-badge">✨ New Features</span>
-          <h2 class="section-title">Complete Financial <span class="gradient-text">Control</span></h2>
-          <p class="section-description">
-            Manage every aspect of your finances with our latest additions
-          </p>
+  <section class="features">
+    <div class="section-header">
+      <div class="section-badge">&#10024; Powerful Features</div>
+      <h2 class="section-title">Everything You Need in <span class="gradient-text">One App</span></h2>
+      <p class="section-description">
+        22 comprehensive features to manage every aspect of your financial life
+      </p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-card-header">
+          <span class="feature-icon">&#128202;</span>
+          <h3 class="feature-title">Smart Expense Tracking</h3>
         </div>
-
-        <div class="new-features-grid">
-          <!-- Credit Cards Feature -->
-          <div class="new-feature-card">
-            <div class="new-feature-header">
-              <div class="new-feature-icon">💳</div>
-              <span class="new-badge">NEW</span>
-            </div>
-            <h3>Credit Card Management</h3>
-            <p>Take control of your credit cards with intelligent tracking and rewards optimization.</p>
-            <div class="feature-highlights">
-              <div class="highlight-item">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-                <span>Track multiple credit cards</span>
-              </div>
-              <div class="highlight-item">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-                <span>Monitor rewards & cashback</span>
-              </div>
-              <div class="highlight-item">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-                <span>Track payment due dates</span>
-              </div>
-              <div class="highlight-item">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-                <span>Optimize credit utilization</span>
-              </div>
-            </div>
-            <a href="credit-cards.html" class="btn btn-feature-link">Learn More →</a>
-          </div>
-
-          <!-- Insurance Feature -->
-          <div class="new-feature-card">
-            <div class="new-feature-header">
-              <div class="new-feature-icon">🏥</div>
-              <span class="new-badge">NEW</span>
-            </div>
-            <h3>Insurance & Healthcare</h3>
-            <p>Manage all your insurance policies and healthcare expenses in one secure place.</p>
-            <div class="feature-highlights">
-              <div class="highlight-item">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-                <span>Track health insurance policies</span>
-              </div>
-              <div class="highlight-item">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-                <span>Monitor medical expenses</span>
-              </div>
-              <div class="highlight-item">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-                <span>Manage policy renewals</span>
-              </div>
-              <div class="highlight-item">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-                <span>Plan healthcare budget</span>
-              </div>
-            </div>
-            <a href="healthcare-insurance.html" class="btn btn-feature-link">Learn More →</a>
-          </div>
-        </div>
+        <p class="feature-description">Track every rupee with intelligent categorization and AI-powered insights</p>
       </div>
-    </section>
-
-    <!-- Security Section -->
-    <section class="security-section" id="security">
-      <div class="container">
-        <div class="section-header">
-          <span class="section-badge">🔒 Security First</span>
-          <h2 class="section-title">Your Data is <span class="gradient-text">100% Secure</span></h2>
-          <p class="section-description">
-            Military-grade encryption ensures your financial data remains private and secure
-          </p>
+      <div class="feature-card">
+        <div class="feature-card-header">
+          <span class="feature-icon">&#128176;</span>
+          <h3 class="feature-title">Budget Management</h3>
         </div>
-        
-
-        <div class="security-grid">
-
-          <div class="security-card primary">
-            <div class="security-icon">🔑</div>
-            <h3>You Control Your Data</h3>
-            <p>Export, delete, or modify your data anytime. Full transparency and control over your information.</p>
-            <div class="security-features">
-              <div class="security-feature">✓ Data export anytime</div>
-              <div class="security-feature">✓ Complete data deletion</div>
-              <div class="security-feature">✓ Full transparency</div>
-            </div>
-          </div>
-
-          <div class="security-card">
-            <div class="security-icon">🛡️</div>
-            <h3>Bank-Level Security</h3>
-            <p>We use the same security standards as major banks and financial institutions to protect your information.</p>
-            <div class="security-features">
-              <div class="security-feature">✓ SSL/TLS encryption</div>
-              <div class="security-feature">✓ Secure data centers</div>
-              <div class="security-feature">✓ Regular security audits</div>
-            </div>
-          </div>
-
-          <div class="security-card">
-            <div class="security-icon">🚫</div>
-            <h3>Zero Data Sharing</h3>
-            <p>We never sell, share, or monetize your personal financial data. Your privacy is our top priority.</p>
-            <div class="security-features">
-              <div class="security-feature">✓ No third-party sharing</div>
-              <div class="security-feature">✓ No data mining</div>
-              <div class="security-feature">✓ No targeted ads</div>
-            </div>
-          </div>
-        </div>
-  
+        <p class="feature-description">Create custom budgets and get real-time alerts when you're overspending</p>
       </div>
-    </section>
-
-    <!-- App Preview Section -->
-    <section class="app-preview-section">
-      <div class="container">
-        <div class="section-header">
-          <span class="section-badge">📱 App Preview</span>
-          <h2 class="section-title">Beautiful & Intuitive</h2>
-          <p class="section-description">
-            Designed for the modern Indian professional
-          </p>
+      <div class="feature-card">
+        <div class="feature-card-header">
+          <span class="feature-icon">&#128200;</span>
+          <h3 class="feature-title">Investment Tracking</h3>
         </div>
-
-        <div class="preview-features">
-          <div class="preview-feature">
-            <div class="preview-icon">🌙</div>
-            <h4>Dark Mode</h4>
-            <p>Easy on eyes</p>
-          </div>
-          <div class="preview-feature">
-            <div class="preview-icon">📊</div>
-            <h4>Charts</h4>
-            <p>Visual insights</p>
-          </div>
-          <div class="preview-feature">
-            <div class="preview-icon">⚡</div>
-            <h4>Fast</h4>
-            <p>Instant loading</p>
-          </div>
-          <div class="preview-feature">
-            <div class="preview-icon">🔐</div>
-            <h4>Encrypted</h4>
-            <p>Military-grade</p>
-          </div>
-        </div>
+        <p class="feature-description">Monitor stocks, mutual funds, crypto & real estate in one dashboard</p>
       </div>
-    </section>
-
-    <!-- How It Works Section -->
-    <section class="how-it-works-section" id="how-it-works">
-      <div class="container">
-        <div class="section-header">
-          <span class="section-badge">🎯 Get Started</span>
-          <h2 class="section-title">3 Simple Steps</h2>
+      <div class="feature-card">
+        <div class="feature-card-header">
+          <span class="feature-icon">&#127919;</span>
+          <h3 class="feature-title">Financial Goals</h3>
         </div>
-
-        <div class="steps-compact">
-          <div class="step-compact">
-            <div class="step-num">1</div>
-            <h4>Sign Up</h4>
-            <p>Create account in seconds</p>
-          </div>
-          <div class="step-compact">
-            <div class="step-num">2</div>
-            <h4>Add Data</h4>
-            <p>Log expenses & income</p>
-          </div>
-          <div class="step-compact">
-            <div class="step-num">3</div>
-            <h4>Get Insights</h4>
-            <p>AI-powered analysis</p>
-          </div>
-        </div>
+        <p class="feature-description">Set and achieve your financial milestones with smart recommendations</p>
       </div>
-    </section>
-
-    <!-- Benefits Section -->
-    <section class="benefits-section">
-      <div class="container">
-        <div class="section-header">
-          <span class="section-badge">💎 Why Rupiya</span>
-          <h2 class="section-title">Built for India</h2>
+      <div class="feature-card">
+        <div class="feature-card-header">
+          <span class="feature-icon">&#129504;</span>
+          <h3 class="feature-title">AI Insights</h3>
         </div>
-
-        <div class="benefits-grid-compact">
-          <div class="benefit-compact">
-            <span class="benefit-emoji">🇮🇳</span>
-            <div>
-              <h4>Made for India</h4>
-              <p>INR & local payments</p>
-            </div>
-          </div>
-
-          <div class="benefit-compact">
-            <span class="benefit-emoji">📱</span>
-            <div>
-              <h4>Mobile First</h4>
-              <p>Works on all devices</p>
-            </div>
-          </div>
-
-          <div class="benefit-compact">
-            <span class="benefit-emoji">🚫</span>
-            <div>
-              <h4>Zero Data Sharing</h4>
-              <p>Your data stays yours</p>
-            </div>
-          </div>
-
-          <div class="benefit-compact">
-            <span class="benefit-emoji">⚡</span>
-            <div>
-              <h4>Lightning Fast</h4>
-              <p>Optimized performance</p>
-            </div>
-          </div>
-
-          <div class="benefit-compact">
-            <span class="benefit-emoji">🆓</span>
-            <div>
-              <h4>100% Free</h4>
-              <p>No hidden charges</p>
-            </div>
-          </div>
-
-          <div class="benefit-compact">
-            <span class="benefit-emoji">☁️</span>
-            <div>
-              <h4>Cloud Sync</h4>
-              <p>Access anywhere</p>
-            </div>
-          </div>
-        </div>
+        <p class="feature-description">Get personalized spending analysis and money-saving suggestions</p>
       </div>
-    </section>
-
-    <!-- Testimonials Section -->
-    <section class="testimonials-section">
-      <div class="container">
-        <div class="section-header">
-          <span class="section-badge">💬 Reviews</span>
-          <h2 class="section-title">Loved by Users</h2>
+      <div class="feature-card">
+        <div class="feature-card-header">
+          <span class="feature-icon">&#128196;</span>
+          <h3 class="feature-title">Documents</h3>
         </div>
-
-        <div class="testimonials-marquee-wrapper">
-          <div class="testimonials-marquee">
-            <div class="testimonials-track">
-              <div class="testimonial-card">
-                <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
-                <p>"Finally an app that understands Indian finances. The family sharing feature is amazing!"</p>
-                <div class="testimonial-author">
-                  <div class="author-avatar">R</div>
-                  <div>
-                    <strong>Rahul S.</strong>
-                    <span>Mumbai</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="testimonial-card">
-                <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
-                <p>"Tracking my vehicle expenses has never been easier. Love the mileage calculator!"</p>
-                <div class="testimonial-author">
-                  <div class="author-avatar">P</div>
-                  <div>
-                    <strong>Priya M.</strong>
-                    <span>Bangalore</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="testimonial-card">
-                <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
-                <p>"The weekly email reports help me stay on top of my spending. Highly recommend!"</p>
-                <div class="testimonial-author">
-                  <div class="author-avatar">A</div>
-                  <div>
-                    <strong>Amit K.</strong>
-                    <span>Delhi</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="testimonial-card">
-                <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
-                <p>"Best expense tracker I've used. The AI insights actually helped me save ₹5000 last month!"</p>
-                <div class="testimonial-author">
-                  <div class="author-avatar">S</div>
-                  <div>
-                    <strong>Sneha R.</strong>
-                    <span>Pune</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="testimonial-card">
-                <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
-                <p>"Managing house help payments is so easy now. The payment tracking feature is a lifesaver!"</p>
-                <div class="testimonial-author">
-                  <div class="author-avatar">V</div>
-                  <div>
-                    <strong>Vikram T.</strong>
-                    <span>Chennai</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="testimonial-card">
-                <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
-                <p>"Love how it works offline. Perfect for when I'm traveling and need to log expenses quickly."</p>
-                <div class="testimonial-author">
-                  <div class="author-avatar">N</div>
-                  <div>
-                    <strong>Neha G.</strong>
-                    <span>Hyderabad</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Duplicate cards for seamless loop -->
-              <div class="testimonial-card">
-                <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
-                <p>"Finally an app that understands Indian finances. The family sharing feature is amazing!"</p>
-                <div class="testimonial-author">
-                  <div class="author-avatar">R</div>
-                  <div>
-                    <strong>Rahul S.</strong>
-                    <span>Mumbai</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="testimonial-card">
-                <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
-                <p>"Tracking my vehicle expenses has never been easier. Love the mileage calculator!"</p>
-                <div class="testimonial-author">
-                  <div class="author-avatar">P</div>
-                  <div>
-                    <strong>Priya M.</strong>
-                    <span>Bangalore</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="testimonial-card">
-                <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
-                <p>"The weekly email reports help me stay on top of my spending. Highly recommend!"</p>
-                <div class="testimonial-author">
-                  <div class="author-avatar">A</div>
-                  <div>
-                    <strong>Amit K.</strong>
-                    <span>Delhi</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="testimonial-card">
-                <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
-                <p>"Best expense tracker I've used. The AI insights actually helped me save ₹5000 last month!"</p>
-                <div class="testimonial-author">
-                  <div class="author-avatar">S</div>
-                  <div>
-                    <strong>Sneha R.</strong>
-                    <span>Pune</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="testimonial-card">
-                <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
-                <p>"Managing house help payments is so easy now. The payment tracking feature is a lifesaver!"</p>
-                <div class="testimonial-author">
-                  <div class="author-avatar">V</div>
-                  <div>
-                    <strong>Vikram T.</strong>
-                    <span>Chennai</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="testimonial-card">
-                <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
-                <p>"Love how it works offline. Perfect for when I'm traveling and need to log expenses quickly."</p>
-                <div class="testimonial-author">
-                  <div class="author-avatar">N</div>
-                  <div>
-                    <strong>Neha G.</strong>
-                    <span>Hyderabad</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <p class="feature-description">Store and manage all your financial documents securely in one place</p>
       </div>
-    </section>
-
-    <!-- CTA Section -->
-    <section class="cta-section">
-      <div class="container">
-        <div class="cta-content">
-          <h2 class="cta-title">Ready to Transform Your Financial Life?</h2>
-          <p class="cta-description">
-            Join thousands of Indians managing their money smarter with Rupiya
-          </p>
-          <div class="cta-buttons">
-            <a href="signup.html" class="btn btn-hero-light">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
-              </svg>
-              Create Free Account
-            </a>
-            <a href="login.html" class="btn btn-hero-outline">
-              Log In
-            </a>
-          </div>
-          <p class="cta-note">✨ No credit card required • Free forever • Cancel anytime</p>
+      <div class="feature-card">
+        <div class="feature-card-header">
+          <span class="feature-icon">&#127968;</span>
+          <h3 class="feature-title">Property Management</h3>
         </div>
+        <p class="feature-description">Track house expenses, maintenance & property values</p>
       </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="landing-footer">
-      <div class="container">
-        <div class="footer-content">
-          <div class="footer-section">
-            <h4>Company</h4>
-            <ul>
-              <li><a href="about-us.html">About Us</a></li>
-              <li><a href="contact-us.html">Contact Us</a></li>
-            </ul>
-          </div>
-          <div class="footer-section">
-            <h4>Legal</h4>
-            <ul>
-              <li><a href="privacy-policy.html">Privacy Policy</a></li>
-              <li><a href="terms-of-service.html">Terms of Service</a></li>
-              <li><a href="disclaimer.html">Disclaimer</a></li>
-            </ul>
-          </div>
-          <div class="footer-section">
-            <h4>Security</h4>
-            <ul>
-              <li><a href="data-protection.html">Data Protection</a></li>
-            </ul>
-          </div>
+      <div class="feature-card">
+        <div class="feature-card-header">
+          <span class="feature-icon">&#128663;</span>
+          <h3 class="feature-title">Vehicle Tracking</h3>
         </div>
-                
-        <div class="footer-bottom">
-          <p class="footer-copyright">© 2026 Rupiya. Built with ❤️ for modern professionals.</p>
-          <p class="footer-disclaimer">Rupiya is a financial management tool only. We do not provide investment advice or tips. Always consult with qualified financial professionals.</p>
-        </div>
+        <p class="feature-description">Monitor fuel, service costs & mileage for all your vehicles</p>
       </div>
-    </footer>
-  </div>
+      <div class="feature-card">
+        <div class="feature-card-header">
+          <span class="feature-icon">&#128179;</span>
+          <h3 class="feature-title">Credit Cards</h3>
+        </div>
+        <p class="feature-description">Track rewards, payments & optimize credit utilization</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-header">
+          <span class="feature-icon">&#128181;</span>
+          <h3 class="feature-title">Loans & EMIs</h3>
+        </div>
+        <p class="feature-description">Manage all your loans and never miss an EMI payment</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-header">
+          <span class="feature-icon">&#128657;</span>
+          <h3 class="feature-title">Insurance</h3>
+        </div>
+        <p class="feature-description">Track health insurance policies and medical expenses</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-header">
+          <span class="feature-icon">&#128241;</span>
+          <h3 class="feature-title">Works Offline</h3>
+        </div>
+        <p class="feature-description">Full PWA support - works perfectly without internet</p>
+      </div>
+    </div>
+  </section>
 
-  <!-- Scripts -->
-  <!-- Error handlers must load first -->
-  <script type="module" src="assets/js/init-error-handlers.js"></script>
-  <script type="module" src="assets/js/pages/landing.js"></script>
+  <section class="security">
+    <div class="section-header">
+      <div class="section-badge" style="background: rgba(255,255,255,0.2);">&#128274; Bank-Level Security</div>
+      <h2 class="section-title" style="color: white;">Your Privacy is <span style="color: #fbbf24;">Our Priority</span></h2>
+      <p class="section-description" style="color: rgba(255,255,255,0.9);">
+        Military-grade encryption ensures your financial data remains completely private
+      </p>
+    </div>
+    <div class="security-grid">
+      <div class="security-card">
+        <div class="security-card-header">
+          <div class="security-icon">&#128683;</div>
+          <h3>Zero Data Selling</h3>
+        </div>
+        <p>We never sell, share, or monetize your personal financial information. Its always yours.</p>
+      </div>
+      <div class="security-card">
+        <div class="security-card-header">
+          <div class="security-icon">&#128100;</div>
+          <h3>Full Control</h3>
+        </div>
+        <p>Export your data anytime, delete your account instantly - you're always in control.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta">
+    <div class="cta-content">
+      <h2 class="cta-title">Ready to Transform Your Financial Life?</h2>
+      <p class="cta-description">
+        Join thousands of Indians managing their money smarter with Rupiya
+      </p>
+      <div class="hero-buttons">
+        <a href="signup.html" class="btn btn-primary" style="font-size: 1.1rem; padding: 1rem 2rem;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+          </svg>
+          Create Free Account
+        </a>
+        <a href="demo.html" class="btn btn-outline" style="font-size: 1.1rem; padding: 1rem 2rem;">
+          Try Demo First
+        </a>
+      </div>
+      <p style="margin-top: 1.5rem; color: var(--gray);">&#10024; No credit card required &bull; Free forever &bull; Cancel anytime</p>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="about-us.html">About Us</a></li>
+          <li><a href="contact-us.html">Contact</a></li>
+          <li><a href="user-guide.html">User Guide</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h4>Features</h4>
+        <ul>
+          <li><a href="features.html">All Features</a></li>
+          <li><a href="ai-insights.html">AI Insights</a></li>
+          <li><a href="gemini-setup.html">Gemini Setup</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="privacy-policy.html">Privacy Policy</a></li>
+          <li><a href="terms-of-service.html">Terms of Service</a></li>
+          <li><a href="disclaimer.html">Disclaimer</a></li>
+          <li><a href="data-protection.html">Data Protection</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h4>Connect</h4>
+        <ul>
+          <li><a href="feedback.html">Feedback</a></li>
+          <li><a href="mailto:help.rupiya@gmail.com">help.rupiya@gmail.com</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 Rupiya. Built with &#10084;&#65039; for modern India.</p>
+      <p style="margin-top: 0.5rem; font-size: 0.9rem;">Rupiya is a financial management tool. We do not provide investment advice. Always consult qualified financial professionals.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Mobile menu toggle
+    const mobileToggle = document.getElementById('mobileToggle');
+    const navLinks = document.getElementById('navLinks');
+    
+    if (mobileToggle && navLinks) {
+      mobileToggle.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        navLinks.classList.toggle('active');
+        console.log('Menu toggled:', navLinks.classList.contains('active'));
+      });
+
+      // Close menu when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!navLinks.contains(e.target) && !mobileToggle.contains(e.target)) {
+          navLinks.classList.remove('active');
+        }
+      });
+
+      // Close menu when clicking on a link
+      navLinks.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+          navLinks.classList.remove('active');
+        });
+      });
+    }
+
+    // Navbar scroll effect
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 50);
+    });
+
+    // PWA Install
+    let deferredPrompt;
+    const installBtn = document.getElementById('installAppBtn');
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installBtn.style.display = 'inline-flex';
+    });
+    installBtn.addEventListener('click', async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      installBtn.style.display = 'none';
+    });
+
+    // Scroll animations
+    const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, observerOptions);
+    document.querySelectorAll('.feature-card, .stat-card, .security-card').forEach(el => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(30px)';
+      el.style.transition = 'all 0.6s ease';
+      observer.observe(el);
+    });
+  </script>
   <script type="module" src="assets/js/pwa-setup.js"></script>
 </body>
 </html>

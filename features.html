@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Features - Rupiya | Complete Financial Management</title>
+    <meta name="description" content="Explore all 22 powerful features of Rupiya - Track expenses, investments, budgets, loans, and more. 100% free, encrypted & works offline!">
+    <meta name="theme-color" content="#667eea">
+    <link rel="icon" href="logo.png" type="image/png">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #667eea; --primary-dark: #5568d3; --secondary: #764ba2;
+            --accent: #f093fb; --success: #4ade80; --dark: #1e293b; --light: #f8fafc; --gray: #64748b;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6; color: var(--dark); background: var(--light);
+        }
+        .navbar {
+            background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .nav-container {
+            max-width: 1200px; margin: 0 auto; padding: 1rem 2rem;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .logo { display: flex; align-items: center; text-decoration: none; }
+        .logo img { height: 40px; width: auto; }
+        .nav-links { display: flex; gap: 2rem; align-items: center; }
+        .nav-links a { text-decoration: none; color: var(--dark); font-weight: 500; }
+        .mobile-toggle { 
+            display: none; background: none; border: none; font-size: 1.5rem; 
+            cursor: pointer; color: var(--dark); padding: 8px; transition: all 0.3s ease;
+            border-radius: 8px;
+        }
+        .mobile-toggle:hover { background: rgba(0,0,0,0.05); }
+        .btn {
+            padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600;
+            text-decoration: none; border: none; cursor: pointer; display: inline-block;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+        .btn-outline {
+            background: transparent; color: var(--primary); border: 2px solid var(--primary);
+        }
+        .hero {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white; padding: 4rem 2rem; text-align: center;
+        }
+        .hero h1 { font-size: 2.5rem; margin-bottom: 1rem; }
+        .hero p { font-size: 1.2rem; opacity: 0.9; max-width: 700px; margin: 0 auto; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 3rem 2rem; }
+        .stats {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem; margin-bottom: 3rem;
+        }
+        .stat-card {
+            background: white; padding: 2rem; border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08); text-align: center;
+        }
+        .stat-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        .stat-value { font-size: 2rem; font-weight: 700; color: var(--primary); }
+        .stat-label { color: var(--gray); font-size: 0.9rem; }
+        .category-section { margin-bottom: 3rem; }
+        .category-header {
+            background: white; padding: 1.5rem; border-radius: 12px;
+            margin-bottom: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+        .category-title {
+            font-size: 1.8rem; color: var(--dark); display: flex;
+            align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;
+        }
+        .category-desc { color: var(--gray); }
+        .features-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+        .feature-card {
+            background: white; padding: 1.5rem; border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08); transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
+        }
+        .feature-header {
+            display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;
+        }
+        .feature-icon { font-size: 2.5rem; }
+        .feature-title { font-size: 1.3rem; font-weight: 700; color: var(--dark); }
+        .feature-desc { color: var(--gray); margin-bottom: 1rem; line-height: 1.5; }
+        .feature-section { margin-top: 1rem; }
+        .feature-section h4 {
+            font-size: 0.9rem; font-weight: 600; color: var(--primary);
+            margin-bottom: 0.5rem; text-transform: uppercase;
+        }
+        .feature-list { list-style: none; }
+        .feature-list li {
+            padding: 0.4rem 0; color: var(--dark); font-size: 0.9rem;
+            display: flex; align-items: flex-start; gap: 0.5rem;
+        }
+        .feature-list li:before { content: "✓"; color: var(--success); font-weight: bold; }
+        .cta {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white; padding: 4rem 2rem; text-align: center; margin-top: 3rem;
+        }
+        .cta h2 { font-size: 2rem; margin-bottom: 1rem; }
+        .cta p { font-size: 1.1rem; margin-bottom: 2rem; opacity: 0.9; }
+        .cta-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+        .btn-white { background: white; color: var(--primary); }
+        .btn-outline { background: transparent; color: white; border: 2px solid white; }
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 1.75rem; }
+            .hero p { font-size: 0.95rem; }
+            .nav-container { position: relative; justify-content: center; }
+            .logo { margin: 0 auto; }
+            .mobile-toggle { 
+                display: block; position: absolute; right: 2rem; 
+                top: 50%; transform: translateY(-50%); 
+            }
+            .nav-links {
+                position: fixed; top: 70px; left: 0; right: 0; background: white;
+                flex-direction: column; padding: 2rem; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+                transform: translateY(-150%); opacity: 0; transition: all 0.3s; z-index: 999;
+            }
+            .nav-links.active { transform: translateY(0); opacity: 1; }
+            .nav-links a { width: 100%; text-align: center; padding: 0.75rem; }
+            .stats { grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+            .stat-card { padding: 1.25rem 0.75rem; }
+            .stat-icon { font-size: 2rem; margin-bottom: 0.25rem; }
+            .stat-value { font-size: 1.5rem; }
+            .stat-label { font-size: 0.75rem; }
+            .category-title { font-size: 1.4rem; }
+            .category-desc { font-size: 0.85rem; }
+            .features-grid { grid-template-columns: 1fr; }
+            .feature-card { padding: 1.25rem; }
+            .feature-icon { font-size: 2rem; }
+            .feature-title { font-size: 1.1rem; }
+            .feature-desc { font-size: 0.85rem; }
+            .feature-list li { font-size: 0.85rem; }
+            .container { padding: 2rem 1rem; }
+            .cta h2 { font-size: 1.5rem; }
+            .cta p { font-size: 0.95rem; }
+        }
+        @media (max-width: 480px) {
+            .mobile-toggle { right: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <img src="logo.png" alt="Rupiya">
+            </a>
+            <div class="nav-links" id="navLinks">
+                <a href="user-guide.html">Guide</a>
+                <a href="features.html">Features</a>
+                <a href="login.html" class="btn btn-outline">Sign In</a>
+                <a href="signup.html" class="btn btn-primary">Get Started</a>
+            </div>
+            <button class="mobile-toggle" id="mobileToggle">&#9776;</button>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <h1>22 Powerful Features for Complete Financial Control</h1>
+        <p>Everything you need to manage your money, investments, budgets, and more. 100% free, encrypted, and works offline!</p>
+    </section>
+
+    <div class="container">
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-icon">📦</div>
+                <div class="stat-value">22</div>
+                <div class="stat-label">Total Features</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📂</div>
+                <div class="stat-value">7</div>
+                <div class="stat-label">Categories</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🎯</div>
+                <div class="stat-value">Free</div>
+                <div class="stat-label">Forever</div>
+            </div>
+        </div>
+
+        <!-- Core Features -->
+        <div class="category-section">
+            <div class="category-header">
+                <h2 class="category-title"><span>📊</span> Core Features</h2>
+                <p class="category-desc">Essential tools for daily financial management</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <span class="feature-icon">📊</span>
+                        <h3 class="feature-title">Dashboard</h3>
+                    </div>
+                    <p class="feature-desc">Your financial overview at a glance with real-time updates and key metrics</p>
+                    <div class="feature-section">
+                        <h4>Key Benefits</h4>
+                        <ul class="feature-list">
+                            <li>Complete financial snapshot in seconds</li>
+                            <li>Monitor KPIs that matter to you</li>
+                            <li>Track progress towards goals</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Features -->
+        <div class="category-section">
+            <div class="category-header">
+                <h2 class="category-title"><span>📈</span> Analytics & Insights</h2>
+                <p class="category-desc">AI-powered analysis and predictions</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <span class="feature-icon">🔮</span>
+                        <h3 class="feature-title">Predictive Analytics</h3>
+                    </div>
+                    <p class="feature-desc">AI-powered forecasting and trend analysis for future spending patterns</p>
+                    <div class="feature-section">
+                        <h4>Key Benefits</h4>
+                        <ul class="feature-list">
+                            <li>Forecast spending patterns with AI</li>
+                            <li>Predict income trends</li>
+                            <li>Identify potential financial risks</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <span class="feature-icon">💡</span>
+                        <h3 class="feature-title">AI Insights</h3>
+                    </div>
+                    <p class="feature-desc">Personalized spending analysis and money-saving recommendations</p>
+                    <div class="feature-section">
+                        <h4>Key Benefits</h4>
+                        <ul class="feature-list">
+                            <li>Personalized recommendations</li>
+                            <li>Discover savings opportunities</li>
+                            <li>Understand spending patterns</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <span class="feature-icon">📊</span>
+                        <h3 class="feature-title">Spending Patterns</h3>
+                    </div>
+                    <p class="feature-desc">Visualize spending habits with interactive heatmaps and charts</p>
+                    <div class="feature-section">
+                        <h4>Key Benefits</h4>
+                        <ul class="feature-list">
+                            <li>Calendar heatmap visualization</li>
+                            <li>Identify peak spending days</li>
+                            <li>Category trend analysis</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transaction Features -->
+        <div class="category-section">
+            <div class="category-header">
+                <h2 class="category-title"><span>💸</span> Transactions</h2>
+                <p class="category-desc">Track all your money movements</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <span class="feature-icon">💸</span>
+                        <h3 class="feature-title">Expenses</h3>
+                    </div>
+                    <p class="feature-desc">Track all your spending with automatic categorization and receipt scanning</p>
+                    <div class="feature-section">
+                        <h4>Key Benefits</h4>
+                        <ul class="feature-list">
+                            <li>Complete spending visibility</li>
+                            <li>Automatic categorization</li>
+                            <li>Receipt scanning and storage</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <span class="feature-icon">💰</span>
+                        <h3 class="feature-title">Income</h3>
+                    </div>
+                    <p class="feature-desc">Track all earnings from salary, freelance, investments, and other sources</p>
+                    <div class="feature-section">
+                        <h4>Key Benefits</h4>
+                        <ul class="feature-list">
+                            <li>Multiple income source tracking</li>
+                            <li>Income trend analysis</li>
+                            <li>Tax-relevant tracking</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <span class="feature-icon">👥</span>
+                        <h3 class="feature-title">Split Expenses</h3>
+                    </div>
+                    <p class="feature-desc">Share and split expenses with friends and family easily</p>
+                    <div class="feature-section">
+                        <h4>Key Benefits</h4>
+                        <ul class="feature-list">
+                            <li>Easy bill splitting</li>
+                            <li>Automatic debt calculation</li>
+                            <li>Settlement tracking</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <span class="feature-icon">🔄</span>
+                        <h3 class="feature-title">Recurring</h3>
+                    </div>
+                    <p class="feature-desc">Auto-track subscriptions, EMIs, and recurring payments</p>
+                    <div class="feature-section">
+                        <h4>Key Benefits</h4>
+                        <ul class="feature-list">
+                            <li>Automatic subscription detection</li>
+                            <li>Payment reminders</li>
+                            <li>Subscription audit</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <span class="feature-icon">🔄</span>
+                        <h3 class="feature-title">Transfers</h3>
+                    </div>
+                    <p class="feature-desc">Track money transfers between accounts and to other people</p>
+                    <div class="feature-section">
+                        <h4>Key Benefits</h4>
+                        <ul class="feature-list">
+                            <li>Track all account transfers</li>
+                            <li>Account reconciliation</li>
+                            <li>Transfer history</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Planning Features -->
+        <div class="category-section">
+            <div class="category-header">
+                <h2 class="category-title"><span>🎯</span> Planning & Goals</h2>
+                <p class="category-desc">Plan your financial future</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <span class="feature-icon">📈</span>
+                        <h3 class="feature-title">Budgets</h3>
+                    </div>
+                    <p class="feature-desc">Set and manage spending budgets with real-time tracking</p>
+                    <div class="feature-section">
+                        <h4>Key Benefits</h4>
+                        <ul class="feature-list">
+                            <li>Category-based budgets</li>
+                            <li>Spending alerts</li>
+                            <li>Budget vs actual tracking</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <span class="feature-icon">🎯</span>
+                        <h3 class="feature-title">Goals</h3>
+                    </div>
+                    <p class="feature-desc">Set and track financial milestones with progress visualization</p>
+                    <div class="feature-section">
+                        <h4>Key Benefits</h4>
+                        <ul class="feature-list">
+                            <li>Clear financial targets</li>
+                            <li>Progress tracking</li>
+                            <li>Automatic savings calculation</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <span class="feature-icon">📊</span>
+                        <h3 class="feature-title">Investments</h3>
+                    </div>
+                    <p class="feature-desc">Track stocks, mutual funds, crypto, and portfolio performance</p>
+                    <div class="feature-section">
+                        <h4>Key Benefits</h4>
+                        <ul class="feature-list">
+                            <li>Multi-asset portfolio tracking</li>
+                            <li>Performance analytics</li>
+                            <li>Asset allocation visualization</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <span class="feature-icon">🏦</span>
+                        <h3 class="feature-title">Loans & EMI</h3>
+                    </div>
+                    <p class="feature-desc">Track loans and EMI payments with payoff planning</p>
+                    <div class="feature-section">
+                        <h4>Key Benefits</h4>
+                        <ul class="feature-list">
+                            <li>Track all loans and EMIs</li>
+                            <li>Payment schedule monitoring</li>
+                            <li>Interest calculation</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <span class="feature-icon">💎</span>
+                        <h3 class="feature-title">Net Worth</h3>
+                    </div>
+                    <p class="feature-desc">Calculate and track total net worth over time</p>
+                    <div class="feature-section">
+                        <h4>Key Benefits</h4>
+                        <ul class="feature-list">
+                            <li>Complete financial picture</li>
+                            <li>Net worth trend analysis</li>
+                            <li>Asset and liability tracking</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <span class="feature-icon">💳</span>
+                        <h3 class="feature-title">Credit Cards</h3>
+                    </div>
+                    <p class="feature-desc">Manage credit cards, track rewards, and optimize utilization</p>
+                    <div class="feature-section">
+                        <h4>Key Benefits</h4>
+                        <ul class="feature-list">
+                            <li>Multi-card management</li>
+                            <li>Rewards points tracker</li>
+                            <li>Payment due date alerts</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <span class="feature-icon">🏥</span>
+                        <h3 class="feature-title">Healthcare & Insurance</h3>
+                    </div>
+                    <p class="feature-desc">Track medical expenses and insurance policies</p>
+                    <div class="feature-section">
+                        <h4>Key Benefits</h4>
+                        <ul class="feature-list">
+                            <li>Medical expense tracking</li>
+                            <li>Insurance policy management</li>
+                            <li>Claims tracking</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Assets Features -->
+        <div class="category-section">
+            <div class="category-header">
+                <h2 class="category-title"><span>🏠</span> Assets</h2>
+                <p class="category-desc">Manage your physical assets</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <span class="feature-icon">🏠</span>
+                        <h3 class="feature-title">Houses</h3>
+                    </div>
+                    <p class="feature-desc">Track properties, values, maintenance, and rental income</p>
+                    <div class="feature-section">
+                        <h4>Key Benefits</h4>
+                        <ul class="feature-list">
+                            <li>Property value tracking</li>
+                            <li>Maintenance cost monitoring</li>
+                            <li>Rental income tracking</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <span class="feature-icon">🚗</span>
+                        <h3 class="feature-title">Vehicles</h3>
+                    </div>
+                    <p class="feature-desc">Track vehicles, maintenance, fuel, and running costs</p>
+                    <div class="feature-section">
+                        <h4>Key Benefits</h4>
+                        <ul class="feature-list">
+                            <li>Maintenance schedule tracking</li>
+                            <li>Fuel expense monitoring</li>
+                            <li>Cost per kilometer calculation</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <span class="feature-icon">👨‍💼</span>
+                        <h3 class="feature-title">House Help</h3>
+                    </div>
+                    <p class="feature-desc">Track staff salaries and household payments</p>
+                    <div class="feature-section">
+                        <h4>Key Benefits</h4>
+                        <ul class="feature-list">
+                            <li>Staff payment tracking</li>
+                            <li>Salary management</li>
+                            <li>Payment history records</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Social Features -->
+        <div class="category-section">
+            <div class="category-header">
+                <h2 class="category-title"><span>✈️</span> Social</h2>
+                <p class="category-desc">Manage group activities</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <span class="feature-icon">✈️</span>
+                        <h3 class="feature-title">Trip Groups</h3>
+                    </div>
+                    <p class="feature-desc">Organize group trips and manage shared expenses</p>
+                    <div class="feature-section">
+                        <h4>Key Benefits</h4>
+                        <ul class="feature-list">
+                            <li>Trip organization</li>
+                            <li>Shared expense tracking</li>
+                            <li>Automatic settlement calculation</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Organization Features -->
+        <div class="category-section">
+            <div class="category-header">
+                <h2 class="category-title"><span>📁</span> Organization</h2>
+                <p class="category-desc">Keep everything organized</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <span class="feature-icon">📝</span>
+                        <h3 class="feature-title">Notes</h3>
+                    </div>
+                    <p class="feature-desc">Keep financial notes, reminders, and important information</p>
+                    <div class="feature-section">
+                        <h4>Key Benefits</h4>
+                        <ul class="feature-list">
+                            <li>Organized financial reminders</li>
+                            <li>Quick access to notes</li>
+                            <li>Categorized organization</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <span class="feature-icon">📁</span>
+                        <h3 class="feature-title">Documents</h3>
+                    </div>
+                    <p class="feature-desc">Store and organize financial documents securely</p>
+                    <div class="feature-section">
+                        <h4>Key Benefits</h4>
+                        <ul class="feature-list">
+                            <li>Centralized document storage</li>
+                            <li>Easy document retrieval</li>
+                            <li>Secure backup</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="cta">
+        <h2>Ready to Take Control of Your Finances?</h2>
+        <p>Join thousands of users managing their money smarter with Rupiya</p>
+        <div class="cta-buttons">
+            <a href="signup.html" class="btn btn-white">Get Started Free</a>
+            <a href="demo.html" class="btn btn-outline">Try Demo</a>
+        </div>
+    </section>
+
+    <script>
+        // Mobile menu toggle
+        const mobileToggle = document.getElementById('mobileToggle');
+        const navLinks = document.getElementById('navLinks');
+        
+        if (mobileToggle && navLinks) {
+            mobileToggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                navLinks.classList.toggle('active');
+            });
+
+            // Close menu when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!navLinks.contains(e.target) && !mobileToggle.contains(e.target)) {
+                    navLinks.classList.remove('active');
+                }
+            });
+
+            // Close menu when clicking on a link
+            navLinks.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    navLinks.classList.remove('active');
+                });
+            });
+        }
+
+        // Navbar scroll effect
+        const navbar = document.getElementById('navbar');
+        if (navbar) {
+            window.addEventListener('scroll', () => {
+                navbar.classList.toggle('scrolled', window.scrollY > 50);
+            });
+        }
+    </script>
+</body>
+</html>
