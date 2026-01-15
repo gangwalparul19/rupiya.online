@@ -1,0 +1,51 @@
+/**
+ * Mobile fixes for spending-patterns.html
+ * Ensures hamburger menu is clickable and sidebar works properly
+ */
+
+/* Ensure mobile header has proper z-index */
+@media (max-width: 768px) {
+  .mobile-header {
+    z-index: 1001 !important;
+    position: relative;
+  }
+
+  .sidebar-toggle {
+    z-index: 1002 !important;
+    position: relative;
+    pointer-events: auto !important;
+  }
+
+  /* Ensure sidebar appears above content */
+  .sidebar {
+    z-index: 1000 !important;
+  }
+
+  .sidebar-overlay {
+    z-index: 999 !important;
+  }
+
+  /* Prevent heatmap elements from covering header */
+  .heatmap-container,
+  .heatmap-day,
+  .heatmap-tooltip {
+    z-index: 1 !important;
+  }
+
+  .heatmap-day:hover {
+    z-index: 2 !important;
+  }
+
+  /* Ensure filters don't cover header */
+  .filters-section {
+    z-index: 1 !important;
+    position: relative;
+  }
+
+  /* Fix any overflow issues */
+  .main-content {
+    overflow-x: hidden;
+    position: relative;
+    z-index: 1;
+  }
+}

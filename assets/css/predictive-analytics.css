@@ -1195,7 +1195,7 @@
 
 @media (max-width: 480px) {
   .summary-cards-row {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr); /* Keep 2 columns on small mobile */
     gap: 0.75rem;
     padding: 0.75rem;
   }

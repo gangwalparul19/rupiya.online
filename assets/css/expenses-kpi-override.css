@@ -43,11 +43,11 @@
   }
 }
 
-/* Tablet: 2 columns (769px - 1024px) */
+/* Tablet: 3 columns (769px - 1024px) */
 @media (min-width: 769px) and (max-width: 1024px) {
   .kpi-summary {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 1rem;
     margin-bottom: 1.5rem;
     width: 100%;
@@ -55,10 +55,10 @@
   }
 }
 
-/* Mobile: 2 columns (max 768px) */
+/* Mobile: 3 columns (max 768px) */
 @media (max-width: 768px) {
   .kpi-summary {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 0.5rem;
     margin-bottom: 1rem;
   }
@@ -244,7 +244,7 @@
 
 @media (max-width: 768px) {
   .kpi-summary {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 0.5rem;
     margin-bottom: 1rem;
   }

@@ -47,7 +47,7 @@
 @media (min-width: 769px) and (max-width: 1024px) {
   .kpi-summary {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 1rem;
     margin-bottom: 1.5rem;
     width: 100%;

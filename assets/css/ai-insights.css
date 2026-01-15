@@ -908,14 +908,25 @@
 @media (max-width: 480px) {
   .ai-hero {
     padding: 20px 16px;
+    border-radius: 16px;
   }
 
   .ai-hero-title {
     font-size: 20px;
   }
 
+  .ai-hero-subtitle {
+    font-size: 13px;
+  }
+
+  .btn-ai-refresh {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+
   .health-score-card {
     padding: 16px;
+    border-radius: 16px;
   }
 
   .health-score-circle {
@@ -927,8 +938,22 @@
     font-size: 24px;
   }
 
+  .health-score-info h2 {
+    font-size: 16px;
+  }
+
+  .health-score-message {
+    font-size: 13px;
+  }
+
+  .health-score-tag {
+    font-size: 11px;
+    padding: 4px 10px;
+  }
+
   .ai-stats-row {
     gap: 6px;
+    grid-template-columns: repeat(3, 1fr);
   }
 
   .ai-stat-card {
@@ -948,6 +973,27 @@
   .ai-stat-label {
     font-size: 8px;
   }
+
+  /* Ensure proper container width */
+  .main-content {
+    padding: 0 12px;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  /* Fix any overflow issues */
+  .ai-insights-container {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .insight-card-new,
+  .recommendation-card,
+  .trend-card {
+    padding: 14px;
+    border-radius: 12px;
+  }
+}
 
   .insight-tab {
     padding: 8px 12px;

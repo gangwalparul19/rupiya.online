@@ -19,7 +19,7 @@
 /* Mobile: 2 columns */
 @media (max-width: 768px) {
   .kpi-summary {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 0.75rem;
   }
 }
@@ -316,11 +316,12 @@
   }
 
   .form-actions {
-    flex-direction: column-reverse;
+    flex-direction: row;
+    gap: 0.5rem;
   }
 
   .form-actions .btn {
-    width: 100%;
+    flex: 1;
   }
 }
 

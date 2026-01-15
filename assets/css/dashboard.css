@@ -171,13 +171,11 @@
 @media (max-width: 768px) {
   .dashboard-header-actions .privacy-toggle,
   .dashboard-header-actions button[title*="Privacy"],
-  .dashboard-header-actions button[title*="privacy"],
-  .dashboard-header-actions .btn-icon:has(svg path[d*="M15 12a3 3 0 11-6 0"]) {
+  .dashboard-header-actions button[title*="privacy"] {
     display: none !important;
   }
 }
-  gap: 12px;
-}
+
 
 .quick-add-btn {
   display: inline-flex;

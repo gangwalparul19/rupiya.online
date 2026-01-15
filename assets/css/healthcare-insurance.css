@@ -19,7 +19,7 @@
 /* Mobile: 2 columns */
 @media (max-width: 768px) {
   .kpi-summary {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 0.75rem;
   }
 }
@@ -432,7 +432,8 @@
 /* Mobile Responsive */
 @media (max-width: 768px) {
   .policies-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
   }
   
   .policy-details {

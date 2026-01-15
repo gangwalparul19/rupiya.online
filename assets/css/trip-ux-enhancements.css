@@ -569,3 +569,43 @@
 .trip-fab.pulse {
   animation: pulse 2s infinite;
 }
+
+/* ============================================
+   MOBILE HEADER FIX - Ensure hamburger is clickable
+   ============================================ */
+
+@media (max-width: 768px) {
+  .mobile-header {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 10001 !important;
+    background: white !important;
+    pointer-events: auto !important;
+  }
+  
+  .mobile-header-actions {
+    z-index: 10002 !important;
+    position: relative !important;
+    pointer-events: auto !important;
+  }
+  
+  .sidebar-toggle {
+    z-index: 10003 !important;
+    position: relative !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+  }
+  
+  /* Ensure page-header doesn't overlap */
+  .page-header {
+    position: relative !important;
+    z-index: 1 !important;
+    margin-top: 0 !important;
+  }
+  
+  /* Ensure trip-summary doesn't overlap */
+  .trip-summary {
+    position: relative !important;
+    z-index: 1 !important;
+  }
+}
