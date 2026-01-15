@@ -192,8 +192,9 @@
     margin-top: 15px;
     flex-wrap: wrap;
     width: 100%;
-    visibility: visible;
-    opacity: 1;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
 }
 
 .btn {
@@ -209,9 +210,10 @@
     align-items: center;
     justify-content: center;
     min-width: 120px;
-    visibility: visible;
-    opacity: 1;
+    visibility: visible !important;
+    opacity: 1 !important;
     z-index: 100;
+    pointer-events: auto !important;
 }
 
 .btn-primary {
@@ -221,8 +223,8 @@
     min-width: 150px;
     padding: 14px 28px;
     font-size: 1.05em;
-    visibility: visible;
-    opacity: 1;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 .btn-primary:hover {
@@ -237,8 +239,8 @@
     border: 1px solid var(--border-color);
     min-width: 100px;
     padding: 12px 20px;
-    visibility: visible;
-    opacity: 1;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 .btn-secondary:hover {
@@ -252,8 +254,8 @@
     padding: 12px 24px;
     font-size: 1em;
     width: 100%;
-    visibility: visible;
-    opacity: 1;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 .btn-danger:hover {

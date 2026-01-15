@@ -301,16 +301,26 @@ class GeminiKeyService {
 
       log.log('Validating Gemini API key...');
 
+      // First, get and decrypt the user's API key
+      const encryptedKey = await this.getUserKey();
+      
+      if (!encryptedKey) {
+        throw new Error('No API key found');
+      }
+
       // Get the user's Firebase ID token
       const idToken = await auth.currentUser.getIdToken();
 
-      // Call backend validation endpoint
+      // Call backend validation endpoint with decrypted key
       const response = await fetch('/api/gemini-validate-key', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${idToken}`,
           'Content-Type': 'application/json'
-        }
+        },
+        body: JSON.stringify({
+          apiKey: encryptedKey
+        })
       });
 
       if (!response.ok) {

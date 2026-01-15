@@ -69,7 +69,7 @@ async function getUserApiKey(userId) {
       throw new Error('API key is inactive');
     }
 
-    // Return encrypted data - will be decrypted on client or using KMS
+    // Return encrypted data - will be decrypted on client
     return data.encryptedKey;
   } catch (error) {
     console.error('Error retrieving API key:', error);
@@ -169,8 +169,15 @@ export default async function handler(req, res) {
 
     console.log(`Validating Gemini API key for user: ${userId}`);
 
-    // Get user's API key
-    const apiKey = await getUserApiKey(userId);
+    // Get the API key from request body (decrypted by client)
+    const { apiKey } = req.body;
+    
+    if (!apiKey) {
+      return res.status(400).json({
+        valid: false,
+        message: 'API key not provided'
+      });
+    }
 
     // Test the API key
     await testGeminiApi(apiKey);
