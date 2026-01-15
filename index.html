@@ -426,20 +426,7 @@
 </head>
 <body>
   <div class="animated-bg"></div>
-  <nav class="navbar" id="navbar">
-    <div class="nav-container">
-      <a href="index.html" class="logo">
-        <img src="logo.png" alt="Rupiya Logo">
-      </a>
-      <div class="nav-links" id="navLinks">
-        <a href="user-guide.html">Guide</a>
-        <a href="features.html">Features</a>
-        <a href="login.html" class="btn btn-outline">Sign In</a>
-        <a href="signup.html" class="btn btn-primary">Get Started</a>
-      </div>
-      <button class="mobile-toggle" id="mobileToggle">&#9776;</button>
-    </div>
-  </nav>
+  <div id="header-container"></div>
 
   <section class="hero">
     <div class="hero-content">
@@ -697,33 +684,6 @@
   </footer>
 
   <script>
-    // Mobile menu toggle
-    const mobileToggle = document.getElementById('mobileToggle');
-    const navLinks = document.getElementById('navLinks');
-    
-    if (mobileToggle && navLinks) {
-      mobileToggle.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        navLinks.classList.toggle('active');
-        console.log('Menu toggled:', navLinks.classList.contains('active'));
-      });
-
-      // Close menu when clicking outside
-      document.addEventListener('click', (e) => {
-        if (!navLinks.contains(e.target) && !mobileToggle.contains(e.target)) {
-          navLinks.classList.remove('active');
-        }
-      });
-
-      // Close menu when clicking on a link
-      navLinks.querySelectorAll('a').forEach(link => {
-        link.addEventListener('click', () => {
-          navLinks.classList.remove('active');
-        });
-      });
-    }
-
     // Navbar scroll effect
     const navbar = document.getElementById('navbar');
     window.addEventListener('scroll', () => {
@@ -783,6 +743,10 @@
       el.style.transition = 'all 0.6s ease';
       observer.observe(el);
     });
+  </script>
+  <script src="assets/js/components/header.js"></script>
+  <script>
+    HeaderComponent.inject('header-container', 'landing', 'index');
   </script>
   <script type="module" src="assets/js/pwa-setup.js"></script>
 </body>

@@ -1,0 +1,58 @@
+<nav class="landing-nav">
+  <div class="container">
+    <div class="landing-logo">
+      <a href="index.html">
+        <img src="assets/images/logo.png" alt="Rupiya">
+      </a>
+    </div>
+    <div class="landing-nav-links" id="navLinks">
+      <a href="user-guide.html">Guide</a>
+      <a href="features.html">Features</a>
+      <!-- This link will be set dynamically based on current page -->
+      <a href="#" id="authToggleLink">Sign Up</a>
+    </div>
+    <button class="mobile-toggle" id="mobileToggle">&#9776;</button>
+  </div>
+</nav>
+
+<script>
+  // Set the correct auth toggle link
+  (function() {
+    const currentPage = window.location.pathname;
+    const authToggleLink = document.getElementById('authToggleLink');
+    
+    if (authToggleLink) {
+      if (currentPage.includes('login')) {
+        authToggleLink.href = 'signup.html';
+        authToggleLink.textContent = 'Sign Up';
+      } else if (currentPage.includes('signup')) {
+        authToggleLink.href = 'login.html';
+        authToggleLink.textContent = 'Login';
+      }
+    }
+
+    // Initialize mobile menu
+    const mobileToggle = document.getElementById('mobileToggle');
+    const navLinks = document.getElementById('navLinks');
+    
+    if (mobileToggle && navLinks) {
+      mobileToggle.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        navLinks.classList.toggle('active');
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!navLinks.contains(e.target) && !mobileToggle.contains(e.target)) {
+          navLinks.classList.remove('active');
+        }
+      });
+
+      navLinks.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+          navLinks.classList.remove('active');
+        });
+      });
+    }
+  })();
+</script>

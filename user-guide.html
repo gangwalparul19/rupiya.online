@@ -253,20 +253,7 @@
     </style>
 </head>
 <body>
-    <nav class="navbar" id="navbar">
-        <div class="nav-container">
-            <a href="index.html" class="logo">
-                <img src="logo.png" alt="Rupiya">
-            </a>
-            <div class="nav-links" id="navLinks">
-                <a href="user-guide.html">Guide</a>
-                <a href="features.html">Features</a>
-                <a href="login.html" class="btn btn-outline">Sign In</a>
-                <a href="signup.html" class="btn btn-primary">Get Started</a>
-            </div>
-            <button class="mobile-toggle" id="mobileToggle">&#9776;</button>
-        </div>
-    </nav>
+    <div id="header-container"></div>
 
     <section class="hero">
         <h1>📚 Rupiya User Guide</h1>
@@ -1017,32 +1004,6 @@
     </div>
 
     <script>
-        // Mobile menu toggle
-        const mobileToggle = document.getElementById('mobileToggle');
-        const navLinks = document.getElementById('navLinks');
-        
-        if (mobileToggle && navLinks) {
-            mobileToggle.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                navLinks.classList.toggle('active');
-            });
-
-            // Close menu when clicking outside
-            document.addEventListener('click', (e) => {
-                if (!navLinks.contains(e.target) && !mobileToggle.contains(e.target)) {
-                    navLinks.classList.remove('active');
-                }
-            });
-
-            // Close menu when clicking on a link
-            navLinks.querySelectorAll('a').forEach(link => {
-                link.addEventListener('click', () => {
-                    navLinks.classList.remove('active');
-                });
-            });
-        }
-
         // Navbar scroll effect
         const navbar = document.getElementById('navbar');
         if (navbar) {
@@ -1085,6 +1046,10 @@
                 }
             });
         });
+    </script>
+    <script src="assets/js/components/header.js"></script>
+    <script>
+        HeaderComponent.inject('header-container', 'landing', 'guide');
     </script>
 </body>
 </html>

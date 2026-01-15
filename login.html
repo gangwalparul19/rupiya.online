@@ -96,21 +96,7 @@
     <div class="auth-decoration auth-decoration-2"></div>
 
     <!-- Navigation Header -->
-    <nav class="landing-nav">
-      <div class="container">
-        <div class="landing-logo">
-          <a href="index.html">
-            <img src="assets/images/logo.png" alt="Rupiya">
-          </a>
-        </div>
-        <div class="landing-nav-links" id="navLinks">
-          <a href="user-guide.html">Guide</a>
-          <a href="features.html">Features</a>
-          <a href="signup.html">Sign Up</a>
-        </div>
-        <button class="mobile-toggle" id="mobileToggle">&#9776;</button>
-      </div>
-    </nav>
+    <div id="header-container"></div>
 
     <div class="auth-container">
       <div class="auth-card">
@@ -224,32 +210,9 @@
   <!-- Error handlers must load first -->
   <script type="module" src="assets/js/init-error-handlers.js"></script>
   <script type="module" src="assets/js/pages/login.js"></script>
+  <script src="assets/js/components/header.js"></script>
   <script>
-    // Mobile menu toggle
-    const mobileToggle = document.getElementById('mobileToggle');
-    const navLinks = document.getElementById('navLinks');
-    
-    if (mobileToggle && navLinks) {
-      mobileToggle.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        navLinks.classList.toggle('active');
-      });
-
-      // Close menu when clicking outside
-      document.addEventListener('click', (e) => {
-        if (!navLinks.contains(e.target) && !mobileToggle.contains(e.target)) {
-          navLinks.classList.remove('active');
-        }
-      });
-
-      // Close menu when clicking on a link
-      navLinks.querySelectorAll('a').forEach(link => {
-        link.addEventListener('click', () => {
-          navLinks.classList.remove('active');
-        });
-      });
-    }
+    HeaderComponent.inject('header-container', 'auth', 'login');
   </script>
 </body>
 </html>
