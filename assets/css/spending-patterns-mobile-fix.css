@@ -11,29 +11,38 @@
     top: 0 !important;
     background: white !important;
     pointer-events: auto !important;
+    isolation: isolate !important;
   }
   
   .mobile-header-actions {
     z-index: 10002 !important;
     position: relative !important;
     pointer-events: auto !important;
+    isolation: isolate !important;
   }
 
-  .sidebar-toggle {
+  .sidebar-toggle,
+  #sidebarOpen {
     z-index: 10003 !important;
     position: relative !important;
     pointer-events: auto !important;
     cursor: pointer !important;
+    isolation: isolate !important;
+    touch-action: manipulation !important;
   }
   
   /* Dark mode toggle button */
   #darkModeToggle,
   .theme-toggle,
+  .theme-toggle-btn,
+  #themeToggleBtn,
   .mobile-header button {
     z-index: 10003 !important;
     position: relative !important;
     pointer-events: auto !important;
     cursor: pointer !important;
+    isolation: isolate !important;
+    touch-action: manipulation !important;
   }
 
   /* Ensure sidebar appears above content */
@@ -46,7 +55,8 @@
   }
 
   /* Prevent page content from covering header */
-  .page-header {
+  .page-header,
+  .page-title-section {
     position: relative !important;
     z-index: 1 !important;
     margin-top: 0 !important;
@@ -83,6 +93,15 @@
   }
   
   .kpi-card {
+    position: relative !important;
+    z-index: 1 !important;
+  }
+  
+  /* Ensure all cards and sections stay below mobile header */
+  .card,
+  .filters-section,
+  .page-actions,
+  canvas {
     position: relative !important;
     z-index: 1 !important;
   }

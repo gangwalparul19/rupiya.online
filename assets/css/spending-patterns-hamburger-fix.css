@@ -1,0 +1,113 @@
+/**
+ * CRITICAL FIX: Hamburger menu clickability for spending-patterns.html
+ * This file ensures the hamburger menu is always clickable on mobile
+ */
+
+@media (max-width: 768px) {
+  /* Force mobile header to be on top of everything */
+  .mobile-header {
+    z-index: 99999 !important;
+    position: sticky !important;
+    top: 0 !important;
+    background: white !important;
+    pointer-events: auto !important;
+    isolation: isolate !important;
+    transform: translateZ(0) !important;
+  }
+  
+  [data-theme="dark"] .mobile-header {
+    background: #1f2937 !important;
+  }
+  
+  /* Mobile header actions container */
+  .mobile-header-actions {
+    z-index: 100000 !important;
+    position: relative !important;
+    pointer-events: auto !important;
+    isolation: isolate !important;
+    transform: translateZ(0) !important;
+  }
+
+  /* Hamburger button - maximum priority */
+  .sidebar-toggle,
+  #sidebarOpen,
+  button.sidebar-toggle,
+  .mobile-header .sidebar-toggle,
+  .mobile-header-actions .sidebar-toggle,
+  .mobile-header-actions button {
+    z-index: 100001 !important;
+    position: relative !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    isolation: isolate !important;
+    touch-action: manipulation !important;
+    transform: translateZ(0) !important;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1) !important;
+  }
+  
+  /* Theme toggle button */
+  .theme-toggle-btn,
+  #themeToggleBtn,
+  .mobile-header .theme-toggle-btn {
+    z-index: 100001 !important;
+    position: relative !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    isolation: isolate !important;
+    touch-action: manipulation !important;
+    transform: translateZ(0) !important;
+  }
+
+  /* Ensure sidebar and overlay are below mobile header but above content */
+  .sidebar {
+    z-index: 50000 !important;
+  }
+
+  .sidebar-overlay {
+    z-index: 49999 !important;
+  }
+
+  /* Force all page content to stay below mobile header */
+  .main-content > *:not(.mobile-header) {
+    position: relative !important;
+    z-index: 1 !important;
+  }
+  
+  .page-header,
+  .page-title-section,
+  .page-actions,
+  .filters-section,
+  .kpi-grid,
+  .kpi-card,
+  .card,
+  .heatmap-container,
+  canvas,
+  .chart-container {
+    position: relative !important;
+    z-index: 1 !important;
+  }
+  
+  /* Prevent any transforms or filters from creating new stacking contexts */
+  .main-content {
+    transform: none !important;
+    filter: none !important;
+  }
+}
+
+/* Extra specificity for stubborn cases */
+@media (max-width: 768px) {
+  body .mobile-header {
+    z-index: 99999 !important;
+  }
+  
+  body .mobile-header-actions {
+    z-index: 100000 !important;
+  }
+  
+  body .mobile-header .sidebar-toggle,
+  body .mobile-header-actions .sidebar-toggle,
+  body #sidebarOpen {
+    z-index: 100001 !important;
+    pointer-events: auto !important;
+  }
+}

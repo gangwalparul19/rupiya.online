@@ -995,6 +995,7 @@
   /* Fix any overflow issues */
   .ai-insights-container {
     max-width: 100%;
+    padding-top: 20px;
     overflow-x: hidden;
   }
 
