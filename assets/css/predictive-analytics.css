@@ -22,6 +22,14 @@
   z-index: 100;
 }
 
+/* Mobile: Ensure page-header doesn't block hamburger menu */
+@media (max-width: 768px) {
+  .page-header {
+    position: relative !important;
+    z-index: 1 !important;
+  }
+}
+
 .page-header-content {
   flex: 1;
 }

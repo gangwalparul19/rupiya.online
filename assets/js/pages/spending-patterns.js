@@ -224,7 +224,6 @@ function updateKPIs() {
   // Update UI
   document.getElementById('avgDailySpending').textContent = `₹${avgDaily.toFixed(0)}`;
   document.getElementById('mostActiveDay').textContent = mostActiveDay ? mostActiveDay[0] : '-';
-  document.getElementById('spendingStreak').textContent = `${maxStreak} days`;
   document.getElementById('peakSpendingDay').textContent = peakDay ? `₹${peakDay[1].toFixed(0)}` : '₹0';
 }
 

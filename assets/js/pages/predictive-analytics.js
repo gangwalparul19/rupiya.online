@@ -10,6 +10,24 @@ import encryptionReauthModal from '../components/encryption-reauth-modal.js';
 import breadcrumbManager from '../utils/breadcrumbs.js';
 import loadingService from '../services/loading-service.js';
 
+// Helper function for compact currency formatting (e.g., 10.3K, 1.2M)
+function formatCurrencyCompact(amount) {
+  if (amount === 0) return '₹0';
+  
+  const absAmount = Math.abs(amount);
+  const sign = amount < 0 ? '-' : '';
+  
+  if (absAmount >= 10000000) { // 1 crore or more
+    return `${sign}₹${(absAmount / 10000000).toFixed(1)}Cr`;
+  } else if (absAmount >= 100000) { // 1 lakh or more
+    return `${sign}₹${(absAmount / 100000).toFixed(1)}L`;
+  } else if (absAmount >= 1000) { // 1 thousand or more
+    return `${sign}₹${(absAmount / 1000).toFixed(1)}K`;
+  } else {
+    return `${sign}₹${absAmount.toFixed(0)}`;
+  }
+}
+
 // Helper function for toast
 const showToast = (message, type) => toast.show(message, type);
 
@@ -228,7 +246,7 @@ function renderSummaryCards() {
   const riskLevel = determineRiskLevel();
   
   // Update summary cards
-  document.getElementById('avgSpendingValue').textContent = formatCurrency(avgMonthlySpending);
+  document.getElementById('avgSpendingValue').textContent = formatCurrencyCompact(avgMonthlySpending);
   document.getElementById('spendingBadge').textContent = 'Monthly';
   document.getElementById('spendingChange').textContent = 'Based on 30-day forecast';
   
@@ -236,13 +254,10 @@ function renderSummaryCards() {
   document.getElementById('trendBadge').textContent = trendPercentage > 0 ? '↑' : '↓';
   document.getElementById('trendChange').textContent = trendPercentage > 0 ? 'Increasing' : 'Decreasing';
   
-  document.getElementById('savingsPotentialValue').textContent = formatCurrency(savingsPotential);
+  document.getElementById('savingsPotentialValue').textContent = formatCurrencyCompact(savingsPotential);
   document.getElementById('savingsBadge').textContent = savingsPotential > 0 ? '✓' : '!';
   document.getElementById('savingsChange').textContent = 'Potential monthly savings';
   
-  document.getElementById('riskLevelValue').textContent = riskLevel.label;
-  document.getElementById('riskBadge').textContent = riskLevel.icon;
-  document.getElementById('riskChange').textContent = riskLevel.description;
 }
 
 // Calculate spending trend

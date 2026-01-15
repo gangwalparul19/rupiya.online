@@ -17,6 +17,14 @@
   overflow: hidden;
 }
 
+/* Mobile: Ensure ai-hero doesn't block hamburger menu */
+@media (max-width: 768px) {
+  .ai-hero {
+    position: relative !important;
+    z-index: 1 !important;
+  }
+}
+
 .ai-hero::before {
   content: '';
   position: absolute;
@@ -910,7 +918,7 @@
 @media (max-width: 480px) {
   .ai-hero {
     padding: 20px 16px;
-    margin-top: 12px;
+    margin-top: 24px;
     border-radius: 16px;
   }
 
@@ -933,8 +941,8 @@
   }
 
   .health-score-circle {
-    width: 100px;
-    height: 100px;
+    width: 120px;
+    height: 120px;
   }
 
   .score-number {

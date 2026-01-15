@@ -2,6 +2,17 @@
  * Spending Patterns & Heatmap Styles
  */
 
+/* Mobile: Ensure page content doesn't block hamburger menu */
+@media (max-width: 768px) {
+  .page-header,
+  .page-title-section,
+  .kpi-grid,
+  .card {
+    position: relative !important;
+    z-index: 1 !important;
+  }
+}
+
 /* Filters Section */
 .filters-section {
   display: flex;
