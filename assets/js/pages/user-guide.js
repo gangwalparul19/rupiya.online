@@ -682,8 +682,51 @@ async function loadUserProfile() {
   }
 }
 
+// Check if user is logged in and show appropriate navigation
+async function initializeNavigation() {
+  try {
+    const { default: authService } = await import('../services/auth-service.js');
+    const user = await authService.waitForAuth();
+    
+    if (user) {
+      // User is logged in - show dashboard sidebar instead of simple nav
+      const navbar = document.querySelector('.navbar');
+      const mobileToggle = document.querySelector('.mobile-toggle');
+      
+      if (navbar && mobileToggle) {
+        // Hide the simple navbar for logged-in users on mobile
+        const style = document.createElement('style');
+        style.textContent = `
+          @media (max-width: 768px) {
+            .navbar { display: none !important; }
+            body { padding-top: 0 !important; }
+          }
+        `;
+        document.head.appendChild(style);
+        
+        // Load and show the dashboard sidebar
+        const sidebarHTML = await fetch('components/sidebar.html').then(r => r.text()).catch(() => '');
+        if (sidebarHTML) {
+          const tempDiv = document.createElement('div');
+          tempDiv.innerHTML = sidebarHTML;
+          document.body.insertBefore(tempDiv.firstElementChild, document.body.firstChild);
+          
+          // Initialize sidebar functionality
+          const { default: sidebarService } = await import('../services/sidebar-service.js').catch(() => ({ default: null }));
+          if (sidebarService && sidebarService.init) {
+            sidebarService.init();
+          }
+        }
+      }
+    }
+  } catch (error) {
+    console.log('User not logged in, showing public navigation');
+  }
+}
+
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
+  initializeNavigation();
   renderGuideContent();
   initScrollSpy();
   initSmoothScroll();

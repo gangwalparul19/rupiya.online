@@ -979,7 +979,7 @@ input[type="file"]:focus {
 /* Mobile responsive */
 @media (max-width: 768px) {
   .documents-summary {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
   }
   
   .document-badges {
@@ -1008,11 +1008,11 @@ input[type="file"]:focus {
 
 @media (max-width: 480px) {
   .documents-summary {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(3, 1fr);
     gap: 0.5rem;
   }
   
   .documents-summary .summary-card:nth-child(5) {
-    grid-column: 1 / -1;
+    grid-column: auto;
   }
 }

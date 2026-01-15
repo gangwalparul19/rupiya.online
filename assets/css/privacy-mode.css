@@ -777,3 +777,51 @@ body[data-privacy-mode="true"] .privacy-hidden-email {
   visibility: visible !important;
   opacity: 1 !important;
 }
+
+
+/* ============================================
+   MOBILE HEADER FIX FOR PRIVACY SETTINGS PAGE
+   ============================================ */
+
+@media (max-width: 768px) {
+    html.privacy-settings-page .mobile-header {
+        display: flex !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        z-index: 99999 !important;
+        position: sticky !important;
+        top: 0 !important;
+        pointer-events: auto !important;
+    }
+    
+    html.privacy-settings-page .mobile-header-actions {
+        z-index: 100000 !important;
+        position: relative !important;
+        pointer-events: auto !important;
+    }
+    
+    html.privacy-settings-page .sidebar-toggle {
+        z-index: 100001 !important;
+        position: relative !important;
+        pointer-events: auto !important;
+        cursor: pointer !important;
+    }
+    
+    /* Ensure guide container doesn't overlap header */
+    html.privacy-settings-page .guide-container {
+        position: relative !important;
+        z-index: 1 !important;
+        margin-top: 0 !important;
+    }
+    
+    /* Ensure page content stays below header */
+    html.privacy-settings-page .main-content > * {
+        position: relative !important;
+        z-index: 1 !important;
+    }
+    
+    /* But keep mobile header above everything */
+    html.privacy-settings-page .main-content > .mobile-header {
+        z-index: 99999 !important;
+    }
+}

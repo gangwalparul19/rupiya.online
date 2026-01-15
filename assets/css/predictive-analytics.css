@@ -170,10 +170,10 @@
   }
 }
 
-/* Tablet: 4 columns (769px - 1024px) */
+/* Tablet: 3 columns (769px - 1024px) */
 @media (min-width: 769px) and (max-width: 1024px) {
   .summary-cards-row {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 0.875rem;
     margin-bottom: 1.75rem;
   }
@@ -235,7 +235,7 @@
   }
 
   .summary-cards-row {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 0.75rem;
     margin-bottom: 1.5rem;
   }
@@ -1131,7 +1131,7 @@
 /* Mobile Responsive */
 @media (max-width: 768px) {
   .summary-cards-row {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 1rem;
     padding: 1rem;
     margin-bottom: 1.5rem;
@@ -1195,7 +1195,7 @@
 
 @media (max-width: 480px) {
   .summary-cards-row {
-    grid-template-columns: repeat(2, 1fr); /* Keep 2 columns on small mobile */
+    grid-template-columns: repeat(3, 1fr);
     gap: 0.75rem;
     padding: 0.75rem;
   }

@@ -578,19 +578,19 @@
   .mobile-header {
     position: sticky !important;
     top: 0 !important;
-    z-index: 10001 !important;
+    z-index: 99999 !important;
     background: white !important;
     pointer-events: auto !important;
   }
   
   .mobile-header-actions {
-    z-index: 10002 !important;
+    z-index: 100000 !important;
     position: relative !important;
     pointer-events: auto !important;
   }
   
   .sidebar-toggle {
-    z-index: 10003 !important;
+    z-index: 100001 !important;
     position: relative !important;
     pointer-events: auto !important;
     cursor: pointer !important;
@@ -607,5 +607,16 @@
   .trip-summary {
     position: relative !important;
     z-index: 1 !important;
+  }
+  
+  /* Ensure all page content stays below header */
+  .main-content > * {
+    position: relative !important;
+    z-index: 1 !important;
+  }
+  
+  /* But keep mobile header above everything */
+  .main-content > .mobile-header {
+    z-index: 99999 !important;
   }
 }

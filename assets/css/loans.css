@@ -145,7 +145,7 @@
 /* Loan Summary Cards */
 .loan-summary {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
   margin-bottom: 1.5rem;
 }
@@ -646,7 +646,7 @@
 /* Mobile Responsive */
 @media (max-width: 768px) {
   .loan-summary {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 0.75rem;
   }
 
@@ -765,7 +765,7 @@
 
 @media (max-width: 480px) {
   .loan-summary {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
   }
 
   /* Keep 2-column form grid on small mobile */
