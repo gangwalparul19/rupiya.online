@@ -30,7 +30,8 @@ if (getApps().length === 0) {
 const db = getApps().length > 0 ? getFirestore() : null;
 const auth = getApps().length > 0 ? getAuth() : null;
 
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+// Use gemini-1.5-flash for validation (fast and free)
+const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
 
 /**
  * Verify Firebase JWT token
