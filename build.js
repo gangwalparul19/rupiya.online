@@ -48,7 +48,8 @@ const htmlFiles = [
   'feature-details.html',
   'credit-cards.html',
   'healthcare-insurance.html',
-  'spending-patterns.html'
+  'spending-patterns.html',
+  'gemini-setup.html'
 ];
 
 // Pages that have the dashboard layout with sidebar
@@ -80,7 +81,8 @@ const pagesWithSidebar = [
   'feature-details.html',
   'credit-cards.html',
   'healthcare-insurance.html',
-  'spending-patterns.html'
+  'spending-patterns.html',
+  'gemini-setup.html'
 ];
 
 // Environment variable injection script (only inject if values are present)

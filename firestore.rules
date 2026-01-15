@@ -490,6 +490,40 @@ service cloud.firestore {
     }
     
     // ============================================
+    // GEMINI API KEYS - Encrypted storage for user's API keys
+    // ============================================
+    match /userGeminiKeys/{userId} {
+      // Only the user can read their own encrypted API key
+      allow read: if isOwner(userId);
+      
+      // Only the user can create their API key
+      allow create: if isOwner(userId) && 
+                       request.resource.data.encryptedKey != null &&
+                       request.resource.data.iv != null &&
+                       request.resource.data.salt != null;
+      
+      // Only the user can update their API key
+      allow update: if isOwner(userId) && 
+                       userIdNotChanged();
+      
+      // Only the user can delete their API key
+      allow delete: if isOwner(userId);
+    }
+    
+    // ============================================
+    // GEMINI USAGE STATISTICS - Track API usage per user
+    // ============================================
+    match /geminiUsage/{usageId} {
+      // usageId format: userId_YYYY-MM-DD
+      // Only the user can read their own usage statistics
+      allow read: if isAuthenticated() && 
+                     usageId.split('_')[0] == request.auth.uid;
+      
+      // Server-only writes (via backend functions)
+      allow write: if false;
+    }
+    
+    // ============================================
     // INVESTMENT PRICE HISTORY - Restricted to admins and owners
     // ============================================
     match /investmentPriceHistory/{historyId} {

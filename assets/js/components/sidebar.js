@@ -132,6 +132,7 @@ const navigationConfig = {
       items: [
         { href: 'profile.html', icon: '⚙️', label: 'Settings', featureKey: null },
         { href: 'privacy-settings.html', icon: '🔒', label: 'Privacy Settings', featureKey: null },
+        { href: 'gemini-setup.html', icon: '🤖', label: 'AI Setup', featureKey: null },
         { href: 'feature-details.html', icon: '✨', label: 'Feature Details', featureKey: null },
         { href: 'user-guide.html', icon: '📖', label: 'User Guide', featureKey: null },
         { href: 'feedback.html', icon: '💬', label: 'Feedback', featureKey: null }
