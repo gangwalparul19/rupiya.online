@@ -147,7 +147,8 @@ h4 { font-size: 18px; }
   z-index: 1000;
 }
 
-.sidebar.show {
+.sidebar.show,
+.sidebar.active {
   left: 0;
 }
 
@@ -162,7 +163,8 @@ h4 { font-size: 18px; }
   z-index: 999;
 }
 
-.sidebar-overlay.show {
+.sidebar-overlay.show,
+.sidebar-overlay.active {
   display: block;
 }
 
@@ -276,10 +278,16 @@ h4 { font-size: 18px; }
   h2 { font-size: 30px; }
   h3 { font-size: 24px; }
 
-  /* KPI Cards - 4 columns */
+  /* KPI Cards - 3-4 columns based on screen size */
   .kpi-grid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 20px;
+  }
+  
+  @media (min-width: 1200px) {
+    .kpi-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
   }
 
   .kpi-card:nth-child(3) {

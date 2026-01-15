@@ -500,14 +500,14 @@ function setupMobileSidebar() {
   const overlay = document.getElementById('sidebarOverlay');
 
   function openSidebar() {
-    sidebar?.classList.add('active');
-    overlay?.classList.add('active');
+    sidebar?.classList.add('show', 'active');
+    overlay?.classList.add('show', 'active');
     document.body.style.overflow = 'hidden';
   }
 
   function closeSidebar() {
-    sidebar?.classList.remove('active');
-    overlay?.classList.remove('active');
+    sidebar?.classList.remove('show', 'active');
+    overlay?.classList.remove('show', 'active');
     document.body.style.overflow = '';
   }
 

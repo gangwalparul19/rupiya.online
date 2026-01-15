@@ -419,9 +419,13 @@ class AIBudgetRecommendations {
       averageMonthlySpending: 0
     };
 
-    // Get expenses
-    if (window.expensesState && window.expensesState.expenses) {
+    // Get expenses from multiple possible sources
+    if (window.budgetsState && window.budgetsState.expenses) {
+      data.expenses = window.budgetsState.expenses;
+    } else if (window.expensesState && window.expensesState.expenses) {
       data.expenses = window.expensesState.expenses;
+    } else if (window.dashboardState && window.dashboardState.expenses) {
+      data.expenses = window.dashboardState.expenses;
     }
 
     // Group by category and calculate averages
@@ -449,11 +453,11 @@ class AIBudgetRecommendations {
 
     // Calculate averages
     const months = Object.keys(monthlyTotals).length || 1;
-    Object.entries(categoryTotals).forEach(([category, data]) => {
+    Object.entries(categoryTotals).forEach(([category, totals]) => {
       data.categories[category] = {
-        averageMonthly: data.total / months,
-        totalSpent: data.total,
-        transactionCount: data.count
+        averageMonthly: totals.total / months,
+        totalSpent: totals.total,
+        transactionCount: totals.count
       };
     });
 
