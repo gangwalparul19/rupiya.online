@@ -227,6 +227,18 @@ async function loadPolicies() {
     console.log('[HealthcareInsurance] Loaded policies:', allPolicies);
     console.log('[HealthcareInsurance] First policy sample:', allPolicies[0]);
     
+    // Check if any policies have decryption issues
+    const policiesWithIssues = allPolicies.filter(p => {
+      const hasUndefinedFields = !p.policyName || !p.provider || !p.coverageAmount;
+      const hasEncryptedMarker = p._encrypted !== undefined;
+      return hasUndefinedFields && hasEncryptedMarker;
+    });
+    
+    if (policiesWithIssues.length > 0) {
+      console.warn('[HealthcareInsurance] Found policies with potential decryption issues:', policiesWithIssues);
+      showToast(`⚠️ Some policies may need re-encryption. Please contact support if data appears incomplete.`, 'warning');
+    }
+    
     state.policies = allPolicies;
     state.filteredPolicies = [...allPolicies];
     state.policiesTotalCount = allPolicies.length;

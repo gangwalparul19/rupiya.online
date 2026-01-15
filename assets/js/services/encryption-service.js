@@ -625,15 +625,9 @@ class EncryptionService {
     }
 
     if (!this.isReady()) {
-      log.warn(`[${collectionName}] Encryption not ready after ${maxRetries} retries, returning placeholder data`);
-      // Return data but try to show something useful
+      log.warn(`[${collectionName}] Encryption not ready after ${maxRetries} retries, returning original data`);
+      // Return original data without the _encrypted marker so it's still usable
       const partialData = { ...data };
-      // Copy encrypted fields as-is so UI doesn't break completely
-      if (data._encrypted) {
-        for (const [field, value] of Object.entries(data._encrypted)) {
-          partialData[field] = '[Encrypted - Key Not Ready]';
-        }
-      }
       delete partialData._encrypted;
       delete partialData._encryptionVersion;
       return partialData;
@@ -644,6 +638,8 @@ class EncryptionService {
       delete decryptedData._encrypted;
       delete decryptedData._encryptionVersion;
 
+      let hasDecryptionErrors = false;
+
       // Decrypt each encrypted field
       for (const [field, encryptedValue] of Object.entries(data._encrypted)) {
         try {
@@ -651,8 +647,9 @@ class EncryptionService {
           // Sanitize output to prevent XSS after decryption
           const sanitized = this._sanitizeOutput(decrypted);
           decryptedData[field] = sanitized;
-          log.log(`[${collectionName}] Decrypted field: ${field} = ${sanitized ? sanitized.substring(0, 50) : 'empty'}`);
+          log.log(`[${collectionName}] Decrypted field: ${field}`);
         } catch (fieldError) {
+          hasDecryptionErrors = true;
           log.warn(`Failed to decrypt field ${field} in ${collectionName}:`, fieldError);
           // If decryption fails, try to use the encrypted value as-is
           // (it might be unencrypted data that was stored in _encrypted by mistake)
@@ -664,18 +661,30 @@ class EncryptionService {
             // Number - definitely unencrypted
             decryptedData[field] = encryptedValue;
           } else {
-            // Show placeholder if we can't recover
-            decryptedData[field] = '[Decryption Failed]';
-            log.error(`[${collectionName}] Could not decrypt field: ${field}`);
+            // For failed decryption, try to return the original unencrypted value if it exists
+            // Otherwise skip the field to avoid breaking JSON parsing
+            if (data[field] !== undefined && data[field] !== null) {
+              decryptedData[field] = data[field];
+            }
+            // Don't set a placeholder - just skip it
+            log.error(`[${collectionName}] Could not decrypt field: ${field}, skipping`);
           }
         }
       }
 
-      log.log(`[${collectionName}] Decrypted object complete. Fields: ${Object.keys(decryptedData).join(', ')}`);
+      if (hasDecryptionErrors) {
+        log.warn(`[${collectionName}] Some fields failed to decrypt. This may indicate the encryption key has changed.`);
+      }
+
+      log.log(`[${collectionName}] Decrypted object complete`);
       return decryptedData;
     } catch (error) {
       log.error('Object decryption failed:', error);
-      return data;
+      // Return original data without _encrypted marker
+      const fallbackData = { ...data };
+      delete fallbackData._encrypted;
+      delete fallbackData._encryptionVersion;
+      return fallbackData;
     }
   }
 
@@ -782,6 +791,27 @@ class EncryptionService {
       ready: this.isReady(),
       version: privacyConfig.encryptionVersion
     };
+  }
+
+  // Check if data appears to be encrypted but can't be decrypted
+  // This helps identify data that needs re-encryption
+  hasDecryptionIssues(data) {
+    if (!data || !data._encrypted) {
+      return false;
+    }
+
+    // Check if any of the encrypted fields are missing from the decrypted data
+    const encryptedFields = Object.keys(data._encrypted || {});
+    const decryptedFields = Object.keys(data).filter(k => !k.startsWith('_'));
+    
+    // If we have encrypted fields but they're not in the decrypted data, there's an issue
+    for (const field of encryptedFields) {
+      if (data[field] === undefined || data[field] === null) {
+        return true;
+      }
+    }
+    
+    return false;
   }
 }
 
