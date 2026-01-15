@@ -17,11 +17,13 @@ if (getApps().length === 0) {
       initializeApp({
         credential: cert(serviceAccount)
       });
+      console.log('✓ Firebase Admin initialized with service account');
     } else {
       initializeApp();
+      console.log('✓ Firebase Admin initialized with default credentials');
     }
   } catch (error) {
-    console.error('Firebase Admin initialization error:', error);
+    console.error('❌ Firebase Admin initialization error:', error);
   }
 }
 
@@ -48,36 +50,6 @@ async function verifyToken(token) {
 }
 
 /**
- * Get user's API key from Firestore
- */
-async function getUserApiKey(userId) {
-  try {
-    if (!db) {
-      throw new Error('Firestore not initialized');
-    }
-
-    const keyDocRef = db.collection('userGeminiKeys').doc(userId);
-    const keyDoc = await keyDocRef.get();
-
-    if (!keyDoc.exists) {
-      throw new Error('No API key found for user');
-    }
-
-    const data = keyDoc.data();
-
-    if (!data.isActive) {
-      throw new Error('API key is inactive');
-    }
-
-    // Return encrypted data - will be decrypted on client
-    return data.encryptedKey;
-  } catch (error) {
-    console.error('Error retrieving API key:', error);
-    throw error;
-  }
-}
-
-/**
  * Test Gemini API with a simple request
  */
 async function testGeminiApi(apiKey) {
@@ -85,6 +57,8 @@ async function testGeminiApi(apiKey) {
     if (!apiKey || typeof apiKey !== 'string') {
       throw new Error('Invalid API key format');
     }
+
+    console.log('🔍 Testing Gemini API with key...');
 
     const response = await fetch(GEMINI_API_URL, {
       method: 'POST',
@@ -110,15 +84,19 @@ async function testGeminiApi(apiKey) {
       })
     });
 
+    console.log('📡 Gemini API response status:', response.status);
+
     if (!response.ok) {
       let errorMessage = 'API validation failed';
       
       try {
         const error = await response.json();
         errorMessage = error.error?.message || error.message || errorMessage;
+        console.error('❌ Gemini API error:', errorMessage);
       } catch (parseError) {
         // If response is not JSON, use status text
         errorMessage = response.statusText || errorMessage;
+        console.error('❌ Gemini API error (non-JSON):', errorMessage);
       }
       
       // Check for specific error types
@@ -140,9 +118,10 @@ async function testGeminiApi(apiKey) {
       throw new Error('Invalid response from Gemini API');
     }
 
+    console.log('✅ Gemini API test successful');
     return true;
   } catch (error) {
-    console.error('Gemini API test error:', error);
+    console.error('❌ Gemini API test error:', error.message);
     throw error;
   }
 }
@@ -151,6 +130,10 @@ async function testGeminiApi(apiKey) {
  * Main handler
  */
 export default async function handler(req, res) {
+  console.log('\n🚀 === Gemini Validate Key API Called ===');
+  console.log('Method:', req.method);
+  console.log('URL:', req.url);
+  
   try {
     // Enable CORS
     res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -159,28 +142,39 @@ export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token,X-Requested-With,Accept,Accept-Version,Content-Length,Content-MD5,Content-Type,Date,X-Api-Version,Authorization');
 
     if (req.method === 'OPTIONS') {
+      console.log('✓ OPTIONS request handled');
       res.status(200).end();
       return;
     }
 
     // Verify request method
     if (req.method !== 'POST') {
+      console.log('❌ Invalid method:', req.method);
       return res.status(405).json({ error: 'Method not allowed' });
     }
 
     // Get and verify Firebase token
     const authHeader = req.headers.authorization;
+    console.log('🔐 Auth header present:', !!authHeader);
+    
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ error: 'Missing or invalid authorization header' });
+      console.log('❌ Missing or invalid auth header');
+      return res.status(401).json({ 
+        valid: false,
+        message: 'Missing or invalid authorization header' 
+      });
     }
 
     const token = authHeader.substring(7);
+    console.log('🎫 Token extracted, length:', token.length);
+    
     let decodedToken;
     
     try {
       decodedToken = await verifyToken(token);
+      console.log('✅ Token verified for user:', decodedToken.uid);
     } catch (tokenError) {
-      console.error('Token verification failed:', tokenError);
+      console.error('❌ Token verification failed:', tokenError.message);
       return res.status(401).json({
         valid: false,
         message: 'Invalid or expired token'
@@ -188,37 +182,61 @@ export default async function handler(req, res) {
     }
 
     const userId = decodedToken.uid;
-    console.log(`Validating Gemini API key for user: ${userId}`);
+    console.log(`👤 Validating Gemini API key for user: ${userId}`);
 
     // Get the API key from request body (decrypted by client)
     const { apiKey } = req.body;
+    console.log('🔑 API key received:', !!apiKey, 'Length:', apiKey?.length || 0);
     
     if (!apiKey) {
+      console.log('❌ No API key in request body');
       return res.status(400).json({
         valid: false,
         message: 'API key not provided'
       });
     }
 
+    // Validate API key format
+    if (typeof apiKey !== 'string') {
+      console.log('❌ API key is not a string:', typeof apiKey);
+      return res.status(400).json({
+        valid: false,
+        message: 'Invalid API key format'
+      });
+    }
+
+    if (!apiKey.startsWith('AIza')) {
+      console.log('❌ API key does not start with AIza');
+      return res.status(400).json({
+        valid: false,
+        message: 'Invalid API key format (should start with AIza)'
+      });
+    }
+
+    console.log('✓ API key format valid, testing with Gemini API...');
+
     // Test the API key
     try {
       await testGeminiApi(apiKey);
+      console.log('✅ API key test passed');
     } catch (testError) {
-      console.error('API key test failed:', testError);
+      console.error('❌ API key test failed:', testError.message);
       return res.status(400).json({
         valid: false,
         message: testError.message || 'API key validation failed'
       });
     }
 
-    console.log(`✅ API key validated for user: ${userId}`);
+    console.log(`✅ API key validated successfully for user: ${userId}`);
+    console.log('=== End of API Call ===\n');
 
     return res.status(200).json({
       valid: true,
       message: 'API key is valid and working'
     });
   } catch (error) {
-    console.error('Unexpected validation error:', error);
+    console.error('❌ Unexpected validation error:', error);
+    console.error('Error stack:', error.stack);
     
     // Ensure we always return JSON
     return res.status(500).json({
