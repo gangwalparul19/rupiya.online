@@ -40,7 +40,6 @@ class UXEnhancements {
     // Check if skip link already exists - prevent duplicates
     const existingSkipLink = document.querySelector('.skip-link');
     if (existingSkipLink) {
-      console.log('[UX] Skip link already exists, skipping creation');
       return;
     }
 
@@ -57,8 +56,6 @@ class UXEnhancements {
     } else {
       document.body.appendChild(skipLink);
     }
-    
-    console.log('[UX] Skip link created');
   }
 
   // Smooth scrolling for anchor links

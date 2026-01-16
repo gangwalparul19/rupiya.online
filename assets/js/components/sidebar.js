@@ -159,13 +159,11 @@ function getCurrentPage() {
 // Save/load expanded sections state
 function getSectionState() {
   // CACHING DISABLED - Always use default state
-  console.log('[Sidebar] Caching disabled - using default section state');
   return {};
 }
 
 function saveSectionState(sectionId, expanded) {
   // CACHING DISABLED - Don't save section state
-  console.log('[Sidebar] Caching disabled - not saving section state');
 }
 
 // Generate sidebar HTML
@@ -249,8 +247,6 @@ function generateSidebarHTML(isAdmin = false) {
     `;
   });
   
-  console.log('[Sidebar] Generated navigation. Sections:', sectionCount, 'Total items:', totalItems, 'Visible items:', visibleItemsCount);
-  
   return navHTML;
 }
 
@@ -284,12 +280,11 @@ export async function initSidebar() {
   try {
     user = await authService.waitForAuth();
   } catch (e) {
-    console.log('[Sidebar] Auth not ready, using defaults');
+    // Auth not ready, using defaults
   }
 
   // Wait for encryption to be ready BEFORE initializing features
   // This is critical to ensure features are properly decrypted
-  console.log('[Sidebar] Waiting for encryption to be ready...');
   
   // Check if encryption is already ready
   let encryptionReady = false;
@@ -304,7 +299,6 @@ export async function initSidebar() {
     while (!encryptionReady && (Date.now() - startTime) < maxWaitTime) {
       if (encryptionService.isReady && encryptionService.isReady()) {
         encryptionReady = true;
-        console.log('[Sidebar] Encryption is ready');
         break;
       }
       
@@ -331,13 +325,10 @@ export async function initSidebar() {
 
   // Initialize feature config (will always load from Firestore now)
   // This will use defaults if encryption is not ready yet
-  console.log('[Sidebar] Initializing feature config...');
   await featureConfig.init();
   
   // Add a small delay to ensure features are fully loaded and processed
   await new Promise(resolve => setTimeout(resolve, 200));
-  
-  console.log('[Sidebar] Features initialized, generating navigation...');
 
   // Check if user is admin
   const isAdmin = await checkIsAdmin();
@@ -378,13 +369,10 @@ export async function initSidebar() {
   // Re-initialize features after encryption is ready (for page refresh scenarios)
   // This handles the case where sidebar loads before encryption is initialized
   window.addEventListener('encryptionReady', async () => {
-    console.log('[Sidebar] Encryption ready event received, reloading features...');
-    
     // Reload features from Firestore now that encryption is ready
     if (featureConfig.reloadFromFirestore) {
       try {
         await featureConfig.reloadFromFirestore();
-        console.log('[Sidebar] Features reloaded after encryption ready');
       } catch (error) {
         console.error('[Sidebar] Error reloading features:', error);
       }
@@ -393,7 +381,6 @@ export async function initSidebar() {
     // Refresh sidebar with newly loaded features
     try {
       await refreshSidebar();
-      console.log('[Sidebar] Sidebar refreshed with newly loaded features');
     } catch (error) {
       console.error('[Sidebar] Error refreshing sidebar:', error);
     }
@@ -520,12 +507,10 @@ function setupMobileSidebar() {
 function autoInitSidebar() {
   // Only initialize if not already initialized
   if (window._sidebarInitialized) {
-    console.log('[Sidebar] Already initialized, skipping auto-init');
     return;
   }
   
   window._sidebarInitialized = true;
-  console.log('[Sidebar] Auto-initializing sidebar...');
   
   // Initialize sidebar - it will internally wait for features to load
   initSidebar().catch(error => {

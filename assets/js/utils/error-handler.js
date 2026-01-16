@@ -350,15 +350,6 @@ class ErrorHandler {
    */
   sendToMonitoring(errorEntry) {
     // Implement integration with monitoring service (e.g., Sentry, LogRocket)
-    // For now, just log to console in development
-    if (window.location.hostname === 'localhost') {
-      console.log('[Error Monitoring]', {
-        ...errorEntry,
-        // Format for better readability in console
-        formattedTime: new Date(errorEntry.timestamp).toLocaleString()
-      });
-    }
-
     // TODO: Add integration with error monitoring service
     // Example for Sentry:
     // if (window.Sentry) {

@@ -13,7 +13,6 @@ class PWAInstallManager {
     
     // Listen for beforeinstallprompt event
     window.addEventListener('beforeinstallprompt', (e) => {
-      console.log('[PWA] Install prompt available');
       e.preventDefault();
       this.deferredPrompt = e;
       this.showInstallUI();
@@ -21,7 +20,6 @@ class PWAInstallManager {
 
     // Listen for app installed event
     window.addEventListener('appinstalled', () => {
-      console.log('[PWA] App installed successfully');
       this.isInstalled = true;
       this.hideInstallUI();
       this.showInstalledMessage();
@@ -32,7 +30,6 @@ class PWAInstallManager {
 
     // Check if launched as PWA
     if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
-      console.log('[PWA] Running as installed app');
       this.isStandalone = true;
       this.hideInstallUI();
     }
@@ -92,8 +89,6 @@ class PWAInstallManager {
 
   async promptInstall() {
     if (!this.deferredPrompt) {
-      console.log('[PWA] Install prompt not available');
-      
       // Show manual install instructions
       this.showManualInstallInstructions();
       return false;
@@ -104,14 +99,11 @@ class PWAInstallManager {
 
     // Wait for the user's response
     const { outcome } = await this.deferredPrompt.userChoice;
-    console.log(`[PWA] User response: ${outcome}`);
 
     if (outcome === 'accepted') {
-      console.log('[PWA] User accepted the install prompt');
       localStorage.setItem('pwa-installed', 'true');
       this.isInstalled = true;
     } else {
-      console.log('[PWA] User dismissed the install prompt');
       localStorage.setItem('pwa-install-dismissed', Date.now().toString());
     }
 

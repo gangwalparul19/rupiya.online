@@ -114,7 +114,6 @@ const DashboardLayout = {
     `;
 
     container.innerHTML = layoutHTML;
-    console.log('✅ Dashboard layout injected');
   },
 
   /**
@@ -129,7 +128,6 @@ const DashboardLayout = {
     }
 
     container.innerHTML = DashboardLayout.getSidebarHTML();
-    console.log('✅ Sidebar injected');
   },
 
   /**
@@ -144,7 +142,6 @@ const DashboardLayout = {
     }
 
     container.innerHTML = DashboardLayout.getMobileHeaderHTML();
-    console.log('✅ Mobile header injected');
   }
 };
 

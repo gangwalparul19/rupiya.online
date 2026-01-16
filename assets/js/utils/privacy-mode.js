@@ -30,7 +30,6 @@ class PrivacyModeManager {
         
         if (isPrivacyPage) {
             document.body.classList.add('privacy-settings-page');
-            console.log('[PrivacyMode] Added privacy-settings-page class to body');
         }
     }
 
@@ -117,8 +116,6 @@ class PrivacyModeManager {
         document.querySelectorAll('button, input, select, textarea, a, .privacy-toggle, .btn').forEach(el => {
             el.style.pointerEvents = 'auto';
         });
-        
-        console.log('Privacy Mode: Removed all effects for privacy-settings page');
     }
 
     /**
@@ -153,8 +150,6 @@ class PrivacyModeManager {
             sidebarOverlay.style.pointerEvents = 'auto !important';
             sidebarOverlay.style.opacity = '1 !important';
         }
-        
-        console.log('Privacy Mode: Ensured privacy-settings page is interactive');
     }
 
     /**

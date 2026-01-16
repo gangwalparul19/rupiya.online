@@ -142,7 +142,6 @@ const DashboardLoader = {
         await DashboardLoader.loadJS(src, true);
       }
 
-      console.log(`✅ Dashboard page loaded: ${pageTitle}`);
     } catch (error) {
       console.error('❌ Error loading dashboard resources:', error);
     }

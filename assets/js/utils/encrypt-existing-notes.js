@@ -8,8 +8,6 @@ import encryptionService from '../services/encryption-service.js';
 
 async function encryptExistingNotes() {
   try {
-    console.log('Starting notes encryption migration...');
-    
     // Wait for auth
     const user = await authService.waitForAuth();
     if (!user) {
@@ -23,8 +21,6 @@ async function encryptExistingNotes() {
       console.error('Encryption service not ready');
       return;
     }
-    
-    console.log('Encryption service ready, fetching notes...');
     
     // Get all notes for current user
     const notesRef = collection(db, 'notes');
@@ -48,13 +44,10 @@ async function encryptExistingNotes() {
       // Check if already encrypted
       if (data._encrypted) {
         alreadyEncrypted++;
-        console.log(`Note ${docSnap.id} already encrypted, skipping`);
         continue;
       }
       
       try {
-        console.log(`Encrypting note ${docSnap.id}...`);
-        
         // Encrypt the note data
         const encryptedData = await encryptionService.encryptObject(data, 'notes');
         
@@ -62,18 +55,11 @@ async function encryptExistingNotes() {
         await updateDoc(doc(db, 'notes', docSnap.id), encryptedData);
         
         encrypted++;
-        console.log(`✓ Note ${docSnap.id} encrypted successfully`);
       } catch (error) {
         errors++;
         console.error(`✗ Failed to encrypt note ${docSnap.id}:`, error);
       }
     }
-    
-    console.log('\n=== Migration Complete ===');
-    console.log(`Total notes found: ${total}`);
-    console.log(`Already encrypted: ${alreadyEncrypted}`);
-    console.log(`Newly encrypted: ${encrypted}`);
-    console.log(`Errors: ${errors}`);
     
     if (encrypted > 0) {
       alert(`Successfully encrypted ${encrypted} notes!`);
@@ -91,8 +77,5 @@ async function encryptExistingNotes() {
 
 // Export for use in console or as a button click handler
 window.encryptExistingNotes = encryptExistingNotes;
-
-console.log('Notes encryption migration script loaded.');
-console.log('Run window.encryptExistingNotes() to encrypt existing notes.');
 
 export default encryptExistingNotes;

@@ -3,16 +3,16 @@
  * Shows sidebar for logged-in users, custom navbar for guests
  */
 
+/* Show custom navbar by default (for guests and until auth is checked) */
+.navbar {
+    display: block !important;
+}
+
 /* Hide sidebar and mobile header by default (for guests) */
 body:not(.user-logged-in) .sidebar,
 body:not(.user-logged-in) .sidebar-overlay,
 body:not(.user-logged-in) .mobile-header {
     display: none !important;
-}
-
-/* Show custom navbar for guests */
-body:not(.user-logged-in) .navbar {
-    display: block !important;
 }
 
 /* Hide custom navbar for logged-in users */

@@ -35,11 +35,8 @@ function createAndAttachPrivacyButton() {
     
     // Skip adding button if not on dashboard
     if (!isDashboard) {
-        console.log('[PrivacyModeButton] Skipping privacy button on:', pathname);
         return;
     }
-    
-    console.log('[PrivacyModeButton] Adding privacy button to dashboard');
     
     // Try to add to mobile header first
     const mobileHeaderActions = document.querySelector('.mobile-header-actions');
@@ -52,7 +49,6 @@ function createAndAttachPrivacyButton() {
         } else {
             mobileHeaderActions.insertBefore(button, mobileHeaderActions.firstChild);
         }
-        console.log('[PrivacyModeButton] Added to mobile header');
     }
     
     // Also try to add to dashboard header actions
@@ -61,7 +57,6 @@ function createAndAttachPrivacyButton() {
         const button = createPrivacyButton();
         button.id = 'privacyModeBtnDashboard';
         dashboardHeaderActions.insertBefore(button, dashboardHeaderActions.firstChild);
-        console.log('[PrivacyModeButton] Added to dashboard header');
     }
     
     // Update button state

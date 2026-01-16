@@ -181,7 +181,6 @@ class FeatureConfigManager {
   _getCachedFeatures(userId) {
     // ALWAYS return null to force Firestore load
     // Cache is causing issues with stale data
-    console.log('[FeatureConfig] Cache disabled - always loading from Firestore');
     return null;
   }
 
@@ -191,7 +190,6 @@ class FeatureConfigManager {
    */
   _cacheFeatures(userId, features) {
     // Don't cache - always load from Firestore
-    console.log('[FeatureConfig] Cache saving disabled - always loading from Firestore');
   }
 
   /**
@@ -786,16 +784,13 @@ class FeatureConfigManager {
         // First try to get from decrypted data
         if (decryptedData && decryptedData.features) {
           savedFeatures = decryptedData.features;
-          console.log('[FeatureConfig] Extracted features from decrypted data');
         }
         
         // If not found, check if it's still in _encrypted (decryption might have failed)
         if (!savedFeatures && savedData && savedData._encrypted && savedData._encrypted.features) {
-          console.log('[FeatureConfig] Features still in _encrypted, attempting direct decryption...');
           try {
             const encryptedFeatures = savedData._encrypted.features;
             savedFeatures = await encryptionService.decryptValue(encryptedFeatures);
-            console.log('[FeatureConfig] Successfully decrypted features from _encrypted.features');
           } catch (e) {
             console.error('[FeatureConfig] Failed to decrypt _encrypted.features:', e);
             savedFeatures = null;
@@ -826,7 +821,6 @@ class FeatureConfigManager {
             }
           });
           
-          console.log('[FeatureConfig] Features reloaded successfully');
           
           // Dispatch event to notify UI
           window.dispatchEvent(new CustomEvent('featuresReloaded', {

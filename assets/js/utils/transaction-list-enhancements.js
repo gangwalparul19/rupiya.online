@@ -376,14 +376,14 @@ class TransactionListEnhancer {
    * Handle edit action (override in implementation)
    */
   onEdit(transactionId) {
-    console.log('Edit transaction:', transactionId);
+    // Override this method in implementation
   }
 
   /**
    * Handle delete action (override in implementation)
    */
   onDelete(transactionId) {
-    console.log('Delete transaction:', transactionId);
+    // Override this method in implementation
   }
 
   /**

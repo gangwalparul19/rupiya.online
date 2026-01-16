@@ -25,7 +25,5 @@
       });
       observer.observe(document.documentElement, { childList: true });
     }
-    
-    console.log('[Privacy Preload] Privacy mode enabled - content hidden');
   }
 })();

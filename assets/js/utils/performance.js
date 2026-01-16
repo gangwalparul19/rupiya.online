@@ -99,7 +99,7 @@ class PerformanceUtils {
     const startTime = performance.now();
     const result = await func();
     const endTime = performance.now();
-    console.log(`${label} took ${(endTime - startTime).toFixed(2)}ms`);
+    // Performance measurement: ${label} took ${(endTime - startTime).toFixed(2)}ms
     return result;
   }
 
@@ -258,7 +258,7 @@ class PerformanceUtils {
       const lcpObserver = new PerformanceObserver((list) => {
         const entries = list.getEntries();
         const lastEntry = entries[entries.length - 1];
-        console.log('LCP:', lastEntry.renderTime || lastEntry.loadTime);
+        // LCP: lastEntry.renderTime || lastEntry.loadTime
       });
       lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
 
@@ -266,7 +266,7 @@ class PerformanceUtils {
       const fidObserver = new PerformanceObserver((list) => {
         const entries = list.getEntries();
         entries.forEach(entry => {
-          console.log('FID:', entry.processingStart - entry.startTime);
+          // FID: entry.processingStart - entry.startTime
         });
       });
       fidObserver.observe({ entryTypes: ['first-input'] });
@@ -279,7 +279,7 @@ class PerformanceUtils {
             clsScore += entry.value;
           }
         }
-        console.log('CLS:', clsScore);
+        // CLS: clsScore
       });
       clsObserver.observe({ entryTypes: ['layout-shift'] });
     }

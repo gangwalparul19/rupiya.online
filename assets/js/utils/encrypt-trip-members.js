@@ -34,32 +34,27 @@ class TripMembersEncryptor {
       if (memberData.name && !this.isEncrypted(memberData.name)) {
         updates.name = await encryptionService.encryptValue(memberData.name);
         needsUpdate = true;
-        console.log(`  - Encrypting name: ${memberData.name}`);
       }
 
       // Encrypt email if present and not already encrypted
       if (memberData.email && !this.isEncrypted(memberData.email)) {
         updates.email = await encryptionService.encryptValue(memberData.email);
         needsUpdate = true;
-        console.log(`  - Encrypting email: ${memberData.email}`);
       }
 
       // Encrypt phone if present and not already encrypted
       if (memberData.phone && !this.isEncrypted(memberData.phone)) {
         updates.phone = await encryptionService.encryptValue(memberData.phone);
         needsUpdate = true;
-        console.log(`  - Encrypting phone: ${memberData.phone}`);
       }
 
       if (needsUpdate) {
         const memberRef = doc(db, this.membersCollection, memberId);
         await updateDoc(memberRef, updates);
         this.processedCount++;
-        console.log(`✓ Encrypted member: ${memberId}`);
         return { success: true };
       } else {
         this.skippedCount++;
-        console.log(`⊘ Skipped (already encrypted): ${memberId}`);
         return { success: true, skipped: true };
       }
     } catch (error) {
@@ -72,8 +67,6 @@ class TripMembersEncryptor {
   // Process all trip members
   async encryptAllMembers() {
     try {
-      console.log('🔐 Starting trip members encryption...\n');
-
       // Check authentication
       await authService.waitForAuth();
       if (!authService.isAuthenticated()) {
@@ -86,14 +79,10 @@ class TripMembersEncryptor {
         throw new Error('No encryption key found. Please set up encryption first.');
       }
 
-      console.log('📋 Fetching all trip members...');
       const membersSnapshot = await getDocs(collection(db, this.membersCollection));
       const totalMembers = membersSnapshot.size;
 
-      console.log(`Found ${totalMembers} trip members to process\n`);
-
       if (totalMembers === 0) {
-        console.log('No trip members found.');
         return;
       }
 
@@ -101,7 +90,6 @@ class TripMembersEncryptor {
       let index = 0;
       for (const docSnap of membersSnapshot.docs) {
         index++;
-        console.log(`\n[${index}/${totalMembers}] Processing member: ${docSnap.id}`);
         
         const memberData = docSnap.data();
         await this.encryptMember(docSnap.id, memberData);
@@ -110,24 +98,6 @@ class TripMembersEncryptor {
         if (index % 10 === 0) {
           await new Promise(resolve => setTimeout(resolve, 500));
         }
-      }
-
-      // Summary
-      console.log('\n' + '='.repeat(60));
-      console.log('📊 ENCRYPTION SUMMARY');
-      console.log('='.repeat(60));
-      console.log(`✓ Successfully encrypted: ${this.processedCount}`);
-      console.log(`⊘ Skipped (already encrypted): ${this.skippedCount}`);
-      console.log(`✗ Errors: ${this.errorCount}`);
-      console.log(`📝 Total processed: ${totalMembers}`);
-      console.log('='.repeat(60));
-
-      if (this.errorCount > 0) {
-        console.log('\n⚠️  Some members failed to encrypt. Check the errors above.');
-      } else if (this.processedCount > 0) {
-        console.log('\n✅ All trip members encrypted successfully!');
-      } else {
-        console.log('\n✅ All trip members were already encrypted!');
       }
 
     } catch (error) {
@@ -139,8 +109,6 @@ class TripMembersEncryptor {
   // Verify encryption (decrypt and check)
   async verifyEncryption() {
     try {
-      console.log('\n🔍 Verifying encryption...\n');
-
       const membersSnapshot = await getDocs(collection(db, this.membersCollection));
       let verifiedCount = 0;
       let failedCount = 0;
@@ -154,7 +122,6 @@ class TripMembersEncryptor {
             const decryptedName = await encryptionService.decryptValue(memberData.name);
             if (decryptedName) {
               verifiedCount++;
-              console.log(`✓ Verified member: ${docSnap.id} - ${decryptedName}`);
             }
           }
         } catch (error) {
@@ -162,13 +129,6 @@ class TripMembersEncryptor {
           console.error(`✗ Failed to verify member: ${docSnap.id}`, error.message);
         }
       }
-
-      console.log('\n' + '='.repeat(60));
-      console.log('📊 VERIFICATION SUMMARY');
-      console.log('='.repeat(60));
-      console.log(`✓ Successfully verified: ${verifiedCount}`);
-      console.log(`✗ Failed verification: ${failedCount}`);
-      console.log('='.repeat(60));
 
     } catch (error) {
       console.error('\n❌ Error during verification:', error);
@@ -182,16 +142,5 @@ const encryptor = new TripMembersEncryptor();
 
 // Export for use in console or other scripts
 window.tripMembersEncryptor = encryptor;
-
-// Auto-run if this script is loaded directly
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
-    console.log('Trip Members Encryptor loaded. Use window.tripMembersEncryptor to run encryption.');
-    console.log('Example: await window.tripMembersEncryptor.encryptAllMembers()');
-  });
-} else {
-  console.log('Trip Members Encryptor loaded. Use window.tripMembersEncryptor to run encryption.');
-  console.log('Example: await window.tripMembersEncryptor.encryptAllMembers()');
-}
 
 export default encryptor;

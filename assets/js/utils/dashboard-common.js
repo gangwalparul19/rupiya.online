@@ -17,13 +17,14 @@ import '../init-error-handlers.js';
 // Sidebar navigation - loads and initializes sidebar
 import '../components/sidebar.js';
 
+// User profile - loads and displays user info in sidebar
+import '../components/user-profile.js';
+
 // UX enhancements - tooltips, animations, etc.
 import './ux-enhancements.js';
 
 // Logout handler - handles logout functionality
 import './logout-handler.js';
-
-console.log('✅ Dashboard common modules loaded');
 
 // Export a ready flag for other modules to check
 export const dashboardCommonReady = true;
