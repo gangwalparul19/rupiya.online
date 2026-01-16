@@ -226,8 +226,6 @@ async function loadLoans() {
   try {
     const allLoans = await firestoreService.getLoans() || [];
     
-    console.log('[Loans] Loaded loans:', allLoans.length, 'loans');
-    
     state.loans = allLoans;
     state.totalCount = allLoans.length;
     
@@ -265,8 +263,6 @@ function calculateKPISummary() {
 function filterLoans() {
   const filter = document.getElementById('loanFilter')?.value || 'all';
   
-  console.log('[Loans] Filtering loans with filter:', filter);
-  
   if (filter === 'active') {
     state.filteredLoans = state.loans.filter(l => l.status !== 'closed');
   } else if (filter === 'closed') {
@@ -275,7 +271,6 @@ function filterLoans() {
     state.filteredLoans = [...state.loans];
   }
   
-  console.log('[Loans] Filtered loans:', state.filteredLoans.length, 'loans');
   state.currentPage = 1;
 }
 
@@ -911,8 +906,6 @@ async function savePayment(e) {
   const paymentAmount = parseFloat(document.getElementById('paymentAmount').value) || 0;
   const paymentDate = document.getElementById('paymentDate').value;
   
-  console.log('[Loans] Saving payment:', { loanId, paymentType, paymentAmount, paymentDate });
-  
   try {
     // Calculate EMI breakdown
     const breakdown = crossFeatureIntegrationService.calculateEMIBreakdown(
@@ -920,8 +913,6 @@ async function savePayment(e) {
       loan.interestRate,
       paymentAmount
     );
-    
-    console.log('[Loans] EMI breakdown:', breakdown);
     
     // Create a complete loan object with all existing fields plus updates
     // This prevents losing encrypted data during partial updates
@@ -944,11 +935,9 @@ async function savePayment(e) {
     delete updatedLoan._encrypted;
     delete updatedLoan._encryptionVersion;
     
-    console.log('[Loans] Updating loan with complete data');
     await firestoreService.updateLoan(loanId, updatedLoan);
     
     // Use cross-feature integration to create expense with breakdown
-    console.log('[Loans] Creating expense record...');
     await crossFeatureIntegrationService.createLoanEMIExpense(
       loanId,
       loan.loanName,
@@ -964,7 +953,6 @@ async function savePayment(e) {
     
     // Also create a transfer record for net worth tracking
     try {
-      console.log('[Loans] Creating transfer record...');
       const transferType = paymentType === 'prepayment' ? 'loan_prepayment' : 'loan_emi';
       await transfersService.createTransfer({
         type: transferType,
@@ -982,7 +970,6 @@ async function savePayment(e) {
       // Don't fail the whole operation if transfer creation fails
     }
     
-    console.log('[Loans] Payment saved successfully');
     toast.success('Payment recorded successfully');
     closePaymentModal();
     await loadLoans();
@@ -1101,8 +1088,6 @@ async function togglePaymentHistory(loanId) {
       const loanTransfers = allTransfers.filter(transfer => 
         transfer.linkedId === loanId && transfer.linkedType === 'loan'
       );
-      
-      console.log('[Loans] Payment history:', { loanPayments, loanTransfers });
       
       // Combine and sort by date
       const allPayments = [

@@ -115,8 +115,6 @@ class CategoriesService {
           updatedAt: Timestamp.now()
         });
         
-        console.log('[CategoriesService] Default categories created successfully');
-        
         return {
           success: true,
           data: {
@@ -126,7 +124,6 @@ class CategoriesService {
         };
       }
 
-      console.log('[CategoriesService] Categories already exist');
       return {
         success: true,
         data: docSnap.data()

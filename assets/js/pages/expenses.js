@@ -277,13 +277,11 @@ async function loadFamilyMemberFilter() {
     }
     
     const uniqueMembers = Array.from(allMembers.values());
-    console.log('[FamilyFilter] Loading family members:', uniqueMembers);
     
     if (uniqueMembers && uniqueMembers.length > 0) {
       const options = uniqueMembers.map(member => {
         const memberId = member.id || member.name;
         const memberName = member.name || member.memberName;
-        console.log('[FamilyFilter] Adding member to filter:', { id: memberId, name: memberName });
         return `<option value="${memberId}">${escapeHtml(memberName)}</option>`;
       }).join('');
       
@@ -299,12 +297,8 @@ function handlePaymentMethodFilterChange() {
   const selectedType = paymentMethodFilter.value;
   const specificPaymentMethodGroup = document.getElementById('specificPaymentMethodFilterGroup');
   
-  console.log('[PaymentMethodFilter] Selected type:', selectedType);
-  console.log('[PaymentMethodFilter] Current state.filters.paymentMethod:', state.filters.paymentMethod);
-  
   if (!selectedType || selectedType === 'cash') {
     // Hide specific payment method dropdown for cash or no selection
-    console.log('[PaymentMethodFilter] Hiding specific payment method dropdown (cash or empty)');
     specificPaymentMethodGroup.style.display = 'none';
     specificPaymentMethodFilter.value = '';
     state.filters.specificPaymentMethod = '';
@@ -314,11 +308,9 @@ function handlePaymentMethodFilterChange() {
   
   // Filter payment methods by selected type
   const methodsOfType = userPaymentMethods.filter(method => method.type === selectedType);
-  console.log('[PaymentMethodFilter] Found', methodsOfType.length, 'methods of type', selectedType);
   
   if (methodsOfType.length === 0) {
     // No saved methods of this type
-    console.log('[PaymentMethodFilter] No saved methods of type', selectedType, '- hiding dropdown');
     specificPaymentMethodGroup.style.display = 'none';
     specificPaymentMethodFilter.value = '';
     state.filters.specificPaymentMethod = '';
@@ -327,7 +319,6 @@ function handlePaymentMethodFilterChange() {
   }
   
   // Populate specific payment method dropdown
-  console.log('[PaymentMethodFilter] Populating dropdown with', methodsOfType.length, 'methods');
   specificPaymentMethodFilter.innerHTML = '<option value="">All ' + getPaymentTypeLabel(selectedType) + '</option>' +
     methodsOfType.map(method => {
       const displayName = getPaymentMethodDisplayName(method);
@@ -339,7 +330,6 @@ function handlePaymentMethodFilterChange() {
   specificPaymentMethodGroup.style.display = 'block';
   
   // Apply filters when payment method type is selected
-  console.log('[PaymentMethodFilter] Applying filters with paymentMethod =', state.filters.paymentMethod);
   applyFilters();
 }
 

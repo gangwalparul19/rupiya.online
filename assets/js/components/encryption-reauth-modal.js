@@ -106,7 +106,6 @@ class EncryptionReauthModal {
     skipBtn?.addEventListener('click', () => {
       this.hide();
       // User chose to skip - data will remain encrypted
-      console.log('[EncryptionReauth] User skipped re-authentication');
     });
 
     // Logout link
@@ -227,17 +226,12 @@ class EncryptionReauthModal {
       return false;
     }
 
-    console.log('[EncryptionReauth] Starting encryption check for user:', user.uid);
-
     // CRITICAL: Ensure encryption is fully initialized before proceeding
     // This handles the race condition where page loads before services-init completes
     const encryptionReady = await this._ensureEncryptionReady(user.uid);
-    
-    console.log('[EncryptionReauth] Encryption ready status:', encryptionReady);
 
     // Always call onSuccess - encryption is automatic
     if (onSuccess) {
-      console.log('[EncryptionReauth] Calling onSuccess callback');
       await onSuccess();
     }
     return false; // Never show modal in V5
@@ -247,16 +241,13 @@ class EncryptionReauthModal {
   async _ensureEncryptionReady(userId) {
     // First check if already ready
     if (encryptionService.isReady()) {
-      console.log('[EncryptionReauth] Encryption already ready');
       return true;
     }
 
     // Try direct initialization first
-    console.log('[EncryptionReauth] Encryption not ready, initializing directly...');
     try {
       const success = await authEncryptionHelper.initializeAfterLogin(null, userId);
       if (success && encryptionService.isReady()) {
-        console.log('[EncryptionReauth] Direct initialization successful');
         return true;
       }
     } catch (e) {
@@ -273,17 +264,14 @@ class EncryptionReauthModal {
       
       // Check if encryption is actually ready
       if (encryptionService.isReady()) {
-        console.log('[EncryptionReauth] Encryption ready after', retries, 'polls');
         return true;
       }
       
       // Try to initialize again every 10 retries
       if (retries > 0 && retries % 10 === 0) {
-        console.log('[EncryptionReauth] Retrying initialization (attempt', Math.floor(retries / 10) + 1, ')');
         try {
           await authEncryptionHelper.initializeAfterLogin(null, userId);
           if (encryptionService.isReady()) {
-            console.log('[EncryptionReauth] Retry initialization successful');
             return true;
           }
         } catch (e) {
@@ -297,7 +285,6 @@ class EncryptionReauthModal {
     }
     
     // Final attempt
-    console.log('[EncryptionReauth] Final initialization attempt...');
     try {
       await authEncryptionHelper.initializeAfterLogin(null, userId);
       return encryptionService.isReady();

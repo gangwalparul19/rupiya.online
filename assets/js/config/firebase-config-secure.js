@@ -37,7 +37,6 @@ let configFetchPromise = null;
 async function fetchFirebaseConfig() {
   // Return cached config if available
   if (firebaseConfigCache) {
-    console.log('[Firebase] Using cached configuration');
     return firebaseConfigCache;
   }
 
@@ -69,7 +68,6 @@ async function fetchFirebaseConfig() {
 
       // Cache the configuration
       firebaseConfigCache = data.config;
-      console.log('[Firebase] Configuration loaded from backend API');
 
       return firebaseConfigCache;
     } catch (error) {
@@ -98,8 +96,6 @@ export async function initializeFirebaseSecure() {
     const auth = getAuth(app);
     const db = getFirestore(app);
     const storage = getStorage(app);
-
-    console.log('[Firebase] Initialized successfully with secure configuration');
 
     return {
       app,

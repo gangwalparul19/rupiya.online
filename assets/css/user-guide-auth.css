@@ -20,25 +20,27 @@ body.user-logged-in .navbar {
     display: none !important;
 }
 
+/* Content wrapper for proper layout */
+.user-guide-content {
+    width: 100%;
+}
+
 /* Desktop - Show sidebar for logged-in users */
 @media (min-width: 769px) {
     body.user-logged-in .sidebar {
         display: flex !important;
         transform: translateX(0) !important;
+        position: fixed !important;
+        left: 0 !important;
+        top: 0 !important;
+        height: 100vh !important;
     }
     
     body.user-logged-in .mobile-header {
         display: none !important;
     }
     
-    body.user-logged-in .hero,
-    body.user-logged-in .container,
-    body.user-logged-in .cta,
-    body.user-logged-in .footer {
-        margin-left: 280px;
-    }
-    
-    body.user-logged-in .main-content {
+    body.user-logged-in .user-guide-content {
         margin-left: 280px;
     }
 }
@@ -49,6 +51,10 @@ body.user-logged-in .navbar {
         display: flex !important;
         transform: translateX(-100%);
         width: 280px;
+        position: fixed !important;
+        left: 0 !important;
+        top: 0 !important;
+        height: 100vh !important;
     }
     
     body.user-logged-in .sidebar.open {
@@ -70,16 +76,9 @@ body.user-logged-in .navbar {
         pointer-events: auto !important;
     }
     
-    /* Adjust content for mobile */
-    body.user-logged-in .hero,
-    body.user-logged-in .container,
-    body.user-logged-in .cta,
-    body.user-logged-in .footer {
+    body.user-logged-in .user-guide-content {
         margin-left: 0;
-    }
-    
-    body.user-logged-in .main-content {
-        margin-left: 0;
+        padding-top: 60px; /* Account for mobile header */
     }
 }
 

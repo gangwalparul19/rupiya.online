@@ -16,8 +16,6 @@ class FeatureCountDisplay {
    * Initialize feature count display
    */
   async init() {
-    console.log('[FeatureCountDisplay] Initializing...');
-    
     // Wait for feature config to be initialized
     await featureConfig.init();
     
@@ -31,8 +29,6 @@ class FeatureCountDisplay {
     window.addEventListener('featuresUpdated', () => this.updateDisplay());
     window.addEventListener('featureToggled', () => this.updateDisplay());
     window.addEventListener('featuresReset', () => this.updateDisplay());
-    
-    console.log('[FeatureCountDisplay] Initialized');
   }
 
   /**
@@ -42,8 +38,6 @@ class FeatureCountDisplay {
     // Look for elements with data-feature-count attribute
     const elements = document.querySelectorAll('[data-feature-count]');
     this.displayElements = Array.from(elements);
-    
-    console.log('[FeatureCountDisplay] Found', this.displayElements.length, 'display elements');
   }
 
   /**
@@ -86,8 +80,6 @@ class FeatureCountDisplay {
   updateDisplay() {
     const enabledCount = this.getEnabledFeatureCount();
     const totalCount = this.getTotalFeatureCount();
-    
-    console.log('[FeatureCountDisplay] Updating display - Enabled:', enabledCount, 'Total:', totalCount);
     
     this.displayElements.forEach(element => {
       const displayType = element.getAttribute('data-feature-count');

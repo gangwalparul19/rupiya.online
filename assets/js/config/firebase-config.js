@@ -42,7 +42,6 @@ export const storage = getStorage(app);
 
 // Auth persistence is LOCAL by default in Firebase v10+
 // No need to call setPersistence explicitly
-console.log('[Firebase] Initialized successfully');
 
 // Export app for other uses
 export default app;

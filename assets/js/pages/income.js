@@ -285,12 +285,8 @@ function handlePaymentMethodFilterChange() {
   const selectedType = paymentMethodFilter.value;
   const specificPaymentMethodGroup = document.getElementById('specificPaymentMethodFilterGroup');
   
-  console.log('[PaymentMethodFilter] Selected type:', selectedType);
-  console.log('[PaymentMethodFilter] Current state.filters.paymentMethod:', state.filters.paymentMethod);
-  
   if (!selectedType || selectedType === 'cash') {
     // Hide specific payment method dropdown for cash or no selection
-    console.log('[PaymentMethodFilter] Hiding specific payment method dropdown (cash or empty)');
     specificPaymentMethodGroup.style.display = 'none';
     specificPaymentMethodFilter.value = '';
     state.filters.specificPaymentMethod = '';
@@ -300,11 +296,9 @@ function handlePaymentMethodFilterChange() {
   
   // Filter payment methods by selected type
   const methodsOfType = userPaymentMethods.filter(method => method.type === selectedType);
-  console.log('[PaymentMethodFilter] Found', methodsOfType.length, 'methods of type', selectedType);
   
   if (methodsOfType.length === 0) {
     // No saved methods of this type
-    console.log('[PaymentMethodFilter] No saved methods of type', selectedType, '- hiding dropdown');
     specificPaymentMethodGroup.style.display = 'none';
     specificPaymentMethodFilter.value = '';
     state.filters.specificPaymentMethod = '';
@@ -313,7 +307,6 @@ function handlePaymentMethodFilterChange() {
   }
   
   // Populate specific payment method dropdown
-  console.log('[PaymentMethodFilter] Populating dropdown with', methodsOfType.length, 'methods');
   specificPaymentMethodFilter.innerHTML = '<option value="">All ' + getPaymentTypeLabel(selectedType) + '</option>' +
     methodsOfType.map(method => {
       const displayName = getPaymentMethodDisplayName(method);
@@ -325,7 +318,6 @@ function handlePaymentMethodFilterChange() {
   specificPaymentMethodGroup.style.display = 'block';
   
   // Apply filters when payment method type is selected
-  console.log('[PaymentMethodFilter] Applying filters with paymentMethod =', state.filters.paymentMethod);
   applyFilters();
 }
 
@@ -374,8 +366,6 @@ async function loadIncome() {
     emptyState.style.display = 'none';
     incomeList.style.display = 'none';
     
-    console.log('[LoadIncome] Starting to load income');
-    
     // Get KPI summary for ALL income (unfiltered)
     const kpiSummary = await firestoreService.getIncomeKPISummary();
     state.allIncomeKPI = {
@@ -386,15 +376,11 @@ async function loadIncome() {
     
     state.totalCount = kpiSummary.totalCount;
     
-    console.log('[LoadIncome] Total income in DB:', state.totalCount);
-    
     // Update KPI cards with all income
     updateIncomeKPIsFromSummary(kpiSummary);
     
     // Build filters array for Firestore query
     const filters = buildFirestoreFilters();
-    
-    console.log('[LoadIncome] Built Firestore filters:', JSON.stringify(filters));
     
     // Check if filters are applied
     // NOTE: Payment method filters are encrypted, so they're applied client-side
@@ -406,9 +392,6 @@ async function loadIncome() {
                        state.filters.dateFrom || 
                        state.filters.dateTo;
     
-    console.log('[LoadIncome] Has filters:', hasFilters);
-    console.log('[LoadIncome] State filters:', JSON.stringify(state.filters));
-    
     if (hasFilters) {
       // Check if we have Firestore filters or only client-side filters
       const hasFirestoreFilters = filters.length > 0;
@@ -419,12 +402,8 @@ async function loadIncome() {
                                     state.filters.dateFrom || 
                                     state.filters.dateTo;
       
-      console.log('[LoadIncome] Has Firestore filters:', hasFirestoreFilters);
-      console.log('[LoadIncome] Has client-side filters:', hasClientSideFilters);
-      
       // If only client-side filters, load all data first
       if (!hasFirestoreFilters && hasClientSideFilters) {
-        console.log('[LoadIncome] Loading all data for client-side filtering');
         const result = await firestoreService.getIncomePaginated({ 
           pageSize: 1000,
           filters: [] // No Firestore filters
@@ -437,7 +416,6 @@ async function loadIncome() {
         updateFilteredIncomeKPIs();
       } else {
         // With Firestore filters: Load filtered data
-        console.log('[LoadIncome] Loading with Firestore filters');
         const result = await firestoreService.getIncomePaginated({ 
           pageSize: 1000,
           filters: filters
@@ -457,16 +435,12 @@ async function loadIncome() {
         filters: filters
       });
       
-      console.log('[LoadIncome] Loaded initial batch:', result.data.length);
-      
       state.income = result.data;
       state.lastDoc = result.lastDoc;
       state.hasMore = result.hasMore;
       state.filteredIncome = [...state.income];
       state.filteredCount = state.totalCount;
     }
-    
-    console.log('[LoadIncome] Income in memory:', state.income.length);
     
     // Reset to page 1
     state.currentPage = 1;
@@ -487,26 +461,22 @@ async function loadMoreIncomeIfNeeded(targetPage) {
   
   // Check if we have enough data loaded
   if (requiredRecords <= state.income.length) {
-    console.log('[LoadMore] Already have enough data');
     return true; // We have enough data
   }
   
   // Check if there's more data to load
   if (!state.hasMore) {
-    console.log('[LoadMore] No more data available');
     return false; // No more data available
   }
   
   // Check if already loading
   if (state.loadingMore) {
-    console.log('[LoadMore] Already loading');
     return false;
   }
   
   let loadingToast = null;
   try {
     state.loadingMore = true;
-    console.log('[LoadMore] Loading more data for page', targetPage);
     
     // Show loading indicator
     loadingToast = toast.info('Loading more income...', 0);
@@ -516,15 +486,11 @@ async function loadMoreIncomeIfNeeded(targetPage) {
     // Load in batches of 50, or exactly what we need (whichever is larger)
     const batchSize = Math.max(50, recordsNeeded);
     
-    console.log('[LoadMore] Need', recordsNeeded, 'more records, loading batch of', batchSize);
-    
     const result = await firestoreService.getIncomePaginated({
       pageSize: batchSize,
       lastDoc: state.lastDoc,
       filters: buildFirestoreFilters()
     });
-    
-    console.log('[LoadMore] Loaded additional:', result.data.length);
     
     // Append new data
     state.income = [...state.income, ...result.data];
@@ -639,13 +605,10 @@ async function handlePageChange(page) {
 
 // Go to specific page
 async function goToPage(page) {
-  console.log('[GoToPage] Navigating to page:', page);
-  
   // Check if we need to load more data
   const hasEnoughData = await loadMoreIncomeIfNeeded(page);
   
   if (!hasEnoughData && page > Math.ceil(state.income.length / state.itemsPerPage)) {
-    console.log('[GoToPage] Not enough data for page', page);
     toast.warning('No more income to load');
     return;
   }
@@ -805,7 +768,6 @@ function buildFirestoreFilters() {
   // Source filter - can be done in Firestore with index
   if (state.filters.source) {
     filters.push({ field: 'source', operator: '==', value: state.filters.source });
-    console.log('[BuildFilters] Added source filter:', state.filters.source);
   }
   
   // NOTE: Payment method and specific payment method filters are encrypted fields
@@ -814,7 +776,6 @@ function buildFirestoreFilters() {
   
   // Note: Date range, search, and family member filters are applied client-side
   
-  console.log('[BuildFilters] Total filters:', filters.length, 'Filters:', JSON.stringify(filters));
   return filters;
 }
 
@@ -827,21 +788,16 @@ function applyClientSideFilters() {
   
   // Payment method filter - encrypted field, must be client-side
   if (state.filters.paymentMethod) {
-    console.log('[Filter] Filtering by payment method:', state.filters.paymentMethod);
     filtered = filtered.filter(i => i.paymentMethod === state.filters.paymentMethod);
-    console.log('[Filter] After payment method filter:', filtered.length, 'income');
   }
   
   // Specific payment method filter - encrypted field, must be client-side
   if (state.filters.specificPaymentMethod) {
-    console.log('[Filter] Filtering by specific payment method:', state.filters.specificPaymentMethod);
     filtered = filtered.filter(i => i.specificPaymentMethodId === state.filters.specificPaymentMethod);
-    console.log('[Filter] After specific payment method filter:', filtered.length, 'income');
   }
   
   // Family member filter (for split income) - single select
   if (state.filters.familyMember) {
-    console.log('[Filter] Filtering by family member:', state.filters.familyMember);
     filtered = filtered.filter(i => {
       if (!i.hasSplit || !i.splitDetails) return false;
       const hasMatch = i.splitDetails.some(split => {
@@ -851,7 +807,6 @@ function applyClientSideFilters() {
       });
       return hasMatch;
     });
-    console.log('[Filter] Filtered income count:', filtered.length);
   }
   
   // Date range filter - client-side for now
@@ -929,18 +884,9 @@ function updateCounts() {
 
 // Render income
 function renderIncome() {
-  console.log('[Render] Starting render with:', {
-    incomeInMemory: state.income.length,
-    filteredCount: state.filteredIncome.length,
-    totalCount: state.totalCount,
-    currentPage: state.currentPage,
-    itemsPerPage: state.itemsPerPage
-  });
-  
   loadingState.style.display = 'none';
   
   if (state.filteredIncome.length === 0) {
-    console.log('[Render] No income to show');
     emptyState.style.display = 'flex';
     incomeList.style.display = 'none';
     const paginationContainer = document.getElementById('paginationContainer');
@@ -968,15 +914,6 @@ function renderIncome() {
   const endIndex = startIndex + state.itemsPerPage;
   const pageIncome = state.filteredIncome.slice(startIndex, endIndex);
   
-  console.log('[Render] Pagination calculated:', {
-    totalRecords,
-    totalPages,
-    startIndex,
-    endIndex,
-    pageIncomeCount: pageIncome.length,
-    hasFilters
-  });
-  
   // Render income cards
   incomeList.innerHTML = pageIncome.map(income => createIncomeCard(income)).join('');
   
@@ -994,25 +931,16 @@ function renderPagination(totalPages) {
   const prevBtn = document.getElementById('prevPageBtn');
   const nextBtn = document.getElementById('nextPageBtn');
   
-  console.log('[Pagination] Rendering pagination:', { 
-    totalPages, 
-    currentPage: state.currentPage,
-    filteredCount: state.filteredIncome.length,
-    itemsPerPage: state.itemsPerPage
-  });
-  
   if (!paginationContainer || !paginationNumbers) {
     console.error('[Pagination] Container or numbers div not found');
     return;
   }
   
   if (totalPages <= 1) {
-    console.log('[Pagination] Only 1 page, hiding pagination');
     paginationContainer.style.display = 'none';
     return;
   }
   
-  console.log('[Pagination] Showing pagination with', totalPages, 'pages');
   paginationContainer.style.display = 'flex';
   
   // Update prev/next buttons
@@ -1021,7 +949,6 @@ function renderPagination(totalPages) {
   
   // Generate page numbers
   const pageNumbers = generatePageNumbers(state.currentPage, totalPages);
-  console.log('[Pagination] Generated page numbers:', pageNumbers);
   
   paginationNumbers.innerHTML = pageNumbers.map(page => {
     if (page === '...') {
@@ -1036,7 +963,6 @@ function renderPagination(totalPages) {
   paginationNumbers.querySelectorAll('.page-number').forEach(btn => {
     btn.addEventListener('click', () => {
       const page = parseInt(btn.dataset.page);
-      console.log('[Pagination] Page button clicked:', page);
       goToPage(page);
     });
   });
@@ -1305,7 +1231,6 @@ function initSwipeActions() {
 async function loadUserPaymentMethods() {
   try {
     userPaymentMethods = await paymentMethodsService.getPaymentMethods();
-    console.log('Loaded payment methods:', userPaymentMethods);
   } catch (error) {
     console.error('Error loading payment methods:', error);
     userPaymentMethods = [];
@@ -1489,7 +1414,6 @@ function setupEventListeners() {
   if (familyMemberFilter) {
     familyMemberFilter.addEventListener('change', () => {
       state.filters.familyMember = familyMemberFilter.value;
-      console.log('[Filter] Selected family member:', state.filters.familyMember);
       applyFilters();
     });
   }

@@ -82,7 +82,6 @@ class CreditCardService {
   async updateCardBalanceOnExpense(paymentMethodId, expenseAmount) {
     try {
       if (!paymentMethodId) {
-        console.log('[CreditCardService] No payment method ID provided, skipping balance update');
         return { success: true };
       }
 
@@ -90,7 +89,6 @@ class CreditCardService {
       const card = await this.getCreditCardByPaymentMethodId(paymentMethodId);
       
       if (!card) {
-        console.log('[CreditCardService] No credit card found for payment method:', paymentMethodId);
         return { success: true };
       }
 
@@ -101,16 +99,6 @@ class CreditCardService {
         currentBalance: newBalance,
         updatedAt: Timestamp.now()
       });
-
-      if (result.success) {
-        console.log('[CreditCardService] Updated card balance:', {
-          cardId: card.id,
-          cardName: card.cardName,
-          previousBalance: card.currentBalance,
-          newBalance: newBalance,
-          expenseAmount: expenseAmount
-        });
-      }
 
       return result;
     } catch (error) {
@@ -126,7 +114,6 @@ class CreditCardService {
   async updateCardBalanceOnExpenseDelete(paymentMethodId, expenseAmount) {
     try {
       if (!paymentMethodId) {
-        console.log('[CreditCardService] No payment method ID provided, skipping balance update');
         return { success: true };
       }
 
@@ -134,7 +121,6 @@ class CreditCardService {
       const card = await this.getCreditCardByPaymentMethodId(paymentMethodId);
       
       if (!card) {
-        console.log('[CreditCardService] No credit card found for payment method:', paymentMethodId);
         return { success: true };
       }
 
@@ -145,16 +131,6 @@ class CreditCardService {
         currentBalance: newBalance,
         updatedAt: Timestamp.now()
       });
-
-      if (result.success) {
-        console.log('[CreditCardService] Updated card balance on delete:', {
-          cardId: card.id,
-          cardName: card.cardName,
-          previousBalance: card.currentBalance,
-          newBalance: newBalance,
-          expenseAmount: expenseAmount
-        });
-      }
 
       return result;
     } catch (error) {
@@ -313,15 +289,6 @@ class CreditCardService {
       const result = await this.updateCreditCard(cardId, {
         currentBalance: newBalance
       });
-
-      if (result.success) {
-        console.log('[CreditCardService] Payment made:', {
-          cardId: cardId,
-          paymentAmount: paymentAmount,
-          previousBalance: card.data.currentBalance,
-          newBalance: newBalance
-        });
-      }
 
       return result;
     } catch (error) {

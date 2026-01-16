@@ -33,29 +33,33 @@ export async function loadUserProfile() {
       userEmail.textContent = user.email || '';
     }
 
-    // Update user avatar with initials
+    // Update user avatar with photo or initials
     if (userAvatar) {
-      const displayName = user.displayName || user.email || 'User';
-      const initials = displayName
-        .split(' ')
-        .map(n => n[0])
-        .join('')
-        .toUpperCase()
-        .slice(0, 2) || 'U';
-      
-      userAvatar.textContent = initials;
+      if (user.photoURL) {
+        // Display user's profile photo
+        userAvatar.innerHTML = `<img src="${user.photoURL}" alt="User Avatar">`;
+      } else {
+        // Display initials as fallback
+        const displayName = user.displayName || user.email || 'User';
+        const initials = displayName
+          .split(' ')
+          .map(n => n[0])
+          .join('')
+          .toUpperCase()
+          .slice(0, 2) || 'U';
+        
+        userAvatar.textContent = initials;
+      }
     }
   } catch (error) {
     console.error('[UserProfile] Error loading profile:', error);
     
-    // Set default values on error
-    const userName = document.getElementById('userName');
-    const userEmail = document.getElementById('userEmail');
+    // Set default initials on error
     const userAvatar = document.getElementById('userAvatar');
     
-    if (userName) userName.textContent = 'User';
-    if (userEmail) userEmail.textContent = '';
-    if (userAvatar) userAvatar.textContent = 'U';
+    if (userAvatar) {
+      userAvatar.textContent = 'U';
+    }
   }
 }
 

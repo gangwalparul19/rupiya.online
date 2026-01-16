@@ -2,7 +2,7 @@
 // Provides offline support and caching
 
 // CACHE_VERSION is injected by build.js during deployment
-const CACHE_VERSION = '1.2.223';
+const CACHE_VERSION = '1.2.224';
 const CACHE_NAME = `rupiya-v${CACHE_VERSION}`;
 const RUNTIME_CACHE = `rupiya-runtime-v${CACHE_VERSION}`;
 
@@ -213,18 +213,12 @@ const LAZY_CACHE_PAGES = [
 
 // Install event - cache critical assets only
 self.addEventListener('install', (event) => {
-  console.log('[Service Worker] Installing...');
-
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
-        console.log('[Service Worker] Caching critical assets only');
-        console.log(`[Service Worker] Critical assets: ${CRITICAL_ASSETS.length} files`);
-        console.log(`[Service Worker] Lazy cache pages: ${LAZY_CACHE_PAGES.length} files (cached on first visit)`);
         return cache.addAll(CRITICAL_ASSETS);
       })
       .then(() => {
-        console.log('[Service Worker] Installed successfully - Fast install with lazy caching');
         return self.skipWaiting();
       })
       .catch((error) => {
@@ -235,8 +229,6 @@ self.addEventListener('install', (event) => {
 
 // Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
-  console.log('[Service Worker] Activating...');
-
   event.waitUntil(
     caches.keys()
       .then((cacheNames) => {
@@ -246,13 +238,11 @@ self.addEventListener('activate', (event) => {
               return cacheName !== CACHE_NAME && cacheName !== RUNTIME_CACHE;
             })
             .map((cacheName) => {
-              console.log('[Service Worker] Deleting old cache:', cacheName);
               return caches.delete(cacheName);
             })
         );
       })
       .then(() => {
-        console.log('[Service Worker] Activated successfully');
         return self.clients.claim();
       })
   );
@@ -361,7 +351,6 @@ self.addEventListener('fetch', (event) => {
               })
               .then(() => {
                 if (isLazyCachePage(url.pathname)) {
-                  console.log('[Service Worker] Lazy cached:', url.pathname);
                 }
               })
               .catch((error) => {
@@ -403,7 +392,6 @@ async function updateCache(request) {
     if (response && response.status === 200) {
       const cache = await caches.open(CACHE_NAME);
       await cache.put(request, response);
-      console.log('[Service Worker] Cache updated:', request.url);
     }
   } catch (error) {
     // Silently fail - we're already serving from cache
@@ -414,8 +402,6 @@ async function updateCache(request) {
 
 // Background sync for offline actions
 self.addEventListener('sync', (event) => {
-  console.log('[Service Worker] Background sync:', event.tag);
-
   if (event.tag === 'sync-data') {
     event.waitUntil(syncData());
   }
@@ -426,7 +412,6 @@ async function syncData() {
   try {
     // Get pending actions from IndexedDB or localStorage
     // Sync with Firebase
-    console.log('[Service Worker] Syncing data...');
 
     // Notify clients that sync is complete
     const clients = await self.clients.matchAll();
@@ -443,8 +428,6 @@ async function syncData() {
 
 // Push notifications (future feature)
 self.addEventListener('push', (event) => {
-  console.log('[Service Worker] Push notification received');
-
   const options = {
     body: event.data ? event.data.text() : 'New notification from Rupiya',
     icon: '/android-chrome-192x192.png',
@@ -475,8 +458,6 @@ self.addEventListener('push', (event) => {
 
 // Notification click handler
 self.addEventListener('notificationclick', (event) => {
-  console.log('[Service Worker] Notification clicked:', event.action);
-
   event.notification.close();
 
   if (event.action === 'view') {
@@ -488,8 +469,6 @@ self.addEventListener('notificationclick', (event) => {
 
 // Message handler for communication with clients
 self.addEventListener('message', (event) => {
-  console.log('[Service Worker] Message received:', event.data);
-
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
   }
@@ -514,13 +493,9 @@ self.addEventListener('periodicsync', (event) => {
 
 async function updateData() {
   try {
-    console.log('[Service Worker] Periodic sync: updating data');
     // Fetch latest data from Firebase
     // Update local cache
   } catch (error) {
     console.error('[Service Worker] Periodic sync failed:', error);
   }
 }
-
-console.log('[Service Worker] Loaded');
-

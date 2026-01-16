@@ -19,7 +19,6 @@
   function resetStuckButtons() {
     // First, remove btn-loading from ALL buttons (even non-disabled ones)
     document.querySelectorAll('.btn-loading').forEach(btn => {
-      console.log('[Button Fix] Removing btn-loading class from:', btn.id || btn.className);
       btn.classList.remove('btn-loading');
     });
     
@@ -61,7 +60,6 @@
       const hasBtnLoading = btn.classList.contains('btn-loading');
       
       if (hasVisibleSpinner || isLoadingText || hasSpinnerInHTML || hasBtnLoading) {
-        console.log('[Button Fix] Resetting stuck button:', btn.id || btn.className);
         btn.disabled = false;
         btn.classList.remove('btn-loading');
         
@@ -152,7 +150,6 @@
   window.addEventListener('pageshow', (event) => {
     if (event.persisted) {
       // Page was restored from bfcache
-      console.log('[Button Fix] Page restored from cache, resetting buttons');
       resetStuckButtons();
     }
   });

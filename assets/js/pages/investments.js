@@ -1177,8 +1177,6 @@ async function handleSymbolSearch(e) {
   const typeInput = document.getElementById('type');
   const type = typeInput?.value || 'all';
 
-  console.log('Symbol search triggered:', { query, type });
-
   if (query.length < 1) {
     const dropdown = document.getElementById('symbolDropdown');
     if (dropdown) dropdown.style.display = 'none';
@@ -1195,9 +1193,7 @@ async function handleSymbolSearch(e) {
     
     isSearching = true;
     try {
-      console.log('Executing search for:', query);
       symbolSearchResults = await symbolSearchService.searchSymbols(query, type, 15);
-      console.log('Search results received:', symbolSearchResults);
       renderSymbolDropdown(symbolSearchResults);
     } catch (error) {
       console.error('Error searching symbols:', error);
@@ -1266,8 +1262,6 @@ function updateSymbolSelection(items) {
 
 // Render symbol dropdown
 function renderSymbolDropdown(results) {
-  console.log('Rendering dropdown with results:', results);
-
   // Try to find existing dropdown first
   let dropdown = document.getElementById('symbolDropdown');
 
@@ -1281,7 +1275,6 @@ function renderSymbolDropdown(results) {
       dropdown.id = 'symbolDropdown';
       dropdown.className = 'symbol-dropdown';
       wrapper.appendChild(dropdown);
-      console.log('Created new dropdown in wrapper');
     } else {
       console.error('Could not find symbol input wrapper');
       return;
@@ -1291,7 +1284,6 @@ function renderSymbolDropdown(results) {
   if (results.length === 0) {
     dropdown.innerHTML = '<div class="symbol-item no-results">No symbols found. You can still enter a custom symbol.</div>';
     dropdown.style.display = 'block';
-    console.log('No results found, showing message');
     return;
   }
 
@@ -1324,7 +1316,6 @@ function renderSymbolDropdown(results) {
       const symbol = item.dataset.symbol;
       const type = item.dataset.type;
       const name = item.dataset.name;
-      console.log('Symbol selected:', { symbol, type, name });
       selectSymbol(symbol, type, name);
     };
     
@@ -1344,7 +1335,6 @@ function renderSymbolDropdown(results) {
   });
 
   dropdown.style.display = 'block';
-  console.log('Dropdown rendered with', results.length, 'items');
 }
 
 // Select symbol from dropdown
@@ -1382,12 +1372,8 @@ async function selectSymbol(symbol, type, name = '') {
       currentPriceInput.placeholder = 'Fetching price...';
       currentPriceInput.disabled = true;
       
-      console.log(`Fetching live price for ${symbol}...`);
-      
       // Get price data from Google Sheets
       const priceData = await googleSheetsPriceService.getLivePrice(symbol);
-      
-      console.log('Price data received:', priceData);
       
       if (priceData && priceData.price) {
         // Set name if available
@@ -1402,9 +1388,7 @@ async function selectSymbol(symbol, type, name = '') {
         if (priceData.currency === 'USD') {
           // Convert USD to INR
           try {
-            console.log(`Converting ${priceData.price} USD to INR...`);
             inrPrice = await googleSheetsPriceService.convertUSDToINR(priceData.price);
-            console.log(`Converted to ${inrPrice} INR`);
             displayMessage = `${priceData.name || symbol}\nPrice: $${priceData.price.toFixed(2)} USD = ₹${inrPrice.toFixed(2)} INR`;
           } catch (conversionError) {
             console.warn('Could not convert to INR:', conversionError);
@@ -1431,13 +1415,8 @@ async function selectSymbol(symbol, type, name = '') {
         // Show additional info if available
         if (priceData.change !== undefined) {
           const changeSign = priceData.change >= 0 ? '+' : '';
-          console.log(
-            `%cChange: ${changeSign}${priceData.change.toFixed(2)} (${changeSign}${priceData.changePercent?.toFixed(2)}%)`,
-            `color: ${priceData.change >= 0 ? 'green' : 'red'}`
-          );
         }
       } else {
-        console.warn('No price data available');
         showToast(`Symbol selected: ${name || symbol}. Please enter price manually.`, 'info');
       }
       

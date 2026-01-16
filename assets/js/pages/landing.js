@@ -263,7 +263,6 @@ function isInStandaloneMode() {
 // Check if already installed
 if (isInStandaloneMode()) {
   // Already installed, don't show install options
-  console.log('App is already installed');
   if (heroInstallBtn) {
     heroInstallBtn.style.display = 'none';
   }
@@ -303,8 +302,6 @@ if (isInStandaloneMode()) {
     e.preventDefault();
     // Stash the event so it can be triggered later
     deferredPrompt = e;
-    
-    console.log('PWA install prompt available (Android/Desktop)');
   });
 }
 
@@ -383,10 +380,7 @@ if (heroInstallBtn) {
       // Wait for the user to respond to the prompt
       const { outcome } = await deferredPrompt.userChoice;
       
-      console.log(`User response to the install prompt: ${outcome}`);
-      
       if (outcome === 'accepted') {
-        console.log('User accepted the install prompt');
         // Hide the install button
         if (heroInstallBtn) {
           heroInstallBtn.style.display = 'none';
@@ -409,8 +403,6 @@ if (heroInstallBtn) {
 
 // Listen for app installed event
 window.addEventListener('appinstalled', () => {
-  console.log('PWA was installed');
-  
   // Hide install button
   if (heroInstallBtn) {
     heroInstallBtn.style.display = 'none';

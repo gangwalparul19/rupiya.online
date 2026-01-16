@@ -246,7 +246,6 @@ function showUpdateNotification(onUpdate) {
     updateNowBtn.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
-      console.log('[PWA] Update Now clicked');
       onUpdate();
       updateBanner.remove();
       // Reload after user clicks update
@@ -260,11 +259,8 @@ function showUpdateNotification(onUpdate) {
     updateLaterBtn.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
-      console.log('[PWA] Update Later clicked');
       updateBanner.remove();
     });
   }
 }
-
-console.log(`[PWA] Setup loaded - Version ${APP_VERSION}`);
 

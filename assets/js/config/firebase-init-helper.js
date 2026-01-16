@@ -30,7 +30,6 @@ export async function initializeFirebase() {
   initializationPromise = (async () => {
     try {
       // Try secure initialization (fetching from API)
-      console.log('[Firebase] Attempting secure initialization from API...');
       firebaseInstance = await initializeFirebaseSecure();
       return firebaseInstance;
     } catch (error) {
@@ -68,7 +67,6 @@ export async function initializeFirebase() {
           storage: getStorage(app)
         };
 
-        console.log('[Firebase] Initialized with fallback (environment variables)');
         return firebaseInstance;
       } catch (fallbackError) {
         console.error('[Firebase] Fallback initialization also failed:', fallbackError);

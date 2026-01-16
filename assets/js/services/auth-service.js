@@ -189,24 +189,16 @@ class AuthService {
   // Sign in with Google
   async signInWithGoogle() {
     try {
-      console.log('[Auth Service] Starting Google sign-in...');
       const provider = new GoogleAuthProvider();
       const userCredential = await signInWithPopup(auth, provider);
       
       log('Google sign-in successful');
-      console.log('[Auth Service] User credential received:', {
-        uid: userCredential.user.uid,
-        email: userCredential.user.email,
-        displayName: userCredential.user.displayName
-      });
       
       // Set auth flag for quick check
       localStorage.setItem('rupiya_user_logged_in', 'true');
       
       if (this.userService) {
-        console.log('[Auth Service] Calling getOrCreateUserProfile from signInWithGoogle...');
         const result = await this.userService.getOrCreateUserProfile(userCredential.user);
-        console.log('[Auth Service] getOrCreateUserProfile result:', result);
       } else {
         console.warn('[Auth Service] userService not available in signInWithGoogle');
       }
