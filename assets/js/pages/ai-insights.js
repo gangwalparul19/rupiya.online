@@ -11,11 +11,6 @@ import toast from '../components/toast.js';
 import { formatCurrency, formatCurrencyCompact } from '../utils/helpers.js';
 import encryptionReauthModal from '../components/encryption-reauth-modal.js';
 import privacyMode from '../utils/privacy-mode.js';
-import { initPrivacyModeButton } from '../components/privacy-mode-button.js';
-
-// Initialize privacy mode button
-initPrivacyModeButton();
-
 
 let aiEngine = null; // Will be lazy loaded
 

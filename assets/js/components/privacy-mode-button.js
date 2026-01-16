@@ -26,23 +26,20 @@ export function initPrivacyModeButton() {
  * Create and attach privacy button to header
  */
 function createAndAttachPrivacyButton() {
-    // Add privacy button to dashboard, privacy-settings, and ai-insights pages
+    // Only add privacy button to dashboard page
     const pathname = window.location.pathname.toLowerCase();
     const href = window.location.href.toLowerCase();
     
-    // Check if we're on dashboard, privacy-settings, or ai-insights
+    // Check if we're on dashboard page only
     const isDashboard = pathname.includes('dashboard') || href.includes('dashboard');
-    const isPrivacySettings = pathname.includes('privacy-settings') || href.includes('privacy-settings');
-    const isAIInsights = pathname.includes('ai-insights') || href.includes('ai-insights');
     
-    // Skip adding button if not on these pages
-    if (!isDashboard && !isPrivacySettings && !isAIInsights) {
+    // Skip adding button if not on dashboard
+    if (!isDashboard) {
         console.log('[PrivacyModeButton] Skipping privacy button on:', pathname);
         return;
     }
     
-    console.log('[PrivacyModeButton] Adding privacy button to:', 
-        isDashboard ? 'dashboard' : isPrivacySettings ? 'privacy-settings' : 'ai-insights');
+    console.log('[PrivacyModeButton] Adding privacy button to dashboard');
     
     // Try to add to mobile header first
     const mobileHeaderActions = document.querySelector('.mobile-header-actions');
@@ -109,8 +106,7 @@ function createPrivacyButton() {
 
 /**
  * Update privacy button appearance
- * When privacy mode is ON, show button as indicator but make it non-clickable
- * Users must go to settings page to disable privacy mode
+ * When privacy mode is ON, hide the button - user must go to privacy settings to disable
  */
 function updatePrivacyButton() {
     const btn = document.getElementById('privacyModeBtn');
@@ -120,15 +116,11 @@ function updatePrivacyButton() {
     
     buttons.forEach(button => {
         if (privacyMode.isEnabled()) {
-            // Show button as indicator but make it non-clickable
-            button.style.display = '';
-            button.classList.add('active', 'privacy-mode-locked');
-            button.setAttribute('title', 'Privacy Mode: ON - Go to Settings to disable');
-            button.setAttribute('aria-pressed', 'true');
-            button.style.pointerEvents = 'none';
-            button.style.cursor = 'not-allowed';
-            button.style.opacity = '0.7';
+            // Hide button when privacy mode is ON
+            // User must go to privacy settings page to disable it
+            button.style.display = 'none';
         } else {
+            // Show button when privacy mode is OFF
             button.style.display = '';
             button.classList.remove('active', 'privacy-mode-locked');
             button.setAttribute('title', 'Privacy Mode: OFF - Click to enable');

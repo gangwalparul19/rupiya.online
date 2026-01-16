@@ -2,11 +2,11 @@
    RUPIYA - EXPENSES PAGE STYLES
    ============================================ */
 
-/* KPI Summary Cards */
+/* KPI Summary Cards - Full width on desktop */
 .kpi-summary {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
+  gap: 1.5rem;
   margin-bottom: 1.5rem;
 }
 

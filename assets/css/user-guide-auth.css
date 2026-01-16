@@ -1,0 +1,93 @@
+/**
+ * User Guide - Authentication-based Layout
+ * Shows sidebar for logged-in users, custom navbar for guests
+ */
+
+/* Hide sidebar and mobile header by default (for guests) */
+body:not(.user-logged-in) .sidebar,
+body:not(.user-logged-in) .sidebar-overlay,
+body:not(.user-logged-in) .mobile-header {
+    display: none !important;
+}
+
+/* Show custom navbar for guests */
+body:not(.user-logged-in) .navbar {
+    display: block !important;
+}
+
+/* Hide custom navbar for logged-in users */
+body.user-logged-in .navbar {
+    display: none !important;
+}
+
+/* Desktop - Show sidebar for logged-in users */
+@media (min-width: 769px) {
+    body.user-logged-in .sidebar {
+        display: flex !important;
+        transform: translateX(0) !important;
+    }
+    
+    body.user-logged-in .mobile-header {
+        display: none !important;
+    }
+    
+    body.user-logged-in .hero,
+    body.user-logged-in .container,
+    body.user-logged-in .cta,
+    body.user-logged-in .footer {
+        margin-left: 280px;
+    }
+    
+    body.user-logged-in .main-content {
+        margin-left: 280px;
+    }
+}
+
+/* Mobile - Show hamburger menu for logged-in users */
+@media (max-width: 768px) {
+    body.user-logged-in .sidebar {
+        display: flex !important;
+        transform: translateX(-100%);
+        width: 280px;
+    }
+    
+    body.user-logged-in .sidebar.open {
+        transform: translateX(0) !important;
+    }
+    
+    body.user-logged-in .mobile-header {
+        display: flex !important;
+        z-index: 10001 !important;
+    }
+    
+    body.user-logged-in .sidebar-overlay {
+        display: block !important;
+    }
+    
+    body.user-logged-in .sidebar-overlay.active {
+        opacity: 1 !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+    }
+    
+    /* Adjust content for mobile */
+    body.user-logged-in .hero,
+    body.user-logged-in .container,
+    body.user-logged-in .cta,
+    body.user-logged-in .footer {
+        margin-left: 0;
+    }
+    
+    body.user-logged-in .main-content {
+        margin-left: 0;
+    }
+}
+
+/* Ensure sidebar has proper z-index */
+body.user-logged-in .sidebar {
+    z-index: 10000 !important;
+}
+
+body.user-logged-in .sidebar-overlay {
+    z-index: 9999 !important;
+}

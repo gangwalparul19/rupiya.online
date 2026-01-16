@@ -7,6 +7,9 @@
     <meta name="description" content="Complete user guide for Rupiya - Learn how to track expenses, manage budgets, investments, and more. Step-by-step tutorials for all features.">
     <meta name="theme-color" content="#667eea">
     <link rel="icon" href="logo.png" type="image/png">
+    <link rel="stylesheet" href="assets/css/user-guide.css">
+    <link rel="stylesheet" href="assets/css/user-guide-auth.css">
+    <link rel="stylesheet" href="assets/css/dashboard-common.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
@@ -1051,5 +1054,24 @@
     <script>
         HeaderComponent.inject('header-container', 'landing', 'guide');
     </script>
+    
+    <!-- Check if user is logged in and add class to body -->
+    <script type="module">
+        import authService from './assets/js/services/auth-service.js';
+        
+        // Check auth status and update body class
+        authService.waitForAuth().then(user => {
+            if (user) {
+                document.body.classList.add('user-logged-in');
+            } else {
+                document.body.classList.remove('user-logged-in');
+            }
+        }).catch(() => {
+            document.body.classList.remove('user-logged-in');
+        });
+    </script>
+    
+    <!-- Load dashboard common JS for logged-in users -->
+    <script type="module" src="assets/js/utils/dashboard-common.js"></script>
 </body>
 </html>

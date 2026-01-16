@@ -617,7 +617,10 @@ html.privacy-settings-page .dashboard-layout {
     height: 100vh !important;
 }
 
-html.privacy-settings-page .mobile-header,
+html.privacy-settings-page .mobile-header {
+    display: none !important;
+}
+
 html.privacy-settings-page .sidebar-overlay {
     display: none !important;
 }
@@ -661,10 +664,16 @@ html.privacy-settings-page .privacy-blur {
     user-select: auto !important;
 }
 
-/* Mobile-specific: ensure sidebar is hidden and main content takes full width */
+/* Mobile-specific: ensure sidebar is hidden by default but can be opened */
 @media (max-width: 768px) {
     html.privacy-settings-page .sidebar {
-        display: none !important;
+        display: flex !important;
+        transform: translateX(-100%) !important;
+    }
+    
+    html.privacy-settings-page .sidebar.open {
+        transform: translateX(0) !important;
+        display: flex !important;
     }
     
     html.privacy-settings-page .main-content {
@@ -687,7 +696,16 @@ html.privacy-settings-page .privacy-blur {
     }
     
     html.privacy-settings-page .sidebar-overlay {
-        display: none !important;
+        display: block !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+    }
+    
+    html.privacy-settings-page .sidebar-overlay.active {
+        opacity: 1 !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
     }
 }
 
