@@ -224,9 +224,6 @@ async function loadPolicies() {
 
     const allPolicies = await firestoreService.getAll('insurancePolicies', 'createdAt', 'desc');
     
-    console.log('[HealthcareInsurance] Loaded policies:', allPolicies);
-    console.log('[HealthcareInsurance] First policy sample:', allPolicies[0]);
-    
     // Check if any policies have decryption issues
     const policiesWithIssues = allPolicies.filter(p => {
       const hasUndefinedFields = !p.policyName || !p.provider || !p.coverageAmount;
@@ -297,18 +294,6 @@ function renderPolicies() {
       statusClass = 'expiring';
       statusText = 'Expiring Soon';
     }
-
-    // Debug logging
-    console.log('[RenderPolicies] Policy data:', {
-      id: policy.id,
-      policyName: policy.policyName,
-      provider: policy.provider,
-      coverageAmount: policy.coverageAmount,
-      premiumAmount: policy.premiumAmount,
-      startDate: policy.startDate,
-      endDate: policy.endDate,
-      allKeys: Object.keys(policy)
-    });
 
     // Document badge if file attached
     const documentBadge = policy.fileUrl ? `

@@ -296,7 +296,6 @@ class TripGroupsService {
 
       // Get current member count safely
       const currentMemberCount = groupResult.data.memberCount || 0;
-      console.log('Current group memberCount:', currentMemberCount);
 
       // Validate member data
       if (!memberData.name || memberData.name.trim() === '') {
@@ -361,15 +360,12 @@ class TripGroupsService {
       // Update group member count
       const groupRef = doc(db, this.groupsCollection, groupId);
       const newMemberCount = currentMemberCount + 1;
-      console.log('Current memberCount:', currentMemberCount);
-      console.log('Updating memberCount to:', newMemberCount);
       
       try {
         await updateDoc(groupRef, {
           memberCount: newMemberCount,
           updatedAt: now
         });
-        console.log('memberCount updated successfully');
       } catch (updateError) {
         console.error('Error updating memberCount with updateDoc:', updateError);
         // Fallback: try using setDoc with merge
@@ -378,7 +374,6 @@ class TripGroupsService {
             memberCount: newMemberCount,
             updatedAt: now
           }, { merge: true });
-          console.log('memberCount updated successfully with setDoc merge');
         } catch (setError) {
           console.error('Error updating memberCount with setDoc:', setError);
         }

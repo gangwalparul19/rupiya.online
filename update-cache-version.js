@@ -43,9 +43,6 @@ function updateCacheVersion() {
     // Write back to file
     fs.writeFileSync(SERVICE_WORKER_PATH, content, 'utf8');
     
-    console.log(`✅ Cache version updated: ${currentVersion} → ${newVersion}`);
-    console.log(`📦 Service worker cache will be cleared on next deployment`);
-    
     return newVersion;
   } catch (error) {
     console.error('❌ Error updating cache version:', error.message);

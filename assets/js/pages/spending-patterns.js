@@ -110,7 +110,6 @@ function setupEventListeners() {
 // Load expense data
 async function loadData() {
   try {
-    console.log('Loading spending data...');
 
     // Calculate date range
     const endDate = new Date();
@@ -119,11 +118,9 @@ async function loadData() {
     startDate.setDate(startDate.getDate() - dateRange);
     startDate.setHours(0, 0, 0, 0); // Start of day
 
-    console.log('Date range:', startDate, 'to', endDate);
 
     // Fetch all expenses and filter by date range
     const allExpensesData = await firestoreService.getAll('expenses', 'date', 'desc');
-    console.log('Total expenses fetched:', allExpensesData.length);
     
     allExpenses = allExpensesData.filter(exp => {
       // Handle both Firestore Timestamp and string dates
@@ -141,8 +138,6 @@ async function loadData() {
       const isInRange = expDate >= startDate && expDate <= endDate;
       return isInRange;
     });
-
-    console.log('Filtered expenses:', allExpenses.length);
 
     if (allExpenses.length === 0) {
       showEmptyState();

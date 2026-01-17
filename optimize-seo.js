@@ -143,7 +143,6 @@ function optimizeHTMLFile(filename) {
   
   // Skip if file doesn't exist
   if (!fs.existsSync(filePath)) {
-    console.log(`⚠️  Skipping ${filename} (not found)`);
     return;
   }
   
@@ -154,7 +153,6 @@ function optimizeHTMLFile(filename) {
       filename.includes('email-template') || filename.includes('force-relogin') ||
       filename.includes('family-modals') || filename.includes('family-test') ||
       filename.includes('offline.html') || filename.includes('admin.html')) {
-    console.log(`⏭️  Skipping ${filename} (test/debug file)`);
     return;
   }
   
@@ -241,29 +239,18 @@ function optimizeHTMLFile(filename) {
     
     // Write the updated content
     fs.writeFileSync(filePath, newContent, 'utf8');
-    console.log(`✅ Optimized ${filename}`);
-    
+
   } catch (error) {
     console.error(`❌ Error optimizing ${filename}:`, error.message);
   }
 }
 
-// Main execution
-console.log('🚀 Starting SEO Optimization...\n');
 
 // Get all HTML files
 const htmlFiles = Object.keys(seoConfig.pages);
-
-console.log(`📄 Found ${htmlFiles.length} pages to optimize\n`);
 
 // Optimize each file
 htmlFiles.forEach(file => {
   optimizeHTMLFile(file);
 });
 
-console.log('\n✅ SEO Optimization Complete!');
-console.log('\n📊 Next Steps:');
-console.log('1. Update sitemap.xml with all pages');
-console.log('2. Submit sitemap to Google Search Console');
-console.log('3. Verify structured data with Google Rich Results Test');
-console.log('4. Monitor rankings for target keywords');

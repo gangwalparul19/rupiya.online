@@ -556,7 +556,6 @@ class TripGroupsPage {
           }
 
           const emailResult = await emailResponse.json();
-          console.log('Email API response:', emailResult);
 
           if (emailResult.success) {
             if (emailResult.sent > 0) {
@@ -573,7 +572,6 @@ class TripGroupsPage {
           this.showToast(`⚠️ Email sending failed: ${emailError.message}`, 'warning');
         }
       } else {
-        console.log('No members with email addresses to send invitations');
       }
 
       this.showToast('✅ Group created successfully!', 'success');

@@ -381,8 +381,6 @@ This feedback was submitted through Rupiya Feedback System.
       html: htmlContent
     });
 
-    console.log('Feedback email sent:', info.messageId);
-
     // Send confirmation email to user
     const confirmationHtml = `
 <!DOCTYPE html>

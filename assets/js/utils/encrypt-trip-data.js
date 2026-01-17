@@ -50,32 +50,27 @@ class TripDataEncryptor {
       if (memberData.name && !this.looksEncrypted(memberData.name)) {
         updates.name = await encryptionService.encryptValue(memberData.name);
         needsUpdate = true;
-        console.log(`  - Encrypting name: ${memberData.name}`);
       }
 
       // Encrypt email if present and not already encrypted
       if (memberData.email && !this.looksEncrypted(memberData.email)) {
         updates.email = await encryptionService.encryptValue(memberData.email);
         needsUpdate = true;
-        console.log(`  - Encrypting email: ${memberData.email}`);
       }
 
       // Encrypt phone if present and not already encrypted
       if (memberData.phone && !this.looksEncrypted(memberData.phone)) {
         updates.phone = await encryptionService.encryptValue(memberData.phone);
         needsUpdate = true;
-        console.log(`  - Encrypting phone: ${memberData.phone}`);
       }
 
       if (needsUpdate) {
         const memberRef = doc(db, this.membersCollection, memberId);
         await updateDoc(memberRef, updates);
         this.stats.members.processed++;
-        console.log(`✓ Encrypted member: ${memberId}`);
         return { success: true };
       } else {
         this.stats.members.skipped++;
-        console.log(`⊘ Skipped member (already encrypted): ${memberId}`);
         return { success: true, skipped: true };
       }
     } catch (error) {

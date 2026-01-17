@@ -160,7 +160,6 @@ async function loadData() {
                        goals.length > 0 || anomalies.length > 0 || patterns.length > 0;
     
     if (!hasAnyData) {
-      console.log('[PredictiveAnalytics] No data available, showing empty state');
       showEmptyState();
       return;
     }

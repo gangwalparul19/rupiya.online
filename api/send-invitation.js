@@ -397,8 +397,6 @@ If you didn't expect this invitation, you can safely ignore this email.
       html: htmlContent
     });
 
-    console.log('Email sent:', info.messageId);
-
     return res.status(200).json({ 
       success: true, 
       messageId: info.messageId 

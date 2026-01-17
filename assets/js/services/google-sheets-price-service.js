@@ -119,14 +119,12 @@ class GoogleSheetsPriceService {
 
     // If there's already a fetch in progress for this sheet type, return that promise
     if (this.fetchPromises[sheetType]) {
-      console.log(`[GoogleSheets] Reusing existing fetch promise for ${sheetType}`);
       return this.fetchPromises[sheetType];
     }
 
     // Create new fetch promise
     this.fetchPromises[sheetType] = (async () => {
       try {
-        console.log(`[GoogleSheets] Fetching ${sheetType} data...`);
         
         const response = await fetch(`${this.API_ENDPOINT}?sheetType=${sheetType}`, {
           method: 'GET',
@@ -166,8 +164,7 @@ class GoogleSheetsPriceService {
         }
 
         this.lastFetch[sheetType] = Date.now();
-        
-        console.log(`[GoogleSheets] Fetched ${data.length} rows from ${sheetType} sheet`);
+
         return data;
       } finally {
         // Clear the promise so future requests can fetch fresh data
@@ -532,7 +529,6 @@ class GoogleSheetsPriceService {
                                    typeUpper.includes('MUTUAL') || 
                                    typeUpper.includes('FUND');
     
-    console.log(`[GoogleSheets] Search type: ${type}, needsStocks: ${needsStocksSheet}, needsMF: ${needsMutualFundsSheet}`);
     
     // Only fetch the sheets we need
     let stocksData = [];
@@ -616,7 +612,6 @@ class GoogleSheetsPriceService {
       if (displaySymbol.toUpperCase().includes(queryUpper) || 
           symbol.toUpperCase().includes(queryUpper) ||
           name.toUpperCase().includes(queryUpper)) {
-        console.log('Match found:', { symbol: displaySymbol, name, type, exchange, originalSymbol: symbol });
         results.push({
           symbol: displaySymbol, // Use clean symbol for display (BTC, ETH, etc.)
           originalSymbol: symbol, // Keep original for lookup (CURRENCY:BTCUSD)
@@ -657,7 +652,6 @@ class GoogleSheetsPriceService {
     });
     }
 
-    console.log('Search results:', results);
     return results.slice(0, limit);
   }
 

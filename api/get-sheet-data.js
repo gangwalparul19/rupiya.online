@@ -57,8 +57,6 @@ export default async function handler(req, res) {
       });
     }
 
-    console.log(`Fetching ${sheetType} from Google Sheets...`);
-
     // Fetch data from Google Sheets
     const response = await fetch(sheetUrl);
 
@@ -88,8 +86,6 @@ export default async function handler(req, res) {
     }
 
     const data = await response.text();
-
-    console.log(`Successfully fetched ${data.length} bytes from ${sheetType}`);
 
     // Set cache headers (5 minutes)
     res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate');

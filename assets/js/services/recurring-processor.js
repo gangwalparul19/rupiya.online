@@ -55,7 +55,6 @@ class RecurringProcessor {
         const dueDates = this.getDueDates(startDate, recurring.frequency, lastProcessed, endDate);
         
         if (dueDates.length > 0) {
-          console.log(`[RecurringProcessor] Found ${dueDates.length} past due transactions for ${recurring.description}`);
           return true;
         }
       }
@@ -179,7 +178,6 @@ class RecurringProcessor {
         const dueDates = this.getDueDates(startDate, recurring.frequency, lastProcessed, endDate);
         
         if (dueDates.length === 0) {
-          console.log(`[RecurringProcessor] No due dates for ${recurring.description}`);
           continue;
         }
 
@@ -204,7 +202,7 @@ class RecurringProcessor {
           } else if (recurring.type === 'income') {
             result = await firestoreService.addIncome(transactionData);
           } else {
-            console.log(`[RecurringProcessor] Unknown type: ${recurring.type} for ${recurring.description}`);
+
           }
 
           if (result?.success) {

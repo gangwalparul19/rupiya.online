@@ -699,8 +699,6 @@ class FeatureDetailsPage {
 
   async init() {
     if (this.initialized) return;
-
-    console.log('[FeatureDetails] Initializing...');
     
     // Mark as initialized immediately to prevent concurrent calls
     this.initialized = true;
@@ -721,7 +719,6 @@ class FeatureDetailsPage {
     // This ensures we have the correct feature data
     try {
       await featureConfig.init();
-      console.log('[FeatureDetails] Features loaded from Firebase');
     } catch (error) {
       console.error('[FeatureDetails] Error loading features:', error);
     }
@@ -769,9 +766,6 @@ class FeatureDetailsPage {
     const enabledCount = Object.values(userFeatures).filter(f => f.enabled === true).length;
     const totalCount = Object.keys(userFeatures).length;
     const categoryCount = Object.keys(this.categories).length;
-
-    console.log('[FeatureDetails] Rendering stats - enabled:', enabledCount, 'total:', totalCount);
-    console.log('[FeatureDetails] User features:', userFeatures);
 
     statsContainer.innerHTML = `
       <div class="stat-card">

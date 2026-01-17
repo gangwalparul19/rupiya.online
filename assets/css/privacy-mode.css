@@ -518,7 +518,6 @@ html.privacy-settings-page body {
     overflow: auto !important;
 }
 
-/* Force sidebar to be visible */
 html.privacy-settings-page .sidebar {
     display: flex !important;
     visibility: visible !important;
@@ -528,16 +527,11 @@ html.privacy-settings-page .sidebar {
     width: 280px !important;
     height: 100vh !important;
     z-index: 1000 !important;
-    transform: none !important;
     pointer-events: auto !important;
     background: white !important;
     border-right: 1px solid #e0e0e0 !important;
     flex-direction: column !important;
     opacity: 1 !important;
-}
-
-html.privacy-settings-page .sidebar.open {
-    transform: none !important;
 }
 
 /* Ensure sidebar nav is visible and scrollable */
@@ -669,6 +663,7 @@ html.privacy-settings-page .privacy-blur {
     html.privacy-settings-page .sidebar {
         display: flex !important;
         transform: translateX(-100%) !important;
+        transition: transform 0.3s ease !important;
     }
     
     html.privacy-settings-page .sidebar.open {

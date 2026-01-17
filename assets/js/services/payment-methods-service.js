@@ -45,29 +45,16 @@ class PaymentMethodsService {
   async getPaymentMethods() {
     try {
       const userId = this.getUserId();
-      console.log('[PaymentMethodsService] Getting payment methods for user:', userId);
       
       // Use firestoreService to get all payment methods (handles decryption)
       const allMethods = await firestoreService.getAll(this.collectionName);
-      console.log('[PaymentMethodsService] Retrieved all methods:', allMethods.length);
       
       // Filter by userId and active status
       const methods = allMethods.filter(method => 
         method.userId === userId && method.isActive !== false
       );
-      console.log('[PaymentMethodsService] Filtered methods for user:', methods.length);
       
-      // Log first method for debugging
-      if (methods.length > 0) {
-        console.log('[PaymentMethodsService] First method sample:', {
-          id: methods[0].id,
-          name: methods[0].name,
-          type: methods[0].type,
-          hasEncrypted: !!methods[0]._encrypted,
-          hasEncryptionVersion: !!methods[0]._encryptionVersion
-        });
-      }
-      
+     
       // Sort by createdAt
       methods.sort((a, b) => {
         const aTime = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
@@ -223,9 +210,6 @@ class PaymentMethodsService {
       
       const result = await firestoreService.add('creditCards', creditCardData);
       
-      if (result.success) {
-        console.log('[PaymentMethodsService] Credit card entry created successfully:', result.id);
-      }
       
       return result;
     } catch (error) {

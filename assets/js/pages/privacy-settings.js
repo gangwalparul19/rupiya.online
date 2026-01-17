@@ -11,17 +11,14 @@ let currentUser = null;
 
 // Initialize
 async function init() {
-  console.log('[Privacy Settings] Starting init...');
   
   try {
     // Add a small delay to ensure Firebase is ready
     await new Promise(resolve => setTimeout(resolve, 100));
     
     currentUser = await authService.waitForAuth();
-    console.log('[Privacy Settings] Auth result:', currentUser ? currentUser.email : 'null');
     
     if (!currentUser) {
-      console.log('[Privacy Settings] No user, redirecting...');
       window.location.href = 'login.html';
       return;
     }
@@ -43,7 +40,6 @@ function initPage() {
   // Setup event listeners
   setupEventListeners();
   
-  console.log('[Privacy Settings] Page initialized successfully');
 }
 
 // Update user profile

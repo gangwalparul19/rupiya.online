@@ -379,8 +379,6 @@ async function loadExpenses() {
     emptyState.style.display = 'none';
     expensesList.style.display = 'none';
     
-    console.log('[LoadExpenses] Starting to load expenses');
-    
     // Get KPI summary for ALL expenses (unfiltered)
     const kpiSummary = await firestoreService.getExpenseKPISummary();
     state.allExpensesKPI = {
@@ -390,17 +388,13 @@ async function loadExpenses() {
     };
     
     state.totalCount = kpiSummary.totalCount;
-    
-    console.log('[LoadExpenses] Total expenses in DB:', state.totalCount);
-    
+        
     // Update KPI cards with all expenses
     updateExpenseKPIsFromSummary(kpiSummary);
     
     // Build filters array for Firestore query
     const filters = buildFirestoreFilters();
-    
-    console.log('[LoadExpenses] Built Firestore filters:', JSON.stringify(filters));
-    
+        
     // Check if filters are applied
     // NOTE: Payment method filters are encrypted, so they're applied client-side
     const hasFilters = filters.length > 0 || 
@@ -410,9 +404,6 @@ async function loadExpenses() {
                        state.filters.search || 
                        state.filters.dateFrom || 
                        state.filters.dateTo;
-    
-    console.log('[LoadExpenses] Has filters:', hasFilters);
-    console.log('[LoadExpenses] State filters:', JSON.stringify(state.filters));
     
     if (hasFilters) {
       // Check if we have Firestore filters or only client-side filters
@@ -424,12 +415,8 @@ async function loadExpenses() {
                                     state.filters.dateFrom || 
                                     state.filters.dateTo;
       
-      console.log('[LoadExpenses] Has Firestore filters:', hasFirestoreFilters);
-      console.log('[LoadExpenses] Has client-side filters:', hasClientSideFilters);
-      
       // If only client-side filters, load all data first
       if (!hasFirestoreFilters && hasClientSideFilters) {
-        console.log('[LoadExpenses] Loading all data for client-side filtering');
         const result = await firestoreService.getExpensesPaginated({ 
           pageSize: 1000,
           filters: [] // No Firestore filters
@@ -442,7 +429,6 @@ async function loadExpenses() {
         updateFilteredExpenseKPIs();
       } else {
         // With Firestore filters: Load filtered data
-        console.log('[LoadExpenses] Loading with Firestore filters');
         const result = await firestoreService.getExpensesPaginated({ 
           pageSize: 1000,
           filters: filters
@@ -462,8 +448,6 @@ async function loadExpenses() {
         filters: filters
       });
       
-      console.log('[LoadExpenses] Loaded initial batch:', result.data.length);
-      
       state.expenses = result.data;
       state.lastDoc = result.lastDoc;
       state.hasMore = result.hasMore;
@@ -471,8 +455,7 @@ async function loadExpenses() {
       state.filteredCount = state.totalCount;
     }
     
-    console.log('[LoadExpenses] Expenses in memory:', state.expenses.length);
-    
+
     // Reset to page 1
     state.currentPage = 1;
     
@@ -492,26 +475,22 @@ async function loadMoreExpensesIfNeeded(targetPage) {
   
   // Check if we have enough data loaded
   if (requiredRecords <= state.expenses.length) {
-    console.log('[LoadMore] Already have enough data');
     return true; // We have enough data
   }
   
   // Check if there's more data to load
   if (!state.hasMore) {
-    console.log('[LoadMore] No more data available');
     return false; // No more data available
   }
   
   // Check if already loading
   if (state.loadingMore) {
-    console.log('[LoadMore] Already loading');
     return false;
   }
   
   let loadingToast = null;
   try {
     state.loadingMore = true;
-    console.log('[LoadMore] Loading more data for page', targetPage);
     
     // Show loading indicator
     loadingToast = toast.info('Loading more expenses...', 0);
@@ -521,16 +500,12 @@ async function loadMoreExpensesIfNeeded(targetPage) {
     // Load in batches of 50, or exactly what we need (whichever is larger)
     const batchSize = Math.max(50, recordsNeeded);
     
-    console.log('[LoadMore] Need', recordsNeeded, 'more records, loading batch of', batchSize);
-    
     const result = await firestoreService.getExpensesPaginated({
       pageSize: batchSize,
       lastDoc: state.lastDoc,
       filters: buildFirestoreFilters()
     });
-    
-    console.log('[LoadMore] Loaded additional:', result.data.length);
-    
+
     // Append new data
     state.expenses = [...state.expenses, ...result.data];
     state.lastDoc = result.lastDoc;
@@ -781,7 +756,6 @@ function buildFirestoreFilters() {
   // Category filter - can be done in Firestore with index
   if (state.filters.category) {
     filters.push({ field: 'category', operator: '==', value: state.filters.category });
-    console.log('[BuildFilters] Added category filter:', state.filters.category);
   }
   
   // NOTE: Payment method and specific payment method filters are encrypted fields
@@ -790,8 +764,6 @@ function buildFirestoreFilters() {
   
   // Note: Date range, search, and family member filters are applied client-side
   // because they require complex logic or don't have indexes
-  
-  console.log('[BuildFilters] Total filters:', filters.length, 'Filters:', JSON.stringify(filters));
   return filters;
 }
 
@@ -803,21 +775,16 @@ function applyClientSideFilters() {
   
   // Payment method filter - encrypted field, must be client-side
   if (state.filters.paymentMethod) {
-    console.log('[Filter] Filtering by payment method:', state.filters.paymentMethod);
     filtered = filtered.filter(e => e.paymentMethod === state.filters.paymentMethod);
-    console.log('[Filter] After payment method filter:', filtered.length, 'expenses');
   }
   
   // Specific payment method filter - encrypted field, must be client-side
   if (state.filters.specificPaymentMethod) {
-    console.log('[Filter] Filtering by specific payment method:', state.filters.specificPaymentMethod);
     filtered = filtered.filter(e => e.specificPaymentMethodId === state.filters.specificPaymentMethod);
-    console.log('[Filter] After specific payment method filter:', filtered.length, 'expenses');
   }
   
   // Family member filter - single select
   if (state.filters.familyMember) {
-    console.log('[Filter] Filtering by family member:', state.filters.familyMember);
     filtered = filtered.filter(e => {
       // Check if expense has split details
       if (e.hasSplit && e.splitDetails && e.splitDetails.length > 0) {
@@ -826,21 +793,12 @@ function applyClientSideFilters() {
           const splitMemberId = String(split.memberId).trim();
           const isSelected = String(state.filters.familyMember).trim() === splitMemberId;
           const hasAmount = split.amount > 0;
-          
-          if (isSelected && hasAmount) {
-            console.log('[Filter] Match found:', { 
-              expenseId: e.id, 
-              splitMemberId, 
-              amount: split.amount 
-            });
-          }
           return isSelected && hasAmount;
         });
         return hasMatch;
       }
       return false;
     });
-    console.log('[Filter] Filtered expenses count:', filtered.length);
   }
   
   // Date range filter - client-side for now (could be moved to Firestore)
@@ -929,18 +887,10 @@ function updateCounts() {
 
 // Render expenses
 async function renderExpenses() {
-  console.log('[Render] Starting render with:', {
-    expensesInMemory: state.expenses.length,
-    filteredCount: state.filteredExpenses.length,
-    totalCount: state.totalCount,
-    currentPage: state.currentPage,
-    itemsPerPage: state.itemsPerPage
-  });
   
   loadingState.style.display = 'none';
   
   if (state.filteredExpenses.length === 0) {
-    console.log('[Render] No expenses to show');
     emptyState.style.display = 'flex';
     expensesList.style.display = 'none';
     const paginationContainer = document.getElementById('paginationContainer');
@@ -968,15 +918,6 @@ async function renderExpenses() {
   const endIndex = startIndex + state.itemsPerPage;
   const pageExpenses = state.filteredExpenses.slice(startIndex, endIndex);
   
-  console.log('[Render] Pagination calculated:', {
-    totalRecords,
-    totalPages,
-    startIndex,
-    endIndex,
-    pageExpensesCount: pageExpenses.length,
-    hasFilters
-  });
-  
   // Render expense cards (async to handle decryption)
   const cardResults = await Promise.allSettled(pageExpenses.map(expense => createExpenseCard(expense)));
   const cardsHTML = cardResults.map((result, index) => {
@@ -1003,25 +944,16 @@ function renderPagination(totalPages) {
   const prevBtn = document.getElementById('prevPageBtn');
   const nextBtn = document.getElementById('nextPageBtn');
   
-  console.log('[Pagination] Rendering pagination:', { 
-    totalPages, 
-    currentPage: state.currentPage,
-    filteredCount: state.filteredExpenses.length,
-    itemsPerPage: state.itemsPerPage
-  });
-  
   if (!paginationContainer || !paginationNumbers) {
     console.error('[Pagination] Container or numbers div not found');
     return;
   }
   
   if (totalPages <= 1) {
-    console.log('[Pagination] Only 1 page, hiding pagination');
     paginationContainer.style.display = 'none';
     return;
   }
   
-  console.log('[Pagination] Showing pagination with', totalPages, 'pages');
   paginationContainer.style.display = 'flex';
   
   // Update prev/next buttons
@@ -1030,7 +962,6 @@ function renderPagination(totalPages) {
   
   // Generate page numbers
   const pageNumbers = generatePageNumbers(state.currentPage, totalPages);
-  console.log('[Pagination] Generated page numbers:', pageNumbers);
   
   paginationNumbers.innerHTML = pageNumbers.map(page => {
     if (page === '...') {
@@ -1045,7 +976,6 @@ function renderPagination(totalPages) {
   paginationNumbers.querySelectorAll('.page-number').forEach(btn => {
     btn.addEventListener('click', () => {
       const page = parseInt(btn.dataset.page);
-      console.log('[Pagination] Page button clicked:', page);
       goToPage(page);
     });
   });
@@ -1090,13 +1020,11 @@ function generatePageNumbers(currentPage, totalPages) {
 
 // Go to specific page
 async function goToPage(page) {
-  console.log('[GoToPage] Navigating to page:', page);
   
   // Check if we need to load more data
   const hasEnoughData = await loadMoreExpensesIfNeeded(page);
   
   if (!hasEnoughData && page > Math.ceil(state.expenses.length / state.itemsPerPage)) {
-    console.log('[GoToPage] Not enough data for page', page);
     toast.warning('No more expenses to load');
     return;
   }
@@ -1371,7 +1299,6 @@ function initSwipeActions() {
 async function loadUserPaymentMethods() {
   try {
     userPaymentMethods = await paymentMethodsService.getPaymentMethods();
-    console.log('Loaded payment methods:', userPaymentMethods);
   } catch (error) {
     console.error('Error loading payment methods:', error);
     userPaymentMethods = [];
@@ -1833,12 +1760,10 @@ function getSplitDetailsData() {
         memberName: input.dataset.memberName,
         amount: amount
       };
-      console.log('[SplitDetails] Adding split:', splitData);
       splitDetails.push(splitData);
     }
   });
   
-  console.log('[SplitDetails] Total splits:', splitDetails);
   return splitDetails.length > 0 ? splitDetails : null;
 }
 
@@ -1930,7 +1855,6 @@ function setupEventListeners() {
   if (familyMemberFilter) {
     familyMemberFilter.addEventListener('change', () => {
       state.filters.familyMember = familyMemberFilter.value;
-      console.log('[Filter] Selected family member:', state.filters.familyMember);
       applyFilters();
     });
   }

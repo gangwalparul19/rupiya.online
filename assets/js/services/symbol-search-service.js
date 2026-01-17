@@ -24,12 +24,10 @@ class SymbolSearchService {
     const cacheKey = `search_${query}_${type}_${limit}`;
     const cached = this.getFromCache(cacheKey);
     if (cached) {
-      console.log('Returning cached results for:', query);
       return cached;
     }
 
     try {
-      console.log('Searching Google Sheets for:', query, 'type:', type);
       
       // Pass type to Google Sheets service for optimized sheet selection
       const results = await googleSheetsPriceService.searchSymbols(query, limit, type);
@@ -64,7 +62,6 @@ class SymbolSearchService {
 
       // Cache for longer since data doesn't change frequently
       this.setCache(cacheKey, enhancedResults);
-      console.log('Found results:', enhancedResults.length);
       return enhancedResults;
     } catch (error) {
       console.error('Error searching symbols:', error);

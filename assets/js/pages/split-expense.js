@@ -131,8 +131,6 @@ async function loadSplits() {
     splitsList.style.display = 'none';
     
     state.splits = await splitService.getSplits();
-    console.log('[Split Expense] Loaded splits:', state.splits);
-    console.log('[Split Expense] First split participants:', state.splits[0]?.participants);
     state.totalCount = state.splits.length;
     
     calculateKPISummary();

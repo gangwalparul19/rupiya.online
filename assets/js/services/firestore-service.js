@@ -164,7 +164,6 @@ class FirestoreService {
       const firstKey = this.cache.keys().next().value;
       if (firstKey) {
         this.cache.delete(firstKey);
-        console.log(`[FirestoreService] Cache LRU eviction: ${firstKey}`);
       }
     }
     
@@ -187,7 +186,7 @@ class FirestoreService {
     }
     
     if (removedCount > 0) {
-      console.log(`[FirestoreService] Cleaned up ${removedCount} expired cache entries`);
+
     }
     
     return removedCount;

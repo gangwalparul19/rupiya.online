@@ -45,7 +45,6 @@ class Logger {
    */
   log(...args) {
     if (this.isDev) {
-      console.log(...args);
     }
   }
 

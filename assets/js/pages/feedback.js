@@ -40,7 +40,6 @@ function showConfigError() {
 
 // Initialize
 async function init() {
-  console.log('[Feedback] Starting init...');
   
   // Check if Firebase is configured
   if (!isFirebaseConfigured()) {
@@ -54,10 +53,8 @@ async function init() {
     await new Promise(resolve => setTimeout(resolve, 100));
     
     currentUser = await authService.waitForAuth();
-    console.log('[Feedback] Auth result:', currentUser ? currentUser.email : 'null');
     
     if (!currentUser) {
-      console.log('[Feedback] No user, redirecting...');
       window.location.href = 'login.html';
       return;
     }
@@ -74,7 +71,6 @@ async function init() {
 
 // Initialize page after auth
 function initPage() {
-  console.log('[Feedback] Initializing page...');
   
   // Update user profile in sidebar
   updateUserProfile();
@@ -88,7 +84,6 @@ function initPage() {
     emailInput.value = currentUser.email;
   }
   
-  console.log('[Feedback] Page initialized successfully');
 }
 
 // Update user profile

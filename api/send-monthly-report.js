@@ -17,8 +17,6 @@ export default async function handler(req, res) {
   }
 
   try {
-    console.log('[SendMonthlyReport] Request received');
-    console.log('[SendMonthlyReport] Body keys:', Object.keys(req.body || {}));
     
     const { 
       userEmail, 
@@ -39,8 +37,6 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Missing user email' });
     }
 
-    console.log(`[SendMonthlyReport] Processing report for ${userEmail}`);
-
     const gmailUser = process.env.GMAIL_USER;
     const gmailAppPassword = process.env.GMAIL_APP_PASSWORD;
 
@@ -51,7 +47,6 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Email service not configured' });
     }
 
-    console.log('[SendMonthlyReport] Creating transporter...');
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: { user: gmailUser, pass: gmailAppPassword }

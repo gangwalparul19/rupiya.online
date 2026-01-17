@@ -25,7 +25,6 @@ async function fetchYahooFinancePrice(symbol) {
     // Check cache first
     const cached = priceCache.get(symbol);
     if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-      console.log(`[Cache Hit] ${symbol}: ${cached.price}`);
       return cached;
     }
 
@@ -170,8 +169,6 @@ export default async function handler(req, res) {
         error: 'Could not determine symbol for investment'
       });
     }
-
-    console.log(`[API] Fetching price for symbol: ${yahooSymbol}`);
 
     const priceData = await fetchYahooFinancePrice(yahooSymbol);
 

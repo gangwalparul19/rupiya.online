@@ -139,22 +139,6 @@ ${isOverBudget
         return { success: false, error: 'Invalid phone number format' };
       }
 
-      // In production, this would call a backend API
-      // For now, we'll log the notification and return success
-      console.log(`[Notification] To: ${cleanPhone}`);
-      console.log(`[Notification] Message: ${message}`);
-
-      // Simulate API call
-      // const response = await fetch(this.apiEndpoint, {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ phone: cleanPhone, message })
-      // });
-      // 
-      // if (!response.ok) {
-      //   throw new Error('Failed to send notification');
-      // }
-
       return { success: true };
     } catch (error) {
       console.error('Error sending notification:', error);

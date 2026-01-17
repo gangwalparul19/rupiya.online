@@ -486,13 +486,13 @@ function setupMobileSidebar() {
   const overlay = document.getElementById('sidebarOverlay');
 
   function openSidebar() {
-    sidebar?.classList.add('active');
+    sidebar?.classList.add('open');
     overlay?.classList.add('active');
     document.body.style.overflow = 'hidden';
   }
 
   function closeSidebar() {
-    sidebar?.classList.remove('active');
+    sidebar?.classList.remove('open');
     overlay?.classList.remove('active');
     document.body.style.overflow = '';
   }

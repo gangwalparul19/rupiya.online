@@ -150,15 +150,8 @@ async function loadGoals() {
     goalsList.style.display = 'none';
     
     const allGoals = await firestoreService.getGoals();
-    console.log('[Goals] Loaded goals count:', allGoals.length);
     if (allGoals.length > 0) {
-      console.log('[Goals] First goal full object:', JSON.parse(JSON.stringify(allGoals[0])));
-      console.log('[Goals] First goal name:', allGoals[0].name);
-      console.log('[Goals] First goal targetAmount:', allGoals[0].targetAmount);
-      console.log('[Goals] First goal currentAmount:', allGoals[0].currentAmount);
-      console.log('[Goals] First goal has _encrypted?:', !!allGoals[0]._encrypted);
       if (allGoals[0]._encrypted) {
-        console.log('[Goals] _encrypted fields:', Object.keys(allGoals[0]._encrypted));
       }
     }
     
@@ -585,11 +578,6 @@ function openAddForm() {
 function openEditForm(id) {
   const goal = state.goals.find(g => g.id === id);
   if (!goal) return;
-  
-  console.log('[Goals] Editing goal:', goal);
-  console.log('[Goals] Goal name:', goal.name);
-  console.log('[Goals] Goal targetAmount:', goal.targetAmount);
-  console.log('[Goals] Goal currentAmount:', goal.currentAmount);
   
   state.editingGoalId = id;
   formTitle.textContent = 'Edit Goal';
