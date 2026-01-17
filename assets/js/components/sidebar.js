@@ -480,11 +480,35 @@ function setupQuickSearch(isAdmin = false) {
 
 // Setup mobile sidebar toggle
 function setupMobileSidebar() {
-  const sidebarOpen = document.getElementById('sidebarOpen');
-  const sidebarClose = document.getElementById('sidebarClose');
-  const sidebar = document.getElementById('sidebar');
-  const overlay = document.getElementById('sidebarOverlay');
+  // Use a small delay to ensure DOM elements are fully rendered
+  setTimeout(() => {
+    const sidebarOpen = document.getElementById('sidebarOpen');
+    const sidebarClose = document.getElementById('sidebarClose');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
 
+    if (!sidebarOpen || !sidebar || !overlay) {
+      console.warn('[Sidebar] Mobile sidebar elements not found, retrying...');
+      // Retry once after a longer delay
+      setTimeout(() => {
+        const retryOpen = document.getElementById('sidebarOpen');
+        const retryClose = document.getElementById('sidebarClose');
+        const retrySidebar = document.getElementById('sidebar');
+        const retryOverlay = document.getElementById('sidebarOverlay');
+        
+        if (retryOpen && retrySidebar && retryOverlay) {
+          attachSidebarListeners(retryOpen, retryClose, retrySidebar, retryOverlay);
+        }
+      }, 500);
+      return;
+    }
+
+    attachSidebarListeners(sidebarOpen, sidebarClose, sidebar, overlay);
+  }, 100);
+}
+
+// Helper function to attach sidebar event listeners
+function attachSidebarListeners(sidebarOpen, sidebarClose, sidebar, overlay) {
   function openSidebar() {
     sidebar?.classList.add('open');
     overlay?.classList.add('active');

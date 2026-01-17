@@ -731,6 +731,8 @@ document.addEventListener('DOMContentLoaded', () => {
   initScrollSpy();
   initSmoothScroll();
   loadUserProfile();
+  // Note: Sidebar toggle is handled by dashboard-common.js -> sidebar.js
+  // No need to duplicate event listeners here
 });
 
 // Add styles dynamically

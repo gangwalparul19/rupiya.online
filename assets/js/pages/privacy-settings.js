@@ -61,27 +61,9 @@ function updateUserProfile() {
 
 // Setup event listeners
 function setupEventListeners() {
-  // Sidebar toggle
-  const sidebarOpen = document.getElementById('sidebarOpen');
-  const sidebarClose = document.getElementById('sidebarClose');
-  const sidebar = document.getElementById('sidebar');
-  const sidebarOverlay = document.getElementById('sidebarOverlay');
-
-  sidebarOpen?.addEventListener('click', () => {
-    sidebar.classList.add('open');
-    sidebarOverlay.classList.add('show');
-  });
-
-  sidebarClose?.addEventListener('click', () => {
-    sidebar.classList.remove('open');
-    sidebarOverlay.classList.remove('show');
-  });
-
-  sidebarOverlay?.addEventListener('click', () => {
-    sidebar.classList.remove('open');
-    sidebarOverlay.classList.remove('show');
-  });
-
+  // Note: Sidebar toggle is handled by dashboard-common.js -> sidebar.js
+  // No need to duplicate event listeners here
+  
   // Privacy mode controls
   const mainToggle = document.getElementById('mainPrivacyToggle');
   const enableBtn = document.getElementById('enablePrivacyBtn');
