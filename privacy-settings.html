@@ -224,5 +224,37 @@
     <script type="module" src="assets/js/components/sidebar.js"></script>
     <script type="module" src="assets/js/pages/privacy-settings.js"></script>
     <script type="module" src="assets/js/pwa-setup.js"></script>
+    
+    <!-- Ensure sidebar toggle works -->
+    <script>
+        window.addEventListener('load', () => {
+            const sidebarOpen = document.getElementById('sidebarOpen');
+            const sidebarClose = document.getElementById('sidebarClose');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            
+            if (sidebarOpen && sidebar && overlay) {
+                sidebarOpen.onclick = () => {
+                    sidebar.classList.add('open');
+                    overlay.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                };
+                
+                if (sidebarClose) {
+                    sidebarClose.onclick = () => {
+                        sidebar.classList.remove('open');
+                        overlay.classList.remove('active');
+                        document.body.style.overflow = '';
+                    };
+                }
+                
+                overlay.onclick = () => {
+                    sidebar.classList.remove('open');
+                    overlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                };
+            }
+        });
+    </script>
 </body>
 </html>

@@ -405,7 +405,6 @@ function showEditForm(recurring) {
   // Fill form with null checks
   const typeEl = document.getElementById('type');
   const descriptionEl = document.getElementById('description');
-  const recipientNameEl = document.getElementById('recipientName');
   const amountEl = document.getElementById('amount');
   const categoryEl = document.getElementById('category');
   const frequencyEl = document.getElementById('frequency');
@@ -416,7 +415,6 @@ function showEditForm(recurring) {
 
   if (typeEl) typeEl.value = recurring.type;
   if (descriptionEl) descriptionEl.value = recurring.description;
-  if (recipientNameEl) recipientNameEl.value = recurring.recipientName || '';
   if (amountEl) amountEl.value = recurring.amount;
   if (categoryEl) categoryEl.value = recurring.category;
   if (frequencyEl) frequencyEl.value = recurring.frequency;
@@ -443,7 +441,6 @@ async function handleSubmit(e) {
   // Validate that all required form elements exist
   const typeEl = document.getElementById('type');
   const descriptionEl = document.getElementById('description');
-  const recipientNameEl = document.getElementById('recipientName');
   const amountEl = document.getElementById('amount');
   const categoryEl = document.getElementById('category');
   const frequencyEl = document.getElementById('frequency');
@@ -452,8 +449,8 @@ async function handleSubmit(e) {
   const statusEl = document.getElementById('status');
   const notesEl = document.getElementById('notes');
 
-  if (!typeEl || !descriptionEl || !recipientNameEl || !amountEl || !categoryEl || !frequencyEl || !startDateEl || !statusEl) {
-    console.error('Form elements not found. Form may not be fully loaded.');
+  if (!typeEl || !descriptionEl || !amountEl || !categoryEl || !frequencyEl || !startDateEl || !statusEl) {
+    console.error('Required form elements not found. Form may not be fully loaded.');
     showToast('Form is not fully loaded. Please refresh the page and try again.', 'error');
     return;
   }
@@ -466,7 +463,6 @@ async function handleSubmit(e) {
   const formData = {
     type: typeEl.value,
     description: descriptionEl.value,
-    recipientName: recipientNameEl.value.trim(),
     amount: parseFloat(amountEl.value),
     category: categoryEl.value,
     frequency: frequencyEl.value,

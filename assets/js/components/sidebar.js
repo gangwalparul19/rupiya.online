@@ -487,9 +487,9 @@ function setupMobileSidebar() {
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('sidebarOverlay');
 
+    // Only log if we're on a page that should have these elements
     if (!sidebarOpen || !sidebar || !overlay) {
-      console.warn('[Sidebar] Mobile sidebar elements not found, retrying...');
-      // Retry once after a longer delay
+      // Silently retry once - some pages may not have sidebar
       setTimeout(() => {
         const retryOpen = document.getElementById('sidebarOpen');
         const retryClose = document.getElementById('sidebarClose');

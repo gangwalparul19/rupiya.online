@@ -9,251 +9,8 @@
     <link rel="icon" href="logo.png" type="image/png">
     <link rel="stylesheet" href="assets/css/user-guide.css">
     <link rel="stylesheet" href="assets/css/user-guide-auth.css">
+    <link rel="stylesheet" href="assets/css/user-guide-layout.css">
     <link rel="stylesheet" href="assets/css/dashboard-common.css">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        :root {
-            --primary: #667eea; --primary-dark: #5568d3; --secondary: #764ba2;
-            --accent: #f093fb; --success: #4ade80; --dark: #1e293b; --light: #f8fafc; --gray: #64748b;
-        }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            line-height: 1.6; color: var(--dark); background: var(--light);
-        }
-        
-        /* Navbar */
-        .navbar {
-            background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            position: sticky; top: 0; z-index: 100;
-        }
-        .nav-container {
-            max-width: 1200px; margin: 0 auto; padding: 1rem 2rem;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .logo { display: flex; align-items: center; text-decoration: none; }
-        .logo img { height: 40px; width: auto; }
-        .nav-links { display: flex; gap: 2rem; align-items: center; }
-        .nav-links a { text-decoration: none; color: var(--dark); font-weight: 500; transition: color 0.3s; }
-        .nav-links a:hover { color: var(--primary); }
-        .mobile-toggle { 
-            display: none; background: none; border: none; font-size: 1.5rem; 
-            cursor: pointer; color: var(--dark); padding: 8px; transition: all 0.3s ease;
-            border-radius: 8px;
-        }
-        .mobile-toggle:hover { background: rgba(0,0,0,0.05); }
-        .btn {
-            padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600;
-            text-decoration: none; border: none; cursor: pointer; display: inline-block;
-            transition: all 0.3s;
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-        }
-        .btn-outline {
-            background: transparent; color: var(--primary); border: 2px solid var(--primary);
-        }
-        .btn:hover { transform: translateY(-2px); }
-        
-        /* Hero */
-        .hero {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white; padding: 4rem 2rem; text-align: center;
-        }
-        .hero h1 { font-size: 2.5rem; margin-bottom: 1rem; }
-        .hero p { font-size: 1.2rem; opacity: 0.9; max-width: 700px; margin: 0 auto; }
-        
-        /* Container */
-        .container { max-width: 1200px; margin: 0 auto; padding: 3rem 2rem; }
-        
-        /* TOC */
-        .toc {
-            background: white; padding: 1.5rem; border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08); margin-bottom: 2rem;
-        }
-        .toc h2 { 
-            color: var(--primary); margin-bottom: 1rem; font-size: 1.3rem;
-            text-align: center;
-        }
-        .toc-grid {
-            display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center;
-        }
-        .toc-item {
-            padding: 0.6rem 1rem; background: var(--light); border-radius: 20px;
-            cursor: pointer; transition: all 0.3s; text-decoration: none;
-            display: inline-flex; align-items: center; gap: 0.5rem;
-            color: var(--dark); font-size: 0.9rem; font-weight: 500;
-            border: 2px solid transparent;
-        }
-        .toc-item:hover {
-            background: #e8f1ff; transform: translateY(-2px);
-            border-color: var(--primary); box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
-        }
-        
-        /* Accordion */
-        .accordion { margin: 1.5rem 0; }
-        .accordion-item {
-            background: white; border: 2px solid #e0e0e0; border-radius: 12px;
-            margin-bottom: 1rem; overflow: hidden; transition: all 0.3s;
-        }
-        .accordion-item.active { border-color: var(--primary); box-shadow: 0 2px 8px rgba(74, 144, 226, 0.15); }
-        .accordion-header {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 1.25rem 1.5rem; cursor: pointer; background: #f9f9f9;
-            transition: all 0.3s; user-select: none;
-        }
-        .accordion-header:hover { background: #e8f1ff; }
-        .accordion-item.active .accordion-header { background: #e8f1ff; }
-        .accordion-title {
-            display: flex; align-items: center; gap: 1rem;
-            font-weight: 600; color: #333; font-size: 1.1rem;
-        }
-        .accordion-icon { font-size: 1.5rem; flex-shrink: 0; }
-        .accordion-toggle {
-            width: 28px; height: 28px; border-radius: 50%;
-            background: var(--primary); color: white;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.2rem; transition: transform 0.3s; flex-shrink: 0;
-        }
-        .accordion-item.active .accordion-toggle { transform: rotate(180deg); }
-        .accordion-content {
-            max-height: 0; overflow: hidden;
-            transition: max-height 0.3s ease-out;
-        }
-        .accordion-item.active .accordion-content {
-            max-height: 5000px; transition: max-height 0.5s ease-in;
-        }
-        .accordion-body { padding: 1.5rem; }
-        
-        /* Steps Compact */
-        .steps-compact {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 1rem; margin: 1rem 0;
-        }
-        .step-compact {
-            background: #f9f9f9; padding: 1rem; border-radius: 8px;
-            text-align: center; border: 2px solid #e0e0e0; transition: all 0.3s;
-        }
-        .step-compact:hover { border-color: var(--primary); transform: translateY(-2px); }
-        .step-compact-number {
-            display: inline-block; background: var(--primary); color: white;
-            width: 32px; height: 32px; border-radius: 50%; text-align: center;
-            line-height: 32px; font-weight: bold; margin-bottom: 0.5rem; font-size: 0.9rem;
-        }
-        .step-compact-text { font-size: 0.9rem; font-weight: 600; color: #333; }
-        
-        /* Quick Cards */
-        .quick-cards {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 1rem; margin: 1rem 0;
-        }
-        .quick-card {
-            background: linear-gradient(135deg, #f9f9f9, #fff);
-            padding: 1.25rem; border-radius: 8px; border: 2px solid #e0e0e0;
-            text-align: center; transition: all 0.3s;
-        }
-        .quick-card:hover {
-            border-color: var(--primary); transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.15);
-        }
-        .quick-card-icon { font-size: 2rem; margin-bottom: 0.5rem; }
-        .quick-card-title { font-weight: 600; color: var(--primary); font-size: 0.95rem; margin-bottom: 0.25rem; }
-        .quick-card-desc { font-size: 0.8rem; color: var(--gray); line-height: 1.3; }
-        
-        /* Tip & Warning */
-        .tip, .warning {
-            padding: 1rem; border-radius: 8px; margin: 1rem 0;
-            border-left: 4px solid;
-        }
-        .tip { background: #e8f4f8; border-color: #00D4FF; }
-        .warning { background: #fff3cd; border-color: #ffc107; }
-        .tip strong { color: #00D4FF; }
-        .warning strong { color: #ff9800; }
-        
-        /* Step */
-        .step {
-            background: #f9f9f9; padding: 1rem; margin: 1rem 0;
-            border-radius: 8px; border-left: 4px solid #00D4FF;
-        }
-        
-        /* CTA */
-        .cta {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white; padding: 4rem 2rem; text-align: center; margin-top: 3rem;
-            border-radius: 12px;
-        }
-        .cta h2 { font-size: 2rem; margin-bottom: 1rem; }
-        .cta p { font-size: 1.1rem; margin-bottom: 2rem; opacity: 0.9; }
-        .cta-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: nowrap; }
-        .btn-white { background: white; color: var(--primary); }
-        
-        /* Footer */
-        .footer {
-            background: white; padding: 2rem; text-align: center;
-            color: var(--gray); font-size: 0.9rem; margin-top: 2rem;
-            border-radius: 12px;
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .nav-container { position: relative; justify-content: center; }
-            .logo { margin: 0 auto; }
-            .mobile-toggle {
-                display: block; position: absolute; right: 2rem;
-                top: 50%; transform: translateY(-50%);
-            }
-            .nav-links {
-                position: fixed; top: 70px; left: 0; right: 0; background: white;
-                flex-direction: column; padding: 2rem; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-                transform: translateY(-150%); opacity: 0; transition: all 0.3s; z-index: 999;
-            }
-            .nav-links.active { transform: translateY(0); opacity: 1; }
-            .nav-links a { width: 100%; text-align: center; padding: 0.75rem; }
-            .hero h1 { font-size: 1.75rem; }
-            .hero p { font-size: 1rem; }
-            .container { padding: 2rem 1rem; }
-            .toc { padding: 1.25rem; }
-            .toc h2 { font-size: 1.1rem; margin-bottom: 0.75rem; }
-            .toc-grid { gap: 0.4rem; }
-            .toc-item { padding: 0.5rem 0.75rem; font-size: 0.85rem; }
-            .accordion-header { padding: 1rem; }
-            .accordion-title { font-size: 1rem; gap: 0.75rem; }
-            .accordion-icon { font-size: 1.3rem; }
-            .accordion-body { padding: 1rem; }
-            .steps-compact { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
-            .quick-cards { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
-            .cta h2 { font-size: 1.5rem; }
-            .cta p { font-size: 0.95rem; }
-            .cta-buttons { gap: 0.75rem; }
-            .cta-buttons .btn { padding: 0.75rem 1.25rem; font-size: 0.9rem; }
-        }
-        
-        @media (max-width: 480px) {
-            .mobile-toggle { right: 1rem; }
-            .hero h1 { font-size: 1.5rem; }
-            .toc { padding: 1rem; }
-            .toc h2 { font-size: 1rem; margin-bottom: 0.6rem; }
-            .toc-grid { gap: 0.35rem; }
-            .toc-item { padding: 0.45rem 0.65rem; font-size: 0.8rem; }
-            .accordion-title { font-size: 0.9rem; gap: 0.5rem; }
-            .accordion-icon { font-size: 1.2rem; }
-            .accordion-toggle { width: 24px; height: 24px; font-size: 1rem; }
-            .steps-compact { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
-            .step-compact { padding: 0.75rem; }
-            .step-compact-number { width: 28px; height: 28px; line-height: 28px; font-size: 0.85rem; }
-            .step-compact-text { font-size: 0.85rem; }
-            .quick-cards { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
-            .quick-card { padding: 1rem; }
-            .quick-card-icon { font-size: 1.75rem; }
-            .quick-card-title { font-size: 0.85rem; }
-            .quick-card-desc { font-size: 0.75rem; }
-            .cta { padding: 2.5rem 1rem; }
-            .cta h2 { font-size: 1.25rem; }
-            .cta p { font-size: 0.85rem; margin-bottom: 1.5rem; }
-            .cta-buttons { gap: 0.5rem; }
-            .cta-buttons .btn { padding: 0.65rem 1rem; font-size: 0.85rem; white-space: nowrap; }
-        }
-    </style>
 </head>
 <body>
     <!-- Sidebar (for logged-in users) -->
@@ -1066,5 +823,37 @@
     <script type="module" src="assets/js/components/sidebar.js"></script>
     <script type="module" src="assets/js/pages/user-guide.js"></script>
     <script type="module" src="assets/js/pwa-setup.js"></script>
+    
+    <!-- Ensure sidebar toggle works -->
+    <script>
+        window.addEventListener('load', () => {
+            const sidebarOpen = document.getElementById('sidebarOpen');
+            const sidebarClose = document.getElementById('sidebarClose');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            
+            if (sidebarOpen && sidebar && overlay) {
+                sidebarOpen.onclick = () => {
+                    sidebar.classList.add('open');
+                    overlay.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                };
+                
+                if (sidebarClose) {
+                    sidebarClose.onclick = () => {
+                        sidebar.classList.remove('open');
+                        overlay.classList.remove('active');
+                        document.body.style.overflow = '';
+                    };
+                }
+                
+                overlay.onclick = () => {
+                    sidebar.classList.remove('open');
+                    overlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                };
+            }
+        });
+    </script>
 </body>
 </html>
