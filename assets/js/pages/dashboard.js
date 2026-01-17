@@ -140,14 +140,8 @@ async function initDashboard() {
   
   if (user) {
     try {
-      // Update user profile
-      const initials = user.displayName 
-        ? user.displayName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
-        : user.email[0].toUpperCase();
-      
-      userAvatar.textContent = initials;
-      userName.textContent = user.displayName || 'User';
-      userEmail.textContent = user.email;
+      // Load user profile
+      loadUserProfile(user);
       
       // Initialize PWA install banner
       initPWAInstallBanner();
@@ -160,6 +154,32 @@ async function initDashboard() {
     } catch (error) {
       console.error('[Dashboard] Error initializing dashboard:', error);
       toast.error('Failed to load dashboard. Please refresh the page.');
+    }
+  }
+}
+
+// Load user profile
+function loadUserProfile(user) {
+  if (!user) return;
+  
+  const userName = document.getElementById('userName');
+  const userEmail = document.getElementById('userEmail');
+  const userAvatar = document.getElementById('userAvatar');
+  
+  if (userName) {
+    userName.textContent = user.displayName || user.email?.split('@')[0] || 'User';
+  }
+  
+  if (userEmail) {
+    userEmail.textContent = user.email || '';
+  }
+  
+  if (userAvatar) {
+    if (user.photoURL) {
+      userAvatar.innerHTML = `<img src="${user.photoURL}" alt="User Avatar">`;
+    } else {
+      const initial = (user.displayName || user.email || 'U')[0].toUpperCase();
+      userAvatar.textContent = initial;
     }
   }
 }
