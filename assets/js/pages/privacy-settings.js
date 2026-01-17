@@ -6,6 +6,8 @@
 import '../services/services-init.js'; // Initialize services first
 import authService from '../services/auth-service.js';
 import privacyMode from '../utils/privacy-mode.js';
+import themeManager from '../utils/theme-manager.js';
+import toast from '../components/toast.js';
 
 let currentUser = null;
 
@@ -99,6 +101,15 @@ function setupEventListeners() {
   window.addEventListener('privacyModeChanged', () => {
     updateToggleState();
   });
+
+  // Theme toggle
+  const themeToggleBtn = document.getElementById('themeToggleBtn');
+  if (themeToggleBtn) {
+    themeToggleBtn.addEventListener('click', () => {
+      const newTheme = themeManager.toggleTheme();
+      toast.success(`Switched to ${newTheme} mode`);
+    });
+  }
 }
 
 // Start initialization when DOM is ready

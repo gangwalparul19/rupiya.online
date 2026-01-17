@@ -296,10 +296,15 @@ function filterLoans() {
 
 // Update summary cards
 function updateSummary() {
-  document.getElementById('totalOutstanding').textContent = formatCurrency(state.allDataKPI.totalOutstanding);
-  document.getElementById('totalMonthlyEmi').textContent = formatCurrency(state.allDataKPI.totalMonthlyEmi);
-  document.getElementById('totalPaid').textContent = formatCurrency(state.allDataKPI.totalPaid);
-  document.getElementById('activeLoansCount').textContent = state.allDataKPI.activeLoansCount;
+  const totalOutstanding = document.getElementById('totalOutstanding');
+  const totalMonthlyEmi = document.getElementById('totalMonthlyEmi');
+  const totalPaid = document.getElementById('totalPaid');
+  const activeLoansCount = document.getElementById('activeLoansCount');
+  
+  if (totalOutstanding) totalOutstanding.textContent = formatCurrency(state.allDataKPI.totalOutstanding);
+  if (totalMonthlyEmi) totalMonthlyEmi.textContent = formatCurrency(state.allDataKPI.totalMonthlyEmi);
+  if (totalPaid) totalPaid.textContent = formatCurrency(state.allDataKPI.totalPaid);
+  if (activeLoansCount) activeLoansCount.textContent = state.allDataKPI.activeLoansCount;
 }
 
 // Render loans grid

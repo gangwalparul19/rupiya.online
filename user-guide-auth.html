@@ -9,6 +9,8 @@
   <link rel="icon" href="logo.png" type="image/png">
   
   <!-- Stylesheets -->
+  <link rel="stylesheet" href="assets/css/common.css">
+  <link rel="stylesheet" href="assets/css/components.css">
   <link rel="stylesheet" href="assets/css/dashboard-common.css">
   <link rel="stylesheet" href="assets/css/user-guide.css">
   
@@ -64,6 +66,22 @@
           <img src="assets/images/logo.png" alt="Rupiya">
         </a>
         <div class="mobile-header-actions">
+          <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle theme">
+            <svg class="theme-icon-light" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <circle cx="12" cy="12" r="5"/>
+              <line x1="12" y1="1" x2="12" y2="3"/>
+              <line x1="12" y1="21" x2="12" y2="23"/>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+              <line x1="1" y1="12" x2="3" y2="12"/>
+              <line x1="21" y1="12" x2="23" y2="12"/>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+            </svg>
+            <svg class="theme-icon-dark" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
+          </button>
           <button class="sidebar-toggle" id="sidebarOpen">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
@@ -74,7 +92,7 @@
 
       <!-- Page Header -->
       <div class="page-header">
-        <br/><br/>
+        <br/>
         <div>
           <h1 class="page-title">📚 User Guide</h1>
           <p class="page-subtitle">Master your personal finances with our comprehensive tutorial</p>
@@ -82,28 +100,28 @@
       </div>
 
       <!-- Content Container -->
-      <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
-        <div class="toc" style="background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); margin-bottom: 2rem;">
-          <h2 style="color: #667eea; margin-bottom: 1rem; font-size: 1.3rem; text-align: center;">📖 Quick Navigation</h2>
-          <div class="toc-grid" style="display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center;">
-            <a href="#getting-started" class="toc-item">🚀 Getting Started</a>
-            <a href="#dashboard" class="toc-item">📊 Dashboard</a>
-            <a href="#expenses" class="toc-item">💸 Expenses</a>
-            <a href="#income" class="toc-item">💰 Income</a>
-            <a href="#budgets" class="toc-item">📈 Budgets</a>
-            <a href="#loans" class="toc-item">🏦 Loans</a>
-            <a href="#credit-cards" class="toc-item">💳 Cards</a>
-            <a href="#health-insurance" class="toc-item">🏥 Insurance</a>
-            <a href="#investments" class="toc-item">📊 Investments</a>
-            <a href="#goals" class="toc-item">🎯 Goals</a>
-            <a href="#reports" class="toc-item">📋 Reports</a>
-            <a href="#faq" class="toc-item">❓ FAQ</a>
-          </div>
+    <div class="container">
+        <div class="toc">
+            <h2>📖 Quick Navigation</h2>
+            <div class="toc-grid">
+                <a href="#getting-started" class="toc-item">🚀 Getting Started</a>
+                <a href="#dashboard" class="toc-item">📊 Dashboard</a>
+                <a href="#expenses" class="toc-item">💸 Expenses</a>
+                <a href="#income" class="toc-item">💰 Income</a>
+                <a href="#budgets" class="toc-item">📈 Budgets</a>
+                <a href="#loans" class="toc-item">🏦 Loans</a>
+                <a href="#credit-cards" class="toc-item">💳 Cards</a>
+                <a href="#health-insurance" class="toc-item">🏥 Insurance</a>
+                <a href="#investments" class="toc-item">📊 Investments</a>
+                <a href="#goals" class="toc-item">🎯 Goals</a>
+                <a href="#reports" class="toc-item">📋 Reports</a>
+                <a href="#faq" class="toc-item">❓ FAQ</a>
+            </div>
         </div>
 
         <!-- Accordion Guide Content -->
         <div class="accordion">
-          
+            
             <!-- Getting Started Accordion -->
             <div class="accordion-item" id="getting-started">
                 <div class="accordion-header">
@@ -187,10 +205,643 @@
                 </div>
             </div>
 
-            <!-- Add more accordion items here - keeping it minimal for now -->
-            
+            <!-- Expenses Accordion -->
+            <div class="accordion-item" id="expenses">
+                <div class="accordion-header">
+                    <div class="accordion-title">
+                        <span class="accordion-icon">💸</span>
+                        <span>Managing Expenses</span>
+                    </div>
+                    <div class="accordion-toggle">▼</div>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <p style="margin-bottom: 15px;">Track every rupee you spend.</p>
+                        
+                        <h4 style="color: #357ABD; margin: 15px 0 10px;">Add an Expense</h4>
+                        <div class="steps-compact">
+                            <div class="step-compact">
+                                <div class="step-compact-number">1</div>
+                                <div class="step-compact-text">Go to Expenses</div>
+                            </div>
+                            <div class="step-compact">
+                                <div class="step-compact-number">2</div>
+                                <div class="step-compact-text">Add Expense</div>
+                            </div>
+                            <div class="step-compact">
+                                <div class="step-compact-number">3</div>
+                                <div class="step-compact-text">Fill Details</div>
+                            </div>
+                            <div class="step-compact">
+                                <div class="step-compact-number">4</div>
+                                <div class="step-compact-text">Save</div>
+                            </div>
+                        </div>
+                        
+                        <h4 style="color: #357ABD; margin: 15px 0 10px;">Categories</h4>
+                        <div class="quick-cards">
+                            <div class="quick-card">
+                                <div class="quick-card-icon">🍔</div>
+                                <div class="quick-card-title">Food</div>
+                                <div class="quick-card-desc">Dining & groceries</div>
+                            </div>
+                            <div class="quick-card">
+                                <div class="quick-card-icon">🚗</div>
+                                <div class="quick-card-title">Transport</div>
+                                <div class="quick-card-desc">Gas & transit</div>
+                            </div>
+                            <div class="quick-card">
+                                <div class="quick-card-icon">🏠</div>
+                                <div class="quick-card-title">Housing</div>
+                                <div class="quick-card-desc">Rent & utilities</div>
+                            </div>
+                            <div class="quick-card">
+                                <div class="quick-card-icon">🏥</div>
+                                <div class="quick-card-title">Healthcare</div>
+                                <div class="quick-card-desc">Medical & insurance</div>
+                            </div>
+                            <div class="quick-card">
+                                <div class="quick-card-icon">📚</div>
+                                <div class="quick-card-title">Education</div>
+                                <div class="quick-card-desc">Courses & books</div>
+                            </div>
+                            <div class="quick-card">
+                                <div class="quick-card-icon">🎮</div>
+                                <div class="quick-card-title">Entertainment</div>
+                                <div class="quick-card-desc">Fun & hobbies</div>
+                            </div>
+                        </div>
+                        
+                        <div class="warning" style="margin-top: 15px;">
+                            <strong>⚠️ Warning:</strong> Deleted expenses cannot be recovered.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Income Accordion -->
+            <div class="accordion-item" id="income">
+                <div class="accordion-header">
+                    <div class="accordion-title">
+                        <span class="accordion-icon">💰</span>
+                        <span>Tracking Income</span>
+                    </div>
+                    <div class="accordion-toggle">▼</div>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <p style="margin-bottom: 15px;">Record all sources of income.</p>
+                        
+                        <h4 style="color: #357ABD; margin: 15px 0 10px;">Add Income</h4>
+                        <div class="steps-compact">
+                            <div class="step-compact">
+                                <div class="step-compact-number">1</div>
+                                <div class="step-compact-text">Go to Income</div>
+                            </div>
+                            <div class="step-compact">
+                                <div class="step-compact-number">2</div>
+                                <div class="step-compact-text">Add Income</div>
+                            </div>
+                            <div class="step-compact">
+                                <div class="step-compact-number">3</div>
+                                <div class="step-compact-text">Enter Details</div>
+                            </div>
+                            <div class="step-compact">
+                                <div class="step-compact-number">4</div>
+                                <div class="step-compact-text">Save</div>
+                            </div>
+                        </div>
+                        
+                        <h4 style="color: #357ABD; margin: 15px 0 10px;">Income Sources</h4>
+                        <div class="quick-cards">
+                            <div class="quick-card">
+                                <div class="quick-card-icon">💼</div>
+                                <div class="quick-card-title">Salary</div>
+                                <div class="quick-card-desc">Employment income</div>
+                            </div>
+                            <div class="quick-card">
+                                <div class="quick-card-icon">🎯</div>
+                                <div class="quick-card-title">Freelance</div>
+                                <div class="quick-card-desc">Contract work</div>
+                            </div>
+                            <div class="quick-card">
+                                <div class="quick-card-icon">📈</div>
+                                <div class="quick-card-title">Investments</div>
+                                <div class="quick-card-desc">Dividends & gains</div>
+                            </div>
+                            <div class="quick-card">
+                                <div class="quick-card-icon">🏪</div>
+                                <div class="quick-card-title">Business</div>
+                                <div class="quick-card-desc">Self-employment</div>
+                            </div>
+                            <div class="quick-card">
+                                <div class="quick-card-icon">🎁</div>
+                                <div class="quick-card-title">Gifts</div>
+                                <div class="quick-card-desc">Money received</div>
+                            </div>
+                            <div class="quick-card">
+                                <div class="quick-card-icon">💳</div>
+                                <div class="quick-card-title">Refunds</div>
+                                <div class="quick-card-desc">Returns & rebates</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Budgets Accordion -->
+            <div class="accordion-item" id="budgets">
+                <div class="accordion-header">
+                    <div class="accordion-title">
+                        <span class="accordion-icon">📈</span>
+                        <span>Budgets</span>
+                    </div>
+                    <div class="accordion-toggle">▼</div>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <p style="margin-bottom: 15px;">Control spending with category budgets.</p>
+                        
+                        <h4 style="color: #357ABD; margin: 15px 0 10px;">Create a Budget</h4>
+                        <div class="steps-compact">
+                            <div class="step-compact">
+                                <div class="step-compact-number">1</div>
+                                <div class="step-compact-text">Open Budgets</div>
+                            </div>
+                            <div class="step-compact">
+                                <div class="step-compact-number">2</div>
+                                <div class="step-compact-text">Create Budget</div>
+                            </div>
+                            <div class="step-compact">
+                                <div class="step-compact-number">3</div>
+                                <div class="step-compact-text">Select Category</div>
+                            </div>
+                            <div class="step-compact">
+                                <div class="step-compact-number">4</div>
+                                <div class="step-compact-text">Set Limit</div>
+                            </div>
+                            <div class="step-compact">
+                                <div class="step-compact-number">5</div>
+                                <div class="step-compact-text">Save</div>
+                            </div>
+                        </div>
+                        
+                        <h4 style="color: #357ABD; margin: 15px 0 10px;">Budget Tracking</h4>
+                        <ul style="margin-left: 20px; font-size: 0.9em; line-height: 1.8;">
+                            <li>📊 Progress bars</li>
+                            <li>⚠️ Limit alerts</li>
+                            <li>🔴 Exceeded indicators</li>
+                            <li>📈 Monthly trends</li>
+                        </ul>
+                        
+                        <div class="tip" style="margin-top: 15px;">
+                            <strong>💡 Tip:</strong> Use 50/30/20 rule: 50% needs, 30% wants, 20% savings.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loans Accordion -->
+            <div class="accordion-item" id="loans">
+                <div class="accordion-header">
+                    <div class="accordion-title">
+                        <span class="accordion-icon">🏦</span>
+                        <span>Loans & EMI</span>
+                    </div>
+                    <div class="accordion-toggle">▼</div>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <p style="margin-bottom: 15px;">Track all your loans and EMI payments in one place.</p>
+                        
+                        <h4 style="color: #357ABD; margin: 15px 0 10px;">Add a Loan</h4>
+                        <div class="steps-compact">
+                            <div class="step-compact">
+                                <div class="step-compact-number">1</div>
+                                <div class="step-compact-text">Go to Loans</div>
+                            </div>
+                            <div class="step-compact">
+                                <div class="step-compact-number">2</div>
+                                <div class="step-compact-text">Add Loan</div>
+                            </div>
+                            <div class="step-compact">
+                                <div class="step-compact-number">3</div>
+                                <div class="step-compact-text">Enter Details</div>
+                            </div>
+                            <div class="step-compact">
+                                <div class="step-compact-number">4</div>
+                                <div class="step-compact-text">Save</div>
+                            </div>
+                        </div>
+                        
+                        <h4 style="color: #357ABD; margin: 15px 0 10px;">Loan Types</h4>
+                        <div class="quick-cards">
+                            <div class="quick-card">
+                                <div class="quick-card-icon">🏠</div>
+                                <div class="quick-card-title">Home Loan</div>
+                                <div class="quick-card-desc">Mortgage & housing</div>
+                            </div>
+                            <div class="quick-card">
+                                <div class="quick-card-icon">�</div>
+                                <div class="quick-card-title">Vehicle Loan</div>
+                                <div class="quick-card-desc">Car & bike loans</div>
+                            </div>
+                            <div class="quick-card">
+                                <div class="quick-card-icon">💼</div>
+                                <div class="quick-card-title">Personal Loan</div>
+                                <div class="quick-card-desc">Bank loans</div>
+                            </div>
+                            <div class="quick-card">
+                                <div class="quick-card-icon">📱</div>
+                                <div class="quick-card-title">Product EMI</div>
+                                <div class="quick-card-desc">Phone, laptop EMIs</div>
+                            </div>
+                            <div class="quick-card">
+                                <div class="quick-card-icon">🎓</div>
+                                <div class="quick-card-title">Education Loan</div>
+                                <div class="quick-card-desc">Student loans</div>
+                            </div>
+                            <div class="quick-card">
+                                <div class="quick-card-icon">💳</div>
+                                <div class="quick-card-title">Credit Card</div>
+                                <div class="quick-card-desc">Card outstanding</div>
+                            </div>
+                        </div>
+                        
+                        <div class="tip" style="margin-top: 15px;">
+                            <strong>💡 Tip:</strong> Set EMI reminders to never miss a payment and avoid penalties.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Credit Cards Accordion -->
+            <div class="accordion-item" id="credit-cards">
+                <div class="accordion-header">
+                    <div class="accordion-title">
+                        <span class="accordion-icon">💳</span>
+                        <span>Credit Cards</span>
+                    </div>
+                    <div class="accordion-toggle">▼</div>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <p style="margin-bottom: 15px;">Manage credit cards, track spending, and maximize rewards.</p>
+                        
+                        <h4 style="color: #357ABD; margin: 15px 0 10px;">Add a Credit Card</h4>
+                        <div class="steps-compact">
+                            <div class="step-compact">
+                                <div class="step-compact-number">1</div>
+                                <div class="step-compact-text">Go to Credit Cards</div>
+                            </div>
+                            <div class="step-compact">
+                                <div class="step-compact-number">2</div>
+                                <div class="step-compact-text">Add Card</div>
+                            </div>
+                            <div class="step-compact">
+                                <div class="step-compact-number">3</div>
+                                <div class="step-compact-text">Enter Details</div>
+                            </div>
+                            <div class="step-compact">
+                                <div class="step-compact-number">4</div>
+                                <div class="step-compact-text">Save</div>
+                            </div>
+                        </div>
+                        
+                        <h4 style="color: #357ABD; margin: 15px 0 10px;">Track & Manage</h4>
+                        <div class="quick-cards">
+                            <div class="quick-card">
+                                <div class="quick-card-icon">💰</div>
+                                <div class="quick-card-title">Credit Limit</div>
+                                <div class="quick-card-desc">Total available credit</div>
+                            </div>
+                            <div class="quick-card">
+                                <div class="quick-card-icon">📊</div>
+                                <div class="quick-card-title">Utilization</div>
+                                <div class="quick-card-desc">% of credit used</div>
+                            </div>
+                            <div class="quick-card">
+                                <div class="quick-card-icon">📅</div>
+                                <div class="quick-card-title">Due Date</div>
+                                <div class="quick-card-desc">Payment reminders</div>
+                            </div>
+                            <div class="quick-card">
+                                <div class="quick-card-icon">🎁</div>
+                                <div class="quick-card-title">Rewards</div>
+                                <div class="quick-card-desc">Points & cashback</div>
+                            </div>
+                            <div class="quick-card">
+                                <div class="quick-card-icon">💸</div>
+                                <div class="quick-card-title">Spending</div>
+                                <div class="quick-card-desc">Monthly expenses</div>
+                            </div>
+                            <div class="quick-card">
+                                <div class="quick-card-icon">📈</div>
+                                <div class="quick-card-title">History</div>
+                                <div class="quick-card-desc">Payment records</div>
+                            </div>
+                        </div>
+                        
+                        <div class="tip" style="margin-top: 15px;">
+                            <strong>💡 Tip:</strong> Keep credit utilization below 30% for better credit score.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Health Insurance Accordion -->
+            <div class="accordion-item" id="health-insurance">
+                <div class="accordion-header">
+                    <div class="accordion-title">
+                        <span class="accordion-icon">🏥</span>
+                        <span>Health Insurance</span>
+                    </div>
+                    <div class="accordion-toggle">▼</div>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <p style="margin-bottom: 15px;">Track health insurance policies and medical expenses.</p>
+                        
+                        <h4 style="color: #357ABD; margin: 15px 0 10px;">Add Insurance Policy</h4>
+                        <div class="steps-compact">
+                            <div class="step-compact">
+                                <div class="step-compact-number">1</div>
+                                <div class="step-compact-text">Go to Insurance</div>
+                            </div>
+                            <div class="step-compact">
+                                <div class="step-compact-number">2</div>
+                                <div class="step-compact-text">Add Policy</div>
+                            </div>
+                            <div class="step-compact">
+                                <div class="step-compact-number">3</div>
+                                <div class="step-compact-text">Enter Details</div>
+                            </div>
+                            <div class="step-compact">
+                                <div class="step-compact-number">4</div>
+                                <div class="step-compact-text">Save</div>
+                            </div>
+                        </div>
+                        
+                        <h4 style="color: #357ABD; margin: 15px 0 10px;">Manage Policies</h4>
+                        <div class="quick-cards">
+                            <div class="quick-card">
+                                <div class="quick-card-icon">📋</div>
+                                <div class="quick-card-title">Policy Details</div>
+                                <div class="quick-card-desc">Coverage & benefits</div>
+                            </div>
+                            <div class="quick-card">
+                                <div class="quick-card-icon">💰</div>
+                                <div class="quick-card-title">Premium</div>
+                                <div class="quick-card-desc">Payment tracking</div>
+                            </div>
+                            <div class="quick-card">
+                                <div class="quick-card-icon">📅</div>
+                                <div class="quick-card-title">Renewal Date</div>
+                                <div class="quick-card-desc">Expiry reminders</div>
+                            </div>
+                            <div class="quick-card">
+                                <div class="quick-card-icon">🏥</div>
+                                <div class="quick-card-title">Claims</div>
+                                <div class="quick-card-desc">Track claims</div>
+                            </div>
+                            <div class="quick-card">
+                                <div class="quick-card-icon">👨‍👩‍👧‍👦</div>
+                                <div class="quick-card-title">Family Members</div>
+                                <div class="quick-card-desc">Covered persons</div>
+                            </div>
+                            <div class="quick-card">
+                                <div class="quick-card-icon">📄</div>
+                                <div class="quick-card-title">Documents</div>
+                                <div class="quick-card-desc">Policy papers</div>
+                            </div>
+                        </div>
+                        
+                        <div class="tip" style="margin-top: 15px;">
+                            <strong>💡 Tip:</strong> Set renewal reminders 30 days before expiry to avoid coverage gaps.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Investments Accordion -->
+            <div class="accordion-item" id="investments">
+                <div class="accordion-header">
+                    <div class="accordion-title">
+                        <span class="accordion-icon">📊</span>
+                        <span>Investments</span>
+                    </div>
+                    <div class="accordion-toggle">▼</div>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <p style="margin-bottom: 15px;">Track your investment portfolio.</p>
+                        
+                        <h4 style="color: #357ABD; margin: 15px 0 10px;">Investment Types</h4>
+                        <div class="quick-cards">
+                            <div class="quick-card">
+                                <div class="quick-card-icon">📈</div>
+                                <div class="quick-card-title">Stocks</div>
+                                <div class="quick-card-desc">Individual stocks</div>
+                            </div>
+                            <div class="quick-card">
+                                <div class="quick-card-icon">💼</div>
+                                <div class="quick-card-title">Mutual Funds</div>
+                                <div class="quick-card-desc">Diversified funds</div>
+                            </div>
+                            <div class="quick-card">
+                                <div class="quick-card-icon">🏦</div>
+                                <div class="quick-card-title">Fixed Deposits</div>
+                                <div class="quick-card-desc">Bank FDs</div>
+                            </div>
+                            <div class="quick-card">
+                                <div class="quick-card-icon">🏠</div>
+                                <div class="quick-card-title">Real Estate</div>
+                                <div class="quick-card-desc">Property</div>
+                            </div>
+                            <div class="quick-card">
+                                <div class="quick-card-icon">💎</div>
+                                <div class="quick-card-title">Precious Metals</div>
+                                <div class="quick-card-desc">Gold & silver</div>
+                            </div>
+                            <div class="quick-card">
+                                <div class="quick-card-icon">🪙</div>
+                                <div class="quick-card-title">Crypto</div>
+                                <div class="quick-card-desc">Cryptocurrency</div>
+                            </div>
+                        </div>
+                        
+                        <div class="tip" style="margin-top: 15px;">
+                            <strong>💡 Tip:</strong> Diversify across asset classes for better risk management.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Goals Accordion -->
+            <div class="accordion-item" id="goals">
+                <div class="accordion-header">
+                    <div class="accordion-title">
+                        <span class="accordion-icon">🎯</span>
+                        <span>Financial Goals</span>
+                    </div>
+                    <div class="accordion-toggle">▼</div>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <p style="margin-bottom: 15px;">Define and track your financial goals.</p>
+                        
+                        <h4 style="color: #357ABD; margin: 15px 0 10px;">Goal Examples</h4>
+                        <div class="quick-cards">
+                            <div class="quick-card">
+                                <div class="quick-card-icon">🏠</div>
+                                <div class="quick-card-title">Home Purchase</div>
+                                <div class="quick-card-desc">Down payment</div>
+                            </div>
+                            <div class="quick-card">
+                                <div class="quick-card-icon">✈️</div>
+                                <div class="quick-card-title">Vacation</div>
+                                <div class="quick-card-desc">Dream trip</div>
+                            </div>
+                            <div class="quick-card">
+                                <div class="quick-card-icon">🎓</div>
+                                <div class="quick-card-title">Education</div>
+                                <div class="quick-card-desc">Courses & degrees</div>
+                            </div>
+                            <div class="quick-card">
+                                <div class="quick-card-icon">🚗</div>
+                                <div class="quick-card-title">Vehicle</div>
+                                <div class="quick-card-desc">New car/bike</div>
+                            </div>
+                            <div class="quick-card">
+                                <div class="quick-card-icon">💰</div>
+                                <div class="quick-card-title">Emergency Fund</div>
+                                <div class="quick-card-desc">6-12 months</div>
+                            </div>
+                            <div class="quick-card">
+                                <div class="quick-card-icon">🎁</div>
+                                <div class="quick-card-title">Wedding</div>
+                                <div class="quick-card-desc">Special day</div>
+                            </div>
+                        </div>
+                        
+                        <div class="tip" style="margin-top: 15px;">
+                            <strong>💡 Tip:</strong> Set SMART goals: Specific, Measurable, Achievable, Relevant, Time-bound.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports Accordion -->
+            <div class="accordion-item" id="reports">
+                <div class="accordion-header">
+                    <div class="accordion-title">
+                        <span class="accordion-icon">📋</span>
+                        <span>Reports & Analytics</span>
+                    </div>
+                    <div class="accordion-toggle">▼</div>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <p style="margin-bottom: 15px;">Analyze your financial data.</p>
+                        
+                        <h4 style="color: #357ABD; margin: 15px 0 10px;">Available Reports</h4>
+                        <div class="quick-cards">
+                            <div class="quick-card">
+                                <div class="quick-card-icon">📊</div>
+                                <div class="quick-card-title">Expense Report</div>
+                                <div class="quick-card-desc">Category breakdown</div>
+                            </div>
+                            <div class="quick-card">
+                                <div class="quick-card-icon">💰</div>
+                                <div class="quick-card-title">Income Report</div>
+                                <div class="quick-card-desc">Source analysis</div>
+                            </div>
+                            <div class="quick-card">
+                                <div class="quick-card-icon">📈</div>
+                                <div class="quick-card-title">Net Worth</div>
+                                <div class="quick-card-desc">Assets - Liabilities</div>
+                            </div>
+                            <div class="quick-card">
+                                <div class="quick-card-icon">🎯</div>
+                                <div class="quick-card-title">Goal Progress</div>
+                                <div class="quick-card-desc">Track milestones</div>
+                            </div>
+                            <div class="quick-card">
+                                <div class="quick-card-icon">💳</div>
+                                <div class="quick-card-title">Budget Analysis</div>
+                                <div class="quick-card-desc">Actual vs budget</div>
+                            </div>
+                            <div class="quick-card">
+                                <div class="quick-card-icon">📉</div>
+                                <div class="quick-card-title">Trend Analysis</div>
+                                <div class="quick-card-desc">Spending patterns</div>
+                            </div>
+                        </div>
+                        
+                        <div class="tip" style="margin-top: 15px;">
+                            <strong>💡 Tip:</strong> Review reports monthly to identify savings opportunities.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FAQ Accordion -->
+            <div class="accordion-item" id="faq">
+                <div class="accordion-header">
+                    <div class="accordion-title">
+                        <span class="accordion-icon">❓</span>
+                        <span>FAQ</span>
+                    </div>
+                    <div class="accordion-toggle">▼</div>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <div class="step" style="margin: 10px 0;">
+                            <strong>Q: Is my data secure?</strong>
+                            <p style="margin-top: 8px; font-size: 0.9em;">A: Yes! Industry-standard encryption. Data never shared with third parties.</p>
+                        </div>
+                        <div class="step" style="margin: 10px 0;">
+                            <strong>Q: Can I edit past transactions?</strong>
+                            <p style="margin-top: 8px; font-size: 0.9em;">A: Yes. Click any transaction to edit or delete.</p>
+                        </div>
+                        <div class="step" style="margin: 10px 0;">
+                            <strong>Q: Can I export my data?</strong>
+                            <p style="margin-top: 8px; font-size: 0.9em;">A: Yes. Settings → Export Data as CSV or PDF.</p>
+                        </div>
+                        <div class="step" style="margin: 10px 0;">
+                            <strong>Q: Is Rupiya free?</strong>
+                            <p style="margin-top: 8px; font-size: 0.9em;">A: Yes! Completely free. No ads, no hidden charges.</p>
+                        </div>
+                        <div class="step" style="margin: 10px 0;">
+                            <strong>Q: Can I use Rupiya offline?</strong>
+                            <p style="margin-top: 8px; font-size: 0.9em;">A: Requires internet to sync. Some features work offline with cached data.</p>
+                        </div>
+                        
+                        <div class="tip" style="margin-top: 15px;">
+                            <strong>💡 Still have questions?</strong> Contact us at support@rupiya.online
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
-      </div>
+
+        <!-- CTA Section -->
+        <div class="cta">
+            <h2>Ready to Take Control of Your Finances?</h2>
+            <p>Join thousands of users managing their money smarter with Rupiya</p>
+            <div class="cta-buttons">
+                <a href="signup.html" class="btn btn-white">Get Started Free</a>
+                <a href="demo.html" class="btn btn-outline" style="border-color: white; color: white;">Try Demo</a>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>📚 <strong>Rupiya User Guide</strong> - Last Updated: January 2026</p>
+            <p style="margin-top: 8px;">For more help, visit <a href="about-us.html" style="color: #4A90E2;">About Us</a> or <a href="contact-us.html" style="color: #4A90E2;">Contact Us</a></p>
+        </div>
+    </div>
     </main>
   </div>
 
@@ -198,6 +849,50 @@
   <script type="module" src="assets/js/utils/ux-enhancements.js"></script>
   <script type="module" src="assets/js/components/sidebar.js"></script>
   <script type="module" src="assets/js/pwa-setup.js"></script>
+  
+  <script type="module">
+    import themeManager from './assets/js/utils/theme-manager.js';
+    import toast from './assets/js/components/toast.js';
+    
+    // Theme toggle
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+    if (themeToggleBtn) {
+      themeToggleBtn.addEventListener('click', () => {
+        const newTheme = themeManager.toggleTheme();
+        toast.success(`Switched to ${newTheme} mode`);
+      });
+    }
+    
+    // Sidebar toggle functionality
+    window.addEventListener('load', () => {
+      const sidebarOpen = document.getElementById('sidebarOpen');
+      const sidebarClose = document.getElementById('sidebarClose');
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      
+      if (sidebarOpen && sidebar && overlay) {
+        sidebarOpen.onclick = () => {
+          sidebar.classList.add('open');
+          overlay.classList.add('active');
+          document.body.style.overflow = 'hidden';
+        };
+        
+        if (sidebarClose) {
+          sidebarClose.onclick = () => {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+          };
+        }
+        
+        overlay.onclick = () => {
+          sidebar.classList.remove('open');
+          overlay.classList.remove('active');
+          document.body.style.overflow = '';
+        };
+      }
+    });
+  </script>
   
   <script>
     // Accordion functionality
