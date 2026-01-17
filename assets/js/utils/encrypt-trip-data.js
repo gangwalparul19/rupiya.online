@@ -81,17 +81,14 @@ class TripDataEncryptor {
   }
 
   async encryptAllMembers() {
-    console.log('\n📋 Processing trip group members...');
     const membersSnapshot = await getDocs(collection(db, this.membersCollection));
     const totalMembers = membersSnapshot.size;
-    console.log(`Found ${totalMembers} members\n`);
 
     if (totalMembers === 0) return;
 
     let index = 0;
     for (const docSnap of membersSnapshot.docs) {
       index++;
-      console.log(`[${index}/${totalMembers}] Member: ${docSnap.id}`);
       await this.encryptMember(docSnap.id, docSnap.data());
 
       if (index % 10 === 0) {
@@ -109,7 +106,6 @@ class TripDataEncryptor {
       // Check if already encrypted using the new format
       if (this.isEncrypted(expenseData)) {
         this.stats.expenses.skipped++;
-        console.log(`⊘ Skipped expense (already encrypted): ${expenseId}`);
         return { success: true, skipped: true };
       }
 
@@ -122,17 +118,13 @@ class TripDataEncryptor {
       // Check if anything was actually encrypted
       if (!encryptedExpense._encrypted || Object.keys(encryptedExpense._encrypted).length === 0) {
         this.stats.expenses.skipped++;
-        console.log(`⊘ Skipped expense (no sensitive data): ${expenseId}`);
         return { success: true, skipped: true };
       }
-
-      console.log(`  - Encrypted fields: ${Object.keys(encryptedExpense._encrypted).join(', ')}`);
 
       const expenseRef = doc(db, this.expensesCollection, expenseId);
       await updateDoc(expenseRef, encryptedExpense);
       
       this.stats.expenses.processed++;
-      console.log(`✓ Encrypted expense: ${expenseId}`);
       return { success: true };
     } catch (error) {
       this.stats.expenses.errors++;
@@ -142,17 +134,14 @@ class TripDataEncryptor {
   }
 
   async encryptAllExpenses() {
-    console.log('\n💰 Processing trip group expenses...');
     const expensesSnapshot = await getDocs(collection(db, this.expensesCollection));
     const totalExpenses = expensesSnapshot.size;
-    console.log(`Found ${totalExpenses} expenses\n`);
 
     if (totalExpenses === 0) return;
 
     let index = 0;
     for (const docSnap of expensesSnapshot.docs) {
       index++;
-      console.log(`[${index}/${totalExpenses}] Expense: ${docSnap.id}`);
       await this.encryptExpense(docSnap.id, docSnap.data());
 
       if (index % 10 === 0) {
@@ -170,7 +159,6 @@ class TripDataEncryptor {
       // Check if already encrypted using the new format
       if (this.isEncrypted(settlementData)) {
         this.stats.settlements.skipped++;
-        console.log(`⊘ Skipped settlement (already encrypted): ${settlementId}`);
         return { success: true, skipped: true };
       }
 
@@ -183,17 +171,13 @@ class TripDataEncryptor {
       // Check if anything was actually encrypted
       if (!encryptedSettlement._encrypted || Object.keys(encryptedSettlement._encrypted).length === 0) {
         this.stats.settlements.skipped++;
-        console.log(`⊘ Skipped settlement (no sensitive data): ${settlementId}`);
         return { success: true, skipped: true };
       }
-
-      console.log(`  - Encrypted fields: ${Object.keys(encryptedSettlement._encrypted).join(', ')}`);
 
       const settlementRef = doc(db, this.settlementsCollection, settlementId);
       await updateDoc(settlementRef, encryptedSettlement);
       
       this.stats.settlements.processed++;
-      console.log(`✓ Encrypted settlement: ${settlementId}`);
       return { success: true };
     } catch (error) {
       this.stats.settlements.errors++;
@@ -203,17 +187,14 @@ class TripDataEncryptor {
   }
 
   async encryptAllSettlements() {
-    console.log('\n🤝 Processing trip group settlements...');
     const settlementsSnapshot = await getDocs(collection(db, this.settlementsCollection));
     const totalSettlements = settlementsSnapshot.size;
-    console.log(`Found ${totalSettlements} settlements\n`);
 
     if (totalSettlements === 0) return;
 
     let index = 0;
     for (const docSnap of settlementsSnapshot.docs) {
       index++;
-      console.log(`[${index}/${totalSettlements}] Settlement: ${docSnap.id}`);
       await this.encryptSettlement(docSnap.id, docSnap.data());
 
       if (index % 10 === 0) {
@@ -231,7 +212,6 @@ class TripDataEncryptor {
       // Check if already encrypted using the new format
       if (this.isEncrypted(groupData)) {
         this.stats.familyGroups.skipped++;
-        console.log(`⊘ Skipped family group (already encrypted): ${groupId}`);
         return { success: true, skipped: true };
       }
 
@@ -244,17 +224,13 @@ class TripDataEncryptor {
       // Check if anything was actually encrypted
       if (!encryptedGroup._encrypted || Object.keys(encryptedGroup._encrypted).length === 0) {
         this.stats.familyGroups.skipped++;
-        console.log(`⊘ Skipped family group (no sensitive data): ${groupId}`);
         return { success: true, skipped: true };
       }
-
-      console.log(`  - Encrypted fields: ${Object.keys(encryptedGroup._encrypted).join(', ')}`);
 
       const groupRef = doc(db, this.familyGroupsCollection, groupId);
       await updateDoc(groupRef, encryptedGroup);
       
       this.stats.familyGroups.processed++;
-      console.log(`✓ Encrypted family group: ${groupId}`);
       return { success: true };
     } catch (error) {
       this.stats.familyGroups.errors++;
@@ -264,17 +240,14 @@ class TripDataEncryptor {
   }
 
   async encryptAllFamilyGroups() {
-    console.log('\n👨‍👩‍👧‍👦 Processing family groups...');
     const groupsSnapshot = await getDocs(collection(db, this.familyGroupsCollection));
     const totalGroups = groupsSnapshot.size;
-    console.log(`Found ${totalGroups} family groups\n`);
 
     if (totalGroups === 0) return;
 
     let index = 0;
     for (const docSnap of groupsSnapshot.docs) {
       index++;
-      console.log(`[${index}/${totalGroups}] Family Group: ${docSnap.id}`);
       await this.encryptFamilyGroup(docSnap.id, docSnap.data());
 
       if (index % 10 === 0) {
@@ -292,7 +265,6 @@ class TripDataEncryptor {
       // Check if already encrypted using the new format
       if (this.isEncrypted(invitationData)) {
         this.stats.familyInvitations.skipped++;
-        console.log(`⊘ Skipped invitation (already encrypted): ${invitationId}`);
         return { success: true, skipped: true };
       }
 
@@ -305,17 +277,13 @@ class TripDataEncryptor {
       // Check if anything was actually encrypted
       if (!encryptedInvitation._encrypted || Object.keys(encryptedInvitation._encrypted).length === 0) {
         this.stats.familyInvitations.skipped++;
-        console.log(`⊘ Skipped invitation (no sensitive data): ${invitationId}`);
         return { success: true, skipped: true };
       }
-
-      console.log(`  - Encrypted fields: ${Object.keys(encryptedInvitation._encrypted).join(', ')}`);
 
       const invitationRef = doc(db, this.familyInvitationsCollection, invitationId);
       await updateDoc(invitationRef, encryptedInvitation);
       
       this.stats.familyInvitations.processed++;
-      console.log(`✓ Encrypted invitation: ${invitationId}`);
       return { success: true };
     } catch (error) {
       this.stats.familyInvitations.errors++;
@@ -325,17 +293,14 @@ class TripDataEncryptor {
   }
 
   async encryptAllFamilyInvitations() {
-    console.log('\n✉️ Processing family invitations...');
     const invitationsSnapshot = await getDocs(collection(db, this.familyInvitationsCollection));
     const totalInvitations = invitationsSnapshot.size;
-    console.log(`Found ${totalInvitations} invitations\n`);
 
     if (totalInvitations === 0) return;
 
     let index = 0;
     for (const docSnap of invitationsSnapshot.docs) {
       index++;
-      console.log(`[${index}/${totalInvitations}] Invitation: ${docSnap.id}`);
       await this.encryptFamilyInvitation(docSnap.id, docSnap.data());
 
       if (index % 10 === 0) {
@@ -350,8 +315,6 @@ class TripDataEncryptor {
 
   async encryptAllTripData() {
     try {
-      console.log('🔐 Starting trip data encryption...\n');
-      console.log('='.repeat(60));
 
       // Check authentication
       await authService.waitForAuth();
@@ -364,9 +327,6 @@ class TripDataEncryptor {
       if (!hasKey) {
         throw new Error('No encryption key found. Please set up encryption first.');
       }
-
-      console.log('✓ Authentication verified');
-      console.log('✓ Encryption key found\n');
 
       // Reset stats
       this.stats = {
@@ -383,36 +343,6 @@ class TripDataEncryptor {
       await this.encryptAllSettlements();
       await this.encryptAllFamilyGroups();
       await this.encryptAllFamilyInvitations();
-
-      // Summary
-      console.log('\n' + '='.repeat(60));
-      console.log('📊 ENCRYPTION SUMMARY');
-      console.log('='.repeat(60));
-      
-      console.log('\n👥 Trip Members:');
-      console.log(`  ✓ Encrypted: ${this.stats.members.processed}`);
-      console.log(`  ⊘ Skipped: ${this.stats.members.skipped}`);
-      console.log(`  ✗ Errors: ${this.stats.members.errors}`);
-      
-      console.log('\n💰 Trip Expenses:');
-      console.log(`  ✓ Encrypted: ${this.stats.expenses.processed}`);
-      console.log(`  ⊘ Skipped: ${this.stats.expenses.skipped}`);
-      console.log(`  ✗ Errors: ${this.stats.expenses.errors}`);
-      
-      console.log('\n🤝 Trip Settlements:');
-      console.log(`  ✓ Encrypted: ${this.stats.settlements.processed}`);
-      console.log(`  ⊘ Skipped: ${this.stats.settlements.skipped}`);
-      console.log(`  ✗ Errors: ${this.stats.settlements.errors}`);
-      
-      console.log('\n👨‍👩‍👧‍👦 Family Groups:');
-      console.log(`  ✓ Encrypted: ${this.stats.familyGroups.processed}`);
-      console.log(`  ⊘ Skipped: ${this.stats.familyGroups.skipped}`);
-      console.log(`  ✗ Errors: ${this.stats.familyGroups.errors}`);
-      
-      console.log('\n✉️ Family Invitations:');
-      console.log(`  ✓ Encrypted: ${this.stats.familyInvitations.processed}`);
-      console.log(`  ⊘ Skipped: ${this.stats.familyInvitations.skipped}`);
-      console.log(`  ✗ Errors: ${this.stats.familyInvitations.errors}`);
       
       const totalErrors = this.stats.members.errors + this.stats.expenses.errors + 
                          this.stats.settlements.errors + this.stats.familyGroups.errors + 
@@ -420,19 +350,6 @@ class TripDataEncryptor {
       const totalProcessed = this.stats.members.processed + this.stats.expenses.processed + 
                             this.stats.settlements.processed + this.stats.familyGroups.processed + 
                             this.stats.familyInvitations.processed;
-      
-      console.log('\n' + '='.repeat(60));
-      console.log(`📝 Total encrypted: ${totalProcessed}`);
-      console.log(`✗ Total errors: ${totalErrors}`);
-      console.log('='.repeat(60));
-
-      if (totalErrors > 0) {
-        console.log('\n⚠️  Some items failed to encrypt. Check the errors above.');
-      } else if (totalProcessed > 0) {
-        console.log('\n✅ All data encrypted successfully!');
-      } else {
-        console.log('\n✅ All data was already encrypted!');
-      }
 
     } catch (error) {
       console.error('\n❌ Fatal error during encryption:', error);
@@ -446,14 +363,11 @@ class TripDataEncryptor {
 
   async verifyEncryption() {
     try {
-      console.log('\n🔍 Verifying encryption...\n');
-      console.log('='.repeat(60));
 
       let verified = { members: 0, expenses: 0, settlements: 0, familyGroups: 0, familyInvitations: 0 };
       let failed = { members: 0, expenses: 0, settlements: 0, familyGroups: 0, familyInvitations: 0 };
 
       // Verify members
-      console.log('\n👥 Verifying trip members...');
       const membersSnapshot = await getDocs(collection(db, this.membersCollection));
       for (const docSnap of membersSnapshot.docs) {
         const data = docSnap.data();
@@ -462,7 +376,6 @@ class TripDataEncryptor {
             const decrypted = await encryptionService.decryptValue(data.name);
             if (decrypted) {
               verified.members++;
-              console.log(`✓ ${docSnap.id}: ${decrypted}`);
             }
           }
         } catch (error) {
@@ -472,7 +385,6 @@ class TripDataEncryptor {
       }
 
       // Verify expenses
-      console.log('\n💰 Verifying trip expenses...');
       const expensesSnapshot = await getDocs(collection(db, this.expensesCollection));
       for (const docSnap of expensesSnapshot.docs) {
         const data = docSnap.data();
@@ -481,7 +393,6 @@ class TripDataEncryptor {
             const decrypted = await encryptionService.decryptObject(data, this.expensesCollection);
             if (decrypted) {
               verified.expenses++;
-              console.log(`✓ ${docSnap.id}: ${decrypted.description || 'No description'}`);
             }
           }
         } catch (error) {
@@ -491,7 +402,6 @@ class TripDataEncryptor {
       }
 
       // Verify settlements
-      console.log('\n🤝 Verifying trip settlements...');
       const settlementsSnapshot = await getDocs(collection(db, this.settlementsCollection));
       for (const docSnap of settlementsSnapshot.docs) {
         const data = docSnap.data();
@@ -500,7 +410,6 @@ class TripDataEncryptor {
             const decrypted = await encryptionService.decryptObject(data, this.settlementsCollection);
             if (decrypted) {
               verified.settlements++;
-              console.log(`✓ ${docSnap.id}: ₹${decrypted.amount || 0}`);
             }
           }
         } catch (error) {
@@ -510,7 +419,6 @@ class TripDataEncryptor {
       }
 
       // Verify family groups
-      console.log('\n👨‍👩‍👧‍👦 Verifying family groups...');
       const groupsSnapshot = await getDocs(collection(db, this.familyGroupsCollection));
       for (const docSnap of groupsSnapshot.docs) {
         const data = docSnap.data();
@@ -519,7 +427,6 @@ class TripDataEncryptor {
             const decrypted = await encryptionService.decryptObject(data, this.familyGroupsCollection);
             if (decrypted) {
               verified.familyGroups++;
-              console.log(`✓ ${docSnap.id}: ${decrypted.name || 'No name'}`);
             }
           }
         } catch (error) {
@@ -529,7 +436,6 @@ class TripDataEncryptor {
       }
 
       // Verify family invitations
-      console.log('\n✉️ Verifying family invitations...');
       const invitationsSnapshot = await getDocs(collection(db, this.familyInvitationsCollection));
       for (const docSnap of invitationsSnapshot.docs) {
         const data = docSnap.data();
@@ -538,7 +444,6 @@ class TripDataEncryptor {
             const decrypted = await encryptionService.decryptObject(data, this.familyInvitationsCollection);
             if (decrypted) {
               verified.familyInvitations++;
-              console.log(`✓ ${docSnap.id}: ${decrypted.invitedEmail || 'No email'}`);
             }
           }
         } catch (error) {
@@ -546,18 +451,6 @@ class TripDataEncryptor {
           console.error(`✗ ${docSnap.id}: ${error.message}`);
         }
       }
-
-      // Summary
-      console.log('\n' + '='.repeat(60));
-      console.log('📊 VERIFICATION SUMMARY');
-      console.log('='.repeat(60));
-      console.log(`✓ Trip Members verified: ${verified.members}`);
-      console.log(`✓ Trip Expenses verified: ${verified.expenses}`);
-      console.log(`✓ Trip Settlements verified: ${verified.settlements}`);
-      console.log(`✓ Family Groups verified: ${verified.familyGroups}`);
-      console.log(`✓ Family Invitations verified: ${verified.familyInvitations}`);
-      console.log(`✗ Total failures: ${failed.members + failed.expenses + failed.settlements + failed.familyGroups + failed.familyInvitations}`);
-      console.log('='.repeat(60));
 
     } catch (error) {
       console.error('\n❌ Error during verification:', error);
@@ -575,12 +468,8 @@ window.tripDataEncryptor = encryptor;
 // Auto-run message
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
-    console.log('Trip Data Encryptor loaded. Use window.tripDataEncryptor to run encryption.');
-    console.log('Example: await window.tripDataEncryptor.encryptAllTripData()');
   });
 } else {
-  console.log('Trip Data Encryptor loaded. Use window.tripDataEncryptor to run encryption.');
-  console.log('Example: await window.tripDataEncryptor.encryptAllTripData()');
 }
 
 export default encryptor;

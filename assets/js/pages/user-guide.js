@@ -720,7 +720,7 @@ async function initializeNavigation() {
       }
     }
   } catch (error) {
-    console.log('User not logged in, showing public navigation');
+
   }
 }
 

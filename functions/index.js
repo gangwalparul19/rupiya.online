@@ -29,7 +29,6 @@ exports.cleanupOldNotifications = functions.pubsub
   .schedule('30 18 * * 6')  // Every Sunday at midnight IST (18:30 UTC Saturday)
   .timeZone('Asia/Kolkata')
   .onRun(async () => {
-    console.log('Starting notification cleanup...');
     
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -43,7 +42,6 @@ exports.cleanupOldNotifications = functions.pubsub
         .get();
       
       if (oldNotifications.empty) {
-        console.log('No old notifications to clean up');
         return null;
       }
       
@@ -53,7 +51,6 @@ exports.cleanupOldNotifications = functions.pubsub
       });
       
       await batch.commit();
-      console.log(`Deleted ${oldNotifications.size} old notifications`);
       
       return null;
     } catch (error) {

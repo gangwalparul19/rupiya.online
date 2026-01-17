@@ -58,7 +58,6 @@ function updateVersionJs(newVersion) {
 export const APP_VERSION = '${newVersion}';
 `;
   fs.writeFileSync(versionJsPath, content, 'utf8');
-  console.log(`Updated version.js to ${newVersion}`);
 }
 
 /**
@@ -75,7 +74,6 @@ function updateServiceWorker(newVersion) {
     );
     
     fs.writeFileSync(serviceWorkerPath, content, 'utf8');
-    console.log(`Updated service-worker.js to ${newVersion}`);
   } catch (error) {
     console.error('Error updating service-worker.js:', error.message);
   }
@@ -85,19 +83,15 @@ function updateServiceWorker(newVersion) {
  * Main function
  */
 function main() {
-  console.log('Auto-incrementing version...');
   
   const currentVersion = getCurrentVersion();
   const newVersion = incrementVersion(currentVersion);
-  
-  console.log(`Version: ${currentVersion} -> ${newVersion}`);
+
   
   // Update both files
   updateVersionJs(newVersion);
   updateServiceWorker(newVersion);
-  
-  console.log('Version increment complete!');
-  
+    
   return newVersion;
 }
 
