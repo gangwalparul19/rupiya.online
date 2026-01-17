@@ -1061,72 +1061,10 @@
     </div>
     </div><!-- End user-guide-content -->
 
-    <script>
-        // Navbar scroll effect
-        const navbar = document.getElementById('navbar');
-        if (navbar) {
-            window.addEventListener('scroll', () => {
-                navbar.classList.toggle('scrolled', window.scrollY > 50);
-            });
-        }
-
-        // Accordion functionality
-        document.querySelectorAll('.accordion-header').forEach(header => {
-            header.addEventListener('click', () => {
-                const item = header.parentElement;
-                const isActive = item.classList.contains('active');
-                
-                // Close all accordions
-                document.querySelectorAll('.accordion-item').forEach(i => {
-                    i.classList.remove('active');
-                });
-                
-                // Open clicked accordion if it wasn't active
-                if (!isActive) {
-                    item.classList.add('active');
-                }
-            });
-        });
-        
-        // Smooth scrolling for TOC links
-        document.querySelectorAll('.toc-item').forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const targetId = link.getAttribute('href').substring(1);
-                const target = document.getElementById(targetId);
-                if (target) {
-                    // Open the accordion
-                    target.classList.add('active');
-                    // Scroll to it
-                    setTimeout(() => {
-                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }, 100);
-                }
-            });
-        });
-    </script>
-    <script src="assets/js/components/header.js"></script>
-    <script>
-        HeaderComponent.inject('header-container', 'landing', 'guide');
-    </script>
-    
-    <!-- Check if user is logged in and add class to body -->
-    <script type="module">
-        import authService from './assets/js/services/auth-service.js';
-        
-        // Check auth status and update body class
-        authService.waitForAuth().then(user => {
-            if (user) {
-                document.body.classList.add('user-logged-in');
-            } else {
-                document.body.classList.remove('user-logged-in');
-            }
-        }).catch(() => {
-            document.body.classList.remove('user-logged-in');
-        });
-    </script>
+    <!-- Scripts -->
     <script type="module" src="assets/js/utils/ux-enhancements.js"></script>
-    <!-- Load dashboard common JS for logged-in users -->
-    <script type="module" src="assets/js/utils/dashboard-common.js"></script>
+    <script type="module" src="assets/js/components/sidebar.js"></script>
+    <script type="module" src="assets/js/pages/user-guide.js"></script>
+    <script type="module" src="assets/js/pwa-setup.js"></script>
 </body>
 </html>
