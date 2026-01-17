@@ -461,7 +461,7 @@ class SetupWizard {
                 <span class="setup-next-icon">📊</span>
                 <span>Set up budgets</span>
               </a>
-              <a href="user-guide.html" class="setup-next-step">
+              <a href="user-guide-public.html" class="setup-next-step">
                 <span class="setup-next-icon">📖</span>
                 <span>Read the user guide</span>
               </a>

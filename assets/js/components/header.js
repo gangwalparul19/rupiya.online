@@ -24,7 +24,7 @@ const HeaderComponent = {
             <img src="logo.png" alt="Rupiya Logo">
           </a>
           <div class="nav-links" id="navLinks">
-            <a href="user-guide.html" ${activePage === 'guide' ? 'class="active"' : ''}>Guide</a>
+            <a href="user-guide-public.html" ${activePage === 'guide' ? 'class="active"' : ''}>Guide</a>
             <a href="features.html" ${activePage === 'features' ? 'class="active"' : ''}>Features</a>
             <a href="login.html" class="btn btn-outline">Sign In</a>
             <a href="signup.html" class="btn btn-primary">Get Started</a>
@@ -58,7 +58,7 @@ const HeaderComponent = {
             </a>
           </div>
           <div class="landing-nav-links" id="navLinks">
-            <a href="user-guide.html">Guide</a>
+            <a href="user-guide-public.html">Guide</a>
             <a href="features.html">Features</a>
             ${currentPage === 'login' ? '<a href="signup.html">Sign Up</a>' : '<a href="login.html">Login</a>'}
           </div>

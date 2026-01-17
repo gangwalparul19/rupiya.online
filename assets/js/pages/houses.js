@@ -337,19 +337,26 @@ function renderHouses() {
   const pageHouses = state.filteredHouses.slice(startIndex, endIndex);
   
   housesList.innerHTML = pageHouses.map(house => {
-    const escapedName = escapeHtml(house.name);
-    const escapedAddress = escapeHtml(house.address);
-    const escapedOwnership = house.ownership ? escapeHtml(house.ownership) : '';
-    const escapedNotes = house.notes ? escapeHtml(house.notes) : '';
+    // Ensure house.name is a string
+    const houseName = String(house.name || '');
+    const houseAddress = String(house.address || '');
+    const houseType = String(house.type || '');
+    const houseOwnership = house.ownership ? String(house.ownership) : '';
+    const houseNotes = house.notes ? String(house.notes) : '';
+    
+    const escapedName = escapeHtml(houseName);
+    const escapedAddress = escapeHtml(houseAddress);
+    const escapedOwnership = houseOwnership ? escapeHtml(houseOwnership) : '';
+    const escapedNotes = houseNotes ? escapeHtml(houseNotes) : '';
     // Escape name for use in onclick handlers
-    const safeNameForJs = house.name.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"');
+    const safeNameForJs = houseName.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"');
     
     return `
       <div class="house-card">
         <div class="house-card-header">
           <div class="house-info">
             <div class="house-name">${escapedName}</div>
-            <span class="house-type">${escapeHtml(house.type)}</span>
+            <span class="house-type">${escapeHtml(houseType)}</span>
             <div class="house-address">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
