@@ -50,23 +50,24 @@
     <!-- Sidebar Overlay (Mobile) -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-    <!-- Mobile Header (for logged-in users) -->
-    <div class="mobile-header">
-      <button class="sidebar-toggle" id="sidebarOpen">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-        </svg>
-      </button>
-      <a href="dashboard.html" class="mobile-brand">
-        <img src="assets/images/logo.png" alt="Rupiya">
-      </a>
-      <div class="mobile-actions">
-        <!-- Placeholder for balance -->
-      </div>
-    </div>
-
     <!-- Main Content Wrapper -->
-    <div class="user-guide-content">
+    <main class="main-content">
+      <!-- Mobile Header -->
+      <div class="mobile-header">
+        <a href="dashboard.html" class="mobile-brand">
+          <img src="assets/images/logo.png" alt="Rupiya">
+        </a>
+        <div class="mobile-header-actions">
+          <button class="sidebar-toggle" id="sidebarOpen">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- User Guide Content -->
+      <div class="user-guide-content">
     <div id="header-container"></div>
 
     <section class="hero">
@@ -814,9 +815,11 @@
         <div class="footer">
             <p>📚 <strong>Rupiya User Guide</strong> - Last Updated: January 2026</p>
             <p style="margin-top: 8px;">For more help, visit <a href="about-us.html" style="color: #4A90E2;">About Us</a> or <a href="contact-us.html" style="color: #4A90E2;">Contact Us</a></p>
+            <p style="margin-top: 12px; font-size: 0.9em; color: #888;">Developed by <a href="https://www.weblithic.com" target="_blank" rel="noopener noreferrer" style="color: #4A90E2; font-weight: 600;">Weblithic</a></p>
         </div>
     </div>
     </div><!-- End user-guide-content -->
+    </main><!-- End main-content -->
 
     <!-- Scripts -->
     <script type="module" src="assets/js/utils/ux-enhancements.js"></script>
@@ -824,8 +827,45 @@
     <script type="module" src="assets/js/pages/user-guide.js"></script>
     <script type="module" src="assets/js/pwa-setup.js"></script>
     
-    <!-- Ensure sidebar toggle works -->
+    <!-- Accordion and Navigation Scripts -->
     <script>
+        // Accordion functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            // Setup accordion click handlers
+            document.querySelectorAll('.accordion-header').forEach(header => {
+                header.addEventListener('click', () => {
+                    const item = header.parentElement;
+                    const isActive = item.classList.contains('active');
+                    
+                    // Close all accordions
+                    document.querySelectorAll('.accordion-item').forEach(i => {
+                        i.classList.remove('active');
+                    });
+                    
+                    // Open clicked accordion if it wasn't active
+                    if (!isActive) {
+                        item.classList.add('active');
+                    }
+                });
+            });
+            
+            // Smooth scrolling for TOC links
+            document.querySelectorAll('.toc-item').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = link.getAttribute('href').substring(1);
+                    const target = document.getElementById(targetId);
+                    if (target) {
+                        // Open the accordion
+                        target.classList.add('active');
+                        // Scroll to it
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+            });
+        });
+        
+        // Sidebar toggle functionality
         window.addEventListener('load', () => {
             const sidebarOpen = document.getElementById('sidebarOpen');
             const sidebarClose = document.getElementById('sidebarClose');
