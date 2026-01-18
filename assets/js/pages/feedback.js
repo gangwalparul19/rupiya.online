@@ -70,10 +70,11 @@ async function init() {
 }
 
 // Initialize page after auth
-function initPage() {
+async function initPage() {
+    const user = await authService.waitForAuth();
   
   // Update user profile in sidebar
-  updateUserProfile();
+  loadUserProfile(user);
   
   // Setup event listeners
   setupEventListeners();
@@ -86,21 +87,30 @@ function initPage() {
   
 }
 
-// Update user profile
-function updateUserProfile() {
-  const userAvatar = document.getElementById('userAvatar');
+// load user profile
+function loadUserProfile(user) {
+  if (!user) return;
+  
   const userName = document.getElementById('userName');
   const userEmail = document.getElementById('userEmail');
-
-  if (userAvatar) {
-    const initials = currentUser.displayName 
-      ? currentUser.displayName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
-      : currentUser.email[0].toUpperCase();
-    userAvatar.textContent = initials;
+  const userAvatar = document.getElementById('userAvatar');
+  
+  if (userName) {
+    userName.textContent = user.displayName || user.email?.split('@')[0] || 'User';
   }
-
-  if (userName) userName.textContent = currentUser.displayName || 'User';
-  if (userEmail) userEmail.textContent = currentUser.email;
+  
+  if (userEmail) {
+    userEmail.textContent = user.email || '';
+  }
+  
+  if (userAvatar) {
+    if (user.photoURL) {
+      userAvatar.innerHTML = `<img src="${user.photoURL}" alt="User Avatar">`;
+    } else {
+      const initial = (user.displayName || user.email || 'U')[0].toUpperCase();
+      userAvatar.textContent = initial;
+    }
+  }
 }
 
 // Setup event listeners

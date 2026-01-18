@@ -9,10 +9,11 @@
   <link rel="icon" href="logo.png" type="image/png">
   
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="assets/css/common.css">
-  <link rel="stylesheet" href="assets/css/components.css">
-  <link rel="stylesheet" href="assets/css/dashboard-common.css">
+  <link rel="stylesheet" href="assets/css/bundles/core.bundle.css">
+  <link rel="stylesheet" href="assets/css/bundles/dashboard.bundle.css">
+  <!-- Page-specific styles -->
   <link rel="stylesheet" href="assets/css/user-guide.css">
+  <link rel="stylesheet" href="assets/css/sidebar.css">
   
   <!-- Auth Guard -->
   <script src="assets/js/utils/auth-guard.js"></script>
@@ -848,117 +849,7 @@
   <!-- Scripts -->
   <script type="module" src="assets/js/utils/ux-enhancements.js"></script>
   <script type="module" src="assets/js/components/sidebar.js"></script>
+  <script type="module" src="assets/js/pages/user-guide-auth.js"></script>
   <script type="module" src="assets/js/pwa-setup.js"></script>
-  
-  <script type="module">
-    import themeManager from './assets/js/utils/theme-manager.js';
-    import toast from './assets/js/components/toast.js';
-    import authService from './assets/js/services/auth-service.js';
-    
-    // Initialize user profile
-    async function initUserProfile() {
-      try {
-        const user = await authService.waitForAuth();
-        
-        if (user) {
-          const userName = document.getElementById('userName');
-          const userEmail = document.getElementById('userEmail');
-          const userAvatar = document.getElementById('userAvatar');
-          
-          if (userName) {
-            userName.textContent = user.displayName || user.email?.split('@')[0] || 'User';
-          }
-          if (userEmail) {
-            userEmail.textContent = user.email || '';
-          }
-          if (userAvatar) {
-            const initials = user.displayName 
-              ? user.displayName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
-              : (user.email ? user.email[0].toUpperCase() : 'U');
-            userAvatar.textContent = initials;
-          }
-        }
-      } catch (error) {
-        console.error('Error initializing user profile:', error);
-      }
-    }
-    
-    // Initialize on load
-    initUserProfile();
-    
-    // Theme toggle
-    const themeToggleBtn = document.getElementById('themeToggleBtn');
-    if (themeToggleBtn) {
-      themeToggleBtn.addEventListener('click', () => {
-        const newTheme = themeManager.toggleTheme();
-        toast.success(`Switched to ${newTheme} mode`);
-      });
-    }
-    
-    // Sidebar toggle functionality
-    window.addEventListener('load', () => {
-      const sidebarOpen = document.getElementById('sidebarOpen');
-      const sidebarClose = document.getElementById('sidebarClose');
-      const sidebar = document.getElementById('sidebar');
-      const overlay = document.getElementById('sidebarOverlay');
-      
-      if (sidebarOpen && sidebar && overlay) {
-        sidebarOpen.onclick = () => {
-          sidebar.classList.add('open');
-          overlay.classList.add('active');
-          document.body.style.overflow = 'hidden';
-        };
-        
-        if (sidebarClose) {
-          sidebarClose.onclick = () => {
-            sidebar.classList.remove('open');
-            overlay.classList.remove('active');
-            document.body.style.overflow = '';
-          };
-        }
-        
-        overlay.onclick = () => {
-          sidebar.classList.remove('open');
-          overlay.classList.remove('active');
-          document.body.style.overflow = '';
-        };
-      }
-    });
-  </script>
-  
-  <script>
-    // Accordion functionality
-    document.addEventListener('DOMContentLoaded', () => {
-      document.querySelectorAll('.accordion-header').forEach(header => {
-        header.addEventListener('click', () => {
-          const item = header.parentElement;
-          const isActive = item.classList.contains('active');
-          
-          // Close all accordions
-          document.querySelectorAll('.accordion-item').forEach(i => {
-            i.classList.remove('active');
-          });
-          
-          // Open clicked accordion if it wasn't active
-          if (!isActive) {
-            item.classList.add('active');
-          }
-        });
-      });
-      
-      // Smooth scrolling for TOC links
-      document.querySelectorAll('.toc-item').forEach(link => {
-        link.addEventListener('click', (e) => {
-          e.preventDefault();
-          const targetId = link.getAttribute('href').substring(1);
-          const target = document.getElementById(targetId);
-          if (target) {
-            target.classList.add('active');
-            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }
-        });
-      });
-    });
-  </script>
 </body>
 </html>

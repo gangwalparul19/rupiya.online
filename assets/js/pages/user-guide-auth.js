@@ -1,11 +1,10 @@
 /**
- * Privacy Settings Page
- * Manages privacy mode and data visibility settings
+ * User Guide (Authenticated) Page
+ * Handles user guide page for authenticated users
  */
 
-import '../services/services-init.js'; // Initialize services first
+import '../services/services-init.js';
 import authService from '../services/auth-service.js';
-import privacyMode from '../utils/privacy-mode.js';
 import themeManager from '../utils/theme-manager.js';
 import toast from '../components/toast.js';
 
@@ -13,11 +12,8 @@ let currentUser = null;
 
 // Initialize
 async function init() {
-  
   try {
-    // Add a small delay to ensure Firebase is ready
-    await new Promise(resolve => setTimeout(resolve, 100));
-    
+    // Wait for auth
     currentUser = await authService.waitForAuth();
     
     if (!currentUser) {
@@ -25,29 +21,33 @@ async function init() {
       return;
     }
     
-    // User is authenticated, initialize page
+    // Initialize page
     initPage();
     
   } catch (error) {
-    console.error('[Privacy Settings] Init error:', error);
+    console.error('[User Guide Auth] Init error:', error);
     window.location.href = 'login.html';
   }
 }
 
 // Initialize page after auth
 async function initPage() {
-
   const user = await authService.waitForAuth();
   if (!user) {
     window.location.href = 'login.html';
     return;
   }
-  // Update user profile in sidebar
+  // Update user profile
   loadUserProfile(user);
   
-  // Setup event listeners
-  setupEventListeners();
+  // Setup theme toggle
+  setupThemeToggle();
   
+  // Setup accordion
+  setupAccordion();
+  
+  // Setup smooth scrolling
+  setupSmoothScrolling();
 }
 
 // Update user profile
@@ -76,48 +76,8 @@ function loadUserProfile(user) {
   }
 }
 
-// Setup event listeners
-function setupEventListeners() {
-  // Note: Sidebar toggle is handled by dashboard-common.js -> sidebar.js
-  // No need to duplicate event listeners here
-  
-  // Privacy mode controls
-  const mainToggle = document.getElementById('mainPrivacyToggle');
-  const enableBtn = document.getElementById('enablePrivacyBtn');
-  const disableBtn = document.getElementById('disablePrivacyBtn');
-
-  function updateToggleState() {
-    if (privacyMode.isEnabled()) {
-      mainToggle?.classList.add('active');
-    } else {
-      mainToggle?.classList.remove('active');
-    }
-  }
-
-  mainToggle?.addEventListener('click', () => {
-    privacyMode.toggle();
-    updateToggleState();
-  });
-
-  enableBtn?.addEventListener('click', () => {
-    privacyMode.enable();
-    updateToggleState();
-  });
-
-  disableBtn?.addEventListener('click', () => {
-    privacyMode.disable();
-    updateToggleState();
-  });
-
-  // Initialize toggle state
-  updateToggleState();
-
-  // Listen for privacy mode changes
-  window.addEventListener('privacyModeChanged', () => {
-    updateToggleState();
-  });
-
-  // Theme toggle
+// Setup theme toggle
+function setupThemeToggle() {
   const themeToggleBtn = document.getElementById('themeToggleBtn');
   if (themeToggleBtn) {
     themeToggleBtn.addEventListener('click', () => {
@@ -125,6 +85,41 @@ function setupEventListeners() {
       toast.success(`Switched to ${newTheme} mode`);
     });
   }
+}
+
+// Setup accordion functionality
+function setupAccordion() {
+  document.querySelectorAll('.accordion-header').forEach(header => {
+    header.addEventListener('click', () => {
+      const item = header.parentElement;
+      const isActive = item.classList.contains('active');
+      
+      // Close all accordions
+      document.querySelectorAll('.accordion-item').forEach(i => {
+        i.classList.remove('active');
+      });
+      
+      // Open clicked accordion if it wasn't active
+      if (!isActive) {
+        item.classList.add('active');
+      }
+    });
+  });
+}
+
+// Setup smooth scrolling for TOC links
+function setupSmoothScrolling() {
+  document.querySelectorAll('.toc-item').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const targetId = link.getAttribute('href').substring(1);
+      const target = document.getElementById(targetId);
+      if (target) {
+        target.classList.add('active');
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
 }
 
 // Start initialization when DOM is ready
