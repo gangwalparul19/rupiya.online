@@ -1255,6 +1255,57 @@
     padding: 40px 20px;
 }
 
+/* Hero Section for Public Pages */
+.public-page .hero {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 4rem 2rem;
+    text-align: center;
+    margin-top: 72px; /* Account for fixed navbar */
+}
+
+.public-page .hero h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
+
+.public-page .hero p {
+    font-size: 1.2rem;
+    opacity: 0.95;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+    .public-page .hero {
+        padding: 3rem 1.5rem;
+        margin-top: 70px;
+    }
+    
+    .public-page .hero h1 {
+        font-size: 2rem;
+    }
+    
+    .public-page .hero p {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .public-page .hero {
+        padding: 2.5rem 1rem;
+    }
+    
+    .public-page .hero h1 {
+        font-size: 1.75rem;
+    }
+    
+    .public-page .hero p {
+        font-size: 0.95rem;
+    }
+}
+
 /* Page Header */
 .page-header {
     padding: 40px 20px;
@@ -1295,11 +1346,13 @@
     }
     
     .steps-compact {
-        flex-direction: column;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
     }
     
     .step-compact {
-        min-width: 100%;
+        min-width: auto;
     }
     
     .cta {
@@ -1315,13 +1368,17 @@
     }
     
     .cta-buttons {
-        flex-direction: column;
-        align-items: stretch;
+        flex-direction: row;
+        justify-content: center;
+        gap: 10px;
     }
     
     .btn {
-        width: 100%;
+        flex: 1;
+        max-width: 180px;
         text-align: center;
+        font-size: 0.85rem;
+        padding: 0.75rem 1rem;
     }
 }
 
@@ -1344,7 +1401,50 @@
     }
     
     .quick-cards {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+    
+    .quick-card {
+        padding: 12px 8px;
+    }
+    
+    .quick-card-icon {
+        font-size: 1.8em;
+        margin-bottom: 8px;
+    }
+    
+    .quick-card-title {
+        font-size: 0.85em;
+        margin-bottom: 4px;
+    }
+    
+    .quick-card-desc {
+        font-size: 0.7em;
+        line-height: 1.2;
+    }
+    
+    .steps-compact {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+    }
+    
+    .step-compact {
+        padding: 10px 5px;
+        min-width: auto;
+    }
+    
+    .step-compact-number {
+        width: 32px;
+        height: 32px;
+        font-size: 1em;
+        margin: 0 auto 6px;
+    }
+    
+    .step-compact-text {
+        font-size: 0.75em;
+        line-height: 1.2;
     }
     
     .toc-grid {

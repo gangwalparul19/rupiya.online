@@ -60,7 +60,7 @@ const HeaderComponent = {
           <div class="landing-nav-links" id="navLinks">
             <a href="user-guide-public.html">Guide</a>
             <a href="features.html">Features</a>
-            ${currentPage === 'login' ? '<a href="signup.html">Sign Up</a>' : '<a href="login.html">Login</a>'}
+            ${currentPage === 'login' ? '<a href="signup.html" class="btn btn-primary">Get Started</a>' : '<a href="login.html" class="btn btn-outline">Login</a>'}
           </div>
           <button class="mobile-toggle" id="mobileToggle">&#9776;</button>
         </div>
