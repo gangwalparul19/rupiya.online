@@ -7,10 +7,12 @@
     <meta name="description" content="Complete user guide for Rupiya - Learn how to track expenses, manage budgets, investments, and more. Step-by-step tutorials for all features.">
     <meta name="theme-color" content="#667eea">
     <link rel="icon" href="logo.png" type="image/png">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="assets/css/bundles/core.bundle.css">
+    <link rel="stylesheet" href="assets/css/bundles/dashboard.bundle.css">
     <link rel="stylesheet" href="assets/css/user-guide.css">
-    <link rel="stylesheet" href="assets/css/user-guide-auth.css">
-    <link rel="stylesheet" href="assets/css/user-guide-layout.css">
-    <link rel="stylesheet" href="assets/css/dashboard-common.css">
+    <link rel="stylesheet" href="assets/css/sidebar.css">
 </head>
 <body>
     <!-- Sidebar (for logged-in users) -->
@@ -875,6 +877,7 @@
             if (sidebarOpen && sidebar && overlay) {
                 sidebarOpen.onclick = () => {
                     sidebar.classList.add('open');
+                    sidebar.classList.add('active');
                     overlay.classList.add('active');
                     document.body.style.overflow = 'hidden';
                 };
@@ -882,6 +885,7 @@
                 if (sidebarClose) {
                     sidebarClose.onclick = () => {
                         sidebar.classList.remove('open');
+                        sidebar.classList.remove('active');
                         overlay.classList.remove('active');
                         document.body.style.overflow = '';
                     };
@@ -889,6 +893,7 @@
                 
                 overlay.onclick = () => {
                     sidebar.classList.remove('open');
+                    sidebar.classList.remove('active');
                     overlay.classList.remove('active');
                     document.body.style.overflow = '';
                 };
