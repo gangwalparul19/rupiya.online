@@ -391,7 +391,14 @@ export async function initSidebar() {
 function setupSectionToggles() {
   document.querySelectorAll('[data-section-toggle]').forEach(header => {
     header.addEventListener('click', (e) => {
+      // Only handle clicks on the header itself, not on nav items
+      if (e.target.closest('.nav-item')) {
+        return; // Let nav item clicks through
+      }
+      
       e.preventDefault();
+      e.stopPropagation();
+      
       const sectionId = header.dataset.sectionToggle;
       const section = document.querySelector(`[data-section="${sectionId}"]`);
       
@@ -401,6 +408,14 @@ function setupSectionToggles() {
         section.classList.toggle('collapsed', isExpanded);
         saveSectionState(sectionId, !isExpanded);
       }
+    });
+  });
+  
+  // Ensure nav items are clickable
+  document.querySelectorAll('.nav-item').forEach(navItem => {
+    navItem.addEventListener('click', (e) => {
+      // Allow default navigation behavior
+      // Don't prevent default or stop propagation
     });
   });
 }
