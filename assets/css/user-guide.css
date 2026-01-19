@@ -614,9 +614,10 @@ body {
     }
     
     .toc {
-        padding: 20px;
+        padding: 20px 15px;
         margin-bottom: 25px;
-        border-radius: 6px;
+        border-radius: 8px;
+        border-left: 4px solid #4A90E2;
     }
     
     .toc h2 {
@@ -624,18 +625,15 @@ body {
         margin-bottom: 15px;
     }
     
-    .toc-list {
-        grid-template-columns: 1fr;
+    .toc-grid {
+        grid-template-columns: repeat(3, 1fr);
         gap: 10px;
     }
     
-    .toc-item {
-        padding: 12px;
-        border-radius: 6px;
-    }
-    
-    .toc-item a {
-        font-size: 0.95em;
+    .toc-grid .toc-item {
+        padding: 12px 8px;
+        font-size: 0.85em;
+        border-radius: 8px;
     }
     
     .section {
@@ -788,9 +786,9 @@ body {
     }
     
     .toc {
-        padding: 15px;
+        padding: 15px 10px;
         margin-bottom: 20px;
-        border-radius: 4px;
+        border-radius: 6px;
         border-left: 3px solid #4A90E2;
     }
     
@@ -799,18 +797,15 @@ body {
         margin-bottom: 12px;
     }
     
-    .toc-list {
+    .toc-grid {
+        grid-template-columns: repeat(3, 1fr);
         gap: 8px;
     }
     
-    .toc-item {
-        padding: 10px;
-        border-radius: 4px;
-    }
-    
-    .toc-item a {
-        font-size: 0.9em;
-        font-weight: 500;
+    .toc-grid .toc-item {
+        padding: 10px 6px;
+        font-size: 0.8em;
+        border-radius: 6px;
     }
     
     .section {
@@ -1228,6 +1223,33 @@ body {
     transform: translateY(-5px) scale(1.05);
     border-color: #667eea;
     box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+/* Mobile: 3 columns for TOC */
+@media (max-width: 768px) {
+    .toc-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+    }
+    
+    .toc-grid .toc-item {
+        padding: 12px 8px;
+        font-size: 0.85em;
+        border-radius: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .toc-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+    
+    .toc-grid .toc-item {
+        padding: 10px 6px;
+        font-size: 0.8em;
+        border-radius: 6px;
+    }
 }
 
 /* Quick Cards */
@@ -1820,16 +1842,6 @@ body {
     .accordion-body .step-compact-text {
         font-size: 0.75em;
         line-height: 1.2;
-    }
-    
-    .toc-grid {
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 10px;
-    }
-    
-    .toc-grid .toc-item {
-        padding: 12px;
-        font-size: 0.9em;
     }
     
     .cta h2 {
