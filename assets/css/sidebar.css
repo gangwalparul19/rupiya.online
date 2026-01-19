@@ -571,6 +571,26 @@
   gap: 0.5rem;
 }
 
+/* Logout Button Styling */
+.sidebar-footer #logoutBtn,
+.sidebar-footer .btn-outline {
+  background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+  color: white;
+  border: none;
+  padding: 0.625rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(74, 144, 226, 0.3);
+}
+
+.sidebar-footer #logoutBtn:hover,
+.sidebar-footer .btn-outline:hover {
+  background: linear-gradient(135deg, #357ABD 0%, #2d5a99 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
+}
+
 /* Dark Mode */
 [data-theme="dark"] .sidebar-footer {
   background: var(--bg-primary, #1f2937);
