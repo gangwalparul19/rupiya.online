@@ -1011,7 +1011,8 @@
     transition: transform 0.3s ease;
 }
 
-.accordion-item.active .accordion-toggle {
+.accordion-item.active .accordion-toggle,
+.accordion-item.open .accordion-toggle {
     transform: rotate(180deg);
 }
 
@@ -1021,8 +1022,10 @@
     transition: max-height 0.4s ease;
 }
 
-.accordion-item.active .accordion-content {
+.accordion-item.active .accordion-content,
+.accordion-item.open .accordion-content {
     max-height: 5000px;
+    display: block !important; /* Override bundle CSS */
 }
 
 .accordion-body {

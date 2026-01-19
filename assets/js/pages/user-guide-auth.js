@@ -89,22 +89,36 @@ function setupThemeToggle() {
 
 // Setup accordion functionality
 function setupAccordion() {
-  document.querySelectorAll('.accordion-header').forEach(header => {
-    header.addEventListener('click', () => {
-      const item = header.parentElement;
-      const isActive = item.classList.contains('active');
-      
-      // Close all accordions
-      document.querySelectorAll('.accordion-item').forEach(i => {
-        i.classList.remove('active');
+  // Use a small delay to ensure DOM is fully rendered
+  setTimeout(() => {
+    const accordionHeaders = document.querySelectorAll('.accordion-header');
+    console.log('[User Guide Auth] Found accordion headers:', accordionHeaders.length);
+    
+    accordionHeaders.forEach((header, index) => {
+      header.addEventListener('click', (e) => {
+        console.log('[User Guide Auth] Accordion clicked:', index);
+        const item = header.parentElement;
+        const isActive = item.classList.contains('active') || item.classList.contains('open');
+        
+        // Close all accordions
+        document.querySelectorAll('.accordion-item').forEach(i => {
+          i.classList.remove('active');
+          i.classList.remove('open');
+        });
+        
+        // Open clicked accordion if it wasn't active
+        if (!isActive) {
+          item.classList.add('active');
+          item.classList.add('open'); // Add both classes for compatibility
+          console.log('[User Guide Auth] Accordion opened:', index);
+        }
       });
-      
-      // Open clicked accordion if it wasn't active
-      if (!isActive) {
-        item.classList.add('active');
-      }
     });
-  });
+    
+    if (accordionHeaders.length === 0) {
+      console.warn('[User Guide Auth] No accordion headers found!');
+    }
+  }, 100);
 }
 
 // Setup smooth scrolling for TOC links
