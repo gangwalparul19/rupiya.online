@@ -32,11 +32,29 @@ body {
     background: white;
     border-right: 1px solid #e5e7eb;
     overflow-y: auto;
+    overflow-x: hidden;
     z-index: 1000;
     transition: transform 0.3s ease;
     display: flex;
     flex-direction: column;
-    padding-bottom: 20px;
+    padding-bottom: 0;
+}
+
+.sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background: #555;
 }
 
 .sidebar-overlay {

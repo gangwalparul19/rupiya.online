@@ -574,9 +574,9 @@
 /* Logout Button Styling */
 .sidebar-footer #logoutBtn,
 .sidebar-footer .btn-outline {
-  background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
-  color: white;
-  border: none;
+  background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%) !important;
+  color: white !important;
+  border: none !important;
   padding: 0.625rem 1rem;
   border-radius: 8px;
   font-weight: 600;
@@ -586,9 +586,15 @@
 
 .sidebar-footer #logoutBtn:hover,
 .sidebar-footer .btn-outline:hover {
-  background: linear-gradient(135deg, #357ABD 0%, #2d5a99 100%);
+  background: linear-gradient(135deg, #357ABD 0%, #2d5a99 100%) !important;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
+}
+
+.sidebar-footer #logoutBtn svg,
+.sidebar-footer .btn-outline svg {
+  color: white;
+  stroke: white;
 }
 
 /* Dark Mode */
