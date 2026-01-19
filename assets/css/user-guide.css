@@ -1,9 +1,24 @@
 /* User Guide Specific Styles */
 
+/* Base Styles */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+    background: #f8fafc;
+    color: #2C3E50;
+}
+
 /* Layout */
 .dashboard-layout {
     display: flex;
     min-height: 100vh;
+}
+
+/* Public Page Layout */
+.public-page {
+    min-height: 100vh;
+    background: #f8fafc;
 }
 
 .sidebar {
@@ -1229,6 +1244,76 @@
 }
 
 /* Footer */
+.landing-footer {
+    padding: 4rem 2rem 2rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-top: 2px solid #4A90E2;
+    margin-top: 4rem;
+    text-align: center;
+}
+
+.footer-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.footer-copyright {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.footer-bottom a {
+    color: inherit;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.footer-bottom a:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+    .landing-footer {
+        padding: 3rem 1rem 1.5rem;
+        margin-top: 2rem;
+    }
+    
+    .footer-bottom {
+        gap: 0.75rem;
+        padding-top: 1.5rem;
+    }
+    
+    .footer-copyright {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .landing-footer {
+        padding: 2rem 0.75rem 1rem;
+        margin-top: 1.5rem;
+    }
+    
+    .footer-bottom {
+        gap: 0.5rem;
+        padding-top: 1rem;
+    }
+    
+    .footer-copyright {
+        font-size: 0.75rem;
+        line-height: 1.4;
+    }
+}
+
+/* Old Footer (deprecated - keeping for backward compatibility) */
 .footer {
     text-align: center;
     padding: 30px 20px;
