@@ -311,25 +311,53 @@ body {
     background: linear-gradient(135deg, #f9f9f9 0%, #f5f5f5 100%);
     padding: 25px;
     margin: 25px 0;
-    border-radius: 8px;
-    border-left: 5px solid #00D4FF;
+    border-radius: 12px;
+    border-left: 5px solid #667eea;
     transition: all 0.3s ease;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
 .step:hover {
-    box-shadow: 0 4px 12px rgba(0, 212, 255, 0.15);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.2);
     transform: translateX(5px);
+    border-left-color: #764ba2;
 }
 
 .step strong {
-    color: #357ABD;
-    font-size: 1.1em;
+    color: #667eea;
+    font-size: 1.15em;
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 700;
 }
 
 .step p {
     margin-top: 12px;
-    color: #666;
+    color: #555;
     line-height: 1.7;
+    font-size: 1em !important;
+}
+
+/* Override inline step styles */
+.accordion-body .step[style] {
+    background: linear-gradient(135deg, #f9f9f9 0%, #f5f5f5 100%) !important;
+    padding: 25px !important;
+    margin: 25px 0 !important;
+    border-radius: 12px !important;
+    border-left: 5px solid #667eea !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.accordion-body .step[style]:hover {
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.2);
+    transform: translateX(5px);
+}
+
+.accordion-body .step[style] p {
+    margin-top: 12px !important;
+    color: #555 !important;
+    line-height: 1.7 !important;
+    font-size: 1em !important;
 }
 
 .step-number {
@@ -1073,6 +1101,103 @@ body {
     line-height: 1.8;
 }
 
+.accordion-body h4 {
+    color: #667eea;
+    font-size: 1.3em;
+    font-weight: 700;
+    margin: 25px 0 15px;
+    padding-bottom: 10px;
+    border-bottom: 3px solid #e8f1ff;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.accordion-body h4::before {
+    content: '▸';
+    color: #667eea;
+    font-size: 1.2em;
+}
+
+/* Override inline h4 styles in accordion */
+.accordion-body h4[style] {
+    color: #667eea !important;
+    margin: 25px 0 15px !important;
+    padding-bottom: 10px;
+    border-bottom: 3px solid #e8f1ff;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.3em;
+    font-weight: 700;
+}
+
+.accordion-body h4[style]::before {
+    content: '▸';
+    color: #667eea;
+    font-size: 1.2em;
+}
+
+.accordion-body p {
+    color: #555;
+    font-size: 1.05em;
+    line-height: 1.8;
+    margin-bottom: 15px;
+}
+
+/* Override inline paragraph styles */
+.accordion-body p[style] {
+    color: #555 !important;
+    font-size: 1.05em !important;
+    line-height: 1.8 !important;
+    margin-bottom: 15px !important;
+}
+
+.accordion-body ul {
+    margin-left: 25px;
+    margin-top: 15px;
+}
+
+.accordion-body ul li {
+    margin-bottom: 12px;
+    color: #555;
+    line-height: 1.7;
+    font-size: 1.05em;
+    position: relative;
+    padding-left: 10px;
+}
+
+.accordion-body ul li::marker {
+    color: #667eea;
+    font-weight: bold;
+}
+
+/* Override inline ul styles */
+.accordion-body ul[style] {
+    margin-left: 25px !important;
+    margin-top: 15px;
+    list-style: none;
+    padding-left: 0;
+}
+
+.accordion-body ul[style] li {
+    margin-bottom: 12px !important;
+    color: #555 !important;
+    line-height: 1.8 !important;
+    font-size: 1.05em !important;
+    position: relative;
+    padding-left: 30px;
+}
+
+.accordion-body ul[style] li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: #667eea;
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
 /* TOC Grid */
 .toc-grid {
     display: grid;
@@ -1234,6 +1359,22 @@ body {
     margin-bottom: 8px;
 }
 
+/* Override inline tip styles */
+.accordion-body .tip[style] {
+    background: linear-gradient(135deg, #e8f4ff 0%, #f0f8ff 100%) !important;
+    padding: 20px 25px !important;
+    border-radius: 12px !important;
+    border-left: 6px solid #4A90E2 !important;
+    color: #2C3E50 !important;
+    box-shadow: 0 4px 15px rgba(74, 144, 226, 0.15);
+    margin: 20px 0 !important;
+}
+
+.accordion-body .tip[style]:hover {
+    transform: translateX(5px);
+    box-shadow: 0 6px 20px rgba(74, 144, 226, 0.25);
+}
+
 .warning {
     background: linear-gradient(135deg, #fff8e1 0%, #fffbf0 100%);
     padding: 20px 25px;
@@ -1257,6 +1398,22 @@ body {
     align-items: center;
     gap: 8px;
     margin-bottom: 8px;
+}
+
+/* Override inline warning styles */
+.accordion-body .warning[style] {
+    background: linear-gradient(135deg, #fff8e1 0%, #fffbf0 100%) !important;
+    padding: 20px 25px !important;
+    border-radius: 12px !important;
+    border-left: 6px solid #ff9800 !important;
+    color: #2C3E50 !important;
+    box-shadow: 0 4px 15px rgba(255, 152, 0, 0.15);
+    margin: 20px 0 !important;
+}
+
+.accordion-body .warning[style]:hover {
+    transform: translateX(5px);
+    box-shadow: 0 6px 20px rgba(255, 152, 0, 0.25);
 }
 
 /* CTA Section */
