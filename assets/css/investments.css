@@ -1660,15 +1660,14 @@
   font-size: 0.9rem;
   line-height: 1.6;
   color: #2C3E50;
-  display: flex;
-  align-items: flex-start;
-  gap: 0.5rem;
 }
 
 .investment-info-banner svg {
-  flex-shrink: 0;
+  float: left;
+  margin-right: 8px;
   margin-top: 2px;
   color: #4A90E2;
+  flex-shrink: 0;
 }
 
 .investment-info-banner strong {
@@ -2048,6 +2047,7 @@
   padding: 0.75rem 0.5rem;
   text-align: left;
   border-bottom: 1px solid var(--border-color, #E5E7EB);
+  white-space: nowrap;
 }
 
 .benchmark-comparison-table th {
@@ -2062,6 +2062,11 @@
 
 .benchmark-comparison-table td.negative {
   color: var(--danger-red, #EF4444);
+}
+
+.benchmark-comparison-table td:last-child {
+  white-space: nowrap;
+  min-width: 150px;
 }
 
 /* Performers List */
@@ -2299,15 +2304,50 @@
   /* Benchmark Table - Mobile optimized */
   .benchmark-comparison-table {
     font-size: 0.75rem;
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .benchmark-comparison-table thead,
+  .benchmark-comparison-table tbody,
+  .benchmark-comparison-table tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
   }
   
   .benchmark-comparison-table th,
   .benchmark-comparison-table td {
     padding: 0.5rem 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .benchmark-comparison-table th {
     font-size: 0.7rem;
+  }
+
+  .benchmark-comparison-table th:nth-child(1),
+  .benchmark-comparison-table td:nth-child(1) {
+    width: 25%;
+  }
+
+  .benchmark-comparison-table th:nth-child(2),
+  .benchmark-comparison-table td:nth-child(2) {
+    width: 25%;
+  }
+
+  .benchmark-comparison-table th:nth-child(3),
+  .benchmark-comparison-table td:nth-child(3) {
+    width: 25%;
+  }
+
+  .benchmark-comparison-table th:nth-child(4),
+  .benchmark-comparison-table td:nth-child(4) {
+    width: 25%;
+    white-space: nowrap;
   }
 
   /* Performers List - Mobile optimized */
@@ -2483,10 +2523,28 @@
     font-size: 0.65rem;
   }
 
-  /* Hide some columns on very small screens */
+  /* Hide Expected Value column on very small screens */
   .benchmark-comparison-table th:nth-child(2),
   .benchmark-comparison-table td:nth-child(2) {
     display: none;
+  }
+
+  /* Adjust column widths after hiding Expected Value */
+  .benchmark-comparison-table th:nth-child(1),
+  .benchmark-comparison-table td:nth-child(1) {
+    width: 30%;
+  }
+
+  .benchmark-comparison-table th:nth-child(3),
+  .benchmark-comparison-table td:nth-child(3) {
+    width: 30%;
+  }
+
+  .benchmark-comparison-table th:nth-child(4),
+  .benchmark-comparison-table td:nth-child(4) {
+    width: 40%;
+    white-space: nowrap;
+    font-size: 0.65rem;
   }
 
   /* Performers List - Small mobile */

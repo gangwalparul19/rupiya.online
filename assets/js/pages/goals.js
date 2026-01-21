@@ -818,8 +818,14 @@ async function handleContributionSubmit(e) {
     
     const newCurrentAmount = goal.currentAmount + amount;
     
+    // IMPORTANT: Pass the complete goal object with updated currentAmount
+    // This prevents encryption from losing other fields
     const result = await firestoreService.updateGoal(state.contributingGoalId, {
-      currentAmount: newCurrentAmount
+      name: goal.name,
+      targetAmount: goal.targetAmount,
+      currentAmount: newCurrentAmount,
+      targetDate: goal.targetDate,
+      description: goal.description || ''
     });
     
     if (result.success) {
