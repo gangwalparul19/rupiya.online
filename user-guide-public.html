@@ -8,6 +8,7 @@
     <meta name="theme-color" content="#667eea">
     <link rel="icon" href="logo.png" type="image/png">
     <link rel="stylesheet" href="assets/css/bundles/core.bundle.css">
+    <link rel="stylesheet" href="assets/css/bundles/landing.bundle.css">
     <link rel="stylesheet" href="assets/css/navbar.css">
     <link rel="stylesheet" href="assets/css/user-guide.css">
 </head>
@@ -757,9 +758,11 @@
                 <a href="demo.html" class="btn btn-outline">Try Demo</a>
             </div>
         </section>
+            </div>
+  </div>
 
           <!-- Footer -->
-  <footer class="landing-footer">
+<footer class="landing-footer">
     <div class="container">
       <div class="footer-content">
         <div class="footer-section">
@@ -802,28 +805,77 @@
     </div>
   </footer>
 
-  <style>
+    <style>
+    /* Override user-guide.css white background */
+    .landing-footer {
+      background: linear-gradient(135deg, #2c3e50 0%, #1a2a4a 100%) !important;
+      color: white !important;
+    }
+    
+    .landing-footer .footer-section h4 {
+      color: white !important;
+      border-bottom: 2px solid #4A90E2 !important;
+    }
+    
+    .landing-footer .footer-section a {
+      color: rgba(255, 255, 255, 0.8) !important;
+    }
+    
+    .landing-footer .footer-section a:hover {
+      color: #4A90E2 !important;
+    }
+    
+    .landing-footer .footer-bottom {
+      color: rgba(255, 255, 255, 0.7) !important;
+    }
+    
+    .landing-footer .footer-bottom p {
+      color: rgba(255, 255, 255, 0.7) !important;
+    }
+    
+    .landing-footer .footer-bottom a {
+      color: #4A90E2 !important;
+    }
+    
+    /* Desktop footer grid */
+    .landing-footer .footer-content {
+      display: grid !important;
+      grid-template-columns: repeat(4, 1fr) !important;
+      gap: 3rem !important;
+    }
+    
     @media (max-width: 768px) {
       .landing-footer .footer-content {
+        display: grid !important;
         grid-template-columns: repeat(2, 1fr) !important;
         gap: 2rem !important;
       }
     }
+    
     @media (max-width: 480px) {
       .landing-footer {
         padding: 2rem 1rem 1.5rem !important;
       }
       .landing-footer .footer-content {
+        display: grid !important;
         grid-template-columns: repeat(2, 1fr) !important;
         gap: 1.5rem !important;
         margin-bottom: 2rem !important;
+      }
+      .landing-footer .footer-section {
+        display: block !important;
       }
       .landing-footer .footer-section h4 {
         font-size: 0.95rem !important;
         margin-bottom: 0.75rem !important;
       }
+      .landing-footer .footer-section ul {
+        display: flex !important;
+        flex-direction: column !important;
+      }
       .landing-footer .footer-section a {
         font-size: 0.85rem !important;
+        word-break: break-word !important;
       }
       .landing-footer .footer-bottom {
         padding-top: 1.5rem !important;

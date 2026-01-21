@@ -367,27 +367,45 @@
   </footer>
 
   <style>
+    /* Desktop footer grid */
+    .landing-footer .footer-content {
+      display: grid !important;
+      grid-template-columns: repeat(4, 1fr) !important;
+      gap: 3rem !important;
+    }
+    
     @media (max-width: 768px) {
       .landing-footer .footer-content {
+        display: grid !important;
         grid-template-columns: repeat(2, 1fr) !important;
         gap: 2rem !important;
       }
     }
+    
     @media (max-width: 480px) {
       .landing-footer {
         padding: 2rem 1rem 1.5rem !important;
       }
       .landing-footer .footer-content {
+        display: grid !important;
         grid-template-columns: repeat(2, 1fr) !important;
         gap: 1.5rem !important;
         margin-bottom: 2rem !important;
+      }
+      .landing-footer .footer-section {
+        display: block !important;
       }
       .landing-footer .footer-section h4 {
         font-size: 0.95rem !important;
         margin-bottom: 0.75rem !important;
       }
+      .landing-footer .footer-section ul {
+        display: flex !important;
+        flex-direction: column !important;
+      }
       .landing-footer .footer-section a {
         font-size: 0.85rem !important;
+        word-break: break-word !important;
       }
       .landing-footer .footer-bottom {
         padding-top: 1.5rem !important;
