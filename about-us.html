@@ -52,6 +52,7 @@
   <!-- Stylesheets -->
   <link rel="stylesheet" href="assets/css/bundles/core.bundle.css">
   <link rel="stylesheet" href="assets/css/bundles/legal.bundle.css">
+  <link rel="stylesheet" href="assets/css/bundles/landing.bundle.css">
 <!-- Structured Data - WebPage -->
   <script type="application/ld+json">
   {
@@ -91,27 +92,7 @@
 </head>
 
 <body>
-  <!-- Navigation -->
-  <nav class="landing-nav" id="landingNav">
-    <div class="container">
-      <div class="nav-content">
-        <a href="index.html" class="landing-logo">
-          <img src="assets/images/logo.png" alt="Rupiya Logo">
-        </a>
-        <div class="landing-nav-links" id="navLinks">
-          <a href="user-guide-public.html">User Guide</a>
-          <a href="features.html">Features</a>
-          <a href="login.html" class="btn btn-outline">Sign In</a>
-          <a href="signup.html" class="btn btn-primary">Sign Up</a>
-        </div>
-        <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-          </svg>
-        </button>
-      </div>
-    </div>
-  </nav>
+  <div id="header-container"></div>
 
   <div class="legal-page-container">
     <div class="legal-page-content">
@@ -289,52 +270,96 @@
   </div>
 
   <!-- Footer -->
-  <footer class="landing-footer">
-    <div class="container">
-      <div class="footer-content">
+  <footer class="landing-footer" style="background: #1e293b; padding: 4rem 2rem 2rem;">
+    <div class="container" style="max-width: 1200px; margin: 0 auto;">
+      <div class="footer-content" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 3rem; margin-bottom: 3rem;">
         <div class="footer-section">
-          <h4>Company</h4>
-          <ul>
-            <li><a href="about-us.html">About Us</a></li>
-            <li><a href="contact-us.html">Contact Us</a></li>
-            <li><a href="user-guide-public.html">User Guide</a></li>
+          <h4 style="color: white; margin-bottom: 1rem; font-size: 1.1rem; font-weight: 600;">Company</h4>
+          <ul style="list-style: none; padding: 0; margin: 0;">
+            <li style="margin-bottom: 0.5rem;"><a href="about-us.html" style="color: rgba(255, 255, 255, 0.7); text-decoration: none; font-size: 0.95rem; transition: color 0.3s;">About Us</a></li>
+            <li style="margin-bottom: 0.5rem;"><a href="contact-us.html" style="color: rgba(255, 255, 255, 0.7); text-decoration: none; font-size: 0.95rem; transition: color 0.3s;">Contact Us</a></li>
+            <li style="margin-bottom: 0.5rem;"><a href="user-guide-public.html" style="color: rgba(255, 255, 255, 0.7); text-decoration: none; font-size: 0.95rem; transition: color 0.3s;">User Guide</a></li>
           </ul>
         </div>
         <div class="footer-section">
-          <h4>Features</h4>
-          <ul>
-            <li><a href="features.html">All Features</a></li>
-            <li><a href="ai-insights.html">AI Insights</a></li>
+          <h4 style="color: white; margin-bottom: 1rem; font-size: 1.1rem; font-weight: 600;">Features</h4>
+          <ul style="list-style: none; padding: 0; margin: 0;">
+            <li style="margin-bottom: 0.5rem;"><a href="features.html" style="color: rgba(255, 255, 255, 0.7); text-decoration: none; font-size: 0.95rem; transition: color 0.3s;">All Features</a></li>
+            <li style="margin-bottom: 0.5rem;"><a href="ai-insights.html" style="color: rgba(255, 255, 255, 0.7); text-decoration: none; font-size: 0.95rem; transition: color 0.3s;">AI Insights</a></li>
           </ul>
         </div>
         <div class="footer-section">
-          <h4>Legal</h4>
-          <ul>
-            <li><a href="privacy-policy.html">Privacy Policy</a></li>
-            <li><a href="terms-of-service.html">Terms of Service</a></li>
-            <li><a href="disclaimer.html">Disclaimer</a></li>
-            <li><a href="data-protection.html">Data Protection</a></li>
+          <h4 style="color: white; margin-bottom: 1rem; font-size: 1.1rem; font-weight: 600;">Legal</h4>
+          <ul style="list-style: none; padding: 0; margin: 0;">
+            <li style="margin-bottom: 0.5rem;"><a href="privacy-policy.html" style="color: rgba(255, 255, 255, 0.7); text-decoration: none; font-size: 0.95rem; transition: color 0.3s;">Privacy Policy</a></li>
+            <li style="margin-bottom: 0.5rem;"><a href="terms-of-service.html" style="color: rgba(255, 255, 255, 0.7); text-decoration: none; font-size: 0.95rem; transition: color 0.3s;">Terms of Service</a></li>
+            <li style="margin-bottom: 0.5rem;"><a href="disclaimer.html" style="color: rgba(255, 255, 255, 0.7); text-decoration: none; font-size: 0.95rem; transition: color 0.3s;">Disclaimer</a></li>
+            <li style="margin-bottom: 0.5rem;"><a href="data-protection.html" style="color: rgba(255, 255, 255, 0.7); text-decoration: none; font-size: 0.95rem; transition: color 0.3s;">Data Protection</a></li>
           </ul>
         </div>
         <div class="footer-section">
-          <h4>Connect</h4>
-          <ul>
-            <li><a href="feedback.html">Feedback</a></li>
-            <li><a href="mailto:help.rupiya@gmail.com">help.rupiya@gmail.com</a></li>
+          <h4 style="color: white; margin-bottom: 1rem; font-size: 1.1rem; font-weight: 600;">Connect</h4>
+          <ul style="list-style: none; padding: 0; margin: 0;">
+            <li style="margin-bottom: 0.5rem;"><a href="feedback.html" style="color: rgba(255, 255, 255, 0.7); text-decoration: none; font-size: 0.95rem; transition: color 0.3s;">Feedback</a></li>
+            <li style="margin-bottom: 0.5rem;"><a href="mailto:help.rupiya@gmail.com" style="color: rgba(255, 255, 255, 0.7); text-decoration: none; font-size: 0.95rem; transition: color 0.3s; word-break: break-word;">help.rupiya@gmail.com</a></li>
           </ul>
         </div>
       </div>
               
-      <div class="footer-bottom">
-        <p class="footer-copyright">© 2026 Rupiya. Built with ❤️ for modern India.</p>
-        <p class="footer-disclaimer">Rupiya is a financial management tool. We do not provide investment advice. Always consult qualified financial professionals.</p>
-        <p style="margin-top: 0.75rem; font-size: 0.9rem; opacity: 0.8;">Developed by <a href="https://www.weblithic.com" target="_blank" rel="noopener noreferrer" style="color: inherit; font-weight: 600; text-decoration: none;">Weblithic</a></p>
+      <div class="footer-bottom" style="text-align: center; padding-top: 2rem; border-top: 1px solid rgba(255, 255, 255, 0.1); color: rgba(255, 255, 255, 0.6);">
+        <p style="margin: 0;">© 2026 Rupiya. Built with ❤️ for modern India.</p>
+        <p style="margin-top: 0.5rem; font-size: 0.9rem;">Rupiya is a financial management tool. We do not provide investment advice. Always consult qualified financial professionals.</p>
+        <p style="margin-top: 0.75rem; font-size: 0.9rem;">Developed by <a href="https://www.weblithic.com" target="_blank" rel="noopener noreferrer" style="color: #4A90E2; font-weight: 600; text-decoration: none;">Weblithic</a></p>
       </div>
     </div>
   </footer>
 
+  <style>
+    @media (max-width: 768px) {
+      .landing-footer .footer-content {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 2rem !important;
+      }
+    }
+    @media (max-width: 480px) {
+      .landing-footer {
+        padding: 2rem 1rem 1.5rem !important;
+      }
+      .landing-footer .footer-content {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 1.5rem !important;
+        margin-bottom: 2rem !important;
+      }
+      .landing-footer .footer-section h4 {
+        font-size: 0.95rem !important;
+        margin-bottom: 0.75rem !important;
+      }
+      .landing-footer .footer-section a {
+        font-size: 0.85rem !important;
+      }
+      .landing-footer .footer-bottom {
+        padding-top: 1.5rem !important;
+      }
+      .landing-footer .footer-bottom p {
+        font-size: 0.85rem !important;
+      }
+    }
+  </style>
+
+  <script>
+    // Navbar scroll effect
+    const navbar = document.getElementById('navbar');
+    if (navbar) {
+      window.addEventListener('scroll', () => {
+        navbar.classList.toggle('scrolled', window.scrollY > 50);
+      });
+    }
+  </script>
+  <script src="assets/js/components/header.js"></script>
+  <script>
+    HeaderComponent.inject('header-container', 'landing', 'about');
+  </script>
   <script type="module" src="assets/js/pwa-setup.js"></script>
-  <script src="assets/js/pages/landing.js"></script>
 </body>
 
 </html>
