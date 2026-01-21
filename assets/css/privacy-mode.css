@@ -545,38 +545,12 @@ html.privacy-settings-page .sidebar-nav {
     opacity: 1 !important;
 }
 
-/* Ensure all sidebar sections are visible */
-html.privacy-settings-page .nav-section {
-    display: block !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
-    opacity: 1 !important;
-}
-
-html.privacy-settings-page .nav-section-items {
-    display: block !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
-    opacity: 1 !important;
-    max-height: none !important;
-}
-
-html.privacy-settings-page .nav-section.collapsed .nav-section-items {
-    max-height: none !important;
-    opacity: 1 !important;
-    display: block !important;
-}
-
-/* Ensure sidebar header and footer are visible */
-html.privacy-settings-page .sidebar-header {
-    display: flex !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
-    opacity: 1 !important;
-}
-
+/* Ensure sidebar footer stays at bottom */
 html.privacy-settings-page .sidebar-footer {
+    margin-top: auto !important;
+    flex-shrink: 0 !important;
     display: flex !important;
+    flex-direction: column !important;
     visibility: visible !important;
     pointer-events: auto !important;
     opacity: 1 !important;
@@ -662,6 +636,7 @@ html.privacy-settings-page .privacy-blur {
 @media (max-width: 768px) {
     html.privacy-settings-page .sidebar {
         display: flex !important;
+        flex-direction: column !important;
         transform: translateX(-100%) !important;
         transition: transform 0.3s ease !important;
     }
@@ -669,6 +644,7 @@ html.privacy-settings-page .privacy-blur {
     html.privacy-settings-page .sidebar.open {
         transform: translateX(0) !important;
         display: flex !important;
+        flex-direction: column !important;
     }
     
     html.privacy-settings-page .main-content {
@@ -720,6 +696,7 @@ html.privacy-settings-page .privacy-blur {
     
     html.privacy-settings-page .sidebar {
         display: flex !important;
+        flex-direction: column !important;
     }
     
     html.privacy-settings-page .mobile-header {
