@@ -381,6 +381,11 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
+.pwa-install-banner-dashboard .btn-primary {
+  background: white !important;
+  color: #4A90E2 !important;
+}
+
 .pwa-install-banner-dashboard .btn:hover {
   background: #f0f0f0;
   transform: translateY(-2px);

@@ -220,13 +220,23 @@ async function handleFeedbackSubmit(e) {
     };
     
     // Send to API
-    const response = await fetch('/api/send-feedback', {
+    const apiUrl = window.location.hostname === 'localhost' 
+      ? 'http://localhost:3000/api/send-feedback'
+      : 'https://rupiya.online/api/send-feedback';
+      
+    const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(feedbackData)
     });
+    
+    // Check if response is JSON
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      throw new Error('Server returned non-JSON response');
+    }
     
     const result = await response.json();
     
@@ -244,7 +254,18 @@ async function handleFeedbackSubmit(e) {
     
   } catch (error) {
     console.error('Error sending feedback:', error);
-    showToast('Failed to send feedback. Please try again.', 'error');
+    
+    // Provide more specific error messages
+    let errorMessage = 'Failed to send feedback. ';
+    if (error.message.includes('non-JSON')) {
+      errorMessage += 'The feedback service is currently unavailable. Please try again later or contact us directly at help.rupiya@gmail.com';
+    } else if (error.message.includes('NetworkError') || error.message.includes('Failed to fetch')) {
+      errorMessage += 'Please check your internet connection and try again.';
+    } else {
+      errorMessage += 'Please try again or contact us at help.rupiya@gmail.com';
+    }
+    
+    showToast(errorMessage, 'error');
   } finally {
     submitBtn.disabled = false;
     submitBtn.textContent = originalText;

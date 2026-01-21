@@ -403,6 +403,59 @@
   grid-column: 1 / -1;
 }
 
+/* Payment Method Form - 2 Column Layout */
+#addPaymentMethodForm {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+#addPaymentMethodForm > .form-group {
+  grid-column: span 1;
+}
+
+/* Full width fields */
+#addPaymentMethodForm > .form-group:first-child,
+#addPaymentMethodForm > .form-group:nth-child(2),
+#addPaymentMethodForm > .form-actions {
+  grid-column: 1 / -1;
+}
+
+/* Card, UPI, Wallet, Bank field containers should also span full width */
+#cardFields,
+#upiFields,
+#walletFields,
+#bankFields {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+#cardFields > .form-group,
+#upiFields > .form-group,
+#walletFields > .form-group,
+#bankFields > .form-group {
+  grid-column: span 1;
+}
+
+/* Credit card fields container */
+#creditCardFields {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+#creditCardFields > .form-group {
+  grid-column: span 1;
+}
+
+/* Notes field should span full width */
+#creditCardFields > .form-group:last-child {
+  grid-column: 1 / -1;
+}
+
 .form-group label {
   display: block;
   font-size: 0.875rem;
@@ -844,6 +897,21 @@ ul li {
     gap: 12px;
   }
   
+  /* Payment Method Form - Keep 2 columns on tablet */
+  #addPaymentMethodForm {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  #cardFields,
+  #upiFields,
+  #walletFields,
+  #bankFields,
+  #creditCardFields {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+  
   .form-group {
     margin-bottom: 0;
   }
@@ -1012,6 +1080,33 @@ ul li {
   .tab-btn span {
     display: block;
     line-height: 1.2;
+  }
+
+  /* Payment Method Form - Single column on small mobile */
+  #addPaymentMethodForm {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  #addPaymentMethodForm > .form-group {
+    grid-column: 1 / -1;
+  }
+
+  #cardFields,
+  #upiFields,
+  #walletFields,
+  #bankFields,
+  #creditCardFields {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  #cardFields > .form-group,
+  #upiFields > .form-group,
+  #walletFields > .form-group,
+  #bankFields > .form-group,
+  #creditCardFields > .form-group {
+    grid-column: 1 / -1;
   }
 
   .categories-list {

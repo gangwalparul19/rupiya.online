@@ -543,6 +543,9 @@
   flex: 1;
   min-width: 0;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
 }
 
 .user-name {
@@ -553,6 +556,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   line-height: 1.3;
+  display: block;
 }
 
 .user-email {
@@ -562,6 +566,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   line-height: 1.3;
+  display: block;
 }
 
 .sidebar-footer .btn {
@@ -614,11 +619,16 @@
 }
 
 [data-theme="dark"] .user-name {
-  color: var(--text-primary, #f3f4f6);
+  color: var(--text-primary, #f3f4f6) !important;
 }
 
 [data-theme="dark"] .user-email {
-  color: var(--text-secondary, #9ca3af);
+  color: var(--text-secondary, #9ca3af) !important;
+}
+
+[data-theme="dark"] .user-avatar {
+  background: linear-gradient(135deg, #4A90E2, #357ABD) !important;
+  color: white !important;
 }
 
 /* Mobile Responsive */

@@ -155,8 +155,7 @@ function setupEventListeners() {
   // Family Members
   document.getElementById('saveFamilyMembersBtn')?.addEventListener('click', handleSaveFamilyMembers);
   document.getElementById('resetFamilyMembersBtn')?.addEventListener('click', handleResetFamilyMembers);
-  document.getElementById('addMoreMembersBtn')?.addEventListener('click', addMoreMembers);
-  
+
   // Allow Enter key to add categories
   document.getElementById('newExpenseCategory')?.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
@@ -1116,23 +1115,13 @@ async function loadFamilyMembersUI() {
 
     // Add event listeners
     setupFamilyMembersEventListeners();
-    
-    // Update "Add More Members" button visibility
-    updateAddMoreButtonVisibility();
+
   } catch (error) {
     console.error('Error loading family members UI:', error);
     familyMembersGrid.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Error loading family members</p>';
   }
 }
 
-// Update "Add More Members" button visibility
-async function updateAddMoreButtonVisibility() {
-  const addMoreBtn = document.getElementById('addMoreMembersBtn');
-  if (!addMoreBtn) return;
-  
-  const members = await getFamilyMembers();
-  addMoreBtn.style.display = members.length >= 10 ? 'none' : 'inline-flex';
-}
 
 // Setup event listeners for family members
 function setupFamilyMembersEventListeners() {

@@ -92,11 +92,9 @@ function setupAccordion() {
   // Use a small delay to ensure DOM is fully rendered
   setTimeout(() => {
     const accordionHeaders = document.querySelectorAll('.accordion-header');
-    console.log('[User Guide Auth] Found accordion headers:', accordionHeaders.length);
-    
+
     accordionHeaders.forEach((header, index) => {
       header.addEventListener('click', (e) => {
-        console.log('[User Guide Auth] Accordion clicked:', index);
         const item = header.parentElement;
         const isActive = item.classList.contains('active') || item.classList.contains('open');
         
@@ -110,7 +108,6 @@ function setupAccordion() {
         if (!isActive) {
           item.classList.add('active');
           item.classList.add('open'); // Add both classes for compatibility
-          console.log('[User Guide Auth] Accordion opened:', index);
         }
       });
     });
