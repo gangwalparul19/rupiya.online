@@ -345,8 +345,15 @@ class AIInsightsEngine {
   getCurrentMonthExpenses() {
     const now = new Date();
     return this.expenses.filter(e => {
-      const date = e.date.toDate ? e.date.toDate() : new Date(e.date);
-      return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
+      if (!e.date) return false;
+      try {
+        const date = e.date.toDate ? e.date.toDate() : new Date(e.date);
+        if (isNaN(date.getTime())) return false;
+        return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
+      } catch (error) {
+        console.warn('Failed to parse expense date:', error);
+        return false;
+      }
     });
   }
 
@@ -354,17 +361,30 @@ class AIInsightsEngine {
     const now = new Date();
     const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
     return this.expenses.filter(e => {
-      const date = e.date.toDate ? e.date.toDate() : new Date(e.date);
-      return date.getMonth() === lastMonth.getMonth() && date.getFullYear() === lastMonth.getFullYear();
+      if (!e.date) return false;
+      try {
+        const date = e.date.toDate ? e.date.toDate() : new Date(e.date);
+        if (isNaN(date.getTime())) return false;
+        return date.getMonth() === lastMonth.getMonth() && date.getFullYear() === lastMonth.getFullYear();
+      } catch (error) {
+        console.warn('Failed to parse expense date:', error);
+        return false;
+      }
     });
   }
 
   getMonthlySpending() {
     const monthlyTotals = {};
     this.expenses.forEach(e => {
-      const date = e.date.toDate ? e.date.toDate() : new Date(e.date);
-      const key = `${date.getFullYear()}-${date.getMonth()}`;
-      monthlyTotals[key] = (monthlyTotals[key] || 0) + (parseFloat(e.amount) || 0);
+      if (!e.date) return;
+      try {
+        const date = e.date.toDate ? e.date.toDate() : new Date(e.date);
+        if (isNaN(date.getTime())) return;
+        const key = `${date.getFullYear()}-${date.getMonth()}`;
+        monthlyTotals[key] = (monthlyTotals[key] || 0) + (parseFloat(e.amount) || 0);
+      } catch (error) {
+        console.warn('Failed to parse expense date:', error);
+      }
     });
     return Object.values(monthlyTotals);
   }

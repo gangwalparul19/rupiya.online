@@ -56,7 +56,12 @@ class TimezoneService {
     
     // Handle Firestore Timestamp
     if (date.toDate && typeof date.toDate === 'function') {
-      date = date.toDate();
+      try {
+        date = date.toDate();
+      } catch (error) {
+        console.warn('Failed to convert Firestore Timestamp:', error);
+        return null;
+      }
     }
     
     // Handle string dates
@@ -67,6 +72,12 @@ class TimezoneService {
     // Handle seconds (Firestore timestamp format)
     if (date.seconds) {
       date = new Date(date.seconds * 1000);
+    }
+    
+    // Validate the date
+    if (date instanceof Date && isNaN(date.getTime())) {
+      console.warn('Invalid date after conversion:', date);
+      return null;
     }
     
     return date;

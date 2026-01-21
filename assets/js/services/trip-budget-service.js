@@ -203,17 +203,23 @@ class TripBudgetService {
       let daysRemaining = 0;
 
       if (groupData.startDate) {
-        const startDate = groupData.startDate.toDate ? groupData.startDate.toDate() : new Date(groupData.startDate);
-        const endDate = groupData.endDate 
-          ? (groupData.endDate.toDate ? groupData.endDate.toDate() : new Date(groupData.endDate))
-          : new Date();
-        const now = new Date();
+        try {
+          const startDate = groupData.startDate.toDate ? groupData.startDate.toDate() : new Date(groupData.startDate);
+          const endDate = groupData.endDate 
+            ? (groupData.endDate.toDate ? groupData.endDate.toDate() : new Date(groupData.endDate))
+            : new Date();
+          const now = new Date();
 
-        const totalDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
-        daysElapsed = Math.max(1, Math.ceil((now - startDate) / (1000 * 60 * 60 * 24)));
-        daysRemaining = Math.max(0, Math.ceil((endDate - now) / (1000 * 60 * 60 * 24)));
-
-        dailyRate = data.spent / daysElapsed;
+          // Validate dates
+          if (!isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
+            const totalDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+            daysElapsed = Math.max(1, Math.ceil((now - startDate) / (1000 * 60 * 60 * 24)));
+            daysRemaining = Math.max(0, Math.ceil((endDate - now) / (1000 * 60 * 60 * 24)));
+          }
+        } catch (error) {
+          console.warn('Failed to calculate trip dates:', error);
+        }
+      }        dailyRate = data.spent / daysElapsed;
       }
 
       // Project final spending
@@ -339,8 +345,18 @@ class TripBudgetService {
       // Daily spending trend
       const dailySpending = {};
       expenses.forEach(e => {
-        const date = e.date?.toDate ? e.date.toDate().toISOString().split('T')[0] : 'unknown';
-        dailySpending[date] = (dailySpending[date] || 0) + e.amount;
+        let dateKey = 'unknown';
+        if (e.date) {
+          try {
+            const date = e.date.toDate ? e.date.toDate() : new Date(e.date);
+            if (!isNaN(date.getTime())) {
+              dateKey = date.toISOString().split('T')[0];
+            }
+          } catch (error) {
+            console.warn('Failed to parse expense date for daily spending:', error);
+          }
+        }
+        dailySpending[dateKey] = (dailySpending[dateKey] || 0) + e.amount;
       });
 
       return {
@@ -395,9 +411,15 @@ class TripBudgetService {
       // Calculate trip duration
       let duration = 0;
       if (groupData.startDate && groupData.endDate) {
-        const start = groupData.startDate.toDate ? groupData.startDate.toDate() : new Date(groupData.startDate);
-        const end = groupData.endDate.toDate ? groupData.endDate.toDate() : new Date(groupData.endDate);
-        duration = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+        try {
+          const start = groupData.startDate.toDate ? groupData.startDate.toDate() : new Date(groupData.startDate);
+          const end = groupData.endDate.toDate ? groupData.endDate.toDate() : new Date(groupData.endDate);
+          if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
+            duration = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+          }
+        } catch (error) {
+          console.warn('Failed to calculate trip duration:', error);
+        }
       }
 
       return {

@@ -247,6 +247,34 @@ class FirestoreService {
             if (key.startsWith(summaryPrefix)) this.cache.delete(key);
           }
         }
+        
+        // Invalidate KPI summary caches when expenses or income change
+        if (collectionName === 'expenses') {
+          const kpiKeys = [
+            `${userId}:expenseKPISummary:{}`,
+            `${userId}:expensesByMonth`,
+            `${userId}:expensesLastMonths`,
+            `${userId}:currentMonthCategoryTotals:{}`
+          ];
+          for (const key of this.cache.keys()) {
+            if (kpiKeys.some(prefix => key.startsWith(prefix))) {
+              this.cache.delete(key);
+            }
+          }
+        }
+        
+        if (collectionName === 'income') {
+          const kpiKeys = [
+            `${userId}:incomeKPISummary:{}`,
+            `${userId}:incomeByMonth`,
+            `${userId}:incomeLastMonths`
+          ];
+          for (const key of this.cache.keys()) {
+            if (kpiKeys.some(prefix => key.startsWith(prefix))) {
+              this.cache.delete(key);
+            }
+          }
+        }
       } catch (error) {
         console.error('Error invalidating cache:', error);
       }

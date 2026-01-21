@@ -675,11 +675,29 @@ class TripGroupsService {
       }
       if (filters.startDate) {
         const start = new Date(filters.startDate);
-        expenses = expenses.filter(e => e.date && e.date.toDate() >= start);
+        expenses = expenses.filter(e => {
+          if (!e.date) return false;
+          try {
+            const expenseDate = e.date.toDate ? e.date.toDate() : new Date(e.date);
+            return !isNaN(expenseDate.getTime()) && expenseDate >= start;
+          } catch (error) {
+            console.warn('Failed to parse expense date:', error);
+            return false;
+          }
+        });
       }
       if (filters.endDate) {
         const end = new Date(filters.endDate);
-        expenses = expenses.filter(e => e.date && e.date.toDate() <= end);
+        expenses = expenses.filter(e => {
+          if (!e.date) return false;
+          try {
+            const expenseDate = e.date.toDate ? e.date.toDate() : new Date(e.date);
+            return !isNaN(expenseDate.getTime()) && expenseDate <= end;
+          } catch (error) {
+            console.warn('Failed to parse expense date:', error);
+            return false;
+          }
+        });
       }
 
       return expenses;

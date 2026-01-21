@@ -126,8 +126,14 @@ class TransfersService {
       if (filters.dateFrom) {
         const fromDate = new Date(filters.dateFrom);
         transfers = transfers.filter(t => {
-          const tDate = t.date?.toDate ? t.date.toDate() : new Date(t.date);
-          return tDate >= fromDate;
+          if (!t.date) return false;
+          try {
+            const tDate = t.date.toDate ? t.date.toDate() : new Date(t.date);
+            return !isNaN(tDate.getTime()) && tDate >= fromDate;
+          } catch (error) {
+            console.warn('Failed to parse transfer date:', error);
+            return false;
+          }
         });
       }
       
@@ -135,8 +141,14 @@ class TransfersService {
         const toDate = new Date(filters.dateTo);
         toDate.setHours(23, 59, 59, 999);
         transfers = transfers.filter(t => {
-          const tDate = t.date?.toDate ? t.date.toDate() : new Date(t.date);
-          return tDate <= toDate;
+          if (!t.date) return false;
+          try {
+            const tDate = t.date.toDate ? t.date.toDate() : new Date(t.date);
+            return !isNaN(tDate.getTime()) && tDate <= toDate;
+          } catch (error) {
+            console.warn('Failed to parse transfer date:', error);
+            return false;
+          }
         });
       }
       
@@ -150,9 +162,15 @@ class TransfersService {
       
       // Sort by date descending
       transfers.sort((a, b) => {
-        const aDate = a.date?.toDate ? a.date.toDate() : new Date(a.date);
-        const bDate = b.date?.toDate ? b.date.toDate() : new Date(b.date);
-        return bDate - aDate;
+        try {
+          const aDate = a.date?.toDate ? a.date.toDate() : new Date(a.date);
+          const bDate = b.date?.toDate ? b.date.toDate() : new Date(b.date);
+          if (isNaN(aDate.getTime()) || isNaN(bDate.getTime())) return 0;
+          return bDate - aDate;
+        } catch (error) {
+          console.warn('Failed to sort transfers by date:', error);
+          return 0;
+        }
       });
       
       return transfers;
@@ -227,8 +245,14 @@ class TransfersService {
       const endDate = new Date(year, month, 0, 23, 59, 59, 999);
       
       const monthlyTransfers = transfers.filter(t => {
-        const tDate = t.date?.toDate ? t.date.toDate() : new Date(t.date);
-        return tDate >= startDate && tDate <= endDate;
+        if (!t.date) return false;
+        try {
+          const tDate = t.date.toDate ? t.date.toDate() : new Date(t.date);
+          return !isNaN(tDate.getTime()) && tDate >= startDate && tDate <= endDate;
+        } catch (error) {
+          console.warn('Failed to parse transfer date in monthly summary:', error);
+          return false;
+        }
       });
       
       const summary = {

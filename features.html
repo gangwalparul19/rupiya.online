@@ -80,8 +80,33 @@
         .cta h2 { font-size: 2rem; margin-bottom: 1rem; }
         .cta p { font-size: 1.1rem; margin-bottom: 2rem; opacity: 0.9; }
         .cta-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
-        .btn-white { background: white; color: var(--primary); }
-        .btn-outline { background: transparent; color: white; border: 2px solid white; }
+        .btn {
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            font-weight: 700;
+            border-radius: 50px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+        .btn-white { 
+            background: white; 
+            color: var(--primary); 
+            border: 2px solid white;
+        }
+        .btn-white:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        .btn-outline { 
+            background: transparent; 
+            color: white; 
+            border: 2px solid white; 
+        }
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
         @media (max-width: 768px) {
             .hero h1 { font-size: 1.75rem; }
             .hero p { font-size: 0.95rem; }
@@ -548,7 +573,7 @@
     <!-- Footer -->
     <footer class="landing-footer">
         <div class="container">            
-            <div class="footer-bottom">
+            <div class="footer-bottom" style="text-align: center;">
                 <p class="footer-copyright">© 2026 Rupiya. Built with ❤️ for modern professionals.</p>
                 <p style="margin-top: 0.75rem; font-size: 0.9rem; opacity: 0.8;">Developed by <a href="https://www.weblithic.com" target="_blank" rel="noopener noreferrer" style="color: inherit; font-weight: 600; text-decoration: none;">Weblithic</a></p>
             </div>

@@ -170,19 +170,31 @@ class TripSettlementService {
       const memberLookup = {};
       members.forEach(m => memberLookup[m.id] = m);
 
-      return settlements.map(s => ({
-        ...s,
-        fromMember: memberLookup[s.fromMemberId] || { name: 'Unknown' },
-        toMember: memberLookup[s.toMemberId] || { name: 'Unknown' },
-        formattedDate: s.date?.toDate ? s.date.toDate().toLocaleDateString('en-IN') : 'Unknown'
-      }));
+      return settlements.map(s => {
+        let formattedDate = 'Unknown';
+        if (s.date) {
+          try {
+            const date = s.date.toDate ? s.date.toDate() : new Date(s.date);
+            if (!isNaN(date.getTime())) {
+              formattedDate = date.toLocaleDateString('en-IN');
+            }
+          } catch (error) {
+            console.warn('Failed to format settlement date:', error);
+          }
+        }
+        
+        return {
+          ...s,
+          fromMember: memberLookup[s.fromMemberId] || { name: 'Unknown' },
+          toMember: memberLookup[s.toMemberId] || { name: 'Unknown' },
+          formattedDate
+        };
+      });
     } catch (error) {
       console.error('Error getting settlement history:', error);
       return [];
     }
   }
-
-  /**
    * Generate settlement reminders for pending settlements
    * @param {string} groupId - Trip group ID
    * @returns {Promise<Array>} - List of reminders

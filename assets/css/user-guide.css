@@ -1575,9 +1575,9 @@ body {
 /* Footer */
 .landing-footer {
     padding: 4rem 2rem 2rem;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border-top: 2px solid #4A90E2;
+    background: white;
+    color: #64748b;
+    border-top: 2px solid #e2e8f0;
     margin-top: 4rem;
     text-align: center;
 }
@@ -1587,14 +1587,14 @@ body {
     flex-direction: column;
     gap: 1rem;
     padding-top: 2rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid #e2e8f0;
     max-width: 1200px;
     margin-left: auto;
     margin-right: auto;
 }
 
 .footer-copyright {
-    color: rgba(255, 255, 255, 0.9);
+    color: #64748b;
     font-size: 0.9rem;
     font-weight: 500;
 }

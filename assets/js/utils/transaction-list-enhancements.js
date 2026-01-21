@@ -288,12 +288,17 @@ class TransactionListEnhancer {
         return 'No date';
       }
 
-      // Handle Firestore Timestamp objects
+      // Handle Firestore Timestamp objects safely
       let dateObj = date;
       
       // Check if it's a Firestore Timestamp
       if (date && typeof date.toDate === 'function') {
-        dateObj = date.toDate();
+        try {
+          dateObj = date.toDate();
+        } catch (error) {
+          console.warn('formatDate: Failed to convert Firestore Timestamp', error);
+          return 'Invalid Date';
+        }
       } 
       // Check if it's a string
       else if (typeof date === 'string') {
@@ -308,8 +313,11 @@ class TransactionListEnhancer {
         dateObj = new Date(date);
       }
       // Last resort - try to create a Date
-      else {
+      else if (date) {
         dateObj = new Date(date);
+      } else {
+        // Null or undefined date
+        return 'Invalid Date';
       }
 
       // Validate date

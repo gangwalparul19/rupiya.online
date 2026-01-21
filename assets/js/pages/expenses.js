@@ -2319,6 +2319,7 @@ async function handleFormSubmit(e) {
           window.location.href = linkedType === 'house' ? 'houses.html' : 'vehicles.html';
         }, 1000);
       } else {
+        // Reload expenses and refresh KPIs
         await loadExpenses();
       }
     } else {

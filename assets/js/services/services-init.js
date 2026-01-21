@@ -18,14 +18,24 @@ import initPrivacyModeButton from '../components/privacy-mode-button.js';
 
 const log = logger.create('Services');
 
-// Connect auth service with user service (avoid circular dependency)
-authService.setUserService(userService);
+// Connect auth service with user service using lazy initialization
+// This avoids circular dependency issues by deferring the connection
+let servicesConnected = false;
+function ensureServicesConnected() {
+  if (!servicesConnected) {
+    authService.setUserService(userService);
+    servicesConnected = true;
+  }
+}
 
 // Track if we've seen a logged-in user to avoid clearing encryption prematurely
 let hasSeenLoggedInUser = false;
 
 // Initialize auth state listener that creates/updates user profile
 authService.onAuthStateChanged(async (user) => {
+  // Ensure services are connected before processing
+  ensureServicesConnected();
+  
   if (user) {
     hasSeenLoggedInUser = true;
     // User is signed in, ensure profile exists in Firestore

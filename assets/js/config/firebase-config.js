@@ -5,18 +5,25 @@ import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase
 import { getStorage } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-storage.js';
 import { loadEnvironment } from './env.js';
 
-// Suppress Firestore idle timeout errors that appear in console
-// These are normal behavior when Firestore connection goes idle
+// Suppress only known benign Firestore idle timeout errors
+// These are normal behavior when Firestore connection goes idle and don't affect functionality
+// All other errors will be logged normally for debugging
 const originalError = console.error;
+const suppressedPatterns = [
+  'QUIC_NETWORK_IDLE_TIMEOUT',
+  'net::ERR_QUIC_PROTOCOL_ERROR'
+];
+
 console.error = function(...args) {
-  // Filter out Firestore idle timeout errors
   const errorString = args.join(' ');
-  if (errorString.includes('QUIC_NETWORK_IDLE_TIMEOUT') || 
-      (errorString.includes('firestore.googleapis.com') && errorString.includes('400')) ||
-      errorString.includes('net::ERR_QUIC_PROTOCOL_ERROR')) {
-    return; // Suppress these specific errors
+  
+  // Only suppress specific known benign errors
+  const shouldSuppress = suppressedPatterns.some(pattern => errorString.includes(pattern)) &&
+                         errorString.includes('firestore.googleapis.com');
+  
+  if (!shouldSuppress) {
+    originalError.apply(console, args);
   }
-  originalError.apply(console, args);
 };
 
 // Load environment variables
