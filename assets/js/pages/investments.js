@@ -338,8 +338,8 @@ async function handleSubmit(e) {
       formData.currentPrice = livePrice;
       showToast(`Price fetched for ${formData.symbol}: ₹${livePrice.toFixed(2)}`, 'success');
     } catch (error) {
-      console.warn('Could not fetch live price, using manual price:', error);
-      showToast('Using manual price (symbol not found in Google Sheets)', 'info');
+      // Silently use manual price - users can add stocks not in sheets
+      // and update prices manually weekly or bi-weekly
     }
 
     let result;
@@ -433,7 +433,7 @@ async function updateLivePrices() {
             inrPrice = await googleSheetsPriceService.convertUSDToINR(priceData.price);
             inrChange = await googleSheetsPriceService.convertUSDToINR(priceData.change);
           } catch (error) {
-            console.warn(`Could not convert ${investment.symbol} to INR:`, error);
+            // Silently use original price if conversion fails
           }
         }
         
@@ -444,8 +444,8 @@ async function updateLivePrices() {
         investment.lastPriceUpdate = priceData.lastUpdate;
         investment.currency = 'INR'; // Always store as INR
       } catch (error) {
-        console.warn(`Could not fetch live price for ${investment.symbol}:`, error.message);
-        // Keep using the stored current price if live price fails
+        // Silently keep using the stored current price if live price fails
+        // Users can manually update prices for stocks not in sheets
       }
     }
   }

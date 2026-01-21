@@ -490,23 +490,20 @@ service cloud.firestore {
     }
     
     // ============================================
-    // INVESTMENT PRICE HISTORY - Restricted to admins and owners
+    // INVESTMENT PRICE HISTORY - Users can track their own investment prices
     // ============================================
     match /investmentPriceHistory/{historyId} {
-      // Read: Users can read their own price history or if they own the related investment
-      allow read: if isAuthenticated() && (
-        belongsToUser() ||
-        isAdmin()
-      );
+      // Read: Users can read their own price history
+      allow read: if belongsToUser() || isAdmin();
       
-      // Create: Only admins or system can create price history (for automated price updates)
-      allow create: if isAdmin();
+      // Create: Users can create their own price history records
+      allow create: if isAuthenticated() && hasValidUserId();
       
-      // Update: Only admins can update price history
-      allow update: if isAdmin();
+      // Update: Users can update their own price history
+      allow update: if belongsToUser() && userIdNotChanged();
       
-      // Delete: Only admins can delete price history
-      allow delete: if isAdmin();
+      // Delete: Users can delete their own price history
+      allow delete: if belongsToUser() || isAdmin();
     }
     
     // ============================================

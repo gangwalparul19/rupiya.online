@@ -32,6 +32,23 @@
     justify-content: center;
   }
 
+  /* Info Banner - Mobile */
+  .investment-info-banner {
+    margin: 12px;
+    padding: 12px;
+    font-size: 13px;
+    line-height: 1.5;
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .investment-info-banner svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
   /* Portfolio Summary - 3 cards in a row like goals page */
   .portfolio-summary {
     display: grid !important;
@@ -214,6 +231,212 @@
     flex-direction: column !important;
     gap: 12px !important;
     padding: 0;
+  }
+
+  /* Portfolio Analytics - Mobile Optimized */
+  .portfolio-analytics-section {
+    padding: 12px;
+    margin: 12px;
+    border-radius: 12px;
+  }
+
+  .analytics-header {
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+  }
+
+  .analytics-header h2 {
+    font-size: 18px;
+    margin: 0;
+  }
+
+  /* Analytics Grid - 2 columns on mobile */
+  .portfolio-analytics-section .analytics-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  .portfolio-analytics-section .analytics-card {
+    padding: 12px;
+    border-radius: 8px;
+  }
+
+  .portfolio-analytics-section .analytics-card h3 {
+    font-size: 13px;
+    margin: 0 0 10px 0;
+  }
+
+  .analytics-card-wide {
+    grid-column: span 2 !important;
+  }
+
+  .analytics-card-full {
+    grid-column: 1 / -1 !important;
+  }
+
+  /* Performance Metrics - 2 columns */
+  .performance-metrics {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  .metric-item {
+    padding: 10px;
+    border-radius: 6px;
+  }
+
+  .metric-label {
+    font-size: 10px;
+    margin-bottom: 4px;
+  }
+
+  .metric-value {
+    font-size: 16px;
+  }
+
+  /* Risk Meter */
+  .risk-meter {
+    text-align: center;
+  }
+
+  .risk-score {
+    font-size: 32px;
+  }
+
+  .risk-label {
+    font-size: 12px;
+    padding: 4px 10px;
+  }
+
+  .risk-bar {
+    height: 6px;
+    margin-top: 12px;
+  }
+
+  /* Diversification Score */
+  .diversification-score {
+    text-align: center;
+  }
+
+  .score-circle {
+    width: 70px;
+    height: 70px;
+    border-width: 4px;
+    margin: 0 auto 10px;
+  }
+
+  .score-value {
+    font-size: 20px;
+  }
+
+  .score-label {
+    font-size: 10px;
+  }
+
+  .score-description {
+    font-size: 12px;
+  }
+
+  /* Allocation Bars */
+  .allocation-bars {
+    gap: 10px;
+  }
+
+  .allocation-bar-label {
+    font-size: 11px;
+  }
+
+  .allocation-bar-container {
+    height: 20px;
+  }
+
+  .allocation-bar-value {
+    font-size: 11px;
+  }
+
+  /* Legend */
+  .allocation-legend,
+  .sector-legend {
+    gap: 6px;
+    margin-top: 10px;
+    padding-top: 8px;
+  }
+
+  .legend-item {
+    font-size: 10px;
+  }
+
+  .legend-color {
+    width: 8px;
+    height: 8px;
+  }
+
+  /* Benchmark Table */
+  .benchmark-comparison-table {
+    font-size: 11px;
+  }
+
+  .benchmark-comparison-table th,
+  .benchmark-comparison-table td {
+    padding: 8px 6px;
+  }
+
+  .benchmark-comparison-table th {
+    font-size: 10px;
+  }
+
+  /* Performers List */
+  .performers-list {
+    gap: 8px;
+  }
+
+  .performer-item {
+    padding: 10px;
+    border-radius: 6px;
+  }
+
+  .performer-name {
+    font-size: 13px;
+  }
+
+  .performer-symbol {
+    font-size: 10px;
+  }
+
+  .performer-returns {
+    font-size: 14px;
+  }
+
+  /* Recommendations */
+  .recommendations-list {
+    gap: 10px;
+  }
+
+  .recommendation-item {
+    gap: 10px;
+    padding: 12px;
+    border-radius: 8px;
+  }
+
+  .recommendation-icon {
+    font-size: 18px;
+  }
+
+  .recommendation-content strong {
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+
+  .recommendation-content p {
+    font-size: 12px;
+  }
+
+  /* Chart Placeholder */
+  .chart-placeholder {
+    padding: 24px 12px;
+    font-size: 13px;
   }
 
   /* Investment Card - Similar to Goals Card */
@@ -499,6 +722,193 @@
 
   .investment-stat-value {
     font-size: 13px;
+  }
+
+  /* Info Banner - Extra Small Mobile */
+  .investment-info-banner {
+    margin: 10px;
+    padding: 10px;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .investment-info-banner svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* Portfolio Analytics - Extra Small Mobile */
+  .portfolio-analytics-section {
+    padding: 10px;
+    margin: 10px;
+  }
+
+  .analytics-header h2 {
+    font-size: 16px;
+  }
+
+  /* Analytics Grid - Keep 2 columns */
+  .portfolio-analytics-section .analytics-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+
+  .portfolio-analytics-section .analytics-card {
+    padding: 10px;
+  }
+
+  .portfolio-analytics-section .analytics-card h3 {
+    font-size: 12px;
+    margin-bottom: 8px;
+  }
+
+  /* Performance Metrics - 2 columns */
+  .performance-metrics {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+
+  .metric-item {
+    padding: 8px;
+  }
+
+  .metric-label {
+    font-size: 9px;
+  }
+
+  .metric-value {
+    font-size: 14px;
+  }
+
+  /* Risk Meter */
+  .risk-score {
+    font-size: 28px;
+  }
+
+  .risk-label {
+    font-size: 11px;
+    padding: 3px 8px;
+  }
+
+  /* Diversification Score */
+  .score-circle {
+    width: 60px;
+    height: 60px;
+    border-width: 3px;
+  }
+
+  .score-value {
+    font-size: 18px;
+  }
+
+  .score-label {
+    font-size: 9px;
+  }
+
+  .score-description {
+    font-size: 11px;
+  }
+
+  /* Allocation Bars */
+  .allocation-bars {
+    gap: 8px;
+  }
+
+  .allocation-bar-label {
+    font-size: 10px;
+  }
+
+  .allocation-bar-container {
+    height: 18px;
+  }
+
+  .allocation-bar-value {
+    font-size: 10px;
+  }
+
+  /* Legend */
+  .allocation-legend,
+  .sector-legend {
+    gap: 5px;
+  }
+
+  .legend-item {
+    font-size: 9px;
+  }
+
+  .legend-color {
+    width: 7px;
+    height: 7px;
+  }
+
+  /* Benchmark Table */
+  .benchmark-comparison-table {
+    font-size: 10px;
+  }
+
+  .benchmark-comparison-table th,
+  .benchmark-comparison-table td {
+    padding: 6px 4px;
+  }
+
+  .benchmark-comparison-table th {
+    font-size: 9px;
+  }
+
+  /* Hide Expected Value column on very small screens */
+  .benchmark-comparison-table th:nth-child(2),
+  .benchmark-comparison-table td:nth-child(2) {
+    display: none;
+  }
+
+  /* Performers List */
+  .performers-list {
+    gap: 6px;
+  }
+
+  .performer-item {
+    padding: 8px;
+  }
+
+  .performer-name {
+    font-size: 12px;
+  }
+
+  .performer-symbol {
+    font-size: 9px;
+  }
+
+  .performer-returns {
+    font-size: 13px;
+  }
+
+  /* Recommendations */
+  .recommendations-list {
+    gap: 8px;
+  }
+
+  .recommendation-item {
+    gap: 8px;
+    padding: 10px;
+    border-left-width: 3px;
+  }
+
+  .recommendation-icon {
+    font-size: 16px;
+  }
+
+  .recommendation-content strong {
+    font-size: 12px;
+  }
+
+  .recommendation-content p {
+    font-size: 11px;
+  }
+
+  /* Chart Placeholder */
+  .chart-placeholder {
+    padding: 20px 10px;
+    font-size: 12px;
   }
 }
 

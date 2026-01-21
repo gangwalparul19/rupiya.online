@@ -43,6 +43,26 @@
     touch-action: manipulation !important;
     transform: translateZ(0) !important;
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 0.5rem !important;
+    width: 44px !important;
+    height: 44px !important;
+  }
+  
+  .sidebar-toggle svg,
+  #sidebarOpen svg,
+  .mobile-header-actions button svg {
+    display: block !important;
+    width: 24px !important;
+    height: 24px !important;
+    stroke: currentColor !important;
+    fill: none !important;
   }
   
   /* Theme toggle button */

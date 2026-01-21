@@ -32,6 +32,12 @@ class InvestmentHistoryService {
       const result = await firestoreService.add(this.collectionName, historyEntry);
       return result;
     } catch (error) {
+      // Check if it's a permissions error
+      if (error.code === 'permission-denied' || error.message?.includes('permission')) {
+        console.warn('Price history tracking disabled due to permissions. Investment saved successfully.');
+        // Return success to not block the main operation
+        return { success: true, warning: 'Price history not tracked' };
+      }
       console.error('Error recording price update:', error);
       throw error;
     }

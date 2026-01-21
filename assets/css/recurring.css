@@ -742,6 +742,33 @@
     font-size: 11px;
   }
 
+  /* Empty state mobile optimization */
+  .empty-state {
+    padding: 2rem 1rem;
+  }
+  
+  .empty-state-icon {
+    font-size: 3rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .empty-state-title {
+    font-size: 1.125rem;
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+  
+  .empty-state-text {
+    font-size: 0.875rem;
+    line-height: 1.5;
+    margin-bottom: 1.5rem;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
   .recurring-grid {
     grid-template-columns: 1fr;
     gap: 8px;

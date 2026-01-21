@@ -466,7 +466,8 @@ class GoogleSheetsPriceService {
       const priceData = await this.findSymbolData(symbol);
       return priceData;
     } catch (error) {
-      console.error(`Error getting price for ${symbol}:`, error);
+      // Silently throw error without console logging
+      // Users can manually add stocks not in sheets and update prices manually
       throw error;
     }
   }
@@ -696,7 +697,7 @@ class GoogleSheetsPriceService {
         return usdInrData.price;
       }
     } catch (error) {
-      console.warn('USD/INR not found in sheets, using fallback');
+      // Silently fall through to external API
     }
 
     // Fallback to external API
@@ -705,8 +706,8 @@ class GoogleSheetsPriceService {
       const data = await response.json();
       return data.rates.INR;
     } catch (error) {
-      console.warn('Could not fetch exchange rate, using fallback');
-      return 83.50; // Fallback rate
+      // Use static fallback rate
+      return 83.50; // Fallback rate (update periodically)
     }
   }
 

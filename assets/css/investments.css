@@ -1652,17 +1652,42 @@
 
 /* Investment Info Banner */
 .investment-info-banner {
-  background: var(--bg-hover, #F3F4F6);
-  padding: 1rem;
+  background: linear-gradient(135deg, rgba(74, 144, 226, 0.1) 0%, rgba(0, 206, 209, 0.1) 100%);
+  border-left: 4px solid #4A90E2;
+  padding: 1rem 1.25rem;
   border-radius: 8px;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
   font-size: 0.9rem;
-  line-height: 1.5;
+  line-height: 1.6;
+  color: #2C3E50;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.investment-info-banner svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: #4A90E2;
+}
+
+.investment-info-banner strong {
+  color: #4A90E2;
+  font-weight: 600;
 }
 
 [data-theme="dark"] .investment-info-banner {
-  background: var(--bg-hover);
+  background: linear-gradient(135deg, rgba(74, 144, 226, 0.15) 0%, rgba(0, 206, 209, 0.15) 100%);
   color: var(--text-primary);
+  border-left-color: #4A90E2;
+}
+
+[data-theme="dark"] .investment-info-banner svg {
+  color: #4A90E2;
+}
+
+[data-theme="dark"] .investment-info-banner strong {
+  color: #4A90E2;
 }
 
 /* Capital Gains Preview */
@@ -2159,18 +2184,119 @@
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
+  .portfolio-analytics-section {
+    padding: 1rem;
+  }
+
+  .analytics-header h2 {
+    font-size: 1.125rem;
+  }
+
+  /* Analytics Grid - 2 columns on mobile */
+  .portfolio-analytics-section .analytics-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .portfolio-analytics-section .analytics-card {
+    padding: 1rem;
+  }
+
+  .portfolio-analytics-section .analytics-card h3 {
+    font-size: 0.85rem;
+    margin-bottom: 0.75rem;
+  }
+
   .analytics-card-wide {
-    grid-column: span 1;
+    grid-column: span 2;
   }
   
   .analytics-card-full {
     grid-column: 1 / -1;
   }
   
+  /* Performance Metrics - 2 columns on mobile */
   .performance-metrics {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .metric-item {
+    padding: 0.625rem;
+  }
+
+  .metric-label {
+    font-size: 0.7rem;
+  }
+
+  .metric-value {
+    font-size: 1.125rem;
+  }
+
+  /* Risk Meter - Mobile optimized */
+  .risk-score {
+    font-size: 2rem;
+  }
+
+  .risk-label {
+    font-size: 0.8rem;
+    padding: 0.2rem 0.6rem;
+  }
+
+  /* Diversification Score - Mobile optimized */
+  .score-circle {
+    width: 80px;
+    height: 80px;
+    border-width: 5px;
+  }
+
+  .score-value {
+    font-size: 1.5rem;
+  }
+
+  .score-label {
+    font-size: 0.7rem;
+  }
+
+  .score-description {
+    font-size: 0.8rem;
+  }
+
+  /* Allocation Bars - Mobile optimized */
+  .allocation-bars {
+    gap: 0.625rem;
+  }
+
+  .allocation-bar-label {
+    font-size: 0.75rem;
+  }
+
+  .allocation-bar-container {
+    height: 20px;
+  }
+
+  .allocation-bar-value {
+    font-size: 0.7rem;
+  }
+
+  /* Legend - Mobile optimized */
+  .allocation-legend,
+  .sector-legend {
+    gap: 0.375rem;
+    margin-top: 0.75rem;
+    padding-top: 0.625rem;
+  }
+
+  .legend-item {
+    font-size: 0.65rem;
+  }
+
+  .legend-color {
+    width: 8px;
+    height: 8px;
   }
   
+  /* Benchmark Table - Mobile optimized */
   .benchmark-comparison-table {
     font-size: 0.75rem;
   }
@@ -2178,6 +2304,240 @@
   .benchmark-comparison-table th,
   .benchmark-comparison-table td {
     padding: 0.5rem 0.25rem;
+  }
+
+  .benchmark-comparison-table th {
+    font-size: 0.7rem;
+  }
+
+  /* Performers List - Mobile optimized */
+  .performers-list {
+    gap: 0.375rem;
+  }
+
+  .performer-item {
+    padding: 0.625rem;
+  }
+
+  .performer-name {
+    font-size: 0.8rem;
+  }
+
+  .performer-symbol {
+    font-size: 0.65rem;
+  }
+
+  .performer-returns {
+    font-size: 0.85rem;
+  }
+
+  /* Recommendations - Mobile optimized */
+  .recommendations-list {
+    gap: 0.625rem;
+  }
+
+  .recommendation-item {
+    gap: 0.625rem;
+    padding: 0.875rem;
+  }
+
+  .recommendation-icon {
+    font-size: 1.125rem;
+  }
+
+  .recommendation-content strong {
+    font-size: 0.85rem;
+  }
+
+  .recommendation-content p {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .portfolio-analytics-section {
+    padding: 0.75rem;
+  }
+
+  .analytics-header {
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+  }
+
+  .analytics-header h2 {
+    font-size: 1rem;
+  }
+
+  /* Analytics Grid - Keep 2 columns on small mobile */
+  .portfolio-analytics-section .analytics-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+
+  .portfolio-analytics-section .analytics-card {
+    padding: 0.75rem;
+  }
+
+  .portfolio-analytics-section .analytics-card h3 {
+    font-size: 0.8rem;
+    margin-bottom: 0.625rem;
+  }
+
+  /* Performance Metrics - 2 columns on small mobile */
+  .performance-metrics {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+
+  .metric-item {
+    padding: 0.5rem;
+  }
+
+  .metric-label {
+    font-size: 0.65rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .metric-value {
+    font-size: 1rem;
+  }
+
+  /* Risk Meter - Small mobile */
+  .risk-score {
+    font-size: 1.75rem;
+  }
+
+  .risk-label {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.5rem;
+  }
+
+  .risk-bar {
+    height: 6px;
+  }
+
+  /* Diversification Score - Small mobile */
+  .score-circle {
+    width: 70px;
+    height: 70px;
+    border-width: 4px;
+  }
+
+  .score-value {
+    font-size: 1.25rem;
+  }
+
+  .score-label {
+    font-size: 0.65rem;
+  }
+
+  .score-description {
+    font-size: 0.75rem;
+  }
+
+  /* Allocation Bars - Small mobile */
+  .allocation-bars {
+    gap: 0.5rem;
+  }
+
+  .allocation-bar-label {
+    font-size: 0.7rem;
+  }
+
+  .allocation-bar-container {
+    height: 18px;
+  }
+
+  .allocation-bar-value {
+    font-size: 0.65rem;
+  }
+
+  /* Legend - Small mobile */
+  .allocation-legend,
+  .sector-legend {
+    gap: 0.3rem;
+    margin-top: 0.625rem;
+    padding-top: 0.5rem;
+  }
+
+  .legend-item {
+    font-size: 0.6rem;
+  }
+
+  .legend-color {
+    width: 7px;
+    height: 7px;
+  }
+
+  /* Benchmark Table - Small mobile */
+  .benchmark-comparison-table {
+    font-size: 0.7rem;
+  }
+
+  .benchmark-comparison-table th,
+  .benchmark-comparison-table td {
+    padding: 0.375rem 0.2rem;
+  }
+
+  .benchmark-comparison-table th {
+    font-size: 0.65rem;
+  }
+
+  /* Hide some columns on very small screens */
+  .benchmark-comparison-table th:nth-child(2),
+  .benchmark-comparison-table td:nth-child(2) {
+    display: none;
+  }
+
+  /* Performers List - Small mobile */
+  .performers-list {
+    gap: 0.3rem;
+  }
+
+  .performer-item {
+    padding: 0.5rem;
+  }
+
+  .performer-name {
+    font-size: 0.75rem;
+  }
+
+  .performer-symbol {
+    font-size: 0.6rem;
+  }
+
+  .performer-returns {
+    font-size: 0.8rem;
+  }
+
+  /* Recommendations - Small mobile */
+  .recommendations-list {
+    gap: 0.5rem;
+  }
+
+  .recommendation-item {
+    gap: 0.5rem;
+    padding: 0.75rem;
+    border-left-width: 3px;
+  }
+
+  .recommendation-icon {
+    font-size: 1rem;
+  }
+
+  .recommendation-content strong {
+    font-size: 0.8rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .recommendation-content p {
+    font-size: 0.75rem;
+  }
+
+  /* Chart Placeholder - Small mobile */
+  .chart-placeholder {
+    padding: 1.5rem;
+    font-size: 0.85rem;
   }
 }
 

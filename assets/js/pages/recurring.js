@@ -816,24 +816,97 @@ function calculateNextDate(recurring) {
   return nextDate;
 }
 
-// Calculate monthly amount
+// Calculate monthly amount based on actual occurrences in current month
 function calculateMonthlyAmount(recurring) {
   const amount = recurring.amount;
+  const frequency = recurring.frequency;
   
-  switch (recurring.frequency) {
-    case 'daily':
-      return amount * 30;
-    case 'weekly':
-      return amount * 4.33;
+  // For monthly, quarterly, yearly - use simple division
+  switch (frequency) {
     case 'monthly':
       return amount;
     case 'quarterly':
       return amount / 3;
     case 'yearly':
       return amount / 12;
-    default:
-      return amount;
   }
+  
+  // For daily, weekly, biweekly - calculate actual occurrences in current month
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth();
+  
+  // Get first and last day of current month
+  const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
+  const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0);
+  
+  // Parse start date
+  const startDate = recurring.startDate ? new Date(recurring.startDate) : firstDayOfMonth;
+  
+  // If recurring hasn't started yet, return 0
+  if (startDate > lastDayOfMonth) {
+    return 0;
+  }
+  
+  // Calculate occurrences based on frequency
+  let occurrences = 0;
+  
+  if (frequency === 'daily') {
+    // Count days from start date (or first of month) to end of month
+    const effectiveStart = startDate > firstDayOfMonth ? startDate : firstDayOfMonth;
+    const daysInMonth = Math.floor((lastDayOfMonth - effectiveStart) / (1000 * 60 * 60 * 24)) + 1;
+    occurrences = Math.max(0, daysInMonth);
+  } 
+  else if (frequency === 'weekly') {
+    // Count weekly occurrences in current month
+    const effectiveStart = startDate > firstDayOfMonth ? new Date(startDate) : new Date(firstDayOfMonth);
+    let currentDate = new Date(effectiveStart);
+    
+    // If start date is before this month, find first occurrence in this month
+    if (startDate < firstDayOfMonth) {
+      const daysSinceStart = Math.floor((firstDayOfMonth - startDate) / (1000 * 60 * 60 * 24));
+      const weeksSinceStart = Math.floor(daysSinceStart / 7);
+      currentDate = new Date(startDate);
+      currentDate.setDate(currentDate.getDate() + (weeksSinceStart * 7));
+      
+      // Move to first occurrence in current month
+      while (currentDate < firstDayOfMonth) {
+        currentDate.setDate(currentDate.getDate() + 7);
+      }
+    }
+    
+    // Count occurrences
+    while (currentDate <= lastDayOfMonth) {
+      occurrences++;
+      currentDate.setDate(currentDate.getDate() + 7);
+    }
+  }
+  else if (frequency === 'biweekly') {
+    // Count biweekly occurrences in current month
+    const effectiveStart = startDate > firstDayOfMonth ? new Date(startDate) : new Date(firstDayOfMonth);
+    let currentDate = new Date(effectiveStart);
+    
+    // If start date is before this month, find first occurrence in this month
+    if (startDate < firstDayOfMonth) {
+      const daysSinceStart = Math.floor((firstDayOfMonth - startDate) / (1000 * 60 * 60 * 24));
+      const biweeksSinceStart = Math.floor(daysSinceStart / 14);
+      currentDate = new Date(startDate);
+      currentDate.setDate(currentDate.getDate() + (biweeksSinceStart * 14));
+      
+      // Move to first occurrence in current month
+      while (currentDate < firstDayOfMonth) {
+        currentDate.setDate(currentDate.getDate() + 14);
+      }
+    }
+    
+    // Count occurrences
+    while (currentDate <= lastDayOfMonth) {
+      occurrences++;
+      currentDate.setDate(currentDate.getDate() + 14);
+    }
+  }
+  
+  return amount * occurrences;
 }
 
 // Update summary

@@ -263,39 +263,66 @@
   color: var(--primary-blue);
 }
 
-/* Family member filter special styling - Multi-select */
+/* Family member filter styling */
 #familyMemberFilter {
-  min-height: 120px;
-  padding: 8px;
+  width: 100%;
+  padding: 0.75rem 2.5rem 0.75rem 1rem;
   background: var(--white);
-  border: 1px solid var(--border-color);
+  border: 2px solid var(--border-color);
   border-radius: var(--border-radius);
   font-family: inherit;
-  overflow-y: auto;
+  font-size: var(--font-size-base);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234A90E2' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 12px;
+}
+
+#familyMemberFilter:hover {
+  border-color: var(--primary-blue);
+  background-color: rgba(74, 144, 226, 0.02);
+}
+
+#familyMemberFilter:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+  background-color: var(--white);
 }
 
 #familyMemberFilter option {
-  padding: 8px 4px;
+  padding: 0.5rem;
   font-size: var(--font-size-base);
-  line-height: 1.6;
-  margin-bottom: 2px;
   background: var(--white);
   color: var(--text-primary);
 }
 
-#familyMemberFilter option:first-child {
-  display: none;
-}
-
 #familyMemberFilter option:checked {
-  background: linear-gradient(#4a90e2, #4a90e2);
-  background-color: var(--primary-blue) !important;
+  background: var(--primary-blue);
   color: white;
-  font-weight: 500;
 }
 
-#familyMemberFilter option:hover {
-  background: rgba(74, 144, 226, 0.1);
+/* Dark mode support */
+[data-theme="dark"] #familyMemberFilter {
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234A90E2' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+}
+
+[data-theme="dark"] #familyMemberFilter:hover {
+  background-color: var(--bg-hover);
+}
+
+[data-theme="dark"] #familyMemberFilter option {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
 }
 
 /* Add Income Form (Inline) */
@@ -897,15 +924,10 @@
 
   /* Family member filter - mobile optimization */
   #familyMemberFilter {
-    min-height: 100px !important;
-    padding: 6px !important;
-    overflow-y: auto;
-  }
-
-  #familyMemberFilter option {
-    padding: 6px 3px !important;
+    padding: 0.625rem 2rem 0.625rem 0.75rem !important;
     font-size: 0.875rem !important;
-    line-height: 1.5;
+    background-size: 10px !important;
+    background-position: right 0.75rem center !important;
   }
 
   /* Clear filters button - full width */
@@ -1022,7 +1044,6 @@
   .pagination-numbers .ellipsis {
     padding: 0.25rem;
     font-size: 0.75rem;
-  }
   }
 
   .modal-container {
@@ -1388,4 +1409,6 @@
     padding: 3px 6px;
     font-size: 10px;
   }
+}
+
 }

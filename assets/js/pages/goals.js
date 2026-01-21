@@ -193,10 +193,27 @@ async function loadGoals() {
 
 // Calculate KPI summary
 function calculateKPISummary() {
-  const active = state.goals.filter(g => g.currentAmount < g.targetAmount).length;
-  const completed = state.goals.filter(g => g.currentAmount >= g.targetAmount).length;
-  const target = state.goals.reduce((sum, g) => sum + g.targetAmount, 0);
-  const saved = state.goals.reduce((sum, g) => sum + g.currentAmount, 0);
+  const active = state.goals.filter(g => {
+    const current = parseFloat(g.currentAmount) || 0;
+    const target = parseFloat(g.targetAmount) || 0;
+    return current < target;
+  }).length;
+  
+  const completed = state.goals.filter(g => {
+    const current = parseFloat(g.currentAmount) || 0;
+    const target = parseFloat(g.targetAmount) || 0;
+    return current >= target;
+  }).length;
+  
+  const target = state.goals.reduce((sum, g) => {
+    const amount = parseFloat(g.targetAmount);
+    return sum + (isNaN(amount) ? 0 : amount);
+  }, 0);
+  
+  const saved = state.goals.reduce((sum, g) => {
+    const amount = parseFloat(g.currentAmount);
+    return sum + (isNaN(amount) ? 0 : amount);
+  }, 0);
   
   state.allDataKPI = {
     totalGoals: state.goals.length,
@@ -265,9 +282,13 @@ function renderGoals() {
 
 // Create goal card HTML
 function createGoalCard(goal) {
-  const percentage = goal.targetAmount > 0 ? (goal.currentAmount / goal.targetAmount) * 100 : 0;
-  const remaining = goal.targetAmount - goal.currentAmount;
-  const isCompleted = goal.currentAmount >= goal.targetAmount;
+  const targetAmount = parseFloat(goal.targetAmount) || 0;
+  const currentAmount = parseFloat(goal.currentAmount) || 0;
+  const goalName = goal.name || 'Unnamed Goal';
+  
+  const percentage = targetAmount > 0 ? (currentAmount / targetAmount) * 100 : 0;
+  const remaining = targetAmount - currentAmount;
+  const isCompleted = currentAmount >= targetAmount;
   const daysRemaining = calculateDaysRemaining(goal.targetDate);
   
   const targetDate = goal.targetDate.toDate ? goal.targetDate.toDate() : new Date(goal.targetDate);
@@ -330,7 +351,7 @@ function createGoalCard(goal) {
     <div class="goal-card ${isCompleted ? 'completed' : ''}" data-id="${goal.id}">
       <div class="goal-header">
         <div>
-          <div class="goal-name">${goal.name}</div>
+          <div class="goal-name">${goalName}</div>
           <div class="goal-target-date">Target: ${targetDateStr}</div>
           ${daysHtml}
         </div>
@@ -360,11 +381,11 @@ function createGoalCard(goal) {
       <div class="goal-amounts">
         <div class="goal-amount">
           <div class="goal-amount-label">Current</div>
-          <div class="goal-amount-value current">${formatCurrency(goal.currentAmount)}</div>
+          <div class="goal-amount-value current">${formatCurrency(currentAmount)}</div>
         </div>
         <div class="goal-amount">
           <div class="goal-amount-label">Target</div>
-          <div class="goal-amount-value target">${formatCurrency(goal.targetAmount)}</div>
+          <div class="goal-amount-value target">${formatCurrency(targetAmount)}</div>
         </div>
         <div class="goal-amount">
           <div class="goal-amount-label">Remaining</div>
@@ -377,7 +398,7 @@ function createGoalCard(goal) {
           <div class="progress-bar ${isCompleted ? 'completed' : ''}" style="width: ${Math.min(percentage, 100)}%"></div>
         </div>
         <div class="progress-text">
-          <span>${formatCurrency(goal.currentAmount)} of ${formatCurrency(goal.targetAmount)}</span>
+          <span>${formatCurrency(currentAmount)} of ${formatCurrency(targetAmount)}</span>
           <span class="progress-percentage ${isCompleted ? 'completed' : ''}">${percentage.toFixed(1)}%</span>
         </div>
       </div>
