@@ -613,9 +613,18 @@ function checkUpcomingEMIs() {
 
 // Calculate EMI
 function calculateEMI() {
-  const principal = parseFloat(document.getElementById('principalAmount').value) || 0;
-  const rate = parseFloat(document.getElementById('interestRate').value) || 0;
-  const tenure = parseInt(document.getElementById('tenure').value) || 0;
+  const principalInput = document.getElementById('principalAmount');
+  const rateInput = document.getElementById('interestRate');
+  const tenureInput = document.getElementById('tenure');
+  const emiInput = document.getElementById('emiAmount');
+  
+  if (!principalInput || !rateInput || !tenureInput || !emiInput) {
+    return; // Fields not found
+  }
+  
+  const principal = parseFloat(principalInput.value) || 0;
+  const rate = parseFloat(rateInput.value) || 0;
+  const tenure = parseInt(tenureInput.value) || 0;
   
   if (principal > 0 && rate > 0 && tenure > 0) {
     const monthlyRate = rate / 12 / 100;
@@ -626,26 +635,40 @@ function calculateEMI() {
     const totalInterest = totalPayment - principal;
     
     // Update EMI field
-    document.getElementById('emiAmount').value = Math.round(emi);
+    emiInput.value = Math.round(emi);
     
     // Update preview
     const preview = document.getElementById('emiPreview');
-    preview.style.display = 'block';
-    
-    document.getElementById('previewEmi').textContent = formatCurrency(Math.round(emi));
-    document.getElementById('previewInterest').textContent = formatCurrency(Math.round(totalInterest));
-    document.getElementById('previewTotal').textContent = formatCurrency(Math.round(totalPayment));
-    
-    // Calculate end date
-    const startDate = document.getElementById('startDate').value;
-    if (startDate) {
-      const end = new Date(startDate);
-      end.setMonth(end.getMonth() + tenure);
-      document.getElementById('previewEndDate').textContent = formatDate(end);
+    if (preview) {
+      preview.style.display = 'block';
+      
+      const previewEmi = document.getElementById('previewEmi');
+      const previewInterest = document.getElementById('previewInterest');
+      const previewTotal = document.getElementById('previewTotal');
+      const previewEndDate = document.getElementById('previewEndDate');
+      
+      if (previewEmi) previewEmi.textContent = formatCurrency(Math.round(emi));
+      if (previewInterest) previewInterest.textContent = formatCurrency(Math.round(totalInterest));
+      if (previewTotal) previewTotal.textContent = formatCurrency(Math.round(totalPayment));
+      
+      // Calculate end date
+      const startDateInput = document.getElementById('startDate');
+      if (startDateInput && startDateInput.value && previewEndDate) {
+        const end = new Date(startDateInput.value);
+        end.setMonth(end.getMonth() + tenure);
+        previewEndDate.textContent = formatDate(end);
+      }
     }
     
     // Also calculate outstanding
     calculateOutstanding();
+  } else {
+    // Clear EMI field if inputs are invalid
+    emiInput.value = '';
+    const preview = document.getElementById('emiPreview');
+    if (preview) {
+      preview.style.display = 'none';
+    }
   }
 }
 
