@@ -1,0 +1,584 @@
+/* Quick Start Checklist Widget */
+
+.quick-start-widget {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 360px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  z-index: 1000;
+  transition: all 0.3s ease;
+  border: 2px solid #e2e8f0;
+}
+
+.quick-start-widget.minimized {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.quick-start-widget.minimized .quick-start-content,
+.quick-start-widget.minimized .quick-start-header h3,
+.quick-start-widget.minimized .quick-start-header p,
+.quick-start-widget.minimized .quick-start-close {
+  display: none;
+}
+
+.quick-start-widget.minimized .quick-start-header {
+  padding: 0;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.quick-start-widget.minimized .quick-start-toggle {
+  font-size: 24px;
+  margin: 0;
+}
+
+.quick-start-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px;
+  border-radius: 14px 14px 0 0;
+  position: relative;
+}
+
+.quick-start-header h3 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.quick-start-header p {
+  margin: 0;
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+.quick-start-toggle {
+  position: absolute;
+  top: 20px;
+  right: 50px;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  transition: all 0.2s;
+}
+
+.quick-start-toggle:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.quick-start-close {
+  position: absolute;
+  top: 20px;
+  right: 15px;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  transition: all 0.2s;
+}
+
+.quick-start-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.quick-start-progress {
+  padding: 16px 20px;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.quick-start-progress-bar {
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.quick-start-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+.quick-start-progress-text {
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.quick-start-content {
+  padding: 20px;
+  max-height: 400px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+.quick-start-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.quick-start-content::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.quick-start-content::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.quick-start-content::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.quick-start-tasks {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.quick-start-task {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 2px solid transparent;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.quick-start-task:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.quick-start-task:active {
+  transform: scale(0.98);
+}
+
+.quick-start-task:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.quick-start-task.completed {
+  background: #f0fdf4;
+  border-color: #86efac;
+}
+
+.quick-start-task.completed .quick-start-task-checkbox {
+  background: #22c55e;
+  border-color: #22c55e;
+}
+
+.quick-start-task.completed .quick-start-task-checkbox::after {
+  content: '✓';
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.quick-start-task.completed .quick-start-task-title {
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+.quick-start-task-checkbox {
+  width: 24px;
+  height: 24px;
+  border: 2px solid #cbd5e1;
+  border-radius: 6px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.quick-start-task-info {
+  flex: 1;
+}
+
+.quick-start-task-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 4px;
+}
+
+.quick-start-task-description {
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+.quick-start-task-action {
+  margin-top: 8px;
+}
+
+.quick-start-task-action .btn {
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.quick-start-footer {
+  padding: 16px 20px;
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
+  border-radius: 0 0 14px 14px;
+}
+
+.quick-start-footer-text {
+  font-size: 12px;
+  color: #64748b;
+  text-align: center;
+}
+
+/* Celebration Animation */
+.quick-start-celebration {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.confetti {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: #667eea;
+  animation: confetti-fall 3s ease-out forwards;
+}
+
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+/* Sample Data Banner */
+.sample-data-banner {
+  position: fixed;
+  top: 72px;
+  left: 0;
+  right: 0;
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  color: white;
+  padding: 12px 20px;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.sample-data-banner-text {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.sample-data-banner-icon {
+  font-size: 20px;
+}
+
+.sample-data-banner-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.sample-data-banner .btn {
+  padding: 6px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sample-data-banner .btn-clear {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.sample-data-banner .btn-clear:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.sample-data-banner .btn-keep {
+  background: white;
+  color: #f59e0b;
+}
+
+.sample-data-banner .btn-keep:hover {
+  background: #f8fafc;
+}
+
+/* Tablet Responsive */
+@media (max-width: 1024px) {
+  .quick-start-widget {
+    width: 380px;
+    bottom: 15px;
+    right: 15px;
+  }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .quick-start-widget {
+    width: calc(100% - 32px);
+    bottom: 16px;
+    right: 16px;
+    left: 16px;
+    max-width: 420px;
+    margin: 0 auto;
+  }
+
+  .quick-start-widget.minimized {
+    width: 56px;
+    height: 56px;
+    left: auto;
+    right: 16px;
+    margin: 0;
+  }
+
+  .quick-start-header {
+    padding: 16px;
+  }
+
+  .quick-start-header h3 {
+    font-size: 17px;
+  }
+
+  .quick-start-header p {
+    font-size: 12px;
+  }
+
+  .quick-start-content {
+    padding: 16px;
+    max-height: 350px;
+  }
+
+  .quick-start-progress {
+    padding: 14px 16px;
+  }
+
+  .quick-start-footer {
+    padding: 14px 16px;
+  }
+
+  .sample-data-banner {
+    flex-direction: column;
+    gap: 12px;
+    padding: 14px 16px;
+    top: 72px;
+  }
+
+  .sample-data-banner-text {
+    font-size: 13px;
+    text-align: center;
+  }
+
+  .sample-data-banner-actions {
+    width: 100%;
+    flex-direction: row;
+  }
+
+  .sample-data-banner .btn {
+    flex: 1;
+    padding: 8px 14px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .quick-start-widget {
+    width: calc(100% - 20px);
+    bottom: 10px;
+    right: 10px;
+    left: 10px;
+  }
+
+  .quick-start-widget.minimized {
+    width: 52px;
+    height: 52px;
+    right: 10px;
+  }
+
+  .quick-start-header {
+    padding: 14px;
+  }
+
+  .quick-start-header h3 {
+    font-size: 16px;
+    gap: 6px;
+  }
+
+  .quick-start-header p {
+    font-size: 11px;
+  }
+
+  .quick-start-toggle,
+  .quick-start-close {
+    width: 28px;
+    height: 28px;
+    font-size: 16px;
+  }
+
+  .quick-start-toggle {
+    right: 45px;
+  }
+
+  .quick-start-close {
+    right: 12px;
+  }
+
+  .quick-start-content {
+    padding: 12px;
+    max-height: 300px;
+  }
+
+  .quick-start-tasks {
+    gap: 10px;
+  }
+
+  .quick-start-task {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .quick-start-task-checkbox {
+    width: 22px;
+    height: 22px;
+  }
+
+  .quick-start-task-title {
+    font-size: 13px;
+    margin-bottom: 3px;
+  }
+
+  .quick-start-task-description {
+    font-size: 11px;
+    line-height: 1.3;
+  }
+
+  .quick-start-task-action .btn {
+    font-size: 11px;
+    padding: 5px 10px;
+  }
+
+  .quick-start-progress {
+    padding: 12px 14px;
+  }
+
+  .quick-start-progress-bar {
+    height: 6px;
+  }
+
+  .quick-start-progress-text {
+    font-size: 12px;
+  }
+
+  .quick-start-footer {
+    padding: 12px 14px;
+  }
+
+  .quick-start-footer-text {
+    font-size: 11px;
+    line-height: 1.4;
+  }
+
+  .sample-data-banner {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .sample-data-banner-text {
+    font-size: 12px;
+    gap: 8px;
+  }
+
+  .sample-data-banner-icon {
+    font-size: 18px;
+  }
+
+  .sample-data-banner .btn {
+    padding: 7px 12px;
+    font-size: 11px;
+  }
+}
+
+/* Small Mobile */
+@media (max-width: 360px) {
+  .quick-start-widget {
+    width: calc(100% - 16px);
+    bottom: 8px;
+    right: 8px;
+    left: 8px;
+  }
+
+  .quick-start-header h3 {
+    font-size: 15px;
+  }
+
+  .quick-start-task-title {
+    font-size: 12px;
+  }
+
+  .quick-start-task-description {
+    font-size: 10px;
+  }
+}
