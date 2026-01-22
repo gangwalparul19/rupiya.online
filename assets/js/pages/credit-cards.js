@@ -519,6 +519,7 @@ async function handleCardSubmit(e) {
       rewardsBalance: parseFloat(document.getElementById('rewardsBalance').value) || 0,
       annualFee: parseFloat(document.getElementById('annualFee').value) || 0,
       notes: document.getElementById('notes').value || null,
+      masterCardId: document.getElementById('masterCardId').value || null,
       userId: currentUser.uid
     };
 
@@ -754,12 +755,9 @@ function renderMasterCards() {
   }
   
   grid.innerHTML = state.filteredMasterCards.map(card => {
-    // Ensure network is an array for display
-    const networks = Array.isArray(card.network) ? card.network : (card.network ? [card.network] : ['N/A']);
-    
     // Safe access to nested properties
-    const rewardRate = card.rewards?.accelerated_rate || card.rewards?.base_rate || 'N/A';
-    const joiningFee = card.fees?.joining_fee;
+    const rewardRate = card.rewards?.rate || 'N/A';
+    const joiningFee = card.fees?.joining;
     const feeText = joiningFee === 0 ? 'Lifetime Free' : (joiningFee ? `₹${joiningFee} joining fee` : 'N/A');
     
     return `
@@ -808,17 +806,8 @@ function showCardDetails(card) {
   state.selectedMasterCard = card;
   document.getElementById('cardDetailsTitle').textContent = card.name || 'Card Details';
   
-  // Ensure network is an array
-  const networks = Array.isArray(card.network) ? card.network : (card.network ? [card.network] : ['N/A']);
-  
-  // Safe access helpers
-  const safeGet = (obj, path, defaultValue = 'N/A') => {
-    try {
-      return path.split('.').reduce((acc, part) => acc?.[part], obj) ?? defaultValue;
-    } catch {
-      return defaultValue;
-    }
-  };
+  // Ensure network is an array or string
+  const networkDisplay = card.network || 'N/A';
   
   const content = document.getElementById('cardDetailsContent');
   content.innerHTML = `
@@ -835,7 +824,7 @@ function showCardDetails(card) {
         </div>
         <div class="card-detail-row">
           <span class="card-detail-label">Network</span>
-          <span class="card-detail-value">${networks.join(', ')}</span>
+          <span class="card-detail-value">${networkDisplay}</span>
         </div>
       </div>
       
@@ -844,15 +833,15 @@ function showCardDetails(card) {
         <h3>💰 Fees</h3>
         <div class="card-detail-row">
           <span class="card-detail-label">Joining Fee</span>
-          <span class="card-detail-value">${card.fees.joining_fee === 0 ? 'Free' : (card.fees.joining_fee ? formatCurrency(card.fees.joining_fee) : 'N/A')}</span>
+          <span class="card-detail-value">${card.fees.joining === 0 ? 'Free' : (card.fees.joining ? formatCurrency(card.fees.joining) : 'N/A')}</span>
         </div>
         <div class="card-detail-row">
           <span class="card-detail-label">Annual Fee</span>
-          <span class="card-detail-value">${card.fees.annual_fee === 0 ? 'Free' : (card.fees.annual_fee ? formatCurrency(card.fees.annual_fee) : 'N/A')}</span>
+          <span class="card-detail-value">${card.fees.annual === 0 ? 'Free' : (card.fees.annual ? formatCurrency(card.fees.annual) : 'N/A')}</span>
         </div>
         <div class="card-detail-row">
           <span class="card-detail-label">Waiver Condition</span>
-          <span class="card-detail-value">${card.fees.waiver_condition || 'N/A'}</span>
+          <span class="card-detail-value">${card.fees.waiver || 'N/A'}</span>
         </div>
       </div>
       ` : ''}
@@ -861,73 +850,26 @@ function showCardDetails(card) {
       <div class="card-detail-section">
         <h3>🎁 Rewards</h3>
         <div class="card-detail-row">
-          <span class="card-detail-label">Type</span>
-          <span class="card-detail-value">${card.rewards.type || 'N/A'}</span>
+          <span class="card-detail-label">Reward Rate</span>
+          <span class="card-detail-value">${card.rewards.rate || 'N/A'}</span>
         </div>
+        ${card.rewards.details ? `
         <div class="card-detail-row">
-          <span class="card-detail-label">Base Rate</span>
-          <span class="card-detail-value">${card.rewards.base_rate || 'N/A'}</span>
+          <span class="card-detail-label">Details</span>
+          <span class="card-detail-value">${card.rewards.details}</span>
         </div>
-        <div class="card-detail-row">
-          <span class="card-detail-label">Accelerated Rate</span>
-          <span class="card-detail-value">${card.rewards.accelerated_rate || 'N/A'}</span>
-        </div>
-        <div class="card-detail-row">
-          <span class="card-detail-label">Capping</span>
-          <span class="card-detail-value">${card.rewards.capping || 'N/A'}</span>
-        </div>
+        ` : ''}
       </div>
       ` : ''}
       
-      ${card.benefits ? `
+      ${card.features && card.features.length > 0 ? `
       <div class="card-detail-section">
-        <h3>✈️ Benefits</h3>
-        ${card.benefits.lounge_access ? `
-        <div class="benefit-item">
-          <strong>Domestic Lounge</strong>
-          <span>${card.benefits.lounge_access.domestic || 'N/A'}</span>
-        </div>
-        <div class="benefit-item">
-          <strong>International Lounge</strong>
-          <span>${card.benefits.lounge_access.international || 'N/A'}</span>
-        </div>
-        ` : ''}
-        ${card.benefits.fuel_surcharge_waiver ? `
-        <div class="benefit-item">
-          <strong>Fuel Surcharge Waiver</strong>
-          <span>${card.benefits.fuel_surcharge_waiver}</span>
-        </div>
-        ` : ''}
-        ${card.benefits.forex_markup ? `
-        <div class="benefit-item">
-          <strong>Forex Markup</strong>
-          <span>${card.benefits.forex_markup}</span>
-        </div>
-        ` : ''}
-        ${card.benefits.milestone_benefits && card.benefits.milestone_benefits.length > 0 ? `
+        <h3>✨ Features & Benefits</h3>
+        ${card.features.map(feature => `
           <div class="benefit-item">
-            <strong>Milestone Benefits</strong>
-            <span>${card.benefits.milestone_benefits.join(' • ')}</span>
+            <span>• ${feature}</span>
           </div>
-        ` : ''}
-      </div>
-      ` : ''}
-      
-      ${card.eligibility ? `
-      <div class="card-detail-section">
-        <h3>📋 Eligibility</h3>
-        <div class="card-detail-row">
-          <span class="card-detail-label">Min Income (Salaried)</span>
-          <span class="card-detail-value">${card.eligibility.min_income_salaried ? formatCurrency(card.eligibility.min_income_salaried) + '/month' : 'N/A'}</span>
-        </div>
-        <div class="card-detail-row">
-          <span class="card-detail-label">Min Age</span>
-          <span class="card-detail-value">${card.eligibility.min_age ? card.eligibility.min_age + ' years' : 'N/A'}</span>
-        </div>
-        <div class="card-detail-row">
-          <span class="card-detail-label">CIBIL Score</span>
-          <span class="card-detail-value">${card.eligibility.cibil_score_required ? card.eligibility.cibil_score_required + '+' : 'N/A'}</span>
-        </div>
+        `).join('')}
       </div>
       ` : ''}
     </div>
@@ -969,31 +911,38 @@ function addCardFromMaster() {
     if (cardNameInput && card.name) cardNameInput.value = card.name;
     if (bankNameInput && card.issuer) bankNameInput.value = card.issuer;
     if (cardTypeInput && card.network) {
-      // Ensure network is an array
-      const networks = Array.isArray(card.network) ? card.network : [card.network];
-      
       // Map network to form value
+      const networkLower = card.network.toLowerCase();
       const networkMap = {
-        'Visa': 'visa',
-        'MasterCard': 'mastercard',
-        'Mastercard': 'mastercard',
-        'RuPay': 'rupay',
-        'Amex': 'amex',
-        'American Express': 'amex'
+        'visa': 'visa',
+        'mastercard': 'mastercard',
+        'rupay': 'rupay',
+        'amex': 'amex',
+        'american express': 'amex'
       };
-      const networkValue = networkMap[networks[0]] || networks[0].toLowerCase();
+      
+      // Check if network contains any of the keywords
+      let networkValue = 'visa'; // default
+      for (const [key, value] of Object.entries(networkMap)) {
+        if (networkLower.includes(key)) {
+          networkValue = value;
+          break;
+        }
+      }
       cardTypeInput.value = networkValue;
     }
-    if (rewardsProgramInput && card.rewards?.type) rewardsProgramInput.value = card.rewards.type;
-    if (annualFeeInput && card.fees?.annual_fee !== undefined) annualFeeInput.value = card.fees.annual_fee;
+    if (rewardsProgramInput && card.rewards?.rate) rewardsProgramInput.value = card.rewards.rate;
+    if (annualFeeInput && card.fees?.annual !== undefined) annualFeeInput.value = card.fees.annual;
     if (masterCardIdInput && card.id) masterCardIdInput.value = card.id;
     
     // Add notes with card benefits
     if (notesInput) {
       const noteParts = [];
       if (card.category) noteParts.push(`Category: ${card.category}`);
-      if (card.rewards?.accelerated_rate) noteParts.push(`Rewards: ${card.rewards.accelerated_rate}`);
-      if (card.benefits?.lounge_access?.domestic) noteParts.push(`Lounge: ${card.benefits.lounge_access.domestic}`);
+      if (card.rewards?.rate) noteParts.push(`Rewards: ${card.rewards.rate}`);
+      if (card.features && card.features.length > 0) {
+        noteParts.push(`Features: ${card.features.join(', ')}`);
+      }
       
       if (noteParts.length > 0) {
         notesInput.value = noteParts.join('\n');
@@ -1065,10 +1014,11 @@ function generateRecommendations() {
   })).filter(({ card, masterData }) => {
     if (masterData) {
       // Use master data for accurate recommendations
-      const rewardsType = masterData.rewards.type.toLowerCase();
-      const category = masterData.category.toLowerCase();
-      return rewardsType.includes('cashback') || 
-             rewardsType.includes('amazon') ||
+      const rewardsRate = (masterData.rewards?.rate || '').toLowerCase();
+      const category = (masterData.category || '').toLowerCase();
+      return rewardsRate.includes('cashback') || 
+             rewardsRate.includes('amazon') ||
+             rewardsRate.includes('flipkart') ||
              category.includes('shopping');
     } else {
       // Fallback to user data if no master card linked
@@ -1085,7 +1035,7 @@ function generateRecommendations() {
     );
     
     const benefit = best.masterData 
-      ? best.masterData.rewards.accelerated_rate 
+      ? best.masterData.rewards?.rate || 'High rewards'
       : `${best.card.rewardsBalance || 0} rewards earned`;
     
     recommendations.push({
@@ -1103,19 +1053,18 @@ function generateRecommendations() {
     masterData: getMasterCardData(card)
   })).filter(({ card, masterData }) => {
     if (masterData) {
-      // Use master data for accurate lounge access check
-      const domesticLounge = masterData.benefits.lounge_access.domestic.toLowerCase();
-      const internationalLounge = masterData.benefits.lounge_access.international.toLowerCase();
-      const hasLounge = !domesticLounge.includes('none') || !internationalLounge.includes('none');
+      // Check features array for lounge access
+      const features = masterData.features || [];
+      const hasLounge = features.some(f => 
+        f.toLowerCase().includes('lounge') && 
+        !f.toLowerCase().includes('no lounge')
+      );
       
       // Also check if it's a travel category card
-      const category = masterData.category.toLowerCase();
-      const rewardsType = masterData.rewards.type.toLowerCase();
-      const isTravelCard = category.includes('travel') || 
-                          rewardsType.includes('miles') || 
-                          rewardsType.includes('travel');
+      const category = (masterData.category || '').toLowerCase();
+      const isTravelCard = category.includes('travel');
       
-      return hasLounge && isTravelCard;
+      return hasLounge || isTravelCard;
     } else {
       // Fallback: Check user's rewards program
       const rewardsLower = (card.rewardsProgram || '').toLowerCase();
@@ -1127,15 +1076,22 @@ function generateRecommendations() {
   
   if (travelCards.length > 0) {
     const best = travelCards[0];
-    const loungeInfo = best.masterData 
-      ? best.masterData.benefits.lounge_access.domestic 
-      : 'Complimentary lounge access';
+    let loungeInfo = 'Travel benefits';
+    
+    if (best.masterData && best.masterData.features) {
+      const loungeFeature = best.masterData.features.find(f => 
+        f.toLowerCase().includes('lounge')
+      );
+      if (loungeFeature) {
+        loungeInfo = loungeFeature;
+      }
+    }
     
     recommendations.push({
       icon: '✈️',
       category: 'Travel & Dining',
       cardName: best.card.cardName,
-      reason: 'Includes airport lounge access and travel benefits',
+      reason: 'Includes travel benefits and rewards',
       benefit: loungeInfo
     });
   }
@@ -1169,10 +1125,12 @@ function generateRecommendations() {
     masterData: getMasterCardData(card)
   })).filter(({ card, masterData }) => {
     if (masterData) {
-      // Use master data for accurate fuel waiver check
-      const fuelWaiver = masterData.benefits.fuel_surcharge_waiver.toLowerCase();
-      return !fuelWaiver.includes('none') && 
-             (fuelWaiver.includes('waiver') || fuelWaiver.includes('%'));
+      // Check features array for fuel waiver
+      const features = masterData.features || [];
+      return features.some(f => 
+        f.toLowerCase().includes('fuel') && 
+        f.toLowerCase().includes('waiver')
+      );
     } else {
       // Fallback: Check user's rewards program or card name
       const rewardsLower = (card.rewardsProgram || '').toLowerCase();
@@ -1183,9 +1141,16 @@ function generateRecommendations() {
   
   if (fuelCards.length > 0) {
     const best = fuelCards[0];
-    const fuelInfo = best.masterData 
-      ? best.masterData.benefits.fuel_surcharge_waiver 
-      : '1% fuel surcharge waiver';
+    let fuelInfo = '1% fuel surcharge waiver';
+    
+    if (best.masterData && best.masterData.features) {
+      const fuelFeature = best.masterData.features.find(f => 
+        f.toLowerCase().includes('fuel')
+      );
+      if (fuelFeature) {
+        fuelInfo = fuelFeature;
+      }
+    }
     
     recommendations.push({
       icon: '⛽',
