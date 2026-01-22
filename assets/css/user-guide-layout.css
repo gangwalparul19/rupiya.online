@@ -316,11 +316,11 @@
 /* Footer */
 .footer {
     background: white;
-    padding: 2rem;
+    padding: 1.5rem 2rem;
     text-align: center;
     color: #64748b;
     font-size: 0.9rem;
-    margin-top: 2rem;
+    margin-top: 1.5rem;
     border-radius: 12px;
 }
 
