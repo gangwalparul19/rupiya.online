@@ -103,6 +103,10 @@ function setupEventListeners() {
   // Browse cards
   document.getElementById('browseCardsBtn')?.addEventListener('click', openBrowseCardsModal);
   document.getElementById('closeBrowseModal')?.addEventListener('click', closeBrowseCardsModal);
+  document.getElementById('addCardManuallyBtn')?.addEventListener('click', () => {
+    closeBrowseCardsModal();
+    openCardForm();
+  });
   document.getElementById('filterBank')?.addEventListener('change', filterMasterCards);
   document.getElementById('filterCategory')?.addEventListener('change', filterMasterCards);
   document.getElementById('searchCards')?.addEventListener('input', filterMasterCards);
@@ -990,46 +994,100 @@ function generateRecommendations() {
   // Find cards with specific benefits
   const userCards = state.creditCards;
   
-  // Shopping recommendation
-  const shoppingCards = userCards.filter(card => 
-    card.rewardsProgram && 
-    (card.rewardsProgram.toLowerCase().includes('cashback') || 
-     card.rewardsProgram.toLowerCase().includes('shopping'))
-  );
+  // Helper function to get master card data
+  const getMasterCardData = (userCard) => {
+    if (userCard.masterCardId) {
+      return state.masterCards.find(mc => mc.id === userCard.masterCardId);
+    }
+    return null;
+  };
+  
+  // Shopping recommendation - Cards with cashback or shopping rewards
+  const shoppingCards = userCards.map(card => ({
+    card,
+    masterData: getMasterCardData(card)
+  })).filter(({ card, masterData }) => {
+    if (masterData) {
+      // Use master data for accurate recommendations
+      const rewardsType = masterData.rewards.type.toLowerCase();
+      const category = masterData.category.toLowerCase();
+      return rewardsType.includes('cashback') || 
+             rewardsType.includes('amazon') ||
+             category.includes('shopping');
+    } else {
+      // Fallback to user data if no master card linked
+      const rewardsLower = (card.rewardsProgram || '').toLowerCase();
+      return rewardsLower.includes('cashback') || 
+             rewardsLower.includes('shopping') ||
+             rewardsLower.includes('amazon');
+    }
+  });
   
   if (shoppingCards.length > 0) {
-    const bestCard = shoppingCards.reduce((best, card) => 
-      (card.rewardsBalance || 0) > (best.rewardsBalance || 0) ? card : best
+    const best = shoppingCards.reduce((best, current) => 
+      (current.card.rewardsBalance || 0) > (best.card.rewardsBalance || 0) ? current : best
     );
+    
+    const benefit = best.masterData 
+      ? best.masterData.rewards.accelerated_rate 
+      : `${best.card.rewardsBalance || 0} rewards earned`;
     
     recommendations.push({
       icon: '🛍️',
       category: 'Online Shopping',
-      cardName: bestCard.cardName,
+      cardName: best.card.cardName,
       reason: 'Best for online purchases with high cashback rates',
-      benefit: `${bestCard.rewardsBalance || 0} rewards earned`
+      benefit: benefit
     });
   }
   
-  // Travel recommendation
-  const travelCards = userCards.filter(card => 
-    card.notes && card.notes.toLowerCase().includes('lounge')
-  );
+  // Travel recommendation - Only cards with actual lounge access
+  const travelCards = userCards.map(card => ({
+    card,
+    masterData: getMasterCardData(card)
+  })).filter(({ card, masterData }) => {
+    if (masterData) {
+      // Use master data for accurate lounge access check
+      const domesticLounge = masterData.benefits.lounge_access.domestic.toLowerCase();
+      const internationalLounge = masterData.benefits.lounge_access.international.toLowerCase();
+      const hasLounge = !domesticLounge.includes('none') || !internationalLounge.includes('none');
+      
+      // Also check if it's a travel category card
+      const category = masterData.category.toLowerCase();
+      const rewardsType = masterData.rewards.type.toLowerCase();
+      const isTravelCard = category.includes('travel') || 
+                          rewardsType.includes('miles') || 
+                          rewardsType.includes('travel');
+      
+      return hasLounge && isTravelCard;
+    } else {
+      // Fallback: Check user's rewards program
+      const rewardsLower = (card.rewardsProgram || '').toLowerCase();
+      return rewardsLower.includes('miles') || 
+             rewardsLower.includes('travel') ||
+             rewardsLower.includes('lounge');
+    }
+  });
   
   if (travelCards.length > 0) {
+    const best = travelCards[0];
+    const loungeInfo = best.masterData 
+      ? best.masterData.benefits.lounge_access.domestic 
+      : 'Complimentary lounge access';
+    
     recommendations.push({
       icon: '✈️',
       category: 'Travel & Dining',
-      cardName: travelCards[0].cardName,
+      cardName: best.card.cardName,
       reason: 'Includes airport lounge access and travel benefits',
-      benefit: 'Complimentary lounge access'
+      benefit: loungeInfo
     });
   }
   
-  // Low utilization card
+  // Low utilization card - Best for large purchases
   const lowUtilCards = userCards.filter(card => {
     const util = (card.currentBalance / card.creditLimit) * 100;
-    return util < 30;
+    return util < 30 && card.creditLimit > 0;
   }).sort((a, b) => {
     const utilA = (a.currentBalance / a.creditLimit) * 100;
     const utilB = (b.currentBalance / b.creditLimit) * 100;
@@ -1049,34 +1107,58 @@ function generateRecommendations() {
     });
   }
   
-  // Fuel recommendation
-  const fuelCards = userCards.filter(card => 
-    card.notes && card.notes.toLowerCase().includes('fuel')
-  );
+  // Fuel recommendation - Cards with fuel benefits
+  const fuelCards = userCards.map(card => ({
+    card,
+    masterData: getMasterCardData(card)
+  })).filter(({ card, masterData }) => {
+    if (masterData) {
+      // Use master data for accurate fuel waiver check
+      const fuelWaiver = masterData.benefits.fuel_surcharge_waiver.toLowerCase();
+      return !fuelWaiver.includes('none') && 
+             (fuelWaiver.includes('waiver') || fuelWaiver.includes('%'));
+    } else {
+      // Fallback: Check user's rewards program or card name
+      const rewardsLower = (card.rewardsProgram || '').toLowerCase();
+      const cardNameLower = (card.cardName || '').toLowerCase();
+      return rewardsLower.includes('fuel') || cardNameLower.includes('fuel');
+    }
+  });
   
   if (fuelCards.length > 0) {
+    const best = fuelCards[0];
+    const fuelInfo = best.masterData 
+      ? best.masterData.benefits.fuel_surcharge_waiver 
+      : '1% fuel surcharge waiver';
+    
     recommendations.push({
       icon: '⛽',
       category: 'Fuel Purchases',
-      cardName: fuelCards[0].cardName,
+      cardName: best.card.cardName,
       reason: 'Fuel surcharge waiver saves money on every fill-up',
-      benefit: '1% fuel surcharge waiver'
+      benefit: fuelInfo
     });
   }
   
-  // Bill payments
+  // Bill payments - Card with most available credit
   if (userCards.length > 0) {
-    const cardWithLowestBalance = userCards.reduce((lowest, card) => 
-      (card.currentBalance || 0) < (lowest.currentBalance || 0) ? card : lowest
-    );
+    const cardWithMostAvailable = userCards
+      .filter(card => card.creditLimit > 0)
+      .reduce((best, card) => {
+        const availableBest = best.creditLimit - best.currentBalance;
+        const availableCurrent = card.creditLimit - card.currentBalance;
+        return availableCurrent > availableBest ? card : best;
+      });
     
-    recommendations.push({
-      icon: '📱',
-      category: 'Bill Payments',
-      cardName: cardWithLowestBalance.cardName,
-      reason: 'Use this card for utility bills to maintain activity',
-      benefit: `${formatCurrency(cardWithLowestBalance.creditLimit - cardWithLowestBalance.currentBalance)} available`
-    });
+    if (cardWithMostAvailable) {
+      recommendations.push({
+        icon: '📱',
+        category: 'Bill Payments',
+        cardName: cardWithMostAvailable.cardName,
+        reason: 'Use this card for utility bills to maintain activity',
+        benefit: `${formatCurrency(cardWithMostAvailable.creditLimit - cardWithMostAvailable.currentBalance)} available`
+      });
+    }
   }
   
   return recommendations;

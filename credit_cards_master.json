@@ -1,249 +1,1315 @@
 {
   "meta": {
-    "version": "1.1",
-    "last_updated": "2025-01-23",
+    "version": "2.0",
+    "country": "IN",
     "currency": "INR",
-    "total_count": 50
+    "total_count": 50,
+    "generated_at": "2025-01-23T12:00:00Z"
   },
   "cards": [
     {
-      "id": "sbi-cashback-card",
-      "name": "Cashback SBI Card",
-      "issuer": "SBI Card",
+      "id": "flipkart-axis-bank",
+      "name": "Flipkart Axis Bank Credit Card",
+      "issuer": "Axis Bank",
       "category": "Shopping",
-      "network": ["Visa"],
+      "network": "Visa/Mastercard",
       "images": {
-        "card_face": "https://www.sbicard.com/sbi-card-en/assets/media/images/personal/credit-cards/shopping/card-faces/cashback-sbi-card.png",
-        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/SBI-logo.svg/1024px-SBI-logo.svg.png"
+        "card_face": "https://www.axisbank.com/images/default-source/progress-with-us_new/flipkart-axis-bank-credit-card.jpg",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Axis_Bank_logo.svg/2560px-Axis_Bank_logo.svg.png"
       },
       "fees": {
-        "joining_fee": 999,
-        "annual_fee": 999,
-        "waiver_condition": "Annual fee reversed on annual spends of ₹2 Lakhs."
+        "joining": 500,
+        "annual": 500,
+        "waiver": "Annual fee waived on spends of ₹3.5 Lakhs"
       },
       "rewards": {
-        "type": "Cashback",
-        "base_rate": "1% on offline spends",
-        "accelerated_rate": "5% on all online spends (without merchant restrictions)",
-        "capping": "Max cashback ₹5,000 per billing cycle",
-        "redemption_method": "Auto-credited to statement"
+        "rate": "5% Cashback on Flipkart",
+        "details": "5% cashback on Flipkart & Cleartrip (capped at ₹4k/quarter), 4% on Swiggy/Uber/PVR, 1% flat on others."
       },
-      "benefits": {
-        "lounge_access": {
-          "domestic": "None",
-          "international": "None"
-        },
-        "milestone_benefits": [],
-        "fuel_surcharge_waiver": "1% waiver on transactions between ₹500 and ₹3,000",
-        "forex_markup": "3.5%"
-      },
-      "eligibility": {
-        "min_income_salaried": 25000,
-        "min_age": 21,
-        "cibil_score_required": 750
-      },
-      "apply_link": "https://rupiya.online/apply/sbi-cashback"
+      "features": [
+        "4 complimentary domestic lounge visits per year (spend based)",
+        "1% Fuel surcharge waiver",
+        "Welcome benefits worth ₹600+"
+      ],
+      "apply_link": "https://rupiya.online/apply/flipkart-axis"
     },
     {
-      "id": "hdfc-regalia-gold",
-      "name": "HDFC Regalia Gold Credit Card",
-      "issuer": "HDFC Bank",
-      "category": "Premium Travel",
-      "network": ["Visa", "MasterCard"],
-      "images": {
-        "card_face": "https://www.hdfcbank.com/content/api/contentstream-id/723fb80a-2dde-42a3-9793-7ae1be57c87f/5d63f282-53b0-466d-8c1d-151016f461e7/Regalia%20Gold%20Credit%20Card_264x167.png",
-        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/HDFC_Bank_Logo.svg/2560px-HDFC_Bank_Logo.svg.png"
-      },
-      "fees": {
-        "joining_fee": 2500,
-        "annual_fee": 2500,
-        "waiver_condition": "Annual fee waived on spends of ₹4 Lakhs in 12 months."
-      },
-      "rewards": {
-        "type": "Points",
-        "base_rate": "4 Reward Points per ₹150",
-        "accelerated_rate": "5X points on Marks & Spencer, Myntra, Nykaa, Reliance Digital",
-        "capping": "No capping on base points",
-        "redemption_method": "SmartBuy Portal (Flights/Hotels @ ₹0.50/point)"
-      },
-      "benefits": {
-        "lounge_access": {
-          "domestic": "12 complimentary visits per calendar year (Both Primary & Add-on)",
-          "international": "6 complimentary visits per year via Priority Pass"
-        },
-        "milestone_benefits": [
-          "₹1,500 voucher on quarterly spends of ₹1.5 Lakhs",
-          "₹5,000 flight voucher on annual spends of ₹5 Lakhs"
-        ],
-        "fuel_surcharge_waiver": "1% waiver on transactions between ₹400 and ₹5,000",
-        "forex_markup": "2.0%"
-      },
-      "eligibility": {
-        "min_income_salaried": 100000,
-        "min_age": 21,
-        "cibil_score_required": 750
-      },
-      "apply_link": "https://rupiya.online/apply/hdfc-regalia-gold"
-    },
-    {
-      "id": "icici-amazon-pay",
+      "id": "amazon-pay-icici",
       "name": "Amazon Pay ICICI Credit Card",
       "issuer": "ICICI Bank",
-      "category": "Lifetime Free",
-      "network": ["Visa"],
+      "category": "Shopping",
+      "network": "Visa",
       "images": {
         "card_face": "https://www.icicibank.com/content/dam/icicibank/india/managed-assets/images/personal-banking/cards/credit-cards/amazon-pay/amazon-pay-credit-card-new.png",
         "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/ICICI_Bank_Logo.svg/2560px-ICICI_Bank_Logo.svg.png"
       },
       "fees": {
-        "joining_fee": 0,
-        "annual_fee": 0,
-        "waiver_condition": "Lifetime Free (LTF)"
+        "joining": 0,
+        "annual": 0,
+        "waiver": "Lifetime Free (LTF)"
       },
       "rewards": {
-        "type": "Amazon Pay Balance",
-        "base_rate": "1% on all other spends",
-        "accelerated_rate": "5% for Prime members on Amazon.in (3% for non-Prime)",
-        "capping": "Unlimited",
-        "redemption_method": "Auto-credited to Amazon Pay wallet"
+        "rate": "5% Cashback for Prime Members",
+        "details": "5% for Prime members on Amazon, 3% for non-Prime, 2% on Amazon Pay partners, 1% on others."
       },
-      "benefits": {
-        "lounge_access": {
-          "domestic": "None",
-          "international": "None"
-        },
-        "milestone_benefits": [],
-        "fuel_surcharge_waiver": "1% waiver",
-        "forex_markup": "3.5%"
+      "features": [
+        "Lifetime Free",
+        "Earnings credited as Amazon Pay Balance",
+        "1% Fuel surcharge waiver",
+        "No capping on rewards"
+      ],
+      "apply_link": "https://rupiya.online/apply/amazon-icici"
+    },
+    {
+      "id": "uni-nx-wave",
+      "name": "Uni NX Wave Credit Card",
+      "issuer": "Yes Bank",
+      "category": "Fintech / Cashback",
+      "network": "Visa",
+      "images": {
+        "card_face": "https://www.uni.cards/images/nx-wave/nx_wave_hero_card.png",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Yes_Bank_SVG_Logo.svg/1200px-Yes_Bank_SVG_Logo.svg.png"
       },
-      "eligibility": {
-        "min_income_salaried": 25000,
-        "min_age": 21,
-        "cibil_score_required": 730
+      "fees": {
+        "joining": 0,
+        "annual": 0,
+        "waiver": "Lifetime Free"
       },
-      "apply_link": "https://rupiya.online/apply/icici-amazon"
+      "rewards": {
+        "rate": "1% Flat Cashback",
+        "details": "1% Real Cashback on all spends. 5X rewards on Uni Store."
+      },
+      "features": [
+        "Zero Forex Markup on international spends",
+        "Lifetime Free",
+        "Control card limits via App"
+      ],
+      "apply_link": "https://rupiya.online/apply/uni-nx"
+    },
+    {
+      "id": "sbi-cashback",
+      "name": "Cashback SBI Card",
+      "issuer": "SBI Card",
+      "category": "Shopping",
+      "network": "Visa",
+      "images": {
+        "card_face": "https://www.sbicard.com/sbi-card-en/assets/media/images/personal/credit-cards/shopping/card-faces/cashback-sbi-card.png",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/SBI-logo.svg/1024px-SBI-logo.svg.png"
+      },
+      "fees": {
+        "joining": 999,
+        "annual": 999,
+        "waiver": "Waived on spends of ₹2 Lakhs"
+      },
+      "rewards": {
+        "rate": "5% Cashback on Online Spends",
+        "details": "5% on all online spends (max ₹5k/month), 1% on offline."
+      },
+      "features": [
+        "Highest cashback rate for general online shopping",
+        "Auto-credit to statement",
+        "Fuel surcharge waiver"
+      ],
+      "apply_link": "https://rupiya.online/apply/sbi-cashback"
+    },
+    {
+      "id": "hdfc-millennia",
+      "name": "HDFC Millennia Credit Card",
+      "issuer": "HDFC Bank",
+      "category": "Cashback",
+      "network": "Visa/Mastercard/Diners",
+      "images": {
+        "card_face": "https://www.hdfcbank.com/content/api/contentstream-id/723fb80a-2dde-42a3-9793-7ae1be57c87f/22646246-814d-466d-9799-276e5d867746/Millennia%20Credit%20Card_264x167.png",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/HDFC_Bank_Logo.svg/2560px-HDFC_Bank_Logo.svg.png"
+      },
+      "fees": {
+        "joining": 1000,
+        "annual": 1000,
+        "waiver": "Waived on spends of ₹1 Lakh"
+      },
+      "rewards": {
+        "rate": "5% Cashback on 10 Brands",
+        "details": "5% on Amazon, Flipkart, Myntra, Swiggy, Zomato, etc. 1% on others."
+      },
+      "features": [
+        "8 Domestic lounge visits per year",
+        "Cashback given as CashPoints (1 CP = ₹1)",
+        "Diners Club variant gets international lounge"
+      ],
+      "apply_link": "https://rupiya.online/apply/hdfc-millennia"
+    },
+    {
+      "id": "hdfc-regalia-gold",
+      "name": "HDFC Regalia Gold",
+      "issuer": "HDFC Bank",
+      "category": "Premium Travel",
+      "network": "Visa/Mastercard",
+      "images": {
+        "card_face": "https://www.hdfcbank.com/content/api/contentstream-id/723fb80a-2dde-42a3-9793-7ae1be57c87f/5d63f282-53b0-466d-8c1d-151016f461e7/Regalia%20Gold%20Credit%20Card_264x167.png",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/HDFC_Bank_Logo.svg/2560px-HDFC_Bank_Logo.svg.png"
+      },
+      "fees": {
+        "joining": 2500,
+        "annual": 2500,
+        "waiver": "Waived on spends of ₹4 Lakhs"
+      },
+      "rewards": {
+        "rate": "4X Reward Points",
+        "details": "4 Points per ₹150. 5X on Marks & Spencer, Myntra, Nykaa, Reliance Digital."
+      },
+      "features": [
+        "12 Domestic & 6 International Lounge Access",
+        "Club Vistara Silver Membership (Subject to availability)",
+        "Flight vouchers on milestones"
+      ],
+      "apply_link": "https://rupiya.online/apply/hdfc-regalia-gold"
+    },
+    {
+      "id": "hdfc-infinia-metal",
+      "name": "HDFC Infinia Metal Edition",
+      "issuer": "HDFC Bank",
+      "category": "Super Premium",
+      "network": "Visa Infinite",
+      "images": {
+        "card_face": "https://www.hdfcbank.com/content/api/contentstream-id/723fb80a-2dde-42a3-9793-7ae1be57c87f/f5446059-d86b-4b13-a44c-289569055844/Infinia_Metal_Card_264x167.png",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/HDFC_Bank_Logo.svg/2560px-HDFC_Bank_Logo.svg.png"
+      },
+      "fees": {
+        "joining": 12500,
+        "annual": 12500,
+        "waiver": "Waived on spends of ₹10 Lakhs"
+      },
+      "rewards": {
+        "rate": "5 RP per ₹150",
+        "details": "Unlimited 5X/10X rewards on SmartBuy (Flights/Hotels). 1 RP = ₹1."
+      },
+      "features": [
+        "Unlimited International & Domestic Lounge Access",
+        "ITC Hotel Buffet 1+1",
+        "Unlimited Golf Games",
+        "Global Concierge"
+      ],
+      "apply_link": "https://rupiya.online/apply/hdfc-infinia"
+    },
+    {
+      "id": "axis-ace",
+      "name": "Axis Bank Ace Credit Card",
+      "issuer": "Axis Bank",
+      "category": "Cashback",
+      "network": "Visa",
+      "images": {
+        "card_face": "https://www.axisbank.com/images/default-source/progress-with-us_new/ace-credit-card.jpg",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Axis_Bank_logo.svg/2560px-Axis_Bank_logo.svg.png"
+      },
+      "fees": {
+        "joining": 499,
+        "annual": 499,
+        "waiver": "Waived on spends of ₹2 Lakhs"
+      },
+      "rewards": {
+        "rate": "5% on Utility Bills",
+        "details": "5% cashback on bills via GPay. 4% on Swiggy/Zomato/Ola. 1.5% flat on others."
+      },
+      "features": [
+        "Best for Utility Bill Payments",
+        "4 Domestic Lounge visits",
+        "Unlimited cashback (except capped categories)"
+      ],
+      "apply_link": "https://rupiya.online/apply/axis-ace"
     },
     {
       "id": "axis-atlas",
       "name": "Axis Atlas Credit Card",
       "issuer": "Axis Bank",
       "category": "Travel Miles",
-      "network": ["Visa"],
+      "network": "Visa",
       "images": {
         "card_face": "https://www.axisbank.com/images/default-source/progress-with-us_new/atlas-credit-card.jpg",
         "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Axis_Bank_logo.svg/2560px-Axis_Bank_logo.svg.png"
       },
       "fees": {
-        "joining_fee": 5000,
-        "annual_fee": 5000,
-        "waiver_condition": "No fee waiver, but renewal benefits given."
+        "joining": 5000,
+        "annual": 5000,
+        "waiver": "No waiver (Milestone benefits apply)"
       },
       "rewards": {
-        "type": "EDGE Miles",
-        "base_rate": "2 EDGE Miles per ₹100",
-        "accelerated_rate": "5 EDGE Miles per ₹100 on Travel EDGE portal",
-        "capping": "None",
-        "redemption_method": "Transfer to Airline/Hotel Partners (1 Mile = 2 Partner Points)"
+        "rate": "2 EDGE Miles per ₹100",
+        "details": "5 Miles on Travel, 2 Miles on others. 1 Mile = 2 Partner Points (Accor/Marriott/Airlines)."
       },
-      "benefits": {
-        "lounge_access": {
-          "domestic": "Up to 18 visits per year (based on tier)",
-          "international": "Up to 12 visits per year (based on tier)"
-        },
-        "milestone_benefits": [
-          "2500 Bonus Miles at Silver Tier (₹3L spend)",
-          "5000 Bonus Miles at Gold Tier (₹7.5L spend)"
-        ],
-        "fuel_surcharge_waiver": "1% waiver on transactions between ₹400 and ₹4,000",
-        "forex_markup": "3.5%"
-      },
-      "eligibility": {
-        "min_income_salaried": 100000,
-        "min_age": 21,
-        "cibil_score_required": 750
-      },
+      "features": [
+        "Tier based benefits (Silver, Gold, Platinum)",
+        "Up to 18 International Lounge visits",
+        "Best conversion ratio for Air Miles"
+      ],
       "apply_link": "https://rupiya.online/apply/axis-atlas"
+    },
+    {
+      "id": "sbi-simplyclick",
+      "name": "SBI SimplyClick Credit Card",
+      "issuer": "SBI Card",
+      "category": "Shopping",
+      "network": "Visa",
+      "images": {
+        "card_face": "https://www.sbicard.com/sbi-card-en/assets/media/images/personal/credit-cards/shopping/card-faces/simplyclick-sbi-card-new.png",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/SBI-logo.svg/1024px-SBI-logo.svg.png"
+      },
+      "fees": {
+        "joining": 499,
+        "annual": 499,
+        "waiver": "Waived on spends of ₹1 Lakh"
+      },
+      "rewards": {
+        "rate": "10X Rewards",
+        "details": "10X points on Apollo, BookMyShow, Cleartrip, Domino's, Myntra. 5X on other online."
+      },
+      "features": [
+        "Amazon gift card ₹500 on joining",
+        "ClearTrip vouchers on milestones",
+        "Good entry level card"
+      ],
+      "apply_link": "https://rupiya.online/apply/sbi-simplyclick"
+    },
+    {
+      "id": "sbi-bpcl-octane",
+      "name": "BPCL SBI Card Octane",
+      "issuer": "SBI Card",
+      "category": "Fuel",
+      "network": "Visa",
+      "images": {
+        "card_face": "https://www.sbicard.com/sbi-card-en/assets/media/images/personal/credit-cards/travel/card-faces/bpcl-sbi-card-octane.png",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/SBI-logo.svg/1024px-SBI-logo.svg.png"
+      },
+      "fees": {
+        "joining": 1499,
+        "annual": 1499,
+        "waiver": "Waived on spends of ₹2 Lakhs"
+      },
+      "rewards": {
+        "rate": "7.25% Valueback on Fuel",
+        "details": "25X Reward Points on BPCL Fuel, Lubricants & Bharat Gas."
+      },
+      "features": [
+        "4 Domestic Lounge visits per year",
+        "Fraud liability cover ₹1 Lakh",
+        "Top tier fuel card"
+      ],
+      "apply_link": "https://rupiya.online/apply/sbi-octane"
+    },
+    {
+      "id": "icici-platinum-chip",
+      "name": "ICICI Platinum Chip Credit Card",
+      "issuer": "ICICI Bank",
+      "category": "Entry Level",
+      "network": "Visa",
+      "images": {
+        "card_face": "https://www.icicibank.com/content/dam/icicibank/india/managed-assets/images/personal-banking/cards/credit-cards/platinum-chip/platinum-chip-card-new.png",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/ICICI_Bank_Logo.svg/2560px-ICICI_Bank_Logo.svg.png"
+      },
+      "fees": {
+        "joining": 0,
+        "annual": 0,
+        "waiver": "Lifetime Free (Usually)"
+      },
+      "rewards": {
+        "rate": "2 PAYBACK Points per ₹100",
+        "details": "Earn points on retail spends (except fuel)."
+      },
+      "features": [
+        "Lifetime Free (LTF)",
+        "Great for ICICI Bank offers/sales",
+        "Culinary Treats Programme (Dining discounts)"
+      ],
+      "apply_link": "https://rupiya.online/apply/icici-platinum"
+    },
+    {
+      "id": "icici-rubyx",
+      "name": "ICICI Bank Rubyx Credit Card",
+      "issuer": "ICICI Bank",
+      "category": "Premium",
+      "network": "Dual (Visa + Amex)",
+      "images": {
+        "card_face": "https://www.icicibank.com/content/dam/icicibank/india/managed-assets/images/personal-banking/cards/credit-cards/rubyx/rubyx-credit-card-new.png",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/ICICI_Bank_Logo.svg/2560px-ICICI_Bank_Logo.svg.png"
+      },
+      "fees": {
+        "joining": 3000,
+        "annual": 2000,
+        "waiver": "Waived on spends of ₹3 Lakhs"
+      },
+      "rewards": {
+        "rate": "Up to 4 points per ₹100",
+        "details": "Higher rewards on Amex variant. Handpicked rewards for travel/lifestyle."
+      },
+      "features": [
+        "2 complimentary domestic lounge visits per quarter",
+        "Buy 1 Get 1 Movie Ticket on BookMyShow",
+        "Comes with 2 cards (Amex + Mastercard/Visa)"
+      ],
+      "apply_link": "https://rupiya.online/apply/icici-rubyx"
     },
     {
       "id": "idfc-first-wealth",
       "name": "IDFC FIRST Wealth Credit Card",
       "issuer": "IDFC FIRST Bank",
       "category": "Premium Lifestyle",
-      "network": ["Visa Infinite"],
+      "network": "Visa Infinite",
       "images": {
         "card_face": "https://www.idfcfirstbank.com/content/dam/idfcfirstbank/images/credit-card/wealth-credit-card.png",
         "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Logo_of_IDFC_First_Bank.svg/2560px-Logo_of_IDFC_First_Bank.svg.png"
       },
       "fees": {
-        "joining_fee": 0,
-        "annual_fee": 0,
-        "waiver_condition": "Lifetime Free (Invitation Only)"
+        "joining": 0,
+        "annual": 0,
+        "waiver": "Lifetime Free"
       },
       "rewards": {
-        "type": "Points",
-        "base_rate": "3X Points per ₹100",
-        "accelerated_rate": "10X Points on incremental spends > ₹20k/month",
-        "capping": "Unlimited",
-        "redemption_method": "Pay with points / Vouchers (1 Reward Point = ₹0.25)"
+        "rate": "10X Points > ₹20k spend",
+        "details": "3X base, 6X online, 10X on spends above ₹20,000/month. Points never expire."
       },
-      "benefits": {
-        "lounge_access": {
-          "domestic": "4 per quarter (Domestic & Spa)",
-          "international": "4 per quarter"
-        },
-        "milestone_benefits": [
-          "Buy 1 Get 1 on Movie Tickets (Up to ₹500)"
-        ],
-        "fuel_surcharge_waiver": "1% waiver",
-        "forex_markup": "1.5%"
-      },
-      "eligibility": {
-        "min_income_salaried": 300000,
-        "min_age": 21,
-        "cibil_score_required": 780
-      },
+      "features": [
+        "Visa Infinite Benefits",
+        "4 Domestic & 4 International Lounge visits per quarter",
+        "Buy 1 Get 1 Movies (up to ₹500)",
+        "Low Forex Markup (1.5%)"
+      ],
       "apply_link": "https://rupiya.online/apply/idfc-wealth"
+    },
+    {
+      "id": "idfc-first-select",
+      "name": "IDFC FIRST Select Credit Card",
+      "issuer": "IDFC FIRST Bank",
+      "category": "Lifestyle",
+      "network": "Visa Signature",
+      "images": {
+        "card_face": "https://www.idfcfirstbank.com/content/dam/idfcfirstbank/images/credit-card/select-credit-card.png",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Logo_of_IDFC_First_Bank.svg/2560px-Logo_of_IDFC_First_Bank.svg.png"
+      },
+      "fees": {
+        "joining": 0,
+        "annual": 0,
+        "waiver": "Lifetime Free"
+      },
+      "rewards": {
+        "rate": "10X Points > ₹20k spend",
+        "details": "3X offline, 6X online, 10X above ₹20k monthly spend."
+      },
+      "features": [
+        "4 Domestic Railway Lounge visits",
+        "4 Domestic Airport Lounge visits (quarterly)",
+        "Buy 1 Get 1 Movies (up to ₹250)"
+      ],
+      "apply_link": "https://rupiya.online/apply/idfc-select"
+    },
+    {
+      "id": "idfc-first-wow",
+      "name": "IDFC FIRST WOW Credit Card",
+      "issuer": "IDFC FIRST Bank",
+      "category": "Secured / FD Based",
+      "network": "Visa",
+      "images": {
+        "card_face": "https://www.idfcfirstbank.com/content/dam/idfcfirstbank/images/credit-card/wow-credit-card.png",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Logo_of_IDFC_First_Bank.svg/2560px-Logo_of_IDFC_First_Bank.svg.png"
+      },
+      "fees": {
+        "joining": 0,
+        "annual": 0,
+        "waiver": "Lifetime Free"
+      },
+      "rewards": {
+        "rate": "4X Reward Points",
+        "details": "4X points on all spends. No capping."
+      },
+      "features": [
+        "Zero Forex Markup",
+        "Issued against Fixed Deposit (No Income Proof)",
+        "Guaranteed Approval",
+        "Lifetime Free"
+      ],
+      "apply_link": "https://rupiya.online/apply/idfc-wow"
     },
     {
       "id": "amex-platinum-travel",
       "name": "American Express Platinum Travel",
       "issuer": "American Express",
       "category": "Travel",
-      "network": ["Amex"],
+      "network": "Amex",
       "images": {
         "card_face": "https://www.americanexpress.com/content/dam/amex/in/benefits/platinum-travel-credit-card/Platinum-Travel-Card-Art.png",
         "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/American_Express_logo_%282018%29.svg/1200px-American_Express_logo_%282018%29.svg.png"
       },
       "fees": {
-        "joining_fee": 3500,
-        "annual_fee": 5000,
-        "waiver_condition": "No waiver"
+        "joining": 3500,
+        "annual": 5000,
+        "waiver": "No Waiver"
       },
       "rewards": {
-        "type": "MR Points",
-        "base_rate": "1 MR Point per ₹50",
-        "accelerated_rate": "3X on Multiplier portal",
-        "capping": "None",
-        "redemption_method": "Marriott/Taj Vouchers or Air Miles"
+        "rate": "Milestone Based",
+        "details": "Rewards are maximized on hitting ₹1.9L and ₹4L milestones (Total ~40k+ points)."
       },
-      "benefits": {
-        "lounge_access": {
-          "domestic": "8 complimentary visits per year (max 2 per quarter)",
-          "international": "None"
-        },
-        "milestone_benefits": [
-          "15,000 Bonus MR Points on ₹1.90 Lakh spend",
-          "25,000 Bonus MR Points + ₹10k Taj Voucher on ₹4 Lakh spend"
-        ],
-        "fuel_surcharge_waiver": "0% for HPCL transactions < ₹5,000",
-        "forex_markup": "3.5%"
+      "features": [
+        "Taj Vouchers worth ₹10,000 on ₹4L spend",
+        "8 Domestic Lounge visits",
+        "Excellent for Marriott Bonvoy transfers"
+      ],
+      "apply_link": "https://rupiya.online/apply/amex-platinum-travel"
+    },
+    {
+      "id": "amex-mrcc",
+      "name": "Amex Membership Rewards (MRCC)",
+      "issuer": "American Express",
+      "category": "Rewards",
+      "network": "Amex",
+      "images": {
+        "card_face": "https://www.americanexpress.com/content/dam/amex/in/benefits/membership-rewards-credit-card/MRCC-Card-Art.png",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/American_Express_logo_%282018%29.svg/1200px-American_Express_logo_%282018%29.svg.png"
       },
-      "eligibility": {
-        "min_income_salaried": 50000,
-        "min_age": 21,
-        "cibil_score_required": 750
+      "fees": {
+        "joining": 1000,
+        "annual": 4500,
+        "waiver": "Waived on spends of ₹1.5 Lakhs"
       },
-      "apply_link": "https://rupiya.online/apply/amex-platinum"
+      "rewards": {
+        "rate": "1 MR per ₹50",
+        "details": "1000 Bonus MR for using card 4 times on transactions >₹1500 per month."
+      },
+      "features": [
+        "Gold Collection Redemption (18k / 24k karat gold)",
+        "Great for wallet loads (if accepted)",
+        "Best for monthly usage of ₹20,000"
+      ],
+      "apply_link": "https://rupiya.online/apply/amex-mrcc"
+    },
+    {
+      "id": "rbl-world-safari",
+      "name": "RBL Bank World Safari",
+      "issuer": "RBL Bank",
+      "category": "Travel",
+      "network": "Mastercard",
+      "images": {
+        "card_face": "https://www.rblbank.com/sites/default/files/2019-06/World-Safari-Card_0.png",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/RBL_Bank_logo.svg/2560px-RBL_Bank_logo.svg.png"
+      },
+      "fees": {
+        "joining": 3000,
+        "annual": 3000,
+        "waiver": "No waiver"
+      },
+      "rewards": {
+        "rate": "2 Travel Points per ₹100",
+        "details": "5 Travel Points per ₹100 on Travel spends."
+      },
+      "features": [
+        "0% Forex Markup (Major Benefit)",
+        "Gift voucher worth ₹3000 on joining",
+        "2 Domestic Lounge visits per quarter"
+      ],
+      "apply_link": "https://rupiya.online/apply/rbl-world-safari"
+    },
+    {
+      "id": "indusind-legend",
+      "name": "IndusInd Bank Legend",
+      "issuer": "IndusInd Bank",
+      "category": "Lifestyle",
+      "network": "Visa",
+      "images": {
+        "card_face": "https://www.indusind.com/content/dam/indusind-platform-images/product-images/personal-banking/cards/credit-cards/legend-credit-card/hero-banner/legend-card.png",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/IndusInd_Bank_Logo.svg/1200px-IndusInd_Bank_Logo.svg.png"
+      },
+      "fees": {
+        "joining": "Varies (Sometimes Free)",
+        "annual": 0,
+        "waiver": "Lifetime Free"
+      },
+      "rewards": {
+        "rate": "1 Point per ₹100 (Weekdays)",
+        "details": "2 Points per ₹100 on Weekends. 1 Point = ₹0.75 or 1 Airmile."
+      },
+      "features": [
+        "Buy 1 Get 1 Movie Ticket (BookMyShow)",
+        "Priority Pass Membership",
+        "Low Forex Markup (1.8%)"
+      ],
+      "apply_link": "https://rupiya.online/apply/indusind-legend"
+    },
+    {
+      "id": "sc-ultimate",
+      "name": "Standard Chartered Ultimate",
+      "issuer": "Standard Chartered",
+      "category": "Super Premium",
+      "network": "Visa/Mastercard",
+      "images": {
+        "card_face": "https://av.sc.com/in/content/images/in-ultimate-card-400x250.jpg",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Standard_Chartered.svg/2560px-Standard_Chartered.svg.png"
+      },
+      "fees": {
+        "joining": 5000,
+        "annual": 5000,
+        "waiver": "No Waiver"
+      },
+      "rewards": {
+        "rate": "5 Reward Points per ₹150",
+        "details": "Flat 3.33% reward rate on all spends. 1 Pt = ₹1."
+      },
+      "features": [
+        "One of the highest flat reward rates in India",
+        "Access to domestic & international lounges",
+        "Reduced Forex Markup (2%)"
+      ],
+      "apply_link": "https://rupiya.online/apply/sc-ultimate"
+    },
+    {
+      "id": "au-zenith-plus",
+      "name": "AU Zenith+ Credit Card",
+      "issuer": "AU Small Finance Bank",
+      "category": "Premium",
+      "network": "Visa",
+      "images": {
+        "card_face": "https://www.aubank.in/assets/images/credit-card/zenith-plus-credit-card.png",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/AU_Small_Finance_Bank_logo.svg/2560px-AU_Small_Finance_Bank_logo.svg.png"
+      },
+      "fees": {
+        "joining": 4999,
+        "annual": 4999,
+        "waiver": "Waived on spends of ₹8 Lakhs"
+      },
+      "rewards": {
+        "rate": "2 Points per ₹100",
+        "details": "2X points on Travel/Dining. 1X on others."
+      },
+      "features": [
+        "Zero Forex Markup",
+        "16 International Lounge visits per year (Priority Pass)",
+        "Luxury Brand Vouchers on milestones"
+      ],
+      "apply_link": "https://rupiya.online/apply/au-zenith-plus"
+    },
+    {
+      "id": "hsbc-live-plus",
+      "name": "HSBC Live+ Credit Card",
+      "issuer": "HSBC",
+      "category": "Cashback",
+      "network": "Visa",
+      "images": {
+        "card_face": "https://www.hsbc.co.in/content/dam/hsbc/in/images/credit-cards/live-plus-credit-card-488x306.jpg",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/HSBC_logo_%282018%29.svg/2560px-HSBC_logo_%282018%29.svg.png"
+      },
+      "fees": {
+        "joining": 999,
+        "annual": 999,
+        "waiver": "Waived on spends of ₹2 Lakhs"
+      },
+      "rewards": {
+        "rate": "10% Cashback on Dining",
+        "details": "10% on Dining/Grocery/Food Delivery. 1.5% Unlimited on others."
+      },
+      "features": [
+        "1.5% cashback on all other spends is unlimited",
+        "Capped at ₹1000/month for 10% category",
+        "4 Domestic Lounge visits"
+      ],
+      "apply_link": "https://rupiya.online/apply/hsbc-live-plus"
+    },
+    {
+      "id": "kotak-mojo",
+      "name": "Kotak Mojo Platinum",
+      "issuer": "Kotak Mahindra Bank",
+      "category": "Rewards",
+      "network": "Visa",
+      "images": {
+        "card_face": "https://www.kotak.com/content/dam/Kotak/product_card_images/mojo-platinum-credit-card.png",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Kotak_Mahindra_Bank_logo.svg/2560px-Kotak_Mahindra_Bank_logo.svg.png"
+      },
+      "fees": {
+        "joining": 1000,
+        "annual": 1000,
+        "waiver": "Waived on spends of ₹1 Lakh"
+      },
+      "rewards": {
+        "rate": "2.5 Points per ₹100",
+        "details": "2.5 points on online spends. 1 point on offline."
+      },
+      "features": [
+        "8 Domestic Airport Lounge visits per year",
+        "Quarterly milestone bonus (2500 points)",
+        "Fuel surcharge waiver"
+      ],
+      "apply_link": "https://rupiya.online/apply/kotak-mojo"
+    },
+    {
+      "id": "yes-marquee",
+      "name": "Yes Bank Marquee",
+      "issuer": "Yes Bank",
+      "category": "Super Premium",
+      "network": "Visa Infinite",
+      "images": {
+        "card_face": "https://www.yesbank.in/content/dam/yesbank-images/credit-card/marquee/marquee-credit-card.png",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Yes_Bank_SVG_Logo.svg/1200px-Yes_Bank_SVG_Logo.svg.png"
+      },
+      "fees": {
+        "joining": 9999,
+        "annual": 4999,
+        "waiver": "Waived on spends of ₹10 Lakhs"
+      },
+      "rewards": {
+        "rate": "36 Points per ₹200 (Online)",
+        "details": "18 Points offline. 1 Point = ₹0.25."
+      },
+      "features": [
+        "Unlimited International & Domestic Lounge Access (Guest allowed)",
+        "1% Forex Markup",
+        "Buy 1 Get 1 on Movies"
+      ],
+      "apply_link": "https://rupiya.online/apply/yes-marquee"
+    },
+    {
+      "id": "icici-emeralde",
+      "name": "ICICI Bank Emeralde",
+      "issuer": "ICICI Bank",
+      "category": "Super Premium",
+      "network": "Mastercard/Amex",
+      "images": {
+        "card_face": "https://www.icicibank.com/content/dam/icicibank/india/managed-assets/images/personal-banking/cards/credit-cards/emeralde/emeralde-card-new.png",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/ICICI_Bank_Logo.svg/2560px-ICICI_Bank_Logo.svg.png"
+      },
+      "fees": {
+        "joining": 12000,
+        "annual": 12000,
+        "waiver": "Waived on spends of ₹15 Lakhs"
+      },
+      "rewards": {
+        "rate": "4 Points per ₹100",
+        "details": "Rewards on all categories including insurance/utilities."
+      },
+      "features": [
+        "Unlimited International & Domestic Lounge",
+        "Unlimited Spa Access (DreamFolks)",
+        "Low Forex Fee (1.5%)"
+      ],
+      "apply_link": "https://rupiya.online/apply/icici-emeralde"
+    },
+    {
+      "id": "hdfc-moneyback-plus",
+      "name": "HDFC MoneyBack+",
+      "issuer": "HDFC Bank",
+      "category": "Entry Level",
+      "network": "Visa/Mastercard",
+      "images": {
+        "card_face": "https://www.hdfcbank.com/content/api/contentstream-id/723fb80a-2dde-42a3-9793-7ae1be57c87f/56722271-4629-4c00-a616-2401f010f3e6/MoneyBack%20Plus%20Credit%20Card_264x167.png",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/HDFC_Bank_Logo.svg/2560px-HDFC_Bank_Logo.svg.png"
+      },
+      "fees": {
+        "joining": 500,
+        "annual": 500,
+        "waiver": "Waived on spends of ₹50,000"
+      },
+      "rewards": {
+        "rate": "10X CashPoints",
+        "details": "10X on Amazon, Flipkart, BigBasket, Reliance Smart, Swiggy."
+      },
+      "features": [
+        "Great for starters",
+        "Quarterly gift voucher ₹500 on spend of ₹50k",
+        "15% off at partner restaurants"
+      ],
+      "apply_link": "https://rupiya.online/apply/hdfc-moneyback"
+    },
+    {
+      "id": "sbi-prime",
+      "name": "SBI Card Prime",
+      "issuer": "SBI Card",
+      "category": "Lifestyle",
+      "network": "Visa/Mastercard",
+      "images": {
+        "card_face": "https://www.sbicard.com/sbi-card-en/assets/media/images/personal/credit-cards/lifestyle/card-faces/sbi-card-prime.png",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/SBI-logo.svg/1024px-SBI-logo.svg.png"
+      },
+      "fees": {
+        "joining": 2999,
+        "annual": 2999,
+        "waiver": "Waived on spends of ₹3 Lakhs"
+      },
+      "rewards": {
+        "rate": "10 Points per ₹100",
+        "details": "10 points on Dining/Groceries/Movies. 2 points on others."
+      },
+      "features": [
+        "Club Vistara Silver Membership",
+        "Trident Privilege Red Tier Membership",
+        "4 International Lounge visits per year"
+      ],
+      "apply_link": "https://rupiya.online/apply/sbi-prime"
+    },
+    {
+      "id": "axis-myzone",
+      "name": "Axis Bank My Zone",
+      "issuer": "Axis Bank",
+      "category": "Entry Level",
+      "network": "Visa",
+      "images": {
+        "card_face": "https://www.axisbank.com/images/default-source/progress-with-us_new/my-zone-credit-card.jpg",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Axis_Bank_logo.svg/2560px-Axis_Bank_logo.svg.png"
+      },
+      "fees": {
+        "joining": 500,
+        "annual": 500,
+        "waiver": "Usually Lifetime Free Offers available"
+      },
+      "rewards": {
+        "rate": "4 Points per ₹200",
+        "details": "Flat rewards structure."
+      },
+      "features": [
+        "Buy 1 Get 1 on Paytm Movies",
+        "Flat ₹120 off on Swiggy (twice a month)",
+        "Complimentary SonyLiv Premium subscription"
+      ],
+      "apply_link": "https://rupiya.online/apply/axis-myzone"
+    },
+    {
+      "id": "axis-magnus",
+      "name": "Axis Magnus",
+      "issuer": "Axis Bank",
+      "category": "Super Premium",
+      "network": "Visa",
+      "images": {
+        "card_face": "https://www.axisbank.com/images/default-source/revamp-new/cards/credit-cards/magnus-credit-card.jpg",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Axis_Bank_logo.svg/2560px-Axis_Bank_logo.svg.png"
+      },
+      "fees": {
+        "joining": 12500,
+        "annual": 12500,
+        "waiver": "Waived on spends of ₹25 Lakhs"
+      },
+      "rewards": {
+        "rate": "12 Points per ₹200",
+        "details": "60 points per ₹200 on Travel Edge."
+      },
+      "features": [
+        "Unlimited Domestic & International Lounge Access",
+        "Unlimited Guest Visits for Lounge",
+        "Airport Concierge Services"
+      ],
+      "apply_link": "https://rupiya.online/apply/axis-magnus"
+    },
+    {
+      "id": "axis-indian-oil",
+      "name": "IndianOil Axis Bank Credit Card",
+      "issuer": "Axis Bank",
+      "category": "Fuel",
+      "network": "Visa",
+      "images": {
+        "card_face": "https://www.axisbank.com/images/default-source/progress-with-us_new/indianoil-credit-card.jpg",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Axis_Bank_logo.svg/2560px-Axis_Bank_logo.svg.png"
+      },
+      "fees": {
+        "joining": 500,
+        "annual": 500,
+        "waiver": "Waived on spends of ₹50,000"
+      },
+      "rewards": {
+        "rate": "4% Valueback on Fuel",
+        "details": "20 Reward points per ₹100 at IOCL pumps."
+      },
+      "features": [
+        "1% Fuel Surcharge Waiver",
+        "10% discount on BookMyShow movie tickets",
+        "Rewards redeemable as cashback"
+      ],
+      "apply_link": "https://rupiya.online/apply/axis-indianoil"
+    },
+    {
+      "id": "icici-coral",
+      "name": "ICICI Bank Coral Credit Card",
+      "issuer": "ICICI Bank",
+      "category": "Entry Level",
+      "network": "Visa/Mastercard",
+      "images": {
+        "card_face": "https://www.icicibank.com/content/dam/icicibank/india/managed-assets/images/personal-banking/cards/credit-cards/coral/coral-credit-card-new.png",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/ICICI_Bank_Logo.svg/2560px-ICICI_Bank_Logo.svg.png"
+      },
+      "fees": {
+        "joining": 500,
+        "annual": 500,
+        "waiver": "Waived on spends of ₹1.5 Lakhs"
+      },
+      "rewards": {
+        "rate": "2 Points per ₹100",
+        "details": "Rewards provided as PAYBACK points."
+      },
+      "features": [
+        "1 Domestic Lounge visit per quarter",
+        "25% discount on BookMyShow (up to ₹100)",
+        "Microchip security"
+      ],
+      "apply_link": "https://rupiya.online/apply/icici-coral"
+    },
+    {
+      "id": "icici-sapphiro",
+      "name": "ICICI Bank Sapphiro",
+      "issuer": "ICICI Bank",
+      "category": "Premium",
+      "network": "Dual (Amex + Mastercard)",
+      "images": {
+        "card_face": "https://www.icicibank.com/content/dam/icicibank/india/managed-assets/images/personal-banking/cards/credit-cards/sapphiro/sapphiro-card-new.png",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/ICICI_Bank_Logo.svg/2560px-ICICI_Bank_Logo.svg.png"
+      },
+      "fees": {
+        "joining": 6500,
+        "annual": 3500,
+        "waiver": "Waived on spends of ₹6 Lakhs"
+      },
+      "rewards": {
+        "rate": "4 Points per ₹100",
+        "details": "Accelerated rewards on international spends."
+      },
+      "features": [
+        "4 Domestic & 2 International Lounge visits per quarter",
+        "Buy 1 Get 1 on BookMyShow (up to ₹500)",
+        "Complimentary Golf Rounds"
+      ],
+      "apply_link": "https://rupiya.online/apply/icici-sapphiro"
+    },
+    {
+      "id": "idfc-first-millennia",
+      "name": "IDFC FIRST Millennia",
+      "issuer": "IDFC FIRST Bank",
+      "category": "Shopping",
+      "network": "Visa",
+      "images": {
+        "card_face": "https://www.idfcfirstbank.com/content/dam/idfcfirstbank/images/credit-card/millennia-credit-card.png",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Logo_of_IDFC_First_Bank.svg/2560px-Logo_of_IDFC_First_Bank.svg.png"
+      },
+      "fees": {
+        "joining": 0,
+        "annual": 0,
+        "waiver": "Lifetime Free"
+      },
+      "rewards": {
+        "rate": "10X Points > ₹20k spend",
+        "details": "3X offline, 6X online, 10X above ₹20k/month."
+      },
+      "features": [
+        "25% discount on Movies (Paytm)",
+        "4 Railway Lounge visits per quarter",
+        "Interest free cash withdrawal (48 days)"
+      ],
+      "apply_link": "https://rupiya.online/apply/idfc-millennia"
+    },
+    {
+      "id": "idfc-first-classic",
+      "name": "IDFC FIRST Classic",
+      "issuer": "IDFC FIRST Bank",
+      "category": "Entry Level",
+      "network": "Visa",
+      "images": {
+        "card_face": "https://www.idfcfirstbank.com/content/dam/idfcfirstbank/images/credit-card/classic-credit-card.png",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Logo_of_IDFC_First_Bank.svg/2560px-Logo_of_IDFC_First_Bank.svg.png"
+      },
+      "fees": {
+        "joining": 0,
+        "annual": 0,
+        "waiver": "Lifetime Free"
+      },
+      "rewards": {
+        "rate": "10X Points > ₹20k spend",
+        "details": "Standard IDFC 3X/6X/10X structure."
+      },
+      "features": [
+        "Lifetime Free",
+        "4 Railway Lounge visits",
+        "Roadside Assistance"
+      ],
+      "apply_link": "https://rupiya.online/apply/idfc-classic"
+    },
+    {
+      "id": "sbi-elite",
+      "name": "SBI Card Elite",
+      "issuer": "SBI Card",
+      "category": "Premium",
+      "network": "Visa/Mastercard",
+      "images": {
+        "card_face": "https://www.sbicard.com/sbi-card-en/assets/media/images/personal/credit-cards/lifestyle/card-faces/sbi-card-elite-new.png",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/SBI-logo.svg/1024px-SBI-logo.svg.png"
+      },
+      "fees": {
+        "joining": 4999,
+        "annual": 4999,
+        "waiver": "Waived on spends of ₹10 Lakhs"
+      },
+      "rewards": {
+        "rate": "5X on Dining/Grocery",
+        "details": "2 Reward points on others. 1 Pt = ₹0.25."
+      },
+      "features": [
+        "Welcome gift worth ₹5000 (Shoppers Stop/Pantaloons)",
+        "6 International Lounge visits",
+        "Free Movie Tickets worth ₹6000/year"
+      ],
+      "apply_link": "https://rupiya.online/apply/sbi-elite"
+    },
+    {
+      "id": "amex-gold-charge",
+      "name": "American Express Gold Charge",
+      "issuer": "American Express",
+      "category": "Charge Card",
+      "network": "Amex",
+      "images": {
+        "card_face": "https://www.americanexpress.com/content/dam/amex/in/benefits/gold-charge-card/Gold-Charge-Card-Art.png",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/American_Express_logo_%282018%29.svg/1200px-American_Express_logo_%282018%29.svg.png"
+      },
+      "fees": {
+        "joining": 1000,
+        "annual": 4500,
+        "waiver": "No Waiver"
+      },
+      "rewards": {
+        "rate": "1 MR per ₹50",
+        "details": "5X Rewards on Reward Multiplier. 1000 Bonus points for 6 txn > ₹1000."
+      },
+      "features": [
+        "No Pre-set Spending Limit",
+        "24K Gold Collection Redemption",
+        "Dining discounts"
+      ],
+      "apply_link": "https://rupiya.online/apply/amex-gold"
+    },
+    {
+      "id": "amex-smart-earn",
+      "name": "American Express SmartEarn",
+      "issuer": "American Express",
+      "category": "Entry Level",
+      "network": "Amex",
+      "images": {
+        "card_face": "https://www.americanexpress.com/content/dam/amex/in/benefits/smartearn-credit-card/SmartEarn-Card-Art.png",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/American_Express_logo_%282018%29.svg/1200px-American_Express_logo_%282018%29.svg.png"
+      },
+      "fees": {
+        "joining": 495,
+        "annual": 495,
+        "waiver": "Waived on spends of ₹40,000"
+      },
+      "rewards": {
+        "rate": "10X on Uber/Flipkart",
+        "details": "10X MR Points on Uber, Flipkart, Amazon (capped at 500 pts/month)."
+      },
+      "features": [
+        "Entry level Amex card",
+        "Cashback as statement credit possible",
+        "Zero lost card liability"
+      ],
+      "apply_link": "https://rupiya.online/apply/amex-smartearn"
+    },
+    {
+      "id": "sc-smart",
+      "name": "Standard Chartered Smart",
+      "issuer": "Standard Chartered",
+      "category": "Cashback",
+      "network": "Visa",
+      "images": {
+        "card_face": "https://av.sc.com/in/content/images/in-smart-credit-card-400x250.jpg",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Standard_Chartered.svg/2560px-Standard_Chartered.svg.png"
+      },
+      "fees": {
+        "joining": 499,
+        "annual": 499,
+        "waiver": "Waived on spends of ₹1.2 Lakhs"
+      },
+      "rewards": {
+        "rate": "2% Cashback Online",
+        "details": "2% flat cashback on online spends. 1% on offline."
+      },
+      "features": [
+        "Cashback capped at ₹1000/month",
+        "Interest-free cash withdrawal for 90 days (One time)",
+        "Extended interest-free period for EMI"
+      ],
+      "apply_link": "https://rupiya.online/apply/sc-smart"
+    },
+    {
+      "id": "sc-super-value",
+      "name": "Standard Chartered Super Value Titanium",
+      "issuer": "Standard Chartered",
+      "category": "Utility/Fuel",
+      "network": "Mastercard/Visa",
+      "images": {
+        "card_face": "https://av.sc.com/in/content/images/in-super-value-titanium-card-400x250.jpg",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Standard_Chartered.svg/2560px-Standard_Chartered.svg.png"
+      },
+      "fees": {
+        "joining": 750,
+        "annual": 750,
+        "waiver": "Waived on spends of ₹90,000"
+      },
+      "rewards": {
+        "rate": "5% Cashback on Fuel/Utility",
+        "details": "5% cashback on Fuel, Phone & Utility Bills (Min transaction ₹750)."
+      },
+      "features": [
+        "Dedicated Utility Card",
+        "Max cashback ₹100 per category per month",
+        "Premium Banking Benefits"
+      ],
+      "apply_link": "https://rupiya.online/apply/sc-super-value"
+    },
+    {
+      "id": "rbl-shoprite",
+      "name": "RBL Bank ShopRite",
+      "issuer": "RBL Bank",
+      "category": "Shopping",
+      "network": "Mastercard",
+      "images": {
+        "card_face": "https://www.rblbank.com/sites/default/files/2019-06/Shoprite-Card_0.png",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/RBL_Bank_logo.svg/2560px-RBL_Bank_logo.svg.png"
+      },
+      "fees": {
+        "joining": 500,
+        "annual": 500,
+        "waiver": "Waived on spends of ₹1.5 Lakhs"
+      },
+      "rewards": {
+        "rate": "20 Points per ₹100 (Grocery)",
+        "details": "5% valueback on grocery spends."
+      },
+      "features": [
+        "10% discount on BookMyShow",
+        "Welcome bonus 2000 points",
+        "Fuel surcharge waiver"
+      ],
+      "apply_link": "https://rupiya.online/apply/rbl-shoprite"
+    },
+    {
+      "id": "rbl-play",
+      "name": "RBL Bank Play Credit Card",
+      "issuer": "RBL Bank",
+      "category": "Entertainment",
+      "network": "Mastercard",
+      "images": {
+        "card_face": "https://www.rblbank.com/sites/default/files/2021-12/Play-Credit-Card.png",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/RBL_Bank_logo.svg/2560px-RBL_Bank_logo.svg.png"
+      },
+      "fees": {
+        "joining": 500,
+        "annual": 500,
+        "waiver": "Waived on spends of ₹1.5 Lakhs"
+      },
+      "rewards": {
+        "rate": "Discount on BookMyShow",
+        "details": "Monthly ₹500 off on BookMyShow on spending ₹5000."
+      },
+      "features": [
+        "Free movie tickets every month",
+        "Best for movie buffs",
+        "Fuel surcharge waiver"
+      ],
+      "apply_link": "https://rupiya.online/apply/rbl-play"
+    },
+    {
+      "id": "kotak-league",
+      "name": "Kotak League Platinum",
+      "issuer": "Kotak Mahindra Bank",
+      "category": "Rewards",
+      "network": "Visa",
+      "images": {
+        "card_face": "https://www.kotak.com/content/dam/Kotak/product_card_images/league-platinum-credit-card.png",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Kotak_Mahindra_Bank_logo.svg/2560px-Kotak_Mahindra_Bank_logo.svg.png"
+      },
+      "fees": {
+        "joining": 500,
+        "annual": 500,
+        "waiver": "Waived on spends of ₹50,000"
+      },
+      "rewards": {
+        "rate": "8X Reward Points",
+        "details": "8X points on Travel/Airlines. 4X on others."
+      },
+      "features": [
+        "Option to redeem points for cashback",
+        "Railway surcharge waiver",
+        "Milestone movie vouchers"
+      ],
+      "apply_link": "https://rupiya.online/apply/kotak-league"
+    },
+    {
+      "id": "indusind-platinum-aura",
+      "name": "IndusInd Platinum Aura Edge",
+      "issuer": "IndusInd Bank",
+      "category": "Lifestyle",
+      "network": "Visa",
+      "images": {
+        "card_face": "https://www.indusind.com/content/dam/indusind-platform-images/product-images/personal-banking/cards/credit-cards/platinum-aura-edge-credit-card/hero-banner/platinum-aura-edge-credit-card.png",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/IndusInd_Bank_Logo.svg/1200px-IndusInd_Bank_Logo.svg.png"
+      },
+      "fees": {
+        "joining": 500,
+        "annual": 0,
+        "waiver": "Lifetime Free"
+      },
+      "rewards": {
+        "rate": "4X Reward Points",
+        "details": "4X on Departmental Stores. 2X on Consumer Durables."
+      },
+      "features": [
+        "Flexible reward plans",
+        "Contactless payment",
+        "Travel insurance cover"
+      ],
+      "apply_link": "https://rupiya.online/apply/indusind-aura"
+    },
+    {
+      "id": "indusind-eazydiner",
+      "name": "EazyDiner IndusInd Credit Card",
+      "issuer": "IndusInd Bank",
+      "category": "Dining",
+      "network": "Visa",
+      "images": {
+        "card_face": "https://www.indusind.com/content/dam/indusind-platform-images/product-images/personal-banking/cards/credit-cards/eazydiner-credit-card/hero-banner/eazydiner-credit-card.png",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/IndusInd_Bank_Logo.svg/1200px-IndusInd_Bank_Logo.svg.png"
+      },
+      "fees": {
+        "joining": 1999,
+        "annual": 1999,
+        "waiver": "No Waiver"
+      },
+      "rewards": {
+        "rate": "10X on Dining",
+        "details": "Additional 25% off on EazyDiner Pay."
+      },
+      "features": [
+        "Free EazyDiner Prime Membership",
+        "2 Domestic Lounge visits per quarter",
+        "Free alcoholic beverage at select restaurants"
+      ],
+      "apply_link": "https://rupiya.online/apply/indusind-eazydiner"
+    },
+    {
+      "id": "au-lit",
+      "name": "AU LIT Credit Card",
+      "issuer": "AU Small Finance Bank",
+      "category": "Customizable",
+      "network": "Visa",
+      "images": {
+        "card_face": "https://www.aubank.in/assets/images/credit-card/lit-credit-card.png",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/AU_Small_Finance_Bank_logo.svg/2560px-AU_Small_Finance_Bank_logo.svg.png"
+      },
+      "fees": {
+        "joining": 0,
+        "annual": 0,
+        "waiver": "Lifetime Free"
+      },
+      "rewards": {
+        "rate": "Customizable",
+        "details": "User pays for specific features (e.g. 5% cashback, lounge access) on a monthly basis."
+      },
+      "features": [
+        "India's first customizable credit card",
+        "Switch features on/off via App",
+        "Base card is Lifetime Free"
+      ],
+      "apply_link": "https://rupiya.online/apply/au-lit"
+    },
+    {
+      "id": "hsbc-visa-platinum",
+      "name": "HSBC Visa Platinum",
+      "issuer": "HSBC",
+      "category": "Entry Level",
+      "network": "Visa",
+      "images": {
+        "card_face": "https://www.hsbc.co.in/content/dam/hsbc/in/images/credit-cards/platinum-credit-card-488x306.jpg",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/HSBC_logo_%282018%29.svg/2560px-HSBC_logo_%282018%29.svg.png"
+      },
+      "fees": {
+        "joining": 0,
+        "annual": 0,
+        "waiver": "Lifetime Free"
+      },
+      "rewards": {
+        "rate": "2 Points per ₹150",
+        "details": "5X Rewards on spending > ₹4 Lakhs."
+      },
+      "features": [
+        "Lifetime Free",
+        "Introductory cashback offers",
+        "Air Miles conversion available"
+      ],
+      "apply_link": "https://rupiya.online/apply/hsbc-platinum"
+    },
+    {
+      "id": "sbi-simplysave",
+      "name": "SBI SimplySave Credit Card",
+      "issuer": "SBI Card",
+      "category": "Shopping",
+      "network": "Visa",
+      "images": {
+        "card_face": "https://www.sbicard.com/sbi-card-en/assets/media/images/personal/credit-cards/shopping/card-faces/simplysave-sbi-card-new.png",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/SBI-logo.svg/1024px-SBI-logo.svg.png"
+      },
+      "fees": {
+        "joining": 499,
+        "annual": 499,
+        "waiver": "Waived on spends of ₹1 Lakh"
+      },
+      "rewards": {
+        "rate": "10X Points Offline",
+        "details": "10X points on Dining, Movies, Grocery, Dept Stores."
+      },
+      "features": [
+        "Best for offline shopping",
+        "Fuel surcharge waiver",
+        "2000 Bonus points on ₹2000 spend in first 60 days"
+      ],
+      "apply_link": "https://rupiya.online/apply/sbi-simplysave"
+    },
+    {
+      "id": "axis-neo",
+      "name": "Axis Bank Neo Credit Card",
+      "issuer": "Axis Bank",
+      "category": "Entry Level",
+      "network": "Visa",
+      "images": {
+        "card_face": "https://www.axisbank.com/images/default-source/progress-with-us_new/neo-credit-card.jpg",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Axis_Bank_logo.svg/2560px-Axis_Bank_logo.svg.png"
+      },
+      "fees": {
+        "joining": 250,
+        "annual": 250,
+        "waiver": "Usually Lifetime Free"
+      },
+      "rewards": {
+        "rate": "Discounts on Zomato/Myntra",
+        "details": "40% off on Zomato, 10% off on Blinkit, 10% off on Myntra."
+      },
+      "features": [
+        "Great for Food/Fashion discounts",
+        "Amazon voucher on joining",
+        "Low annual fee"
+      ],
+      "apply_link": "https://rupiya.online/apply/axis-neo"
+    },
+    {
+      "id": "hdfc-swiggy",
+      "name": "Swiggy HDFC Credit Card",
+      "issuer": "HDFC Bank",
+      "category": "Cashback",
+      "network": "Mastercard",
+      "images": {
+        "card_face": "https://www.hdfcbank.com/content/api/contentstream-id/723fb80a-2dde-42a3-9793-7ae1be57c87f/f0a4025f-256d-472e-9d21-395066928e1c/Swiggy%20HDFC%20Bank%20Credit%20Card_264x167.png",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/HDFC_Bank_Logo.svg/2560px-HDFC_Bank_Logo.svg.png"
+      },
+      "fees": {
+        "joining": 500,
+        "annual": 500,
+        "waiver": "Waived on spends of ₹2 Lakhs"
+      },
+      "rewards": {
+        "rate": "10% Cashback on Swiggy",
+        "details": "10% on Swiggy App (Food, Instamart, Dineout). 5% on Online shopping."
+      },
+      "features": [
+        "Cashback credited as Swiggy Money",
+        "Welcome Benefit: 3 months Swiggy One",
+        "Capped cashback (₹1500/month)"
+      ],
+      "apply_link": "https://rupiya.online/apply/hdfc-swiggy"
     }
   ]
 }
