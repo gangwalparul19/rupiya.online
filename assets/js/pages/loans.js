@@ -1071,7 +1071,7 @@ function calculatePrepayment() {
     return;
   }
   
-  const loan = loans.find(l => l.id === loanId);
+  const loan = state.loans.find(l => l.id === loanId);
   if (!loan) return;
   
   const monthlyRate = loan.interestRate / 12 / 100;

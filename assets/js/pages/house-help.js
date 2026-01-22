@@ -898,10 +898,30 @@ async function handleDelete() {
   confirmDeleteBtn.textContent = 'Deleting...';
 
   try {
+    // First, delete all payments for this staff member
+    const staffPayments = state.staffPayments[deleteHelpId] || [];
+    for (const payment of staffPayments) {
+      // Find and delete the corresponding expense
+      const linkedExpense = await firestoreService.findExpenseByField('houseHelpPaymentId', payment.id);
+      if (linkedExpense) {
+        await firestoreService.delete('expenses', linkedExpense.id);
+      }
+      // Delete the payment record
+      await firestoreService.delete('houseHelpPayments', payment.id);
+    }
+    
+    // Delete all expenses linked to this staff member
+    const allExpenses = await firestoreService.getAll('expenses', 'createdAt', 'desc');
+    const staffExpenses = allExpenses.filter(exp => exp.linkedType === 'houseHelp' && exp.linkedId === deleteHelpId);
+    for (const expense of staffExpenses) {
+      await firestoreService.delete('expenses', expense.id);
+    }
+    
+    // Finally, delete the staff member
     const result = await firestoreService.delete('houseHelps', deleteHelpId);
     
     if (result.success) {
-      showToast('Staff deleted successfully', 'success');
+      showToast('Staff and all related data deleted successfully', 'success');
       hideDeleteModal();
       await loadStaff();
     } else {

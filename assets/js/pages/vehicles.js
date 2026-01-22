@@ -974,6 +974,14 @@ async function deleteFuelLog(logId) {
     const logToDelete = state.fuelLogs.find(l => l.id === logId);
     const vehicleId = logToDelete?.vehicleId;
     
+    // Find and delete the corresponding expense
+    const linkedExpense = await firestoreService.findExpenseByField('fuelLogId', logId);
+    
+    if (linkedExpense) {
+      await firestoreService.delete('expenses', linkedExpense.id);
+    }
+    
+    // Then delete the fuel log
     const result = await firestoreService.delete('fuelLogs', logId);
     if (result.success) {
       showToast('Fuel entry deleted', 'success');
@@ -1148,10 +1156,37 @@ async function handleDelete() {
   confirmDeleteBtn.textContent = 'Deleting...';
 
   try {
+    // First, delete all fuel logs for this vehicle
+    const vehicleFuelLogs = state.fuelLogs.filter(log => log.vehicleId === deleteVehicleId);
+    for (const log of vehicleFuelLogs) {
+      // Find and delete the corresponding expense
+      const linkedExpense = await firestoreService.findExpenseByField('fuelLogId', log.id);
+      if (linkedExpense) {
+        await firestoreService.delete('expenses', linkedExpense.id);
+      }
+      // Delete the fuel log
+      await firestoreService.delete('fuelLogs', log.id);
+    }
+    
+    // Delete all expenses linked to this vehicle (maintenance, insurance, etc.)
+    const allExpenses = await firestoreService.getAll('expenses', 'createdAt', 'desc');
+    const vehicleExpenses = allExpenses.filter(exp => exp.linkedType === 'vehicle' && exp.linkedId === deleteVehicleId);
+    for (const expense of vehicleExpenses) {
+      await firestoreService.delete('expenses', expense.id);
+    }
+    
+    // Delete all income linked to this vehicle
+    const allIncome = await firestoreService.getAll('income', 'createdAt', 'desc');
+    const vehicleIncome = allIncome.filter(inc => inc.linkedType === 'vehicle' && inc.linkedId === deleteVehicleId);
+    for (const income of vehicleIncome) {
+      await firestoreService.delete('income', income.id);
+    }
+    
+    // Finally, delete the vehicle itself
     const result = await firestoreService.delete('vehicles', deleteVehicleId);
     
     if (result.success) {
-      showToast('Vehicle deleted successfully', 'success');
+      showToast('Vehicle and all related data deleted successfully', 'success');
       hideDeleteModal();
       await loadVehicles();
     } else {

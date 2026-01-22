@@ -201,7 +201,7 @@ function renderCreditCards() {
   cardsGrid.innerHTML = pageCards.map(card => {
     const utilization = (card.currentBalance / card.creditLimit) * 100;
     const utilizationClass = utilization > 70 ? 'high' : '';
-    const cardTypeClass = `card-type-${card.cardType.toLowerCase().replace(' ', '')}`;
+    const cardTypeClass = card.cardType ? `card-type-${card.cardType.toLowerCase().replace(' ', '')}` : 'card-type-default';
 
     return `
       <div class="card-item">
@@ -210,7 +210,7 @@ function renderCreditCards() {
             <h3>${card.cardName}</h3>
             <div class="card-bank">${card.bankName}</div>
           </div>
-          <span class="card-type-badge ${cardTypeClass}">${card.cardType}</span>
+          <span class="card-type-badge ${cardTypeClass}">${card.cardType || 'N/A'}</span>
         </div>
 
         <div class="card-number">•••• •••• •••• ${card.lastFourDigits}</div>
