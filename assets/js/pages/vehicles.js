@@ -282,11 +282,13 @@ async function handleSubmit(e) {
       if (result.success) showToast('Vehicle updated successfully', 'success');
     } else {
       result = await firestoreService.add('vehicles', formData);
-      if (result.success) showToast('Vehicle added successfully', 'success');
+      if (result.success) showToast('Vehicle added successfully. Refreshing...', 'success');
     }
 
     if (result.success) {
       hideForm();
+      // Add a small delay to ensure encryption is complete before reloading
+      await new Promise(resolve => setTimeout(resolve, 500));
       await loadVehicles();
     } else {
       showToast(result.error || 'Failed to save vehicle', 'error');
@@ -310,6 +312,18 @@ async function loadVehicles() {
     // Load both vehicles and fuel logs
     await loadFuelLogs();
     const allVehicles = await firestoreService.getAll('vehicles', 'createdAt', 'desc');
+    
+    // Check if any vehicles have decryption issues
+    const vehiclesWithIssues = allVehicles.filter(v => {
+      const hasUndefinedFields = !v.name || !v.fuelType;
+      const hasEncryptedMarker = v._encrypted !== undefined;
+      return hasUndefinedFields && hasEncryptedMarker;
+    });
+    
+    if (vehiclesWithIssues.length > 0) {
+      console.warn('[Vehicles] Found vehicles with potential decryption issues:', vehiclesWithIssues);
+      showToast('⚠️ Some vehicles may need re-encryption. Please refresh the page.', 'warning');
+    }
     
     state.vehicles = allVehicles;
     state.filteredVehicles = [...allVehicles];
@@ -833,9 +847,10 @@ async function handleSaveFuelLog() {
       showToast('Fuel entry saved successfully', 'success');
       hideFuelLogModal();
       
-      // Reload data
+      // Reload data and update KPIs
       await loadFuelLogs();
       await loadVehicles();
+      updateSummary(); // Update KPI cards to show new expense
     } else {
       showToast(result.error || 'Failed to save fuel entry', 'error');
     }
