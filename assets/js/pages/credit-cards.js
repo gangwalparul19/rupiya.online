@@ -753,10 +753,18 @@ function renderMasterCards() {
     return;
   }
   
-  grid.innerHTML = state.filteredMasterCards.map(card => `
+  grid.innerHTML = state.filteredMasterCards.map(card => {
+    // Ensure network is an array for display
+    const networks = Array.isArray(card.network) ? card.network : [card.network];
+    
+    return `
     <div class="master-card-item" data-card-id="${card.id}">
       <div class="master-card-header">
-        <img src="${card.images.card_face}" alt="${card.name}" class="master-card-image" onerror="this.style.display='none'">
+        <img src="${card.images.card_face}" 
+             alt="${card.name}" 
+             class="master-card-image" 
+             onerror="this.style.display='none'"
+             loading="lazy">
         <div class="master-card-info">
           <div class="master-card-name">${card.name}</div>
           <div class="master-card-issuer">${card.issuer}</div>
@@ -770,7 +778,8 @@ function renderMasterCards() {
         ${card.fees.joining_fee === 0 ? 'Lifetime Free' : `₹${card.fees.joining_fee} joining fee`}
       </div>
     </div>
-  `).join('');
+  `;
+  }).join('');
   
   // Add click handlers
   grid.querySelectorAll('.master-card-item').forEach(item => {
@@ -787,6 +796,9 @@ function showCardDetails(card) {
   state.selectedMasterCard = card;
   document.getElementById('cardDetailsTitle').textContent = card.name;
   
+  // Ensure network is an array
+  const networks = Array.isArray(card.network) ? card.network : [card.network];
+  
   const content = document.getElementById('cardDetailsContent');
   content.innerHTML = `
     <div class="card-details-grid">
@@ -802,7 +814,7 @@ function showCardDetails(card) {
         </div>
         <div class="card-detail-row">
           <span class="card-detail-label">Network</span>
-          <span class="card-detail-value">${card.network.join(', ')}</span>
+          <span class="card-detail-value">${networks.join(', ')}</span>
         </div>
       </div>
       
@@ -922,6 +934,9 @@ function addCardFromMaster() {
     if (cardNameInput) cardNameInput.value = card.name;
     if (bankNameInput) bankNameInput.value = card.issuer;
     if (cardTypeInput) {
+      // Ensure network is an array
+      const networks = Array.isArray(card.network) ? card.network : [card.network];
+      
       // Map network to form value
       const networkMap = {
         'Visa': 'visa',
@@ -931,7 +946,7 @@ function addCardFromMaster() {
         'Amex': 'amex',
         'American Express': 'amex'
       };
-      const networkValue = networkMap[card.network[0]] || card.network[0].toLowerCase();
+      const networkValue = networkMap[networks[0]] || networks[0].toLowerCase();
       cardTypeInput.value = networkValue;
     }
     if (rewardsProgramInput) rewardsProgramInput.value = card.rewards.type;
