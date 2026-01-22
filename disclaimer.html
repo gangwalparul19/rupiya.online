@@ -337,7 +337,6 @@
           <h4>Features</h4>
           <ul>
             <li><a href="features.html">All Features</a></li>
-            <li><a href="ai-insights.html">AI Insights</a></li>
           </ul>
         </div>
         <div class="footer-section">
@@ -366,11 +365,46 @@
   </footer>
 
   <style>
+    /* Standardize footer to match index.html */
+    .landing-footer {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;
+      color: white !important;
+      padding: 2rem 2rem 1.5rem !important;
+      margin-top: 2rem !important;
+    }
+    
+    .landing-footer .footer-section h4 {
+      color: white !important;
+      border-bottom-color: rgba(102, 126, 234, 0.3) !important;
+    }
+    
+    .landing-footer .footer-section a {
+      color: rgba(255, 255, 255, 0.7) !important;
+    }
+    
+    .landing-footer .footer-section a:hover {
+      color: white !important;
+    }
+    
+    .landing-footer .footer-bottom {
+      color: rgba(255, 255, 255, 0.6) !important;
+      border-top-color: rgba(255, 255, 255, 0.1) !important;
+    }
+    
+    .landing-footer .footer-bottom p {
+      color: rgba(255, 255, 255, 0.6) !important;
+    }
+    
+    .landing-footer .footer-bottom a {
+      color: #4A90E2 !important;
+    }
+    
     /* Desktop footer grid */
     .landing-footer .footer-content {
       display: grid !important;
       grid-template-columns: repeat(4, 1fr) !important;
-      gap: 3rem !important;
+      gap: 2rem !important;
+      margin-bottom: 2rem !important;
     }
     
     @media (max-width: 768px) {
