@@ -370,6 +370,12 @@
   .empty-state p {
     font-size: var(--font-size-sm);
     margin-bottom: 1.5rem;
+    padding: 0 1rem;
+  }
+  
+  .empty-state .btn {
+    width: 100%;
+    max-width: 280px;
   }
   
   .card-item {
@@ -453,6 +459,10 @@
 
 .modal-container.modal-sm {
   max-width: 400px;
+}
+
+.modal-container.modal-lg {
+  max-width: 900px;
 }
 
 @keyframes modalSlideIn {
@@ -800,5 +810,309 @@
   .pagination-numbers .ellipsis {
     padding: 0.25rem;
     font-size: 0.75rem;
+  }
+}
+
+/* Browse Cards Modal */
+.browse-filters {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.browse-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: 0.5rem;
+}
+
+.master-card-item {
+  background: var(--bg-card);
+  border: 2px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.master-card-item:hover {
+  border-color: var(--primary-blue);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.2);
+}
+
+.master-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.master-card-image {
+  width: 60px;
+  height: 38px;
+  object-fit: contain;
+  border-radius: 4px;
+  background: white;
+  padding: 2px;
+}
+
+.master-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.master-card-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+  line-height: 1.3;
+}
+
+.master-card-issuer {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.master-card-category {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  background: var(--primary-blue);
+  color: white;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.master-card-highlights {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin-bottom: 0.5rem;
+}
+
+.master-card-fee {
+  font-size: 0.75rem;
+  color: var(--accent-green);
+  font-weight: 600;
+}
+
+/* Card Details Modal */
+.card-details-grid {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.card-detail-section {
+  background: var(--bg-secondary);
+  padding: 1rem;
+  border-radius: var(--border-radius);
+}
+
+.card-detail-section h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.card-detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.card-detail-row:last-child {
+  border-bottom: none;
+}
+
+.card-detail-label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.card-detail-value {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  font-weight: 600;
+  text-align: right;
+}
+
+.benefit-item {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.benefit-item:last-child {
+  border-bottom: none;
+}
+
+.benefit-item strong {
+  display: block;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.benefit-item span {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+/* Card Recommendations Section */
+.card-recommendations {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: var(--border-radius-lg);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  color: white;
+  animation: slideDown 0.3s ease-out;
+}
+
+.recommendations-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.recommendations-header h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  color: white;
+}
+
+.recommendations-header .btn {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.recommendations-header .btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.recommendation-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.recommendation-card {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--border-radius);
+  padding: 1.25rem;
+  transition: all 0.3s ease;
+}
+
+.recommendation-card:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+}
+
+.recommendation-category {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.recommendation-category-icon {
+  font-size: 1.5rem;
+}
+
+.recommendation-card-name {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: white;
+}
+
+.recommendation-reason {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  opacity: 0.95;
+  margin-bottom: 0.75rem;
+}
+
+.recommendation-benefit {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.no-recommendations {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+/* Mobile Responsive for New Features */
+@media (max-width: 768px) {
+  .browse-filters {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  
+  .browse-cards-grid {
+    grid-template-columns: 1fr;
+    max-height: 50vh;
+  }
+  
+  .modal-container.modal-lg {
+    max-width: 100%;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+  
+  .card-recommendations {
+    padding: 1rem;
+  }
+  
+  .recommendations-header h2 {
+    font-size: 1.25rem;
+  }
+  
+  .recommendation-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  
+  .recommendation-card {
+    padding: 1rem;
+  }
+  
+  .page-actions {
+    flex-wrap: wrap;
+  }
+  
+  .page-actions .btn {
+    flex: 1 1 calc(50% - 0.25rem);
+    min-width: 0;
+    font-size: 0.8rem;
+    padding: 0.5rem 0.75rem;
   }
 }

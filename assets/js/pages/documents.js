@@ -426,7 +426,7 @@ async function loadDocuments() {
     // Initialize pagination if not already done
     if (!pagination) {
       pagination = new Pagination({
-        pageSize: 12, // 12 documents per page for grid layout
+        pageSize: 6, // 6 documents per page
         containerId: 'paginationContainer',
         onPageChange: handlePageChange
       });
@@ -517,7 +517,7 @@ function renderDocuments() {
   const now = new Date();
 
   // Apply pagination
-  const pageSize = pagination ? pagination.pageSize : 12;
+  const pageSize = pagination ? pagination.pageSize : 6;
   const currentPage = pagination ? pagination.currentPage : 1;
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = startIndex + pageSize;

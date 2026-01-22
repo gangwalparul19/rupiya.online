@@ -178,6 +178,18 @@
           <p class="page-subtitle">Manage cards, track rewards, and optimize credit utilization</p>
         </div>
         <div class="page-actions">
+          <button class="btn btn-outline" id="browseCardsBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+            Browse Cards
+          </button>
+          <button class="btn btn-outline" id="getRecommendationsBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+            </svg>
+            Get Recommendations
+          </button>
           <button class="btn btn-primary" id="addCardBtn">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -219,6 +231,73 @@
         </div>
       </div>
 
+      <!-- Card Recommendations Section -->
+      <div class="card-recommendations" id="cardRecommendations" style="display: none;">
+        <div class="recommendations-header">
+          <h2>💡 Smart Card Recommendations</h2>
+          <button class="btn btn-sm btn-outline" id="closeRecommendations">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+        <div id="recommendationsContent"></div>
+      </div>
+
+      <!-- Browse Cards Modal -->
+      <div class="modal-overlay" id="browseCardsModal">
+        <div class="modal-container modal-lg">
+          <div class="modal-header">
+            <h2 class="modal-title">🔍 Browse Credit Cards</h2>
+            <button class="modal-close" id="closeBrowseModal">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="browse-filters">
+              <div class="form-group">
+                <label for="filterBank">Filter by Bank</label>
+                <select id="filterBank" class="form-input">
+                  <option value="">All Banks</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="filterCategory">Filter by Category</label>
+                <select id="filterCategory" class="form-input">
+                  <option value="">All Categories</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="searchCards">Search Cards</label>
+                <input type="text" id="searchCards" class="form-input" placeholder="Search by name...">
+              </div>
+            </div>
+            <div class="browse-cards-grid" id="browseCardsGrid"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card Details Modal -->
+      <div class="modal-overlay" id="cardDetailsModal">
+        <div class="modal-container modal-lg">
+          <div class="modal-header">
+            <h2 class="modal-title" id="cardDetailsTitle">Card Details</h2>
+            <button class="modal-close" id="closeCardDetailsModal">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+          <div class="modal-body" id="cardDetailsContent"></div>
+          <div class="modal-footer">
+            <button class="btn btn-outline" id="closeCardDetailsBtn">Close</button>
+            <button class="btn btn-primary" id="addFromMasterBtn">Add This Card</button>
+          </div>
+        </div>
+      </div>
+
       <!-- Add/Edit Card Form (Inline) -->
       <div class="add-card-section" id="addCardSection">
         <div class="add-card-header">
@@ -235,6 +314,7 @@
             <div class="form-group">
               <label for="cardName">Card Name *</label>
               <input type="text" id="cardName" class="form-input" placeholder="e.g., HDFC Regalia" required>
+              <input type="hidden" id="masterCardId">
             </div>
 
             <div class="form-group">

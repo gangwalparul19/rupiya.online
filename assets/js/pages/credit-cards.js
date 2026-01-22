@@ -2,15 +2,16 @@
 import '../services/services-init.js';
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
-import creditCardService from '../services/credit-card-service.js';
 import toast from '../components/toast.js';
-import { formatCurrency, formatCurrencyCompact, formatDate } from '../utils/helpers.js';
+import { formatCurrency, formatCurrencyCompact } from '../utils/helpers.js';
 import encryptionReauthModal from '../components/encryption-reauth-modal.js';
 
 // State
 const state = {
   creditCards: [],
   filteredCards: [],
+  masterCards: [],
+  filteredMasterCards: [],
   currentPage: 1,
   itemsPerPage: 10,
   totalCount: 0,
@@ -19,7 +20,8 @@ const state = {
     totalLimit: 0,
     totalSpent: 0,
     totalRewards: 0
-  }
+  },
+  selectedMasterCard: null
 };
 let editingCardId = null;
 let currentUser = null;
@@ -34,6 +36,7 @@ async function init() {
 
   loadUserProfile();
   setupEventListeners();
+  await loadMasterCards();
 
   // Check if encryption reauth is needed
   await encryptionReauthModal.checkAndPrompt(async () => {
@@ -96,6 +99,22 @@ function setupEventListeners() {
   document.getElementById('closeFormBtn')?.addEventListener('click', closeCardForm);
   document.getElementById('cancelBtn')?.addEventListener('click', closeCardForm);
   document.getElementById('cardForm')?.addEventListener('submit', handleCardSubmit);
+  
+  // Browse cards
+  document.getElementById('browseCardsBtn')?.addEventListener('click', openBrowseCardsModal);
+  document.getElementById('closeBrowseModal')?.addEventListener('click', closeBrowseCardsModal);
+  document.getElementById('filterBank')?.addEventListener('change', filterMasterCards);
+  document.getElementById('filterCategory')?.addEventListener('change', filterMasterCards);
+  document.getElementById('searchCards')?.addEventListener('input', filterMasterCards);
+  
+  // Card details modal
+  document.getElementById('closeCardDetailsModal')?.addEventListener('click', closeCardDetailsModal);
+  document.getElementById('closeCardDetailsBtn')?.addEventListener('click', closeCardDetailsModal);
+  document.getElementById('addFromMasterBtn')?.addEventListener('click', addCardFromMaster);
+  
+  // Recommendations
+  document.getElementById('getRecommendationsBtn')?.addEventListener('click', showRecommendations);
+  document.getElementById('closeRecommendations')?.addEventListener('click', hideRecommendations);
   
   // Delete modal
   document.getElementById('closeDeleteModal')?.addEventListener('click', closeDeleteModal);
@@ -657,3 +676,379 @@ async function handlePayBill(e) {
 
 // Initialize on page load
 init();
+
+// Load master cards database
+async function loadMasterCards() {
+  try {
+    const response = await fetch('/credit_cards_master.json');
+    const data = await response.json();
+    state.masterCards = data.cards || [];
+    state.filteredMasterCards = [...state.masterCards];
+  } catch (error) {
+    console.error('Error loading master cards:', error);
+    state.masterCards = [];
+    state.filteredMasterCards = [];
+  }
+}
+
+// Open browse cards modal
+function openBrowseCardsModal() {
+  populateFilters();
+  filterMasterCards();
+  document.getElementById('browseCardsModal').classList.add('show');
+}
+
+// Close browse cards modal
+function closeBrowseCardsModal() {
+  document.getElementById('browseCardsModal').classList.remove('show');
+  document.getElementById('filterBank').value = '';
+  document.getElementById('filterCategory').value = '';
+  document.getElementById('searchCards').value = '';
+}
+
+// Populate filter dropdowns
+function populateFilters() {
+  const banks = [...new Set(state.masterCards.map(card => card.issuer))].sort();
+  const categories = [...new Set(state.masterCards.map(card => card.category))].sort();
+  
+  const bankSelect = document.getElementById('filterBank');
+  const categorySelect = document.getElementById('filterCategory');
+  
+  bankSelect.innerHTML = '<option value="">All Banks</option>' + 
+    banks.map(bank => `<option value="${bank}">${bank}</option>`).join('');
+  
+  categorySelect.innerHTML = '<option value="">All Categories</option>' + 
+    categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+}
+
+// Filter master cards
+function filterMasterCards() {
+  const bankFilter = document.getElementById('filterBank').value;
+  const categoryFilter = document.getElementById('filterCategory').value;
+  const searchTerm = document.getElementById('searchCards').value.toLowerCase();
+  
+  state.filteredMasterCards = state.masterCards.filter(card => {
+    const matchesBank = !bankFilter || card.issuer === bankFilter;
+    const matchesCategory = !categoryFilter || card.category === categoryFilter;
+    const matchesSearch = !searchTerm || 
+      card.name.toLowerCase().includes(searchTerm) ||
+      card.issuer.toLowerCase().includes(searchTerm);
+    
+    return matchesBank && matchesCategory && matchesSearch;
+  });
+  
+  renderMasterCards();
+}
+
+// Render master cards
+function renderMasterCards() {
+  const grid = document.getElementById('browseCardsGrid');
+  
+  if (state.filteredMasterCards.length === 0) {
+    grid.innerHTML = '<div class="no-recommendations">No cards found matching your criteria</div>';
+    return;
+  }
+  
+  grid.innerHTML = state.filteredMasterCards.map(card => `
+    <div class="master-card-item" data-card-id="${card.id}">
+      <div class="master-card-header">
+        <img src="${card.images.card_face}" alt="${card.name}" class="master-card-image" onerror="this.style.display='none'">
+        <div class="master-card-info">
+          <div class="master-card-name">${card.name}</div>
+          <div class="master-card-issuer">${card.issuer}</div>
+        </div>
+      </div>
+      <div class="master-card-category">${card.category}</div>
+      <div class="master-card-highlights">
+        ${card.rewards.accelerated_rate || card.rewards.base_rate}
+      </div>
+      <div class="master-card-fee">
+        ${card.fees.joining_fee === 0 ? 'Lifetime Free' : `₹${card.fees.joining_fee} joining fee`}
+      </div>
+    </div>
+  `).join('');
+  
+  // Add click handlers
+  grid.querySelectorAll('.master-card-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const cardId = item.dataset.cardId;
+      const card = state.masterCards.find(c => c.id === cardId);
+      if (card) showCardDetails(card);
+    });
+  });
+}
+
+// Show card details
+function showCardDetails(card) {
+  state.selectedMasterCard = card;
+  document.getElementById('cardDetailsTitle').textContent = card.name;
+  
+  const content = document.getElementById('cardDetailsContent');
+  content.innerHTML = `
+    <div class="card-details-grid">
+      <div class="card-detail-section">
+        <h3>💳 Card Information</h3>
+        <div class="card-detail-row">
+          <span class="card-detail-label">Issuer</span>
+          <span class="card-detail-value">${card.issuer}</span>
+        </div>
+        <div class="card-detail-row">
+          <span class="card-detail-label">Category</span>
+          <span class="card-detail-value">${card.category}</span>
+        </div>
+        <div class="card-detail-row">
+          <span class="card-detail-label">Network</span>
+          <span class="card-detail-value">${card.network.join(', ')}</span>
+        </div>
+      </div>
+      
+      <div class="card-detail-section">
+        <h3>💰 Fees</h3>
+        <div class="card-detail-row">
+          <span class="card-detail-label">Joining Fee</span>
+          <span class="card-detail-value">${card.fees.joining_fee === 0 ? 'Free' : formatCurrency(card.fees.joining_fee)}</span>
+        </div>
+        <div class="card-detail-row">
+          <span class="card-detail-label">Annual Fee</span>
+          <span class="card-detail-value">${card.fees.annual_fee === 0 ? 'Free' : formatCurrency(card.fees.annual_fee)}</span>
+        </div>
+        <div class="card-detail-row">
+          <span class="card-detail-label">Waiver Condition</span>
+          <span class="card-detail-value">${card.fees.waiver_condition}</span>
+        </div>
+      </div>
+      
+      <div class="card-detail-section">
+        <h3>🎁 Rewards</h3>
+        <div class="card-detail-row">
+          <span class="card-detail-label">Type</span>
+          <span class="card-detail-value">${card.rewards.type}</span>
+        </div>
+        <div class="card-detail-row">
+          <span class="card-detail-label">Base Rate</span>
+          <span class="card-detail-value">${card.rewards.base_rate}</span>
+        </div>
+        <div class="card-detail-row">
+          <span class="card-detail-label">Accelerated Rate</span>
+          <span class="card-detail-value">${card.rewards.accelerated_rate}</span>
+        </div>
+        <div class="card-detail-row">
+          <span class="card-detail-label">Capping</span>
+          <span class="card-detail-value">${card.rewards.capping}</span>
+        </div>
+      </div>
+      
+      <div class="card-detail-section">
+        <h3>✈️ Benefits</h3>
+        <div class="benefit-item">
+          <strong>Domestic Lounge</strong>
+          <span>${card.benefits.lounge_access.domestic}</span>
+        </div>
+        <div class="benefit-item">
+          <strong>International Lounge</strong>
+          <span>${card.benefits.lounge_access.international}</span>
+        </div>
+        <div class="benefit-item">
+          <strong>Fuel Surcharge Waiver</strong>
+          <span>${card.benefits.fuel_surcharge_waiver}</span>
+        </div>
+        <div class="benefit-item">
+          <strong>Forex Markup</strong>
+          <span>${card.benefits.forex_markup}</span>
+        </div>
+        ${card.benefits.milestone_benefits.length > 0 ? `
+          <div class="benefit-item">
+            <strong>Milestone Benefits</strong>
+            <span>${card.benefits.milestone_benefits.join(' • ')}</span>
+          </div>
+        ` : ''}
+      </div>
+      
+      <div class="card-detail-section">
+        <h3>📋 Eligibility</h3>
+        <div class="card-detail-row">
+          <span class="card-detail-label">Min Income (Salaried)</span>
+          <span class="card-detail-value">${formatCurrency(card.eligibility.min_income_salaried)}/month</span>
+        </div>
+        <div class="card-detail-row">
+          <span class="card-detail-label">Min Age</span>
+          <span class="card-detail-value">${card.eligibility.min_age} years</span>
+        </div>
+        <div class="card-detail-row">
+          <span class="card-detail-label">CIBIL Score</span>
+          <span class="card-detail-value">${card.eligibility.cibil_score_required}+</span>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  closeBrowseCardsModal();
+  document.getElementById('cardDetailsModal').classList.add('show');
+}
+
+// Close card details modal
+function closeCardDetailsModal() {
+  document.getElementById('cardDetailsModal').classList.remove('show');
+  state.selectedMasterCard = null;
+}
+
+// Add card from master database
+function addCardFromMaster() {
+  if (!state.selectedMasterCard) return;
+  
+  const card = state.selectedMasterCard;
+  
+  // Pre-fill form with master card data
+  document.getElementById('cardName').value = card.name;
+  document.getElementById('bankName').value = card.issuer;
+  document.getElementById('cardType').value = card.network[0].toLowerCase();
+  document.getElementById('rewardsProgram').value = card.rewards.type;
+  document.getElementById('annualFee').value = card.fees.annual_fee;
+  document.getElementById('masterCardId').value = card.id;
+  
+  // Add notes with card benefits
+  const notes = `Category: ${card.category}\nRewards: ${card.rewards.accelerated_rate}\nLounge: ${card.benefits.lounge_access.domestic}`;
+  document.getElementById('notes').value = notes;
+  
+  closeCardDetailsModal();
+  openCardForm();
+  toast.success('Card details pre-filled. Please add your personal card information.');
+}
+
+// Show recommendations
+function showRecommendations() {
+  if (state.creditCards.length === 0) {
+    toast.info('Add some credit cards first to get personalized recommendations');
+    return;
+  }
+  
+  const recommendations = generateRecommendations();
+  const content = document.getElementById('recommendationsContent');
+  
+  if (recommendations.length === 0) {
+    content.innerHTML = '<div class="no-recommendations">No recommendations available at this time</div>';
+  } else {
+    content.innerHTML = `
+      <div class="recommendation-grid">
+        ${recommendations.map(rec => `
+          <div class="recommendation-card">
+            <div class="recommendation-category">
+              <span class="recommendation-category-icon">${rec.icon}</span>
+              <span>${rec.category}</span>
+            </div>
+            <div class="recommendation-card-name">${rec.cardName}</div>
+            <div class="recommendation-reason">${rec.reason}</div>
+            <div class="recommendation-benefit">${rec.benefit}</div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+  
+  document.getElementById('cardRecommendations').style.display = 'block';
+  document.getElementById('cardRecommendations').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// Hide recommendations
+function hideRecommendations() {
+  document.getElementById('cardRecommendations').style.display = 'none';
+}
+
+// Generate smart recommendations
+function generateRecommendations() {
+  const recommendations = [];
+  
+  // Find cards with specific benefits
+  const userCards = state.creditCards;
+  
+  // Shopping recommendation
+  const shoppingCards = userCards.filter(card => 
+    card.rewardsProgram && 
+    (card.rewardsProgram.toLowerCase().includes('cashback') || 
+     card.rewardsProgram.toLowerCase().includes('shopping'))
+  );
+  
+  if (shoppingCards.length > 0) {
+    const bestCard = shoppingCards.reduce((best, card) => 
+      (card.rewardsBalance || 0) > (best.rewardsBalance || 0) ? card : best
+    );
+    
+    recommendations.push({
+      icon: '🛍️',
+      category: 'Online Shopping',
+      cardName: bestCard.cardName,
+      reason: 'Best for online purchases with high cashback rates',
+      benefit: `${bestCard.rewardsBalance || 0} rewards earned`
+    });
+  }
+  
+  // Travel recommendation
+  const travelCards = userCards.filter(card => 
+    card.notes && card.notes.toLowerCase().includes('lounge')
+  );
+  
+  if (travelCards.length > 0) {
+    recommendations.push({
+      icon: '✈️',
+      category: 'Travel & Dining',
+      cardName: travelCards[0].cardName,
+      reason: 'Includes airport lounge access and travel benefits',
+      benefit: 'Complimentary lounge access'
+    });
+  }
+  
+  // Low utilization card
+  const lowUtilCards = userCards.filter(card => {
+    const util = (card.currentBalance / card.creditLimit) * 100;
+    return util < 30;
+  }).sort((a, b) => {
+    const utilA = (a.currentBalance / a.creditLimit) * 100;
+    const utilB = (b.currentBalance / b.creditLimit) * 100;
+    return utilA - utilB;
+  });
+  
+  if (lowUtilCards.length > 0) {
+    const card = lowUtilCards[0];
+    const util = ((card.currentBalance / card.creditLimit) * 100).toFixed(1);
+    
+    recommendations.push({
+      icon: '💳',
+      category: 'Large Purchases',
+      cardName: card.cardName,
+      reason: 'Low utilization rate - best for maintaining credit score',
+      benefit: `Only ${util}% utilized`
+    });
+  }
+  
+  // Fuel recommendation
+  const fuelCards = userCards.filter(card => 
+    card.notes && card.notes.toLowerCase().includes('fuel')
+  );
+  
+  if (fuelCards.length > 0) {
+    recommendations.push({
+      icon: '⛽',
+      category: 'Fuel Purchases',
+      cardName: fuelCards[0].cardName,
+      reason: 'Fuel surcharge waiver saves money on every fill-up',
+      benefit: '1% fuel surcharge waiver'
+    });
+  }
+  
+  // Bill payments
+  if (userCards.length > 0) {
+    const cardWithLowestBalance = userCards.reduce((lowest, card) => 
+      (card.currentBalance || 0) < (lowest.currentBalance || 0) ? card : lowest
+    );
+    
+    recommendations.push({
+      icon: '📱',
+      category: 'Bill Payments',
+      cardName: cardWithLowestBalance.cardName,
+      reason: 'Use this card for utility bills to maintain activity',
+      benefit: `${formatCurrency(cardWithLowestBalance.creditLimit - cardWithLowestBalance.currentBalance)} available`
+    });
+  }
+  
+  return recommendations;
+}
