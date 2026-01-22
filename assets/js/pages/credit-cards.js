@@ -898,21 +898,50 @@ function addCardFromMaster() {
   
   const card = state.selectedMasterCard;
   
-  // Pre-fill form with master card data
-  document.getElementById('cardName').value = card.name;
-  document.getElementById('bankName').value = card.issuer;
-  document.getElementById('cardType').value = card.network[0].toLowerCase();
-  document.getElementById('rewardsProgram').value = card.rewards.type;
-  document.getElementById('annualFee').value = card.fees.annual_fee;
-  document.getElementById('masterCardId').value = card.id;
-  
-  // Add notes with card benefits
-  const notes = `Category: ${card.category}\nRewards: ${card.rewards.accelerated_rate}\nLounge: ${card.benefits.lounge_access.domestic}`;
-  document.getElementById('notes').value = notes;
-  
+  // Close the details modal first
   closeCardDetailsModal();
+  
+  // Open the form (this will reset it)
   openCardForm();
-  toast.success('Card details pre-filled. Please add your personal card information.');
+  
+  // Use setTimeout to ensure form is rendered before filling
+  setTimeout(() => {
+    // Pre-fill form with master card data
+    const cardNameInput = document.getElementById('cardName');
+    const bankNameInput = document.getElementById('bankName');
+    const cardTypeInput = document.getElementById('cardType');
+    const rewardsProgramInput = document.getElementById('rewardsProgram');
+    const annualFeeInput = document.getElementById('annualFee');
+    const masterCardIdInput = document.getElementById('masterCardId');
+    const notesInput = document.getElementById('notes');
+    
+    if (cardNameInput) cardNameInput.value = card.name;
+    if (bankNameInput) bankNameInput.value = card.issuer;
+    if (cardTypeInput) {
+      // Map network to form value
+      const networkMap = {
+        'Visa': 'visa',
+        'MasterCard': 'mastercard',
+        'Mastercard': 'mastercard',
+        'RuPay': 'rupay',
+        'Amex': 'amex',
+        'American Express': 'amex'
+      };
+      const networkValue = networkMap[card.network[0]] || card.network[0].toLowerCase();
+      cardTypeInput.value = networkValue;
+    }
+    if (rewardsProgramInput) rewardsProgramInput.value = card.rewards.type;
+    if (annualFeeInput) annualFeeInput.value = card.fees.annual_fee;
+    if (masterCardIdInput) masterCardIdInput.value = card.id;
+    
+    // Add notes with card benefits
+    if (notesInput) {
+      const notes = `Category: ${card.category}\nRewards: ${card.rewards.accelerated_rate}\nLounge: ${card.benefits.lounge_access.domestic}`;
+      notesInput.value = notes;
+    }
+    
+    toast.success('Card details pre-filled. Please add your personal card information.');
+  }, 100);
 }
 
 // Show recommendations
