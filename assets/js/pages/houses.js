@@ -394,6 +394,14 @@ function renderHouses() {
         </div>
 
         <div class="house-card-actions">
+          ${house.ownership === 'Rented' ? `
+          <button class="btn btn-sm btn-primary" onclick="window.addRentPayment('${house.id}', '${safeNameForJs}')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+            </svg>
+            Pay Rent
+          </button>
+          ` : ''}
           <button class="btn btn-sm btn-outline" onclick="window.addHouseExpense('${house.id}', '${safeNameForJs}')">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -590,8 +598,21 @@ function formatDateForInput(date) {
 // Expose functions to window for onclick handlers
 window.editHouse = editHouse;
 window.showDeleteConfirmation = showDeleteConfirmation;
+window.addRentPayment = addRentPayment;
 window.addHouseExpense = addHouseExpense;
 window.addHouseIncome = addHouseIncome;
+
+// Add rent payment
+function addRentPayment(houseId, houseName) {
+  // Redirect to expenses page with pre-filled data for rent
+  const params = new URLSearchParams({
+    linkedType: 'house',
+    linkedId: houseId,
+    linkedName: houseName,
+    category: 'Rent'
+  });
+  window.location.href = `expenses.html?${params.toString()}`;
+}
 
 // Add house expense
 function addHouseExpense(houseId, houseName) {

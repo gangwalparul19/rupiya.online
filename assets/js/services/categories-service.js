@@ -23,6 +23,7 @@ class CategoriesService {
       'Vehicle Fuel',      // Used by vehicles.js for fuel expenses
       'Vehicle Maintenance', // Used by vehicles.js for maintenance expenses
       'House Maintenance', // Used by houses.js for property maintenance
+      'Rent',              // Used by houses.js for rent payments
       'Other'              // Fallback category
     ];
     
@@ -30,6 +31,7 @@ class CategoriesService {
     this.protectedIncomeCategories = [
       'House Rent',        // Used by houses.js for rental income
       'Vehicle Earnings',  // Used by vehicles.js for vehicle earnings
+      'Rent Income',       // Used by houses.js for rental income (alternative)
       'Other'              // Fallback category
     ];
     
@@ -44,6 +46,7 @@ class CategoriesService {
       'Education',
       'Travel',
       'Personal Care',
+      'Rent',
       'House Maintenance',
       'House Help',
       'Vehicle Fuel',
@@ -61,6 +64,7 @@ class CategoriesService {
       'Investments',
       'Rental Income',
       'House Rent',
+      'Rent Income',
       'Vehicle Earnings',
       'Interest',
       'Dividends',

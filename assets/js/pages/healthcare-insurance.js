@@ -50,8 +50,6 @@ async function init() {
   await encryptionReauthModal.checkAndPrompt(async () => {
     await loadData();
   });
-
-  await loadData();
 }
 
 // Load user profile

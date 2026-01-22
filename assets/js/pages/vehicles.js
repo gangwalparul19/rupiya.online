@@ -65,9 +65,6 @@ async function init() {
   setupEventListeners();
   loadUserProfile(user);
   
-  // Load data again after encryption is ready (fixes race condition)
-  await loadVehicles();
-  
   // Set default date if element exists
   const purchaseDateInput = document.getElementById('purchaseDate');
   if (purchaseDateInput) {
