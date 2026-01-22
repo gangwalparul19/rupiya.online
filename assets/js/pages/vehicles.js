@@ -712,7 +712,7 @@ async function calculateVehicleExpenses(vehicleId) {
 async function loadFuelLogs() {
   try {
     // Use createdAt for ordering as it's more reliable
-mil    // vehicleId is now in unencryptedFields, so no need to decrypt it
+    // vehicleId is now in unencryptedFields, so no need to decrypt it
     state.fuelLogs = await firestoreService.getAll('fuelLogs', 'createdAt', 'desc');
   } catch (error) {
     console.error('Error loading fuel logs:', error);

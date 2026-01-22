@@ -338,11 +338,15 @@
   }
   
   .card-actions {
-    flex-direction: column;
+    flex-wrap: wrap;
+    gap: 0.375rem;
   }
   
   .card-actions .btn {
-    width: 100%;
+    flex: 1 1 auto;
+    min-width: fit-content;
+    font-size: 0.75rem;
+    padding: 0.5rem 0.75rem;
   }
 }
 

@@ -207,27 +207,37 @@ function renderCreditCards() {
     const utilization = (card.currentBalance / card.creditLimit) * 100;
     const utilizationClass = utilization > 70 ? 'high' : '';
     const cardTypeClass = card.cardType ? `card-type-${card.cardType.toLowerCase().replace(' ', '')}` : 'card-type-default';
+    
+    // Safely handle potentially undefined values
+    const cardName = card.cardName || 'Unnamed Card';
+    const bankName = card.bankName || 'Unknown Bank';
+    const cardType = card.cardType || 'N/A';
+    const lastFourDigits = card.lastFourDigits || '****';
+    const creditLimit = card.creditLimit || 0;
+    const currentBalance = card.currentBalance || 0;
+    const rewardsProgram = card.rewardsProgram || '';
+    const rewardsBalance = card.rewardsBalance || 0;
 
     return `
-      <div class="card-item">
+      <div class="card-item" data-card-id="${card.id}">
         <div class="card-header">
           <div class="card-info">
-            <h3>${card.cardName}</h3>
-            <div class="card-bank">${card.bankName}</div>
+            <h3>${cardName}</h3>
+            <div class="card-bank">${bankName}</div>
           </div>
-          <span class="card-type-badge ${cardTypeClass}">${card.cardType || 'N/A'}</span>
+          <span class="card-type-badge ${cardTypeClass}">${cardType}</span>
         </div>
 
-        <div class="card-number">•••• •••• •••• ${card.lastFourDigits}</div>
+        <div class="card-number">•••• •••• •••• ${lastFourDigits}</div>
 
         <div class="card-stats">
           <div class="card-stat">
             <div class="card-stat-label">Credit Limit</div>
-            <div class="card-stat-value">${formatCurrency(card.creditLimit)}</div>
+            <div class="card-stat-value">${formatCurrency(creditLimit)}</div>
           </div>
           <div class="card-stat">
             <div class="card-stat-label">Available</div>
-            <div class="card-stat-value">${formatCurrency(card.creditLimit - card.currentBalance)}</div>
+            <div class="card-stat-value">${formatCurrency(creditLimit - currentBalance)}</div>
           </div>
         </div>
 
@@ -241,24 +251,43 @@ function renderCreditCards() {
           </div>
         </div>
 
-        ${card.rewardsProgram ? `
+        ${rewardsProgram ? `
           <div class="card-rewards">
             <div class="card-rewards-icon">🎁</div>
             <div class="card-rewards-info">
-              <div class="card-rewards-label">${card.rewardsProgram}</div>
-              <div class="card-rewards-value">${card.rewardsBalance || 0} points</div>
+              <div class="card-rewards-label">${rewardsProgram}</div>
+              <div class="card-rewards-value">${rewardsBalance} points</div>
             </div>
           </div>
         ` : ''}
 
         <div class="card-actions">
-          <button class="btn btn-sm btn-success" onclick="payBill('${card.id}', '${card.cardName}', ${card.currentBalance})">💰 Pay Bill</button>
-          <button class="btn btn-sm btn-outline" onclick="editCard('${card.id}')">Edit</button>
-          <button class="btn btn-sm btn-danger-outline" onclick="deleteCard('${card.id}', '${card.cardName}')">Delete</button>
+          <button class="btn btn-sm btn-success" data-action="pay-bill">💰 Pay Bill</button>
+          <button class="btn btn-sm btn-outline" data-action="edit">Edit</button>
+          <button class="btn btn-sm btn-danger-outline" data-action="delete">Delete</button>
         </div>
       </div>
     `;
   }).join('');
+  
+  // Add event listeners to buttons
+  document.querySelectorAll('.card-item').forEach(cardEl => {
+    const cardId = cardEl.dataset.cardId;
+    const card = state.creditCards.find(c => c.id === cardId);
+    if (!card) return;
+    
+    cardEl.querySelector('[data-action="pay-bill"]')?.addEventListener('click', () => {
+      payBill(card.id, card.cardName || 'Unnamed Card', card.currentBalance || 0);
+    });
+    
+    cardEl.querySelector('[data-action="edit"]')?.addEventListener('click', () => {
+      editCard(card.id);
+    });
+    
+    cardEl.querySelector('[data-action="delete"]')?.addEventListener('click', () => {
+      deleteCard(card.id, card.cardName || 'Unnamed Card');
+    });
+  });
   
   renderPagination(totalPages);
 }
@@ -361,18 +390,18 @@ function updateKPIs() {
 }
 
 // Edit card
-window.editCard = function(cardId) {
+function editCard(cardId) {
   openCardForm(cardId);
-};
+}
 
 // Delete card
 let deleteCardId = null;
 
-window.deleteCard = function(cardId, cardName) {
+function deleteCard(cardId, cardName) {
   deleteCardId = cardId;
   document.getElementById('deleteCardName').textContent = cardName;
   document.getElementById('deleteModal').classList.add('show');
-};
+}
 
 function closeDeleteModal() {
   document.getElementById('deleteModal').classList.remove('show');
@@ -493,7 +522,7 @@ async function handleCardSubmit(e) {
 let payBillCardId = null;
 let payBillCurrentBalance = 0;
 
-window.payBill = function(cardId, cardName, currentBalance) {
+function payBill(cardId, cardName, currentBalance) {
   payBillCardId = cardId;
   payBillCurrentBalance = currentBalance;
   
@@ -502,7 +531,7 @@ window.payBill = function(cardId, cardName, currentBalance) {
   document.getElementById('paymentAmount').value = currentBalance.toFixed(2);
   document.getElementById('paymentDate').valueAsDate = new Date();
   document.getElementById('payBillModal').classList.add('show');
-};
+}
 
 function closePayBillModal() {
   document.getElementById('payBillModal').classList.remove('show');
