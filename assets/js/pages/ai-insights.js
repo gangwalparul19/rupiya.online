@@ -528,7 +528,7 @@ function animateNumber(elementId, value) {
   const el = document.getElementById(elementId);
   if (!el) return;
   
-  const prefix = value < 0 ? '-₹' : '₹';
+  const prefix = value < 0 ? '-' : '';
   const absValue = Math.abs(value);
   
   animateValue(el, 0, absValue, 1000, (v) => `${prefix}${formatCurrencyCompact(v)}`);

@@ -337,46 +337,73 @@ function renderSpendingForecastChart() {
     charts.spendingForecast.destroy();
   }
 
-  // Group forecasts by date
-  const forecastsByDate = {};
-  const historicalData = {};
+  // Check if we have forecast data
+  if (!currentData.forecasts || currentData.forecasts.length === 0) {
+    // Show message if no data
+    const container = ctx.parentElement;
+    container.innerHTML = `
+      <div style="text-align: center; padding: 3rem; color: var(--text-secondary);">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">📊</div>
+        <h3>No Forecast Data Available</h3>
+        <p>Add more transactions to generate spending predictions</p>
+      </div>
+    `;
+    return;
+  }
 
+  // Group forecasts by week for better readability
+  const forecastsByWeek = {};
+  const weekLabels = [];
+  
   currentData.forecasts.forEach(forecast => {
-    const dateKey = forecast.date.toISOString().split('T')[0];
-    if (!forecastsByDate[dateKey]) {
-      forecastsByDate[dateKey] = 0;
+    const date = new Date(forecast.date);
+    const weekStart = new Date(date);
+    weekStart.setDate(date.getDate() - date.getDay()); // Start of week (Sunday)
+    const weekKey = weekStart.toISOString().split('T')[0];
+    
+    if (!forecastsByWeek[weekKey]) {
+      forecastsByWeek[weekKey] = {
+        total: 0,
+        upper: 0,
+        lower: 0,
+        count: 0,
+        dates: []
+      };
     }
-    forecastsByDate[dateKey] += forecast.predictedAmount;
+    
+    forecastsByWeek[weekKey].total += forecast.predictedAmount;
+    forecastsByWeek[weekKey].upper += forecast.confidenceInterval.upper;
+    forecastsByWeek[weekKey].lower += forecast.confidenceInterval.lower;
+    forecastsByWeek[weekKey].count++;
+    forecastsByWeek[weekKey].dates.push(date);
   });
 
-  // Sort dates
-  const sortedDates = Object.keys(forecastsByDate).sort();
-  const labels = sortedDates.map(date => {
-    const d = new Date(date);
-    return d.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' });
+  // Sort weeks and create labels
+  const sortedWeeks = Object.keys(forecastsByWeek).sort();
+  const labels = sortedWeeks.map((weekKey, index) => {
+    const weekStart = new Date(weekKey);
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekStart.getDate() + 6);
+    
+    return `Week ${index + 1}\n${weekStart.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })} - ${weekEnd.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}`;
   });
 
-  const forecastData = sortedDates.map(date => forecastsByDate[date]);
-
-  // Create confidence interval data
-  const upperBound = sortedDates.map(date => {
-    const dayForecasts = currentData.forecasts.filter(f => f.date.toISOString().split('T')[0] === date);
-    return dayForecasts.reduce((sum, f) => sum + f.confidenceInterval.upper, 0);
-  });
-
-  const lowerBound = sortedDates.map(date => {
-    const dayForecasts = currentData.forecasts.filter(f => f.date.toISOString().split('T')[0] === date);
-    return dayForecasts.reduce((sum, f) => sum + f.confidenceInterval.lower, 0);
-  });
+  const forecastData = sortedWeeks.map(week => forecastsByWeek[week].total);
+  const upperBound = sortedWeeks.map(week => forecastsByWeek[week].upper);
+  const lowerBound = sortedWeeks.map(week => forecastsByWeek[week].lower);
 
   // Update forecast stats
   const totalPredicted = forecastData.reduce((sum, val) => sum + val, 0);
-  const dailyAverage = totalPredicted / forecastData.length;
-  const avgConfidence = 85; // Calculate from confidence intervals
+  const dailyAverage = totalPredicted / 30; // 30 days
+  const avgConfidence = 85;
   
   document.getElementById('totalPredicted').textContent = formatCurrency(totalPredicted);
   document.getElementById('dailyAverage').textContent = formatCurrency(dailyAverage);
   document.getElementById('forecastConfidence').textContent = `${avgConfidence}%`;
+
+  // Find max value for better scaling
+  const maxValue = Math.max(...upperBound);
+  const suggestedMax = maxValue * 1.2; // Add 20% padding
 
   charts.spendingForecast = new Chart(ctx, {
     type: 'line',
@@ -391,11 +418,11 @@ function renderSpendingForecastChart() {
           borderWidth: 3,
           fill: true,
           tension: 0.4,
-          pointRadius: 5,
+          pointRadius: 6,
           pointBackgroundColor: 'rgba(74, 144, 226, 1)',
           pointBorderColor: '#fff',
           pointBorderWidth: 2,
-          pointHoverRadius: 7,
+          pointHoverRadius: 8,
           pointHoverBackgroundColor: 'rgba(74, 144, 226, 1)',
           pointHoverBorderColor: '#fff',
           pointHoverBorderWidth: 3
@@ -410,7 +437,7 @@ function renderSpendingForecastChart() {
           fill: '+1',
           tension: 0.4,
           pointRadius: 0,
-          pointHoverRadius: 0
+          pointHoverRadius: 5
         },
         {
           label: 'Lower Bound (95% CI)',
@@ -422,7 +449,7 @@ function renderSpendingForecastChart() {
           fill: false,
           tension: 0.4,
           pointRadius: 0,
-          pointHoverRadius: 0
+          pointHoverRadius: 5
         }
       ]
     },
@@ -432,6 +459,35 @@ function renderSpendingForecastChart() {
       interaction: {
         mode: 'index',
         intersect: false,
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          suggestedMax: suggestedMax,
+          ticks: {
+            callback: function(value) {
+              return formatCurrencyCompact(value);
+            },
+            font: {
+              size: 12
+            }
+          },
+          grid: {
+            color: 'rgba(0, 0, 0, 0.05)'
+          }
+        },
+        x: {
+          ticks: {
+            font: {
+              size: 11
+            },
+            maxRotation: 0,
+            minRotation: 0
+          },
+          grid: {
+            display: false
+          }
+        }
       },
       plugins: {
         legend: {

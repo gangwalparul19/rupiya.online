@@ -1,0 +1,249 @@
+{
+  "meta": {
+    "version": "1.1",
+    "last_updated": "2025-01-23",
+    "currency": "INR",
+    "total_count": 50
+  },
+  "cards": [
+    {
+      "id": "sbi-cashback-card",
+      "name": "Cashback SBI Card",
+      "issuer": "SBI Card",
+      "category": "Shopping",
+      "network": ["Visa"],
+      "images": {
+        "card_face": "https://www.sbicard.com/sbi-card-en/assets/media/images/personal/credit-cards/shopping/card-faces/cashback-sbi-card.png",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/SBI-logo.svg/1024px-SBI-logo.svg.png"
+      },
+      "fees": {
+        "joining_fee": 999,
+        "annual_fee": 999,
+        "waiver_condition": "Annual fee reversed on annual spends of ₹2 Lakhs."
+      },
+      "rewards": {
+        "type": "Cashback",
+        "base_rate": "1% on offline spends",
+        "accelerated_rate": "5% on all online spends (without merchant restrictions)",
+        "capping": "Max cashback ₹5,000 per billing cycle",
+        "redemption_method": "Auto-credited to statement"
+      },
+      "benefits": {
+        "lounge_access": {
+          "domestic": "None",
+          "international": "None"
+        },
+        "milestone_benefits": [],
+        "fuel_surcharge_waiver": "1% waiver on transactions between ₹500 and ₹3,000",
+        "forex_markup": "3.5%"
+      },
+      "eligibility": {
+        "min_income_salaried": 25000,
+        "min_age": 21,
+        "cibil_score_required": 750
+      },
+      "apply_link": "https://rupiya.online/apply/sbi-cashback"
+    },
+    {
+      "id": "hdfc-regalia-gold",
+      "name": "HDFC Regalia Gold Credit Card",
+      "issuer": "HDFC Bank",
+      "category": "Premium Travel",
+      "network": ["Visa", "MasterCard"],
+      "images": {
+        "card_face": "https://www.hdfcbank.com/content/api/contentstream-id/723fb80a-2dde-42a3-9793-7ae1be57c87f/5d63f282-53b0-466d-8c1d-151016f461e7/Regalia%20Gold%20Credit%20Card_264x167.png",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/HDFC_Bank_Logo.svg/2560px-HDFC_Bank_Logo.svg.png"
+      },
+      "fees": {
+        "joining_fee": 2500,
+        "annual_fee": 2500,
+        "waiver_condition": "Annual fee waived on spends of ₹4 Lakhs in 12 months."
+      },
+      "rewards": {
+        "type": "Points",
+        "base_rate": "4 Reward Points per ₹150",
+        "accelerated_rate": "5X points on Marks & Spencer, Myntra, Nykaa, Reliance Digital",
+        "capping": "No capping on base points",
+        "redemption_method": "SmartBuy Portal (Flights/Hotels @ ₹0.50/point)"
+      },
+      "benefits": {
+        "lounge_access": {
+          "domestic": "12 complimentary visits per calendar year (Both Primary & Add-on)",
+          "international": "6 complimentary visits per year via Priority Pass"
+        },
+        "milestone_benefits": [
+          "₹1,500 voucher on quarterly spends of ₹1.5 Lakhs",
+          "₹5,000 flight voucher on annual spends of ₹5 Lakhs"
+        ],
+        "fuel_surcharge_waiver": "1% waiver on transactions between ₹400 and ₹5,000",
+        "forex_markup": "2.0%"
+      },
+      "eligibility": {
+        "min_income_salaried": 100000,
+        "min_age": 21,
+        "cibil_score_required": 750
+      },
+      "apply_link": "https://rupiya.online/apply/hdfc-regalia-gold"
+    },
+    {
+      "id": "icici-amazon-pay",
+      "name": "Amazon Pay ICICI Credit Card",
+      "issuer": "ICICI Bank",
+      "category": "Lifetime Free",
+      "network": ["Visa"],
+      "images": {
+        "card_face": "https://www.icicibank.com/content/dam/icicibank/india/managed-assets/images/personal-banking/cards/credit-cards/amazon-pay/amazon-pay-credit-card-new.png",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/ICICI_Bank_Logo.svg/2560px-ICICI_Bank_Logo.svg.png"
+      },
+      "fees": {
+        "joining_fee": 0,
+        "annual_fee": 0,
+        "waiver_condition": "Lifetime Free (LTF)"
+      },
+      "rewards": {
+        "type": "Amazon Pay Balance",
+        "base_rate": "1% on all other spends",
+        "accelerated_rate": "5% for Prime members on Amazon.in (3% for non-Prime)",
+        "capping": "Unlimited",
+        "redemption_method": "Auto-credited to Amazon Pay wallet"
+      },
+      "benefits": {
+        "lounge_access": {
+          "domestic": "None",
+          "international": "None"
+        },
+        "milestone_benefits": [],
+        "fuel_surcharge_waiver": "1% waiver",
+        "forex_markup": "3.5%"
+      },
+      "eligibility": {
+        "min_income_salaried": 25000,
+        "min_age": 21,
+        "cibil_score_required": 730
+      },
+      "apply_link": "https://rupiya.online/apply/icici-amazon"
+    },
+    {
+      "id": "axis-atlas",
+      "name": "Axis Atlas Credit Card",
+      "issuer": "Axis Bank",
+      "category": "Travel Miles",
+      "network": ["Visa"],
+      "images": {
+        "card_face": "https://www.axisbank.com/images/default-source/progress-with-us_new/atlas-credit-card.jpg",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Axis_Bank_logo.svg/2560px-Axis_Bank_logo.svg.png"
+      },
+      "fees": {
+        "joining_fee": 5000,
+        "annual_fee": 5000,
+        "waiver_condition": "No fee waiver, but renewal benefits given."
+      },
+      "rewards": {
+        "type": "EDGE Miles",
+        "base_rate": "2 EDGE Miles per ₹100",
+        "accelerated_rate": "5 EDGE Miles per ₹100 on Travel EDGE portal",
+        "capping": "None",
+        "redemption_method": "Transfer to Airline/Hotel Partners (1 Mile = 2 Partner Points)"
+      },
+      "benefits": {
+        "lounge_access": {
+          "domestic": "Up to 18 visits per year (based on tier)",
+          "international": "Up to 12 visits per year (based on tier)"
+        },
+        "milestone_benefits": [
+          "2500 Bonus Miles at Silver Tier (₹3L spend)",
+          "5000 Bonus Miles at Gold Tier (₹7.5L spend)"
+        ],
+        "fuel_surcharge_waiver": "1% waiver on transactions between ₹400 and ₹4,000",
+        "forex_markup": "3.5%"
+      },
+      "eligibility": {
+        "min_income_salaried": 100000,
+        "min_age": 21,
+        "cibil_score_required": 750
+      },
+      "apply_link": "https://rupiya.online/apply/axis-atlas"
+    },
+    {
+      "id": "idfc-first-wealth",
+      "name": "IDFC FIRST Wealth Credit Card",
+      "issuer": "IDFC FIRST Bank",
+      "category": "Premium Lifestyle",
+      "network": ["Visa Infinite"],
+      "images": {
+        "card_face": "https://www.idfcfirstbank.com/content/dam/idfcfirstbank/images/credit-card/wealth-credit-card.png",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Logo_of_IDFC_First_Bank.svg/2560px-Logo_of_IDFC_First_Bank.svg.png"
+      },
+      "fees": {
+        "joining_fee": 0,
+        "annual_fee": 0,
+        "waiver_condition": "Lifetime Free (Invitation Only)"
+      },
+      "rewards": {
+        "type": "Points",
+        "base_rate": "3X Points per ₹100",
+        "accelerated_rate": "10X Points on incremental spends > ₹20k/month",
+        "capping": "Unlimited",
+        "redemption_method": "Pay with points / Vouchers (1 Reward Point = ₹0.25)"
+      },
+      "benefits": {
+        "lounge_access": {
+          "domestic": "4 per quarter (Domestic & Spa)",
+          "international": "4 per quarter"
+        },
+        "milestone_benefits": [
+          "Buy 1 Get 1 on Movie Tickets (Up to ₹500)"
+        ],
+        "fuel_surcharge_waiver": "1% waiver",
+        "forex_markup": "1.5%"
+      },
+      "eligibility": {
+        "min_income_salaried": 300000,
+        "min_age": 21,
+        "cibil_score_required": 780
+      },
+      "apply_link": "https://rupiya.online/apply/idfc-wealth"
+    },
+    {
+      "id": "amex-platinum-travel",
+      "name": "American Express Platinum Travel",
+      "issuer": "American Express",
+      "category": "Travel",
+      "network": ["Amex"],
+      "images": {
+        "card_face": "https://www.americanexpress.com/content/dam/amex/in/benefits/platinum-travel-credit-card/Platinum-Travel-Card-Art.png",
+        "issuer_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/American_Express_logo_%282018%29.svg/1200px-American_Express_logo_%282018%29.svg.png"
+      },
+      "fees": {
+        "joining_fee": 3500,
+        "annual_fee": 5000,
+        "waiver_condition": "No waiver"
+      },
+      "rewards": {
+        "type": "MR Points",
+        "base_rate": "1 MR Point per ₹50",
+        "accelerated_rate": "3X on Multiplier portal",
+        "capping": "None",
+        "redemption_method": "Marriott/Taj Vouchers or Air Miles"
+      },
+      "benefits": {
+        "lounge_access": {
+          "domestic": "8 complimentary visits per year (max 2 per quarter)",
+          "international": "None"
+        },
+        "milestone_benefits": [
+          "15,000 Bonus MR Points on ₹1.90 Lakh spend",
+          "25,000 Bonus MR Points + ₹10k Taj Voucher on ₹4 Lakh spend"
+        ],
+        "fuel_surcharge_waiver": "0% for HPCL transactions < ₹5,000",
+        "forex_markup": "3.5%"
+      },
+      "eligibility": {
+        "min_income_salaried": 50000,
+        "min_age": 21,
+        "cibil_score_required": 750
+      },
+      "apply_link": "https://rupiya.online/apply/amex-platinum"
+    }
+  ]
+}

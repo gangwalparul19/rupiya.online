@@ -558,7 +558,7 @@ async function handlePayBill(e) {
     const paymentNotes = document.getElementById('paymentNotes').value.trim();
     const billDocument = document.getElementById('billDocument').files[0];
 
-    // Get card details
+    // Get card details from state (already decrypted)
     const card = state.creditCards.find(c => c.id === payBillCardId);
     if (!card) {
       toast.error('Card not found');
@@ -568,10 +568,24 @@ async function handlePayBill(e) {
     // Calculate new balance
     const newBalance = Math.max(0, card.currentBalance - paymentAmount);
 
-    // Update card balance
-    await firestoreService.update('creditCards', payBillCardId, {
-      currentBalance: newBalance
-    });
+    // Create updated card object with all fields to preserve encryption
+    const updatedCardData = {
+      cardName: card.cardName,
+      bankName: card.bankName,
+      cardType: card.cardType,
+      lastFourDigits: card.lastFourDigits,
+      creditLimit: card.creditLimit,
+      currentBalance: newBalance, // Only this field changes
+      billingDate: card.billingDate,
+      dueDate: card.dueDate,
+      rewardsProgram: card.rewardsProgram,
+      rewardsBalance: card.rewardsBalance,
+      annualFee: card.annualFee,
+      notes: card.notes
+    };
+
+    // Update card with full data to preserve encryption
+    await firestoreService.update('creditCards', payBillCardId, updatedCardData);
 
     // Upload document if provided
     let documentId = null;
