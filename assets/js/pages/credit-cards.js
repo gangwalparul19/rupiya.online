@@ -102,6 +102,11 @@ function setupEventListeners() {
   document.getElementById('cancelDeleteBtn')?.addEventListener('click', closeDeleteModal);
   document.getElementById('confirmDeleteBtn')?.addEventListener('click', confirmDelete);
   
+  // Pay Bill modal
+  document.getElementById('closePayBillModal')?.addEventListener('click', closePayBillModal);
+  document.getElementById('cancelPayBillBtn')?.addEventListener('click', closePayBillModal);
+  document.getElementById('payBillForm')?.addEventListener('submit', handlePayBill);
+  
   // Pagination buttons
   const prevPageBtn = document.getElementById('prevPageBtn');
   const nextPageBtn = document.getElementById('nextPageBtn');
@@ -247,6 +252,7 @@ function renderCreditCards() {
         ` : ''}
 
         <div class="card-actions">
+          <button class="btn btn-sm btn-success" onclick="payBill('${card.id}', '${card.cardName}', ${card.currentBalance})">💰 Pay Bill</button>
           <button class="btn btn-sm btn-outline" onclick="editCard('${card.id}')">Edit</button>
           <button class="btn btn-sm btn-danger-outline" onclick="deleteCard('${card.id}', '${card.cardName}')">Delete</button>
         </div>
@@ -480,6 +486,129 @@ async function handleCardSubmit(e) {
   } finally {
     saveBtn.disabled = false;
     saveBtn.textContent = originalText;
+  }
+}
+
+// Pay Bill functionality
+let payBillCardId = null;
+let payBillCurrentBalance = 0;
+
+window.payBill = function(cardId, cardName, currentBalance) {
+  payBillCardId = cardId;
+  payBillCurrentBalance = currentBalance;
+  
+  document.getElementById('payBillCardName').textContent = cardName;
+  document.getElementById('payBillAmount').textContent = formatCurrency(currentBalance);
+  document.getElementById('paymentAmount').value = currentBalance.toFixed(2);
+  document.getElementById('paymentDate').valueAsDate = new Date();
+  document.getElementById('payBillModal').classList.add('show');
+};
+
+function closePayBillModal() {
+  document.getElementById('payBillModal').classList.remove('show');
+  document.getElementById('payBillForm').reset();
+  payBillCardId = null;
+  payBillCurrentBalance = 0;
+}
+
+async function handlePayBill(e) {
+  e.preventDefault();
+  
+  if (!payBillCardId) return;
+
+  const confirmBtn = document.getElementById('confirmPayBillBtn');
+  const originalText = confirmBtn.textContent;
+
+  try {
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = 'Processing...';
+
+    const paymentAmount = parseFloat(document.getElementById('paymentAmount').value);
+    const paymentDate = document.getElementById('paymentDate').value;
+    const paymentMethod = document.getElementById('paymentMethod').value;
+    const paymentNotes = document.getElementById('paymentNotes').value.trim();
+    const billDocument = document.getElementById('billDocument').files[0];
+
+    // Get card details
+    const card = state.creditCards.find(c => c.id === payBillCardId);
+    if (!card) {
+      toast.error('Card not found');
+      return;
+    }
+
+    // Calculate new balance
+    const newBalance = Math.max(0, card.currentBalance - paymentAmount);
+
+    // Update card balance
+    await firestoreService.update('creditCards', payBillCardId, {
+      currentBalance: newBalance
+    });
+
+    // Upload document if provided
+    let documentId = null;
+    if (billDocument) {
+      try {
+        // Import storage service dynamically
+        const { default: storageService } = await import('../services/storage-service.js');
+        
+        // Upload file
+        const uploadResult = await storageService.uploadFile(
+          billDocument,
+          'documents'
+        );
+
+        if (uploadResult.success) {
+          // Create document record
+          const documentData = {
+            name: `${card.cardName} - Bill Payment`,
+            description: `Credit card bill payment for ${card.cardName} on ${paymentDate}`,
+            category: 'Credit Card Bill',
+            documentDate: new Date(paymentDate),
+            fileUrl: uploadResult.url,
+            filePath: uploadResult.path,
+            fileName: uploadResult.name,
+            fileSize: uploadResult.size,
+            fileType: uploadResult.type,
+            linkedType: 'creditCard',
+            linkedId: payBillCardId,
+            linkedName: card.cardName
+          };
+
+          const docResult = await firestoreService.add('documents', documentData);
+          if (docResult.success) {
+            documentId = docResult.id;
+          }
+        }
+      } catch (docError) {
+        console.error('Error uploading document:', docError);
+        // Continue even if document upload fails
+      }
+    }
+
+    // Create a payment record (for tracking payment history)
+    const paymentRecord = {
+      cardId: payBillCardId,
+      cardName: card.cardName,
+      amount: paymentAmount,
+      date: new Date(paymentDate),
+      paymentMethod: paymentMethod,
+      notes: paymentNotes,
+      documentId: documentId,
+      previousBalance: card.currentBalance,
+      newBalance: newBalance
+    };
+
+    await firestoreService.add('creditCardPayments', paymentRecord);
+
+    toast.success(`Payment of ${formatCurrency(paymentAmount)} recorded successfully`);
+    closePayBillModal();
+    await loadCreditCards();
+  } catch (error) {
+    console.error('Error processing payment:', error);
+    toast.error('Failed to process payment');
+  } finally {
+    confirmBtn.disabled = false;
+    confirmBtn.textContent = originalText;
   }
 }
 

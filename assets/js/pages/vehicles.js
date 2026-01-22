@@ -2,7 +2,6 @@
 import '../services/services-init.js'; // Initialize services first
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
-import encryptionService from '../services/encryption-service.js';
 import crossFeatureIntegrationService from '../services/cross-feature-integration-service.js';
 import toast from '../components/toast.js';
 import confirmationModal from '../components/confirmation-modal.js';
@@ -350,12 +349,12 @@ async function loadVehicles() {
 }
 
 function calculateKPISummary() {
-  const totalMileage = state.fuelLogs.reduce((sum, log) => sum + (log.mileage || 0), 0);
-  const avgMileage = state.fuelLogs.length > 0 ? totalMileage / state.fuelLogs.length : 0;
+  // Calculate overall mileage stats from all fuel logs
+  const overallStats = calculateOverallMileageStats();
   
   state.allDataKPI = {
     totalVehicles: state.vehicles.length,
-    avgMileage: avgMileage
+    avgMileage: overallStats.avgMileage
   };
 }
 
@@ -713,32 +712,8 @@ async function calculateVehicleExpenses(vehicleId) {
 async function loadFuelLogs() {
   try {
     // Use createdAt for ordering as it's more reliable
-    const rawFuelLogs = await firestoreService.getAll('fuelLogs', 'createdAt', 'desc');
-    
-    // Decrypt vehicleId for each fuel log
-    const logResults = await Promise.allSettled(rawFuelLogs.map(async (log) => {
-      try {
-        // Decrypt the vehicleId if it's encrypted
-        const decryptedVehicleId = await encryptionService.decryptValue(log.vehicleId);
-        return {
-          ...log,
-          vehicleId: decryptedVehicleId
-        };
-      } catch (error) {
-        console.warn('Error decrypting vehicleId for fuel log:', error);
-        // If decryption fails, return the log as-is (might already be decrypted)
-        return log;
-      }
-    }));
-    
-    state.fuelLogs = logResults.map((result, index) => {
-      if (result.status === 'fulfilled') {
-        return result.value;
-      } else {
-        console.error(`Failed to process fuel log ${index}:`, result.reason);
-        return rawFuelLogs[index]; // Return original if processing fails
-      }
-    });
+mil    // vehicleId is now in unencryptedFields, so no need to decrypt it
+    state.fuelLogs = await firestoreService.getAll('fuelLogs', 'createdAt', 'desc');
   } catch (error) {
     console.error('Error loading fuel logs:', error);
     state.fuelLogs = [];

@@ -43,8 +43,9 @@ class TripGroupDetailPage {
     const user = await authService.waitForAuth();
 
     if (!user) {
-      // Not logged in, redirect to login
-      window.location.href = 'login.html';
+      // Not logged in, redirect to login with return URL
+      const returnUrl = encodeURIComponent(window.location.href);
+      window.location.href = `login.html?redirect=${returnUrl}`;
       return null;
     }
 
@@ -144,13 +145,28 @@ class TripGroupDetailPage {
       const groupResult = await tripGroupsService.getGroup(this.groupId);
 
       if (!groupResult.success) {
-        throw new Error(groupResult.error);
+        // Check if it's an access issue
+        if (groupResult.error?.includes('permission') || groupResult.error?.includes('access')) {
+          this.showError('You don\'t have access to this trip. Please check your invitation link or contact the trip organizer.');
+        } else {
+          this.showError(`Failed to load trip: ${groupResult.error}`);
+        }
+        return;
       }
       this.group = groupResult.data;
 
+      // Check if current user is a member
+      const members = await tripGroupsService.getGroupMembers(this.groupId);
+      const isMember = members.some(m => m.userId === this.currentUserId);
+      
+      if (!isMember) {
+        this.showError('You are not a member of this trip. Please check your invitation or contact the trip organizer.');
+        return;
+      }
+
       // Load members, expenses, settlements in parallel
       [this.members, this.expenses, this.settlements] = await Promise.all([
-        tripGroupsService.getGroupMembers(this.groupId),
+        Promise.resolve(members), // Already loaded
         tripGroupsService.getGroupExpenses(this.groupId),
         tripGroupsService.getSettlements(this.groupId)
       ]);
@@ -178,10 +194,30 @@ class TripGroupDetailPage {
       this.initializeKeyboardShortcuts();
     } catch (error) {
       console.error('Error loading group data:', error);
-      this.showToast('Failed to load group data', 'error');
+      this.showError(`Failed to load trip details: ${error.message}`);
     } finally {
       this.showLoading(false);
     }
+  }
+
+  showError(message) {
+    const mainContent = document.querySelector('.main-content');
+    if (mainContent) {
+      mainContent.innerHTML = `
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; padding: 2rem; text-align: center;">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="color: #dc2626; margin-bottom: 1rem;">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          <h2 style="font-size: 1.5rem; font-weight: 600; color: #1f2937; margin-bottom: 0.5rem;">Unable to Load Trip</h2>
+          <p style="color: #6b7280; margin-bottom: 1.5rem; max-width: 500px;">${message}</p>
+          <div style="display: flex; gap: 1rem;">
+            <a href="trip-groups.html" class="btn btn-primary">Back to Trips</a>
+            <button onclick="window.location.reload()" class="btn btn-outline">Retry</button>
+          </div>
+        </div>
+      `;
+    }
+    this.showToast(message, 'error');
   }
 
   renderHeader() {

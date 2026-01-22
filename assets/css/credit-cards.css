@@ -466,6 +466,62 @@
   font-size: 0.875rem;
 }
 
+/* Pay Bill Modal Styles */
+.pay-bill-info {
+  background: linear-gradient(135deg, var(--primary-blue) 0%, #357ABD 100%);
+  padding: var(--spacing-lg);
+  border-radius: var(--border-radius);
+  margin-bottom: var(--spacing-lg);
+  color: white;
+}
+
+.pay-bill-card-name {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  margin-bottom: var(--spacing-sm);
+}
+
+.pay-bill-amount {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--spacing-md);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.pay-bill-label {
+  font-size: var(--font-size-sm);
+  opacity: 0.9;
+}
+
+.pay-bill-value {
+  font-size: var(--font-size-xxl);
+  font-weight: 700;
+}
+
+.form-help {
+  display: block;
+  margin-top: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.btn-success {
+  background: var(--accent-green);
+  color: white;
+  border: none;
+}
+
+.btn-success:hover {
+  background: #27ae60;
+}
+
+.btn-success:disabled {
+  background: #95a5a6;
+  cursor: not-allowed;
+}
+
 @media (max-width: 768px) {
   .modal-container {
     max-width: 100%;

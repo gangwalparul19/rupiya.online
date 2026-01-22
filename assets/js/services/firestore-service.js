@@ -1356,8 +1356,15 @@ class FirestoreService {
       );
       
       const querySnapshot = await getDocs(q);
+      const data = [];
+      querySnapshot.forEach((doc) => data.push({ id: doc.id, ...doc.data() }));
+      
+      // Decrypt all documents
+      const decryptedData = await encryptionService.decryptArray(data, 'expenses');
+      
+      // Calculate total from decrypted data
       let total = 0;
-      querySnapshot.forEach((doc) => total += doc.data().amount || 0);
+      decryptedData.forEach((expense) => total += expense.amount || 0);
       
       this.setCache(cacheKey, total);
       return total;
@@ -1381,8 +1388,15 @@ class FirestoreService {
       );
       
       const querySnapshot = await getDocs(q);
+      const data = [];
+      querySnapshot.forEach((doc) => data.push({ id: doc.id, ...doc.data() }));
+      
+      // Decrypt all documents
+      const decryptedData = await encryptionService.decryptArray(data, 'income');
+      
+      // Calculate total from decrypted data
       let total = 0;
-      querySnapshot.forEach((doc) => total += doc.data().amount || 0);
+      decryptedData.forEach((income) => total += income.amount || 0);
       
       this.setCache(cacheKey, total);
       return total;

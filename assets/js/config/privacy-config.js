@@ -26,6 +26,20 @@ export const privacyConfig = {
     'year',
     'linkedType',
     'linkedId',
+    'linkedSubType',
+    'vehicleId',
+    'fuelLogId',
+    'houseId',
+    'loanId',
+    'investmentId',
+    'staffId',
+    'houseHelpPaymentId',
+    'loanPaymentType',
+    'principalPaid',
+    'interestPaid',
+    'isHouseHelpPayment',
+    'cardId',
+    'documentId',
     'familyGroupId',
     'tripGroupId',
     'tripGroupExpenseId',
@@ -66,6 +80,7 @@ export const privacyConfig = {
     'tripGroupSettlements',
     'tripGroupMembers',      // Member info (name, email, phone)
     'transfers',             // Money transfers between accounts
+    'creditCardPayments',    // Credit card payment records
     'netWorthSnapshots',     // Net worth history snapshots
     'notifications',         // EMI reminders and alerts
     'familyMembers',          // Family member names and roles
@@ -105,7 +120,7 @@ export const privacyConfig = {
     recurringTransactions: ['amount', 'description', 'paymentMethod', 'notes', 'recipientName'],
     houseHelps: ['name', 'phone', 'monthlySalary', 'notes', 'address'],
     houseHelpPayments: ['amount', 'notes'],
-    fuelLogs: ['fuelPrice', 'totalCost', 'fuelStation', 'notes', 'odometer', 'quantity'],
+    fuelLogs: ['odometerReading', 'fuelQuantity', 'fuelPrice', 'totalCost', 'fuelStation', 'notes'],
     splits: ['amount', 'description', 'notes', 'participants', 'paidBy', 'paidByName'],
     categories: ['name', 'description'],
     wallets: ['name', 'balance', 'notes'],
@@ -170,6 +185,14 @@ export const privacyConfig = {
       'claimable',
       'policyId',
       'notes'
+    ],
+    creditCardPayments: [
+      'cardName',
+      'amount',
+      'paymentMethod',
+      'notes',
+      'previousBalance',
+      'newBalance'
     ]
     // NOTE: familyGroups and familyInvitations are NOT in sensitiveFields
     // because they are shared across users and cannot use per-user encryption
