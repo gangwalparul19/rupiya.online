@@ -755,27 +755,34 @@ function renderMasterCards() {
   
   grid.innerHTML = state.filteredMasterCards.map(card => {
     // Ensure network is an array for display
-    const networks = Array.isArray(card.network) ? card.network : [card.network];
+    const networks = Array.isArray(card.network) ? card.network : (card.network ? [card.network] : ['N/A']);
+    
+    // Safe access to nested properties
+    const rewardRate = card.rewards?.accelerated_rate || card.rewards?.base_rate || 'N/A';
+    const joiningFee = card.fees?.joining_fee;
+    const feeText = joiningFee === 0 ? 'Lifetime Free' : (joiningFee ? `₹${joiningFee} joining fee` : 'N/A');
     
     return `
     <div class="master-card-item" data-card-id="${card.id}">
       <div class="master-card-header">
+        ${card.images?.card_face ? `
         <img src="${card.images.card_face}" 
-             alt="${card.name}" 
+             alt="${card.name || 'Card'}" 
              class="master-card-image" 
              onerror="this.style.display='none'"
              loading="lazy">
+        ` : ''}
         <div class="master-card-info">
-          <div class="master-card-name">${card.name}</div>
-          <div class="master-card-issuer">${card.issuer}</div>
+          <div class="master-card-name">${card.name || 'Unnamed Card'}</div>
+          <div class="master-card-issuer">${card.issuer || 'Unknown Bank'}</div>
         </div>
       </div>
-      <div class="master-card-category">${card.category}</div>
+      <div class="master-card-category">${card.category || 'General'}</div>
       <div class="master-card-highlights">
-        ${card.rewards.accelerated_rate || card.rewards.base_rate}
+        ${rewardRate}
       </div>
       <div class="master-card-fee">
-        ${card.fees.joining_fee === 0 ? 'Lifetime Free' : `₹${card.fees.joining_fee} joining fee`}
+        ${feeText}
       </div>
     </div>
   `;
@@ -793,11 +800,25 @@ function renderMasterCards() {
 
 // Show card details
 function showCardDetails(card) {
+  if (!card) {
+    console.error('Card data is missing');
+    return;
+  }
+  
   state.selectedMasterCard = card;
-  document.getElementById('cardDetailsTitle').textContent = card.name;
+  document.getElementById('cardDetailsTitle').textContent = card.name || 'Card Details';
   
   // Ensure network is an array
-  const networks = Array.isArray(card.network) ? card.network : [card.network];
+  const networks = Array.isArray(card.network) ? card.network : (card.network ? [card.network] : ['N/A']);
+  
+  // Safe access helpers
+  const safeGet = (obj, path, defaultValue = 'N/A') => {
+    try {
+      return path.split('.').reduce((acc, part) => acc?.[part], obj) ?? defaultValue;
+    } catch {
+      return defaultValue;
+    }
+  };
   
   const content = document.getElementById('cardDetailsContent');
   content.innerHTML = `
@@ -806,11 +827,11 @@ function showCardDetails(card) {
         <h3>💳 Card Information</h3>
         <div class="card-detail-row">
           <span class="card-detail-label">Issuer</span>
-          <span class="card-detail-value">${card.issuer}</span>
+          <span class="card-detail-value">${card.issuer || 'N/A'}</span>
         </div>
         <div class="card-detail-row">
           <span class="card-detail-label">Category</span>
-          <span class="card-detail-value">${card.category}</span>
+          <span class="card-detail-value">${card.category || 'N/A'}</span>
         </div>
         <div class="card-detail-row">
           <span class="card-detail-label">Network</span>
@@ -818,83 +839,97 @@ function showCardDetails(card) {
         </div>
       </div>
       
+      ${card.fees ? `
       <div class="card-detail-section">
         <h3>💰 Fees</h3>
         <div class="card-detail-row">
           <span class="card-detail-label">Joining Fee</span>
-          <span class="card-detail-value">${card.fees.joining_fee === 0 ? 'Free' : formatCurrency(card.fees.joining_fee)}</span>
+          <span class="card-detail-value">${card.fees.joining_fee === 0 ? 'Free' : (card.fees.joining_fee ? formatCurrency(card.fees.joining_fee) : 'N/A')}</span>
         </div>
         <div class="card-detail-row">
           <span class="card-detail-label">Annual Fee</span>
-          <span class="card-detail-value">${card.fees.annual_fee === 0 ? 'Free' : formatCurrency(card.fees.annual_fee)}</span>
+          <span class="card-detail-value">${card.fees.annual_fee === 0 ? 'Free' : (card.fees.annual_fee ? formatCurrency(card.fees.annual_fee) : 'N/A')}</span>
         </div>
         <div class="card-detail-row">
           <span class="card-detail-label">Waiver Condition</span>
-          <span class="card-detail-value">${card.fees.waiver_condition}</span>
+          <span class="card-detail-value">${card.fees.waiver_condition || 'N/A'}</span>
         </div>
       </div>
+      ` : ''}
       
+      ${card.rewards ? `
       <div class="card-detail-section">
         <h3>🎁 Rewards</h3>
         <div class="card-detail-row">
           <span class="card-detail-label">Type</span>
-          <span class="card-detail-value">${card.rewards.type}</span>
+          <span class="card-detail-value">${card.rewards.type || 'N/A'}</span>
         </div>
         <div class="card-detail-row">
           <span class="card-detail-label">Base Rate</span>
-          <span class="card-detail-value">${card.rewards.base_rate}</span>
+          <span class="card-detail-value">${card.rewards.base_rate || 'N/A'}</span>
         </div>
         <div class="card-detail-row">
           <span class="card-detail-label">Accelerated Rate</span>
-          <span class="card-detail-value">${card.rewards.accelerated_rate}</span>
+          <span class="card-detail-value">${card.rewards.accelerated_rate || 'N/A'}</span>
         </div>
         <div class="card-detail-row">
           <span class="card-detail-label">Capping</span>
-          <span class="card-detail-value">${card.rewards.capping}</span>
+          <span class="card-detail-value">${card.rewards.capping || 'N/A'}</span>
         </div>
       </div>
+      ` : ''}
       
+      ${card.benefits ? `
       <div class="card-detail-section">
         <h3>✈️ Benefits</h3>
+        ${card.benefits.lounge_access ? `
         <div class="benefit-item">
           <strong>Domestic Lounge</strong>
-          <span>${card.benefits.lounge_access.domestic}</span>
+          <span>${card.benefits.lounge_access.domestic || 'N/A'}</span>
         </div>
         <div class="benefit-item">
           <strong>International Lounge</strong>
-          <span>${card.benefits.lounge_access.international}</span>
+          <span>${card.benefits.lounge_access.international || 'N/A'}</span>
         </div>
+        ` : ''}
+        ${card.benefits.fuel_surcharge_waiver ? `
         <div class="benefit-item">
           <strong>Fuel Surcharge Waiver</strong>
           <span>${card.benefits.fuel_surcharge_waiver}</span>
         </div>
+        ` : ''}
+        ${card.benefits.forex_markup ? `
         <div class="benefit-item">
           <strong>Forex Markup</strong>
           <span>${card.benefits.forex_markup}</span>
         </div>
-        ${card.benefits.milestone_benefits.length > 0 ? `
+        ` : ''}
+        ${card.benefits.milestone_benefits && card.benefits.milestone_benefits.length > 0 ? `
           <div class="benefit-item">
             <strong>Milestone Benefits</strong>
             <span>${card.benefits.milestone_benefits.join(' • ')}</span>
           </div>
         ` : ''}
       </div>
+      ` : ''}
       
+      ${card.eligibility ? `
       <div class="card-detail-section">
         <h3>📋 Eligibility</h3>
         <div class="card-detail-row">
           <span class="card-detail-label">Min Income (Salaried)</span>
-          <span class="card-detail-value">${formatCurrency(card.eligibility.min_income_salaried)}/month</span>
+          <span class="card-detail-value">${card.eligibility.min_income_salaried ? formatCurrency(card.eligibility.min_income_salaried) + '/month' : 'N/A'}</span>
         </div>
         <div class="card-detail-row">
           <span class="card-detail-label">Min Age</span>
-          <span class="card-detail-value">${card.eligibility.min_age} years</span>
+          <span class="card-detail-value">${card.eligibility.min_age ? card.eligibility.min_age + ' years' : 'N/A'}</span>
         </div>
         <div class="card-detail-row">
           <span class="card-detail-label">CIBIL Score</span>
-          <span class="card-detail-value">${card.eligibility.cibil_score_required}+</span>
+          <span class="card-detail-value">${card.eligibility.cibil_score_required ? card.eligibility.cibil_score_required + '+' : 'N/A'}</span>
         </div>
       </div>
+      ` : ''}
     </div>
   `;
   
@@ -931,9 +966,9 @@ function addCardFromMaster() {
     const masterCardIdInput = document.getElementById('masterCardId');
     const notesInput = document.getElementById('notes');
     
-    if (cardNameInput) cardNameInput.value = card.name;
-    if (bankNameInput) bankNameInput.value = card.issuer;
-    if (cardTypeInput) {
+    if (cardNameInput && card.name) cardNameInput.value = card.name;
+    if (bankNameInput && card.issuer) bankNameInput.value = card.issuer;
+    if (cardTypeInput && card.network) {
       // Ensure network is an array
       const networks = Array.isArray(card.network) ? card.network : [card.network];
       
@@ -949,14 +984,20 @@ function addCardFromMaster() {
       const networkValue = networkMap[networks[0]] || networks[0].toLowerCase();
       cardTypeInput.value = networkValue;
     }
-    if (rewardsProgramInput) rewardsProgramInput.value = card.rewards.type;
-    if (annualFeeInput) annualFeeInput.value = card.fees.annual_fee;
-    if (masterCardIdInput) masterCardIdInput.value = card.id;
+    if (rewardsProgramInput && card.rewards?.type) rewardsProgramInput.value = card.rewards.type;
+    if (annualFeeInput && card.fees?.annual_fee !== undefined) annualFeeInput.value = card.fees.annual_fee;
+    if (masterCardIdInput && card.id) masterCardIdInput.value = card.id;
     
     // Add notes with card benefits
     if (notesInput) {
-      const notes = `Category: ${card.category}\nRewards: ${card.rewards.accelerated_rate}\nLounge: ${card.benefits.lounge_access.domestic}`;
-      notesInput.value = notes;
+      const noteParts = [];
+      if (card.category) noteParts.push(`Category: ${card.category}`);
+      if (card.rewards?.accelerated_rate) noteParts.push(`Rewards: ${card.rewards.accelerated_rate}`);
+      if (card.benefits?.lounge_access?.domestic) noteParts.push(`Lounge: ${card.benefits.lounge_access.domestic}`);
+      
+      if (noteParts.length > 0) {
+        notesInput.value = noteParts.join('\n');
+      }
     }
     
     toast.success('Card details pre-filled. Please add your personal card information.');
