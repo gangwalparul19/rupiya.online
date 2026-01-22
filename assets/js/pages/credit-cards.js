@@ -763,13 +763,6 @@ function renderMasterCards() {
     return `
     <div class="master-card-item" data-card-id="${card.id}">
       <div class="master-card-header">
-        ${card.images?.card_face ? `
-        <img src="${card.images.card_face}" 
-             alt="${card.name || 'Card'}" 
-             class="master-card-image" 
-             onerror="this.style.display='none'"
-             loading="lazy">
-        ` : ''}
         <div class="master-card-info">
           <div class="master-card-name">${card.name || 'Unnamed Card'}</div>
           <div class="master-card-issuer">${card.issuer || 'Unknown Bank'}</div>
