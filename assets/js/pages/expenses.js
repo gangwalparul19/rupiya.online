@@ -275,23 +275,28 @@ async function loadFamilyMemberFilter() {
     const familyMembers = await getActiveFamilyMembers();
     const expenseFamilyMembers = await extractFamilyMembersFromExpenses();
     
-    // Combine and deduplicate family members
+    // Combine and deduplicate family members using name as the unique key
     const allMembers = new Map();
     
     // Add members from localStorage
     if (familyMembers && familyMembers.length > 0) {
       familyMembers.forEach(member => {
-        allMembers.set(member.id, member);
+        const memberName = member.name || member.memberName;
+        if (memberName) {
+          allMembers.set(memberName.toLowerCase(), member);
+        }
       });
     }
     
-    // Add members from expenses (these might have different names/IDs)
+    // Add members from expenses (only if not already in map)
     if (expenseFamilyMembers && expenseFamilyMembers.length > 0) {
       expenseFamilyMembers.forEach(member => {
-        // Use memberName as key if no ID, to avoid duplicates
-        const key = member.id || member.name;
-        if (!allMembers.has(key)) {
-          allMembers.set(key, member);
+        const memberName = member.name || member.memberName;
+        if (memberName) {
+          const key = memberName.toLowerCase();
+          if (!allMembers.has(key)) {
+            allMembers.set(key, member);
+          }
         }
       });
     }

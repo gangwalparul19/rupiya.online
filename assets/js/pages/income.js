@@ -264,22 +264,28 @@ async function populateFamilyMemberFilter() {
     
     if (!familyMemberFilter) return;
     
-    // Combine and deduplicate family members
+    // Combine and deduplicate family members using name as the unique key
     const allMembers = new Map();
     
     // Add members from localStorage
     if (familyMembers && familyMembers.length > 0) {
       familyMembers.forEach(member => {
-        allMembers.set(member.id, member);
+        const memberName = member.name || member.memberName;
+        if (memberName) {
+          allMembers.set(memberName.toLowerCase(), member);
+        }
       });
     }
     
-    // Add members from income (these might have different names/IDs)
+    // Add members from income (only if not already in map)
     if (incomeFamilyMembers && incomeFamilyMembers.length > 0) {
       incomeFamilyMembers.forEach(member => {
-        const key = member.id || member.name;
-        if (!allMembers.has(key)) {
-          allMembers.set(key, member);
+        const memberName = member.name || member.memberName;
+        if (memberName) {
+          const key = memberName.toLowerCase();
+          if (!allMembers.has(key)) {
+            allMembers.set(key, member);
+          }
         }
       });
     }

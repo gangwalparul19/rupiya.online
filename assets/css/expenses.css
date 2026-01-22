@@ -248,8 +248,11 @@
 
 /* Family member filter styling - inherits from .filter-select */
 #familyMemberFilter {
-  /* Remove custom width and padding to match other filters */
   /* All styling inherited from .filter-select class */
+  /* Ensure consistent height with other dropdowns */
+  height: auto;
+  max-height: 42px;
+  overflow: hidden;
 }
 
 .search-row {
