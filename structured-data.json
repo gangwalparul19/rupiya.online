@@ -96,7 +96,7 @@
         "Income Management",
         "Budget Planning",
         "Financial Goals",
-        "Family Sharing",
+        "Credit Card Management",
         "Offline Support",
         "Bank-Level Security",
         "Multi-Currency Support"
@@ -188,7 +188,7 @@
           "name": "What makes Rupiya the best investment app in India?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Rupiya is the best investment app because it's: 100% free forever, supports all investment types (stocks, MF, crypto, real estate), provides real-time tracking, offers AI-powered insights, works offline, has family sharing, includes expense tracking, and is built specifically for Indian investors with INR support and NSE/BSE integration."
+            "text": "Rupiya is the best investment app because it's: 100% free forever, supports all investment types (stocks, MF, crypto, real estate), provides real-time tracking, offers AI-powered insights, works offline, includes credit card management, includes expense tracking, and is built specifically for Indian investors with INR support and NSE/BSE integration."
           }
         },
         {
@@ -264,8 +264,8 @@
         {
           "@type": "ListItem",
           "position": 10,
-          "name": "Family Sharing",
-          "description": "Share portfolios and track joint investments with family members"
+          "name": "Credit Card Management",
+          "description": "Track credit cards, manage payments, monitor rewards, and get smart recommendations"
         }
       ]
     },

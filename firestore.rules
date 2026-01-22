@@ -551,7 +551,7 @@ service cloud.firestore {
     }
     
     // ============================================
-    // FAMILY MEMBERS (Family sharing and management)
+    // FAMILY MEMBERS (Legacy - kept for data compatibility)
     // ============================================
     match /familyMembers/{memberId} {
       // Users can only access their own family members

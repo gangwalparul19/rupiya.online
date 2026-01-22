@@ -328,7 +328,7 @@ If you're confused about managing money, I got you!
 • Managing investments
 • Vehicle expense tracking
 • House help payments
-• Family sharing
+• Credit card management
 • AI insights
 
 It's like a free personal finance course!
@@ -403,7 +403,7 @@ HOUSEHOLD:
 🏦 EMI & Loan tracker
 
 SOCIAL:
-👨‍👩‍👧‍👦 Family sharing
+💳 Credit card management
 🤝 Split expenses
 
 SMART:
@@ -497,8 +497,8 @@ Manage domestic staff payments
 Slide 6: 📈 Investments
 Stocks, MFs, FDs in one place
 
-Slide 7: 👨‍👩‍👧‍👦 Family Sharing
-Transparent household finances
+Slide 7: 💳 Credit Cards
+Track cards, rewards & payments
 
 Slide 8: 🤖 AI Insights
 Smart spending analysis
@@ -719,14 +719,14 @@ Monitor your portfolio:
 One dashboard for all investments.
 ```
 ```
-8/ 👨‍👩‍👧‍👦 FAMILY SHARING
+8/ 💳 CREDIT CARDS
 
-- Create family groups
-- Share expenses transparently
-- Track who paid what
-- Split household costs
+- Track all your cards
+- Monitor rewards & cashback
+- Payment reminders
+- Smart recommendations
 
-Perfect for joint families & couples.
+Optimize your credit card usage.
 ```
 ```
 9/ 🤖 AI INSIGHTS
@@ -824,7 +824,7 @@ Free forever. No ads. No data selling.
 1. **India-focused** - House help tracking, UPI support, EMI tracker, INR
 2. **Try before signup** - Interactive demo with sample data
 3. **Comprehensive guide** - 14-section user manual for everyone
-4. **Family sharing** - Transparent household finance management
+4. **Credit card management** - Track cards, rewards, and smart recommendations
 5. **Offline-first** - Works without internet (PWA)
 6. **AI insights** - Smart spending analysis
 7. **All-in-one** - Expenses, income, investments, EMIs, vehicles, house help
