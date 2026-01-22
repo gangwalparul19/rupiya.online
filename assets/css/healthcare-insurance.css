@@ -357,11 +357,16 @@
 
 /* Empty State */
 .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-align: center;
   padding: 3rem 2rem;
   background: var(--bg-secondary);
   border-radius: 12px;
   border: 2px dashed var(--border-color);
+  min-height: 300px;
 }
 
 .empty-state-icon {
@@ -375,6 +380,7 @@
   font-weight: 700;
   color: var(--text-primary);
   margin: 0 0 0.5rem 0;
+  width: 100%;
 }
 
 .empty-state p {
@@ -382,10 +388,12 @@
   color: var(--text-secondary);
   margin: 0 0 1.5rem 0;
   line-height: 1.5;
+  max-width: 400px;
 }
 
 .empty-state .btn {
   margin-top: 0.5rem;
+  min-width: 180px;
 }
 
 .expense-item {
@@ -490,19 +498,30 @@
   }
   
   .empty-state {
-    padding: 2rem 1.25rem;
+    padding: 2.5rem 1.5rem;
+    min-height: 280px;
   }
   
   .empty-state-icon {
-    font-size: 3rem;
+    font-size: 3.5rem;
+    margin-bottom: 1rem;
   }
   
   .empty-state h3 {
     font-size: 1.125rem;
+    margin-bottom: 0.75rem;
   }
   
   .empty-state p {
     font-size: 0.875rem;
+    margin-bottom: 1.25rem;
+    padding: 0 0.5rem;
+  }
+  
+  .empty-state .btn {
+    width: auto;
+    min-width: 160px;
+    padding: 0.75rem 1.5rem;
   }
   
   .expense-item {
@@ -527,6 +546,7 @@
   .tabs {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    margin-bottom: 1.5rem;
   }
   
   .tab-btn {
@@ -549,6 +569,18 @@
     width: 100%;
   }
   
+  .page-header {
+    padding: 1rem;
+  }
+  
+  .page-title {
+    font-size: 1.5rem;
+  }
+  
+  .page-subtitle {
+    font-size: 0.875rem;
+  }
+  
   .page-actions {
     width: 100%;
     display: flex;
@@ -559,6 +591,16 @@
     flex: 1;
     font-size: 0.875rem;
     padding: 0.625rem 1rem;
+  }
+  
+  .add-policy-section,
+  .add-expense-section {
+    padding: 1.25rem;
+  }
+  
+  .add-policy-title,
+  .add-expense-title {
+    font-size: 1.25rem;
   }
 }
 
