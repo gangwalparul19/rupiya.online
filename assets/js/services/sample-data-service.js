@@ -261,8 +261,12 @@ class SampleDataService {
 
     budgets.forEach(budget => {
       const docRef = doc(collection(db, 'budgets'));
+      // Remove any undefined fields
+      const cleanBudget = Object.fromEntries(
+        Object.entries(budget).filter(([_, v]) => v !== undefined)
+      );
       batch.set(docRef, {
-        ...budget,
+        ...cleanBudget,
         userId,
         isSampleData: true,
         createdAt: serverTimestamp()
@@ -288,20 +292,58 @@ class SampleDataService {
    * Generate sample goal
    */
   async generateSampleGoal(userId) {
-    const goal = {
-      name: 'Emergency Fund',
-      targetAmount: 100000,
-      currentAmount: 45000,
-      deadline: Timestamp.fromDate(
-        new Date(Date.now() + 180 * 24 * 60 * 60 * 1000) // 6 months from now
-      ),
-      category: 'Savings',
-      userId,
-      isSampleData: true,
-      createdAt: serverTimestamp()
-    };
+    const goals = [
+      {
+        name: 'Emergency Fund',
+        targetAmount: 100000,
+        currentAmount: 45000,
+        deadline: Timestamp.fromDate(
+          new Date(Date.now() + 180 * 24 * 60 * 60 * 1000) // 6 months from now
+        ),
+        category: 'Savings',
+        description: 'Build emergency fund for 6 months expenses',
+        status: 'active'
+      },
+      {
+        name: 'Vacation to Goa',
+        targetAmount: 50000,
+        currentAmount: 18000,
+        deadline: Timestamp.fromDate(
+          new Date(Date.now() + 120 * 24 * 60 * 60 * 1000) // 4 months from now
+        ),
+        category: 'Travel',
+        description: 'Family vacation to Goa',
+        status: 'active'
+      },
+      {
+        name: 'New Laptop',
+        targetAmount: 80000,
+        currentAmount: 25000,
+        deadline: Timestamp.fromDate(
+          new Date(Date.now() + 90 * 24 * 60 * 60 * 1000) // 3 months from now
+        ),
+        category: 'Shopping',
+        description: 'Upgrade to new MacBook',
+        status: 'active'
+      }
+    ];
 
-    await addDoc(collection(db, 'goals'), goal);
+    const batch = writeBatch(db);
+    goals.forEach(goal => {
+      const docRef = doc(collection(db, 'goals'));
+      // Remove any undefined fields
+      const cleanGoal = Object.fromEntries(
+        Object.entries(goal).filter(([_, v]) => v !== undefined)
+      );
+      batch.set(docRef, {
+        ...cleanGoal,
+        userId,
+        isSampleData: true,
+        createdAt: serverTimestamp()
+      });
+    });
+
+    await batch.commit();
   }
 
   /**
@@ -320,34 +362,123 @@ class SampleDataService {
       {
         name: 'Honda City',
         type: 'Car',
+        fuelType: 'Petrol',
         registrationNumber: 'MH-02-AB-1234',
+        currentMileage: 45000,
         purchaseDate: Timestamp.fromDate(new Date('2020-03-15')),
         purchasePrice: 1200000,
         currentValue: 850000,
         insuranceExpiry: Timestamp.fromDate(new Date(Date.now() + 90 * 24 * 60 * 60 * 1000)),
         insuranceProvider: 'HDFC ERGO',
-        insurancePremium: 18500
+        insurancePremium: 18500,
+        notes: 'Family car, well maintained'
       },
       {
         name: 'Honda Activa',
         type: 'Two Wheeler',
+        fuelType: 'Petrol',
         registrationNumber: 'MH-02-CD-5678',
+        currentMileage: 12000,
         purchaseDate: Timestamp.fromDate(new Date('2021-06-20')),
         purchasePrice: 75000,
         currentValue: 55000,
         insuranceExpiry: Timestamp.fromDate(new Date(Date.now() + 120 * 24 * 60 * 60 * 1000)),
         insuranceProvider: 'ICICI Lombard',
-        insurancePremium: 3500
+        insurancePremium: 3500,
+        notes: 'Daily commute'
       }
     ];
 
     const batch = writeBatch(db);
+    const vehicleIds = [];
+    
     vehicles.forEach(vehicle => {
       const docRef = doc(collection(db, 'vehicles'));
+      vehicleIds.push(docRef.id);
+      // Remove any undefined fields
+      const cleanVehicle = Object.fromEntries(
+        Object.entries(vehicle).filter(([_, v]) => v !== undefined)
+      );
       batch.set(docRef, {
-        ...vehicle,
+        ...cleanVehicle,
         userId,
         isSampleData: true,
+        createdAt: serverTimestamp()
+      });
+    });
+
+    await batch.commit();
+
+    // Generate fuel logs for vehicles
+    await this.generateSampleFuelLogs(userId, vehicleIds, vehicles);
+  }
+
+  /**
+   * Generate sample fuel logs for vehicles
+   */
+  async generateSampleFuelLogs(userId, vehicleIds, vehicles) {
+    const fuelLogs = [];
+    const today = new Date();
+
+    // Fuel logs for Honda City (vehicleIds[0])
+    const cityLogs = [
+      { daysAgo: 5, liters: 40, cost: 4200, odometer: 45000 },
+      { daysAgo: 15, liters: 38, cost: 3990, odometer: 44550 },
+      { daysAgo: 25, liters: 42, cost: 4410, odometer: 44100 },
+      { daysAgo: 35, liters: 40, cost: 4200, odometer: 43650 }
+    ];
+
+    cityLogs.forEach(log => {
+      const date = new Date(today);
+      date.setDate(date.getDate() - log.daysAgo);
+      fuelLogs.push({
+        vehicleId: vehicleIds[0],
+        vehicleName: vehicles[0].name,
+        date: Timestamp.fromDate(date),
+        liters: log.liters,
+        costPerLiter: log.cost / log.liters,
+        totalCost: log.cost,
+        odometerReading: log.odometer,
+        fuelType: 'Petrol',
+        userId,
+        isSampleData: true
+      });
+    });
+
+    // Fuel logs for Honda Activa (vehicleIds[1])
+    const activaLogs = [
+      { daysAgo: 7, liters: 4, cost: 420, odometer: 12000 },
+      { daysAgo: 17, liters: 4, cost: 420, odometer: 11850 },
+      { daysAgo: 27, liters: 4, cost: 420, odometer: 11700 }
+    ];
+
+    activaLogs.forEach(log => {
+      const date = new Date(today);
+      date.setDate(date.getDate() - log.daysAgo);
+      fuelLogs.push({
+        vehicleId: vehicleIds[1],
+        vehicleName: vehicles[1].name,
+        date: Timestamp.fromDate(date),
+        liters: log.liters,
+        costPerLiter: log.cost / log.liters,
+        totalCost: log.cost,
+        odometerReading: log.odometer,
+        fuelType: 'Petrol',
+        userId,
+        isSampleData: true
+      });
+    });
+
+    // Save fuel logs
+    const batch = writeBatch(db);
+    fuelLogs.forEach(log => {
+      const docRef = doc(collection(db, 'fuelLogs'));
+      // Remove any undefined fields
+      const cleanLog = Object.fromEntries(
+        Object.entries(log).filter(([_, v]) => v !== undefined)
+      );
+      batch.set(docRef, {
+        ...cleanLog,
         createdAt: serverTimestamp()
       });
     });
@@ -378,8 +509,12 @@ class SampleDataService {
     const batch = writeBatch(db);
     houses.forEach(house => {
       const docRef = doc(collection(db, 'houses'));
+      // Remove any undefined fields
+      const cleanHouse = Object.fromEntries(
+        Object.entries(house).filter(([_, v]) => v !== undefined)
+      );
       batch.set(docRef, {
-        ...house,
+        ...cleanHouse,
         userId,
         isSampleData: true,
         createdAt: serverTimestamp()
@@ -417,8 +552,12 @@ class SampleDataService {
     const batch = writeBatch(db);
     houseHelp.forEach(help => {
       const docRef = doc(collection(db, 'houseHelp'));
+      // Remove any undefined fields
+      const cleanHelp = Object.fromEntries(
+        Object.entries(help).filter(([_, v]) => v !== undefined)
+      );
       batch.set(docRef, {
-        ...help,
+        ...cleanHelp,
         userId,
         isSampleData: true,
         createdAt: serverTimestamp()
@@ -466,8 +605,12 @@ class SampleDataService {
     const batch = writeBatch(db);
     insurance.forEach(policy => {
       const docRef = doc(collection(db, 'insurancePolicies'));
+      // Remove any undefined fields
+      const cleanPolicy = Object.fromEntries(
+        Object.entries(policy).filter(([_, v]) => v !== undefined)
+      );
       batch.set(docRef, {
-        ...policy,
+        ...cleanPolicy,
         userId,
         isSampleData: true,
         createdAt: serverTimestamp()
@@ -487,7 +630,7 @@ class SampleDataService {
         type: 'Stock',
         symbol: 'RELIANCE',
         quantity: 50,
-        buyPrice: 2450,
+        purchasePrice: 2450,
         currentPrice: 2680,
         investedAmount: 122500,
         currentValue: 134000,
@@ -498,7 +641,7 @@ class SampleDataService {
         type: 'Stock',
         symbol: 'HDFCBANK',
         quantity: 100,
-        buyPrice: 1580,
+        purchasePrice: 1580,
         currentPrice: 1650,
         investedAmount: 158000,
         currentValue: 165000,
@@ -508,8 +651,8 @@ class SampleDataService {
         name: 'SBI Bluechip Fund',
         type: 'Mutual Fund',
         symbol: 'SBI-BLUECHIP',
-        units: 500,
-        buyPrice: 65,
+        quantity: 500,
+        purchasePrice: 65,
         currentPrice: 72,
         investedAmount: 32500,
         currentValue: 36000,
@@ -519,8 +662,8 @@ class SampleDataService {
         name: 'ICICI Prudential Equity Fund',
         type: 'Mutual Fund',
         symbol: 'ICICI-EQUITY',
-        units: 300,
-        buyPrice: 120,
+        quantity: 300,
+        purchasePrice: 120,
         currentPrice: 135,
         investedAmount: 36000,
         currentValue: 40500,
@@ -530,6 +673,9 @@ class SampleDataService {
         name: 'Fixed Deposit - SBI',
         type: 'Fixed Deposit',
         symbol: 'FD-SBI',
+        quantity: 1,
+        purchasePrice: 200000,
+        currentPrice: 215000,
         investedAmount: 200000,
         currentValue: 215000,
         interestRate: 7.5,
@@ -541,8 +687,12 @@ class SampleDataService {
     const batch = writeBatch(db);
     investments.forEach(investment => {
       const docRef = doc(collection(db, 'investments'));
+      // Remove any undefined fields
+      const cleanInvestment = Object.fromEntries(
+        Object.entries(investment).filter(([_, v]) => v !== undefined)
+      );
       batch.set(docRef, {
-        ...investment,
+        ...cleanInvestment,
         userId,
         isSampleData: true,
         createdAt: serverTimestamp()
@@ -588,8 +738,12 @@ class SampleDataService {
     const batch = writeBatch(db);
     loans.forEach(loan => {
       const docRef = doc(collection(db, 'loans'));
+      // Remove any undefined fields
+      const cleanLoan = Object.fromEntries(
+        Object.entries(loan).filter(([_, v]) => v !== undefined)
+      );
       batch.set(docRef, {
-        ...loan,
+        ...cleanLoan,
         userId,
         isSampleData: true,
         createdAt: serverTimestamp()
@@ -643,8 +797,12 @@ class SampleDataService {
     const batch = writeBatch(db);
     creditCards.forEach(card => {
       const docRef = doc(collection(db, 'creditCards'));
+      // Remove any undefined fields
+      const cleanCard = Object.fromEntries(
+        Object.entries(card).filter(([_, v]) => v !== undefined)
+      );
       batch.set(docRef, {
-        ...card,
+        ...cleanCard,
         userId,
         isSampleData: true,
         createdAt: serverTimestamp()
@@ -682,8 +840,12 @@ class SampleDataService {
     const batch = writeBatch(db);
     notes.forEach(note => {
       const docRef = doc(collection(db, 'notes'));
+      // Remove any undefined fields
+      const cleanNote = Object.fromEntries(
+        Object.entries(note).filter(([_, v]) => v !== undefined)
+      );
       batch.set(docRef, {
-        ...note,
+        ...cleanNote,
         userId,
         isSampleData: true,
         createdAt: serverTimestamp(),
@@ -705,6 +867,8 @@ class SampleDataService {
         category: 'Entertainment',
         type: 'expense',
         frequency: 'monthly',
+        paymentMethod: 'credit card',
+        status: 'active',
         startDate: Timestamp.fromDate(new Date('2023-01-01')),
         nextDate: Timestamp.fromDate(new Date(Date.now() + 10 * 24 * 60 * 60 * 1000)),
         isActive: true
@@ -715,6 +879,8 @@ class SampleDataService {
         category: 'Healthcare',
         type: 'expense',
         frequency: 'monthly',
+        paymentMethod: 'debit card',
+        status: 'active',
         startDate: Timestamp.fromDate(new Date('2023-02-01')),
         nextDate: Timestamp.fromDate(new Date(Date.now() + 5 * 24 * 60 * 60 * 1000)),
         isActive: true
@@ -725,6 +891,8 @@ class SampleDataService {
         category: 'Salary',
         type: 'income',
         frequency: 'monthly',
+        paymentMethod: 'bank transfer',
+        status: 'active',
         startDate: Timestamp.fromDate(new Date('2022-01-01')),
         nextDate: Timestamp.fromDate(new Date(Date.now() + 25 * 24 * 60 * 60 * 1000)),
         isActive: true
@@ -735,6 +903,8 @@ class SampleDataService {
         category: 'Investments',
         type: 'expense',
         frequency: 'monthly',
+        paymentMethod: 'bank transfer',
+        status: 'active',
         startDate: Timestamp.fromDate(new Date('2022-06-01')),
         nextDate: Timestamp.fromDate(new Date(Date.now() + 8 * 24 * 60 * 60 * 1000)),
         isActive: true
@@ -744,8 +914,12 @@ class SampleDataService {
     const batch = writeBatch(db);
     recurring.forEach(item => {
       const docRef = doc(collection(db, 'recurringTransactions'));
+      // Remove any undefined fields
+      const cleanItem = Object.fromEntries(
+        Object.entries(item).filter(([_, v]) => v !== undefined)
+      );
       batch.set(docRef, {
-        ...item,
+        ...cleanItem,
         userId,
         isSampleData: true,
         createdAt: serverTimestamp()
@@ -780,8 +954,12 @@ class SampleDataService {
     const batch = writeBatch(db);
     tripGroups.forEach(trip => {
       const docRef = doc(collection(db, 'tripGroups'));
+      // Remove any undefined fields
+      const cleanTrip = Object.fromEntries(
+        Object.entries(trip).filter(([_, v]) => v !== undefined)
+      );
       batch.set(docRef, {
-        ...trip,
+        ...cleanTrip,
         userId,
         isSampleData: true,
         createdAt: serverTimestamp()
