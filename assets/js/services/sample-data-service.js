@@ -35,30 +35,77 @@ class SampleDataService {
       throw new Error('User ID is required');
     }
 
+    console.log('🔍 Starting sample data generation for userId:', userId);
+    console.log('🔍 Current auth user:', auth.currentUser?.uid);
+
     try {
       // Generate sample data for all features
+      console.log('📝 Generating expenses...');
       await this.generateSampleExpenses(userId);
+      console.log('✅ Expenses generated');
+      
+      console.log('📝 Generating income...');
       await this.generateSampleIncome(userId);
+      console.log('✅ Income generated');
+      
+      console.log('📝 Generating budgets...');
       await this.generateSampleBudget(userId);
+      console.log('✅ Budgets generated');
+      
+      console.log('📝 Generating goals...');
       await this.generateSampleGoal(userId);
+      console.log('✅ Goals generated');
+      
+      console.log('📝 Generating vehicles...');
       await this.generateSampleVehicles(userId);
+      console.log('✅ Vehicles generated');
+      
+      console.log('📝 Generating houses...');
       await this.generateSampleHouses(userId);
+      console.log('✅ Houses generated');
+      
+      console.log('📝 Generating house help...');
       await this.generateSampleHouseHelp(userId);
+      console.log('✅ House help generated');
+      
+      console.log('📝 Generating healthcare insurance...');
       await this.generateSampleHealthcareInsurance(userId);
+      console.log('✅ Healthcare insurance generated');
+      
+      console.log('📝 Generating investments...');
       await this.generateSampleInvestments(userId);
+      console.log('✅ Investments generated');
+      
+      console.log('📝 Generating loans...');
       await this.generateSampleLoans(userId);
+      console.log('✅ Loans generated');
+      
+      console.log('📝 Generating credit cards...');
       await this.generateSampleCreditCards(userId);
+      console.log('✅ Credit cards generated');
+      
+      console.log('📝 Generating notes...');
       await this.generateSampleNotes(userId);
+      console.log('✅ Notes generated');
+      
+      console.log('📝 Generating recurring transactions...');
       await this.generateSampleRecurring(userId);
+      console.log('✅ Recurring transactions generated');
+      
+      console.log('📝 Generating trip groups...');
       await this.generateSampleTripGroups(userId);
+      console.log('✅ Trip groups generated');
 
       // Mark sample data as active
       this.isSampleDataActive = true;
       this.saveState();
 
+      console.log('🎉 All sample data generated successfully!');
       return true;
     } catch (error) {
-      console.error('Error generating sample data:', error);
+      console.error('❌ Error generating sample data:', error);
+      console.error('Error details:', error.message);
+      console.error('Error code:', error.code);
       throw error;
     }
   }

@@ -2,9 +2,12 @@
 import '../services/services-init.js';
 import authService from '../services/auth-service.js';
 import sampleDataService from '../services/sample-data-service.js';
+import { auth } from '../config/firebase-config.js';
 
 // Make globally accessible for console testing
 window.sampleDataService = sampleDataService;
+window.auth = auth;
+window.authService = authService;
 
 // DOM Elements
 const statusIndicator = document.getElementById('statusIndicator');
@@ -107,6 +110,12 @@ async function generateSampleData() {
     return;
   }
   
+  console.log('🔍 User from authService:', user);
+  console.log('🔍 User UID:', user.uid);
+  console.log('🔍 Auth object:', auth);
+  console.log('🔍 Auth currentUser:', auth.currentUser);
+  console.log('🔍 Auth currentUser UID:', auth.currentUser?.uid);
+  
   if (!confirm('Generate sample data? This will add comprehensive test data across all features including expenses, income, budgets, goals, vehicles, houses, investments, loans, credit cards, and more.')) {
     return;
   }
@@ -115,6 +124,7 @@ async function generateSampleData() {
     showLoading(true);
     showAlert('info', '⏳ Generating sample data...');
     
+    console.log('🚀 Calling generateSampleData with userId:', user.uid);
     await sampleDataService.generateSampleData(user.uid);
     
     showLoading(false);
