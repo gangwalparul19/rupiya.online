@@ -473,5 +473,28 @@
   
   <!-- Scripts -->
   <script type="module" src="assets/js/pages/generate-sample-data.js"></script>
+
+  <script type="module">
+import { db } from './assets/js/config/firebase-config.js';
+import { collection, query, where, getDocs, writeBatch } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+
+window.deleteUserData = async function(userId) {
+  const collections = ['expenses', 'income', 'budgets', 'goals', 'vehicles', 'fuelLogs', 'houses', 'houseHelps', 'insurancePolicies', 'investments', 'loans', 'creditCards', 'notes', 'recurringTransactions', 'tripGroups'];
+  let total = 0;
+  for (const col of collections) {
+    const q = query(collection(db, col), where('userId', '==', userId));
+    const snap = await getDocs(q);
+    if (!snap.empty) {
+      const batch = writeBatch(db);
+      snap.docs.forEach(doc => batch.delete(doc.ref));
+      await batch.commit();
+      total += snap.size;
+      console.log(`✅ Deleted ${snap.size} from ${col}`);
+    }
+  }
+  console.log(`🎉 Total deleted: ${total}`);
+};
+</script>
+
 </body>
 </html>
