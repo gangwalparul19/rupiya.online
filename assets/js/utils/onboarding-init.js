@@ -3,6 +3,7 @@
 
 import quickStartChecklist from '../components/quick-start-checklist.js';
 import sampleDataService from '../services/sample-data-service.js';
+import onboardingService from '../services/onboarding-service.js';
 
 class OnboardingInit {
   constructor() {
@@ -16,6 +17,11 @@ class OnboardingInit {
     if (this.initialized) return;
 
     try {
+      // Make services globally accessible for testing
+      window.onboardingService = onboardingService;
+      window.sampleDataService = sampleDataService;
+      window.quickStartChecklist = quickStartChecklist;
+
       // Wait for Firebase auth
       await this.waitForAuth();
 

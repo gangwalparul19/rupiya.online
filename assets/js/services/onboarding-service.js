@@ -207,8 +207,10 @@ class OnboardingService {
    */
   startOnboarding() {
     this.defineSteps();
-    this.currentStep = 0;
+    this.currentStep = 0; // Start from first step (index 0)
     this.completedSteps.clear();
+    this.isOnboardingComplete = false;
+    this.saveOnboardingState(); // Save the reset state
     this.showOnboardingModal();
   }
 
@@ -394,6 +396,8 @@ class OnboardingService {
         const state = JSON.parse(saved);
         this.isOnboardingComplete = state.isComplete;
         this.completedSteps = new Set(state.completedSteps);
+        // Don't restore currentStep - always start from 0
+        this.currentStep = 0;
       }
     } catch (e) {
       console.warn('Failed to load onboarding state:', e);
@@ -401,13 +405,43 @@ class OnboardingService {
   }
 
   /**
-   * Reset onboarding
+   * Reset onboarding (for testing or re-running)
    */
   resetOnboarding() {
     this.isOnboardingComplete = false;
     this.currentStep = 0;
     this.completedSteps.clear();
+    localStorage.removeItem('rupiya_onboarding_complete');
     this.saveOnboardingState();
+    console.log('✅ Onboarding reset complete. Call onboardingService.startOnboarding() to restart.');
+  }
+
+  /**
+   * Reset all onboarding and tour data (for complete testing reset)
+   */
+  resetAll() {
+    // Reset onboarding
+    this.resetOnboarding();
+    
+    // Reset product tours
+    localStorage.removeItem('rupiya_product_tour');
+    
+    // Reset quick start checklist
+    localStorage.removeItem('rupiya_quick_start_state');
+    localStorage.removeItem('rupiya_checklist_celebration_shown');
+    localStorage.removeItem('rupiya_visited_dashboard');
+    
+    // Reset sample data offer
+    localStorage.removeItem('rupiya_sample_data_offered');
+    
+    // Reset tour offers
+    const pages = ['dashboard', 'expenses', 'income', 'budgets', 'goals'];
+    pages.forEach(page => {
+      localStorage.removeItem(`rupiya_tour_${page}_offered`);
+    });
+    
+    console.log('✅ All onboarding data reset! Reload the page to see the onboarding flow from the beginning.');
+    console.log('💡 To test: Reload the page or call location.reload()');
   }
 }
 

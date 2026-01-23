@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generate Sample Data - Rupiya</title>
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    .container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      max-width: 600px;
+      width: 100%;
+      overflow: hidden;
+    }
+    
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 40px 30px;
+      text-align: center;
+    }
+    
+    .header h1 {
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+    
+    .header p {
+      font-size: 16px;
+      opacity: 0.9;
+    }
+    
+    .content {
+      padding: 40px 30px;
+    }
+    
+    .status-box {
+      background: #f8fafc;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 30px;
+      border-left: 4px solid #667eea;
+    }
+    
+    .status-box h3 {
+      color: #1e293b;
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+    
+    .status-box p {
+      color: #64748b;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    
+    .status-indicator {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+    
+    .status-indicator.active {
+      background: #22c55e;
+      box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+    }
+    
+    .status-indicator.inactive {
+      background: #94a3b8;
+    }
+    
+    .data-preview {
+      background: #f1f5f9;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .data-preview h3 {
+      color: #1e293b;
+      font-size: 16px;
+      margin-bottom: 15px;
+    }
+    
+    .data-item {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      background: white;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+    
+    .data-item:last-child {
+      margin-bottom: 0;
+    }
+    
+    .data-icon {
+      font-size: 24px;
+      margin-right: 12px;
+    }
+    
+    .data-info {
+      flex: 1;
+    }
+    
+    .data-label {
+      font-weight: 600;
+      color: #1e293b;
+      font-size: 14px;
+    }
+    
+    .data-description {
+      color: #64748b;
+      font-size: 13px;
+    }
+    
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    
+    .btn {
+      flex: 1;
+      padding: 16px 24px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-danger {
+      background: #ef4444;
+      color: white;
+    }
+    
+    .btn-danger:hover:not(:disabled) {
+      background: #dc2626;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(239, 68, 68, 0.4);
+    }
+    
+    .btn-secondary {
+      background: #f1f5f9;
+      color: #475569;
+    }
+    
+    .btn-secondary:hover:not(:disabled) {
+      background: #e2e8f0;
+    }
+    
+    .alert {
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      display: none;
+    }
+    
+    .alert.show {
+      display: block;
+      animation: slideIn 0.3s ease;
+    }
+    
+    .alert-success {
+      background: #dcfce7;
+      color: #166534;
+      border-left: 4px solid #22c55e;
+    }
+    
+    .alert-error {
+      background: #fee2e2;
+      color: #991b1b;
+      border-left: 4px solid #ef4444;
+    }
+    
+    .alert-info {
+      background: #dbeafe;
+      color: #1e40af;
+      border-left: 4px solid #3b82f6;
+    }
+    
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 20px;
+    }
+    
+    .loading.show {
+      display: block;
+    }
+    
+    .spinner {
+      border: 3px solid #f3f4f6;
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 10px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .footer {
+      background: #f8fafc;
+      padding: 20px 30px;
+      text-align: center;
+      color: #64748b;
+      font-size: 14px;
+    }
+    
+    .footer a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    
+    .footer a:hover {
+      text-decoration: underline;
+    }
+    
+    @media (max-width: 640px) {
+      .header h1 {
+        font-size: 24px;
+      }
+      
+      .content {
+        padding: 30px 20px;
+      }
+      
+      .btn-group {
+        flex-direction: column;
+      }
+      
+      .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🎮 Sample Data Generator</h1>
+      <p>Test Rupiya with realistic dummy data</p>
+    </div>
+    
+    <div class="content">
+      <!-- Alerts -->
+      <div id="alertSuccess" class="alert alert-success"></div>
+      <div id="alertError" class="alert alert-error"></div>
+      <div id="alertInfo" class="alert alert-info"></div>
+      
+      <!-- Loading -->
+      <div id="loading" class="loading">
+        <div class="spinner"></div>
+        <p>Processing...</p>
+      </div>
+      
+      <!-- Status -->
+      <div class="status-box">
+        <h3>
+          <span id="statusIndicator" class="status-indicator inactive"></span>
+          <span id="statusText">Checking status...</span>
+        </h3>
+        <p id="statusDescription">Please wait while we check your account.</p>
+      </div>
+      
+      <!-- Data Preview -->
+      <div class="data-preview">
+        <h3>📊 What You'll Get (Complete Test Data)</h3>
+        
+        <div class="data-item">
+          <div class="data-icon">💸</div>
+          <div class="data-info">
+            <div class="data-label">20 Expenses</div>
+            <div class="data-description">Last 30 days of realistic spending</div>
+          </div>
+        </div>
+        
+        <div class="data-item">
+          <div class="data-icon">💰</div>
+          <div class="data-info">
+            <div class="data-label">3 Income Entries</div>
+            <div class="data-description">Salary, freelance, and investments</div>
+          </div>
+        </div>
+        
+        <div class="data-item">
+          <div class="data-icon">📊</div>
+          <div class="data-info">
+            <div class="data-label">4 Budgets</div>
+            <div class="data-description">With progress tracking</div>
+          </div>
+        </div>
+        
+        <div class="data-item">
+          <div class="data-icon">🎯</div>
+          <div class="data-info">
+            <div class="data-label">1 Savings Goal</div>
+            <div class="data-description">Emergency fund target</div>
+          </div>
+        </div>
+        
+        <div class="data-item">
+          <div class="data-icon">🚗</div>
+          <div class="data-info">
+            <div class="data-label">2 Vehicles</div>
+            <div class="data-description">Car and two-wheeler with insurance</div>
+          </div>
+        </div>
+        
+        <div class="data-item">
+          <div class="data-icon">🏠</div>
+          <div class="data-info">
+            <div class="data-label">1 House</div>
+            <div class="data-description">Primary residence with loan details</div>
+          </div>
+        </div>
+        
+        <div class="data-item">
+          <div class="data-icon">👥</div>
+          <div class="data-info">
+            <div class="data-label">2 House Help</div>
+            <div class="data-description">Cook and maid with salary details</div>
+          </div>
+        </div>
+        
+        <div class="data-item">
+          <div class="data-icon">🏥</div>
+          <div class="data-info">
+            <div class="data-label">1 Health Insurance</div>
+            <div class="data-description">Family coverage policy</div>
+          </div>
+        </div>
+        
+        <div class="data-item">
+          <div class="data-icon">📈</div>
+          <div class="data-info">
+            <div class="data-label">5 Investments</div>
+            <div class="data-description">Stocks, mutual funds, and FD</div>
+          </div>
+        </div>
+        
+        <div class="data-item">
+          <div class="data-icon">💳</div>
+          <div class="data-info">
+            <div class="data-label">2 Credit Cards</div>
+            <div class="data-description">With limits and due dates</div>
+          </div>
+        </div>
+        
+        <div class="data-item">
+          <div class="data-icon">🏦</div>
+          <div class="data-info">
+            <div class="data-label">2 Loans</div>
+            <div class="data-description">Home loan and car loan</div>
+          </div>
+        </div>
+        
+        <div class="data-item">
+          <div class="data-icon">📝</div>
+          <div class="data-info">
+            <div class="data-label">3 Notes</div>
+            <div class="data-description">Financial planning notes</div>
+          </div>
+        </div>
+        
+        <div class="data-item">
+          <div class="data-icon">🔄</div>
+          <div class="data-info">
+            <div class="data-label">4 Recurring Transactions</div>
+            <div class="data-description">Subscriptions, SIP, and salary</div>
+          </div>
+        </div>
+        
+        <div class="data-item">
+          <div class="data-icon">✈️</div>
+          <div class="data-info">
+            <div class="data-label">1 Trip Group</div>
+            <div class="data-description">Goa trip with friends</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Actions -->
+      <div class="btn-group">
+        <button id="generateBtn" class="btn btn-primary" disabled>
+          <span>✨</span>
+          <span>Generate Sample Data</span>
+        </button>
+      </div>
+      
+      <div class="btn-group">
+        <button id="clearBtn" class="btn btn-danger" disabled>
+          <span>🗑️</span>
+          <span>Clear Sample Data</span>
+        </button>
+      </div>
+      
+      <div class="btn-group">
+        <button id="dashboardBtn" class="btn btn-secondary">
+          <span>🏠</span>
+          <span>Go to Dashboard</span>
+        </button>
+      </div>
+    </div>
+    
+    <div class="footer">
+      <p>
+        💡 Sample data covers ALL features and is clearly marked<br>
+        Test expenses, income, investments, vehicles, loans, and more!<br>
+        <a href="README_ONBOARDING_TESTING.md" target="_blank">View Testing Guide</a>
+      </p>
+    </div>
+  </div>
+  
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  
+  <!-- Firebase Config -->
+  <script src="assets/js/config/firebase-config.js"></script>
+  
+  <!-- Sample Data Service -->
+  <script type="module">
+    import sampleDataService from './assets/js/services/sample-data-service.js';
+    
+    // Make globally accessible
+    window.sampleDataService = sampleDataService;
+    
+    // DOM Elements
+    const statusIndicator = document.getElementById('statusIndicator');
+    const statusText = document.getElementById('statusText');
+    const statusDescription = document.getElementById('statusDescription');
+    const generateBtn = document.getElementById('generateBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const dashboardBtn = document.getElementById('dashboardBtn');
+    const loading = document.getElementById('loading');
+    const alertSuccess = document.getElementById('alertSuccess');
+    const alertError = document.getElementById('alertError');
+    const alertInfo = document.getElementById('alertInfo');
+    
+    // Show alert
+    function showAlert(type, message) {
+      const alert = type === 'success' ? alertSuccess : 
+                    type === 'error' ? alertError : alertInfo;
+      
+      // Hide all alerts
+      alertSuccess.classList.remove('show');
+      alertError.classList.remove('show');
+      alertInfo.classList.remove('show');
+      
+      // Show selected alert
+      alert.textContent = message;
+      alert.classList.add('show');
+      
+      // Auto hide after 5 seconds
+      setTimeout(() => {
+        alert.classList.remove('show');
+      }, 5000);
+    }
+    
+    // Show loading
+    function showLoading(show) {
+      if (show) {
+        loading.classList.add('show');
+        generateBtn.disabled = true;
+        clearBtn.disabled = true;
+      } else {
+        loading.classList.remove('show');
+      }
+    }
+    
+    // Update status
+    function updateStatus(isActive, user) {
+      if (isActive) {
+        statusIndicator.classList.remove('inactive');
+        statusIndicator.classList.add('active');
+        statusText.textContent = 'Sample Data Active';
+        statusDescription.textContent = 'You are currently exploring with sample data. You can clear it and start fresh anytime.';
+        generateBtn.disabled = true;
+        clearBtn.disabled = false;
+      } else {
+        statusIndicator.classList.remove('active');
+        statusIndicator.classList.add('inactive');
+        statusText.textContent = 'No Sample Data';
+        statusDescription.textContent = user ? 
+          'Generate sample data to explore all features with realistic dummy data.' :
+          'Please login to generate sample data.';
+        generateBtn.disabled = !user;
+        clearBtn.disabled = true;
+      }
+    }
+    
+    // Check status
+    async function checkStatus() {
+      try {
+        const user = firebase.auth().currentUser;
+        
+        if (!user) {
+          updateStatus(false, null);
+          showAlert('info', '⚠️ Please login first. Redirecting to login page...');
+          setTimeout(() => {
+            window.location.href = 'login.html';
+          }, 2000);
+          return;
+        }
+        
+        const isActive = sampleDataService.isActive();
+        updateStatus(isActive, user);
+        
+        if (isActive) {
+          showAlert('info', '✅ Sample data is currently active');
+        } else {
+          showAlert('info', '💡 Ready to generate sample data');
+        }
+      } catch (error) {
+        console.error('Error checking status:', error);
+        showAlert('error', '❌ Error checking status: ' + error.message);
+      }
+    }
+    
+    // Generate sample data
+    async function generateSampleData() {
+      const user = firebase.auth().currentUser;
+      
+      if (!user) {
+        showAlert('error', '❌ Please login first');
+        return;
+      }
+      
+      if (!confirm('Generate sample data? This will add comprehensive test data across all features including expenses, income, budgets, goals, vehicles, houses, investments, loans, credit cards, and more.')) {
+        return;
+      }
+      
+      try {
+        showLoading(true);
+        showAlert('info', '⏳ Generating sample data...');
+        
+        await sampleDataService.generateSampleData(user.uid);
+        
+        showLoading(false);
+        showAlert('success', '✅ Sample data generated successfully! Redirecting to dashboard...');
+        
+        updateStatus(true, user);
+        
+        setTimeout(() => {
+          window.location.href = 'dashboard.html';
+        }, 2000);
+      } catch (error) {
+        showLoading(false);
+        console.error('Error generating sample data:', error);
+        showAlert('error', '❌ Error: ' + error.message);
+      }
+    }
+    
+    // Clear sample data
+    async function clearSampleData() {
+      const user = firebase.auth().currentUser;
+      
+      if (!user) {
+        showAlert('error', '❌ Please login first');
+        return;
+      }
+      
+      if (!confirm('Clear all sample data? This will remove all sample expenses, income, budgets, and goals.')) {
+        return;
+      }
+      
+      try {
+        showLoading(true);
+        showAlert('info', '⏳ Clearing sample data...');
+        
+        await sampleDataService.clearSampleData(user.uid);
+        
+        showLoading(false);
+        showAlert('success', '✅ Sample data cleared successfully!');
+        
+        updateStatus(false, user);
+      } catch (error) {
+        showLoading(false);
+        console.error('Error clearing sample data:', error);
+        showAlert('error', '❌ Error: ' + error.message);
+      }
+    }
+    
+    // Event listeners
+    generateBtn.addEventListener('click', generateSampleData);
+    clearBtn.addEventListener('click', clearSampleData);
+    dashboardBtn.addEventListener('click', () => {
+      window.location.href = 'dashboard.html';
+    });
+    
+    // Wait for auth
+    firebase.auth().onAuthStateChanged((user) => {
+      checkStatus();
+    });
+  </script>
+</body>
+</html>

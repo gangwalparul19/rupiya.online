@@ -440,7 +440,24 @@ class QuickStartChecklist {
     localStorage.removeItem('rupiya_quick_start_state');
     localStorage.removeItem('rupiya_checklist_celebration_shown');
     localStorage.removeItem('rupiya_visited_dashboard');
+    
+    // Remove widget if exists
+    const widget = document.getElementById('quickStartWidget');
+    if (widget) {
+      widget.remove();
+    }
+    
+    console.log('✅ Quick start checklist reset complete.');
+  }
+
+  /**
+   * Force show checklist (for testing)
+   */
+  forceShow() {
+    this.isDismissed = false;
+    this.saveState();
     this.render();
+    console.log('✅ Quick start checklist shown.');
   }
 }
 

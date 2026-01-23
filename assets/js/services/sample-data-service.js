@@ -23,17 +23,21 @@ class SampleDataService {
     }
 
     try {
-      // Generate sample expenses
+      // Generate sample data for all features
       await this.generateSampleExpenses(userId);
-
-      // Generate sample income
       await this.generateSampleIncome(userId);
-
-      // Generate sample budget
       await this.generateSampleBudget(userId);
-
-      // Generate sample goal
       await this.generateSampleGoal(userId);
+      await this.generateSampleVehicles(userId);
+      await this.generateSampleHouses(userId);
+      await this.generateSampleHouseHelp(userId);
+      await this.generateSampleHealthcareInsurance(userId);
+      await this.generateSampleInvestments(userId);
+      await this.generateSampleLoans(userId);
+      await this.generateSampleCreditCards(userId);
+      await this.generateSampleNotes(userId);
+      await this.generateSampleRecurring(userId);
+      await this.generateSampleTripGroups(userId);
 
       // Mark sample data as active
       this.isSampleDataActive = true;
@@ -224,6 +228,459 @@ class SampleDataService {
   }
 
   /**
+   * Generate sample vehicles
+   */
+  async generateSampleVehicles(userId) {
+    const vehicles = [
+      {
+        name: 'Honda City',
+        type: 'Car',
+        registrationNumber: 'MH-02-AB-1234',
+        purchaseDate: firebase.firestore.Timestamp.fromDate(new Date('2020-03-15')),
+        purchasePrice: 1200000,
+        currentValue: 850000,
+        insuranceExpiry: firebase.firestore.Timestamp.fromDate(new Date(Date.now() + 90 * 24 * 60 * 60 * 1000)),
+        insuranceProvider: 'HDFC ERGO',
+        insurancePremium: 18500
+      },
+      {
+        name: 'Honda Activa',
+        type: 'Two Wheeler',
+        registrationNumber: 'MH-02-CD-5678',
+        purchaseDate: firebase.firestore.Timestamp.fromDate(new Date('2021-06-20')),
+        purchasePrice: 75000,
+        currentValue: 55000,
+        insuranceExpiry: firebase.firestore.Timestamp.fromDate(new Date(Date.now() + 120 * 24 * 60 * 60 * 1000)),
+        insuranceProvider: 'ICICI Lombard',
+        insurancePremium: 3500
+      }
+    ];
+
+    const batch = firebase.firestore().batch();
+    vehicles.forEach(vehicle => {
+      const docRef = firebase.firestore().collection('vehicles').doc();
+      batch.set(docRef, {
+        ...vehicle,
+        userId,
+        isSampleData: true,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    });
+
+    await batch.commit();
+  }
+
+  /**
+   * Generate sample houses
+   */
+  async generateSampleHouses(userId) {
+    const houses = [
+      {
+        name: 'Primary Residence',
+        type: 'Apartment',
+        address: '123, Green Valley Society, Pune',
+        purchaseDate: firebase.firestore.Timestamp.fromDate(new Date('2018-01-15')),
+        purchasePrice: 5500000,
+        currentValue: 7200000,
+        area: 1200,
+        areaUnit: 'sqft',
+        hasLoan: true,
+        loanAmount: 2500000,
+        monthlyEMI: 35000
+      }
+    ];
+
+    const batch = firebase.firestore().batch();
+    houses.forEach(house => {
+      const docRef = firebase.firestore().collection('houses').doc();
+      batch.set(docRef, {
+        ...house,
+        userId,
+        isSampleData: true,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    });
+
+    await batch.commit();
+  }
+
+  /**
+   * Generate sample house help
+   */
+  async generateSampleHouseHelp(userId) {
+    const houseHelp = [
+      {
+        name: 'Ramesh Kumar',
+        role: 'Cook',
+        salary: 8000,
+        paymentFrequency: 'monthly',
+        phoneNumber: '+91-9876543210',
+        startDate: firebase.firestore.Timestamp.fromDate(new Date('2022-06-01')),
+        isActive: true
+      },
+      {
+        name: 'Sunita Devi',
+        role: 'Maid',
+        salary: 5000,
+        paymentFrequency: 'monthly',
+        phoneNumber: '+91-9876543211',
+        startDate: firebase.firestore.Timestamp.fromDate(new Date('2023-01-15')),
+        isActive: true
+      }
+    ];
+
+    const batch = firebase.firestore().batch();
+    houseHelp.forEach(help => {
+      const docRef = firebase.firestore().collection('houseHelp').doc();
+      batch.set(docRef, {
+        ...help,
+        userId,
+        isSampleData: true,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    });
+
+    await batch.commit();
+  }
+
+  /**
+   * Generate sample healthcare insurance
+   */
+  async generateSampleHealthcareInsurance(userId) {
+    const insurance = [
+      {
+        policyName: 'Family Health Shield',
+        provider: 'Star Health Insurance',
+        policyNumber: 'SH-2023-456789',
+        coverageAmount: 1000000,
+        premium: 25000,
+        premiumFrequency: 'annual',
+        startDate: firebase.firestore.Timestamp.fromDate(new Date('2023-04-01')),
+        endDate: firebase.firestore.Timestamp.fromDate(new Date('2024-03-31')),
+        members: ['Self', 'Spouse', 'Child'],
+        isActive: true
+      }
+    ];
+
+    const batch = firebase.firestore().batch();
+    insurance.forEach(policy => {
+      const docRef = firebase.firestore().collection('healthcareInsurance').doc();
+      batch.set(docRef, {
+        ...policy,
+        userId,
+        isSampleData: true,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    });
+
+    await batch.commit();
+  }
+
+  /**
+   * Generate sample investments
+   */
+  async generateSampleInvestments(userId) {
+    const investments = [
+      {
+        name: 'Reliance Industries',
+        type: 'Stock',
+        symbol: 'RELIANCE',
+        quantity: 50,
+        buyPrice: 2450,
+        currentPrice: 2680,
+        investedAmount: 122500,
+        currentValue: 134000,
+        purchaseDate: firebase.firestore.Timestamp.fromDate(new Date('2023-01-15'))
+      },
+      {
+        name: 'HDFC Bank',
+        type: 'Stock',
+        symbol: 'HDFCBANK',
+        quantity: 100,
+        buyPrice: 1580,
+        currentPrice: 1650,
+        investedAmount: 158000,
+        currentValue: 165000,
+        purchaseDate: firebase.firestore.Timestamp.fromDate(new Date('2023-03-20'))
+      },
+      {
+        name: 'SBI Bluechip Fund',
+        type: 'Mutual Fund',
+        symbol: 'SBI-BLUECHIP',
+        units: 500,
+        buyPrice: 65,
+        currentPrice: 72,
+        investedAmount: 32500,
+        currentValue: 36000,
+        purchaseDate: firebase.firestore.Timestamp.fromDate(new Date('2022-06-10'))
+      },
+      {
+        name: 'ICICI Prudential Equity Fund',
+        type: 'Mutual Fund',
+        symbol: 'ICICI-EQUITY',
+        units: 300,
+        buyPrice: 120,
+        currentPrice: 135,
+        investedAmount: 36000,
+        currentValue: 40500,
+        purchaseDate: firebase.firestore.Timestamp.fromDate(new Date('2022-09-15'))
+      },
+      {
+        name: 'Fixed Deposit - SBI',
+        type: 'Fixed Deposit',
+        symbol: 'FD-SBI',
+        investedAmount: 200000,
+        currentValue: 215000,
+        interestRate: 7.5,
+        maturityDate: firebase.firestore.Timestamp.fromDate(new Date(Date.now() + 180 * 24 * 60 * 60 * 1000)),
+        purchaseDate: firebase.firestore.Timestamp.fromDate(new Date('2023-06-01'))
+      }
+    ];
+
+    const batch = firebase.firestore().batch();
+    investments.forEach(investment => {
+      const docRef = firebase.firestore().collection('investments').doc();
+      batch.set(docRef, {
+        ...investment,
+        userId,
+        isSampleData: true,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    });
+
+    await batch.commit();
+  }
+
+  /**
+   * Generate sample loans
+   */
+  async generateSampleLoans(userId) {
+    const loans = [
+      {
+        name: 'Home Loan',
+        type: 'Home Loan',
+        lender: 'HDFC Bank',
+        principalAmount: 4000000,
+        outstandingAmount: 2500000,
+        interestRate: 8.5,
+        emi: 35000,
+        startDate: firebase.firestore.Timestamp.fromDate(new Date('2018-01-15')),
+        endDate: firebase.firestore.Timestamp.fromDate(new Date('2038-01-15')),
+        tenure: 240,
+        remainingTenure: 168
+      },
+      {
+        name: 'Car Loan',
+        type: 'Vehicle Loan',
+        lender: 'ICICI Bank',
+        principalAmount: 800000,
+        outstandingAmount: 350000,
+        interestRate: 9.5,
+        emi: 18500,
+        startDate: firebase.firestore.Timestamp.fromDate(new Date('2020-03-15')),
+        endDate: firebase.firestore.Timestamp.fromDate(new Date('2025-03-15')),
+        tenure: 60,
+        remainingTenure: 18
+      }
+    ];
+
+    const batch = firebase.firestore().batch();
+    loans.forEach(loan => {
+      const docRef = firebase.firestore().collection('loans').doc();
+      batch.set(docRef, {
+        ...loan,
+        userId,
+        isSampleData: true,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    });
+
+    await batch.commit();
+  }
+
+  /**
+   * Generate sample credit cards
+   */
+  async generateSampleCreditCards(userId) {
+    const creditCards = [
+      {
+        name: 'HDFC Regalia',
+        bank: 'HDFC Bank',
+        lastFourDigits: '4567',
+        creditLimit: 300000,
+        availableCredit: 245000,
+        currentDue: 55000,
+        dueDate: firebase.firestore.Timestamp.fromDate(new Date(Date.now() + 15 * 24 * 60 * 60 * 1000)),
+        billingCycle: 5,
+        rewardPoints: 12500,
+        isActive: true
+      },
+      {
+        name: 'SBI SimplyCLICK',
+        bank: 'State Bank of India',
+        lastFourDigits: '8901',
+        creditLimit: 150000,
+        availableCredit: 135000,
+        currentDue: 15000,
+        dueDate: firebase.firestore.Timestamp.fromDate(new Date(Date.now() + 20 * 24 * 60 * 60 * 1000)),
+        billingCycle: 10,
+        rewardPoints: 5800,
+        isActive: true
+      }
+    ];
+
+    const batch = firebase.firestore().batch();
+    creditCards.forEach(card => {
+      const docRef = firebase.firestore().collection('creditCards').doc();
+      batch.set(docRef, {
+        ...card,
+        userId,
+        isSampleData: true,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    });
+
+    await batch.commit();
+  }
+
+  /**
+   * Generate sample notes
+   */
+  async generateSampleNotes(userId) {
+    const notes = [
+      {
+        title: 'Investment Strategy 2024',
+        content: 'Focus on bluechip stocks and diversified mutual funds. Target: 15% annual returns. Review portfolio quarterly.',
+        category: 'Investment',
+        isPinned: true
+      },
+      {
+        title: 'Tax Planning Checklist',
+        content: '1. Max out 80C deductions\n2. Invest in ELSS\n3. Review HRA claims\n4. Check for additional deductions',
+        category: 'Tax',
+        isPinned: false
+      },
+      {
+        title: 'Financial Goals',
+        content: 'Short-term: Emergency fund ₹1L\nMid-term: Car upgrade ₹5L\nLong-term: Retirement corpus ₹2Cr',
+        category: 'Goals',
+        isPinned: true
+      }
+    ];
+
+    const batch = firebase.firestore().batch();
+    notes.forEach(note => {
+      const docRef = firebase.firestore().collection('notes').doc();
+      batch.set(docRef, {
+        ...note,
+        userId,
+        isSampleData: true,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    });
+
+    await batch.commit();
+  }
+
+  /**
+   * Generate sample recurring transactions
+   */
+  async generateSampleRecurring(userId) {
+    const recurring = [
+      {
+        name: 'Netflix Subscription',
+        amount: 649,
+        category: 'Entertainment',
+        type: 'expense',
+        frequency: 'monthly',
+        startDate: firebase.firestore.Timestamp.fromDate(new Date('2023-01-01')),
+        nextDate: firebase.firestore.Timestamp.fromDate(new Date(Date.now() + 10 * 24 * 60 * 60 * 1000)),
+        isActive: true
+      },
+      {
+        name: 'Gym Membership',
+        amount: 2000,
+        category: 'Healthcare',
+        type: 'expense',
+        frequency: 'monthly',
+        startDate: firebase.firestore.Timestamp.fromDate(new Date('2023-02-01')),
+        nextDate: firebase.firestore.Timestamp.fromDate(new Date(Date.now() + 5 * 24 * 60 * 60 * 1000)),
+        isActive: true
+      },
+      {
+        name: 'Salary',
+        amount: 75000,
+        category: 'Salary',
+        type: 'income',
+        frequency: 'monthly',
+        startDate: firebase.firestore.Timestamp.fromDate(new Date('2022-01-01')),
+        nextDate: firebase.firestore.Timestamp.fromDate(new Date(Date.now() + 25 * 24 * 60 * 60 * 1000)),
+        isActive: true
+      },
+      {
+        name: 'SIP - Mutual Fund',
+        amount: 10000,
+        category: 'Investments',
+        type: 'expense',
+        frequency: 'monthly',
+        startDate: firebase.firestore.Timestamp.fromDate(new Date('2022-06-01')),
+        nextDate: firebase.firestore.Timestamp.fromDate(new Date(Date.now() + 8 * 24 * 60 * 60 * 1000)),
+        isActive: true
+      }
+    ];
+
+    const batch = firebase.firestore().batch();
+    recurring.forEach(item => {
+      const docRef = firebase.firestore().collection('recurring').doc();
+      batch.set(docRef, {
+        ...item,
+        userId,
+        isSampleData: true,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    });
+
+    await batch.commit();
+  }
+
+  /**
+   * Generate sample trip groups
+   */
+  async generateSampleTripGroups(userId) {
+    const tripGroups = [
+      {
+        name: 'Goa Beach Trip',
+        description: 'Weekend getaway with friends',
+        startDate: firebase.firestore.Timestamp.fromDate(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)),
+        endDate: firebase.firestore.Timestamp.fromDate(new Date(Date.now() + 33 * 24 * 60 * 60 * 1000)),
+        budget: 50000,
+        spent: 12000,
+        members: [
+          { name: 'You', email: firebase.auth().currentUser?.email || 'you@example.com', isAdmin: true },
+          { name: 'Rahul', email: 'rahul@example.com', isAdmin: false },
+          { name: 'Priya', email: 'priya@example.com', isAdmin: false }
+        ],
+        currency: 'INR',
+        isActive: true
+      }
+    ];
+
+    const batch = firebase.firestore().batch();
+    tripGroups.forEach(trip => {
+      const docRef = firebase.firestore().collection('tripGroups').doc();
+      batch.set(docRef, {
+        ...trip,
+        userId,
+        isSampleData: true,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    });
+
+    await batch.commit();
+  }
+
+  /**
    * Clear all sample data
    */
   async clearSampleData(userId) {
@@ -232,7 +689,12 @@ class SampleDataService {
     }
 
     try {
-      const collections = ['expenses', 'income', 'budgets', 'goals'];
+      const collections = [
+        'expenses', 'income', 'budgets', 'goals', 
+        'vehicles', 'houses', 'houseHelp', 'healthcareInsurance',
+        'investments', 'loans', 'creditCards', 'notes', 
+        'recurring', 'tripGroups'
+      ];
       
       for (const collectionName of collections) {
         const snapshot = await firebase.firestore()

@@ -501,6 +501,20 @@ class ProductTour {
   reset() {
     localStorage.removeItem('rupiya_product_tour');
     this.cleanup();
+    console.log('✅ Product tour reset complete.');
+  }
+
+  /**
+   * Reset tour for specific page
+   */
+  resetPage(page) {
+    const state = this.loadState();
+    delete state[`tour_${page}_completed`];
+    delete state[`tour_${page}_skipped`];
+    delete state[`tour_${page}_timestamp`];
+    this.saveState(state);
+    localStorage.removeItem(`rupiya_tour_${page}_offered`);
+    console.log(`✅ Tour reset for ${page} page.`);
   }
 }
 
