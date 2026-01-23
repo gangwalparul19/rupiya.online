@@ -1144,6 +1144,27 @@ class SampleDataService {
         if (!snapshot.empty) {
           const groupIds = snapshot.docs.map(doc => doc.id);
           
+          // First, delete the trip groups themselves
+          const batchSize = 100;
+          const docs = snapshot.docs;
+          
+          for (let i = 0; i < docs.length; i += batchSize) {
+            const batch = writeBatch(db);
+            const batchDocs = docs.slice(i, i + batchSize);
+            
+            batchDocs.forEach(docSnapshot => {
+              console.log(`🗑️ Deleting tripGroups/${docSnapshot.id}`);
+              batch.delete(docSnapshot.ref);
+            });
+
+            await batch.commit();
+            deletedCount += batchDocs.length;
+            console.log(`✅ Deleted batch of ${batchDocs.length} trip groups`);
+          }
+
+          // Then delete related data (members, expenses, settlements)
+          // These can be deleted after the group is gone because rules check userId
+          
           // Delete trip group members for these groups
           console.log(`🔍 Checking tripGroupMembers for ${groupIds.length} groups...`);
           for (const groupId of groupIds) {
@@ -1185,7 +1206,7 @@ class SampleDataService {
               if (!expensesSnapshot.empty) {
                 const expenseBatch = writeBatch(db);
                 expensesSnapshot.docs.forEach(docSnapshot => {
-                  console.log(`🗑️ Deleting tripGroupExpenses/${docSnapshot.id}`);
+                  console.log(`�️ Deleting tripGroupExpenses/${docSnapshot.id}`);
                   expenseBatch.delete(docSnapshot.ref);
                 });
                 await expenseBatch.commit();
@@ -1220,24 +1241,6 @@ class SampleDataService {
             } catch (settlementError) {
               console.error(`❌ Error deleting settlements for group ${groupId}:`, settlementError);
             }
-          }
-
-          // Finally, delete the trip groups themselves
-          const batchSize = 100;
-          const docs = snapshot.docs;
-          
-          for (let i = 0; i < docs.length; i += batchSize) {
-            const batch = writeBatch(db);
-            const batchDocs = docs.slice(i, i + batchSize);
-            
-            batchDocs.forEach(docSnapshot => {
-              console.log(`🗑️ Deleting tripGroups/${docSnapshot.id}`);
-              batch.delete(docSnapshot.ref);
-            });
-
-            await batch.commit();
-            deletedCount += batchDocs.length;
-            console.log(`✅ Deleted batch of ${batchDocs.length} trip groups`);
           }
 
           console.log(`✅ Cleared ${docs.length} sample trip groups and related data`);
