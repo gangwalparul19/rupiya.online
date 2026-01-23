@@ -308,11 +308,14 @@ class SampleDataService {
    * Get sample budget data
    */
   getSampleBudgets() {
+    const currentDate = new Date();
+    const currentMonth = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
+    
     return [
-      { category: 'Food & Groceries', limit: 12000, period: 'monthly' },
-      { category: 'Transportation', limit: 5000, period: 'monthly' },
-      { category: 'Entertainment', limit: 3000, period: 'monthly' },
-      { category: 'Shopping', limit: 5000, period: 'monthly' }
+      { category: 'Food & Groceries', amount: 12000, month: currentMonth, alertThreshold: 80, notes: 'Monthly grocery and food expenses' },
+      { category: 'Transportation', amount: 5000, month: currentMonth, alertThreshold: 80, notes: 'Fuel, public transport, and commute' },
+      { category: 'Entertainment', amount: 3000, month: currentMonth, alertThreshold: 80, notes: 'Movies, dining out, subscriptions' },
+      { category: 'Shopping', amount: 5000, month: currentMonth, alertThreshold: 80, notes: 'Clothing and personal items' }
     ];
   }
 
@@ -325,34 +328,22 @@ class SampleDataService {
         name: 'Emergency Fund',
         targetAmount: 100000,
         currentAmount: 45000,
-        deadline: Timestamp.fromDate(
-          new Date(Date.now() + 180 * 24 * 60 * 60 * 1000) // 6 months from now
-        ),
-        category: 'Savings',
-        description: 'Build emergency fund for 6 months expenses',
-        status: 'active'
+        targetDate: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000), // 6 months from now
+        description: 'Build emergency fund for 6 months expenses'
       },
       {
         name: 'Vacation to Goa',
         targetAmount: 50000,
         currentAmount: 18000,
-        deadline: Timestamp.fromDate(
-          new Date(Date.now() + 120 * 24 * 60 * 60 * 1000) // 4 months from now
-        ),
-        category: 'Travel',
-        description: 'Family vacation to Goa',
-        status: 'active'
+        targetDate: new Date(Date.now() + 120 * 24 * 60 * 60 * 1000), // 4 months from now
+        description: 'Family vacation to Goa'
       },
       {
         name: 'New Laptop',
         targetAmount: 80000,
         currentAmount: 25000,
-        deadline: Timestamp.fromDate(
-          new Date(Date.now() + 90 * 24 * 60 * 60 * 1000) // 3 months from now
-        ),
-        category: 'Shopping',
-        description: 'Upgrade to new MacBook',
-        status: 'active'
+        targetDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), // 3 months from now
+        description: 'Upgrade to new MacBook'
       }
     ];
 
@@ -971,21 +962,29 @@ class SampleDataService {
    * Generate sample trip groups
    */
   async generateSampleTripGroups(userId) {
+    const now = Timestamp.now();
     const tripGroups = [
       {
         name: 'Goa Beach Trip',
         description: 'Weekend getaway with friends',
+        destination: 'Goa, India',
         startDate: Timestamp.fromDate(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)),
         endDate: Timestamp.fromDate(new Date(Date.now() + 33 * 24 * 60 * 60 * 1000)),
-        budget: 50000,
-        spent: 12000,
-        members: [
-          { name: 'You', email: auth.currentUser?.email || 'you@example.com', isAdmin: true },
-          { name: 'Rahul', email: 'rahul@example.com', isAdmin: false },
-          { name: 'Priya', email: 'priya@example.com', isAdmin: false }
-        ],
-        currency: 'INR',
-        isActive: true
+        createdBy: userId,
+        status: 'active',
+        budget: {
+          total: 50000,
+          categories: {
+            'Accommodation': 20000,
+            'Transport': 10000,
+            'Food & Dining': 15000,
+            'Activities': 5000
+          }
+        },
+        categories: ['Accommodation', 'Transport', 'Food & Dining', 'Activities', 'Shopping', 'Tips', 'Other'],
+        memberCount: 3,
+        totalExpenses: 12000,
+        updatedAt: now
       }
     ];
 
@@ -998,7 +997,6 @@ class SampleDataService {
       );
       batch.set(docRef, {
         ...cleanTrip,
-        userId,
         isSampleData: true,
         createdAt: serverTimestamp()
       });
@@ -1022,7 +1020,7 @@ class SampleDataService {
         'expenses', 'income', 'budgets', 'goals', 
         'vehicles', 'fuelLogs', 'houses', 'houseHelps', 'insurancePolicies',
         'investments', 'loans', 'creditCards', 'notes', 
-        'recurringTransactions', 'tripGroups'
+        'recurringTransactions'
       ];
       
       let deletedCount = 0;
@@ -1069,6 +1067,44 @@ class SampleDataService {
           errorCount++;
           // Continue with other collections even if one fails
         }
+      }
+
+      // Handle tripGroups separately since it uses 'createdBy' instead of 'userId'
+      try {
+        console.log(`🔍 Checking tripGroups...`);
+        const tripGroupsQuery = query(
+          collection(db, 'tripGroups'), 
+          where('createdBy', '==', userId), 
+          where('isSampleData', '==', true)
+        );
+        const snapshot = await getDocs(tripGroupsQuery);
+
+        console.log(`📊 Found ${snapshot.size} sample items in tripGroups`);
+
+        if (!snapshot.empty) {
+          const batchSize = 100;
+          const docs = snapshot.docs;
+          
+          for (let i = 0; i < docs.length; i += batchSize) {
+            const batch = writeBatch(db);
+            const batchDocs = docs.slice(i, i + batchSize);
+            
+            batchDocs.forEach(docSnapshot => {
+              console.log(`🗑️ Deleting tripGroups/${docSnapshot.id}`);
+              batch.delete(docSnapshot.ref);
+            });
+
+            await batch.commit();
+            deletedCount += batchDocs.length;
+            console.log(`✅ Deleted batch of ${batchDocs.length} items from tripGroups`);
+          }
+
+          console.log(`✅ Cleared ${docs.length} sample items from tripGroups`);
+        }
+      } catch (error) {
+        console.error(`❌ Error clearing tripGroups:`, error);
+        console.error('Error details:', error.message, error.code);
+        errorCount++;
       }
 
       console.log(`🎉 Sample data cleared: ${deletedCount} items deleted, ${errorCount} errors`);
