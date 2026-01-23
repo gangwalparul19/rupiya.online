@@ -145,14 +145,23 @@ async function generateSampleData() {
 
 // Clear sample data
 async function clearSampleData() {
+  console.log('🔴 Clear Sample Data button clicked!');
+  
   const user = authService.getCurrentUser();
+  console.log('👤 Current user:', user);
   
   if (!user) {
+    console.error('❌ No user found');
     showAlert('error', '❌ Please login first');
     return;
   }
   
-  if (!confirm('Clear all sample data? This will remove all sample expenses, income, budgets, goals, and more.')) {
+  console.log('💬 Showing confirmation dialog...');
+  const confirmed = confirm('Clear all sample data? This will remove all sample expenses, income, budgets, goals, and more.');
+  console.log('💬 User confirmed:', confirmed);
+  
+  if (!confirmed) {
+    console.log('❌ User cancelled');
     return;
   }
   
@@ -160,15 +169,28 @@ async function clearSampleData() {
     showLoading(true);
     showAlert('info', '⏳ Clearing sample data...');
     
-    await sampleDataService.clearSampleData(user.uid);
+    console.log('🗑️ Starting to clear sample data for user:', user.uid);
+    const result = await sampleDataService.clearSampleData(user.uid);
+    console.log('🗑️ Clear result:', result);
     
     showLoading(false);
-    showAlert('success', '✅ Sample data cleared successfully!');
     
-    updateStatus(false, user);
+    if (result) {
+      showAlert('success', '✅ Sample data cleared successfully! Refreshing page...');
+      updateStatus(false, user);
+      
+      // Refresh the page after a short delay
+      setTimeout(() => {
+        console.log('🔄 Reloading page...');
+        window.location.reload();
+      }, 1500);
+    } else {
+      showAlert('error', '❌ Failed to clear sample data');
+    }
   } catch (error) {
     showLoading(false);
-    console.error('Error clearing sample data:', error);
+    console.error('❌ Error clearing sample data:', error);
+    console.error('Error stack:', error.stack);
     showAlert('error', '❌ Error: ' + error.message);
   }
 }

@@ -1015,6 +1015,8 @@ class SampleDataService {
       throw new Error('User ID is required');
     }
 
+    console.log('🗑️ clearSampleData called with userId:', userId);
+
     try {
       const collections = [
         'expenses', 'income', 'budgets', 'goals', 
@@ -1026,14 +1028,19 @@ class SampleDataService {
       let deletedCount = 0;
       let errorCount = 0;
 
+      console.log('🗑️ Checking', collections.length, 'collections for sample data...');
+
       for (const collectionName of collections) {
         try {
+          console.log(`🔍 Checking ${collectionName}...`);
           const q = query(
             collection(db, collectionName), 
             where('userId', '==', userId), 
             where('isSampleData', '==', true)
           );
           const snapshot = await getDocs(q);
+
+          console.log(`📊 Found ${snapshot.size} sample items in ${collectionName}`);
 
           if (snapshot.empty) continue;
 
@@ -1046,16 +1053,19 @@ class SampleDataService {
             const batchDocs = docs.slice(i, i + batchSize);
             
             batchDocs.forEach(docSnapshot => {
+              console.log(`🗑️ Deleting ${collectionName}/${docSnapshot.id}`);
               batch.delete(docSnapshot.ref);
             });
 
             await batch.commit();
             deletedCount += batchDocs.length;
+            console.log(`✅ Deleted batch of ${batchDocs.length} items from ${collectionName}`);
           }
 
           console.log(`✅ Cleared ${docs.length} sample items from ${collectionName}`);
         } catch (error) {
-          console.warn(`⚠️ Error clearing ${collectionName}:`, error.message);
+          console.error(`❌ Error clearing ${collectionName}:`, error);
+          console.error('Error details:', error.message, error.code);
           errorCount++;
           // Continue with other collections even if one fails
         }
@@ -1068,7 +1078,7 @@ class SampleDataService {
 
       return true;
     } catch (error) {
-      console.error('Error clearing sample data:', error);
+      console.error('❌ Fatal error in clearSampleData:', error);
       throw error;
     }
   }
