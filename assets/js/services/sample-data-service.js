@@ -1170,23 +1170,24 @@ class SampleDataService {
         if (!snapshot.empty) {
           const groupIds = snapshot.docs.map(doc => doc.id);
           
-          // First, delete the trip groups themselves
-          const batchSize = 100;
-          const docs = snapshot.docs;
+          // Delete trip groups one by one to handle permission errors gracefully
+          let tripGroupsDeleted = 0;
+          let tripGroupsSkipped = 0;
           
-          for (let i = 0; i < docs.length; i += batchSize) {
-            const batch = writeBatch(db);
-            const batchDocs = docs.slice(i, i + batchSize);
-            
-            batchDocs.forEach(docSnapshot => {
+          for (const docSnapshot of snapshot.docs) {
+            try {
               console.log(`🗑️ Deleting tripGroups/${docSnapshot.id}`);
-              batch.delete(docSnapshot.ref);
-            });
-
-            await batch.commit();
-            deletedCount += batchDocs.length;
-            console.log(`✅ Deleted batch of ${batchDocs.length} trip groups`);
+              await deleteDoc(docSnapshot.ref);
+              tripGroupsDeleted++;
+              deletedCount++;
+            } catch (deleteError) {
+              console.warn(`⚠️ Could not delete tripGroup ${docSnapshot.id}:`, deleteError.message);
+              tripGroupsSkipped++;
+              // Continue with next group
+            }
           }
+          
+          console.log(`✅ Deleted ${tripGroupsDeleted} trip groups, skipped ${tripGroupsSkipped}`);
 
           // Then delete related data (members, expenses, settlements)
           // These can be deleted after the group is gone because rules check userId
@@ -1195,7 +1196,20 @@ class SampleDataService {
           console.log(`🔍 Checking tripGroupMembers for ${groupIds.length} groups...`);
           for (const groupId of groupIds) {
             try {
-              let membersQuery; if (clearAll) { membersQuery = query(collection(db, 'tripGroupMembers'), where('groupId', '==', groupId)); } else { membersQuery = query(collection(db, 'tripGroupMembers'), where('groupId', '==', groupId), where('isSampleData', '==', true)); }
+              let membersQuery;
+              if (clearAll) {
+                membersQuery = query(
+                  collection(db, 'tripGroupMembers'),
+                  where('groupId', '==', groupId)
+                );
+              } else {
+                membersQuery = query(
+                  collection(db, 'tripGroupMembers'),
+                  where('groupId', '==', groupId),
+                  where('isSampleData', '==', true)
+                );
+              }
+              
               const membersSnapshot = await getDocs(membersQuery);
               console.log(`📊 Found ${membersSnapshot.size} members for group ${groupId}`);
               
