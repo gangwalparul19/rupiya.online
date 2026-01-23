@@ -136,8 +136,12 @@ class SampleDataService {
 
     expenses.forEach(expense => {
       const docRef = doc(collection(db, 'expenses'));
+      // Remove any undefined fields
+      const cleanExpense = Object.fromEntries(
+        Object.entries(expense).filter(([_, v]) => v !== undefined)
+      );
       batch.set(docRef, {
-        ...expense,
+        ...cleanExpense,
         userId,
         isSampleData: true,
         createdAt: serverTimestamp()
@@ -204,8 +208,12 @@ class SampleDataService {
 
     incomes.forEach(income => {
       const docRef = doc(collection(db, 'income'));
+      // Remove any undefined fields
+      const cleanIncome = Object.fromEntries(
+        Object.entries(income).filter(([_, v]) => v !== undefined)
+      );
       batch.set(docRef, {
-        ...income,
+        ...cleanIncome,
         userId,
         isSampleData: true,
         createdAt: serverTimestamp()
