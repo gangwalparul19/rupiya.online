@@ -417,25 +417,25 @@ class SetupWizard {
                 <div class="setup-asset-icon">🏠</div>
                 <h4>Properties</h4>
                 <p>Houses, apartments, land</p>
-                <a href="houses.html" class="btn btn-sm btn-outline" target="_blank">Add Later →</a>
+                <a href="houses.html" class="btn btn-sm btn-outline" target="_blank">Add →</a>
               </div>
               <div class="setup-asset-card" data-asset="vehicle">
                 <div class="setup-asset-icon">🚗</div>
                 <h4>Vehicles</h4>
                 <p>Cars, bikes, scooters</p>
-                <a href="vehicles.html" class="btn btn-sm btn-outline" target="_blank">Add Later →</a>
+                <a href="vehicles.html" class="btn btn-sm btn-outline" target="_blank">Add →</a>
               </div>
               <div class="setup-asset-card" data-asset="househelp">
                 <div class="setup-asset-icon">🧹</div>
                 <h4>House Help</h4>
                 <p>Maid, cook, driver</p>
-                <a href="house-help.html" class="btn btn-sm btn-outline" target="_blank">Add Later →</a>
+                <a href="house-help.html" class="btn btn-sm btn-outline" target="_blank">Add →</a>
               </div>
               <div class="setup-asset-card" data-asset="loans">
                 <div class="setup-asset-icon">🏦</div>
                 <h4>Loans & EMI</h4>
                 <p>Home, car, personal loans</p>
-                <a href="loans.html" class="btn btn-sm btn-outline" target="_blank">Add Later →</a>
+                <a href="loans.html" class="btn btn-sm btn-outline" target="_blank">Add →</a>
               </div>
             </div>
             <p class="setup-skip-hint">💡 You can add these anytime from the sidebar menu</p>
@@ -490,7 +490,7 @@ class SetupWizard {
         btn.addEventListener('click', (e) => {
           const type = e.target.closest('.setup-payment-type').dataset.type;
           // Open payment method modal or redirect
-          window.open('profile.html?tab=payment-methods', '_blank');
+          window.open('profile.html?tab=payment-methods_tab', '_blank');
         });
       });
     }
