@@ -24,6 +24,34 @@ class SampleDataService {
   /**
    * Check if sample data is active
    */
+  async isActiveAsync(userId) {
+    if (!userId) return false;
+    
+    try {
+      // Check if any sample data exists in Firestore
+      const expensesQuery = query(
+        collection(db, 'expenses'),
+        where('userId', '==', userId),
+        where('isSampleData', '==', true),
+        limit(1)
+      );
+      const snapshot = await getDocs(expensesQuery);
+      const hasData = !snapshot.empty;
+      
+      // Update local state
+      this.isSampleDataActive = hasData;
+      this.saveState();
+      
+      return hasData;
+    } catch (error) {
+      console.error('Error checking sample data:', error);
+      return this.isSampleDataActive;
+    }
+  }
+
+  /**
+   * Check if sample data is active (synchronous)
+   */
   isActive() {
     return this.isSampleDataActive;
   }

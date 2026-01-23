@@ -87,7 +87,8 @@ async function checkStatus() {
       return;
     }
     
-    const isActive = sampleDataService.isActive();
+    // Check if sample data actually exists in Firestore
+    const isActive = await sampleDataService.isActiveAsync(user.uid);
     updateStatus(isActive, user);
     
     if (isActive) {
