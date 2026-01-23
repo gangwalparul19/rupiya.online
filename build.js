@@ -50,7 +50,8 @@ const htmlFiles = [
   'healthcare-insurance.html',
   'spending-patterns.html',
   'user-guide-auth.html',
-  'user-guide-public.html'
+  'user-guide-public.html',
+  'generate-sample-data.html'
 ];
 
 // Pages that have the dashboard layout with sidebar
