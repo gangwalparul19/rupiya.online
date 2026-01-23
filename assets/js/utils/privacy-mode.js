@@ -660,7 +660,7 @@ class PrivacyModeManager {
      */
     hideTextNodesWithPattern(pattern, type = 'amount') {
         // Expand containers to include all common financial data containers
-        const containers = document.querySelectorAll(
+        let containers = document.querySelectorAll(
             '.kpi-card, .transaction-item, .card-body, .dashboard-header, .widgets-row, ' +
             '.card, .transaction, .expense-card, .income-card, .bill-card, ' +
             '[class*="card"], [class*="transaction"], [class*="expense"], [class*="income"], ' +
@@ -669,7 +669,7 @@ class PrivacyModeManager {
         
         if (containers.length === 0) {
             // If no specific containers found, scan the entire body
-            containers.push(document.body);
+            containers = [document.body];
         }
         
         containers.forEach(container => {

@@ -1,6 +1,19 @@
 // Sample Data Service
 // Generates realistic sample financial data for new users
 
+import { db, auth } from '../config/firebase-config.js';
+import {
+  collection,
+  doc,
+  addDoc,
+  writeBatch,
+  Timestamp,
+  serverTimestamp,
+  query,
+  where,
+  getDocs
+} from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+
 class SampleDataService {
   constructor() {
     this.isSampleDataActive = false;
@@ -55,15 +68,15 @@ class SampleDataService {
    */
   async generateSampleExpenses(userId) {
     const expenses = this.getSampleExpenses();
-    const batch = firebase.firestore().batch();
+    const batch = writeBatch(db);
 
     expenses.forEach(expense => {
-      const docRef = firebase.firestore().collection('expenses').doc();
+      const docRef = doc(collection(db, 'expenses'));
       batch.set(docRef, {
         ...expense,
         userId,
         isSampleData: true,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        createdAt: serverTimestamp()
       });
     });
 
@@ -109,7 +122,7 @@ class SampleDataService {
         amount: template.amount,
         category: template.category,
         description: template.description,
-        date: firebase.firestore.Timestamp.fromDate(date),
+        date: Timestamp.fromDate(date),
         paymentMethod: this.getRandomPaymentMethod(),
         notes: ''
       });
@@ -123,15 +136,15 @@ class SampleDataService {
    */
   async generateSampleIncome(userId) {
     const incomes = this.getSampleIncome();
-    const batch = firebase.firestore().batch();
+    const batch = writeBatch(db);
 
     incomes.forEach(income => {
-      const docRef = firebase.firestore().collection('income').doc();
+      const docRef = doc(collection(db, 'income'));
       batch.set(docRef, {
         ...income,
         userId,
         isSampleData: true,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        createdAt: serverTimestamp()
       });
     });
 
@@ -159,7 +172,7 @@ class SampleDataService {
         amount: template.amount,
         source: template.source,
         description: template.description,
-        date: firebase.firestore.Timestamp.fromDate(date),
+        date: Timestamp.fromDate(date),
         notes: ''
       });
     });
@@ -172,15 +185,15 @@ class SampleDataService {
    */
   async generateSampleBudget(userId) {
     const budgets = this.getSampleBudgets();
-    const batch = firebase.firestore().batch();
+    const batch = writeBatch(db);
 
     budgets.forEach(budget => {
-      const docRef = firebase.firestore().collection('budgets').doc();
+      const docRef = doc(collection(db, 'budgets'));
       batch.set(docRef, {
         ...budget,
         userId,
         isSampleData: true,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        createdAt: serverTimestamp()
       });
     });
 
@@ -207,16 +220,16 @@ class SampleDataService {
       name: 'Emergency Fund',
       targetAmount: 100000,
       currentAmount: 45000,
-      deadline: firebase.firestore.Timestamp.fromDate(
+      deadline: Timestamp.fromDate(
         new Date(Date.now() + 180 * 24 * 60 * 60 * 1000) // 6 months from now
       ),
       category: 'Savings',
       userId,
       isSampleData: true,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      createdAt: serverTimestamp()
     };
 
-    await firebase.firestore().collection('goals').add(goal);
+    await addDoc(collection(db, 'goals'), goal);
   }
 
   /**
@@ -236,10 +249,10 @@ class SampleDataService {
         name: 'Honda City',
         type: 'Car',
         registrationNumber: 'MH-02-AB-1234',
-        purchaseDate: firebase.firestore.Timestamp.fromDate(new Date('2020-03-15')),
+        purchaseDate: Timestamp.fromDate(new Date('2020-03-15')),
         purchasePrice: 1200000,
         currentValue: 850000,
-        insuranceExpiry: firebase.firestore.Timestamp.fromDate(new Date(Date.now() + 90 * 24 * 60 * 60 * 1000)),
+        insuranceExpiry: Timestamp.fromDate(new Date(Date.now() + 90 * 24 * 60 * 60 * 1000)),
         insuranceProvider: 'HDFC ERGO',
         insurancePremium: 18500
       },
@@ -247,23 +260,23 @@ class SampleDataService {
         name: 'Honda Activa',
         type: 'Two Wheeler',
         registrationNumber: 'MH-02-CD-5678',
-        purchaseDate: firebase.firestore.Timestamp.fromDate(new Date('2021-06-20')),
+        purchaseDate: Timestamp.fromDate(new Date('2021-06-20')),
         purchasePrice: 75000,
         currentValue: 55000,
-        insuranceExpiry: firebase.firestore.Timestamp.fromDate(new Date(Date.now() + 120 * 24 * 60 * 60 * 1000)),
+        insuranceExpiry: Timestamp.fromDate(new Date(Date.now() + 120 * 24 * 60 * 60 * 1000)),
         insuranceProvider: 'ICICI Lombard',
         insurancePremium: 3500
       }
     ];
 
-    const batch = firebase.firestore().batch();
+    const batch = writeBatch(db);
     vehicles.forEach(vehicle => {
-      const docRef = firebase.firestore().collection('vehicles').doc();
+      const docRef = doc(collection(db, 'vehicles'));
       batch.set(docRef, {
         ...vehicle,
         userId,
         isSampleData: true,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        createdAt: serverTimestamp()
       });
     });
 
@@ -279,7 +292,7 @@ class SampleDataService {
         name: 'Primary Residence',
         type: 'Apartment',
         address: '123, Green Valley Society, Pune',
-        purchaseDate: firebase.firestore.Timestamp.fromDate(new Date('2018-01-15')),
+        purchaseDate: Timestamp.fromDate(new Date('2018-01-15')),
         purchasePrice: 5500000,
         currentValue: 7200000,
         area: 1200,
@@ -290,14 +303,14 @@ class SampleDataService {
       }
     ];
 
-    const batch = firebase.firestore().batch();
+    const batch = writeBatch(db);
     houses.forEach(house => {
-      const docRef = firebase.firestore().collection('houses').doc();
+      const docRef = doc(collection(db, 'houses'));
       batch.set(docRef, {
         ...house,
         userId,
         isSampleData: true,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        createdAt: serverTimestamp()
       });
     });
 
@@ -315,7 +328,7 @@ class SampleDataService {
         salary: 8000,
         paymentFrequency: 'monthly',
         phoneNumber: '+91-9876543210',
-        startDate: firebase.firestore.Timestamp.fromDate(new Date('2022-06-01')),
+        startDate: Timestamp.fromDate(new Date('2022-06-01')),
         isActive: true
       },
       {
@@ -324,19 +337,19 @@ class SampleDataService {
         salary: 5000,
         paymentFrequency: 'monthly',
         phoneNumber: '+91-9876543211',
-        startDate: firebase.firestore.Timestamp.fromDate(new Date('2023-01-15')),
+        startDate: Timestamp.fromDate(new Date('2023-01-15')),
         isActive: true
       }
     ];
 
-    const batch = firebase.firestore().batch();
+    const batch = writeBatch(db);
     houseHelp.forEach(help => {
-      const docRef = firebase.firestore().collection('houseHelp').doc();
+      const docRef = doc(collection(db, 'houseHelp'));
       batch.set(docRef, {
         ...help,
         userId,
         isSampleData: true,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        createdAt: serverTimestamp()
       });
     });
 
@@ -355,21 +368,21 @@ class SampleDataService {
         coverageAmount: 1000000,
         premium: 25000,
         premiumFrequency: 'annual',
-        startDate: firebase.firestore.Timestamp.fromDate(new Date('2023-04-01')),
-        endDate: firebase.firestore.Timestamp.fromDate(new Date('2024-03-31')),
+        startDate: Timestamp.fromDate(new Date('2023-04-01')),
+        endDate: Timestamp.fromDate(new Date('2024-03-31')),
         members: ['Self', 'Spouse', 'Child'],
         isActive: true
       }
     ];
 
-    const batch = firebase.firestore().batch();
+    const batch = writeBatch(db);
     insurance.forEach(policy => {
-      const docRef = firebase.firestore().collection('healthcareInsurance').doc();
+      const docRef = doc(collection(db, 'healthcareInsurance'));
       batch.set(docRef, {
         ...policy,
         userId,
         isSampleData: true,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        createdAt: serverTimestamp()
       });
     });
 
@@ -390,7 +403,7 @@ class SampleDataService {
         currentPrice: 2680,
         investedAmount: 122500,
         currentValue: 134000,
-        purchaseDate: firebase.firestore.Timestamp.fromDate(new Date('2023-01-15'))
+        purchaseDate: Timestamp.fromDate(new Date('2023-01-15'))
       },
       {
         name: 'HDFC Bank',
@@ -401,7 +414,7 @@ class SampleDataService {
         currentPrice: 1650,
         investedAmount: 158000,
         currentValue: 165000,
-        purchaseDate: firebase.firestore.Timestamp.fromDate(new Date('2023-03-20'))
+        purchaseDate: Timestamp.fromDate(new Date('2023-03-20'))
       },
       {
         name: 'SBI Bluechip Fund',
@@ -412,7 +425,7 @@ class SampleDataService {
         currentPrice: 72,
         investedAmount: 32500,
         currentValue: 36000,
-        purchaseDate: firebase.firestore.Timestamp.fromDate(new Date('2022-06-10'))
+        purchaseDate: Timestamp.fromDate(new Date('2022-06-10'))
       },
       {
         name: 'ICICI Prudential Equity Fund',
@@ -423,7 +436,7 @@ class SampleDataService {
         currentPrice: 135,
         investedAmount: 36000,
         currentValue: 40500,
-        purchaseDate: firebase.firestore.Timestamp.fromDate(new Date('2022-09-15'))
+        purchaseDate: Timestamp.fromDate(new Date('2022-09-15'))
       },
       {
         name: 'Fixed Deposit - SBI',
@@ -432,19 +445,19 @@ class SampleDataService {
         investedAmount: 200000,
         currentValue: 215000,
         interestRate: 7.5,
-        maturityDate: firebase.firestore.Timestamp.fromDate(new Date(Date.now() + 180 * 24 * 60 * 60 * 1000)),
-        purchaseDate: firebase.firestore.Timestamp.fromDate(new Date('2023-06-01'))
+        maturityDate: Timestamp.fromDate(new Date(Date.now() + 180 * 24 * 60 * 60 * 1000)),
+        purchaseDate: Timestamp.fromDate(new Date('2023-06-01'))
       }
     ];
 
-    const batch = firebase.firestore().batch();
+    const batch = writeBatch(db);
     investments.forEach(investment => {
-      const docRef = firebase.firestore().collection('investments').doc();
+      const docRef = doc(collection(db, 'investments'));
       batch.set(docRef, {
         ...investment,
         userId,
         isSampleData: true,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        createdAt: serverTimestamp()
       });
     });
 
@@ -464,8 +477,8 @@ class SampleDataService {
         outstandingAmount: 2500000,
         interestRate: 8.5,
         emi: 35000,
-        startDate: firebase.firestore.Timestamp.fromDate(new Date('2018-01-15')),
-        endDate: firebase.firestore.Timestamp.fromDate(new Date('2038-01-15')),
+        startDate: Timestamp.fromDate(new Date('2018-01-15')),
+        endDate: Timestamp.fromDate(new Date('2038-01-15')),
         tenure: 240,
         remainingTenure: 168
       },
@@ -477,21 +490,21 @@ class SampleDataService {
         outstandingAmount: 350000,
         interestRate: 9.5,
         emi: 18500,
-        startDate: firebase.firestore.Timestamp.fromDate(new Date('2020-03-15')),
-        endDate: firebase.firestore.Timestamp.fromDate(new Date('2025-03-15')),
+        startDate: Timestamp.fromDate(new Date('2020-03-15')),
+        endDate: Timestamp.fromDate(new Date('2025-03-15')),
         tenure: 60,
         remainingTenure: 18
       }
     ];
 
-    const batch = firebase.firestore().batch();
+    const batch = writeBatch(db);
     loans.forEach(loan => {
-      const docRef = firebase.firestore().collection('loans').doc();
+      const docRef = doc(collection(db, 'loans'));
       batch.set(docRef, {
         ...loan,
         userId,
         isSampleData: true,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        createdAt: serverTimestamp()
       });
     });
 
@@ -510,7 +523,7 @@ class SampleDataService {
         creditLimit: 300000,
         availableCredit: 245000,
         currentDue: 55000,
-        dueDate: firebase.firestore.Timestamp.fromDate(new Date(Date.now() + 15 * 24 * 60 * 60 * 1000)),
+        dueDate: Timestamp.fromDate(new Date(Date.now() + 15 * 24 * 60 * 60 * 1000)),
         billingCycle: 5,
         rewardPoints: 12500,
         isActive: true
@@ -522,21 +535,21 @@ class SampleDataService {
         creditLimit: 150000,
         availableCredit: 135000,
         currentDue: 15000,
-        dueDate: firebase.firestore.Timestamp.fromDate(new Date(Date.now() + 20 * 24 * 60 * 60 * 1000)),
+        dueDate: Timestamp.fromDate(new Date(Date.now() + 20 * 24 * 60 * 60 * 1000)),
         billingCycle: 10,
         rewardPoints: 5800,
         isActive: true
       }
     ];
 
-    const batch = firebase.firestore().batch();
+    const batch = writeBatch(db);
     creditCards.forEach(card => {
-      const docRef = firebase.firestore().collection('creditCards').doc();
+      const docRef = doc(collection(db, 'creditCards'));
       batch.set(docRef, {
         ...card,
         userId,
         isSampleData: true,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        createdAt: serverTimestamp()
       });
     });
 
@@ -568,15 +581,15 @@ class SampleDataService {
       }
     ];
 
-    const batch = firebase.firestore().batch();
+    const batch = writeBatch(db);
     notes.forEach(note => {
-      const docRef = firebase.firestore().collection('notes').doc();
+      const docRef = doc(collection(db, 'notes'));
       batch.set(docRef, {
         ...note,
         userId,
         isSampleData: true,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
       });
     });
 
@@ -594,8 +607,8 @@ class SampleDataService {
         category: 'Entertainment',
         type: 'expense',
         frequency: 'monthly',
-        startDate: firebase.firestore.Timestamp.fromDate(new Date('2023-01-01')),
-        nextDate: firebase.firestore.Timestamp.fromDate(new Date(Date.now() + 10 * 24 * 60 * 60 * 1000)),
+        startDate: Timestamp.fromDate(new Date('2023-01-01')),
+        nextDate: Timestamp.fromDate(new Date(Date.now() + 10 * 24 * 60 * 60 * 1000)),
         isActive: true
       },
       {
@@ -604,8 +617,8 @@ class SampleDataService {
         category: 'Healthcare',
         type: 'expense',
         frequency: 'monthly',
-        startDate: firebase.firestore.Timestamp.fromDate(new Date('2023-02-01')),
-        nextDate: firebase.firestore.Timestamp.fromDate(new Date(Date.now() + 5 * 24 * 60 * 60 * 1000)),
+        startDate: Timestamp.fromDate(new Date('2023-02-01')),
+        nextDate: Timestamp.fromDate(new Date(Date.now() + 5 * 24 * 60 * 60 * 1000)),
         isActive: true
       },
       {
@@ -614,8 +627,8 @@ class SampleDataService {
         category: 'Salary',
         type: 'income',
         frequency: 'monthly',
-        startDate: firebase.firestore.Timestamp.fromDate(new Date('2022-01-01')),
-        nextDate: firebase.firestore.Timestamp.fromDate(new Date(Date.now() + 25 * 24 * 60 * 60 * 1000)),
+        startDate: Timestamp.fromDate(new Date('2022-01-01')),
+        nextDate: Timestamp.fromDate(new Date(Date.now() + 25 * 24 * 60 * 60 * 1000)),
         isActive: true
       },
       {
@@ -624,20 +637,20 @@ class SampleDataService {
         category: 'Investments',
         type: 'expense',
         frequency: 'monthly',
-        startDate: firebase.firestore.Timestamp.fromDate(new Date('2022-06-01')),
-        nextDate: firebase.firestore.Timestamp.fromDate(new Date(Date.now() + 8 * 24 * 60 * 60 * 1000)),
+        startDate: Timestamp.fromDate(new Date('2022-06-01')),
+        nextDate: Timestamp.fromDate(new Date(Date.now() + 8 * 24 * 60 * 60 * 1000)),
         isActive: true
       }
     ];
 
-    const batch = firebase.firestore().batch();
+    const batch = writeBatch(db);
     recurring.forEach(item => {
-      const docRef = firebase.firestore().collection('recurring').doc();
+      const docRef = doc(collection(db, 'recurring'));
       batch.set(docRef, {
         ...item,
         userId,
         isSampleData: true,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        createdAt: serverTimestamp()
       });
     });
 
@@ -652,12 +665,12 @@ class SampleDataService {
       {
         name: 'Goa Beach Trip',
         description: 'Weekend getaway with friends',
-        startDate: firebase.firestore.Timestamp.fromDate(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)),
-        endDate: firebase.firestore.Timestamp.fromDate(new Date(Date.now() + 33 * 24 * 60 * 60 * 1000)),
+        startDate: Timestamp.fromDate(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)),
+        endDate: Timestamp.fromDate(new Date(Date.now() + 33 * 24 * 60 * 60 * 1000)),
         budget: 50000,
         spent: 12000,
         members: [
-          { name: 'You', email: firebase.auth().currentUser?.email || 'you@example.com', isAdmin: true },
+          { name: 'You', email: auth.currentUser?.email || 'you@example.com', isAdmin: true },
           { name: 'Rahul', email: 'rahul@example.com', isAdmin: false },
           { name: 'Priya', email: 'priya@example.com', isAdmin: false }
         ],
@@ -666,14 +679,14 @@ class SampleDataService {
       }
     ];
 
-    const batch = firebase.firestore().batch();
+    const batch = writeBatch(db);
     tripGroups.forEach(trip => {
-      const docRef = firebase.firestore().collection('tripGroups').doc();
+      const docRef = doc(collection(db, 'tripGroups'));
       batch.set(docRef, {
         ...trip,
         userId,
         isSampleData: true,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        createdAt: serverTimestamp()
       });
     });
 
@@ -697,13 +710,10 @@ class SampleDataService {
       ];
       
       for (const collectionName of collections) {
-        const snapshot = await firebase.firestore()
-          .collection(collectionName)
-          .where('userId', '==', userId)
-          .where('isSampleData', '==', true)
-          .get();
+        const q = query(collection(db, collectionName), where('userId', '==', userId), where('isSampleData', '==', true));
+        const snapshot = await getDocs(q);
 
-        const batch = firebase.firestore().batch();
+        const batch = writeBatch(db);
         snapshot.docs.forEach(doc => {
           batch.delete(doc.ref);
         });
@@ -755,7 +765,7 @@ class SampleDataService {
     // Bind events
     document.getElementById('clearSampleDataBtn')?.addEventListener('click', async () => {
       if (confirm('Are you sure you want to clear all sample data?')) {
-        const user = firebase.auth().currentUser;
+        const user = auth.currentUser;
         if (user) {
           await this.clearSampleData(user.uid);
           banner.remove();
