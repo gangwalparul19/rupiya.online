@@ -3,11 +3,13 @@ import '../services/services-init.js';
 import authService from '../services/auth-service.js';
 import sampleDataService from '../services/sample-data-service.js';
 import { auth } from '../config/firebase-config.js';
+import toast from '../components/toast.js';
 
 // Make globally accessible for console testing
 window.sampleDataService = sampleDataService;
 window.auth = auth;
 window.authService = authService;
+window.showToast = toast.show.bind(toast);
 
 // DOM Elements
 const statusIndicator = document.getElementById('statusIndicator');
@@ -23,22 +25,27 @@ const alertInfo = document.getElementById('alertInfo');
 
 // Show alert
 function showAlert(type, message) {
-  const alert = type === 'success' ? alertSuccess : 
-                type === 'error' ? alertError : alertInfo;
-  
-  // Hide all alerts
-  alertSuccess.classList.remove('show');
-  alertError.classList.remove('show');
-  alertInfo.classList.remove('show');
-  
-  // Show selected alert
-  alert.textContent = message;
-  alert.classList.add('show');
-  
-  // Auto hide after 5 seconds
-  setTimeout(() => {
-    alert.classList.remove('show');
-  }, 5000);
+  // Use toast if available, otherwise use alert boxes
+  if (window.showToast) {
+    window.showToast(message, type);
+  } else {
+    const alert = type === 'success' ? alertSuccess : 
+                  type === 'error' ? alertError : alertInfo;
+    
+    // Hide all alerts
+    alertSuccess.classList.remove('show');
+    alertError.classList.remove('show');
+    alertInfo.classList.remove('show');
+    
+    // Show selected alert
+    alert.textContent = message;
+    alert.classList.add('show');
+    
+    // Auto hide after 5 seconds
+    setTimeout(() => {
+      alert.classList.remove('show');
+    }, 5000);
+  }
 }
 
 // Show loading
@@ -60,7 +67,7 @@ function updateStatus(isActive, user) {
     statusText.textContent = 'Sample Data Active';
     statusDescription.textContent = 'You are currently exploring with sample data. You can clear it and start fresh anytime.';
     generateBtn.disabled = true;
-    clearBtn.disabled = false;
+    clearBtn.disabled = false; // Always enabled
   } else {
     statusIndicator.classList.remove('active');
     statusIndicator.classList.add('inactive');
@@ -69,7 +76,7 @@ function updateStatus(isActive, user) {
       'Generate sample data to explore all features with realistic dummy data.' :
       'Please login to generate sample data.';
     generateBtn.disabled = !user;
-    clearBtn.disabled = true;
+    clearBtn.disabled = false; // Always enabled
   }
 }
 
@@ -156,20 +163,35 @@ async function clearSampleData() {
     return;
   }
   
-  console.log('💬 Showing confirmation dialog...');
-  const confirmed = confirm('Clear all sample data? This will remove all sample expenses, income, budgets, goals, and more.');
-  console.log('💬 User confirmed:', confirmed);
-  
-  if (!confirmed) {
-    console.log('❌ User cancelled');
-    return;
-  }
-  
   try {
+    // First check if there's any sample data to clear
+    showLoading(true);
+    showAlert('info', '⏳ Checking for sample data...');
+    
+    const hasSampleData = await sampleDataService.isActiveAsync(user.uid);
+    console.log('📊 Has sample data:', hasSampleData);
+    
+    if (!hasSampleData) {
+      showLoading(false);
+      showAlert('info', 'ℹ️ No sample data found. Nothing to clear!');
+      return;
+    }
+    
+    showLoading(false);
+    
+    console.log('� Showing confirmation dialog...');
+    const confirmed = confirm('Clear all sample data? This will remove all sample expenses, income, budgets, goals, and more.');
+    console.log('� User confirmed:', confirmed);
+    
+    if (!confirmed) {
+      console.log('❌ User cancelled');
+      return;
+    }
+    
     showLoading(true);
     showAlert('info', '⏳ Clearing sample data...');
     
-    console.log('🗑️ Starting to clear sample data for user:', user.uid);
+    console.log('�️ Starting to clear sample data for user:', user.uid);
     const result = await sampleDataService.clearSampleData(user.uid);
     console.log('🗑️ Clear result:', result);
     
