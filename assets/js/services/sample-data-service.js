@@ -11,7 +11,8 @@ import {
   serverTimestamp,
   query,
   where,
-  getDocs
+  getDocs,
+  limit
 } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
 
 class SampleDataService {
