@@ -136,12 +136,17 @@ class ProductTour {
    * Start the tour for current page
    */
   startTour(page = 'dashboard') {
-    if (this.isActive) return;
+    // Always reset to beginning when starting tour
+    this.currentStep = 0;
+    
+    // End any active tour first
+    if (this.isActive) {
+      this.cleanup();
+    }
 
     this.tourSteps = this.getTourSteps(page);
     if (this.tourSteps.length === 0) return;
 
-    this.currentStep = 0;
     this.isActive = true;
     this.createOverlay();
     this.showStep(0);
