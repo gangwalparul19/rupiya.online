@@ -696,10 +696,13 @@
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
-      installBtn.style.display = 'inline-flex';
+      if (installBtn) {
+        installBtn.style.display = 'inline-flex';
+      }
     });
     
-    installBtn.addEventListener('click', async () => {
+    if (installBtn) {
+      installBtn.addEventListener('click', async () => {
       if (deferredPrompt) {
         // PWA install prompt is available
         deferredPrompt.prompt();
@@ -725,6 +728,7 @@
         alert(message);
       }
     });
+    }
 
     // Scroll animations
     const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
