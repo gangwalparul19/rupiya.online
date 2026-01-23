@@ -49,8 +49,10 @@ class SampleDataService {
       const existingData = await getDocs(expensesQuery);
       
       if (!existingData.empty) {
-        console.log('⚠️ Sample data already exists. Clearing old data first...');
-        await this.clearSampleData(userId);
+        console.log('⚠️ Sample data already exists. Skipping generation to avoid duplicates.');
+        this.isSampleDataActive = true;
+        this.saveState();
+        return true;
       }
 
       // Generate sample data for all features
@@ -791,22 +793,50 @@ class SampleDataService {
     try {
       const collections = [
         'expenses', 'income', 'budgets', 'goals', 
-        'vehicles', 'houses', 'houseHelp', 'healthcareInsurance',
+        'vehicles', 'houses', 'houseHelp', 'insurancePolicies',
         'investments', 'loans', 'creditCards', 'notes', 
         'recurringTransactions', 'tripGroups'
       ];
       
+      let deletedCount = 0;
+      let errorCount = 0;
+
       for (const collectionName of collections) {
-        const q = query(collection(db, collectionName), where('userId', '==', userId), where('isSampleData', '==', true));
-        const snapshot = await getDocs(q);
+        try {
+          const q = query(
+            collection(db, collectionName), 
+            where('userId', '==', userId), 
+            where('isSampleData', '==', true)
+          );
+          const snapshot = await getDocs(q);
 
-        const batch = writeBatch(db);
-        snapshot.docs.forEach(doc => {
-          batch.delete(doc.ref);
-        });
+          if (snapshot.empty) continue;
 
-        await batch.commit();
+          // Delete in smaller batches to avoid permission issues
+          const batchSize = 100;
+          const docs = snapshot.docs;
+          
+          for (let i = 0; i < docs.length; i += batchSize) {
+            const batch = writeBatch(db);
+            const batchDocs = docs.slice(i, i + batchSize);
+            
+            batchDocs.forEach(docSnapshot => {
+              batch.delete(docSnapshot.ref);
+            });
+
+            await batch.commit();
+            deletedCount += batchDocs.length;
+          }
+
+          console.log(`✅ Cleared ${docs.length} sample items from ${collectionName}`);
+        } catch (error) {
+          console.warn(`⚠️ Error clearing ${collectionName}:`, error.message);
+          errorCount++;
+          // Continue with other collections even if one fails
+        }
       }
+
+      console.log(`🎉 Sample data cleared: ${deletedCount} items deleted, ${errorCount} errors`);
 
       this.isSampleDataActive = false;
       this.saveState();

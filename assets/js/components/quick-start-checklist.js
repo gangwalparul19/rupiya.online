@@ -1,6 +1,9 @@
 // Quick Start Checklist Component
 // Guides new users through essential first steps
 
+import { auth, db } from '../config/firebase-config.js';
+import { collection, query, where, limit, getDocs, getDoc, doc } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+
 class QuickStartChecklist {
   constructor() {
     this.tasks = [
@@ -84,15 +87,13 @@ class QuickStartChecklist {
    */
   async isNewUser() {
     try {
-      const user = firebase.auth().currentUser;
+      const user = auth.currentUser;
       if (!user) return false;
 
-      const userDoc = await firebase.firestore()
-        .collection('users')
-        .doc(user.uid)
-        .get();
+      const userDocRef = doc(db, 'users', user.uid);
+      const userDoc = await getDoc(userDocRef);
 
-      if (!userDoc.exists) return true;
+      if (!userDoc.exists()) return true;
 
       const userData = userDoc.data();
       const registrationDate = userData.createdAt?.toDate() || new Date();
@@ -123,14 +124,15 @@ class QuickStartChecklist {
    */
   async hasExpenses() {
     try {
-      const user = firebase.auth().currentUser;
+      const user = auth.currentUser;
       if (!user) return false;
 
-      const snapshot = await firebase.firestore()
-        .collection('expenses')
-        .where('userId', '==', user.uid)
-        .limit(1)
-        .get();
+      const expensesQuery = query(
+        collection(db, 'expenses'),
+        where('userId', '==', user.uid),
+        limit(1)
+      );
+      const snapshot = await getDocs(expensesQuery);
 
       return !snapshot.empty;
     } catch (error) {
@@ -143,14 +145,15 @@ class QuickStartChecklist {
    */
   async hasIncome() {
     try {
-      const user = firebase.auth().currentUser;
+      const user = auth.currentUser;
       if (!user) return false;
 
-      const snapshot = await firebase.firestore()
-        .collection('income')
-        .where('userId', '==', user.uid)
-        .limit(1)
-        .get();
+      const incomeQuery = query(
+        collection(db, 'income'),
+        where('userId', '==', user.uid),
+        limit(1)
+      );
+      const snapshot = await getDocs(incomeQuery);
 
       return !snapshot.empty;
     } catch (error) {
@@ -163,14 +166,15 @@ class QuickStartChecklist {
    */
   async hasBudgets() {
     try {
-      const user = firebase.auth().currentUser;
+      const user = auth.currentUser;
       if (!user) return false;
 
-      const snapshot = await firebase.firestore()
-        .collection('budgets')
-        .where('userId', '==', user.uid)
-        .limit(1)
-        .get();
+      const budgetsQuery = query(
+        collection(db, 'budgets'),
+        where('userId', '==', user.uid),
+        limit(1)
+      );
+      const snapshot = await getDocs(budgetsQuery);
 
       return !snapshot.empty;
     } catch (error) {
@@ -183,14 +187,15 @@ class QuickStartChecklist {
    */
   async hasGoals() {
     try {
-      const user = firebase.auth().currentUser;
+      const user = auth.currentUser;
       if (!user) return false;
 
-      const snapshot = await firebase.firestore()
-        .collection('goals')
-        .where('userId', '==', user.uid)
-        .limit(1)
-        .get();
+      const goalsQuery = query(
+        collection(db, 'goals'),
+        where('userId', '==', user.uid),
+        limit(1)
+      );
+      const snapshot = await getDocs(goalsQuery);
 
       return !snapshot.empty;
     } catch (error) {
