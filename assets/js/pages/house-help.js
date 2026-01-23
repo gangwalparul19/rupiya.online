@@ -861,6 +861,7 @@ async function handleDeletePayment() {
 }
 
 function calculateDuration(joinDate) {
+  if (!joinDate) return 'N/A';
   const start = joinDate.toDate ? joinDate.toDate() : new Date(joinDate);
   const now = new Date();
   const months = Math.floor((now - start) / (1000 * 60 * 60 * 24 * 30));

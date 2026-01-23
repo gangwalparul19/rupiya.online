@@ -539,7 +539,8 @@ class SampleDataService {
         salary: 8000,
         paymentFrequency: 'monthly',
         phoneNumber: '+91-9876543210',
-        startDate: Timestamp.fromDate(new Date('2022-06-01')),
+        joinDate: Timestamp.fromDate(new Date('2022-06-01')),
+        status: 'Active',
         isActive: true
       },
       {
@@ -548,7 +549,8 @@ class SampleDataService {
         salary: 5000,
         paymentFrequency: 'monthly',
         phoneNumber: '+91-9876543211',
-        startDate: Timestamp.fromDate(new Date('2023-01-15')),
+        joinDate: Timestamp.fromDate(new Date('2023-01-15')),
+        status: 'Active',
         isActive: true
       }
     ];
