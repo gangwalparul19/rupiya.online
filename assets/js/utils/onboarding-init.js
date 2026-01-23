@@ -4,6 +4,8 @@
 import quickStartChecklist from '../components/quick-start-checklist.js';
 import sampleDataService from '../services/sample-data-service.js';
 import onboardingService from '../services/onboarding-service.js';
+import { auth } from '../config/firebase-config.js';
+import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
 
 class OnboardingInit {
   constructor() {
@@ -60,7 +62,7 @@ class OnboardingInit {
    */
   waitForAuth() {
     return new Promise((resolve) => {
-      const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
+      const unsubscribe = onAuthStateChanged(auth, (user) => {
         unsubscribe();
         resolve(user);
       });

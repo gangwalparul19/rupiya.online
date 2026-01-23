@@ -692,7 +692,7 @@ class SampleDataService {
 
     const batch = writeBatch(db);
     recurring.forEach(item => {
-      const docRef = doc(collection(db, 'recurring'));
+      const docRef = doc(collection(db, 'recurringTransactions'));
       batch.set(docRef, {
         ...item,
         userId,
@@ -753,7 +753,7 @@ class SampleDataService {
         'expenses', 'income', 'budgets', 'goals', 
         'vehicles', 'houses', 'houseHelp', 'healthcareInsurance',
         'investments', 'loans', 'creditCards', 'notes', 
-        'recurring', 'tripGroups'
+        'recurringTransactions', 'tripGroups'
       ];
       
       for (const collectionName of collections) {

@@ -8,67 +8,650 @@ service cloud.firestore {
       return request.auth != null;
     }
     
-    // SIMPLIFIED RULES FOR TESTING ONLY
-    // These allow any authenticated user to create documents
-    // DO NOT USE IN PRODUCTION!
+    // Helper function to check if user owns the document
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
     
+    // Helper function to check if document belongs to current user
+    function belongsToUser() {
+      return isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+    
+    // Helper function to validate userId is set correctly on create
+    function hasValidUserId() {
+      return request.resource.data.userId == request.auth.uid;
+    }
+    
+    // Helper function to check if userId is not being changed
+    function userIdNotChanged() {
+      return request.resource.data.userId == resource.data.userId;
+    }
+    
+    // Helper function to validate timestamps
+    function hasValidTimestamps() {
+      return request.resource.data.createdAt is timestamp &&
+             request.resource.data.updatedAt is timestamp;
+    }
+    
+    // Helper function to check if user is an admin
+    function isAdmin() {
+      return isAuthenticated() && 
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+    }
+    
+    // Helper function to check if user is a member of a trip group
+    function isGroupMember(groupId) {
+      return isAuthenticated() && 
+             exists(/databases/$(database)/documents/tripGroupMembers/$(groupId + '_' + request.auth.uid));
+    }
+    
+    // Helper function to check if user is the creator/admin of a trip group
+    function isGroupCreator(groupId) {
+      return isAuthenticated() && 
+             get(/databases/$(database)/documents/tripGroups/$(groupId)).data.createdBy == request.auth.uid;
+    }
+    
+    // Helper function to check if user is member of group from expense data
+    function isGroupMemberFromExpense(expenseData) {
+      return isAuthenticated() && 
+             exists(/databases/$(database)/documents/tripGroupMembers/$(expenseData.groupId + '_' + request.auth.uid));
+    }
+    
+    // Helper function to check if user is member of group from settlement data
+    function isGroupMemberFromSettlement(settlementData) {
+      return isAuthenticated() && 
+             exists(/databases/$(database)/documents/tripGroupMembers/$(settlementData.groupId + '_' + request.auth.uid));
+    }
+    
+    // ============================================
+    // USER PROFILES
+    // ============================================
+    match /users/{userId} {
+      // Users can read and write their own profile
+      // Admins can read all user profiles for analytics
+      // For email lookups during signup/login, use server-side functions instead
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId);
+    }
+    
+    // ============================================
+    // EXPENSES
+    // ============================================
     match /expenses/{expenseId} {
-      allow read, write: if isAuthenticated();
+      // Users can read their own expenses
+      // Admins can read all expenses for analytics
+      allow read: if belongsToUser() || isAdmin();
+      allow create: if isAuthenticated() && hasValidUserId();
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
     }
     
+    // ============================================
+    // INCOME
+    // ============================================
     match /income/{incomeId} {
-      allow read, write: if isAuthenticated();
+      // Users can read their own income
+      // Admins can read all income for analytics
+      allow read: if belongsToUser() || isAdmin();
+      allow create: if isAuthenticated() && hasValidUserId();
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
     }
     
+    // ============================================
+    // BUDGETS
+    // ============================================
     match /budgets/{budgetId} {
-      allow read, write: if isAuthenticated();
+      // Users can only access their own budgets
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && hasValidUserId();
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
     }
     
-    match /goals/{goalId} {
-      allow read, write: if isAuthenticated();
-    }
-    
-    match /vehicles/{vehicleId} {
-      allow read, write: if isAuthenticated();
-    }
-    
-    match /houses/{houseId} {
-      allow read, write: if isAuthenticated();
-    }
-    
-    match /houseHelp/{houseHelpId} {
-      allow read, write: if isAuthenticated();
-    }
-    
-    match /healthcareInsurance/{policyId} {
-      allow read, write: if isAuthenticated();
-    }
-    
+    // ============================================
+    // INVESTMENTS
+    // ============================================
     match /investments/{investmentId} {
-      allow read, write: if isAuthenticated();
+      // Users can only access their own investments
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && hasValidUserId();
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
     }
     
+    // ============================================
+    // GOALS
+    // ============================================
+    match /goals/{goalId} {
+      // Users can only access their own goals
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && hasValidUserId();
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
+    }
+    
+    // ============================================
+    // LOANS & EMI
+    // ============================================
     match /loans/{loanId} {
-      allow read, write: if isAuthenticated();
+      // Users can only access their own loans
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && hasValidUserId();
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
     }
     
-    match /creditCards/{cardId} {
-      allow read, write: if isAuthenticated();
+    // ============================================
+    // HOUSES
+    // ============================================
+    match /houses/{houseId} {
+      // Users can only access their own houses
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && hasValidUserId();
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
     }
     
+    // ============================================
+    // VEHICLES
+    // ============================================
+    match /vehicles/{vehicleId} {
+      // Users can only access their own vehicles
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && hasValidUserId();
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
+    }
+    
+    // ============================================
+    // VEHICLE MAINTENANCE EXPENSES
+    // ============================================
+    match /vehicleMaintenanceExpenses/{expenseId} {
+      // Users can only access their own vehicle maintenance expenses
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && hasValidUserId();
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
+    }
+    
+    // ============================================
+    // VEHICLE INCOME
+    // ============================================
+    match /vehicleIncome/{incomeId} {
+      // Users can only access their own vehicle income
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && hasValidUserId();
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
+    }
+    
+    // ============================================
+    // HOUSE HELPS
+    // ============================================
+    match /houseHelps/{houseHelpId} {
+      // Users can only access their own house help records
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && hasValidUserId();
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
+    }
+    
+    // ============================================
+    // HOUSE HELP (Alternative collection name)
+    // ============================================
+    match /houseHelp/{houseHelpId} {
+      // Users can only access their own house help records
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && hasValidUserId();
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
+    }
+    
+    // ============================================
+    // HOUSE HELP PAYMENTS
+    // ============================================
+    match /houseHelpPayments/{paymentId} {
+      // Users can only access their own house help payment records
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && hasValidUserId();
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
+    }
+    
+    // ============================================
+    // NOTES
+    // ============================================
     match /notes/{noteId} {
-      allow read, write: if isAuthenticated();
+      // Users can only access their own notes
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && hasValidUserId();
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
     }
     
+    // ============================================
+    // DOCUMENTS
+    // ============================================
+    match /documents/{documentId} {
+      // Users can only access their own documents
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && hasValidUserId();
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
+    }
+    
+    // ============================================
+    // CATEGORIES
+    // ============================================
+    match /categories/{userId} {
+      // Categories document ID is the userId itself
+      // Users can only access their own categories
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId);
+    }
+    
+    // ============================================
+    // USER CATEGORIES (Alternative collection name)
+    // ============================================
+    match /userCategories/{userId} {
+      // User categories document ID is the userId itself
+      // Users can only access their own categories
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId);
+    }
+    
+    // ============================================
+    // USER PREFERENCES
+    // ============================================
+    match /userPreferences/{userId} {
+      // User preferences document ID is the userId itself
+      // Users can only access their own preferences
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId);
+    }
+    
+    // ============================================
+    // USER SETTINGS (Family Members, etc.)
+    // ============================================
+    match /userSettings/{userId} {
+      // User settings document ID is the userId itself
+      // Users can only access their own settings
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId);
+    }
+    
+    // ============================================
+    // PAYMENT METHODS
+    // ============================================
+    match /paymentMethods/{methodId} {
+      // Users can only access their own payment methods
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && hasValidUserId();
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
+    }
+    
+    // ============================================
+    // WALLETS
+    // ============================================
+    match /wallets/{walletId} {
+      // Users can only access their own wallets
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && hasValidUserId();
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
+    }
+    
+    // ============================================
+    // RECURRING TRANSACTIONS
+    // ============================================
+    match /recurringTransactions/{recurringId} {
+      // Users can only access their own recurring transactions
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && hasValidUserId();
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
+    }
+    
+    // ============================================
+    // RECURRING (Alternative collection name)
+    // ============================================
     match /recurring/{recurringId} {
-      allow read, write: if isAuthenticated();
+      // Users can only access their own recurring transactions
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && hasValidUserId();
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
     }
     
+    // ============================================
+    // SPLITS (Expense Splitting)
+    // ============================================
+    match /splits/{splitId} {
+      // Users can only access their own splits
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && hasValidUserId();
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
+    }
+    
+    // ============================================
+    // FUEL FILLUPS (Vehicle Fuel Tracking)
+    // ============================================
+    match /fuelFillups/{fillupId} {
+      // Users can only access their own fuel fill-ups
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && hasValidUserId();
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
+    }
+    
+    // ============================================
+    // FUEL LOGS (Vehicle Mileage Tracking)
+    // ============================================
+    match /fuelLogs/{logId} {
+      // Users can only access their own fuel logs
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && hasValidUserId();
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
+    }
+    
+
+    
+    // ============================================
+    // GAMIFICATION
+    // ============================================
+    match /gamification/{userId} {
+      // Gamification document ID is the userId itself
+      // Users can only access their own gamification data
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId);
+    }
+    
+    // ============================================
+    // TRIP GROUPS - Secured with membership validation
+    // ============================================
     match /tripGroups/{groupId} {
-      allow read, write: if isAuthenticated();
+      // Read: Only group members can read
+      allow read: if isGroupMember(groupId) || isGroupCreator(groupId);
+      
+      // Create: Any authenticated user can create (they become the creator)
+      allow create: if isAuthenticated() && request.resource.data.createdBy == request.auth.uid;
+      
+      // Update: Only group creator can update group settings
+      allow update: if isGroupCreator(groupId);
+      
+      // Delete: Only group creator can delete
+      allow delete: if isGroupCreator(groupId);
     }
     
-    // Deny all other collections
+    // ============================================
+    // TRIP GROUP MEMBERS - Secured with membership validation
+    // ============================================
+    match /tripGroupMembers/{memberId} {
+      // Get: Users can read individual documents if they are a member of the group OR the group creator
+      // memberId format: groupId_userId
+      allow get: if isAuthenticated() && (
+        memberId.split('_')[1] == request.auth.uid ||
+        isGroupCreator(memberId.split('_')[0])
+      );
+      
+      // List: Allow authenticated users to query members
+      // Note: Application code filters by groupId, and users can only see groups they're members of
+      allow list: if isAuthenticated();
+      
+      // Create: Group creator can add members, or users can join via invitation
+      allow create: if isAuthenticated() && (
+        isGroupCreator(request.resource.data.groupId) ||
+        request.resource.data.userId == request.auth.uid
+      );
+      
+      // Update: Group creator or the member themselves can update
+      allow update: if isAuthenticated() && (
+        isGroupCreator(resource.data.groupId) ||
+        resource.data.userId == request.auth.uid
+      );
+      
+      // Delete: Group creator or the member themselves can delete
+      allow delete: if isAuthenticated() && (
+        isGroupCreator(resource.data.groupId) ||
+        resource.data.userId == request.auth.uid
+      );
+    }
+    
+    // ============================================
+    // TRIP GROUP EXPENSES - Secured with membership validation
+    // ============================================
+    match /tripGroupExpenses/{expenseId} {
+      // Get: Only group members can read individual expenses
+      allow get: if isGroupMemberFromExpense(resource.data);
+      
+      // List: Allow authenticated users to query expenses
+      // Note: Application code filters by groupId, and users can only see groups they're members of
+      allow list: if isAuthenticated();
+      
+      // Create: Only group members can create expenses
+      allow create: if isAuthenticated() && isGroupMemberFromExpense(request.resource.data);
+      
+      // Update: Only group members can update expenses
+      allow update: if isGroupMemberFromExpense(resource.data);
+      
+      // Delete: Only the expense creator or group creator can delete
+      allow delete: if isAuthenticated() && (
+        resource.data.paidBy == request.auth.uid ||
+        isGroupCreator(resource.data.groupId)
+      );
+    }
+
+    // ============================================
+    // CATEGORIZATION PATTERNS (Smart Categorization)
+    // ============================================
+    match /categorizationPatterns/{userId} {
+      // Categorization patterns document ID is the userId itself
+      // Users can only access their own categorization patterns
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId);
+    }
+    
+    // ============================================
+    // USER CATEGORIZATION PATTERNS (Smart Categorization - Alternative)
+    // ============================================
+    match /userCategorizationPatterns/{userId} {
+      // User categorization patterns document ID is the userId itself
+      // Users can only access their own categorization patterns
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId);
+    }
+    
+    // ============================================
+    // TRIP GROUP SETTLEMENTS - Secured with membership validation
+    // ============================================
+    match /tripGroupSettlements/{settlementId} {
+      // Get: Only group members can read individual settlements
+      allow get: if isGroupMemberFromSettlement(resource.data);
+      
+      // List: Allow authenticated users to query settlements
+      // Note: Application code filters by groupId, and users can only see groups they're members of
+      allow list: if isAuthenticated();
+      
+      // Create: Only group members can create settlements
+      allow create: if isAuthenticated() && isGroupMemberFromSettlement(request.resource.data);
+      
+      // Update: Only group members involved in the settlement can update
+      allow update: if isAuthenticated() && (
+        resource.data.fromUserId == request.auth.uid ||
+        resource.data.toUserId == request.auth.uid ||
+        isGroupCreator(resource.data.groupId)
+      );
+      
+      // Delete: Only the settlement creator or group creator can delete
+      allow delete: if isAuthenticated() && (
+        resource.data.createdBy == request.auth.uid ||
+        isGroupCreator(resource.data.groupId)
+      );
+    }
+    
+    // ============================================
+    // INVESTMENT PRICE HISTORY - Users can track their own investment prices
+    // ============================================
+    match /investmentPriceHistory/{historyId} {
+      // Read: Users can read their own price history
+      allow read: if belongsToUser() || isAdmin();
+      
+      // Create: Users can create their own price history records
+      allow create: if isAuthenticated() && hasValidUserId();
+      
+      // Update: Users can update their own price history
+      allow update: if belongsToUser() && userIdNotChanged();
+      
+      // Delete: Users can delete their own price history
+      allow delete: if belongsToUser() || isAdmin();
+    }
+    
+    // ============================================
+    // USER ENCRYPTION (Salt storage for cross-device sync)
+    // ============================================
+    match /userEncryption/{userId} {
+      // Users can only access their own encryption salt
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId);
+    }
+    
+    // ============================================
+    // NOTIFICATIONS (EMI Reminders, Alerts, etc.)
+    // ============================================
+    match /notifications/{notificationId} {
+      // Users can only access their own notifications
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && hasValidUserId();
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
+    }
+    
+    // ============================================
+    // TRANSFERS (Money movements between accounts)
+    // ============================================
+    match /transfers/{transferId} {
+      // Users can only access their own transfers
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && hasValidUserId();
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
+    }
+    
+    // ============================================
+    // NET WORTH SNAPSHOTS (Historical net worth tracking)
+    // ============================================
+    match /netWorthSnapshots/{snapshotId} {
+      // Users can only access their own net worth snapshots
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && hasValidUserId();
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
+    }
+    
+    // ============================================
+    // FAMILY MEMBERS (Legacy - kept for data compatibility)
+    // ============================================
+    match /familyMembers/{memberId} {
+      // Users can only access their own family members
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && hasValidUserId();
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
+    }
+    
+    // ============================================
+    // FEATURES (User feature preferences)
+    // ============================================
+    match /features/{userId} {
+      // Features document ID is the userId itself
+      // Users can only access their own feature preferences
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId);
+    }
+    
+    // ============================================
+    // CREDIT CARDS
+    // ============================================
+    match /creditCards/{cardId} {
+      // Users can only access their own credit cards
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && hasValidUserId();
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
+    }
+    
+    // ============================================
+    // HEALTHCARE INSURANCE
+    // ============================================
+    match /healthcareInsurance/{policyId} {
+      // Users can only access their own healthcare insurance policies
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && hasValidUserId();
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
+    }
+    
+    // ============================================
+    // INSURANCE POLICIES
+    // ============================================
+    match /insurancePolicies/{policyId} {
+      // Users can only access their own insurance policies
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && hasValidUserId();
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
+    }
+    
+    // ============================================
+    // HEALTHCARE EXPENSES
+    // ============================================
+    match /healthcareExpenses/{expenseId} {
+      // Users can only access their own healthcare expenses
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && hasValidUserId();
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
+    }
+    
+    // ============================================
+    // RATE LIMITS (API rate limiting - server-side only)
+    // ============================================
+    match /rateLimits/{limitId} {
+      // Only server-side (Firebase Admin) can read/write rate limits
+      // Users should never access this collection directly
+      allow read, write: if false;
+    }
+    
+    // ============================================
+    // DENY ALL OTHER COLLECTIONS
+    // ============================================
+    // Explicitly deny access to any other collections
     match /{document=**} {
       allow read, write: if false;
     }

@@ -2,7 +2,7 @@
 // Provides offline support and caching
 
 // CACHE_VERSION is injected by build.js during deployment
-const CACHE_VERSION = '1.2.291';
+const CACHE_VERSION = '1.2.292';
 const CACHE_NAME = `rupiya-v${CACHE_VERSION}`;
 const RUNTIME_CACHE = `rupiya-runtime-v${CACHE_VERSION}`;
 
