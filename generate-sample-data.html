@@ -478,22 +478,32 @@
 import { db } from './assets/js/config/firebase-config.js';
 import { collection, query, where, getDocs, writeBatch } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
 
+// Delete all data for a specific user
 window.deleteUserData = async function(userId) {
-  const collections = ['expenses', 'income', 'budgets', 'goals', 'vehicles', 'fuelLogs', 'houses', 'houseHelps', 'insurancePolicies', 'investments', 'loans', 'creditCards', 'notes', 'recurringTransactions', 'tripGroups'];
+  console.log('🗑️ Starting deletion for user:', userId);
+  const collections = ['expenses', 'income', 'budgets', 'goals', 'vehicles', 'fuelLogs', 'houses', 'houseHelps', 'insurancePolicies', 'investments', 'loans', 'creditCards', 'notes', 'recurringTransactions', 'tripGroups', 'houseHelpPayments', 'tripGroupMembers', 'tripGroupExpenses'];
   let total = 0;
   for (const col of collections) {
-    const q = query(collection(db, col), where('userId', '==', userId));
-    const snap = await getDocs(q);
-    if (!snap.empty) {
-      const batch = writeBatch(db);
-      snap.docs.forEach(doc => batch.delete(doc.ref));
-      await batch.commit();
-      total += snap.size;
-      console.log(`✅ Deleted ${snap.size} from ${col}`);
+    try {
+      const q = query(collection(db, col), where('userId', '==', userId));
+      const snap = await getDocs(q);
+      if (!snap.empty) {
+        const batch = writeBatch(db);
+        snap.docs.forEach(doc => batch.delete(doc.ref));
+        await batch.commit();
+        total += snap.size;
+        console.log(`✅ Deleted ${snap.size} from ${col}`);
+      }
+    } catch (error) {
+      console.error(`❌ Error deleting from ${col}:`, error.message);
     }
   }
-  console.log(`🎉 Total deleted: ${total}`);
+  console.log(`🎉 Total deleted: ${total} documents`);
+  alert(`Deleted ${total} documents for user ${userId}`);
+  return total;
 };
+
+console.log('✅ deleteUserData function loaded. Usage: deleteUserData("USER_ID")');
 </script>
 
 </body>
