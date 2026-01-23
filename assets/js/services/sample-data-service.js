@@ -6,12 +6,14 @@ import {
   collection,
   doc,
   addDoc,
+  setDoc,
   writeBatch,
   Timestamp,
   serverTimestamp,
   query,
   where,
   getDocs,
+  deleteDoc,
   limit
 } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
 
@@ -502,6 +504,8 @@ class SampleDataService {
       );
       batch.set(docRef, {
         ...cleanLog,
+        userId,
+        isSampleData: true,
         createdAt: serverTimestamp()
       });
     });
@@ -963,46 +967,101 @@ class SampleDataService {
    */
   async generateSampleTripGroups(userId) {
     const now = Timestamp.now();
-    const tripGroups = [
+    const user = auth.currentUser;
+    
+    // Create trip group
+    const tripGroupData = {
+      name: 'Goa Beach Trip',
+      description: 'Weekend getaway with friends',
+      destination: 'Goa, India',
+      startDate: Timestamp.fromDate(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)),
+      endDate: Timestamp.fromDate(new Date(Date.now() + 33 * 24 * 60 * 60 * 1000)),
+      createdBy: userId,
+      status: 'active',
+      budget: {
+        total: 50000,
+        categories: {
+          'Accommodation': 20000,
+          'Transport': 10000,
+          'Food & Dining': 15000,
+          'Activities': 5000
+        }
+      },
+      categories: ['Accommodation', 'Transport', 'Food & Dining', 'Activities', 'Shopping', 'Tips', 'Other'],
+      memberCount: 1,
+      totalExpenses: 12000,
+      updatedAt: now,
+      isSampleData: true,
+      createdAt: now
+    };
+
+    // Create the trip group document
+    const groupRef = doc(collection(db, 'tripGroups'));
+    const groupId = groupRef.id;
+    await setDoc(groupRef, tripGroupData);
+
+    // Create trip group member (creator as admin)
+    const memberId = `${groupId}_${userId}`;
+    const memberData = {
+      id: memberId,
+      groupId: groupId,
+      userId: userId,
+      name: user?.displayName || user?.email || 'You',
+      email: user?.email || 'sample@example.com',
+      phone: null,
+      isAdmin: true,
+      isRupiyaUser: true,
+      notificationsEnabled: true,
+      joinedAt: now,
+      inviteStatus: 'accepted',
+      isSampleData: true,
+      createdAt: now
+    };
+
+    // Note: In production, member data should be encrypted
+    // For sample data, we'll keep it simple
+    await setDoc(doc(db, 'tripGroupMembers', memberId), memberData);
+
+    // Create sample trip expenses
+    const expenses = [
       {
-        name: 'Goa Beach Trip',
-        description: 'Weekend getaway with friends',
-        destination: 'Goa, India',
-        startDate: Timestamp.fromDate(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)),
-        endDate: Timestamp.fromDate(new Date(Date.now() + 33 * 24 * 60 * 60 * 1000)),
-        createdBy: userId,
-        status: 'active',
-        budget: {
-          total: 50000,
-          categories: {
-            'Accommodation': 20000,
-            'Transport': 10000,
-            'Food & Dining': 15000,
-            'Activities': 5000
-          }
-        },
-        categories: ['Accommodation', 'Transport', 'Food & Dining', 'Activities', 'Shopping', 'Tips', 'Other'],
-        memberCount: 3,
-        totalExpenses: 12000,
-        updatedAt: now
+        groupId: groupId,
+        description: 'Hotel Booking - Beach Resort',
+        amount: 8000,
+        category: 'Accommodation',
+        date: Timestamp.fromDate(new Date(Date.now() - 5 * 24 * 60 * 60 * 1000)),
+        paidBy: memberId,
+        splitType: 'equal',
+        splits: [{ memberId: memberId, amount: 8000 }],
+        linkedExpenseId: null,
+        addedBy: userId,
+        isSampleData: true,
+        createdAt: now
+      },
+      {
+        groupId: groupId,
+        description: 'Flight Tickets',
+        amount: 4000,
+        category: 'Transport',
+        date: Timestamp.fromDate(new Date(Date.now() - 3 * 24 * 60 * 60 * 1000)),
+        paidBy: memberId,
+        splitType: 'equal',
+        splits: [{ memberId: memberId, amount: 4000 }],
+        linkedExpenseId: null,
+        addedBy: userId,
+        isSampleData: true,
+        createdAt: now
       }
     ];
 
-    const batch = writeBatch(db);
-    tripGroups.forEach(trip => {
-      const docRef = doc(collection(db, 'tripGroups'));
-      // Remove any undefined fields
-      const cleanTrip = Object.fromEntries(
-        Object.entries(trip).filter(([_, v]) => v !== undefined)
-      );
-      batch.set(docRef, {
-        ...cleanTrip,
-        isSampleData: true,
-        createdAt: serverTimestamp()
-      });
+    const expenseBatch = writeBatch(db);
+    expenses.forEach(expense => {
+      const expenseRef = doc(collection(db, 'tripGroupExpenses'));
+      expenseBatch.set(expenseRef, expense);
     });
+    await expenseBatch.commit();
 
-    await batch.commit();
+    console.log('✅ Trip group created with ID:', groupId);
   }
 
   /**
@@ -1069,7 +1128,8 @@ class SampleDataService {
         }
       }
 
-      // Handle tripGroups separately since it uses 'createdBy' instead of 'userId'
+      // Handle tripGroups and related collections separately
+      // Trip groups use 'createdBy' instead of 'userId'
       try {
         console.log(`🔍 Checking tripGroups...`);
         const tripGroupsQuery = query(
@@ -1079,9 +1139,90 @@ class SampleDataService {
         );
         const snapshot = await getDocs(tripGroupsQuery);
 
-        console.log(`📊 Found ${snapshot.size} sample items in tripGroups`);
+        console.log(`📊 Found ${snapshot.size} sample trip groups`);
 
         if (!snapshot.empty) {
+          const groupIds = snapshot.docs.map(doc => doc.id);
+          
+          // Delete trip group members for these groups
+          console.log(`🔍 Checking tripGroupMembers for ${groupIds.length} groups...`);
+          for (const groupId of groupIds) {
+            try {
+              const membersQuery = query(
+                collection(db, 'tripGroupMembers'),
+                where('groupId', '==', groupId),
+                where('isSampleData', '==', true)
+              );
+              const membersSnapshot = await getDocs(membersQuery);
+              console.log(`📊 Found ${membersSnapshot.size} members for group ${groupId}`);
+              
+              if (!membersSnapshot.empty) {
+                const memberBatch = writeBatch(db);
+                membersSnapshot.docs.forEach(docSnapshot => {
+                  console.log(`🗑️ Deleting tripGroupMembers/${docSnapshot.id}`);
+                  memberBatch.delete(docSnapshot.ref);
+                });
+                await memberBatch.commit();
+                deletedCount += membersSnapshot.size;
+              }
+            } catch (memberError) {
+              console.error(`❌ Error deleting members for group ${groupId}:`, memberError);
+            }
+          }
+
+          // Delete trip group expenses for these groups
+          console.log(`🔍 Checking tripGroupExpenses for ${groupIds.length} groups...`);
+          for (const groupId of groupIds) {
+            try {
+              const expensesQuery = query(
+                collection(db, 'tripGroupExpenses'),
+                where('groupId', '==', groupId),
+                where('isSampleData', '==', true)
+              );
+              const expensesSnapshot = await getDocs(expensesQuery);
+              console.log(`📊 Found ${expensesSnapshot.size} expenses for group ${groupId}`);
+              
+              if (!expensesSnapshot.empty) {
+                const expenseBatch = writeBatch(db);
+                expensesSnapshot.docs.forEach(docSnapshot => {
+                  console.log(`🗑️ Deleting tripGroupExpenses/${docSnapshot.id}`);
+                  expenseBatch.delete(docSnapshot.ref);
+                });
+                await expenseBatch.commit();
+                deletedCount += expensesSnapshot.size;
+              }
+            } catch (expenseError) {
+              console.error(`❌ Error deleting expenses for group ${groupId}:`, expenseError);
+            }
+          }
+
+          // Delete trip group settlements for these groups
+          console.log(`🔍 Checking tripGroupSettlements for ${groupIds.length} groups...`);
+          for (const groupId of groupIds) {
+            try {
+              const settlementsQuery = query(
+                collection(db, 'tripGroupSettlements'),
+                where('groupId', '==', groupId),
+                where('isSampleData', '==', true)
+              );
+              const settlementsSnapshot = await getDocs(settlementsQuery);
+              console.log(`📊 Found ${settlementsSnapshot.size} settlements for group ${groupId}`);
+              
+              if (!settlementsSnapshot.empty) {
+                const settlementBatch = writeBatch(db);
+                settlementsSnapshot.docs.forEach(docSnapshot => {
+                  console.log(`🗑️ Deleting tripGroupSettlements/${docSnapshot.id}`);
+                  settlementBatch.delete(docSnapshot.ref);
+                });
+                await settlementBatch.commit();
+                deletedCount += settlementsSnapshot.size;
+              }
+            } catch (settlementError) {
+              console.error(`❌ Error deleting settlements for group ${groupId}:`, settlementError);
+            }
+          }
+
+          // Finally, delete the trip groups themselves
           const batchSize = 100;
           const docs = snapshot.docs;
           
@@ -1096,13 +1237,13 @@ class SampleDataService {
 
             await batch.commit();
             deletedCount += batchDocs.length;
-            console.log(`✅ Deleted batch of ${batchDocs.length} items from tripGroups`);
+            console.log(`✅ Deleted batch of ${batchDocs.length} trip groups`);
           }
 
-          console.log(`✅ Cleared ${docs.length} sample items from tripGroups`);
+          console.log(`✅ Cleared ${docs.length} sample trip groups and related data`);
         }
       } catch (error) {
-        console.error(`❌ Error clearing tripGroups:`, error);
+        console.error(`❌ Error clearing trip groups:`, error);
         console.error('Error details:', error.message, error.code);
         errorCount++;
       }
