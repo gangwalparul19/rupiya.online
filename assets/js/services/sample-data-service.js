@@ -1066,13 +1066,15 @@ class SampleDataService {
 
   /**
    * Clear all sample data
+   * @param {string} userId - User ID
+   * @param {boolean} clearAll - If true, clears ALL user data (for legacy data without isSampleData flag)
    */
-  async clearSampleData(userId) {
+  async clearSampleData(userId, clearAll = false) {
     if (!userId) {
       throw new Error('User ID is required');
     }
 
-    console.log('🗑️ clearSampleData called with userId:', userId);
+    console.log('🗑️ clearSampleData called with userId:', userId, 'clearAll:', clearAll);
 
     try {
       const collections = [
@@ -1090,14 +1092,27 @@ class SampleDataService {
       for (const collectionName of collections) {
         try {
           console.log(`🔍 Checking ${collectionName}...`);
-          const q = query(
-            collection(db, collectionName), 
-            where('userId', '==', userId), 
-            where('isSampleData', '==', true)
-          );
+          
+          // Build query based on clearAll flag
+          let q;
+          if (clearAll) {
+            // Delete ALL user data (for legacy data without isSampleData flag)
+            q = query(
+              collection(db, collectionName), 
+              where('userId', '==', userId)
+            );
+          } else {
+            // Delete only data with isSampleData flag
+            q = query(
+              collection(db, collectionName), 
+              where('userId', '==', userId), 
+              where('isSampleData', '==', true)
+            );
+          }
+          
           const snapshot = await getDocs(q);
 
-          console.log(`📊 Found ${snapshot.size} sample items in ${collectionName}`);
+          console.log(`📊 Found ${snapshot.size} items in ${collectionName}`);
 
           if (snapshot.empty) continue;
 
@@ -1119,7 +1134,7 @@ class SampleDataService {
             console.log(`✅ Deleted batch of ${batchDocs.length} items from ${collectionName}`);
           }
 
-          console.log(`✅ Cleared ${docs.length} sample items from ${collectionName}`);
+          console.log(`✅ Cleared ${docs.length} items from ${collectionName}`);
         } catch (error) {
           console.error(`❌ Error clearing ${collectionName}:`, error);
           console.error('Error details:', error.message, error.code);
@@ -1132,14 +1147,25 @@ class SampleDataService {
       // Trip groups use 'createdBy' instead of 'userId'
       try {
         console.log(`🔍 Checking tripGroups...`);
-        const tripGroupsQuery = query(
-          collection(db, 'tripGroups'), 
-          where('createdBy', '==', userId), 
-          where('isSampleData', '==', true)
-        );
+        
+        // Build query based on clearAll flag
+        let tripGroupsQuery;
+        if (clearAll) {
+          tripGroupsQuery = query(
+            collection(db, 'tripGroups'), 
+            where('createdBy', '==', userId)
+          );
+        } else {
+          tripGroupsQuery = query(
+            collection(db, 'tripGroups'), 
+            where('createdBy', '==', userId), 
+            where('isSampleData', '==', true)
+          );
+        }
+        
         const snapshot = await getDocs(tripGroupsQuery);
 
-        console.log(`📊 Found ${snapshot.size} sample trip groups`);
+        console.log(`📊 Found ${snapshot.size} trip groups`);
 
         if (!snapshot.empty) {
           const groupIds = snapshot.docs.map(doc => doc.id);
@@ -1169,11 +1195,7 @@ class SampleDataService {
           console.log(`🔍 Checking tripGroupMembers for ${groupIds.length} groups...`);
           for (const groupId of groupIds) {
             try {
-              const membersQuery = query(
-                collection(db, 'tripGroupMembers'),
-                where('groupId', '==', groupId),
-                where('isSampleData', '==', true)
-              );
+              let membersQuery; if (clearAll) { membersQuery = query(collection(db, 'tripGroupMembers'), where('groupId', '==', groupId)); } else { membersQuery = query(collection(db, 'tripGroupMembers'), where('groupId', '==', groupId), where('isSampleData', '==', true)); }
               const membersSnapshot = await getDocs(membersQuery);
               console.log(`📊 Found ${membersSnapshot.size} members for group ${groupId}`);
               

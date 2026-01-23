@@ -171,17 +171,11 @@ async function clearSampleData() {
     const hasSampleData = await sampleDataService.isActiveAsync(user.uid);
     console.log('📊 Has sample data:', hasSampleData);
     
-    if (!hasSampleData) {
-      showLoading(false);
-      showAlert('info', 'ℹ️ No sample data found. Nothing to clear!');
-      return;
-    }
-    
     showLoading(false);
     
-    console.log('� Showing confirmation dialog...');
-    const confirmed = confirm('Clear all sample data? This will remove all sample expenses, income, budgets, goals, and more.');
-    console.log('� User confirmed:', confirmed);
+    console.log('📝 Showing confirmation dialog...');
+    const confirmed = confirm('Clear all sample data? This will remove all sample expenses, income, budgets, goals, and more.\n\nNote: This only clears data marked as sample data. If you have legacy data without the sample flag, use the console command: clearAllUserData()');
+    console.log('✅ User confirmed:', confirmed);
     
     if (!confirmed) {
       console.log('❌ User cancelled');
@@ -191,8 +185,8 @@ async function clearSampleData() {
     showLoading(true);
     showAlert('info', '⏳ Clearing sample data...');
     
-    console.log('�️ Starting to clear sample data for user:', user.uid);
-    const result = await sampleDataService.clearSampleData(user.uid);
+    console.log('🗑️ Starting to clear sample data for user:', user.uid);
+    const result = await sampleDataService.clearSampleData(user.uid, false);
     console.log('🗑️ Clear result:', result);
     
     showLoading(false);
@@ -216,6 +210,32 @@ async function clearSampleData() {
     showAlert('error', '❌ Error: ' + error.message);
   }
 }
+
+// Helper function to clear ALL user data (including legacy data without isSampleData flag)
+// This is exposed globally for console access
+window.clearAllUserData = async function() {
+  const user = authService.getCurrentUser();
+  
+  if (!user) {
+    console.error('❌ No user found. Please login first.');
+    return false;
+  }
+  
+  console.warn('⚠️ WARNING: This will delete ALL your data, not just sample data!');
+  console.log('🗑️ Clearing ALL data for user:', user.uid);
+  
+  try {
+    const result = await sampleDataService.clearSampleData(user.uid, true);
+    console.log('✅ All data cleared successfully!');
+    console.log('🔄 Please refresh the page.');
+    return result;
+  } catch (error) {
+    console.error('❌ Error clearing all data:', error);
+    return false;
+  }
+};
+
+console.log('💡 TIP: To clear ALL data (including legacy data), open console and run: clearAllUserData()');
 
 // Event listeners
 generateBtn?.addEventListener('click', generateSampleData);

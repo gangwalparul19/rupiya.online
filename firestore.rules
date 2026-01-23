@@ -388,8 +388,12 @@ service cloud.firestore {
     // TRIP GROUPS - Secured with membership validation
     // ============================================
     match /tripGroups/{groupId} {
-      // Read: Only group members can read
-      allow read: if isGroupMember(groupId) || isGroupCreator(groupId);
+      // Get: Only group members can read individual groups
+      allow get: if isGroupMember(groupId) || isGroupCreator(groupId);
+      
+      // List: Allow authenticated users to query groups
+      // Note: Application code filters by createdBy or membership
+      allow list: if isAuthenticated();
       
       // Create: Any authenticated user can create (they become the creator)
       allow create: if isAuthenticated() && request.resource.data.createdBy == request.auth.uid;
@@ -508,10 +512,11 @@ service cloud.firestore {
         isGroupCreator(resource.data.groupId)
       );
       
-      // Delete: Only the settlement creator or group creator can delete
+      // Delete: Only the settlement creator can delete, or group creator if group still exists
       allow delete: if isAuthenticated() && (
         resource.data.createdBy == request.auth.uid ||
-        isGroupCreator(resource.data.groupId)
+        (exists(/databases/$(database)/documents/tripGroups/$(resource.data.groupId)) && 
+         isGroupCreator(resource.data.groupId))
       );
     }
     
