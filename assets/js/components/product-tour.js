@@ -9,6 +9,7 @@ class ProductTour {
     this.overlay = null;
     this.tooltip = null;
     this.highlight = null;
+    this.boundKeyHandler = null;
     this.loadState();
   }
 
@@ -185,7 +186,16 @@ class ProductTour {
     const target = document.querySelector(step.target);
     if (!target) {
       console.warn(`Tour target not found: ${step.target}`);
-      this.nextStep();
+      
+      // Try to find next valid step instead of auto-advancing
+      const nextValidStep = this.findNextValidStep(stepIndex);
+      if (nextValidStep !== -1 && nextValidStep !== stepIndex) {
+        this.showStep(nextValidStep);
+      } else {
+        // No valid steps found, end tour
+        console.warn('No valid tour targets found. Ending tour.');
+        this.endTour();
+      }
       return;
     }
 
@@ -197,6 +207,32 @@ class ProductTour {
 
     // Scroll target into view
     target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  /**
+   * Find next valid step with existing target
+   */
+  findNextValidStep(fromIndex) {
+    for (let i = fromIndex + 1; i < this.tourSteps.length; i++) {
+      const target = document.querySelector(this.tourSteps[i].target);
+      if (target) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  /**
+   * Find previous valid step with existing target
+   */
+  findPreviousValidStep(fromIndex) {
+    for (let i = fromIndex - 1; i >= 0; i--) {
+      const target = document.querySelector(this.tourSteps[i].target);
+      if (target) {
+        return i;
+      }
+    }
+    return -1;
   }
 
   /**
@@ -343,8 +379,11 @@ class ProductTour {
     skipBtn?.addEventListener('click', () => this.skipTour());
     finishBtn?.addEventListener('click', () => this.endTour());
 
-    // Keyboard navigation
-    document.addEventListener('keydown', this.handleKeyPress.bind(this));
+    // Keyboard navigation - store bound handler for proper cleanup
+    if (!this.boundKeyHandler) {
+      this.boundKeyHandler = this.handleKeyPress.bind(this);
+    }
+    document.addEventListener('keydown', this.boundKeyHandler);
   }
 
   /**
@@ -378,7 +417,14 @@ class ProductTour {
    */
   previousStep() {
     if (this.currentStep > 0) {
-      this.showStep(this.currentStep - 1);
+      // Find the previous step with a valid target
+      const prevValidStep = this.findPreviousValidStep(this.currentStep);
+      if (prevValidStep !== -1) {
+        this.showStep(prevValidStep);
+      } else {
+        // If no previous valid step, just go to previous index
+        this.showStep(this.currentStep - 1);
+      }
     }
   }
 
@@ -420,7 +466,10 @@ class ProductTour {
       this.highlight = null;
     }
 
-    document.removeEventListener('keydown', this.handleKeyPress);
+    // Remove keyboard listener using the bound reference
+    if (this.boundKeyHandler) {
+      document.removeEventListener('keydown', this.boundKeyHandler);
+    }
   }
 
   /**
