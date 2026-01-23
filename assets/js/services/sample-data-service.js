@@ -435,11 +435,13 @@ class SampleDataService {
         vehicleId: vehicleIds[0],
         vehicleName: vehicles[0].name,
         date: Timestamp.fromDate(date),
-        liters: log.liters,
-        costPerLiter: log.cost / log.liters,
+        fuelQuantity: log.liters,
+        fuelPrice: log.cost / log.liters,
         totalCost: log.cost,
         odometerReading: log.odometer,
         fuelType: 'Petrol',
+        fuelStation: 'Sample Station',
+        fullTank: true,
         userId,
         isSampleData: true
       });
@@ -459,11 +461,13 @@ class SampleDataService {
         vehicleId: vehicleIds[1],
         vehicleName: vehicles[1].name,
         date: Timestamp.fromDate(date),
-        liters: log.liters,
-        costPerLiter: log.cost / log.liters,
+        fuelQuantity: log.liters,
+        fuelPrice: log.cost / log.liters,
         totalCost: log.cost,
         odometerReading: log.odometer,
         fuelType: 'Petrol',
+        fuelStation: 'Sample Station',
+        fullTank: true,
         userId,
         isSampleData: true
       });
@@ -863,6 +867,7 @@ class SampleDataService {
     const recurring = [
       {
         name: 'Netflix Subscription',
+        description: 'Netflix Subscription',
         amount: 649,
         category: 'Entertainment',
         type: 'expense',
@@ -875,6 +880,7 @@ class SampleDataService {
       },
       {
         name: 'Gym Membership',
+        description: 'Gym Membership',
         amount: 2000,
         category: 'Healthcare',
         type: 'expense',
@@ -887,6 +893,7 @@ class SampleDataService {
       },
       {
         name: 'Salary',
+        description: 'Monthly Salary',
         amount: 75000,
         category: 'Salary',
         type: 'income',
@@ -899,6 +906,7 @@ class SampleDataService {
       },
       {
         name: 'SIP - Mutual Fund',
+        description: 'SIP - Mutual Fund',
         amount: 10000,
         category: 'Investments',
         type: 'expense',

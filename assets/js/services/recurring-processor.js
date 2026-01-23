@@ -186,14 +186,14 @@ class RecurringProcessor {
           const transactionData = {
             amount: recurring.amount,
             category: recurring.category,
-            description: recurring.description,
+            description: recurring.description || recurring.name || 'Recurring transaction',
             date: dueDate,
             paymentMethod: recurring.paymentMethod || 'cash',
             paymentMethodId: recurring.paymentMethodId || null,
             paymentMethodName: recurring.paymentMethodName || null,
             isRecurring: true,
             recurringId: recurring.id,
-            notes: recurring.notes || `Auto-generated from recurring: ${recurring.description}`
+            notes: recurring.notes || `Auto-generated from recurring: ${recurring.description || recurring.name}`
           };
 
           let result;
