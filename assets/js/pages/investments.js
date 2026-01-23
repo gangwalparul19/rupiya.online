@@ -574,10 +574,12 @@ function renderInvestments() {
   const pageInvestments = state.filteredInvestments.slice(startIndex, endIndex);
   
   investmentsList.innerHTML = pageInvestments.map(investment => {
-    // Use live price if available, otherwise use stored current price
-    const currentPrice = investment.livePrice || investment.currentPrice;
-    const totalInvested = investment.quantity * investment.purchasePrice;
-    const currentValue = investment.quantity * currentPrice;
+    // Use live price if available, otherwise use stored current price, fallback to purchase price
+    const currentPrice = investment.livePrice || investment.currentPrice || investment.purchasePrice || 0;
+    const purchasePrice = investment.purchasePrice || 0;
+    const quantity = investment.quantity || 0;
+    const totalInvested = quantity * purchasePrice;
+    const currentValue = quantity * currentPrice;
     const returns = currentValue - totalInvested;
     const returnsPercentage = totalInvested > 0 ? ((returns / totalInvested) * 100).toFixed(2) : 0;
     const returnsClass = returns >= 0 ? 'positive' : 'negative';
@@ -588,10 +590,10 @@ function renderInvestments() {
     const escapedSymbol = escapeHtml(investment.symbol || '');
 
     // Price change indicator (always in INR)
-    const priceChangeClass = investment.priceChange >= 0 ? 'positive' : 'negative';
-    const priceChangeSign = investment.priceChange >= 0 ? '+' : '';
+    const priceChangeClass = (investment.priceChange || 0) >= 0 ? 'positive' : 'negative';
+    const priceChangeSign = (investment.priceChange || 0) >= 0 ? '+' : '';
     const priceChangeDisplay = investment.priceChange !== undefined
-      ? `<span class="price-change ${priceChangeClass}">${priceChangeSign}₹${investment.priceChange?.toFixed(2)} (${priceChangeSign}${investment.priceChangePercent?.toFixed(2)}%)</span>`
+      ? `<span class="price-change ${priceChangeClass}">${priceChangeSign}₹${(investment.priceChange || 0).toFixed(2)} (${priceChangeSign}${(investment.priceChangePercent || 0).toFixed(2)}%)</span>`
       : '';
 
     // Live price indicator

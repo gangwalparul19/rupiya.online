@@ -3,6 +3,8 @@
 
 import productTour from '../components/product-tour.js';
 import contextualHelp from '../components/contextual-help.js';
+import { auth, db } from '../config/firebase-config.js';
+import { getDoc, doc } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
 
 class HelpTourInit {
   constructor() {
@@ -84,15 +86,13 @@ class HelpTourInit {
    */
   async isNewUser() {
     try {
-      const user = firebase.auth().currentUser;
+      const user = auth.currentUser;
       if (!user) return false;
 
-      const userDoc = await firebase.firestore()
-        .collection('users')
-        .doc(user.uid)
-        .get();
+      const userDocRef = doc(db, 'users', user.uid);
+      const userDoc = await getDoc(userDocRef);
 
-      if (!userDoc.exists) return true;
+      if (!userDoc.exists()) return true;
 
       const userData = userDoc.data();
       const registrationDate = userData.createdAt?.toDate() || new Date();

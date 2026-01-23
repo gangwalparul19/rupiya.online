@@ -39,6 +39,20 @@ class SampleDataService {
     console.log('🔍 Current auth user:', auth.currentUser?.uid);
 
     try {
+      // Check if sample data already exists
+      const expensesQuery = query(
+        collection(db, 'expenses'),
+        where('userId', '==', userId),
+        where('isSampleData', '==', true),
+        limit(1)
+      );
+      const existingData = await getDocs(expensesQuery);
+      
+      if (!existingData.empty) {
+        console.log('⚠️ Sample data already exists. Clearing old data first...');
+        await this.clearSampleData(userId);
+      }
+
       // Generate sample data for all features
       console.log('📝 Generating expenses...');
       await this.generateSampleExpenses(userId);
@@ -413,18 +427,34 @@ class SampleDataService {
         provider: 'Star Health Insurance',
         policyNumber: 'SH-2023-456789',
         coverageAmount: 1000000,
-        premium: 25000,
+        premiumAmount: 25000,
         premiumFrequency: 'annual',
         startDate: Timestamp.fromDate(new Date('2023-04-01')),
         endDate: Timestamp.fromDate(new Date('2024-03-31')),
+        renewalDate: Timestamp.fromDate(new Date('2024-03-31')),
         members: ['Self', 'Spouse', 'Child'],
+        status: 'active',
+        isActive: true
+      },
+      {
+        policyName: 'Personal Accident Cover',
+        provider: 'ICICI Lombard',
+        policyNumber: 'IL-2023-789012',
+        coverageAmount: 500000,
+        premiumAmount: 5000,
+        premiumFrequency: 'annual',
+        startDate: Timestamp.fromDate(new Date('2023-06-15')),
+        endDate: Timestamp.fromDate(new Date('2024-06-14')),
+        renewalDate: Timestamp.fromDate(new Date('2024-06-14')),
+        members: ['Self'],
+        status: 'active',
         isActive: true
       }
     ];
 
     const batch = writeBatch(db);
     insurance.forEach(policy => {
-      const docRef = doc(collection(db, 'healthcareInsurance'));
+      const docRef = doc(collection(db, 'insurancePolicies'));
       batch.set(docRef, {
         ...policy,
         userId,
@@ -564,27 +594,37 @@ class SampleDataService {
   async generateSampleCreditCards(userId) {
     const creditCards = [
       {
-        name: 'HDFC Regalia',
-        bank: 'HDFC Bank',
+        cardName: 'HDFC Regalia',
+        bankName: 'HDFC Bank',
+        cardType: 'Visa',
+        network: 'Visa',
         lastFourDigits: '4567',
         creditLimit: 300000,
         availableCredit: 245000,
+        currentBalance: 55000,
         currentDue: 55000,
         dueDate: Timestamp.fromDate(new Date(Date.now() + 15 * 24 * 60 * 60 * 1000)),
         billingCycle: 5,
         rewardPoints: 12500,
+        rewardsProgram: 'HDFC Rewards',
+        rewardsBalance: 12500,
         isActive: true
       },
       {
-        name: 'SBI SimplyCLICK',
-        bank: 'State Bank of India',
+        cardName: 'SBI SimplyCLICK',
+        bankName: 'State Bank of India',
+        cardType: 'Mastercard',
+        network: 'Mastercard',
         lastFourDigits: '8901',
         creditLimit: 150000,
         availableCredit: 135000,
+        currentBalance: 15000,
         currentDue: 15000,
         dueDate: Timestamp.fromDate(new Date(Date.now() + 20 * 24 * 60 * 60 * 1000)),
         billingCycle: 10,
         rewardPoints: 5800,
+        rewardsProgram: 'SBI Rewards',
+        rewardsBalance: 5800,
         isActive: true
       }
     ];

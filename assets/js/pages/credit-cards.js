@@ -227,17 +227,17 @@ function renderCreditCards() {
   const pageCards = state.filteredCards.slice(startIndex, endIndex);
 
   cardsGrid.innerHTML = pageCards.map(card => {
-    const utilization = (card.currentBalance / card.creditLimit) * 100;
+    const creditLimit = card.creditLimit || 0;
+    const currentBalance = card.currentBalance || 0;
+    const utilization = creditLimit > 0 ? (currentBalance / creditLimit) * 100 : 0;
     const utilizationClass = utilization > 70 ? 'high' : '';
     const cardTypeClass = card.cardType ? `card-type-${card.cardType.toLowerCase().replace(' ', '')}` : 'card-type-default';
     
     // Safely handle potentially undefined values
     const cardName = card.cardName || 'Unnamed Card';
     const bankName = card.bankName || 'Unknown Bank';
-    const cardType = card.cardType || 'N/A';
+    const cardType = card.cardType || card.network || 'N/A';
     const lastFourDigits = card.lastFourDigits || '****';
-    const creditLimit = card.creditLimit || 0;
-    const currentBalance = card.currentBalance || 0;
     const rewardsProgram = card.rewardsProgram || '';
     const rewardsBalance = card.rewardsBalance || 0;
 

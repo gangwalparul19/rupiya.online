@@ -4,8 +4,9 @@
 import quickStartChecklist from '../components/quick-start-checklist.js';
 import sampleDataService from '../services/sample-data-service.js';
 import onboardingService from '../services/onboarding-service.js';
-import { auth } from '../config/firebase-config.js';
+import { auth, db } from '../config/firebase-config.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
+import { collection, query, where, limit, getDocs, getDoc, doc } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
 
 class OnboardingInit {
   constructor() {
@@ -25,9 +26,7 @@ class OnboardingInit {
       window.quickStartChecklist = quickStartChecklist;
 
       // Wait for Firebase auth
-      await this.waitForAuth();
-
-      const user = firebase.auth().currentUser;
+      const user = await this.waitForAuth();
       if (!user) return;
 
       // Check if user is new (first login)
@@ -75,30 +74,30 @@ class OnboardingInit {
   async checkIfNewUser(userId) {
     try {
       // Check if user has any expenses
-      const expensesSnapshot = await firebase.firestore()
-        .collection('expenses')
-        .where('userId', '==', userId)
-        .limit(1)
-        .get();
+      const expensesQuery = query(
+        collection(db, 'expenses'),
+        where('userId', '==', userId),
+        limit(1)
+      );
+      const expensesSnapshot = await getDocs(expensesQuery);
 
       if (!expensesSnapshot.empty) return false;
 
       // Check if user has any income
-      const incomeSnapshot = await firebase.firestore()
-        .collection('income')
-        .where('userId', '==', userId)
-        .limit(1)
-        .get();
+      const incomeQuery = query(
+        collection(db, 'income'),
+        where('userId', '==', userId),
+        limit(1)
+      );
+      const incomeSnapshot = await getDocs(incomeQuery);
 
       if (!incomeSnapshot.empty) return false;
 
       // Check user registration date
-      const userDoc = await firebase.firestore()
-        .collection('users')
-        .doc(userId)
-        .get();
+      const userDocRef = doc(db, 'users', userId);
+      const userDoc = await getDoc(userDocRef);
 
-      if (!userDoc.exists) return true;
+      if (!userDoc.exists()) return true;
 
       const userData = userDoc.data();
       const registrationDate = userData.createdAt?.toDate() || new Date();
