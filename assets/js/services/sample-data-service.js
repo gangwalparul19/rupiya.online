@@ -551,7 +551,7 @@ class SampleDataService {
 
     const batch = writeBatch(db);
     houseHelp.forEach(help => {
-      const docRef = doc(collection(db, 'houseHelp'));
+      const docRef = doc(collection(db, 'houseHelps'));
       // Remove any undefined fields
       const cleanHelp = Object.fromEntries(
         Object.entries(help).filter(([_, v]) => v !== undefined)
@@ -980,7 +980,7 @@ class SampleDataService {
     try {
       const collections = [
         'expenses', 'income', 'budgets', 'goals', 
-        'vehicles', 'houses', 'houseHelp', 'insurancePolicies',
+        'vehicles', 'fuelLogs', 'houses', 'houseHelps', 'insurancePolicies',
         'investments', 'loans', 'creditCards', 'notes', 
         'recurringTransactions', 'tripGroups'
       ];

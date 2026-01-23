@@ -643,7 +643,7 @@ function renderInvestments() {
           <div class="investment-stats-row">
             <div class="investment-stat">
               <div class="investment-stat-label">Purchase Price</div>
-              <div class="investment-stat-value">₹${investment.purchasePrice.toFixed(2)}</div>
+              <div class="investment-stat-value">₹${purchasePrice.toFixed(2)}</div>
             </div>
             <div class="investment-stat">
               <div class="investment-stat-label">Current Price ${liveIndicator}</div>
