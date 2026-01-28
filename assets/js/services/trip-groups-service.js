@@ -113,10 +113,10 @@ class TripGroupsService {
       };
 
       // Encrypt sensitive member data before saving
+      // NOTE: Email is NOT encrypted for trip members because it's needed for invitation matching
       const encryptedMemberData = {
         ...memberData,
-        name: await encryptionService.encryptValue(memberData.name),
-        email: await encryptionService.encryptValue(memberData.email)
+        name: await encryptionService.encryptValue(memberData.name)
       };
 
       await setDoc(doc(db, this.membersCollection, memberId), encryptedMemberData);
@@ -348,10 +348,11 @@ class TripGroupsService {
       };
 
       // Encrypt sensitive member data before saving
+      // NOTE: Email is NOT encrypted for trip members because it's needed for invitation matching
+      // across different users. Only name and phone are encrypted.
       const encryptedMember = {
         ...member,
         name: await encryptionService.encryptValue(member.name),
-        email: member.email ? await encryptionService.encryptValue(member.email) : null,
         phone: member.phone ? await encryptionService.encryptValue(member.phone) : null
       };
 
@@ -458,13 +459,12 @@ class TripGroupsService {
         const memberData = { id: docSnap.id, ...docSnap.data() };
         
         // Decrypt sensitive fields
+        // NOTE: Email is NOT encrypted for trip members (stored in plain text for invitation matching)
         try {
           if (memberData.name) {
             memberData.name = await encryptionService.decryptValue(memberData.name);
           }
-          if (memberData.email) {
-            memberData.email = await encryptionService.decryptValue(memberData.email);
-          }
+          // Email is not encrypted - skip decryption
           if (memberData.phone) {
             memberData.phone = await encryptionService.decryptValue(memberData.phone);
           }
@@ -510,22 +510,31 @@ class TripGroupsService {
   // Check if user is member of a group
   async isGroupMember(groupId, userId) {
     try {
+      console.log(`Checking if user ${userId} is member of group ${groupId}`);
+      
       const memberId = `${groupId}_${userId}`;
       const memberRef = doc(db, this.membersCollection, memberId);
       const memberSnap = await getDoc(memberRef);
       
       if (memberSnap.exists()) {
+        console.log(`User ${userId} is already a member of group ${groupId}`);
         return true;
       }
+      
+      console.log(`User ${userId} not found as direct member, checking for pending invitation...`);
       
       // Check if user has a pending invitation by email
       // This handles the case where a user was invited before they had an account
       const user = authService.getCurrentUser();
       if (user && user.email) {
         const hasPendingInvite = await this.checkAndAcceptPendingInvitation(groupId, user.email, userId);
-        return hasPendingInvite;
+        if (hasPendingInvite) {
+          console.log(`Accepted pending invitation for user ${userId}`);
+          return true;
+        }
       }
       
+      console.log(`User ${userId} is not a member of group ${groupId}`);
       return false;
     } catch (error) {
       console.error('Error checking member status:', error);
@@ -543,13 +552,12 @@ class TripGroupsService {
         const memberData = { id: memberSnap.id, ...memberSnap.data() };
         
         // Decrypt sensitive fields
+        // NOTE: Email is NOT encrypted for trip members (stored in plain text for invitation matching)
         try {
           if (memberData.name) {
             memberData.name = await encryptionService.decryptValue(memberData.name);
           }
-          if (memberData.email) {
-            memberData.email = await encryptionService.decryptValue(memberData.email);
-          }
+          // Email is not encrypted - skip decryption
           if (memberData.phone) {
             memberData.phone = await encryptionService.decryptValue(memberData.phone);
           }
@@ -570,7 +578,12 @@ class TripGroupsService {
   // Check and accept pending invitation for a user
   async checkAndAcceptPendingInvitation(groupId, userEmail, userId) {
     try {
-      if (!userEmail || !userId) return false;
+      if (!userEmail || !userId) {
+        console.log('checkAndAcceptPendingInvitation: Missing email or userId');
+        return false;
+      }
+      
+      console.log(`Checking for pending invitation: groupId=${groupId}, email=${userEmail}, userId=${userId}`);
       
       // Get all members of the group
       const membersQuery = query(
@@ -579,30 +592,42 @@ class TripGroupsService {
       );
       const snapshot = await getDocs(membersQuery);
       
+      console.log(`Found ${snapshot.size} members in group ${groupId}`);
+      
       // Look for a member with matching email but no userId (pending invitation)
       for (const docSnap of snapshot.docs) {
         const memberData = docSnap.data();
         
-        // Decrypt email to check
-        let decryptedEmail = null;
-        try {
-          if (memberData.email) {
-            decryptedEmail = await encryptionService.decryptValue(memberData.email);
-          }
-        } catch (decryptError) {
-          // Try unencrypted email (legacy data)
-          decryptedEmail = memberData.email;
+        // Skip if this member already has a userId
+        if (memberData.userId) {
+          continue;
         }
         
+        // Email is stored unencrypted for trip members (for invitation matching)
+        const memberEmail = memberData.email;
+        
+        console.log(`Checking member: email=${memberEmail}, userId=${memberData.userId}, inviteStatus=${memberData.inviteStatus}`);
+        
         // Check if this is a pending invitation for this email
-        if (decryptedEmail && 
-            decryptedEmail.toLowerCase() === userEmail.toLowerCase() && 
-            !memberData.userId && 
-            memberData.inviteStatus === 'pending') {
+        if (memberEmail && 
+            memberEmail.toLowerCase() === userEmail.toLowerCase()) {
+          
+          console.log(`Found matching invitation for ${userEmail}`);
           
           // Update the member record with userId and accept the invitation
           const oldMemberId = docSnap.id;
           const newMemberId = `${groupId}_${userId}`;
+          
+          // Check if the new member ID already exists (avoid duplicates)
+          const existingMemberRef = doc(db, this.membersCollection, newMemberId);
+          const existingMemberSnap = await getDoc(existingMemberRef);
+          
+          if (existingMemberSnap.exists()) {
+            console.log(`Member ${newMemberId} already exists, just deleting old record`);
+            // Just delete the old pending invitation
+            await deleteDoc(doc(db, this.membersCollection, oldMemberId));
+            return true;
+          }
           
           // Create new member document with userId
           const updatedMemberData = {
@@ -619,11 +644,12 @@ class TripGroupsService {
           // Delete old member document
           await deleteDoc(doc(db, this.membersCollection, oldMemberId));
           
-          console.log(`Accepted pending invitation for ${userEmail} in group ${groupId}`);
+          console.log(`Successfully accepted pending invitation for ${userEmail} in group ${groupId}`);
           return true;
         }
       }
       
+      console.log(`No pending invitation found for ${userEmail} in group ${groupId}`);
       return false;
     } catch (error) {
       console.error('Error checking pending invitation:', error);

@@ -388,8 +388,9 @@ service cloud.firestore {
     // TRIP GROUPS - Secured with membership validation
     // ============================================
     match /tripGroups/{groupId} {
-      // Get: Only group members can read individual groups
-      allow get: if isGroupMember(groupId) || isGroupCreator(groupId);
+      // Get: Allow any authenticated user to read (app-level checks membership)
+      // This is needed so invited users can check if they have access
+      allow get: if isAuthenticated();
       
       // List: Allow authenticated users to query groups
       // Note: Application code filters by createdBy or membership
