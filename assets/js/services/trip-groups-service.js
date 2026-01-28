@@ -747,11 +747,13 @@ class TripGroupsService {
         createdAt: now
       };
 
-      // Encrypt expense data before saving
-      const encryptedExpense = await encryptionService.encryptObject(expense, this.expensesCollection);
+      // For trip groups, we don't encrypt expense data because:
+      // 1. All group members need to see all expenses
+      // 2. Each user has their own encryption key, so cross-user decryption doesn't work
+      // Trip expenses are stored unencrypted (Firestore rules handle access control)
 
       // Create group expense
-      const expenseRef = await addDoc(collection(db, this.expensesCollection), encryptedExpense);
+      const expenseRef = await addDoc(collection(db, this.expensesCollection), expense);
       const expenseId = expenseRef.id;
 
       // NOTE: Trip expenses are kept separate from personal expenses
@@ -790,9 +792,9 @@ class TripGroupsService {
 
       for (const docSnap of snapshot.docs) {
         const data = { id: docSnap.id, ...docSnap.data() };
-        // Decrypt expense data
-        const decryptedData = await encryptionService.decryptObject(data, this.expensesCollection);
-        expenses.push(decryptedData);
+        // Trip expenses are stored unencrypted for cross-user access
+        // No decryption needed
+        expenses.push(data);
       }
 
       // Apply filters
@@ -925,9 +927,8 @@ class TripGroupsService {
         createdAt: now
       };
 
-      // Encrypt settlement data before saving
-      const encryptedSettlement = await encryptionService.encryptObject(settlement, this.settlementsCollection);
-      const settlementRef = await addDoc(collection(db, this.settlementsCollection), encryptedSettlement);
+      // Trip settlements are stored unencrypted for cross-user access
+      const settlementRef = await addDoc(collection(db, this.settlementsCollection), settlement);
 
       return { success: true, settlementId: settlementRef.id, data: { id: settlementRef.id, ...settlement } };
     } catch (error) {
@@ -950,9 +951,8 @@ class TripGroupsService {
 
       for (const docSnap of snapshot.docs) {
         const data = { id: docSnap.id, ...docSnap.data() };
-        // Decrypt settlement data
-        const decryptedData = await encryptionService.decryptObject(data, this.settlementsCollection);
-        settlements.push(decryptedData);
+        // Trip settlements are stored unencrypted for cross-user access
+        settlements.push(data);
       }
 
       return settlements;
