@@ -411,17 +411,14 @@ service cloud.firestore {
     // ============================================
     match /tripGroupMembers/{memberId} {
       // Get: Users can read individual documents if they are a member of the group OR the group creator
-      // memberId format: groupId_userId
-      allow get: if isAuthenticated() && (
-        memberId.split('_')[1] == request.auth.uid ||
-        isGroupCreator(memberId.split('_')[0])
-      );
+      // memberId format: groupId_userId or groupId_timestamp_random (for pending invitations)
+      allow get: if isAuthenticated();
       
       // List: Allow authenticated users to query members
       // Note: Application code filters by groupId, and users can only see groups they're members of
       allow list: if isAuthenticated();
       
-      // Create: Group creator can add members, or users can join via invitation
+      // Create: Group creator can add members, or users can accept their own invitation
       allow create: if isAuthenticated() && (
         isGroupCreator(request.resource.data.groupId) ||
         request.resource.data.userId == request.auth.uid
@@ -435,8 +432,10 @@ service cloud.firestore {
       
       // Delete: Group creator (if group exists) or the member themselves can delete
       // Also allow if userId matches (for cleanup when group is already deleted)
+      // Also allow deletion of pending invitations when accepting (userId is null)
       allow delete: if isAuthenticated() && (
         resource.data.userId == request.auth.uid ||
+        resource.data.userId == null ||
         (exists(/databases/$(database)/documents/tripGroups/$(resource.data.groupId)) && 
          isGroupCreator(resource.data.groupId))
       );

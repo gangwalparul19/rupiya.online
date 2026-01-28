@@ -114,12 +114,8 @@ class TripGroupsService {
 
       // Encrypt sensitive member data before saving
       // NOTE: Email is NOT encrypted for trip members because it's needed for invitation matching
-      const encryptedMemberData = {
-        ...memberData,
-        name: await encryptionService.encryptValue(memberData.name)
-      };
-
-      await setDoc(doc(db, this.membersCollection, memberId), encryptedMemberData);
+      // NOTE: Name is also NOT encrypted so all group members can see each other
+      await setDoc(doc(db, this.membersCollection, memberId), memberData);
 
       return { success: true, groupId: groupId, data: { id: groupId, ...tripGroup } };
     } catch (error) {
@@ -347,16 +343,17 @@ class TripGroupsService {
         inviteStatus: memberData.userId ? 'pending' : 'accepted'
       };
 
-      // Encrypt sensitive member data before saving
-      // NOTE: Email is NOT encrypted for trip members because it's needed for invitation matching
-      // across different users. Only name and phone are encrypted.
-      const encryptedMember = {
+      // For trip groups, we don't encrypt member data because:
+      // 1. Email needs to be readable for invitation matching across users
+      // 2. Names need to be visible to all group members
+      // 3. Each user has their own encryption key, so cross-user decryption doesn't work
+      // Only phone numbers are encrypted for privacy
+      const memberToSave = {
         ...member,
-        name: await encryptionService.encryptValue(member.name),
         phone: member.phone ? await encryptionService.encryptValue(member.phone) : null
       };
 
-      await setDoc(doc(db, this.membersCollection, memberId), encryptedMember);
+      await setDoc(doc(db, this.membersCollection, memberId), memberToSave);
 
       // Update group member count
       const groupRef = doc(db, this.groupsCollection, groupId);
@@ -454,23 +451,37 @@ class TripGroupsService {
 
       const members = [];
       
-      // Decrypt member data
+      // Decrypt member data (for legacy encrypted data)
       for (const docSnap of snapshot.docs) {
         const memberData = { id: docSnap.id, ...docSnap.data() };
         
-        // Decrypt sensitive fields
-        // NOTE: Email is NOT encrypted for trip members (stored in plain text for invitation matching)
+        // Try to decrypt sensitive fields (for legacy data)
+        // New trip members are stored unencrypted (except phone)
         try {
-          if (memberData.name) {
-            memberData.name = await encryptionService.decryptValue(memberData.name);
+          // Try to decrypt name - if it fails, it's already unencrypted
+          if (memberData.name && typeof memberData.name === 'string') {
+            try {
+              const decrypted = await encryptionService.decryptValue(memberData.name);
+              memberData.name = decrypted;
+            } catch (e) {
+              // Name is not encrypted or can't be decrypted - keep as is
+            }
           }
-          // Email is not encrypted - skip decryption
-          if (memberData.phone) {
-            memberData.phone = await encryptionService.decryptValue(memberData.phone);
+          
+          // Email is never encrypted for trip members
+          
+          // Try to decrypt phone - if it fails, it's already unencrypted
+          if (memberData.phone && typeof memberData.phone === 'string') {
+            try {
+              const decrypted = await encryptionService.decryptValue(memberData.phone);
+              memberData.phone = decrypted;
+            } catch (e) {
+              // Phone is not encrypted or can't be decrypted - keep as is
+            }
           }
         } catch (decryptError) {
-          console.warn('Error decrypting member data, might be unencrypted legacy data:', decryptError);
-          // Keep original data if decryption fails (legacy unencrypted data)
+          console.warn('Error decrypting member data:', decryptError);
+          // Keep original data if decryption fails
         }
         
         members.push(memberData);
@@ -551,19 +562,31 @@ class TripGroupsService {
       if (memberSnap.exists()) {
         const memberData = { id: memberSnap.id, ...memberSnap.data() };
         
-        // Decrypt sensitive fields
-        // NOTE: Email is NOT encrypted for trip members (stored in plain text for invitation matching)
+        // Try to decrypt sensitive fields (for legacy data)
+        // New trip members are stored unencrypted (except phone)
         try {
-          if (memberData.name) {
-            memberData.name = await encryptionService.decryptValue(memberData.name);
+          // Try to decrypt name - if it fails, it's already unencrypted
+          if (memberData.name && typeof memberData.name === 'string') {
+            try {
+              const decrypted = await encryptionService.decryptValue(memberData.name);
+              memberData.name = decrypted;
+            } catch (e) {
+              // Name is not encrypted or can't be decrypted - keep as is
+            }
           }
-          // Email is not encrypted - skip decryption
-          if (memberData.phone) {
-            memberData.phone = await encryptionService.decryptValue(memberData.phone);
+          
+          // Try to decrypt phone - if it fails, it's already unencrypted
+          if (memberData.phone && typeof memberData.phone === 'string') {
+            try {
+              const decrypted = await encryptionService.decryptValue(memberData.phone);
+              memberData.phone = decrypted;
+            } catch (e) {
+              // Phone is not encrypted or can't be decrypted - keep as is
+            }
           }
         } catch (decryptError) {
-          console.warn('Error decrypting member data, might be unencrypted legacy data:', decryptError);
-          // Keep original data if decryption fails (legacy unencrypted data)
+          console.warn('Error decrypting member data:', decryptError);
+          // Keep original data if decryption fails
         }
         
         return { success: true, data: memberData };

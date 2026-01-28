@@ -123,8 +123,9 @@ class TripGroupDetailPage {
       btn.addEventListener('click', (e) => this.switchTab(e.target.dataset.tab));
     });
 
-    // Add expense button
-    document.getElementById('addExpenseBtn')?.addEventListener('click', () => this.toggleExpenseSection());
+    // Add expense button (from quick actions and FAB)
+    document.getElementById('quickAddExpenseBtn')?.addEventListener('click', () => this.toggleExpenseSection());
+    document.getElementById('tripFab')?.addEventListener('click', () => this.toggleExpenseSection());
     document.getElementById('closeExpenseFormBtn')?.addEventListener('click', () => this.closeExpenseModal());
     document.getElementById('cancelExpenseBtn')?.addEventListener('click', () => this.closeExpenseModal());
     document.getElementById('expenseForm')?.addEventListener('submit', (e) => this.handleExpenseSubmit(e));
@@ -281,16 +282,11 @@ class TripGroupDetailPage {
 
     document.getElementById('groupDates').textContent = dateText;
 
-    // Disable add expense button for archived groups
-    const addExpenseBtn = document.getElementById('addExpenseBtn');
-    if (addExpenseBtn) {
-      if (this.group.status === 'archived') {
-        addExpenseBtn.disabled = true;
-        addExpenseBtn.title = 'Cannot add expenses to archived groups';
-      } else {
-        addExpenseBtn.disabled = false;
-        addExpenseBtn.title = '';
-      }
+    // Show settings button only for admins
+    const currentUserMember = this.members.find(m => m.userId === this.currentUserId);
+    const settingsBtn = document.getElementById('settingsBtn');
+    if (settingsBtn && currentUserMember && currentUserMember.isAdmin) {
+      settingsBtn.style.display = 'inline-flex';
     }
   }
 
@@ -969,7 +965,9 @@ class TripGroupDetailPage {
   // Utility methods
   showLoading(show) {
     const loadingState = document.getElementById('loadingState');
-    loadingState.style.display = show ? 'block' : 'none';
+    if (loadingState) {
+      loadingState.style.display = show ? 'block' : 'none';
+    }
   }
 
   setExpenseLoading(loading) {
