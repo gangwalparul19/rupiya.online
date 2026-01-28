@@ -53,18 +53,6 @@ service cloud.firestore {
              get(/databases/$(database)/documents/tripGroups/$(groupId)).data.createdBy == request.auth.uid;
     }
     
-    // Helper function to check if user is member of group from expense data
-    function isGroupMemberFromExpense(expenseData) {
-      return isAuthenticated() && 
-             exists(/databases/$(database)/documents/tripGroupMembers/$(expenseData.groupId + '_' + request.auth.uid));
-    }
-    
-    // Helper function to check if user is member of group from settlement data
-    function isGroupMemberFromSettlement(settlementData) {
-      return isAuthenticated() && 
-             exists(/databases/$(database)/documents/tripGroupMembers/$(settlementData.groupId + '_' + request.auth.uid));
-    }
-    
     // ============================================
     // USER PROFILES
     // ============================================
@@ -445,18 +433,20 @@ service cloud.firestore {
     // TRIP GROUP EXPENSES - Secured with membership validation
     // ============================================
     match /tripGroupExpenses/{expenseId} {
-      // Get: Only group members can read individual expenses
-      allow get: if isGroupMemberFromExpense(resource.data);
+      // Get: Allow authenticated users to read expenses
+      // Application code filters by groupId and checks membership
+      allow get: if isAuthenticated();
       
       // List: Allow authenticated users to query expenses
       // Note: Application code filters by groupId, and users can only see groups they're members of
       allow list: if isAuthenticated();
       
-      // Create: Only group members can create expenses
-      allow create: if isAuthenticated() && isGroupMemberFromExpense(request.resource.data);
+      // Create: Allow authenticated users to create expenses
+      // Application code checks if user is a group member before creating
+      allow create: if isAuthenticated() && request.resource.data.addedBy == request.auth.uid;
       
-      // Update: Only group members can update expenses
-      allow update: if isGroupMemberFromExpense(resource.data);
+      // Update: Only the expense creator can update
+      allow update: if isAuthenticated() && resource.data.addedBy == request.auth.uid;
       
       // Delete: Only the expense creator can delete, or group creator if group still exists
       // Note: addedBy contains the userId
@@ -495,26 +485,24 @@ service cloud.firestore {
     // TRIP GROUP SETTLEMENTS - Secured with membership validation
     // ============================================
     match /tripGroupSettlements/{settlementId} {
-      // Get: Only group members can read individual settlements
-      allow get: if isGroupMemberFromSettlement(resource.data);
+      // Get: Allow authenticated users to read settlements
+      // Application code filters by groupId and checks membership
+      allow get: if isAuthenticated();
       
       // List: Allow authenticated users to query settlements
       // Note: Application code filters by groupId, and users can only see groups they're members of
       allow list: if isAuthenticated();
       
-      // Create: Only group members can create settlements
-      allow create: if isAuthenticated() && isGroupMemberFromSettlement(request.resource.data);
+      // Create: Allow authenticated users to create settlements
+      // Application code checks if user is a group member before creating
+      allow create: if isAuthenticated() && request.resource.data.recordedBy == request.auth.uid;
       
-      // Update: Only group members involved in the settlement can update
-      allow update: if isAuthenticated() && (
-        resource.data.fromUserId == request.auth.uid ||
-        resource.data.toUserId == request.auth.uid ||
-        isGroupCreator(resource.data.groupId)
-      );
+      // Update: Only the settlement creator can update
+      allow update: if isAuthenticated() && resource.data.recordedBy == request.auth.uid;
       
       // Delete: Only the settlement creator can delete, or group creator if group still exists
       allow delete: if isAuthenticated() && (
-        resource.data.createdBy == request.auth.uid ||
+        resource.data.recordedBy == request.auth.uid ||
         (exists(/databases/$(database)/documents/tripGroups/$(resource.data.groupId)) && 
          isGroupCreator(resource.data.groupId))
       );

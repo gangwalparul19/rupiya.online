@@ -276,7 +276,8 @@ class TripGroupDetailPage {
     }
 
     // Add status badge if archived
-    if (this.group.status === 'archived') {
+    const isArchived = this.group.status === 'archived';
+    if (isArchived) {
       dateText += ' • Archived';
     }
 
@@ -287,6 +288,21 @@ class TripGroupDetailPage {
     const settingsBtn = document.getElementById('settingsBtn');
     if (settingsBtn && currentUserMember && currentUserMember.isAdmin) {
       settingsBtn.style.display = 'inline-flex';
+    }
+
+    // Disable add member buttons for archived groups
+    const addMemberBtn = document.getElementById('addMemberBtn');
+    const quickAddMemberBtn = document.getElementById('quickAddMemberBtn');
+    
+    if (isArchived) {
+      if (addMemberBtn) {
+        addMemberBtn.disabled = true;
+        addMemberBtn.title = 'Cannot add members to archived groups';
+      }
+      if (quickAddMemberBtn) {
+        quickAddMemberBtn.disabled = true;
+        quickAddMemberBtn.title = 'Cannot add members to archived groups';
+      }
     }
   }
 
@@ -799,6 +815,12 @@ class TripGroupDetailPage {
   }
 
   toggleMemberSection() {
+    // Don't allow adding members to archived groups
+    if (this.group.status === 'archived') {
+      this.showToast('Cannot add members to archived groups', 'error');
+      return;
+    }
+
     const section = document.getElementById('addMemberSection');
     const isVisible = section.style.display === 'block' || section.classList.contains('show');
 
@@ -1601,7 +1623,12 @@ class TripGroupDetailPage {
           break;
         case 'm':
           e.preventDefault();
-          this.openMemberSection();
+          // Don't allow adding members to archived groups
+          if (this.group && this.group.status === 'archived') {
+            this.showToast('Cannot add members to archived groups', 'error');
+          } else {
+            this.openMemberSection();
+          }
           break;
         case '?':
           e.preventDefault();
