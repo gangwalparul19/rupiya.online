@@ -1068,6 +1068,18 @@ async function createExpenseCard(expense) {
   const isTripExpense = expense.tripGroupId && expense.tripGroupExpenseId;
   const hasSplit = expense.hasSplit && expense.splitDetails && expense.splitDetails.length > 0;
   
+  // Get payment method display text
+  let paymentMethodDisplay = expense.paymentMethod || 'cash';
+  if (expense.specificPaymentMethodId) {
+    const method = userPaymentMethods.find(m => m.id === expense.specificPaymentMethodId);
+    if (method) {
+      paymentMethodDisplay = getPaymentMethodDisplayName(method);
+    } else {
+      // Payment method not found, show type with indicator
+      paymentMethodDisplay = `${expense.paymentMethod} (details unavailable)`;
+    }
+  }
+  
   // Build split details HTML if available (decrypt member names)
   let splitDetailsHTML = '';
   if (hasSplit) {
@@ -1154,7 +1166,7 @@ async function createExpenseCard(expense) {
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
             </svg>
-            ${expense.paymentMethod}
+            ${escapeHtml(paymentMethodDisplay)}
           </div>
         </div>
       </div>

@@ -189,6 +189,23 @@ class PaymentMethodsService {
    */
   async createCreditCardEntry(methodData, userId, paymentMethodId) {
     try {
+      // Check if a credit card with the same last 4 digits already exists
+      const existingCards = await firestoreService.getAll('creditCards');
+      const matchingCard = existingCards.find(card => 
+        card.userId === userId && 
+        card.lastFourDigits === (methodData.cardNumber ? methodData.cardNumber.slice(-4) : '')
+      );
+      
+      if (matchingCard) {
+        // Link the existing credit card to this payment method
+        await firestoreService.update('creditCards', matchingCard.id, {
+          paymentMethodId: paymentMethodId
+        });
+        
+        return { success: true, id: matchingCard.id, linked: true };
+      }
+      
+      // Create new credit card entry
       const creditCardData = {
         userId,
         paymentMethodId, // Link to the payment method

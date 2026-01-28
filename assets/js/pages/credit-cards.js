@@ -524,10 +524,47 @@ async function handleCardSubmit(e) {
     };
 
     if (editingCardId) {
+      // Update existing card
       await firestoreService.update('creditCards', editingCardId, cardData);
+      
+      // Also update the linked payment method if it exists
+      const card = state.creditCards.find(c => c.id === editingCardId);
+      if (card && card.paymentMethodId) {
+        const paymentMethodsService = (await import('../services/payment-methods-service.js')).default;
+        await paymentMethodsService.updatePaymentMethod(card.paymentMethodId, {
+          name: cardData.cardName,
+          bankName: cardData.bankName,
+          cardNumber: cardData.lastFourDigits
+        });
+      }
+      
       toast.success('Credit card updated successfully');
     } else {
-      await firestoreService.add('creditCards', cardData);
+      // Add new card
+      const result = await firestoreService.add('creditCards', cardData);
+      
+      // Create a corresponding payment method entry
+      if (result.success) {
+        const paymentMethodsService = (await import('../services/payment-methods-service.js')).default;
+        const paymentMethodData = {
+          type: 'card',
+          name: cardData.cardName,
+          cardNumber: cardData.lastFourDigits,
+          cardType: 'credit',
+          bankName: cardData.bankName,
+          isDefault: false
+        };
+        
+        const pmResult = await paymentMethodsService.addPaymentMethod(paymentMethodData);
+        
+        // Link the payment method to the credit card
+        if (pmResult.success) {
+          await firestoreService.update('creditCards', result.id, {
+            paymentMethodId: pmResult.id
+          });
+        }
+      }
+      
       toast.success('Credit card added successfully');
     }
 

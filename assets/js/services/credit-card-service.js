@@ -89,14 +89,28 @@ class CreditCardService {
       const card = await this.getCreditCardByPaymentMethodId(paymentMethodId);
       
       if (!card) {
+        // No credit card found for this payment method
         return { success: true };
       }
 
       // Update the card's current balance
       const newBalance = (card.currentBalance || 0) + expenseAmount;
       
+      // Update with all card fields to preserve encryption
       const result = await firestoreService.update(this.collectionName, card.id, {
+        cardName: card.cardName,
+        bankName: card.bankName,
+        cardType: card.cardType,
+        lastFourDigits: card.lastFourDigits,
+        creditLimit: card.creditLimit,
         currentBalance: newBalance,
+        billingDate: card.billingDate,
+        dueDate: card.dueDate,
+        rewardsProgram: card.rewardsProgram,
+        rewardsBalance: card.rewardsBalance,
+        annualFee: card.annualFee,
+        notes: card.notes,
+        paymentMethodId: card.paymentMethodId,
         updatedAt: Timestamp.now()
       });
 
@@ -127,8 +141,21 @@ class CreditCardService {
       // Reduce the card's current balance
       const newBalance = Math.max(0, (card.currentBalance || 0) - expenseAmount);
       
+      // Update with all card fields to preserve encryption
       const result = await firestoreService.update(this.collectionName, card.id, {
+        cardName: card.cardName,
+        bankName: card.bankName,
+        cardType: card.cardType,
+        lastFourDigits: card.lastFourDigits,
+        creditLimit: card.creditLimit,
         currentBalance: newBalance,
+        billingDate: card.billingDate,
+        dueDate: card.dueDate,
+        rewardsProgram: card.rewardsProgram,
+        rewardsBalance: card.rewardsBalance,
+        annualFee: card.annualFee,
+        notes: card.notes,
+        paymentMethodId: card.paymentMethodId,
         updatedAt: Timestamp.now()
       });
 
