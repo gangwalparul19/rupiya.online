@@ -2294,11 +2294,52 @@ async function handleFormSubmit(e) {
     let result;
     
     if (state.editingExpenseId) {
+      // Get the old expense data to handle payment method changes
+      const oldExpense = state.expenses.find(e => e.id === state.editingExpenseId);
+      
       // Update existing expense
       result = await firestoreService.updateExpense(state.editingExpenseId, expenseData);
       
       if (result.success) {
         toast.success('Expense updated successfully');
+        
+        // Handle credit card balance updates for edited expenses
+        if (oldExpense) {
+          // If payment method changed from credit card to something else
+          if (oldExpense.paymentMethod === 'card' && oldExpense.specificPaymentMethodId && 
+              (expenseData.paymentMethod !== 'card' || expenseData.specificPaymentMethodId !== oldExpense.specificPaymentMethodId)) {
+            // Reduce balance from old card
+            await creditCardService.updateCardBalanceOnExpenseDelete(
+              oldExpense.specificPaymentMethodId,
+              oldExpense.amount
+            );
+          }
+          
+          // If payment method changed to credit card or amount changed
+          if (expenseData.paymentMethod === 'card' && expenseData.specificPaymentMethodId) {
+            if (oldExpense.paymentMethod !== 'card' || oldExpense.specificPaymentMethodId !== expenseData.specificPaymentMethodId) {
+              // Add balance to new card
+              await creditCardService.updateCardBalanceOnExpense(
+                expenseData.specificPaymentMethodId,
+                expenseData.amount
+              );
+            } else if (oldExpense.amount !== expenseData.amount) {
+              // Same card but amount changed - adjust the difference
+              const difference = expenseData.amount - oldExpense.amount;
+              if (difference > 0) {
+                await creditCardService.updateCardBalanceOnExpense(
+                  expenseData.specificPaymentMethodId,
+                  difference
+                );
+              } else if (difference < 0) {
+                await creditCardService.updateCardBalanceOnExpenseDelete(
+                  expenseData.specificPaymentMethodId,
+                  Math.abs(difference)
+                );
+              }
+            }
+          }
+        }
       }
     } else {
       // Add new expense
@@ -2380,9 +2421,20 @@ async function handleDelete() {
   confirmDeleteBtn.textContent = 'Deleting...';
   
   try {
+    // Get expense data before deleting
+    const expense = state.expenses.find(e => e.id === deleteExpenseId);
+    
     const result = await firestoreService.deleteExpense(deleteExpenseId);
     
     if (result.success) {
+      // Update credit card balance if this was a credit card expense
+      if (expense && expense.paymentMethod === 'card' && expense.specificPaymentMethodId) {
+        await creditCardService.updateCardBalanceOnExpenseDelete(
+          expense.specificPaymentMethodId,
+          expense.amount
+        );
+      }
+      
       toast.success('Expense deleted successfully');
       closeDeleteConfirmModal();
       await loadExpenses();

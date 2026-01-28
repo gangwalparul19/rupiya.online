@@ -478,6 +478,13 @@ function openCardForm(cardId = null) {
       document.getElementById('rewardsBalance').value = card.rewardsBalance || 0;
       document.getElementById('annualFee').value = card.annualFee || 0;
       document.getElementById('notes').value = card.notes || '';
+      
+      // Show warning if credit limit is 0 or missing
+      if (!card.creditLimit || card.creditLimit === 0) {
+        setTimeout(() => {
+          toast.warning('Please set a valid credit limit for this card');
+        }, 500);
+      }
     }
   } else {
     formTitle.textContent = 'Add Credit Card';
@@ -506,12 +513,21 @@ async function handleCardSubmit(e) {
     saveBtn.disabled = true;
     saveBtn.textContent = 'Saving...';
 
+    // Validate credit limit
+    const creditLimitValue = parseFloat(document.getElementById('creditLimit').value);
+    if (!creditLimitValue || creditLimitValue <= 0) {
+      toast.error('Please enter a valid credit limit greater than 0');
+      saveBtn.disabled = false;
+      saveBtn.textContent = originalText;
+      return;
+    }
+
     const cardData = {
       cardName: document.getElementById('cardName').value,
       bankName: document.getElementById('bankName').value,
       cardType: document.getElementById('cardType').value,
       lastFourDigits: document.getElementById('lastFourDigits').value,
-      creditLimit: parseFloat(document.getElementById('creditLimit').value),
+      creditLimit: creditLimitValue,
       currentBalance: parseFloat(document.getElementById('currentBalance').value) || 0,
       billingDate: parseInt(document.getElementById('billingDate').value) || null,
       dueDate: parseInt(document.getElementById('dueDate').value) || null,
