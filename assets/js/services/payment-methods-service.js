@@ -199,7 +199,22 @@ class PaymentMethodsService {
       
       if (matchingCard) {
         // Link the existing credit card to this payment method
+        // IMPORTANT: Include all card data to preserve encryption
         await firestoreService.update('creditCards', matchingCard.id, {
+          cardName: matchingCard.cardName || '',
+          bankName: matchingCard.bankName || '',
+          cardType: matchingCard.cardType || 'credit',
+          lastFourDigits: matchingCard.lastFourDigits || '',
+          creditLimit: matchingCard.creditLimit || 0,
+          currentBalance: matchingCard.currentBalance || 0,
+          billingDate: matchingCard.billingDate || null,
+          dueDate: matchingCard.dueDate || null,
+          rewardsProgram: matchingCard.rewardsProgram || null,
+          rewardsBalance: matchingCard.rewardsBalance || 0,
+          annualFee: matchingCard.annualFee || 0,
+          notes: matchingCard.notes || null,
+          masterCardId: matchingCard.masterCardId || null,
+          userId: matchingCard.userId,
           paymentMethodId: paymentMethodId
         });
         
