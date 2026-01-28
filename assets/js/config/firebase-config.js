@@ -47,6 +47,18 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
 
+// Handle auth persistence issues in restricted browser environments
+// Some in-app browsers (like Gmail app) restrict sessionStorage access
+try {
+  // Test if sessionStorage is accessible
+  sessionStorage.setItem('test', 'test');
+  sessionStorage.removeItem('test');
+} catch (e) {
+  console.warn('SessionStorage not accessible, auth state may not persist in this browser');
+  // Firebase will automatically fall back to memory-only persistence
+  // Users may need to open the link in their default browser
+}
+
 // Auth persistence is LOCAL by default in Firebase v10+
 // No need to call setPersistence explicitly
 

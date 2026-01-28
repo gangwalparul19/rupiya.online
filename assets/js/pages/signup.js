@@ -26,15 +26,7 @@ const validationRules = {
 // Get redirect URL after signup (checks for pending invitations)
 function getRedirectUrl() {
   try {
-    // Check for pending invitation first
-    const pendingInvitation = localStorage.getItem('rupiya_pending_invitation');
-    if (pendingInvitation) {
-      localStorage.removeItem('rupiya_pending_invitation');
-      localStorage.removeItem('rupiya_redirect_url');
-      return 'dashboard.html';
-    }
-    
-    // Check for stored redirect URL
+    // Check for stored redirect URL first (trip invitation links)
     const redirectUrl = localStorage.getItem('rupiya_redirect_url');
     if (redirectUrl) {
       localStorage.removeItem('rupiya_redirect_url');
@@ -44,6 +36,13 @@ function getRedirectUrl() {
       } catch (e) {
         return 'dashboard.html';
       }
+    }
+    
+    // Check for pending invitation (legacy family invitations)
+    const pendingInvitation = localStorage.getItem('rupiya_pending_invitation');
+    if (pendingInvitation) {
+      localStorage.removeItem('rupiya_pending_invitation');
+      return 'dashboard.html';
     }
     
     return 'dashboard.html';

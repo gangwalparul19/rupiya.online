@@ -40,7 +40,17 @@ class TripGroupDetailPage {
 
   async waitForAuth() {
     // Wait for auth service to initialize
-    const user = await authService.waitForAuth();
+    let user;
+    try {
+      user = await authService.waitForAuth();
+    } catch (error) {
+      // Handle auth initialization errors (e.g., sessionStorage issues in restricted browsers)
+      if (error.message && error.message.includes('sessionStorage')) {
+        this.showBrowserCompatibilityError();
+        return null;
+      }
+      throw error;
+    }
 
     if (!user) {
       // Not logged in, redirect to login with return URL
@@ -53,6 +63,33 @@ class TripGroupDetailPage {
     this.loadUserProfile(user);
 
     return user;
+  }
+
+  showBrowserCompatibilityError() {
+    const mainContent = document.querySelector('.main-content');
+    if (mainContent) {
+      mainContent.innerHTML = `
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; padding: 2rem; text-align: center;">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="color: #f59e0b; margin-bottom: 1rem;">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          <h2 style="font-size: 1.5rem; font-weight: 600; color: #1f2937; margin-bottom: 0.5rem;">Browser Compatibility Issue</h2>
+          <p style="color: #6b7280; margin-bottom: 1.5rem; max-width: 500px;">
+            This link needs to be opened in your default browser (Chrome, Safari, Firefox, etc.) instead of the in-app browser.
+          </p>
+          <p style="color: #6b7280; margin-bottom: 1.5rem; max-width: 500px; font-size: 0.9rem;">
+            <strong>How to fix:</strong><br>
+            1. Tap the three dots (⋮) or share icon<br>
+            2. Select "Open in Browser" or "Open in Chrome/Safari"<br>
+            3. Or copy the link and paste it in your browser
+          </p>
+          <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
+            <button onclick="navigator.clipboard.writeText(window.location.href).then(() => alert('Link copied! Now paste it in your browser.'))" class="btn btn-primary">Copy Link</button>
+            <a href="trip-groups.html" class="btn btn-outline">Go to Trips</a>
+          </div>
+        </div>
+      `;
+    }
   }
 
   loadUserProfile(user) {
@@ -132,7 +169,7 @@ class TripGroupDetailPage {
       if (e.target.classList.contains('modal-overlay')) {
         if (e.target.id === 'addExpenseModal') this.closeExpenseModal();
         else if (e.target.id === 'settlementModal') this.closeSettlementModal();
-        else if (e.target.id === 'addMemberModal') this.closeMemberModal();
+        else if (e.target.id === 'addMemberModal') this.closeMemberSection();
       }
     });
   }
@@ -919,7 +956,7 @@ class TripGroupDetailPage {
       }
 
       this.showToast('Member added!', 'success');
-      this.closeMemberModal();
+      this.closeMemberSection();
       await this.loadGroupData();
     } catch (error) {
       console.error('Error adding member:', error);
