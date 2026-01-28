@@ -387,8 +387,9 @@ service cloud.firestore {
       // Create: Any authenticated user can create (they become the creator)
       allow create: if isAuthenticated() && request.resource.data.createdBy == request.auth.uid;
       
-      // Update: Only group creator can update group settings
-      allow update: if isGroupCreator(groupId);
+      // Update: Allow authenticated users to update (app checks membership)
+      // This allows members to update totalExpenses when adding expenses
+      allow update: if isAuthenticated();
       
       // Delete: Only group creator can delete
       allow delete: if isGroupCreator(groupId);

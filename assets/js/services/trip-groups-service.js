@@ -146,10 +146,15 @@ class TripGroupsService {
     try {
       const userId = this.getUserId();
 
-      // Check if user is admin
-      const isAdmin = await this.isGroupAdmin(groupId, userId);
-      if (!isAdmin) {
-        return { success: false, error: 'Only admins can update group details' };
+      // Allow updating totalExpenses without admin check (for expense sync)
+      const isTotalExpensesOnly = Object.keys(updates).length === 1 && 'totalExpenses' in updates;
+      
+      if (!isTotalExpensesOnly) {
+        // Check if user is admin for other updates
+        const isAdmin = await this.isGroupAdmin(groupId, userId);
+        if (!isAdmin) {
+          return { success: false, error: 'Only admins can update group details' };
+        }
       }
 
       const groupRef = doc(db, this.groupsCollection, groupId);
@@ -165,6 +170,7 @@ class TripGroupsService {
       if (updates.endDate) updateData.endDate = Timestamp.fromDate(new Date(updates.endDate));
       if (updates.budget) updateData.budget = updates.budget;
       if (updates.categories) updateData.categories = updates.categories;
+      if (updates.totalExpenses !== undefined) updateData.totalExpenses = updates.totalExpenses;
 
       await updateDoc(groupRef, updateData);
 
