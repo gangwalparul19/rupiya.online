@@ -361,8 +361,9 @@
             </div>
 
             <div class="form-group">
-              <label for="currentBalance">Current Balance (₹)</label>
+              <label for="currentBalance">Current Outstanding (₹)</label>
               <input type="number" id="currentBalance" class="form-input" placeholder="0" min="0" step="0.01">
+              <small class="form-help">Enter the current outstanding balance on this card</small>
             </div>
 
             <div class="form-group">
@@ -470,7 +471,10 @@
           <div class="delete-info">
             <strong id="deleteCardName"></strong>
           </div>
-          <p class="text-danger">This action cannot be undone.</p>
+          <div class="alert alert-warning" style="margin-top: 1rem; padding: 0.75rem; background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; color: #856404;">
+            <strong>⚠️ Note:</strong> This will also delete the linked payment method from your profile.
+          </div>
+          <p class="text-danger" style="margin-top: 1rem;">This action cannot be undone.</p>
         </div>
 
         <div class="modal-footer">

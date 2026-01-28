@@ -233,13 +233,23 @@ function renderCreditCards() {
     const utilizationClass = utilization > 70 ? 'high' : '';
     const cardTypeClass = card.cardType ? `card-type-${card.cardType.toLowerCase().replace(' ', '')}` : 'card-type-default';
     
-    // Safely handle potentially undefined values
-    const cardName = card.cardName || 'Unnamed Card';
-    const bankName = card.bankName || 'Unknown Bank';
+    // Safely handle potentially undefined values with better fallbacks
+    const cardName = card.cardName || card.name || 'Unnamed Card';
+    const bankName = card.bankName || card.issuer || 'Unknown Bank';
     const cardType = card.cardType || card.network || 'N/A';
-    const lastFourDigits = card.lastFourDigits || '****';
+    const lastFourDigits = card.lastFourDigits || card.cardNumber || '****';
     const rewardsProgram = card.rewardsProgram || '';
     const rewardsBalance = card.rewardsBalance || 0;
+    
+    // Debug log for cards with missing data
+    if (!card.cardName || creditLimit === 0) {
+      console.warn('Card with incomplete data:', {
+        id: card.id,
+        cardName: card.cardName,
+        creditLimit: card.creditLimit,
+        currentBalance: card.currentBalance
+      });
+    }
 
     return `
       <div class="card-item" data-card-id="${card.id}">
@@ -259,8 +269,12 @@ function renderCreditCards() {
             <div class="card-stat-value">${formatCurrency(creditLimit)}</div>
           </div>
           <div class="card-stat">
+            <div class="card-stat-label">Outstanding</div>
+            <div class="card-stat-value">${formatCurrency(currentBalance)}</div>
+          </div>
+          <div class="card-stat">
             <div class="card-stat-label">Available</div>
-            <div class="card-stat-value">${formatCurrency(creditLimit - currentBalance)}</div>
+            <div class="card-stat-value">${formatCurrency(Math.max(0, creditLimit - currentBalance))}</div>
           </div>
         </div>
 
@@ -270,7 +284,7 @@ function renderCreditCards() {
             <span>${utilization.toFixed(1)}%</span>
           </div>
           <div class="progress-bar">
-            <div class="progress-fill ${utilizationClass}" style="width: ${utilization}%"></div>
+            <div class="progress-fill ${utilizationClass}" style="width: ${Math.min(100, utilization)}%"></div>
           </div>
         </div>
 
@@ -441,8 +455,19 @@ async function confirmDelete() {
     confirmBtn.disabled = true;
     confirmBtn.textContent = 'Deleting...';
 
+    // Get the card to find the linked payment method
+    const card = state.creditCards.find(c => c.id === deleteCardId);
+    
+    // Delete the credit card
     await firestoreService.delete('creditCards', deleteCardId);
-    toast.success('Credit card deleted successfully');
+    
+    // Also delete the linked payment method if it exists
+    if (card && card.paymentMethodId) {
+      const paymentMethodsService = (await import('../services/payment-methods-service.js')).default;
+      await paymentMethodsService.permanentlyDeletePaymentMethod(card.paymentMethodId);
+    }
+    
+    toast.success('Credit card and linked payment method deleted successfully');
     closeDeleteModal();
     await loadCreditCards();
   } catch (error) {
@@ -559,7 +584,7 @@ async function handleCardSubmit(e) {
       // Add new card
       const result = await firestoreService.add('creditCards', cardData);
       
-      // Create a corresponding payment method entry
+      // Create a corresponding payment method entry (without triggering duplicate credit card creation)
       if (result.success) {
         const paymentMethodsService = (await import('../services/payment-methods-service.js')).default;
         const paymentMethodData = {
@@ -568,7 +593,8 @@ async function handleCardSubmit(e) {
           cardNumber: cardData.lastFourDigits,
           cardType: 'credit',
           bankName: cardData.bankName,
-          isDefault: false
+          isDefault: false,
+          skipCreditCardCreation: true // Flag to prevent duplicate creation
         };
         
         const pmResult = await paymentMethodsService.addPaymentMethod(paymentMethodData);

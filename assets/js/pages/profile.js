@@ -1919,12 +1919,30 @@ window.showEditPaymentMethodModal = function(methodId) {
 };
 
 // Show delete payment method modal
-window.showDeletePaymentMethodModal = function(methodId) {
+window.showDeletePaymentMethodModal = async function(methodId) {
   const method = paymentMethods.find(m => m.id === methodId);
   if (!method) return;
   
   deletePaymentMethodId = methodId;
   deletePaymentMethodName.textContent = paymentMethodsService.getPaymentMethodDisplayName(method);
+  
+  // Check if this is a credit card payment method
+  const warningDiv = document.getElementById('deletePaymentMethodWarning');
+  if (method.type === 'card' && method.cardType === 'credit') {
+    // Check if linked to a credit card
+    const firestoreService = (await import('../services/firestore-service.js')).default;
+    const allCreditCards = await firestoreService.getAll('creditCards');
+    const linkedCard = allCreditCards.find(card => card.paymentMethodId === methodId);
+    
+    if (linkedCard && warningDiv) {
+      warningDiv.style.display = 'block';
+    } else if (warningDiv) {
+      warningDiv.style.display = 'none';
+    }
+  } else if (warningDiv) {
+    warningDiv.style.display = 'none';
+  }
+  
   deletePaymentMethodModal.classList.add('show');
 };
 
@@ -1943,10 +1961,30 @@ async function handleDeletePaymentMethod() {
   confirmDeletePaymentMethodBtn.textContent = 'Deleting...';
   
   try {
-    const result = await paymentMethodsService.deletePaymentMethod(deletePaymentMethodId);
+    // Check if this payment method is linked to a credit card
+    const method = paymentMethods.find(m => m.id === deletePaymentMethodId);
+    let linkedCreditCard = null;
+    
+    if (method && method.type === 'card' && method.cardType === 'credit') {
+      // Import firestore service to check for linked credit card
+      const firestoreService = (await import('../services/firestore-service.js')).default;
+      const allCreditCards = await firestoreService.getAll('creditCards');
+      linkedCreditCard = allCreditCards.find(card => card.paymentMethodId === deletePaymentMethodId);
+    }
+    
+    // Delete the payment method
+    const result = await paymentMethodsService.permanentlyDeletePaymentMethod(deletePaymentMethodId);
     
     if (result.success) {
-      showToast('Payment method deleted successfully', 'success');
+      // Also delete the linked credit card if it exists
+      if (linkedCreditCard) {
+        const firestoreService = (await import('../services/firestore-service.js')).default;
+        await firestoreService.delete('creditCards', linkedCreditCard.id);
+        showToast('Payment method and linked credit card deleted successfully', 'success');
+      } else {
+        showToast('Payment method deleted successfully', 'success');
+      }
+      
       hideDeletePaymentMethodModal();
       await loadPaymentMethods();
     } else {

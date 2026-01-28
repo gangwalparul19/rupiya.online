@@ -750,7 +750,10 @@
       <div class="modal-body">
         <p>Are you sure you want to delete this payment method?</p>
         <p class="text-bold" id="deletePaymentMethodName"></p>
-        <p class="text-muted">This action cannot be undone.</p>
+        <div id="deletePaymentMethodWarning" class="alert alert-warning" style="display: none; margin-top: 1rem; padding: 0.75rem; background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; color: #856404;">
+          <strong>⚠️ Note:</strong> This will also delete the linked credit card from the Credit Cards page.
+        </div>
+        <p class="text-muted" style="margin-top: 1rem;">This action cannot be undone.</p>
       </div>
       <div class="modal-footer">
         <button class="btn btn-outline" id="cancelDeletePaymentMethodBtn">Cancel</button>

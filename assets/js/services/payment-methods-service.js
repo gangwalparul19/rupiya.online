@@ -173,7 +173,8 @@ class PaymentMethodsService {
       const result = await firestoreService.add(this.collectionName, data);
       
       // If this is a credit card, also create an entry in creditCards collection
-      if (result.success && methodData.type === this.types.CARD && methodData.cardType === 'credit') {
+      // UNLESS skipCreditCardCreation flag is set (to prevent duplicates when adding from credit cards page)
+      if (result.success && methodData.type === this.types.CARD && methodData.cardType === 'credit' && !methodData.skipCreditCardCreation) {
         await this.createCreditCardEntry(methodData, userId, result.id);
       }
       
