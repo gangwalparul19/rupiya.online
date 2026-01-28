@@ -156,17 +156,20 @@ class TripGroupDetailPage {
       this.group = groupResult.data;
 
       // Check if current user is a member
-      const members = await tripGroupsService.getGroupMembers(this.groupId);
-      const isMember = members.some(m => m.userId === this.currentUserId);
+      // This will also automatically accept any pending invitations for this user's email
+      const isMember = await tripGroupsService.isGroupMember(this.groupId, this.currentUserId);
       
       if (!isMember) {
         this.showError('You are not a member of this trip. Please check your invitation or contact the trip organizer.');
         return;
       }
+      
+      // Reload members after potential invitation acceptance
+      const members = await tripGroupsService.getGroupMembers(this.groupId);
+      this.members = members;
 
-      // Load members, expenses, settlements in parallel
-      [this.members, this.expenses, this.settlements] = await Promise.all([
-        Promise.resolve(members), // Already loaded
+      // Load expenses and settlements in parallel
+      [this.expenses, this.settlements] = await Promise.all([
         tripGroupsService.getGroupExpenses(this.groupId),
         tripGroupsService.getSettlements(this.groupId)
       ]);

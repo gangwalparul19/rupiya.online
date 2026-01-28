@@ -513,7 +513,20 @@ class TripGroupsService {
       const memberId = `${groupId}_${userId}`;
       const memberRef = doc(db, this.membersCollection, memberId);
       const memberSnap = await getDoc(memberRef);
-      return memberSnap.exists();
+      
+      if (memberSnap.exists()) {
+        return true;
+      }
+      
+      // Check if user has a pending invitation by email
+      // This handles the case where a user was invited before they had an account
+      const user = authService.getCurrentUser();
+      if (user && user.email) {
+        const hasPendingInvite = await this.checkAndAcceptPendingInvitation(groupId, user.email, userId);
+        return hasPendingInvite;
+      }
+      
+      return false;
     } catch (error) {
       console.error('Error checking member status:', error);
       return false;
@@ -551,6 +564,70 @@ class TripGroupsService {
     } catch (error) {
       console.error('Error getting member:', error);
       return { success: false, error: error.message };
+    }
+  }
+
+  // Check and accept pending invitation for a user
+  async checkAndAcceptPendingInvitation(groupId, userEmail, userId) {
+    try {
+      if (!userEmail || !userId) return false;
+      
+      // Get all members of the group
+      const membersQuery = query(
+        collection(db, this.membersCollection),
+        where('groupId', '==', groupId)
+      );
+      const snapshot = await getDocs(membersQuery);
+      
+      // Look for a member with matching email but no userId (pending invitation)
+      for (const docSnap of snapshot.docs) {
+        const memberData = docSnap.data();
+        
+        // Decrypt email to check
+        let decryptedEmail = null;
+        try {
+          if (memberData.email) {
+            decryptedEmail = await encryptionService.decryptValue(memberData.email);
+          }
+        } catch (decryptError) {
+          // Try unencrypted email (legacy data)
+          decryptedEmail = memberData.email;
+        }
+        
+        // Check if this is a pending invitation for this email
+        if (decryptedEmail && 
+            decryptedEmail.toLowerCase() === userEmail.toLowerCase() && 
+            !memberData.userId && 
+            memberData.inviteStatus === 'pending') {
+          
+          // Update the member record with userId and accept the invitation
+          const oldMemberId = docSnap.id;
+          const newMemberId = `${groupId}_${userId}`;
+          
+          // Create new member document with userId
+          const updatedMemberData = {
+            ...memberData,
+            id: newMemberId,
+            userId: userId,
+            inviteStatus: 'accepted',
+            acceptedAt: Timestamp.now()
+          };
+          
+          // Save with new ID
+          await setDoc(doc(db, this.membersCollection, newMemberId), updatedMemberData);
+          
+          // Delete old member document
+          await deleteDoc(doc(db, this.membersCollection, oldMemberId));
+          
+          console.log(`Accepted pending invitation for ${userEmail} in group ${groupId}`);
+          return true;
+        }
+      }
+      
+      return false;
+    } catch (error) {
+      console.error('Error checking pending invitation:', error);
+      return false;
     }
   }
 
