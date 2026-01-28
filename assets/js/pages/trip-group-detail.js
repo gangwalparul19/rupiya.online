@@ -397,21 +397,26 @@ class TripGroupDetailPage {
     const memberLookup = {};
     this.members.forEach(m => memberLookup[m.id] = m);
 
-    list.innerHTML = this.expenses.map(expense => {
+    // Filter out expenses with invalid data (corrupted encrypted data)
+    const validExpenses = this.expenses.filter(expense => {
+      return expense.amount && expense.description && expense.paidBy;
+    });
+
+    list.innerHTML = validExpenses.map(expense => {
       const paidByMember = memberLookup[expense.paidBy];
       const date = expense.date?.toDate ? expense.date.toDate() : new Date();
 
       return `
         <div class="expense-item" data-expense-id="${expense.id}">
           <div class="expense-main">
-            <div class="expense-description">${this.escapeHtml(expense.description)}</div>
+            <div class="expense-description">${this.escapeHtml(expense.description || 'Unknown')}</div>
             <div class="expense-meta">
-              <span class="expense-category">${expense.category}</span>
+              <span class="expense-category">${expense.category || 'Other'}</span>
               <span>${this.formatDate(date)}</span>
             </div>
           </div>
           <div class="expense-right">
-            <div class="expense-amount">₹${expense.amount.toLocaleString('en-IN')}</div>
+            <div class="expense-amount">₹${(expense.amount || 0).toLocaleString('en-IN')}</div>
             <div class="expense-paid-by">Paid by ${paidByMember?.name || 'Unknown'}</div>
           </div>
         </div>

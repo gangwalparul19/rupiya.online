@@ -1096,6 +1096,12 @@ class TripGroupsService {
 
       // Process expenses
       expenses.forEach(expense => {
+        // Skip expenses with missing or invalid data (corrupted encrypted data)
+        if (!expense.amount || !expense.paidBy || !expense.splits || !Array.isArray(expense.splits)) {
+          console.warn('Skipping expense with invalid data:', expense.id);
+          return;
+        }
+
         // Person who paid gets credit for the full amount
         if (balances[expense.paidBy] !== undefined) {
           balances[expense.paidBy] += expense.amount;
@@ -1103,7 +1109,7 @@ class TripGroupsService {
 
         // Each person in the split owes their share
         expense.splits.forEach(split => {
-          if (balances[split.memberId] !== undefined) {
+          if (split && split.memberId && split.amount && balances[split.memberId] !== undefined) {
             balances[split.memberId] -= split.amount;
           }
         });
@@ -1111,6 +1117,12 @@ class TripGroupsService {
 
       // Process settlements
       settlements.forEach(settlement => {
+        // Skip settlements with missing data
+        if (!settlement.amount || !settlement.fromMemberId || !settlement.toMemberId) {
+          console.warn('Skipping settlement with invalid data:', settlement.id);
+          return;
+        }
+
         // Person who paid (from) reduces their debt
         if (balances[settlement.fromMemberId] !== undefined) {
           balances[settlement.fromMemberId] += settlement.amount;
