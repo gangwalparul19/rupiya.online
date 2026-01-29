@@ -1283,6 +1283,11 @@
     margin-bottom: var(--spacing-md);
   }
   
+  /* Make upcoming bills full width on mobile */
+  .upcoming-bills-widget {
+    grid-column: 1 / -1;
+  }
+  
   .savings-rate-widget,
   .goal-progress-widget,
   .top-categories-widget,

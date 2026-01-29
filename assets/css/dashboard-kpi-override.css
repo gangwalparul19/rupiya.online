@@ -267,8 +267,14 @@
 
 @media (max-width: 768px) {
   .widgets-row {
+    grid-template-columns: 1fr;
     gap: 12px;
     margin-bottom: 16px;
+  }
+  
+  /* Make upcoming bills full width on mobile */
+  .upcoming-bills-widget {
+    grid-column: 1 / -1;
   }
 }
 
@@ -460,6 +466,11 @@
 
   .widgets-row {
     gap: 8px;
+  }
+  
+  /* Make upcoming bills full width on extra small mobile */
+  .upcoming-bills-widget {
+    grid-column: 1 / -1;
   }
 
   .savings-rate-widget,
