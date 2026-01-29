@@ -1,5 +1,13 @@
 /* Savings Page Styles */
 
+/* KPI Grid Override for Savings Page */
+/* Default: 4 columns on desktop */
+.container .kpi-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 1.5rem !important;
+}
+
 /* Form Section Visibility */
 .form-section {
   margin: 2rem 0;
@@ -527,6 +535,32 @@
     font-size: 1rem;
   }
 
+  /* KPI Grid Mobile - 2 per row */
+  .container .kpi-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.75rem !important;
+  }
+
+  .kpi-card {
+    padding: 1rem;
+  }
+
+  .kpi-icon {
+    font-size: 1.5rem;
+  }
+
+  .kpi-label {
+    font-size: 0.75rem;
+  }
+
+  .kpi-value {
+    font-size: 1.25rem;
+  }
+
+  .kpi-change {
+    font-size: 0.7rem;
+  }
+
   /* Empty State Mobile */
   .empty-state {
     padding: 2rem 1rem;
@@ -561,9 +595,18 @@
     gap: 1rem;
   }
 
-  .kpi-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
+  /* Keep KPI grid at 2 columns even on very small screens */
+  .container .kpi-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem !important;
+  }
+
+  .kpi-card {
+    padding: 0.75rem;
+  }
+
+  .kpi-value {
+    font-size: 1.125rem;
   }
 
   .page-header {

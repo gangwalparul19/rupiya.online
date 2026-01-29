@@ -3,7 +3,6 @@ import '../services/services-init.js';
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
 import toast from '../components/toast.js';
-import confirmationModal from '../components/confirmation-modal.js';
 import encryptionReauthModal from '../components/encryption-reauth-modal.js';
 import { formatCurrency, formatCurrencyCompact, formatDate, formatDateForInput, escapeHtml } from '../utils/helpers.js';
 import timezoneService from '../utils/timezone.js';
@@ -40,11 +39,13 @@ async function init() {
   const isAuthenticated = await checkAuth();
   if (!isAuthenticated) return;
   
+  // Initialize page first to set up DOM elements
+  await initPage();
+  
+  // Then check encryption and load data
   await encryptionReauthModal.checkAndPrompt(async () => {
     await loadSavings();
   });
-  
-  await initPage();
 }
 
 // Start initialization
@@ -96,7 +97,7 @@ async function initPage() {
     // Set default start date to today
     document.getElementById('startDate').value = formatDateForInput(new Date());
     
-    await loadSavings();
+    // Don't load savings here - it will be loaded by encryption modal callback
     setupEventListeners();
   }
 }
@@ -145,9 +146,9 @@ async function loadGoals() {
 // Load savings
 async function loadSavings() {
   try {
-    loadingState.style.display = 'flex';
-    emptyState.style.display = 'none';
-    savingsList.style.display = 'none';
+    if (loadingState) loadingState.style.display = 'flex';
+    if (emptyState) emptyState.style.display = 'none';
+    if (savingsList) savingsList.style.display = 'none';
     
     state.savings = await firestoreService.getSavings();
     state.filteredSavings = [...state.savings];
@@ -162,7 +163,7 @@ async function loadSavings() {
   } catch (error) {
     console.error('Error loading savings:', error);
     toast.error('Failed to load savings');
-    loadingState.style.display = 'none';
+    if (loadingState) loadingState.style.display = 'none';
   }
 }
 
@@ -243,14 +244,19 @@ function calculateMaturityValue(saving) {
 
 // Update KPIs
 function updateKPIs() {
-  monthlySavingsValue.textContent = formatCurrencyCompact(state.allDataKPI.monthlyCommitment);
-  totalSavedValue.textContent = formatCurrencyCompact(state.allDataKPI.totalSaved);
-  activeSavingsValue.textContent = state.allDataKPI.activeSavings;
-  maturityValue.textContent = formatCurrencyCompact(state.allDataKPI.expectedMaturity);
+  if (monthlySavingsValue) monthlySavingsValue.textContent = formatCurrencyCompact(state.allDataKPI.monthlyCommitment);
+  if (totalSavedValue) totalSavedValue.textContent = formatCurrencyCompact(state.allDataKPI.totalSaved);
+  if (activeSavingsValue) activeSavingsValue.textContent = state.allDataKPI.activeSavings;
+  if (maturityValue) maturityValue.textContent = formatCurrencyCompact(state.allDataKPI.expectedMaturity);
 }
 
 // Render savings
 function renderSavings() {
+  if (!loadingState || !emptyState || !savingsList) {
+    console.error('Required DOM elements not found');
+    return;
+  }
+  
   loadingState.style.display = 'none';
   
   if (state.filteredSavings.length === 0) {
