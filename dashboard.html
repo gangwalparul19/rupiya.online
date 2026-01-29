@@ -67,13 +67,64 @@
   <style>
     /* Mobile styles - highest priority */
     @media (max-width: 768px) {
-      /* KPI Cards - Keep 2 columns per row */
+      /* KPI Cards - Compact 2 columns per row */
       .kpi-grid {
         display: grid !important;
         grid-template-columns: repeat(2, 1fr) !important;
-        gap: 8px !important;
-        padding: 0 16px 16px 16px !important;
+        gap: 6px !important;
+        padding: 0 8px 12px 8px !important;
         margin-bottom: 0 !important;
+      }
+      
+      /* Compact KPI Card Design */
+      .kpi-card {
+        padding: 10px 8px !important;
+        min-height: auto !important;
+        border-width: 1.5px !important;
+      }
+      
+      .kpi-header {
+        margin-bottom: 6px !important;
+        gap: 4px !important;
+        align-items: center !important;
+      }
+      
+      .kpi-title {
+        font-size: 9px !important;
+        letter-spacing: 0.3px !important;
+        line-height: 1.1 !important;
+        text-transform: uppercase !important;
+        font-weight: 600 !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+      }
+      
+      .kpi-icon {
+        width: 28px !important;
+        height: 28px !important;
+        font-size: 14px !important;
+        flex-shrink: 0 !important;
+        border-radius: 6px !important;
+      }
+      
+      .kpi-value {
+        font-size: 18px !important;
+        font-weight: 700 !important;
+        margin-bottom: 4px !important;
+        line-height: 1.1 !important;
+        word-break: break-word !important;
+      }
+      
+      .kpi-change {
+        font-size: 9px !important;
+        gap: 2px !important;
+        line-height: 1.2 !important;
+        font-weight: 600 !important;
+      }
+      
+      .kpi-change span {
+        display: inline !important;
       }
       
       /* Widgets Row - Full width, no gaps */
@@ -123,16 +174,74 @@
       }
     }
     
-    /* Extra small mobile */
+    /* Extra small mobile - even more compact */
     @media (max-width: 480px) {
       .kpi-grid {
-        gap: 6px !important;
+        gap: 4px !important;
+        padding: 0 6px 10px 6px !important;
+      }
+      
+      .kpi-card {
+        padding: 8px 6px !important;
+      }
+      
+      .kpi-header {
+        margin-bottom: 4px !important;
+      }
+      
+      .kpi-title {
+        font-size: 8px !important;
+      }
+      
+      .kpi-icon {
+        width: 24px !important;
+        height: 24px !important;
+        font-size: 12px !important;
+      }
+      
+      .kpi-value {
+        font-size: 16px !important;
+        margin-bottom: 3px !important;
+      }
+      
+      .kpi-change {
+        font-size: 8px !important;
       }
       
       .widgets-row > *,
       .widgets-row [class*="-widget"] {
         margin: 0 0 12px 0 !important;
         padding: 12px !important;
+      }
+    }
+    
+    /* Ultra compact for very small screens */
+    @media (max-width: 360px) {
+      .kpi-grid {
+        gap: 3px !important;
+        padding: 0 4px 8px 4px !important;
+      }
+      
+      .kpi-card {
+        padding: 6px 4px !important;
+      }
+      
+      .kpi-title {
+        font-size: 7px !important;
+      }
+      
+      .kpi-icon {
+        width: 22px !important;
+        height: 22px !important;
+        font-size: 11px !important;
+      }
+      
+      .kpi-value {
+        font-size: 14px !important;
+      }
+      
+      .kpi-change {
+        font-size: 7px !important;
       }
     }
   </style>
