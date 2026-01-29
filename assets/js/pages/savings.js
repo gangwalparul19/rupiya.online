@@ -7,6 +7,10 @@ import encryptionReauthModal from '../components/encryption-reauth-modal.js';
 import { formatCurrency, formatCurrencyCompact, formatDate, formatDateForInput, escapeHtml } from '../utils/helpers.js';
 import timezoneService from '../utils/timezone.js';
 
+// Import components for sidebar and header
+import '../components/sidebar.js';
+import '../components/header.js';
+
 // State management
 const state = {
   savings: [],
