@@ -65,6 +65,58 @@
   
   <!-- CRITICAL FIX: Force full width widgets and 2-column KPI cards on mobile -->
   <style>
+    /* Desktop styles - 2 column layout for widgets and charts */
+    @media (min-width: 769px) {
+      /* Widgets Row - 2 columns on desktop */
+      .widgets-row {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 1.5rem !important;
+        margin-bottom: 1.5rem !important;
+      }
+      
+      /* Savings Rate - spans full width (first row) */
+      .savings-rate-widget {
+        grid-column: 1 / -1 !important;
+      }
+      
+      /* Top Categories and Emergency Fund - second row, 2 columns */
+      .top-categories-widget {
+        grid-column: 1 / 2 !important;
+      }
+      
+      .emergency-fund-widget {
+        grid-column: 2 / 3 !important;
+      }
+      
+      /* Goal Progress and Upcoming Bills - third row, 2 columns */
+      .goal-progress-widget {
+        grid-column: 1 / 2 !important;
+      }
+      
+      .upcoming-bills-widget {
+        grid-column: 2 / 3 !important;
+      }
+      
+      /* Charts Grid - 2 columns on desktop */
+      .charts-grid {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 1.5rem !important;
+        margin-bottom: 1.5rem !important;
+      }
+      
+      /* Income vs Expenses - left column */
+      .charts-grid > .chart-card:nth-child(1) {
+        grid-column: 1 / 2 !important;
+      }
+      
+      /* Expense Breakdown - right column */
+      .charts-grid > .chart-card:nth-child(2) {
+        grid-column: 2 / 3 !important;
+      }
+    }
+    
     /* Mobile styles - highest priority */
     @media (max-width: 768px) {
       /* KPI Cards - Compact 2 columns per row */
@@ -81,12 +133,39 @@
         padding: 10px 8px !important;
         min-height: auto !important;
         border-width: 1.5px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
       }
       
       .kpi-header {
         margin-bottom: 3px !important;
         gap: 4px !important;
         align-items: center !important;
+        width: 100% !important;
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: space-between !important;
+      }
+      
+      /* Icon on extreme left */
+      .kpi-icon {
+        width: 28px !important;
+        height: 28px !important;
+        font-size: 14px !important;
+        flex-shrink: 0 !important;
+        border-radius: 6px !important;
+        order: 1 !important;
+      }
+      
+      /* Title in center, bold */
+      .kpi-header > div:first-child {
+        order: 2 !important;
+        flex: 1 !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        text-align: center !important;
       }
       
       .kpi-title {
@@ -98,30 +177,38 @@
         white-space: nowrap !important;
         overflow: hidden !important;
         text-overflow: ellipsis !important;
+        text-align: center !important;
+        width: 100% !important;
       }
       
-      .kpi-icon {
-        width: 28px !important;
-        height: 28px !important;
-        font-size: 14px !important;
+      /* Info button on extreme right */
+      .kpi-info-btn {
+        order: 3 !important;
         flex-shrink: 0 !important;
-        border-radius: 6px !important;
+        margin-left: 0 !important;
       }
       
+      /* Value centered */
       .kpi-value {
         font-size: 20px !important;
         font-weight: 700 !important;
         margin-bottom: 2px !important;
         line-height: 1.1 !important;
         word-break: break-word !important;
+        text-align: center !important;
+        width: 100% !important;
       }
       
+      /* Change text centered */
       .kpi-change {
         font-size: 9px !important;
         gap: 2px !important;
         line-height: 1.1 !important;
         font-weight: 600 !important;
         margin-top: 0 !important;
+        text-align: center !important;
+        width: 100% !important;
+        justify-content: center !important;
       }
       
       .kpi-change span {
@@ -204,11 +291,14 @@
       .kpi-value {
         font-size: 18px !important;
         margin-bottom: 2px !important;
+        text-align: center !important;
       }
       
       .kpi-change {
         font-size: 8px !important;
         line-height: 1.1 !important;
+        text-align: center !important;
+        justify-content: center !important;
       }
       
       .widgets-row > *,
@@ -247,11 +337,14 @@
       .kpi-value {
         font-size: 16px !important;
         margin-bottom: 1px !important;
+        text-align: center !important;
       }
       
       .kpi-change {
         font-size: 7px !important;
         line-height: 1.1 !important;
+        text-align: center !important;
+        justify-content: center !important;
       }
     }
   </style>

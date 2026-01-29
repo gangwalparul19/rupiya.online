@@ -388,7 +388,7 @@ export async function initSidebar() {
   });
 }
 
-// Setup collapsible section toggles
+// Setup collapsible section toggles with accordion behavior
 function setupSectionToggles() {
   document.querySelectorAll('[data-section-toggle]').forEach(header => {
     header.addEventListener('click', (e) => {
@@ -405,6 +405,21 @@ function setupSectionToggles() {
       
       if (section) {
         const isExpanded = section.classList.contains('expanded');
+        
+        // ACCORDION BEHAVIOR: Collapse all other sections first
+        document.querySelectorAll('.nav-section').forEach(otherSection => {
+          if (otherSection !== section) {
+            otherSection.classList.remove('expanded');
+            otherSection.classList.add('collapsed');
+            // Save collapsed state for other sections
+            const otherSectionId = otherSection.dataset.section;
+            if (otherSectionId) {
+              saveSectionState(otherSectionId, false);
+            }
+          }
+        });
+        
+        // Toggle the clicked section
         section.classList.toggle('expanded', !isExpanded);
         section.classList.toggle('collapsed', isExpanded);
         saveSectionState(sectionId, !isExpanded);
