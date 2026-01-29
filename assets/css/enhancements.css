@@ -963,7 +963,12 @@
    ============================================ */
 @media (max-width: 768px) {
   .widgets-row {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
+  }
+  
+  /* Force ALL widgets to full width on mobile */
+  .widgets-row > * {
+    grid-column: 1 / -1 !important;
   }
   
   .expense-header,

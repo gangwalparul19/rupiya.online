@@ -891,9 +891,14 @@
 @media (max-width: 768px) {
   .widgets-row {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
     gap: 1rem;
     margin-bottom: 1rem;
+  }
+  
+  /* Force ALL widgets to full width on mobile */
+  .widgets-row > * {
+    grid-column: 1 / -1 !important;
   }
 }
 

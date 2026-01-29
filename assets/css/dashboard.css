@@ -1278,20 +1278,20 @@
   
   /* Widgets Row Mobile */
   .widgets-row {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
     gap: var(--spacing-md);
     margin-bottom: var(--spacing-md);
   }
   
-  /* Make upcoming bills full width on mobile */
-  .upcoming-bills-widget {
-    grid-column: 1 / -1;
-  }
-  
+  /* Make ALL widgets full width on mobile - catch all */
+  .widgets-row > *,
+  .widgets-row [class*="-widget"],
   .savings-rate-widget,
   .goal-progress-widget,
   .top-categories-widget,
-  .upcoming-bills-widget {
+  .upcoming-bills-widget,
+  .emergency-fund-widget {
+    grid-column: 1 / -1 !important;
     padding: var(--spacing-md);
   }
   

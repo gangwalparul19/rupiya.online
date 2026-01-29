@@ -267,14 +267,20 @@
 
 @media (max-width: 768px) {
   .widgets-row {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
     gap: 12px;
     margin-bottom: 16px;
   }
   
-  /* Make upcoming bills full width on mobile */
-  .upcoming-bills-widget {
-    grid-column: 1 / -1;
+  /* Make ALL widgets full width on mobile - catch all */
+  .widgets-row > *,
+  .widgets-row [class*="-widget"],
+  .savings-rate-widget,
+  .goal-progress-widget,
+  .top-categories-widget,
+  .upcoming-bills-widget,
+  .emergency-fund-widget {
+    grid-column: 1 / -1 !important;
   }
 }
 
@@ -468,9 +474,15 @@
     gap: 8px;
   }
   
-  /* Make upcoming bills full width on extra small mobile */
-  .upcoming-bills-widget {
-    grid-column: 1 / -1;
+  /* Make ALL widgets full width on extra small mobile - catch all */
+  .widgets-row > *,
+  .widgets-row [class*="-widget"],
+  .savings-rate-widget,
+  .goal-progress-widget,
+  .top-categories-widget,
+  .upcoming-bills-widget,
+  .emergency-fund-widget {
+    grid-column: 1 / -1 !important;
   }
 
   .savings-rate-widget,
