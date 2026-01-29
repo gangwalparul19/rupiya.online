@@ -1,0 +1,517 @@
+/* ============================================
+   RUPIYA - FLOATING ACTION BUTTON (FAB)
+   Quick action access with expandable menu
+   ============================================ */
+
+/* ============================================
+   MAIN FAB BUTTON
+   ============================================ */
+
+.fab-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: var(--z-index-fixed);
+}
+
+.fab-main {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
+  color: var(--white);
+  border: none;
+  box-shadow: var(--shadow-xl);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.fab-main::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.fab-main:hover {
+  transform: scale(1.1);
+  box-shadow: var(--shadow-2xl);
+}
+
+.fab-main:hover::before {
+  width: 200px;
+  height: 200px;
+}
+
+.fab-main:active {
+  transform: scale(1.05);
+}
+
+.fab-main:focus-visible {
+  outline: 4px solid var(--primary-blue-light);
+  outline-offset: 4px;
+}
+
+/* FAB Icon Rotation */
+.fab-icon {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fab-container.open .fab-icon {
+  transform: rotate(45deg);
+}
+
+/* ============================================
+   FAB MENU
+   ============================================ */
+
+.fab-menu {
+  position: absolute;
+  bottom: 80px;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(20px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fab-container.open .fab-menu {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+/* ============================================
+   FAB MENU ITEMS
+   ============================================ */
+
+.fab-item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--spacing-md);
+  opacity: 0;
+  transform: translateX(20px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fab-container.open .fab-item {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Stagger animation for menu items */
+.fab-container.open .fab-item:nth-child(1) { transition-delay: 0.05s; }
+.fab-container.open .fab-item:nth-child(2) { transition-delay: 0.1s; }
+.fab-container.open .fab-item:nth-child(3) { transition-delay: 0.15s; }
+.fab-container.open .fab-item:nth-child(4) { transition-delay: 0.2s; }
+.fab-container.open .fab-item:nth-child(5) { transition-delay: 0.25s; }
+.fab-container.open .fab-item:nth-child(6) { transition-delay: 0.3s; }
+
+/* FAB Item Label */
+.fab-label {
+  background: var(--white);
+  color: var(--text-primary);
+  padding: 8px 16px;
+  border-radius: var(--border-radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+  box-shadow: var(--shadow-md);
+  opacity: 0;
+  transform: translateX(10px);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+.fab-item:hover .fab-label {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* FAB Item Button */
+.fab-button {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--white);
+  color: var(--text-primary);
+  border: none;
+  box-shadow: var(--shadow-lg);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.fab-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: var(--primary-blue);
+  transform: translate(-50%, -50%);
+  transition: width 0.4s, height 0.4s;
+  z-index: 0;
+}
+
+.fab-button:hover::before {
+  width: 100px;
+  height: 100px;
+}
+
+.fab-button:hover {
+  transform: scale(1.15);
+  box-shadow: var(--shadow-xl);
+  color: var(--white);
+}
+
+.fab-button:active {
+  transform: scale(1.05);
+}
+
+.fab-button:focus-visible {
+  outline: 3px solid var(--primary-blue);
+  outline-offset: 3px;
+}
+
+.fab-button-icon {
+  position: relative;
+  z-index: 1;
+}
+
+/* FAB Button Color Variants */
+.fab-button.expense {
+  background: linear-gradient(135deg, var(--danger-light) 0%, var(--danger) 100%);
+  color: var(--white);
+}
+
+.fab-button.income {
+  background: linear-gradient(135deg, var(--success-light) 0%, var(--success) 100%);
+  color: var(--white);
+}
+
+.fab-button.investment {
+  background: linear-gradient(135deg, var(--info-light) 0%, var(--info) 100%);
+  color: var(--white);
+}
+
+.fab-button.goal {
+  background: linear-gradient(135deg, var(--warning-light) 0%, var(--warning) 100%);
+  color: var(--white);
+}
+
+.fab-button.transfer {
+  background: linear-gradient(135deg, var(--accent-purple) 0%, #8E44AD 100%);
+  color: var(--white);
+}
+
+.fab-button.note {
+  background: linear-gradient(135deg, var(--accent-teal) 0%, #16A085 100%);
+  color: var(--white);
+}
+
+/* ============================================
+   FAB BACKDROP
+   ============================================ */
+
+.fab-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(2px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: calc(var(--z-index-fixed) - 1);
+}
+
+.fab-container.open ~ .fab-backdrop {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ============================================
+   KEYBOARD SHORTCUTS HINT
+   ============================================ */
+
+.fab-keyboard-hint {
+  position: absolute;
+  bottom: -32px;
+  right: 0;
+  background: var(--gray-900);
+  color: var(--white);
+  padding: 4px 12px;
+  border-radius: var(--border-radius);
+  font-size: var(--font-size-xs);
+  font-family: var(--font-family-mono);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fab-main:hover .fab-keyboard-hint {
+  opacity: 1;
+}
+
+.fab-keyboard-hint kbd {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-weight: var(--font-weight-semibold);
+}
+
+/* ============================================
+   FAB NOTIFICATION BADGE
+   ============================================ */
+
+.fab-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--danger);
+  color: var(--white);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid var(--white);
+  animation: badgePulse 2s ease-in-out infinite;
+}
+
+@keyframes badgePulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+/* ============================================
+   MINI FAB (Smaller variant)
+   ============================================ */
+
+.fab-mini {
+  width: 48px;
+  height: 48px;
+  font-size: 20px;
+}
+
+.fab-mini .fab-keyboard-hint {
+  bottom: -28px;
+}
+
+/* ============================================
+   EXTENDED FAB (With text)
+   ============================================ */
+
+.fab-extended {
+  width: auto;
+  padding: 0 24px;
+  border-radius: var(--border-radius-full);
+  gap: var(--spacing-sm);
+}
+
+.fab-extended-text {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 768px) {
+  .fab-container {
+    bottom: 16px;
+    right: 16px;
+  }
+
+  .fab-main {
+    width: 56px;
+    height: 56px;
+    font-size: 24px;
+  }
+
+  .fab-menu {
+    bottom: 72px;
+  }
+
+  .fab-button {
+    width: 44px;
+    height: 44px;
+    font-size: 18px;
+  }
+
+  .fab-label {
+    font-size: var(--font-size-xs);
+    padding: 6px 12px;
+  }
+
+  /* Hide labels on very small screens */
+  @media (max-width: 480px) {
+    .fab-label {
+      display: none;
+    }
+  }
+}
+
+/* Landscape mode on mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+  .fab-container {
+    bottom: 12px;
+    right: 12px;
+  }
+
+  .fab-main {
+    width: 48px;
+    height: 48px;
+    font-size: 20px;
+  }
+
+  .fab-menu {
+    bottom: 60px;
+  }
+}
+
+/* ============================================
+   DARK MODE SUPPORT
+   ============================================ */
+
+[data-theme="dark"] .fab-label {
+  background: var(--gray-800);
+  color: var(--white);
+}
+
+[data-theme="dark"] .fab-button {
+  background: var(--gray-800);
+  color: var(--white);
+}
+
+[data-theme="dark"] .fab-backdrop {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .fab-main,
+  .fab-button {
+    border: 2px solid currentColor;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .fab-main,
+  .fab-button,
+  .fab-menu,
+  .fab-item,
+  .fab-label,
+  .fab-backdrop {
+    transition: none;
+    animation: none;
+  }
+
+  .fab-container.open .fab-icon {
+    transform: none;
+  }
+}
+
+/* ============================================
+   PRINT STYLES
+   ============================================ */
+
+@media print {
+  .fab-container,
+  .fab-backdrop {
+    display: none !important;
+  }
+}
+
+/* ============================================
+   TOOLTIP VARIANT
+   ============================================ */
+
+.fab-tooltip {
+  position: absolute;
+  bottom: 50%;
+  right: calc(100% + 12px);
+  transform: translateY(50%);
+  background: var(--gray-900);
+  color: var(--white);
+  padding: 8px 12px;
+  border-radius: var(--border-radius);
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: var(--z-index-tooltip);
+}
+
+.fab-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: -6px;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid var(--gray-900);
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+}
+
+.fab-button:hover .fab-tooltip {
+  opacity: 1;
+}
+
+/* ============================================
+   SPEED DIAL VARIANT
+   ============================================ */
+
+.fab-speed-dial .fab-menu {
+  flex-direction: column-reverse;
+  bottom: auto;
+  top: -16px;
+  transform: translateY(-100%);
+}
+
+.fab-speed-dial.open .fab-menu {
+  transform: translateY(-100%);
+}

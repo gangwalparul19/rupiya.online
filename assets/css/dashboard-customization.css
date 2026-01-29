@@ -1,0 +1,521 @@
+/* ============================================
+   RUPIYA - DASHBOARD CUSTOMIZATION
+   Drag-and-drop widget reordering and customization
+   ============================================ */
+
+/* ============================================
+   CUSTOMIZATION MODE
+   ============================================ */
+
+/* Customization Toggle Button */
+.customize-dashboard-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
+  color: var(--white);
+  border: none;
+  box-shadow: var(--shadow-lg);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: var(--z-index-fixed);
+}
+
+.customize-dashboard-btn:hover {
+  transform: scale(1.1) rotate(90deg);
+  box-shadow: var(--shadow-xl);
+}
+
+.customize-dashboard-btn:active {
+  transform: scale(1.05) rotate(90deg);
+}
+
+/* Customization Mode Active State */
+body.customization-mode {
+  cursor: move;
+}
+
+body.customization-mode .customize-dashboard-btn {
+  background: linear-gradient(135deg, var(--success) 0%, var(--success-dark) 100%);
+}
+
+/* ============================================
+   WIDGET CONTAINER
+   ============================================ */
+
+.dashboard-widgets {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--spacing-lg);
+  padding: var(--spacing-lg);
+}
+
+/* Widget Card */
+.dashboard-widget {
+  background: var(--bg-card);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.dashboard-widget:hover {
+  box-shadow: var(--shadow-md);
+}
+
+/* Widget in Customization Mode */
+body.customization-mode .dashboard-widget {
+  cursor: move;
+  border: 2px dashed var(--border-color);
+}
+
+body.customization-mode .dashboard-widget:hover {
+  border-color: var(--primary-blue);
+  box-shadow: var(--shadow-primary);
+  transform: scale(1.02);
+}
+
+/* Widget Being Dragged */
+.dashboard-widget.dragging {
+  opacity: 0.5;
+  transform: scale(0.95);
+  box-shadow: var(--shadow-xl);
+  z-index: var(--z-index-modal);
+}
+
+/* Widget Drop Zone */
+.dashboard-widget.drag-over {
+  border-color: var(--primary-blue);
+  background: rgba(74, 144, 226, 0.05);
+  transform: scale(1.05);
+}
+
+/* ============================================
+   WIDGET HEADER
+   ============================================ */
+
+.widget-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.widget-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.widget-icon {
+  font-size: 20px;
+  opacity: 0.7;
+}
+
+/* Widget Actions */
+.widget-actions {
+  display: flex;
+  gap: var(--spacing-xs);
+  opacity: 0;
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dashboard-widget:hover .widget-actions,
+body.customization-mode .widget-actions {
+  opacity: 1;
+}
+
+.widget-action-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--border-radius);
+  background: var(--bg-hover);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  color: var(--text-secondary);
+}
+
+.widget-action-btn:hover {
+  background: var(--primary-blue);
+  color: var(--white);
+  transform: scale(1.1);
+}
+
+.widget-action-btn.danger:hover {
+  background: var(--danger);
+}
+
+/* Drag Handle */
+.widget-drag-handle {
+  cursor: move;
+  opacity: 0;
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body.customization-mode .widget-drag-handle {
+  opacity: 1;
+}
+
+/* ============================================
+   WIDGET VISIBILITY TOGGLE
+   ============================================ */
+
+.dashboard-widget.hidden {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+body.customization-mode .dashboard-widget.hidden {
+  opacity: 0.6;
+  pointer-events: auto;
+  border-style: dotted;
+}
+
+/* ============================================
+   WIDGET LIBRARY PANEL
+   ============================================ */
+
+.widget-library-panel {
+  position: fixed;
+  top: 0;
+  right: -400px;
+  width: 400px;
+  height: 100vh;
+  background: var(--bg-primary);
+  box-shadow: var(--shadow-2xl);
+  z-index: var(--z-index-modal);
+  transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow-y: auto;
+  padding: var(--spacing-xl);
+}
+
+.widget-library-panel.open {
+  right: 0;
+}
+
+.widget-library-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-xl);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 2px solid var(--border-color);
+}
+
+.widget-library-title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+}
+
+.widget-library-close {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--bg-hover);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.widget-library-close:hover {
+  background: var(--danger);
+  color: var(--white);
+  transform: rotate(90deg);
+}
+
+/* Widget Library Items */
+.widget-library-items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.widget-library-item {
+  background: var(--bg-secondary);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 2px solid transparent;
+}
+
+.widget-library-item:hover {
+  border-color: var(--primary-blue);
+  background: var(--white);
+  transform: translateX(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.widget-library-item.active {
+  border-color: var(--success);
+  background: rgba(39, 174, 96, 0.05);
+}
+
+.widget-library-item-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+}
+
+.widget-library-item-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--border-radius);
+  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.widget-library-item-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+}
+
+.widget-library-item-description {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  line-height: var(--line-height-relaxed);
+}
+
+.widget-library-item-toggle {
+  margin-top: var(--spacing-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+/* ============================================
+   WIDGET SIZE OPTIONS
+   ============================================ */
+
+.widget-size-selector {
+  display: flex;
+  gap: var(--spacing-xs);
+  margin-top: var(--spacing-sm);
+}
+
+.widget-size-btn {
+  padding: 4px 12px;
+  border-radius: var(--border-radius);
+  background: var(--bg-hover);
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  font-size: var(--font-size-xs);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.widget-size-btn:hover {
+  background: var(--primary-blue);
+  color: var(--white);
+  border-color: var(--primary-blue);
+}
+
+.widget-size-btn.active {
+  background: var(--primary-blue);
+  color: var(--white);
+  border-color: var(--primary-blue);
+}
+
+/* Widget Sizes */
+.dashboard-widget.size-small {
+  grid-column: span 1;
+}
+
+.dashboard-widget.size-medium {
+  grid-column: span 2;
+}
+
+.dashboard-widget.size-large {
+  grid-column: span 3;
+}
+
+.dashboard-widget.size-full {
+  grid-column: 1 / -1;
+}
+
+/* ============================================
+   SAVE/RESET CONTROLS
+   ============================================ */
+
+.customization-controls {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--white);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--border-radius-full);
+  box-shadow: var(--shadow-2xl);
+  display: flex;
+  gap: var(--spacing-md);
+  z-index: var(--z-index-modal);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body.customization-mode .customization-controls {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.customization-controls .btn {
+  min-width: 120px;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes widgetSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dashboard-widget {
+  animation: widgetSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dashboard-widget:nth-child(1) { animation-delay: 0.05s; }
+.dashboard-widget:nth-child(2) { animation-delay: 0.1s; }
+.dashboard-widget:nth-child(3) { animation-delay: 0.15s; }
+.dashboard-widget:nth-child(4) { animation-delay: 0.2s; }
+.dashboard-widget:nth-child(5) { animation-delay: 0.25s; }
+.dashboard-widget:nth-child(6) { animation-delay: 0.3s; }
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 768px) {
+  .dashboard-widgets {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+  }
+
+  .dashboard-widget.size-small,
+  .dashboard-widget.size-medium,
+  .dashboard-widget.size-large,
+  .dashboard-widget.size-full {
+    grid-column: span 1;
+  }
+
+  .widget-library-panel {
+    width: 100%;
+    right: -100%;
+  }
+
+  .customize-dashboard-btn {
+    bottom: 16px;
+    right: 16px;
+    width: 48px;
+    height: 48px;
+    font-size: 20px;
+  }
+
+  .customization-controls {
+    bottom: 16px;
+    left: 16px;
+    right: 16px;
+    transform: none;
+    flex-direction: column;
+    border-radius: var(--border-radius-lg);
+  }
+
+  .customization-controls .btn {
+    width: 100%;
+  }
+}
+
+/* ============================================
+   DARK MODE SUPPORT
+   ============================================ */
+
+[data-theme="dark"] .dashboard-widget {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .widget-library-panel {
+  background: var(--gray-900);
+}
+
+[data-theme="dark"] .widget-library-item {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .widget-library-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .customization-controls {
+  background: var(--gray-800);
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+
+.widget-action-btn:focus-visible,
+.widget-library-close:focus-visible,
+.customize-dashboard-btn:focus-visible {
+  outline: 3px solid var(--primary-blue);
+  outline-offset: 3px;
+}
+
+/* Screen reader only text */
+.sr-only-widget {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-widget,
+  .widget-library-panel,
+  .customization-controls {
+    animation: none;
+    transition: none;
+  }
+}

@@ -1,80 +1,82 @@
-/* Micro-interactions & Animations */
+/* ============================================
+   RUPIYA - MICRO-INTERACTIONS & ANIMATIONS
+   Enhanced animations for delightful UX
+   ============================================ */
 
-/* Loading Skeleton Screens */
-.skeleton {
-  background: linear-gradient(90deg, var(--hover-bg) 25%, var(--border-color) 50%, var(--hover-bg) 75%);
-  background-size: 200% 100%;
-  animation: shimmer 2s infinite;
+/* ============================================
+   CARD INTERACTIONS
+   ============================================ */
+
+/* Card Hover Effect with Scale and Shadow */
+.card-interactive {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
 }
 
-@keyframes shimmer {
+.card-interactive:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.card-interactive:active {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* KPI Card Pulse on Update */
+.kpi-card-update {
+  animation: kpiPulse 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes kpiPulse {
   0% {
-    background-position: 200% 0;
+    transform: scale(1);
+    box-shadow: 0 2px 8px rgba(74, 144, 226, 0.2);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 8px 24px rgba(74, 144, 226, 0.4);
   }
   100% {
-    background-position: -200% 0;
+    transform: scale(1);
+    box-shadow: 0 2px 8px rgba(74, 144, 226, 0.2);
   }
 }
 
-.skeleton-text {
-  height: 1rem;
-  border-radius: 4px;
-  margin-bottom: 0.5rem;
+/* Card Flip Animation */
+.card-flip {
+  perspective: 1000px;
 }
 
-.skeleton-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
+.card-flip-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
 }
 
-.skeleton-card {
-  height: 200px;
-  border-radius: 8px;
+.card-flip:hover .card-flip-inner {
+  transform: rotateY(180deg);
 }
 
-.skeleton-line {
-  height: 0.75rem;
-  border-radius: 4px;
-  margin-bottom: 0.5rem;
+.card-flip-front,
+.card-flip-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
 }
 
-.skeleton-line:last-child {
-  margin-bottom: 0;
+.card-flip-back {
+  transform: rotateY(180deg);
 }
 
-/* Page Transition Animations */
-.page-enter {
-  animation: pageEnter 0.3s ease;
-}
+/* ============================================
+   BUTTON INTERACTIONS
+   ============================================ */
 
-@keyframes pageEnter {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.page-exit {
-  animation: pageExit 0.3s ease;
-}
-
-@keyframes pageExit {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-}
-
-/* Button Press Feedback - Ripple Effect */
+/* Enhanced Ripple Effect */
 .btn-ripple {
   position: relative;
   overflow: hidden;
@@ -105,31 +107,100 @@
   }
 }
 
-/* Smooth Number Animations */
-.number-animate {
-  font-variant-numeric: tabular-nums;
+/* Button Success State */
+.btn-success-state {
+  animation: btnSuccess 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Success Animation */
-.success-animation {
-  animation: successPulse 0.6s ease;
-}
-
-@keyframes successPulse {
+@keyframes btnSuccess {
   0% {
     transform: scale(1);
   }
+  25% {
+    transform: scale(0.95);
+  }
   50% {
     transform: scale(1.05);
+  }
+  75% {
+    transform: scale(0.98);
   }
   100% {
     transform: scale(1);
   }
 }
 
+/* Button Loading Pulse */
+.btn-loading-pulse {
+  animation: btnLoadingPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes btnLoadingPulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* ============================================
+   FORM INTERACTIONS
+   ============================================ */
+
+/* Input Focus Glow */
+.input-focus-glow {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.input-focus-glow:focus {
+  box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.1),
+              0 0 20px rgba(74, 144, 226, 0.2);
+  transform: scale(1.01);
+}
+
+/* Success Checkmark Animation */
+.success-checkmark {
+  animation: checkmarkDraw 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes checkmarkDraw {
+  0% {
+    stroke-dashoffset: 100;
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+}
+
+/* Form Submission Success */
+.form-success {
+  animation: formSuccess 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes formSuccess {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
 /* Error Shake Animation */
 .error-shake {
-  animation: shake 0.5s ease;
+  animation: shake 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @keyframes shake {
@@ -137,14 +208,157 @@
     transform: translateX(0);
   }
   10%, 30%, 50%, 70%, 90% {
-    transform: translateX(-5px);
+    transform: translateX(-8px);
   }
   20%, 40%, 60%, 80% {
-    transform: translateX(5px);
+    transform: translateX(8px);
   }
 }
 
-/* Loading Spinner */
+/* Input Error Highlight */
+.input-error-highlight {
+  animation: errorHighlight 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes errorHighlight {
+  0%, 100% {
+    border-color: var(--accent-red);
+  }
+  50% {
+    border-color: var(--accent-red);
+    box-shadow: 0 0 0 4px rgba(231, 76, 60, 0.2);
+  }
+}
+
+/* ============================================
+   TOAST NOTIFICATIONS
+   ============================================ */
+
+/* Toast Slide In */
+.toast-slide-in {
+  animation: toastSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes toastSlideIn {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Toast Slide Out */
+.toast-slide-out {
+  animation: toastSlideOut 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes toastSlideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+}
+
+/* Toast Progress Bar */
+.toast-progress {
+  animation: toastProgress 3s linear forwards;
+}
+
+@keyframes toastProgress {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+/* ============================================
+   LOADING STATES
+   ============================================ */
+
+/* Skeleton Shimmer */
+.skeleton {
+  background: linear-gradient(90deg, 
+    var(--hover-bg) 25%, 
+    var(--border-color) 50%, 
+    var(--hover-bg) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.skeleton-text {
+  height: 1rem;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+}
+
+.skeleton-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.skeleton-card {
+  height: 200px;
+  border-radius: 8px;
+}
+
+/* Loading Dots */
+.loading-dots {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.loading-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--primary-blue);
+  animation: loadingDot 1.4s ease-in-out infinite;
+}
+
+.loading-dot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.loading-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.loading-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes loadingDot {
+  0%, 80%, 100% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
+
+/* Spinner */
 .spinner {
   display: inline-block;
   width: 20px;
@@ -173,7 +387,135 @@
   }
 }
 
-/* Pulse Animation */
+/* ============================================
+   NUMBER ANIMATIONS
+   ============================================ */
+
+/* Smooth Number Counter */
+.number-animate {
+  font-variant-numeric: tabular-nums;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Number Increase Highlight */
+.number-increase {
+  animation: numberIncrease 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes numberIncrease {
+  0% {
+    color: var(--accent-green);
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    color: inherit;
+    transform: scale(1);
+  }
+}
+
+/* Number Decrease Highlight */
+.number-decrease {
+  animation: numberDecrease 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes numberDecrease {
+  0% {
+    color: var(--accent-red);
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    color: inherit;
+    transform: scale(1);
+  }
+}
+
+/* ============================================
+   PAGE TRANSITIONS
+   ============================================ */
+
+/* Page Enter */
+.page-enter {
+  animation: pageEnter 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Page Exit */
+.page-exit {
+  animation: pageExit 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes pageExit {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+}
+
+/* ============================================
+   SCROLL ANIMATIONS
+   ============================================ */
+
+/* Fade In on Scroll */
+.fade-in-scroll {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fade-in-scroll.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Slide In on Scroll */
+.slide-in-scroll {
+  opacity: 0;
+  transform: translateX(-50px);
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slide-in-scroll.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Scale In on Scroll */
+.scale-in-scroll {
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.scale-in-scroll.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ============================================
+   UTILITY ANIMATIONS
+   ============================================ */
+
+/* Pulse */
 .pulse {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
@@ -187,9 +529,9 @@
   }
 }
 
-/* Bounce Animation */
+/* Bounce */
 .bounce {
-  animation: bounce 1s infinite;
+  animation: bounce 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
 @keyframes bounce {
@@ -201,126 +543,7 @@
   }
 }
 
-/* Fade In Animation */
-.fade-in {
-  animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-/* Slide In Animation */
-.slide-in-left {
-  animation: slideInLeft 0.3s ease;
-}
-
-@keyframes slideInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-.slide-in-right {
-  animation: slideInRight 0.3s ease;
-}
-
-@keyframes slideInRight {
-  from {
-    opacity: 0;
-    transform: translateX(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-.slide-in-up {
-  animation: slideInUp 0.3s ease;
-}
-
-@keyframes slideInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.slide-in-down {
-  animation: slideInDown 0.3s ease;
-}
-
-@keyframes slideInDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Scale Animation */
-.scale-in {
-  animation: scaleIn 0.3s ease;
-}
-
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-/* Flip Animation */
-.flip {
-  animation: flip 0.6s ease;
-}
-
-@keyframes flip {
-  0% {
-    transform: rotateY(0deg);
-  }
-  100% {
-    transform: rotateY(360deg);
-  }
-}
-
-/* Rotate Animation */
-.rotate {
-  animation: rotate 2s linear infinite;
-}
-
-@keyframes rotate {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* Glow Animation */
+/* Glow */
 .glow {
   animation: glow 2s ease-in-out infinite;
 }
@@ -334,46 +557,114 @@
   }
 }
 
-/* Hover Lift Effect */
+/* Rotate */
+.rotate {
+  animation: rotate 2s linear infinite;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Flip */
+.flip {
+  animation: flip 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes flip {
+  0% {
+    transform: rotateY(0deg);
+  }
+  100% {
+    transform: rotateY(360deg);
+  }
+}
+
+/* ============================================
+   HOVER EFFECTS
+   ============================================ */
+
+/* Hover Lift */
 .hover-lift {
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .hover-lift:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
 }
 
-/* Smooth Transitions */
+/* Hover Grow */
+.hover-grow {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-grow:hover {
+  transform: scale(1.05);
+}
+
+/* Hover Glow */
+.hover-glow {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 20px rgba(74, 144, 226, 0.4);
+}
+
+/* ============================================
+   STAGGER ANIMATIONS
+   ============================================ */
+
+.stagger-item {
+  animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  opacity: 0;
+}
+
+.stagger-item:nth-child(1) { animation-delay: 0.05s; }
+.stagger-item:nth-child(2) { animation-delay: 0.1s; }
+.stagger-item:nth-child(3) { animation-delay: 0.15s; }
+.stagger-item:nth-child(4) { animation-delay: 0.2s; }
+.stagger-item:nth-child(5) { animation-delay: 0.25s; }
+.stagger-item:nth-child(6) { animation-delay: 0.3s; }
+.stagger-item:nth-child(7) { animation-delay: 0.35s; }
+.stagger-item:nth-child(8) { animation-delay: 0.4s; }
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================
+   SMOOTH TRANSITIONS
+   ============================================ */
+
 .smooth-transition {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Stagger Animation */
-.stagger-item {
-  animation: fadeIn 0.3s ease forwards;
-  opacity: 0;
+.smooth-transition-fast {
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.stagger-item:nth-child(1) {
-  animation-delay: 0s;
+.smooth-transition-slow {
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.stagger-item:nth-child(2) {
-  animation-delay: 0.1s;
-}
-
-.stagger-item:nth-child(3) {
-  animation-delay: 0.2s;
-}
-
-.stagger-item:nth-child(4) {
-  animation-delay: 0.3s;
-}
-
-.stagger-item:nth-child(5) {
-  animation-delay: 0.4s;
-}
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
 
 /* Disable animations for reduced motion preference */
 @media (prefers-reduced-motion: reduce) {
@@ -386,21 +677,56 @@
   }
 }
 
-/* Mobile Animations */
+/* ============================================
+   MOBILE OPTIMIZATIONS
+   ============================================ */
+
 @media (max-width: 768px) {
+  /* Faster animations on mobile */
   .skeleton {
-    animation: shimmer 1.5s infinite;
+    animation-duration: 1.5s;
   }
 
   .page-enter,
   .page-exit {
-    animation-duration: 0.2s;
+    animation-duration: 0.3s;
   }
 
-  .slide-in-left,
-  .slide-in-right,
-  .slide-in-up,
-  .slide-in-down {
-    animation-duration: 0.2s;
+  .card-interactive:hover {
+    transform: translateY(-2px) scale(1.01);
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-2px);
+  }
+
+  /* Reduce animation complexity on mobile */
+  .card-flip:hover .card-flip-inner {
+    transform: none;
+  }
+}
+
+/* ============================================
+   DARK MODE SUPPORT
+   ============================================ */
+
+[data-theme="dark"] .skeleton {
+  background: linear-gradient(90deg, 
+    rgba(255, 255, 255, 0.05) 25%, 
+    rgba(255, 255, 255, 0.1) 50%, 
+    rgba(255, 255, 255, 0.05) 75%
+  );
+}
+
+[data-theme="dark"] .glow {
+  animation: glowDark 2s ease-in-out infinite;
+}
+
+@keyframes glowDark {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(74, 144, 226, 0.8);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(74, 144, 226, 1);
   }
 }
