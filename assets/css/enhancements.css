@@ -779,11 +779,15 @@
 /* ============================================
    15. WIDGETS ROW
    ============================================ */
-.widgets-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 1.5rem;
+
+/* Desktop only: Allow auto-fit grid */
+@media (min-width: 769px) {
+  .widgets-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
 }
 
 /* ============================================

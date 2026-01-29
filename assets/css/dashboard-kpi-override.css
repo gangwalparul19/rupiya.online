@@ -229,14 +229,19 @@
    WIDGETS ROW - RESPONSIVE LAYOUT
    ============================================ */
 
-.widgets-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-lg);
-  margin-bottom: var(--spacing-xl);
-  width: 100%;
-  box-sizing: border-box;
+/* Desktop: 2-column grid */
+@media (min-width: 769px) {
+  .widgets-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+    width: 100%;
+    box-sizing: border-box;
+  }
 }
+
+/* Mobile: Single column - defined below in mobile breakpoint */
 
 .savings-rate-widget {
   grid-column: 1 / -1;

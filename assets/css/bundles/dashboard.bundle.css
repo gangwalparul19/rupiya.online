@@ -422,11 +422,25 @@
 /* ============================================
    DASHBOARD WIDGETS ROW
    ============================================ */
-.widgets-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: var(--spacing-lg);
-  margin-bottom: var(--spacing-xl);
+
+/* Desktop: Allow auto-fit grid */
+@media (min-width: 769px) {
+  .widgets-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+  }
+}
+
+/* Mobile: Force single column */
+@media (max-width: 768px) {
+  .widgets-row {
+    display: grid;
+    grid-template-columns: 1fr !important;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+  }
 }
 
 /* ============================================
@@ -2984,11 +2998,15 @@
 /* ============================================
    15. WIDGETS ROW
    ============================================ */
-.widgets-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 1.5rem;
+
+/* Desktop only: Allow auto-fit grid */
+@media (min-width: 769px) {
+  .widgets-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
 }
 
 /* ============================================
