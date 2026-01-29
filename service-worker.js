@@ -2,7 +2,7 @@
 // Provides offline support and caching
 
 // CACHE_VERSION is injected by build.js during deployment
-const CACHE_VERSION = '1.2.334';
+const CACHE_VERSION = '1.2.335';
 const CACHE_NAME = `rupiya-v${CACHE_VERSION}`;
 const RUNTIME_CACHE = `rupiya-runtime-v${CACHE_VERSION}`;
 
@@ -402,28 +402,128 @@ async function updateCache(request) {
 
 // Background sync for offline actions
 self.addEventListener('sync', (event) => {
-  if (event.tag === 'sync-data') {
-    event.waitUntil(syncData());
+  console.log('[Service Worker] Background sync triggered:', event.tag);
+  
+  if (event.tag === 'rupiya-sync') {
+    event.waitUntil(syncPendingOperations());
   }
 });
 
-// Sync data when back online
-async function syncData() {
+// Sync pending operations when back online
+async function syncPendingOperations() {
   try {
-    // Get pending actions from IndexedDB or localStorage
-    // Sync with Firebase
+    console.log('[Service Worker] Starting sync...');
+    
+    // Get sync queue from IndexedDB or localStorage
+    const syncQueue = await getSyncQueue();
+    
+    if (!syncQueue || syncQueue.length === 0) {
+      console.log('[Service Worker] No pending operations to sync');
+      return;
+    }
 
-    // Notify clients that sync is complete
+    console.log(`[Service Worker] Syncing ${syncQueue.length} operations`);
+
+    const results = {
+      success: [],
+      failed: []
+    };
+
+    // Process each operation
+    for (const operation of syncQueue) {
+      try {
+        await processSyncOperation(operation);
+        results.success.push(operation.id);
+      } catch (error) {
+        console.error('[Service Worker] Sync operation failed:', error);
+        results.failed.push({
+          id: operation.id,
+          error: error.message
+        });
+      }
+    }
+
+    // Notify clients about sync completion
     const clients = await self.clients.matchAll();
     clients.forEach((client) => {
       client.postMessage({
         type: 'SYNC_COMPLETE',
+        results,
         timestamp: Date.now()
       });
     });
+
+    console.log(`[Service Worker] Sync complete: ${results.success.length} succeeded, ${results.failed.length} failed`);
   } catch (error) {
     console.error('[Service Worker] Sync failed:', error);
+    
+    // Notify clients about sync failure
+    const clients = await self.clients.matchAll();
+    clients.forEach((client) => {
+      client.postMessage({
+        type: 'SYNC_FAILED',
+        error: error.message,
+        timestamp: Date.now()
+      });
+    });
   }
+}
+
+// Get sync queue from storage
+async function getSyncQueue() {
+  try {
+    // Try to get from IndexedDB first (more reliable)
+    const db = await openSyncDB();
+    const transaction = db.transaction(['syncQueue'], 'readonly');
+    const store = transaction.objectStore('syncQueue');
+    const queue = await store.getAll();
+    return queue;
+  } catch (error) {
+    console.warn('[Service Worker] IndexedDB not available, falling back to message passing');
+    return null;
+  }
+}
+
+// Open IndexedDB for sync queue
+function openSyncDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open('RupiyaSyncDB', 1);
+    
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve(request.result);
+    
+    request.onupgradeneeded = (event) => {
+      const db = event.target.result;
+      if (!db.objectStoreNames.contains('syncQueue')) {
+        db.createObjectStore('syncQueue', { keyPath: 'id' });
+      }
+    };
+  });
+}
+
+// Process a single sync operation
+async function processSyncOperation(operation) {
+  const { type, collection, docId, data } = operation;
+  
+  // Make API request to sync data
+  const response = await fetch(`/api/sync`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      type,
+      collection,
+      docId,
+      data
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error(`Sync failed: ${response.statusText}`);
+  }
+
+  return response.json();
 }
 
 // Push notifications (future feature)

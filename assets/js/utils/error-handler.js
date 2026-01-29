@@ -349,23 +349,45 @@ class ErrorHandler {
    * @param {Object} errorEntry - Error entry with full context
    */
   sendToMonitoring(errorEntry) {
-    // Implement integration with monitoring service (e.g., Sentry, LogRocket)
-    // TODO: Add integration with error monitoring service
-    // Example for Sentry:
-    // if (window.Sentry) {
-    //   window.Sentry.captureException(new Error(errorEntry.message), {
-    //     contexts: {
-    //       error: errorEntry
-    //     }
-    //   });
-    // }
+    // Integration with error monitoring service
+    
+    // Sentry integration
+    if (window.Sentry && !this.isDev) {
+      try {
+        window.Sentry.captureException(new Error(errorEntry.message), {
+          level: errorEntry.severity || 'error',
+          tags: {
+            feature: errorEntry.context?.feature || 'unknown',
+            userId: errorEntry.context?.userId || 'anonymous'
+          },
+          contexts: {
+            error: {
+              timestamp: errorEntry.timestamp,
+              stack: errorEntry.stack,
+              userAgent: errorEntry.userAgent,
+              url: errorEntry.url
+            }
+          },
+          extra: errorEntry.context
+        });
+      } catch (e) {
+        console.error('Failed to send error to Sentry:', e);
+      }
+    }
 
-    // Example for LogRocket:
-    // if (window.LogRocket) {
-    //   window.LogRocket.captureException(new Error(errorEntry.message), {
-    //     extra: errorEntry
-    //   });
-    // }
+    // LogRocket integration
+    if (window.LogRocket && !this.isDev) {
+      try {
+        window.LogRocket.captureException(new Error(errorEntry.message), {
+          tags: {
+            feature: errorEntry.context?.feature || 'unknown'
+          },
+          extra: errorEntry
+        });
+      } catch (e) {
+        console.error('Failed to send error to LogRocket:', e);
+      }
+    }
   }
 
   /**
