@@ -273,8 +273,10 @@
 @media (max-width: 768px) {
   .widgets-row {
     grid-template-columns: 1fr !important;
-    gap: 12px;
-    margin-bottom: 16px;
+    gap: 0 !important;
+    margin-bottom: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
   }
   
   /* Make ALL widgets full width on mobile - catch all */
@@ -286,6 +288,14 @@
   .upcoming-bills-widget,
   .emergency-fund-widget {
     grid-column: 1 / -1 !important;
+    margin: 0 0 16px 0 !important;
+    padding: 16px !important;
+    border-radius: 0 !important;
+    border-left: none !important;
+    border-right: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
 }
 
@@ -416,29 +426,51 @@
   }
 
   .widgets-row {
-    gap: 10px;
-    margin-bottom: 12px;
+    gap: 0 !important;
+    margin-bottom: 0 !important;
+    padding: 0 !important;
   }
 
   .savings-rate-widget,
   .goal-progress-widget,
   .top-categories-widget,
   .upcoming-bills-widget {
-    padding: 12px;
+    padding: 12px !important;
+    margin: 0 0 12px 0 !important;
+    border-radius: 0 !important;
+    border-left: none !important;
+    border-right: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
 
   .charts-grid {
-    gap: 10px;
-    margin-bottom: 12px;
+    gap: 0 !important;
+    margin-bottom: 0 !important;
+    padding: 0 !important;
   }
 
   .chart-card {
-    padding: 12px;
+    padding: 12px !important;
+    margin: 0 0 12px 0 !important;
+    border-radius: 0 !important;
+    border-left: none !important;
+    border-right: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
 
   .transactions-card {
-    padding: 12px;
-    margin-bottom: 12px;
+    padding: 12px !important;
+    margin: 0 0 12px 0 !important;
+    border-radius: 0 !important;
+    border-left: none !important;
+    border-right: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
 }
 
@@ -476,7 +508,8 @@
   }
 
   .widgets-row {
-    gap: 8px;
+    gap: 0 !important;
+    padding: 0 !important;
   }
   
   /* Make ALL widgets full width on extra small mobile - catch all */
@@ -488,6 +521,15 @@
   .upcoming-bills-widget,
   .emergency-fund-widget {
     grid-column: 1 / -1 !important;
+    margin: 0 0 8px 0 !important;
+    padding: 10px !important;
+    border-radius: 0 !important;
+    border-left: none !important;
+    border-right: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
   }
 
   .savings-rate-widget,
