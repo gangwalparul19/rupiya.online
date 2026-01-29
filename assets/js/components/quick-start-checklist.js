@@ -451,8 +451,6 @@ class QuickStartChecklist {
     if (widget) {
       widget.remove();
     }
-    
-    console.log('✅ Quick start checklist reset complete.');
   }
 
   /**
@@ -462,7 +460,6 @@ class QuickStartChecklist {
     this.isDismissed = false;
     this.saveState();
     this.render();
-    console.log('✅ Quick start checklist shown.');
   }
 }
 

@@ -1919,50 +1919,38 @@ window.showEditPaymentMethodModal = function(methodId) {
 };
 
 // Show delete payment method modal
-window.showDeletePaymentMethodModal = async function(methodId) {
-  console.log('showDeletePaymentMethodModal called with:', methodId);
-  
+window.showDeletePaymentMethodModal = async function(methodId) {  
   const method = paymentMethods.find(m => m.id === methodId);
   if (!method) {
     console.error('Payment method not found:', methodId);
     return;
   }
   
-  console.log('Payment method found:', method);
-  
   deletePaymentMethodId = methodId;
   deletePaymentMethodName.textContent = paymentMethodsService.getPaymentMethodDisplayName(method);
   
   // Check if this is a credit card payment method
   const warningDiv = document.getElementById('deletePaymentMethodWarning');
-  console.log('Warning div found:', warningDiv);
   
   if (method.type === 'card' && method.cardType === 'credit') {
-    console.log('This is a credit card payment method, checking for linked card...');
-    
+
     // Check if linked to a credit card
     const firestoreService = (await import('../services/firestore-service.js')).default;
     const allCreditCards = await firestoreService.getAll('creditCards');
-    console.log('All credit cards:', allCreditCards.length);
-    
+
     const linkedCard = allCreditCards.find(card => card.paymentMethodId === methodId);
-    console.log('Linked card found:', linkedCard);
-    
+ 
     if (linkedCard && warningDiv) {
-      console.log('Showing warning for linked card');
       warningDiv.style.display = 'block';
     } else if (warningDiv) {
-      console.log('No linked card, hiding warning');
       warningDiv.style.display = 'none';
     }
   } else {
-    console.log('Not a credit card payment method');
     if (warningDiv) {
       warningDiv.style.display = 'none';
     }
   }
   
-  console.log('Showing modal');
   deletePaymentMethodModal.classList.add('show');
 };
 
@@ -1975,9 +1963,7 @@ function hideDeletePaymentMethodModal() {
 // Handle delete payment method
 async function handleDeletePaymentMethod() {
   if (!deletePaymentMethodId) return;
-  
-  console.log('handleDeletePaymentMethod called for:', deletePaymentMethodId);
-  
+    
   // Show loading state - just disable and change text
   confirmDeletePaymentMethodBtn.disabled = true;
   confirmDeletePaymentMethodBtn.textContent = 'Deleting...';
@@ -1985,37 +1971,29 @@ async function handleDeletePaymentMethod() {
   try {
     // Check if this payment method is linked to a credit card
     const method = paymentMethods.find(m => m.id === deletePaymentMethodId);
-    console.log('Payment method to delete:', method);
     
     let linkedCreditCard = null;
     
     if (method && method.type === 'card' && method.cardType === 'credit') {
-      console.log('Checking for linked credit card...');
       
       // Import firestore service to check for linked credit card
       const firestoreService = (await import('../services/firestore-service.js')).default;
       const allCreditCards = await firestoreService.getAll('creditCards');
       linkedCreditCard = allCreditCards.find(card => card.paymentMethodId === deletePaymentMethodId);
       
-      console.log('Linked credit card:', linkedCreditCard);
     }
     
     // Delete the payment method
-    console.log('Deleting payment method...');
     const result = await paymentMethodsService.permanentlyDeletePaymentMethod(deletePaymentMethodId);
-    console.log('Payment method delete result:', result);
     
     if (result.success) {
       // Also delete the linked credit card if it exists
       if (linkedCreditCard) {
-        console.log('Deleting linked credit card:', linkedCreditCard.id);
         const firestoreService = (await import('../services/firestore-service.js')).default;
         const deleteCardResult = await firestoreService.delete('creditCards', linkedCreditCard.id);
-        console.log('Credit card delete result:', deleteCardResult);
         
         showToast('Payment method and linked credit card deleted successfully', 'success');
       } else {
-        console.log('No linked credit card to delete');
         showToast('Payment method deleted successfully', 'success');
       }
       

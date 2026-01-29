@@ -527,31 +527,25 @@ class TripGroupsService {
   // Check if user is member of a group
   async isGroupMember(groupId, userId) {
     try {
-      console.log(`Checking if user ${userId} is member of group ${groupId}`);
       
       const memberId = `${groupId}_${userId}`;
       const memberRef = doc(db, this.membersCollection, memberId);
       const memberSnap = await getDoc(memberRef);
       
       if (memberSnap.exists()) {
-        console.log(`User ${userId} is already a member of group ${groupId}`);
         return true;
       }
-      
-      console.log(`User ${userId} not found as direct member, checking for pending invitation...`);
-      
+
       // Check if user has a pending invitation by email
       // This handles the case where a user was invited before they had an account
       const user = authService.getCurrentUser();
       if (user && user.email) {
         const hasPendingInvite = await this.checkAndAcceptPendingInvitation(groupId, user.email, userId);
         if (hasPendingInvite) {
-          console.log(`Accepted pending invitation for user ${userId}`);
           return true;
         }
       }
       
-      console.log(`User ${userId} is not a member of group ${groupId}`);
       return false;
     } catch (error) {
       console.error('Error checking member status:', error);
@@ -608,11 +602,8 @@ class TripGroupsService {
   async checkAndAcceptPendingInvitation(groupId, userEmail, userId) {
     try {
       if (!userEmail || !userId) {
-        console.log('checkAndAcceptPendingInvitation: Missing email or userId');
         return false;
       }
-      
-      console.log(`Checking for pending invitation: groupId=${groupId}, email=${userEmail}, userId=${userId}`);
       
       // Get all members of the group
       const membersQuery = query(
@@ -620,8 +611,6 @@ class TripGroupsService {
         where('groupId', '==', groupId)
       );
       const snapshot = await getDocs(membersQuery);
-      
-      console.log(`Found ${snapshot.size} members in group ${groupId}`);
       
       // Look for a member with matching email but no userId (pending invitation)
       for (const docSnap of snapshot.docs) {
@@ -635,14 +624,10 @@ class TripGroupsService {
         // Email is stored unencrypted for trip members (for invitation matching)
         const memberEmail = memberData.email;
         
-        console.log(`Checking member: email=${memberEmail}, userId=${memberData.userId}, inviteStatus=${memberData.inviteStatus}`);
-        
         // Check if this is a pending invitation for this email
         if (memberEmail && 
             memberEmail.toLowerCase() === userEmail.toLowerCase()) {
-          
-          console.log(`Found matching invitation for ${userEmail}`);
-          
+                    
           // Update the member record with userId and accept the invitation
           const oldMemberId = docSnap.id;
           const newMemberId = `${groupId}_${userId}`;
@@ -652,7 +637,6 @@ class TripGroupsService {
           const existingMemberSnap = await getDoc(existingMemberRef);
           
           if (existingMemberSnap.exists()) {
-            console.log(`Member ${newMemberId} already exists, just deleting old record`);
             // Just delete the old pending invitation
             await deleteDoc(doc(db, this.membersCollection, oldMemberId));
             return true;
@@ -672,13 +656,10 @@ class TripGroupsService {
           
           // Delete old member document
           await deleteDoc(doc(db, this.membersCollection, oldMemberId));
-          
-          console.log(`Successfully accepted pending invitation for ${userEmail} in group ${groupId}`);
           return true;
         }
       }
-      
-      console.log(`No pending invitation found for ${userEmail} in group ${groupId}`);
+    
       return false;
     } catch (error) {
       console.error('Error checking pending invitation:', error);

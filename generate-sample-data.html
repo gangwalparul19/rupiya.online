@@ -480,7 +480,6 @@ import { collection, query, where, getDocs, writeBatch } from 'https://www.gstat
 
 // Delete all data for a specific user
 window.deleteUserData = async function(userId) {
-  console.log('🗑️ Starting deletion for user:', userId);
   const collections = ['expenses', 'income', 'budgets', 'goals', 'vehicles', 'fuelLogs', 'houses', 'houseHelps', 'insurancePolicies', 'investments', 'loans', 'creditCards', 'notes', 'recurringTransactions', 'tripGroups', 'houseHelpPayments', 'tripGroupMembers', 'tripGroupExpenses'];
   let total = 0;
   for (const col of collections) {
@@ -492,18 +491,15 @@ window.deleteUserData = async function(userId) {
         snap.docs.forEach(doc => batch.delete(doc.ref));
         await batch.commit();
         total += snap.size;
-        console.log(`✅ Deleted ${snap.size} from ${col}`);
       }
     } catch (error) {
       console.error(`❌ Error deleting from ${col}:`, error.message);
     }
   }
-  console.log(`🎉 Total deleted: ${total} documents`);
   alert(`Deleted ${total} documents for user ${userId}`);
   return total;
 };
 
-console.log('✅ deleteUserData function loaded. Usage: deleteUserData("USER_ID")');
 </script>
 
 </body>

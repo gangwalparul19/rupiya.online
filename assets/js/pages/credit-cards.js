@@ -587,9 +587,7 @@ async function handleCardSubmit(e) {
       if (!result.success) {
         throw new Error(result.error || 'Failed to add credit card');
       }
-      
-      console.log('Credit card added successfully:', result.id);
-      
+
       // Create a corresponding payment method entry (without triggering duplicate credit card creation)
       if (result.success) {
         const paymentMethodsService = (await import('../services/payment-methods-service.js')).default;
@@ -609,8 +607,6 @@ async function handleCardSubmit(e) {
           console.error('Failed to create payment method:', pmResult.error);
           toast.warning('Credit card added but payment method creation failed');
         } else {
-          console.log('Payment method created successfully:', pmResult.id);
-          
           // Link the payment method to the credit card
           // IMPORTANT: Include all card data to preserve encryption
           const updateResult = await firestoreService.update('creditCards', result.id, {

@@ -413,9 +413,7 @@ class OnboardingService {
     this.completedSteps.clear();
     localStorage.removeItem('rupiya_onboarding_complete');
     this.saveOnboardingState();
-    console.log('✅ Onboarding reset complete. Call onboardingService.startOnboarding() to restart.');
   }
-
   /**
    * Reset all onboarding and tour data (for complete testing reset)
    */
@@ -440,8 +438,6 @@ class OnboardingService {
       localStorage.removeItem(`rupiya_tour_${page}_offered`);
     });
     
-    console.log('✅ All onboarding data reset! Reload the page to see the onboarding flow from the beginning.');
-    console.log('💡 To test: Reload the page or call location.reload()');
   }
 }
 

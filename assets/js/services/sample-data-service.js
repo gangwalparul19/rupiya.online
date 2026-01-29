@@ -66,9 +66,6 @@ class SampleDataService {
       throw new Error('User ID is required');
     }
 
-    console.log('🔍 Starting sample data generation for userId:', userId);
-    console.log('🔍 Current auth user:', auth.currentUser?.uid);
-
     try {
       // Check if sample data already exists
       const expensesQuery = query(
@@ -80,74 +77,35 @@ class SampleDataService {
       const existingData = await getDocs(expensesQuery);
       
       if (!existingData.empty) {
-        console.log('⚠️ Sample data already exists. Skipping generation to avoid duplicates.');
         this.isSampleDataActive = true;
         this.saveState();
         return true;
       }
 
       // Generate sample data for all features
-      console.log('📝 Generating expenses...');
       await this.generateSampleExpenses(userId);
-      console.log('✅ Expenses generated');
       
-      console.log('📝 Generating income...');
       await this.generateSampleIncome(userId);
-      console.log('✅ Income generated');
       
-      console.log('📝 Generating budgets...');
       await this.generateSampleBudget(userId);
-      console.log('✅ Budgets generated');
       
-      console.log('📝 Generating goals...');
       await this.generateSampleGoal(userId);
-      console.log('✅ Goals generated');
       
-      console.log('📝 Generating vehicles...');
       await this.generateSampleVehicles(userId);
-      console.log('✅ Vehicles generated');
-      
-      console.log('📝 Generating houses...');
       await this.generateSampleHouses(userId);
-      console.log('✅ Houses generated');
-      
-      console.log('📝 Generating house help...');
       await this.generateSampleHouseHelp(userId);
-      console.log('✅ House help generated');
-      
-      console.log('📝 Generating healthcare insurance...');
       await this.generateSampleHealthcareInsurance(userId);
-      console.log('✅ Healthcare insurance generated');
-      
-      console.log('📝 Generating investments...');
       await this.generateSampleInvestments(userId);
-      console.log('✅ Investments generated');
-      
-      console.log('📝 Generating loans...');
       await this.generateSampleLoans(userId);
-      console.log('✅ Loans generated');
-      
-      console.log('📝 Generating credit cards...');
       await this.generateSampleCreditCards(userId);
-      console.log('✅ Credit cards generated');
-      
-      console.log('📝 Generating notes...');
       await this.generateSampleNotes(userId);
-      console.log('✅ Notes generated');
-      
-      console.log('📝 Generating recurring transactions...');
       await this.generateSampleRecurring(userId);
-      console.log('✅ Recurring transactions generated');
-      
-      console.log('📝 Generating trip groups...');
       await this.generateSampleTripGroups(userId);
-      console.log('✅ Trip groups generated');
 
       // Mark sample data as active
       this.isSampleDataActive = true;
       this.saveState();
 
-      console.log('🎉 All sample data generated successfully!');
       return true;
     } catch (error) {
       console.error('❌ Error generating sample data:', error);
@@ -1060,8 +1018,6 @@ class SampleDataService {
       expenseBatch.set(expenseRef, expense);
     });
     await expenseBatch.commit();
-
-    console.log('✅ Trip group created with ID:', groupId);
   }
 
   /**
@@ -1074,8 +1030,6 @@ class SampleDataService {
       throw new Error('User ID is required');
     }
 
-    console.log('🗑️ clearSampleData called with userId:', userId, 'clearAll:', clearAll);
-
     try {
       const collections = [
         'expenses', 'income', 'budgets', 'goals', 
@@ -1087,12 +1041,8 @@ class SampleDataService {
       let deletedCount = 0;
       let errorCount = 0;
 
-      console.log('🗑️ Checking', collections.length, 'collections for sample data...');
-
       for (const collectionName of collections) {
         try {
-          console.log(`🔍 Checking ${collectionName}...`);
-          
           // Build query based on clearAll flag
           let q;
           if (clearAll) {
@@ -1112,8 +1062,6 @@ class SampleDataService {
           
           const snapshot = await getDocs(q);
 
-          console.log(`📊 Found ${snapshot.size} items in ${collectionName}`);
-
           if (snapshot.empty) continue;
 
           // Delete in smaller batches to avoid permission issues
@@ -1125,16 +1073,12 @@ class SampleDataService {
             const batchDocs = docs.slice(i, i + batchSize);
             
             batchDocs.forEach(docSnapshot => {
-              console.log(`🗑️ Deleting ${collectionName}/${docSnapshot.id}`);
               batch.delete(docSnapshot.ref);
             });
 
             await batch.commit();
             deletedCount += batchDocs.length;
-            console.log(`✅ Deleted batch of ${batchDocs.length} items from ${collectionName}`);
-          }
-
-          console.log(`✅ Cleared ${docs.length} items from ${collectionName}`);
+        }
         } catch (error) {
           console.error(`❌ Error clearing ${collectionName}:`, error);
           console.error('Error details:', error.message, error.code);
@@ -1146,7 +1090,6 @@ class SampleDataService {
       // Handle tripGroups and related collections separately
       // Trip groups use 'createdBy' instead of 'userId'
       try {
-        console.log(`🔍 Checking tripGroups...`);
         
         // Build query based on clearAll flag
         let tripGroupsQuery;
@@ -1165,8 +1108,6 @@ class SampleDataService {
         
         const snapshot = await getDocs(tripGroupsQuery);
 
-        console.log(`📊 Found ${snapshot.size} trip groups`);
-
         if (!snapshot.empty) {
           const groupIds = snapshot.docs.map(doc => doc.id);
           
@@ -1176,7 +1117,6 @@ class SampleDataService {
           
           for (const docSnapshot of snapshot.docs) {
             try {
-              console.log(`🗑️ Deleting tripGroups/${docSnapshot.id}`);
               await deleteDoc(docSnapshot.ref);
               tripGroupsDeleted++;
               deletedCount++;
@@ -1187,13 +1127,10 @@ class SampleDataService {
             }
           }
           
-          console.log(`✅ Deleted ${tripGroupsDeleted} trip groups, skipped ${tripGroupsSkipped}`);
-
           // Then delete related data (members, expenses, settlements)
           // These can be deleted after the group is gone because rules check userId
           
           // Delete trip group members for these groups
-          console.log(`🔍 Checking tripGroupMembers for ${groupIds.length} groups...`);
           for (const groupId of groupIds) {
             try {
               let membersQuery;
@@ -1211,12 +1148,9 @@ class SampleDataService {
               }
               
               const membersSnapshot = await getDocs(membersQuery);
-              console.log(`📊 Found ${membersSnapshot.size} members for group ${groupId}`);
-              
               if (!membersSnapshot.empty) {
                 const memberBatch = writeBatch(db);
                 membersSnapshot.docs.forEach(docSnapshot => {
-                  console.log(`🗑️ Deleting tripGroupMembers/${docSnapshot.id}`);
                   memberBatch.delete(docSnapshot.ref);
                 });
                 await memberBatch.commit();
@@ -1228,7 +1162,6 @@ class SampleDataService {
           }
 
           // Delete trip group expenses for these groups
-          console.log(`🔍 Checking tripGroupExpenses for ${groupIds.length} groups...`);
           for (const groupId of groupIds) {
             try {
               const expensesQuery = query(
@@ -1237,12 +1170,10 @@ class SampleDataService {
                 where('isSampleData', '==', true)
               );
               const expensesSnapshot = await getDocs(expensesQuery);
-              console.log(`📊 Found ${expensesSnapshot.size} expenses for group ${groupId}`);
               
               if (!expensesSnapshot.empty) {
                 const expenseBatch = writeBatch(db);
                 expensesSnapshot.docs.forEach(docSnapshot => {
-                  console.log(`�️ Deleting tripGroupExpenses/${docSnapshot.id}`);
                   expenseBatch.delete(docSnapshot.ref);
                 });
                 await expenseBatch.commit();
@@ -1254,7 +1185,6 @@ class SampleDataService {
           }
 
           // Delete trip group settlements for these groups
-          console.log(`🔍 Checking tripGroupSettlements for ${groupIds.length} groups...`);
           for (const groupId of groupIds) {
             try {
               const settlementsQuery = query(
@@ -1263,12 +1193,10 @@ class SampleDataService {
                 where('isSampleData', '==', true)
               );
               const settlementsSnapshot = await getDocs(settlementsQuery);
-              console.log(`📊 Found ${settlementsSnapshot.size} settlements for group ${groupId}`);
               
               if (!settlementsSnapshot.empty) {
                 const settlementBatch = writeBatch(db);
                 settlementsSnapshot.docs.forEach(docSnapshot => {
-                  console.log(`🗑️ Deleting tripGroupSettlements/${docSnapshot.id}`);
                   settlementBatch.delete(docSnapshot.ref);
                 });
                 await settlementBatch.commit();
@@ -1279,15 +1207,12 @@ class SampleDataService {
             }
           }
 
-          console.log(`✅ Cleared ${docs.length} sample trip groups and related data`);
         }
       } catch (error) {
         console.error(`❌ Error clearing trip groups:`, error);
         console.error('Error details:', error.message, error.code);
         errorCount++;
       }
-
-      console.log(`🎉 Sample data cleared: ${deletedCount} items deleted, ${errorCount} errors`);
 
       this.isSampleDataActive = false;
       this.saveState();

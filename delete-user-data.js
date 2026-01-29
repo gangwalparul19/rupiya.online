@@ -20,26 +20,20 @@ async function deleteAllUserData(userId) {
     console.error('❌ User ID is required');
     return;
   }
-
-  console.log('⚠️ WARNING: This will delete ALL data for user:', userId);
-  console.log('⚠️ This action cannot be undone!');
   
   const confirmed = confirm(`Are you absolutely sure you want to delete ALL data for user ${userId}?\n\nThis includes:\n- All expenses\n- All income\n- All budgets\n- All goals\n- All investments\n- All vehicles\n- All loans\n- All credit cards\n- All notes\n- And everything else\n\nThis action CANNOT be undone!`);
   
   if (!confirmed) {
-    console.log('❌ Operation cancelled');
     return;
   }
 
   const doubleConfirm = confirm('FINAL CONFIRMATION: Type YES in the next prompt to proceed');
   if (!doubleConfirm) {
-    console.log('❌ Operation cancelled');
     return;
   }
 
   const finalConfirm = prompt('Type YES to confirm deletion:');
   if (finalConfirm !== 'YES') {
-    console.log('❌ Operation cancelled - confirmation text did not match');
     return;
   }
 
@@ -82,12 +76,8 @@ async function deleteAllUserData(userId) {
     let totalDeleted = 0;
     let errorCount = 0;
 
-    console.log('🗑️ Starting deletion process...');
-    console.log('📊 Checking', collections.length, 'collections...');
-
     for (const collectionName of collections) {
       try {
-        console.log(`\n🔍 Processing ${collectionName}...`);
         
         const q = query(
           collection(db, collectionName),
@@ -95,10 +85,8 @@ async function deleteAllUserData(userId) {
         );
         
         const snapshot = await getDocs(q);
-        console.log(`📊 Found ${snapshot.size} documents in ${collectionName}`);
 
         if (snapshot.empty) {
-          console.log(`✓ No documents to delete in ${collectionName}`);
           continue;
         }
 
@@ -111,16 +99,13 @@ async function deleteAllUserData(userId) {
           const batchDocs = docs.slice(i, i + batchSize);
           
           batchDocs.forEach(docSnapshot => {
-            console.log(`  🗑️ Deleting ${collectionName}/${docSnapshot.id}`);
             batch.delete(docSnapshot.ref);
           });
 
           await batch.commit();
           totalDeleted += batchDocs.length;
-          console.log(`  ✅ Deleted batch of ${batchDocs.length} documents`);
         }
 
-        console.log(`✅ Completed ${collectionName}: ${docs.length} documents deleted`);
       } catch (error) {
         console.error(`❌ Error processing ${collectionName}:`, error);
         console.error('Error details:', error.message);
@@ -142,11 +127,8 @@ async function deleteAllUserData(userId) {
       'userCategorizationPatterns'
     ];
 
-    console.log('\n🔍 Checking user-specific collections...');
-
     for (const collectionName of userSpecificCollections) {
       try {
-        console.log(`\n🔍 Processing ${collectionName}/${userId}...`);
         
         const docRef = doc(db, collectionName, userId);
         const docSnap = await getDoc(docRef);
@@ -154,7 +136,6 @@ async function deleteAllUserData(userId) {
         if (docSnap.exists()) {
           await deleteDoc(docRef);
           totalDeleted++;
-          console.log(`✅ Deleted ${collectionName}/${userId}`);
         } else {
           console.log(`✓ No document at ${collectionName}/${userId}`);
         }
@@ -163,14 +144,6 @@ async function deleteAllUserData(userId) {
         errorCount++;
       }
     }
-
-    console.log('\n' + '='.repeat(50));
-    console.log('🎉 DELETION COMPLETE');
-    console.log('='.repeat(50));
-    console.log(`✅ Total documents deleted: ${totalDeleted}`);
-    console.log(`❌ Errors encountered: ${errorCount}`);
-    console.log(`👤 User ID: ${userId}`);
-    console.log('='.repeat(50));
 
     alert(`Deletion complete!\n\nDeleted: ${totalDeleted} documents\nErrors: ${errorCount}`);
 
@@ -182,18 +155,5 @@ async function deleteAllUserData(userId) {
 
 // Make function globally available
 window.deleteAllUserData = deleteAllUserData;
-
-// Usage instructions
-console.log('='.repeat(50));
-console.log('DELETE USER DATA UTILITY LOADED');
-console.log('='.repeat(50));
-console.log('To delete all data for a user, run:');
-console.log('  deleteAllUserData("USER_ID_HERE")');
-console.log('');
-console.log('Example:');
-console.log('  deleteAllUserData("qJREHLYIH5Mo9OKPiplDF9dCYzW2")');
-console.log('');
-console.log('⚠️ WARNING: This action cannot be undone!');
-console.log('='.repeat(50));
 
 export { deleteAllUserData };

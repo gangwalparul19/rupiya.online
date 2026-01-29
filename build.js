@@ -90,7 +90,6 @@ const pagesWithSidebar = [
 // Environment variable injection script (only inject if values are present)
 const hasEnvVars = process.env.VITE_FIREBASE_API_KEY && process.env.VITE_FIREBASE_API_KEY.trim() !== '';
 
-console.log(`Firebase API Key present: ${hasEnvVars ? 'YES' : 'NO'}`);
 if (hasEnvVars) {
   console.log(`Project ID: ${process.env.VITE_FIREBASE_PROJECT_ID}`);
 }
@@ -124,19 +123,9 @@ const sidebarCSSLink = '<link rel="stylesheet" href="assets/css/sidebar.css">';
 // Generate the sidebar JS import (added before closing body tag)
 const sidebarJSImport = '<script type="module" src="assets/js/components/sidebar.js"></script>';
 
-console.log('🔧 Starting build process...\n');
-
 // Check if running in Vercel environment
 const isVercel = process.env.VERCEL === '1';
-console.log(`Environment: ${isVercel ? 'Vercel' : 'Local'}\n`);
 
-// Get sidebar HTML
-const sidebarHTML = getSidebarHTML();
-if (sidebarHTML) {
-  console.log('✓ Loaded sidebar component template\n');
-} else {
-  console.log('⚠️ Sidebar component template not found\n');
-}
 
 // Inject cache version into service worker
 function injectServiceWorkerVersion() {
@@ -168,7 +157,6 @@ function injectServiceWorkerVersion() {
     if (swContent.includes('__CACHE_VERSION__')) {
       swContent = swContent.replace(/__CACHE_VERSION__/g, version);
       fs.writeFileSync(swPath, swContent, 'utf8');
-      console.log(`✓ Injected cache version ${version} into service-worker.js\n`);
     } else {
       console.log('⚠️  Could not find __CACHE_VERSION__ placeholder in service-worker.js\n');
     }
@@ -211,7 +199,6 @@ htmlFiles.forEach(file => {
       console.error(`❌ CRITICAL: ${message}`);
     } else {
       warnings.push({ file, warning: message });
-      console.log(`⚠️  Skipping ${file} (not found)`);
     }
     return;
   }
@@ -225,7 +212,6 @@ htmlFiles.forEach(file => {
       if (content.includes('<head>')) {
         content = content.replace('<head>', `<head>\n  ${envScript}`);
         modified = true;
-        console.log(`✓ Injected environment variables into ${file}`);
       } else {
         const message = 'No <head> tag found for env injection';
         if (criticalFiles.includes(file)) {
@@ -233,7 +219,6 @@ htmlFiles.forEach(file => {
           console.error(`❌ CRITICAL: ${file} - ${message}`);
         } else {
           warnings.push({ file, warning: message });
-          console.log(`⚠️  ${file} - ${message}`);
         }
       }
     } else if (!envScript && !content.includes('window.__ENV__')) {
@@ -248,7 +233,6 @@ htmlFiles.forEach(file => {
         const lastCSS = lastCSSMatch[lastCSSMatch.length - 1];
         content = content.replace(lastCSS, `${lastCSS}\n  ${sidebarCSSLink}`);
         modified = true;
-        console.log(`✓ Added sidebar CSS to ${file}`);
       }
     }
 
@@ -259,7 +243,6 @@ htmlFiles.forEach(file => {
       if (pageScriptMatch) {
         content = content.replace(pageScriptMatch[0], `${sidebarJSImport}\n  ${pageScriptMatch[0]}`);
         modified = true;
-        console.log(`✓ Added sidebar JS to ${file}`);
       }
     }
 
@@ -267,7 +250,6 @@ htmlFiles.forEach(file => {
       fs.writeFileSync(filePath, content, 'utf8');
       successCount++;
     } else if (content.includes('window.__ENV__')) {
-      console.log(`✓ ${file} already configured`);
       successCount++;
     } else {
       successCount++;
@@ -284,26 +266,15 @@ htmlFiles.forEach(file => {
   }
 });
 
-// Print summary
-console.log('\n' + '='.repeat(60));
-console.log('BUILD SUMMARY');
-console.log('='.repeat(60));
-console.log(`✓ Successfully processed: ${successCount}/${htmlFiles.length} files`);
-
 if (warnings.length > 0) {
-  console.log(`⚠️  Warnings: ${warnings.length}`);
   warnings.forEach(w => console.log(`   - ${w.file}: ${w.warning}`));
 }
 
 if (errors.length > 0) {
-  console.log(`❌ Errors: ${errors.length}`);
   errors.forEach(e => {
     const prefix = e.critical ? 'CRITICAL' : 'ERROR';
-    console.log(`   - [${prefix}] ${e.file}: ${e.error}`);
   });
 }
-
-console.log('='.repeat(60) + '\n');
 
 // Fail build if there are critical errors
 const criticalErrors = errors.filter(e => e.critical);
@@ -313,14 +284,3 @@ if (criticalErrors.length > 0) {
   process.exit(1);
 }
 
-// Warn if there are non-critical errors but continue
-if (errors.length > 0 && criticalErrors.length === 0) {
-  console.log('⚠️  BUILD COMPLETED WITH ERRORS');
-  console.log(`   ${errors.length} non-critical file(s) had errors\n`);
-}
-
-if (errors.length === 0 && warnings.length === 0) {
-  console.log('✅ BUILD COMPLETED SUCCESSFULLY!\n');
-} else if (errors.length === 0) {
-  console.log('✅ BUILD COMPLETED WITH WARNINGS\n');
-}

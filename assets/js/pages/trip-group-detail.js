@@ -215,7 +215,6 @@ class TripGroupDetailPage {
       // Fix totalExpenses if it's out of sync
       const actualTotal = this.expenses.reduce((sum, e) => sum + e.amount, 0);
       if (Math.abs(actualTotal - (this.group.totalExpenses || 0)) > 0.01) {
-        console.log(`Fixing totalExpenses: ${this.group.totalExpenses} -> ${actualTotal}`);
         this.group.totalExpenses = actualTotal;
         // Update in background, don't wait
         tripGroupsService.updateGroup(this.groupId, { totalExpenses: actualTotal }).catch(err => {

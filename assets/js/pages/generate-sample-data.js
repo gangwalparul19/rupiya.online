@@ -118,12 +118,6 @@ async function generateSampleData() {
     return;
   }
   
-  console.log('🔍 User from authService:', user);
-  console.log('🔍 User UID:', user.uid);
-  console.log('🔍 Auth object:', auth);
-  console.log('🔍 Auth currentUser:', auth.currentUser);
-  console.log('🔍 Auth currentUser UID:', auth.currentUser?.uid);
-  
   if (!confirm('Generate sample data? This will add comprehensive test data across all features including expenses, income, budgets, goals, vehicles, houses, investments, loans, credit cards, and more.')) {
     return;
   }
@@ -132,7 +126,6 @@ async function generateSampleData() {
     showLoading(true);
     showAlert('info', '⏳ Generating sample data...');
     
-    console.log('🚀 Calling generateSampleData with userId:', user.uid);
     await sampleDataService.generateSampleData(user.uid);
     
     showLoading(false);
@@ -151,11 +144,8 @@ async function generateSampleData() {
 }
 
 // Clear sample data
-async function clearSampleData() {
-  console.log('🔴 Clear Sample Data button clicked!');
-  
+async function clearSampleData() {  
   const user = authService.getCurrentUser();
-  console.log('👤 Current user:', user);
   
   if (!user) {
     console.error('❌ No user found');
@@ -169,25 +159,19 @@ async function clearSampleData() {
     showAlert('info', '⏳ Checking for sample data...');
     
     const hasSampleData = await sampleDataService.isActiveAsync(user.uid);
-    console.log('📊 Has sample data:', hasSampleData);
     
     showLoading(false);
     
-    console.log('📝 Showing confirmation dialog...');
     const confirmed = confirm('Clear all sample data? This will remove all sample expenses, income, budgets, goals, and more.\n\nNote: This only clears data marked as sample data. If you have legacy data without the sample flag, use the console command: clearAllUserData()');
-    console.log('✅ User confirmed:', confirmed);
     
     if (!confirmed) {
-      console.log('❌ User cancelled');
       return;
     }
     
     showLoading(true);
     showAlert('info', '⏳ Clearing sample data...');
     
-    console.log('🗑️ Starting to clear sample data for user:', user.uid);
     const result = await sampleDataService.clearSampleData(user.uid, false);
-    console.log('🗑️ Clear result:', result);
     
     showLoading(false);
     
@@ -197,7 +181,6 @@ async function clearSampleData() {
       
       // Refresh the page after a short delay
       setTimeout(() => {
-        console.log('🔄 Reloading page...');
         window.location.reload();
       }, 1500);
     } else {
@@ -220,22 +203,15 @@ window.clearAllUserData = async function() {
     console.error('❌ No user found. Please login first.');
     return false;
   }
-  
-  console.warn('⚠️ WARNING: This will delete ALL your data, not just sample data!');
-  console.log('🗑️ Clearing ALL data for user:', user.uid);
-  
+
   try {
     const result = await sampleDataService.clearSampleData(user.uid, true);
-    console.log('✅ All data cleared successfully!');
-    console.log('🔄 Please refresh the page.');
     return result;
   } catch (error) {
     console.error('❌ Error clearing all data:', error);
     return false;
   }
 };
-
-console.log('💡 TIP: To clear ALL data (including legacy data), open console and run: clearAllUserData()');
 
 // Event listeners
 generateBtn?.addEventListener('click', generateSampleData);
