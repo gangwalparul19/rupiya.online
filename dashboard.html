@@ -75,27 +75,27 @@
         margin-bottom: 1.5rem !important;
       }
       
-      /* Savings Rate - spans full width (first row) */
+      /* Savings Rate and Top Categories - first row, 2 columns */
       .savings-rate-widget {
-        grid-column: 1 / -1 !important;
-      }
-      
-      /* Top Categories and Emergency Fund - second row, 2 columns */
-      .top-categories-widget {
         grid-column: 1 / 2 !important;
       }
       
-      .emergency-fund-widget {
+      .top-categories-widget {
         grid-column: 2 / 3 !important;
       }
       
-      /* Goal Progress and Upcoming Bills - third row, 2 columns */
-      .goal-progress-widget {
+      /* Emergency Fund and Upcoming Bills - second row, 2 columns */
+      .emergency-fund-widget {
         grid-column: 1 / 2 !important;
       }
       
       .upcoming-bills-widget {
         grid-column: 2 / 3 !important;
+      }
+      
+      /* Goal Progress - if exists, spans full width or shares row */
+      .goal-progress-widget {
+        grid-column: 1 / 2 !important;
       }
       
       /* Charts Grid - 2 columns on desktop */
