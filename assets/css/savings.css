@@ -394,8 +394,8 @@
 }
 
 .saving-stats-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
   gap: 1.25rem;
   margin-bottom: 1.25rem;
   padding: 1rem;
@@ -940,19 +940,25 @@
     font-size: 1.125rem;
   }
 
-  /* Saving Stats - 2 columns on mobile */
-  .saving-stats-row {
+  /* Saving Stats - 2 columns on mobile - FORCE */
+  .saving-card .saving-stats-row {
+    display: grid !important;
     grid-template-columns: 1fr 1fr !important;
     gap: 0.75rem !important;
     padding: 0.875rem !important;
   }
 
+  .saving-card .saving-stat {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
   .saving-stat-label {
-    font-size: 0.7rem;
+    font-size: 0.7rem !important;
   }
 
   .saving-stat-value {
-    font-size: 1rem;
+    font-size: 1rem !important;
   }
 
   .saving-card-header {
@@ -978,28 +984,33 @@
   }
 
   .saving-card-footer {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
-    flex-wrap: wrap;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 0.75rem !important;
+    flex-wrap: nowrap !important;
   }
 
   .saving-dates {
+    display: flex !important;
+    flex-direction: column !important;
     flex: 1;
     font-size: 0.75rem;
     min-width: 0;
+    gap: 0.25rem;
   }
 
   .saving-dates div {
-    font-size: 0.75rem;
+    font-size: 0.75rem !important;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
   .saving-status {
-    flex-shrink: 0;
+    flex-shrink: 0 !important;
+    white-space: nowrap;
   }
 
   /* Empty State */
