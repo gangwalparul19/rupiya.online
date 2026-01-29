@@ -50,31 +50,11 @@ async function init() {
 // Start initialization
 init();
 
-// Get DOM elements
-const addSavingBtn = document.getElementById('addSavingBtn');
-const addSavingSection = document.getElementById('addSavingSection');
-const closeFormBtn = document.getElementById('closeFormBtn');
-const cancelFormBtn = document.getElementById('cancelFormBtn');
-const savingForm = document.getElementById('savingForm');
-const formTitle = document.getElementById('formTitle');
-const saveFormBtn = document.getElementById('saveFormBtn');
-const savingsList = document.getElementById('savingsList');
-const emptyState = document.getElementById('emptyState');
-const loadingState = document.getElementById('loadingState');
-
-// KPI elements
-const monthlySavingsValue = document.getElementById('monthlySavingsValue');
-const totalSavedValue = document.getElementById('totalSavedValue');
-const activeSavingsValue = document.getElementById('activeSavingsValue');
-const maturityValue = document.getElementById('maturityValue');
-
-// Delete modal
-const deleteModal = document.getElementById('deleteModal');
-const closeDeleteModalBtn = document.getElementById('closeDeleteModalBtn');
-const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
-const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-const deleteSavingName = document.getElementById('deleteSavingName');
-const deleteSavingType = document.getElementById('deleteSavingType');
+// DOM elements (will be initialized after page loads)
+let addSavingBtn, addSavingSection, closeFormBtn, cancelFormBtn, savingForm, formTitle, saveFormBtn;
+let savingsList, emptyState, loadingState;
+let monthlySavingsValue, totalSavedValue, activeSavingsValue, maturityValue;
+let deleteModal, closeDeleteModalBtn, cancelDeleteBtn, confirmDeleteBtn, deleteSavingName, deleteSavingType;
 let deleteSavingId = null;
 
 // Initialize page
@@ -82,6 +62,32 @@ async function initPage() {
   const user = authService.getCurrentUser();
   
   if (user) {
+    // Initialize DOM elements after page is loaded
+    addSavingBtn = document.getElementById('addSavingBtn');
+    addSavingSection = document.getElementById('addSavingSection');
+    closeFormBtn = document.getElementById('closeFormBtn');
+    cancelFormBtn = document.getElementById('cancelFormBtn');
+    savingForm = document.getElementById('savingForm');
+    formTitle = document.getElementById('formTitle');
+    saveFormBtn = document.getElementById('saveFormBtn');
+    savingsList = document.getElementById('savingsList');
+    emptyState = document.getElementById('emptyState');
+    loadingState = document.getElementById('loadingState');
+    
+    // KPI elements
+    monthlySavingsValue = document.getElementById('monthlySavingsValue');
+    totalSavedValue = document.getElementById('totalSavedValue');
+    activeSavingsValue = document.getElementById('activeSavingsValue');
+    maturityValue = document.getElementById('maturityValue');
+    
+    // Delete modal
+    deleteModal = document.getElementById('deleteModal');
+    closeDeleteModalBtn = document.getElementById('closeDeleteModalBtn');
+    cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+    confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+    deleteSavingName = document.getElementById('deleteSavingName');
+    deleteSavingType = document.getElementById('deleteSavingType');
+    
     loadUserProfile(user);
     
     // Load goals for linking
@@ -440,14 +446,37 @@ function formatFrequency(frequency) {
 
 // Setup event listeners
 function setupEventListeners() {
-  addSavingBtn.addEventListener('click', showAddForm);
-  closeFormBtn.addEventListener('click', hideForm);
-  cancelFormBtn.addEventListener('click', hideForm);
-  savingForm.addEventListener('submit', handleSubmit);
+  if (addSavingBtn) {
+    addSavingBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      console.log('Add Saving button clicked');
+      showAddForm();
+    });
+  }
   
-  closeDeleteModalBtn.addEventListener('click', hideDeleteModal);
-  cancelDeleteBtn.addEventListener('click', hideDeleteModal);
-  confirmDeleteBtn.addEventListener('click', handleDelete);
+  if (closeFormBtn) {
+    closeFormBtn.addEventListener('click', hideForm);
+  }
+  
+  if (cancelFormBtn) {
+    cancelFormBtn.addEventListener('click', hideForm);
+  }
+  
+  if (savingForm) {
+    savingForm.addEventListener('submit', handleSubmit);
+  }
+  
+  if (closeDeleteModalBtn) {
+    closeDeleteModalBtn.addEventListener('click', hideDeleteModal);
+  }
+  
+  if (cancelDeleteBtn) {
+    cancelDeleteBtn.addEventListener('click', hideDeleteModal);
+  }
+  
+  if (confirmDeleteBtn) {
+    confirmDeleteBtn.addEventListener('click', handleDelete);
+  }
   
   // Pagination
   const prevPageBtn = document.getElementById('prevPageBtn');
@@ -473,25 +502,47 @@ function setupEventListeners() {
 
 // Show add form
 function showAddForm() {
+  console.log('showAddForm called');
+  console.log('addSavingSection:', addSavingSection);
+  
+  if (!addSavingSection) {
+    console.error('addSavingSection element not found');
+    return;
+  }
+  
   state.editingSavingId = null;
   formTitle.textContent = 'Add Saving';
   saveFormBtn.textContent = 'Save Saving';
   savingForm.reset();
   document.getElementById('startDate').value = formatDateForInput(new Date());
   document.getElementById('autoDeduct').checked = true;
+  
+  // Remove display: none and add show class
+  addSavingSection.style.display = 'block';
   addSavingSection.classList.add('show');
-  addSavingSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  
+  console.log('Form should be visible now');
+  
+  // Scroll to form
+  setTimeout(() => {
+    addSavingSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
 }
 
 // Hide form
 function hideForm() {
+  if (!addSavingSection) return;
+  
   addSavingSection.classList.remove('show');
+  addSavingSection.style.display = 'none';
   savingForm.reset();
   state.editingSavingId = null;
 }
 
 // Show edit form
 function showEditForm(saving) {
+  if (!addSavingSection) return;
+  
   state.editingSavingId = saving.id;
   formTitle.textContent = 'Edit Saving';
   saveFormBtn.textContent = 'Update Saving';
@@ -508,8 +559,12 @@ function showEditForm(saving) {
   document.getElementById('linkedGoal').value = saving.linkedGoalId || '';
   document.getElementById('notes').value = saving.notes || '';
   
+  addSavingSection.style.display = 'block';
   addSavingSection.classList.add('show');
-  addSavingSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  
+  setTimeout(() => {
+    addSavingSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
 }
 
 // Handle form submit
