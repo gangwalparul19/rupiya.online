@@ -63,18 +63,30 @@
   <!-- Button Reset Fix - Prevents buttons from getting stuck -->
   <script src="assets/js/utils/button-reset-fix.js"></script>
   
-  <!-- CRITICAL FIX: Force single column layout on mobile for widgets -->
+  <!-- CRITICAL FIX: Force full width widgets and 2-column KPI cards on mobile -->
   <style>
-    /* Force single column on mobile - highest priority */
+    /* Mobile styles - highest priority */
     @media (max-width: 768px) {
+      /* KPI Cards - Keep 2 columns per row */
+      .kpi-grid {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
+        padding: 0 16px 16px 16px !important;
+        margin-bottom: 0 !important;
+      }
+      
+      /* Widgets Row - Full width, no gaps */
       .widgets-row {
         display: grid !important;
         grid-template-columns: 1fr !important;
-        gap: 12px !important;
-        margin-bottom: 16px !important;
+        gap: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
       }
       
-      /* Force ALL widgets to full width */
+      /* Force ALL widgets to full width edge-to-edge */
       .widgets-row > *,
       .widgets-row .savings-rate-widget,
       .widgets-row .goal-progress-widget,
@@ -84,13 +96,43 @@
         grid-column: 1 / -1 !important;
         width: 100% !important;
         max-width: 100% !important;
+        margin: 0 0 16px 0 !important;
+        padding: 16px !important;
+        border-radius: 0 !important;
+        border-left: none !important;
+        border-right: none !important;
+        box-sizing: border-box !important;
+      }
+      
+      /* Charts also full width */
+      .charts-grid {
+        gap: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      
+      .chart-card {
+        margin: 0 0 16px 0 !important;
+        padding: 16px !important;
+        border-radius: 0 !important;
+        border-left: none !important;
+        border-right: none !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
       }
     }
     
     /* Extra small mobile */
-    @media (max-width: 374px) {
-      .widgets-row {
-        gap: 8px !important;
+    @media (max-width: 480px) {
+      .kpi-grid {
+        gap: 6px !important;
+      }
+      
+      .widgets-row > *,
+      .widgets-row [class*="-widget"] {
+        margin: 0 0 12px 0 !important;
+        padding: 12px !important;
       }
     }
   </style>
@@ -333,9 +375,9 @@
       </div>
 
       <!-- Dashboard Widgets Row -->
-      <div class="widgets-row" style="padding: 0 !important; margin: 0 !important;">
+      <div class="widgets-row" style="display: grid; grid-template-columns: 1fr; gap: 0; padding: 0; margin: 0; width: 100%;">
         <!-- Savings Rate Widget -->
-        <div class="savings-rate-widget" id="savingsRateWidget" style="margin: 0 !important; border-radius: 0 !important; border-left: none !important; border-right: none !important;">
+        <div class="savings-rate-widget" id="savingsRateWidget" style="margin: 0 0 16px 0; padding: 16px; border-radius: 0; border-left: none; border-right: none; width: 100%; max-width: 100%; box-sizing: border-box;">
           <div class="savings-rate-header">
             <div class="savings-rate-title">💰 Savings Rate</div>
             <div class="savings-rate-value" id="savingsRateValue">0%</div>
@@ -368,7 +410,7 @@
         </div>
 
         <!-- Goal Progress Widget -->
-        <div class="goal-progress-widget" id="goalProgressWidget" style="display: none; margin: 0 !important; border-radius: 0 !important; border-left: none !important; border-right: none !important;">
+        <div class="goal-progress-widget" id="goalProgressWidget" style="display: none; margin: 0 0 16px 0; padding: 16px; border-radius: 0; border-left: none; border-right: none; width: 100%; max-width: 100%; box-sizing: border-box;">
           <div class="goal-progress-header">
             <div class="goal-progress-title">🎯 <span id="goalName">Savings Goal</span></div>
             <div class="goal-progress-percent" id="goalPercent">0%</div>
@@ -383,7 +425,7 @@
         </div>
 
         <!-- Top Spending Categories Widget -->
-        <div class="top-categories-widget" id="topCategoriesWidget" style="margin: 0 !important; border-radius: 0 !important; border-left: none !important; border-right: none !important;">
+        <div class="top-categories-widget" id="topCategoriesWidget" style="margin: 0 0 16px 0; padding: 16px; border-radius: 0; border-left: none; border-right: none; width: 100%; max-width: 100%; box-sizing: border-box;">
           <div class="top-categories-title">📊 Top Spending Categories</div>
           <div id="topCategoriesList">
             <!-- Categories will be loaded here -->
@@ -391,7 +433,7 @@
         </div>
 
         <!-- Upcoming Bills Widget -->
-        <div class="upcoming-bills-widget" id="upcomingBillsWidget" style="margin: 0 !important; border-radius: 0 !important; border-left: none !important; border-right: none !important;">
+        <div class="upcoming-bills-widget" id="upcomingBillsWidget" style="margin: 0 0 16px 0; padding: 16px; border-radius: 0; border-left: none; border-right: none; width: 100%; max-width: 100%; box-sizing: border-box;">
           <div class="upcoming-bills-title">📅 Upcoming Bills</div>
           <div id="upcomingBillsList">
             <!-- Bills will be loaded here -->
@@ -400,9 +442,9 @@
       </div>
 
       <!-- Analytics Charts -->
-      <div class="charts-grid" style="padding: 0 !important; margin: 0 !important;">
+      <div class="charts-grid" style="display: grid; grid-template-columns: 1fr; gap: 0; padding: 0; margin: 0; width: 100%;">
         <!-- Income vs Expenses Trend -->
-        <div class="chart-card" style="margin: 0 !important; border-radius: 0 !important; border-left: none !important; border-right: none !important;">
+        <div class="chart-card" style="margin: 0 0 16px 0; padding: 16px; border-radius: 0; border-left: none; border-right: none; width: 100%; max-width: 100%; box-sizing: border-box;">
           <div class="card-header">
             <h2 class="card-title">Income vs Expenses</h2>
             <select id="trendPeriod" class="chart-filter">
@@ -417,7 +459,7 @@
         </div>
 
         <!-- Expense by Category -->
-        <div class="chart-card" style="margin: 0 !important; border-radius: 0 !important; border-left: none !important; border-right: none !important;">
+        <div class="chart-card" style="margin: 0 0 16px 0; padding: 16px; border-radius: 0; border-left: none; border-right: none; width: 100%; max-width: 100%; box-sizing: border-box;">
           <div class="card-header">
             <h2 class="card-title">Expense Breakdown</h2>
             <select id="categoryPeriod" class="chart-filter">
