@@ -13,6 +13,7 @@
   position: sticky;
   top: 0;
   z-index: 100;
+  min-height: 60px;
 }
 
 .header-left {
@@ -50,32 +51,12 @@
   display: block;
 }
 
-/* Breadcrumbs */
-.breadcrumbs {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-}
-
-.breadcrumbs a {
-  color: var(--text-secondary);
-  text-decoration: none;
-  transition: color 0.2s ease;
-}
-
-.breadcrumbs a:hover {
-  color: var(--primary-color);
-}
-
-.breadcrumb-separator {
-  color: var(--text-tertiary);
-}
-
-.breadcrumb-current {
-  color: var(--text-primary);
-  font-weight: 500;
+/* ============================================
+   CONTAINER - NO SIDE PADDING
+   ============================================ */
+.container {
+  padding: 2rem 2rem 2rem 2rem;
+  max-width: 100%;
 }
 
 /* ============================================
@@ -864,8 +845,9 @@
     padding: 1rem;
   }
 
-  .breadcrumbs {
-    font-size: 0.75rem;
+  /* Container - Reduce padding on mobile */
+  .container {
+    padding: 1.5rem 1rem;
   }
 
   /* Page Header */

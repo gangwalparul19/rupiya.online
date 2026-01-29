@@ -627,24 +627,51 @@ async function handleSubmit(e) {
 
 // Show delete confirmation
 function showDeleteConfirmation(savingId) {
+  console.log('showDeleteConfirmation called with ID:', savingId);
+  console.log('deleteModal element:', deleteModal);
+  
   const saving = state.savings.find(s => s.id === savingId);
-  if (!saving) return;
+  if (!saving) {
+    console.error('Saving not found:', savingId);
+    return;
+  }
+  
+  if (!deleteModal) {
+    console.error('Delete modal element not found');
+    return;
+  }
   
   deleteSavingId = savingId;
-  deleteSavingName.textContent = saving.name;
-  deleteSavingType.textContent = saving.savingType;
+  
+  if (deleteSavingName) deleteSavingName.textContent = saving.name;
+  if (deleteSavingType) deleteSavingType.textContent = saving.savingType;
+  
+  deleteModal.style.display = 'flex';
   deleteModal.classList.add('show');
+  
+  console.log('Modal should be visible now');
 }
 
 // Hide delete modal
 function hideDeleteModal() {
+  if (!deleteModal) return;
+  
   deleteModal.classList.remove('show');
+  deleteModal.style.display = 'none';
   deleteSavingId = null;
 }
 
 // Handle delete
 async function handleDelete() {
-  if (!deleteSavingId) return;
+  if (!deleteSavingId) {
+    console.error('No saving ID to delete');
+    return;
+  }
+  
+  if (!confirmDeleteBtn) {
+    console.error('Confirm delete button not found');
+    return;
+  }
   
   confirmDeleteBtn.disabled = true;
   confirmDeleteBtn.textContent = 'Deleting...';
@@ -662,8 +689,10 @@ async function handleDelete() {
     console.error('Error deleting:', error);
     toast.error('Failed to delete');
   } finally {
-    confirmDeleteBtn.disabled = false;
-    confirmDeleteBtn.textContent = 'Delete';
+    if (confirmDeleteBtn) {
+      confirmDeleteBtn.disabled = false;
+      confirmDeleteBtn.textContent = 'Delete';
+    }
   }
 }
 
