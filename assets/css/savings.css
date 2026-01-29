@@ -155,14 +155,41 @@
   font-weight: 700;
   color: var(--text-primary);
   margin-bottom: 0.25rem;
+  position: relative;
+  cursor: help;
 }
 
-.kpi-change {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
+/* KPI Tooltip Styles */
+.kpi-value[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.5rem 0.75rem;
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+  border-radius: 6px;
+  z-index: 1000;
+  margin-bottom: 0.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+}
+
+.kpi-value[title]:hover::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: rgba(0, 0, 0, 0.9);
+  margin-bottom: -6px;
+  z-index: 1000;
+  pointer-events: none;
 }
 
 /* ============================================
@@ -422,6 +449,8 @@
   font-weight: 700;
   color: var(--text-primary);
   line-height: 1.2;
+  position: relative;
+  cursor: help;
 }
 
 .saving-stat-value.positive {
@@ -430,6 +459,39 @@
 
 .saving-stat-value.negative {
   color: #E74C3C;
+}
+
+/* Tooltip Styles */
+.saving-stat-value[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.5rem 0.75rem;
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+  border-radius: 6px;
+  z-index: 1000;
+  margin-bottom: 0.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+}
+
+.saving-stat-value[title]:hover::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: rgba(0, 0, 0, 0.9);
+  margin-bottom: -6px;
+  z-index: 1000;
+  pointer-events: none;
 }
 
 /* Progress Bar */
@@ -686,7 +748,7 @@
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.6);
-  z-index: 2000;
+  z-index: 10000 !important;
   align-items: center;
   justify-content: center;
   backdrop-filter: blur(4px);
@@ -720,6 +782,8 @@
   overflow-y: auto;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   animation: slideUp 0.3s ease;
+  position: relative;
+  z-index: 10001 !important;
 }
 
 @keyframes slideUp {
@@ -892,10 +956,6 @@
 
   .kpi-value {
     font-size: 1.25rem;
-  }
-
-  .kpi-change {
-    font-size: 0.7rem;
   }
 
   /* Form - Single Column */

@@ -244,10 +244,21 @@ function calculateMaturityValue(saving) {
 
 // Update KPIs
 function updateKPIs() {
-  if (monthlySavingsValue) monthlySavingsValue.textContent = formatCurrencyCompact(state.allDataKPI.monthlyCommitment);
-  if (totalSavedValue) totalSavedValue.textContent = formatCurrencyCompact(state.allDataKPI.totalSaved);
-  if (activeSavingsValue) activeSavingsValue.textContent = state.allDataKPI.activeSavings;
-  if (maturityValue) maturityValue.textContent = formatCurrencyCompact(state.allDataKPI.expectedMaturity);
+  if (monthlySavingsValue) {
+    monthlySavingsValue.textContent = formatCurrencyCompact(state.allDataKPI.monthlyCommitment);
+    monthlySavingsValue.title = formatCurrency(state.allDataKPI.monthlyCommitment);
+  }
+  if (totalSavedValue) {
+    totalSavedValue.textContent = formatCurrencyCompact(state.allDataKPI.totalSaved);
+    totalSavedValue.title = formatCurrency(state.allDataKPI.totalSaved);
+  }
+  if (activeSavingsValue) {
+    activeSavingsValue.textContent = state.allDataKPI.activeSavings;
+  }
+  if (maturityValue) {
+    maturityValue.textContent = formatCurrencyCompact(state.allDataKPI.expectedMaturity);
+    maturityValue.title = formatCurrency(state.allDataKPI.expectedMaturity);
+  }
 }
 
 // Render savings
@@ -370,11 +381,11 @@ function createSavingCard(saving) {
         <div class="saving-stats-row">
           <div class="saving-stat">
             <div class="saving-stat-label">Amount</div>
-            <div class="saving-stat-value">${formatCurrency(amount)}</div>
+            <div class="saving-stat-value" title="${formatCurrency(amount)}">${formatCurrency(amount)}</div>
           </div>
           <div class="saving-stat">
             <div class="saving-stat-label">Current Value</div>
-            <div class="saving-stat-value">${formatCurrency(currentValue)}</div>
+            <div class="saving-stat-value" title="${formatCurrency(currentValue)}">${formatCurrency(currentValue)}</div>
           </div>
         </div>
 
@@ -382,11 +393,11 @@ function createSavingCard(saving) {
           <div class="saving-stats-row">
             <div class="saving-stat">
               <div class="saving-stat-label">Expected Maturity</div>
-              <div class="saving-stat-value positive">${formatCurrency(expectedMaturity)}</div>
+              <div class="saving-stat-value positive" title="${formatCurrency(expectedMaturity)}">${formatCurrency(expectedMaturity)}</div>
             </div>
             <div class="saving-stat">
               <div class="saving-stat-label">Expected Returns</div>
-              <div class="saving-stat-value ${returns >= 0 ? 'positive' : 'negative'}">
+              <div class="saving-stat-value ${returns >= 0 ? 'positive' : 'negative'}" title="${formatCurrency(Math.abs(returns))}">
                 ${returns >= 0 ? '+' : ''}${formatCurrency(returns)}
               </div>
             </div>
