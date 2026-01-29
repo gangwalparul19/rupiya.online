@@ -1103,8 +1103,14 @@
   
   .transactions-card,
   .charts-grid {
-    margin-left: 16px;
-    margin-right: 16px;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+  
+  .transactions-card {
+    border-radius: 0 !important;
+    border-left: none !important;
+    border-right: none !important;
   }
 }
 
@@ -1314,6 +1320,10 @@
     grid-template-columns: 1fr !important;
     gap: var(--spacing-md);
     margin-bottom: var(--spacing-md);
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
   }
   
   /* Make ALL widgets full width on mobile - catch all */
@@ -1326,6 +1336,11 @@
   .emergency-fund-widget {
     grid-column: 1 / -1 !important;
     padding: var(--spacing-md);
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    border-radius: 0 !important;
+    border-left: none !important;
+    border-right: none !important;
   }
   
   .savings-rate-header {
@@ -1460,10 +1475,19 @@
     grid-template-columns: 1fr;
     gap: var(--spacing-md);
     margin-bottom: var(--spacing-md);
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
   }
   
   .chart-card {
     padding: 12px;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    border-radius: 0 !important;
+    border-left: none !important;
+    border-right: none !important;
   }
   
   .chart-container {
