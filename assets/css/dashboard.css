@@ -1065,10 +1065,11 @@
   }
   
   .main-content {
-    margin-left: 0;
-    padding: 16px 0;
-    max-width: 100vw;
-    overflow-x: hidden;
+    margin-left: 0 !important;
+    padding: 0 !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+    width: 100% !important;
   }
   
   .mobile-header {
@@ -1080,37 +1081,70 @@
     border-bottom: 2px solid var(--primary-blue);
     position: relative;
     margin-bottom: 16px;
-    width: 100vw;
-    max-width: 100vw;
+    width: 100%;
     box-sizing: border-box;
   }
   
-  /* Dashboard content with proper padding */
+  /* Dashboard content with proper padding only for text */
   .dashboard-header {
-    padding-left: 16px;
-    padding-right: 16px;
+    padding: 0 16px 16px 16px !important;
+    margin-bottom: 0 !important;
   }
   
   .kpi-grid {
-    padding-left: 16px;
-    padding-right: 16px;
+    padding: 0 16px 16px 16px !important;
+    margin-bottom: 0 !important;
   }
   
+  /* FULL WIDTH WIDGETS - NO SIDE PADDING */
   .widgets-row {
-    padding-left: 16px;
-    padding-right: 16px;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
   }
   
-  .transactions-card,
-  .charts-grid {
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-  }
-  
-  .transactions-card {
+  .widgets-row > *,
+  .savings-rate-widget,
+  .goal-progress-widget,
+  .top-categories-widget,
+  .upcoming-bills-widget {
+    margin: 0 0 16px 0 !important;
+    padding: 16px !important;
     border-radius: 0 !important;
     border-left: none !important;
     border-right: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  /* FULL WIDTH CHARTS */
+  .charts-grid {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+  }
+  
+  .chart-card {
+    margin: 0 0 16px 0 !important;
+    padding: 16px !important;
+    border-radius: 0 !important;
+    border-left: none !important;
+    border-right: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .transactions-card {
+    margin: 0 0 16px 0 !important;
+    padding: 16px !important;
+    border-radius: 0 !important;
+    border-left: none !important;
+    border-right: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
 }
 
