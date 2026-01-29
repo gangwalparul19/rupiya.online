@@ -306,6 +306,40 @@ const FEATURE_DETAILS = {
     ],
     whyEnable: 'Powerful for motivation and long-term planning. Having clear goals helps you stay focused and make better financial decisions.'
   },
+  savings: {
+    label: 'Savings',
+    icon: '💰',
+    category: 'planning',
+    shortDescription: 'Track SIP, FD, RD, PPF & systematic savings',
+    longDescription: 'Track all your systematic savings instruments like SIP, Fixed Deposits, Recurring Deposits, PPF, and more. Monitor monthly commitments, calculate maturity values, and see how savings affect your cashflow.',
+    benefits: [
+      'Track 9 types of savings (SIP, FD, RD, PPF, NSC, SSY, EPF, NPS)',
+      'Calculate monthly savings commitment automatically',
+      'Project maturity values with compound interest',
+      'Auto-deduct from income for accurate cashflow',
+      'Link savings to financial goals',
+      'Get maturity alerts 30 days in advance'
+    ],
+    useCases: [
+      'Track monthly SIP investments',
+      'Monitor Fixed Deposit maturity dates',
+      'Calculate PPF returns and maturity value',
+      'Track EPF contributions',
+      'Plan systematic savings for goals',
+      'Monitor total savings commitment'
+    ],
+    features: [
+      'Support for 9 savings types',
+      'Monthly commitment calculator',
+      'Compound interest maturity projections',
+      'Auto-deduct flag for cashflow impact',
+      'Goal linking for better tracking',
+      'Maturity date alerts',
+      'Progress tracking with time-based bars',
+      'Frequency conversion (quarterly/yearly to monthly)'
+    ],
+    whyEnable: 'Essential for systematic wealth building. Track all your savings in one place, understand your monthly commitments, and see how they contribute to your financial goals. The auto-deduct feature ensures accurate cashflow calculations.'
+  },
   investments: {
     label: 'Investments',
     icon: '📊',
