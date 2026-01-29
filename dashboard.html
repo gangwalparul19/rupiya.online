@@ -81,6 +81,38 @@
   <!-- Button Reset Fix - Prevents buttons from getting stuck -->
   <script src="assets/js/utils/button-reset-fix.js"></script>
   
+  <!-- CRITICAL FIX: Force single column layout on mobile for widgets -->
+  <style>
+    /* Force single column on mobile - highest priority */
+    @media (max-width: 768px) {
+      .widgets-row {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+        margin-bottom: 16px !important;
+      }
+      
+      /* Force ALL widgets to full width */
+      .widgets-row > *,
+      .widgets-row .savings-rate-widget,
+      .widgets-row .goal-progress-widget,
+      .widgets-row .top-categories-widget,
+      .widgets-row .upcoming-bills-widget,
+      .widgets-row [class*="-widget"] {
+        grid-column: 1 / -1 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+    }
+    
+    /* Extra small mobile */
+    @media (max-width: 374px) {
+      .widgets-row {
+        gap: 8px !important;
+      }
+    }
+  </style>
+  
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <!-- Structured Data - WebPage -->
   <script type="application/ld+json">
