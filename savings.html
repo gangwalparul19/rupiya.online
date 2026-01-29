@@ -81,39 +81,37 @@
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <!-- Main Content -->
-    <div class="main-content">
-      <!-- Header -->
-      <header class="header" id="header">
-        <div class="header-left">
-          <button class="hamburger" id="sidebarOpen">
+    <main class="main-content">
+      <!-- Mobile Header -->
+      <div class="mobile-header">
+        <a href="dashboard.html" class="mobile-brand">
+          <img src="assets/images/logo.png" alt="Rupiya">
+        </a>
+        <div class="mobile-header-actions">
+          <div id="privacyModeContainer"></div>
+          <button class="sidebar-toggle" id="sidebarOpen">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
             </svg>
           </button>
         </div>
-        <div class="header-right">
-          <!-- Privacy Mode Button (loaded by privacy-mode-button.js) -->
-          <div id="privacyModeContainer"></div>
-        </div>
-      </header>
+      </div>
 
-      <!-- Page Content -->
-      <div class="container">
-        <!-- Page Header -->
-        <div class="page-header">
-          <div class="page-header-content">
-            <h1 class="page-title">💰 Savings</h1>
-            <p class="page-subtitle" id="savingsSubtitle">Track systematic savings and auto-deductions</p>
-          </div>
-          <div class="page-header-actions">
-            <button type="button" id="addSavingBtn" class="btn btn-primary">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-              </svg>
-              Add Saving
-            </button>
-          </div>
+      <!-- Page Header -->
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">💰 Savings</h1>
+          <p class="page-subtitle" id="savingsSubtitle">Track systematic savings and auto-deductions</p>
         </div>
+        <div class="page-actions">
+          <button type="button" id="addSavingBtn" class="btn btn-primary">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Add Saving
+          </button>
+        </div>
+      </div>
 
         <!-- KPI Cards -->
         <div class="kpi-grid">
@@ -319,7 +317,7 @@
         <button type="button" id="cancelDeleteBtn" class="btn btn-secondary">Cancel</button>
         <button type="button" id="confirmDeleteBtn" class="btn btn-danger">Delete</button>
       </div>
-    </div>
+    </main>
   </div>
 
   <!-- Scripts -->
