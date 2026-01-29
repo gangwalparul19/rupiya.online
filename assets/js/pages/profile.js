@@ -1537,6 +1537,20 @@ function handlePaymentTypeChange() {
 // Load payment methods
 async function loadPaymentMethods() {
   try {
+    // Check if user is authenticated
+    const currentUser = authService.getCurrentUser();
+    if (!currentUser) {
+      console.warn('User not authenticated, cannot load payment methods');
+      if (paymentMethodsList) {
+        paymentMethodsList.innerHTML = `
+          <div class="empty-state">
+            <p>Please log in to view payment methods.</p>
+          </div>
+        `;
+      }
+      return;
+    }
+    
     paymentMethods = await paymentMethodsService.getPaymentMethods();
     
     renderPaymentMethods();
@@ -2018,6 +2032,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const paymentMethodsTab = document.querySelector('[data-tab="payment-methods"]');
   if (paymentMethodsTab) {
     paymentMethodsTab.addEventListener('click', async () => {
+      // Check if user is authenticated before loading payment methods
+      const currentUser = authService.getCurrentUser();
+      if (!currentUser) {
+        console.warn('User not authenticated, skipping payment methods load');
+        return;
+      }
+      
       if (!paymentMethodsList) {
         initPaymentMethodsDOM();
         setupPaymentMethodsListeners();
