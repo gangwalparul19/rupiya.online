@@ -747,19 +747,20 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.6);
-  z-index: 10000 !important;
+  background: rgba(0, 0, 0, 0.75) !important;
+  z-index: 999999 !important;
   align-items: center;
   justify-content: center;
   backdrop-filter: blur(4px);
-}
-
-.modal:not(.show) {
   display: none;
 }
 
+.modal:not(.show) {
+  display: none !important;
+}
+
 .modal.show {
-  display: flex;
+  display: flex !important;
   animation: fadeIn 0.2s ease;
 }
 
@@ -773,17 +774,18 @@
 }
 
 .modal-content {
-  background: var(--card-bg);
+  background: #ffffff !important;
   border-radius: 16px;
   padding: 2rem;
   max-width: 500px;
   width: 90%;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
   animation: slideUp 0.3s ease;
   position: relative;
-  z-index: 10001 !important;
+  z-index: 1000000 !important;
+  opacity: 1 !important;
 }
 
 @keyframes slideUp {
@@ -803,14 +805,14 @@
   align-items: center;
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
-  border-bottom: 2px solid var(--border-color);
+  border-bottom: 2px solid #e5e7eb;
 }
 
 .modal-header h3 {
   margin: 0;
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--text-primary);
+  color: #1f2937;
 }
 
 .modal-body {
@@ -819,8 +821,9 @@
 
 .modal-body p {
   margin: 0.75rem 0;
-  color: var(--text-secondary);
+  color: #6b7280;
   line-height: 1.6;
+  font-size: 1rem;
 }
 
 .modal-footer {
@@ -828,13 +831,46 @@
   justify-content: flex-end;
   gap: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid var(--border-color);
+  border-top: 1px solid #e5e7eb;
+}
+
+.modal-footer .btn {
+  min-width: 120px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.modal-footer .btn-secondary {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.modal-footer .btn-secondary:hover {
+  background: #e5e7eb;
+  transform: translateY(-1px);
+}
+
+.modal-footer .btn-danger {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.modal-footer .btn-danger:hover {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
 }
 
 .delete-details {
   margin: 1.5rem 0;
   padding: 1.25rem;
-  background: var(--bg-secondary);
+  background: #f9fafb;
   border-radius: 8px;
   border-left: 3px solid #E74C3C;
 }
@@ -842,21 +878,23 @@
 .delete-details p {
   margin: 0.5rem 0;
   font-size: 0.875rem;
+  color: #374151;
 }
 
 .delete-details strong {
-  color: var(--text-primary);
+  color: #1f2937;
   font-weight: 600;
 }
 
 .warning-text {
-  color: #E74C3C;
+  color: #dc2626;
   font-weight: 700;
   margin-top: 1rem;
   padding: 0.75rem;
-  background: #FFEBEE;
+  background: #fee2e2;
   border-radius: 6px;
   text-align: center;
+  font-size: 0.875rem;
 }
 
 /* ============================================
@@ -1169,4 +1207,57 @@
 [data-theme="dark"] .empty-state {
   background: var(--bg-tertiary-dark);
   border-color: var(--border-color-dark);
+}
+
+/* Dark mode modal styles */
+[data-theme="dark"] .modal {
+  background: rgba(0, 0, 0, 0.85) !important;
+}
+
+[data-theme="dark"] .modal-content {
+  background: #1f2937 !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+}
+
+[data-theme="dark"] .modal-header {
+  border-bottom-color: #374151;
+}
+
+[data-theme="dark"] .modal-header h3 {
+  color: #f9fafb;
+}
+
+[data-theme="dark"] .modal-body p {
+  color: #d1d5db;
+}
+
+[data-theme="dark"] .modal-footer {
+  border-top-color: #374151;
+}
+
+[data-theme="dark"] .modal-footer .btn-secondary {
+  background: #374151;
+  color: #f9fafb;
+}
+
+[data-theme="dark"] .modal-footer .btn-secondary:hover {
+  background: #4b5563;
+}
+
+[data-theme="dark"] .delete-details {
+  background: #111827;
+  border-left-color: #dc2626;
+}
+
+[data-theme="dark"] .delete-details p {
+  color: #d1d5db;
+}
+
+[data-theme="dark"] .delete-details strong {
+  color: #f9fafb;
+}
+
+[data-theme="dark"] .warning-text {
+  background: rgba(220, 38, 38, 0.2);
+  color: #fca5a5;
 }
