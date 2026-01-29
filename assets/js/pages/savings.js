@@ -657,7 +657,8 @@ function showDeleteConfirmation(savingId) {
   if (deleteSavingName) deleteSavingName.textContent = saving.name;
   if (deleteSavingType) deleteSavingType.textContent = saving.savingType;
   
-  deleteModal.style.display = 'flex';
+  // Remove inline style and add show class
+  deleteModal.removeAttribute('style');
   deleteModal.classList.add('show');
   
   console.log('Modal should be visible now');
@@ -668,7 +669,6 @@ function hideDeleteModal() {
   if (!deleteModal) return;
   
   deleteModal.classList.remove('show');
-  deleteModal.style.display = 'none';
   deleteSavingId = null;
 }
 
