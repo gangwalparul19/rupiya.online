@@ -42,6 +42,243 @@
 <!-- Auth Guard -->
   <script src="assets/js/utils/auth-guard.js"></script>
   
+  <!-- MOBILE OPTIMIZATION: Inline CSS for immediate mobile fixes -->
+  <style>
+    /* Mobile-first responsive fixes */
+    @media (max-width: 768px) {
+      /* Admin Header - Stack vertically */
+      .admin-header {
+        flex-direction: column !important;
+        padding: 12px !important;
+        gap: 12px !important;
+      }
+      
+      .admin-header-left,
+      .admin-header-right {
+        width: 100% !important;
+        justify-content: space-between !important;
+      }
+      
+      .admin-header-right {
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+      }
+      
+      .admin-user-info {
+        order: -1 !important;
+        width: 100% !important;
+        margin-bottom: 8px !important;
+      }
+      
+      /* Stats Cards - Single column */
+      .admin-stats-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+      }
+      
+      .admin-stat-card {
+        padding: 16px !important;
+      }
+      
+      .admin-stat-value {
+        font-size: 24px !important;
+      }
+      
+      /* Location Cards - Single column */
+      .admin-locations-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+      }
+      
+      .admin-location-card {
+        padding: 16px !important;
+      }
+      
+      /* User Directory Table - Card view */
+      .admin-table-container {
+        overflow-x: visible !important;
+        border-radius: 8px !important;
+      }
+      
+      .admin-table {
+        display: block !important;
+        width: 100% !important;
+      }
+      
+      .admin-table thead {
+        display: none !important;
+      }
+      
+      .admin-table tbody {
+        display: block !important;
+      }
+      
+      .admin-table tr {
+        display: block !important;
+        margin-bottom: 16px !important;
+        border: 1px solid #e0e0e0 !important;
+        border-radius: 8px !important;
+        padding: 12px !important;
+        background: white !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important;
+      }
+      
+      .admin-table td {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        padding: 8px 0 !important;
+        border: none !important;
+        border-bottom: 1px solid #f0f0f0 !important;
+      }
+      
+      .admin-table td:last-child {
+        border-bottom: none !important;
+      }
+      
+      .admin-table td::before {
+        content: attr(data-label) !important;
+        font-weight: 600 !important;
+        color: #666 !important;
+        font-size: 12px !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.5px !important;
+      }
+      
+      /* User avatar in table */
+      .admin-table .user-avatar-cell {
+        justify-content: flex-start !important;
+      }
+      
+      .admin-table .user-avatar-cell::before {
+        display: none !important;
+      }
+      
+      /* Status badges */
+      .admin-status-badge {
+        padding: 4px 12px !important;
+        font-size: 12px !important;
+      }
+      
+      /* Charts - Full width */
+      .admin-chart-card {
+        padding: 16px !important;
+      }
+      
+      .admin-chart-container {
+        height: 250px !important;
+      }
+      
+      /* Page header */
+      .admin-page-header {
+        padding: 16px !important;
+      }
+      
+      .admin-title {
+        font-size: 24px !important;
+      }
+      
+      .admin-subtitle {
+        font-size: 14px !important;
+      }
+      
+      /* Buttons */
+      .btn {
+        padding: 8px 12px !important;
+        font-size: 13px !important;
+      }
+      
+      .btn-sm {
+        padding: 6px 10px !important;
+        font-size: 12px !important;
+      }
+      
+      /* Search input */
+      .admin-search-input {
+        width: 100% !important;
+        font-size: 14px !important;
+      }
+      
+      /* Section headers */
+      .admin-section-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 12px !important;
+      }
+      
+      .admin-section-title {
+        font-size: 18px !important;
+      }
+      
+      /* Filters */
+      .admin-filters {
+        flex-direction: column !important;
+        width: 100% !important;
+        gap: 8px !important;
+      }
+      
+      .admin-filter-select {
+        width: 100% !important;
+      }
+      
+      /* Pagination */
+      .admin-pagination {
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+        justify-content: center !important;
+      }
+      
+      .admin-pagination-btn {
+        padding: 6px 10px !important;
+        font-size: 12px !important;
+      }
+      
+      /* Main content padding */
+      .admin-main {
+        padding: 12px !important;
+      }
+      
+      /* Cards spacing */
+      .admin-card {
+        margin-bottom: 16px !important;
+        padding: 16px !important;
+      }
+      
+      /* Hide overflow on mobile */
+      body {
+        overflow-x: hidden !important;
+      }
+      
+      .admin-body {
+        overflow-x: hidden !important;
+      }
+    }
+    
+    /* Extra small mobile (< 375px) */
+    @media (max-width: 374px) {
+      .admin-header {
+        padding: 10px !important;
+      }
+      
+      .admin-stat-card {
+        padding: 12px !important;
+      }
+      
+      .admin-stat-value {
+        font-size: 20px !important;
+      }
+      
+      .admin-title {
+        font-size: 20px !important;
+      }
+      
+      .btn {
+        padding: 6px 10px !important;
+        font-size: 12px !important;
+      }
+    }
+  </style>
+  
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
 </head>

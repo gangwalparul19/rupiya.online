@@ -124,6 +124,17 @@ service cloud.firestore {
     }
     
     // ============================================
+    // SAVINGS (SIP, FD, RD, PPF, etc.)
+    // ============================================
+    match /savings/{savingId} {
+      // Users can only access their own savings
+      allow read: if belongsToUser();
+      allow create: if isAuthenticated() && hasValidUserId();
+      allow update: if belongsToUser() && userIdNotChanged();
+      allow delete: if belongsToUser();
+    }
+    
+    // ============================================
     // LOANS & EMI
     // ============================================
     match /loans/{loanId} {

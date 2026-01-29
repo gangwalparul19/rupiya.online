@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Primary Meta Tags -->
+  <title>Savings Tracker - SIP, FD, RD & More | Rupiya</title>
+  <meta name="title" content="Savings Tracker - Track SIP, FD, RD, PPF | Rupiya">
+  <meta name="description" content="Track systematic savings like SIP, Fixed Deposits, Recurring Deposits, PPF, and more. Monitor auto-deductions and build wealth systematically.">
+  <meta name="keywords" content="savings tracker, SIP tracker, FD tracker, recurring deposit, PPF tracker, systematic savings, auto-debit tracker">
+  <meta name="author" content="Rupiya">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#4A90E2">
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="assets/images/logo.png" type="image/png">
+  <link rel="apple-touch-icon" href="/android-chrome-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="assets/css/bundles/core.bundle.css">
+  <link rel="stylesheet" href="assets/css/bundles/dashboard.bundle.css">
+  <link rel="stylesheet" href="assets/css/savings.css">
+  
+  <!-- Auth Guard -->
+  <script src="assets/js/utils/auth-guard.js"></script>
+  <script src="assets/js/utils/button-reset-fix.js"></script>
+</head>
+<body>
+  <!-- Sidebar -->
+  <div id="sidebar"></div>
+  <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Header -->
+    <div id="header"></div>
+
+    <!-- Page Content -->
+    <div class="container">
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="page-header-content">
+          <h1 class="page-title">💰 Savings</h1>
+          <p class="page-subtitle" id="savingsSubtitle">Track systematic savings and auto-deductions</p>
+        </div>
+        <div class="page-header-actions">
+          <button type="button" id="addSavingBtn" class="btn btn-primary">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Add Saving
+          </button>
+        </div>
+      </div>
+
+      <!-- KPI Cards -->
+      <div class="kpi-grid">
+        <div class="kpi-card" id="monthlySavingsKpi">
+          <div class="kpi-icon">📅</div>
+          <div class="kpi-content">
+            <div class="kpi-label">Monthly Commitment</div>
+            <div class="kpi-value" id="monthlySavingsValue">₹0</div>
+            <div class="kpi-change" id="monthlySavingsChange">
+              <span>→</span><span>No data</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="kpi-card" id="totalSavedKpi">
+          <div class="kpi-icon">💵</div>
+          <div class="kpi-content">
+            <div class="kpi-label">Total Saved</div>
+            <div class="kpi-value" id="totalSavedValue">₹0</div>
+            <div class="kpi-change" id="totalSavedChange">
+              <span>→</span><span>All time</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="kpi-card" id="activeSavingsKpi">
+          <div class="kpi-icon">✅</div>
+          <div class="kpi-content">
+            <div class="kpi-label">Active Savings</div>
+            <div class="kpi-value" id="activeSavingsValue">0</div>
+            <div class="kpi-change" id="activeSavingsChange">
+              <span>→</span><span>Running</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="kpi-card" id="maturityValueKpi">
+          <div class="kpi-icon">🎯</div>
+          <div class="kpi-content">
+            <div class="kpi-label">Expected Maturity</div>
+            <div class="kpi-value" id="maturityValue">₹0</div>
+            <div class="kpi-change" id="maturityChange">
+              <span>→</span><span>Projected</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add/Edit Saving Form -->
+      <div id="addSavingSection" class="form-section">
+        <div class="form-header">
+          <h2 id="formTitle">Add Saving</h2>
+          <button type="button" id="closeFormBtn" class="btn-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <form id="savingForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="savingType">Saving Type *</label>
+              <select id="savingType" required>
+                <option value="">Select type</option>
+                <option value="SIP">SIP (Systematic Investment Plan)</option>
+                <option value="FD">Fixed Deposit</option>
+                <option value="RD">Recurring Deposit</option>
+                <option value="PPF">Public Provident Fund</option>
+                <option value="NSC">National Savings Certificate</option>
+                <option value="SSY">Sukanya Samriddhi Yojana</option>
+                <option value="EPF">Employee Provident Fund</option>
+                <option value="NPS">National Pension System</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="savingName">Name *</label>
+              <input type="text" id="savingName" placeholder="e.g., HDFC Equity SIP" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="amount">Amount *</label>
+              <input type="number" id="amount" placeholder="0.00" step="0.01" min="0" required>
+            </div>
+
+            <div class="form-group">
+              <label for="frequency">Frequency *</label>
+              <select id="frequency" required>
+                <option value="monthly">Monthly</option>
+                <option value="quarterly">Quarterly</option>
+                <option value="yearly">Yearly</option>
+                <option value="one-time">One-time</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="startDate">Start Date *</label>
+              <input type="date" id="startDate" required>
+            </div>
+
+            <div class="form-group">
+              <label for="maturityDate">Maturity Date</label>
+              <input type="date" id="maturityDate">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="interestRate">Interest Rate (% p.a.)</label>
+              <input type="number" id="interestRate" placeholder="0.00" step="0.01" min="0" max="100">
+            </div>
+
+            <div class="form-group">
+              <label for="currentValue">Current Value</label>
+              <input type="number" id="currentValue" placeholder="0.00" step="0.01" min="0">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="autoDeduct">
+              <input type="checkbox" id="autoDeduct" checked>
+              Auto-deduct from income (affects cashflow calculation)
+            </label>
+          </div>
+
+          <div class="form-group">
+            <label for="linkedGoal">Link to Goal (Optional)</label>
+            <select id="linkedGoal">
+              <option value="">No goal linked</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="notes">Notes</label>
+            <textarea id="notes" rows="3" placeholder="Additional details..."></textarea>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" id="cancelFormBtn" class="btn btn-secondary">Cancel</button>
+            <button type="submit" id="saveFormBtn" class="btn btn-primary">Save Saving</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Savings List -->
+      <div class="savings-container">
+        <!-- Loading State -->
+        <div id="loadingState" class="loading-state">
+          <div class="spinner"></div>
+          <p>Loading savings...</p>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="empty-state">
+          <div class="empty-state-icon">💰</div>
+          <h3 class="empty-state-title">No savings yet</h3>
+          <p class="empty-state-text">Start tracking your systematic savings like SIP, FD, RD, and more.</p>
+          <button type="button" class="btn btn-primary" onclick="document.getElementById('addSavingBtn').click()">
+            Add Your First Saving
+          </button>
+        </div>
+
+        <!-- Savings Grid -->
+        <div id="savingsList" class="savings-grid"></div>
+
+        <!-- Pagination -->
+        <div id="paginationContainer" class="pagination-container">
+          <button id="prevPageBtn" class="btn btn-secondary">Previous</button>
+          <div id="paginationNumbers" class="pagination-numbers"></div>
+          <button id="nextPageBtn" class="btn btn-secondary">Next</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div id="deleteModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Delete Saving</h3>
+        <button type="button" id="closeDeleteModalBtn" class="btn-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete this saving?</p>
+        <div class="delete-details">
+          <p><strong>Name:</strong> <span id="deleteSavingName"></span></p>
+          <p><strong>Type:</strong> <span id="deleteSavingType"></span></p>
+        </div>
+        <p class="warning-text">This action cannot be undone.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="cancelDeleteBtn" class="btn btn-secondary">Cancel</button>
+        <button type="button" id="confirmDeleteBtn" class="btn btn-danger">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="assets/js/pages/savings.js"></script>
+</body>
+</html>

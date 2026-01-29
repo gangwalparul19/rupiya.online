@@ -86,6 +86,7 @@ const navigationConfig = {
       items: [
         { href: 'budgets.html', icon: '💳', label: 'Budgets', featureKey: 'budgets' },
         { href: 'goals.html', icon: '🎯', label: 'Goals', featureKey: 'goals' },
+        { href: 'savings.html', icon: '💰', label: 'Savings', featureKey: 'savings' },
         { href: 'investments.html', icon: '📈', label: 'Investments', featureKey: 'investments' },
         { href: 'loans.html', icon: '🏦', label: 'Loans & EMI', featureKey: 'loans' },
         { href: 'transfers.html', icon: '🔄', label: 'Transfers', featureKey: 'transfers' },

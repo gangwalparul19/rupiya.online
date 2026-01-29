@@ -73,6 +73,12 @@ const DEFAULT_FEATURES = {
     description: 'Set financial milestones',
     category: 'planning'
   },
+  savings: {
+    enabled: false,
+    label: 'Savings',
+    description: 'Track SIP, FD, RD, PPF & more',
+    category: 'planning'
+  },
   investments: {
     enabled: false,
     label: 'Investments',

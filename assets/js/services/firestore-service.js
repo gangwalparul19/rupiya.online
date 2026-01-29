@@ -30,6 +30,7 @@ class FirestoreService {
       budgets: 'budgets',
       investments: 'investments',
       goals: 'goals',
+      savings: 'savings',
       loans: 'loans',
       houses: 'houses',
       vehicles: 'vehicles',
@@ -726,6 +727,57 @@ class FirestoreService {
   }
 
   async deleteGoal(id) { return this.delete(this.collections.goals, id); }
+
+  // ============================================
+  // SAVINGS (SIP, FD, RD, PPF, etc.)
+  // ============================================
+
+  async addSaving(saving) {
+    return this.add(this.collections.savings, {
+      ...saving,
+      startDate: saving.startDate instanceof Date ? Timestamp.fromDate(saving.startDate) : Timestamp.now(),
+      maturityDate: saving.maturityDate instanceof Date ? Timestamp.fromDate(saving.maturityDate) : null
+    });
+  }
+
+  async getSavings() { return this.getAll(this.collections.savings, 'startDate', 'desc'); }
+
+  async updateSaving(id, saving) {
+    const updateData = { ...saving };
+    if (saving.startDate instanceof Date) updateData.startDate = Timestamp.fromDate(saving.startDate);
+    if (saving.maturityDate instanceof Date) updateData.maturityDate = Timestamp.fromDate(saving.maturityDate);
+    return this.update(this.collections.savings, id, updateData);
+  }
+
+  async deleteSaving(id) { return this.delete(this.collections.savings, id); }
+
+  // Get monthly savings commitment (for auto-deduct)
+  async getMonthlySavingsCommitment() {
+    try {
+      const savings = await this.getSavings();
+      let monthlyCommitment = 0;
+      
+      savings.forEach(saving => {
+        if (saving.status === 'active' && saving.autoDeduct) {
+          const amount = parseFloat(saving.amount) || 0;
+          
+          // Convert to monthly equivalent
+          if (saving.frequency === 'monthly') {
+            monthlyCommitment += amount;
+          } else if (saving.frequency === 'quarterly') {
+            monthlyCommitment += amount / 3;
+          } else if (saving.frequency === 'yearly') {
+            monthlyCommitment += amount / 12;
+          }
+        }
+      });
+      
+      return monthlyCommitment;
+    } catch (error) {
+      console.error('Error getting monthly savings commitment:', error);
+      return 0;
+    }
+  }
 
   // ============================================
   // LOANS & EMI

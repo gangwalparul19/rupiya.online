@@ -330,7 +330,7 @@ function renderUsersTable() {
 
       return `
         <tr>
-          <td>
+          <td data-label="User" class="user-avatar-cell">
             <div class="user-cell">
               <div class="user-avatar ${colorClass}">${initials}</div>
               <div class="user-info">
@@ -339,15 +339,15 @@ function renderUsersTable() {
               </div>
             </div>
           </td>
-          <td>
+          <td data-label="Location">
             <div class="user-location">
               ${location !== '-' ? '<span class="user-location-icon">📍</span>' : ''}
               <span>${escapeHtml(location)}</span>
             </div>
           </td>
-          <td>${joined}</td>
-          <td>${lastActive}</td>
-          <td>
+          <td data-label="Joined">${joined}</td>
+          <td data-label="Last Active">${lastActive}</td>
+          <td data-label="Status">
             <span class="user-status ${user.isActive ? 'active' : 'inactive'}">
               <span class="user-status-dot"></span>
               ${user.isActive ? 'Active' : 'Inactive'}
