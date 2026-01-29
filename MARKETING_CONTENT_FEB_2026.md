@@ -124,7 +124,6 @@ With Rupiya's 23 features, you get:
 ✅ AI-powered predictions
 
 🎁 SPECIAL LAUNCH BENEFITS:
-• Lifetime free access
 • All 23 features unlocked
 • Priority support
 • Regular updates
@@ -187,8 +186,6 @@ COLLABORATION:
 • Privacy mode
 • Secure data storage
 • GDPR compliant
-
-🆓 COMPLETELY FREE - No hidden costs, no premium tiers
 
 🌐 WEB-BASED - Access from any device, anywhere
 
