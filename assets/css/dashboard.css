@@ -1066,7 +1066,7 @@
   
   .main-content {
     margin-left: 0;
-    padding: 16px;
+    padding: 16px 0;
     max-width: 100vw;
     overflow-x: hidden;
   }
@@ -1079,13 +1079,32 @@
     background: var(--white);
     border-bottom: 2px solid var(--primary-blue);
     position: relative;
-    left: -16px;
-    right: -16px;
-    margin-top: -16px;
     margin-bottom: 16px;
     width: 100vw;
     max-width: 100vw;
     box-sizing: border-box;
+  }
+  
+  /* Dashboard content with proper padding */
+  .dashboard-header {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  
+  .kpi-grid {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  
+  .widgets-row {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  
+  .transactions-card,
+  .charts-grid {
+    margin-left: 16px;
+    margin-right: 16px;
   }
 }
 
