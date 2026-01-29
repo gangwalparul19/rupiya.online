@@ -23,31 +23,64 @@ import authService from '../services/auth-service.js';
 import { initLogoutHandler } from '../utils/logout-handler.js';
 import { featureConfig } from '../config/feature-config.js';
 
-// Check if current user is admin (non-blocking)
+// Check if current user is admin (optimized with caching)
+let adminStatusCache = null;
+let adminStatusPromise = null;
+
 async function checkIsAdmin() {
-  try {
-    // First check if user is already available (fast path)
-    let user = authService.getCurrentUser();
-    
-    // If not, wait briefly for auth to initialize
-    if (!user) {
-      // Use a timeout to avoid blocking on public pages
-      const timeoutPromise = new Promise(resolve => setTimeout(() => resolve(null), 500));
-      const authPromise = authService.waitForAuth();
-      user = await Promise.race([authPromise, timeoutPromise]);
-    }
-    
-    if (!user) return false;
-    
-    const userDoc = await getDoc(doc(db, 'users', user.uid));
-    if (userDoc.exists()) {
-      return userDoc.data().isAdmin === true;
-    }
-    return false;
-  } catch (error) {
-    console.error('Error checking admin status:', error);
-    return false;
+  // Return cached value if available
+  if (adminStatusCache !== null) {
+    return adminStatusCache;
   }
+
+  // If already checking, return the existing promise
+  if (adminStatusPromise) {
+    return adminStatusPromise;
+  }
+
+  // Start new check
+  adminStatusPromise = (async () => {
+    try {
+      let user = authService.getCurrentUser();
+      
+      if (!user) {
+        const timeoutPromise = new Promise(resolve => setTimeout(() => resolve(null), 500));
+        const authPromise = authService.waitForAuth();
+        user = await Promise.race([authPromise, timeoutPromise]);
+      }
+      
+      if (!user) {
+        adminStatusCache = false;
+        return false;
+      }
+      
+      // Add timeout to Firestore call
+      const docPromise = getDoc(doc(db, 'users', user.uid));
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Admin check timeout')), 1000)
+      );
+      
+      const userDoc = await Promise.race([docPromise, timeoutPromise]);
+      const isAdmin = userDoc.exists() ? userDoc.data().isAdmin === true : false;
+      
+      adminStatusCache = isAdmin;
+      return isAdmin;
+    } catch (error) {
+      console.warn('[Sidebar] Admin check failed:', error.message);
+      adminStatusCache = false;
+      return false;
+    } finally {
+      adminStatusPromise = null;
+    }
+  })();
+
+  return adminStatusPromise;
+}
+
+// Clear admin cache on logout
+function clearAdminCache() {
+  adminStatusCache = null;
+  adminStatusPromise = null;
 }
 
 // Navigation configuration - edit this to update nav across all pages
@@ -166,10 +199,23 @@ function saveSectionState(sectionId, expanded) {
   // CACHING DISABLED - Don't save section state
 }
 
-// Generate sidebar HTML
-function generateSidebarHTML(isAdmin = false) {
+// Generate sidebar HTML with optional loading state
+function generateSidebarHTML(isAdmin = false, isLoading = false) {
   const currentPage = getCurrentPage();
   const sectionState = getSectionState();
+  
+  // Show loading skeleton if data is still loading
+  if (isLoading) {
+    return `
+      <div class="sidebar-loading">
+        <div class="skeleton-item"></div>
+        <div class="skeleton-item"></div>
+        <div class="skeleton-item"></div>
+        <div class="skeleton-item"></div>
+        <div class="skeleton-item"></div>
+      </div>
+    `;
+  }
   
   // Find which section contains the current page and expand it
   let currentSection = null;
@@ -266,7 +312,7 @@ function generateQuickSearchHTML() {
   `;
 }
 
-// Initialize sidebar
+// Initialize sidebar with optimized loading strategy
 export async function initSidebar() {
   const sidebar = document.getElementById('sidebar');
   if (!sidebar) return;
@@ -275,116 +321,105 @@ export async function initSidebar() {
   const sidebarNav = sidebar.querySelector('.sidebar-nav');
   if (!sidebarNav) return;
 
-  // Wait for auth to be ready first
-  let user = null;
-  try {
-    user = await authService.waitForAuth();
-  } catch (e) {
-    // Auth not ready, using defaults
-  }
-
-  // Wait for encryption to be ready BEFORE initializing features
-  // This is critical to ensure features are properly decrypted
+  // OPTIMIZATION: Show sidebar immediately with defaults, then update when data loads
+  // This prevents the UI from being blocked by slow async operations
   
-  // Check if encryption is already ready
-  let encryptionReady = false;
-  try {
-    // Try to import encryption service to check status
-    const encryptionService = await import('../services/encryption-service.js').then(m => m.default);
-    
-    // Wait for encryption to be ready with timeout
-    const maxWaitTime = 15000; // 15 seconds
-    const startTime = Date.now();
-    
-    while (!encryptionReady && (Date.now() - startTime) < maxWaitTime) {
-      if (encryptionService.isReady && encryptionService.isReady()) {
-        encryptionReady = true;
-        break;
-      }
-      
-      if (encryptionService.waitForInitialization) {
-        try {
-          await Promise.race([
-            encryptionService.waitForInitialization(),
-            new Promise(resolve => setTimeout(resolve, 500))
-          ]);
-        } catch (e) {
-          // Ignore timeout
-        }
-      }
-      
-      await new Promise(resolve => setTimeout(resolve, 100));
-    }
-    
-    if (!encryptionReady) {
-      console.warn('[Sidebar] Encryption not ready after timeout, proceeding anyway');
-    }
-  } catch (error) {
-    console.warn('[Sidebar] Error checking encryption status:', error.message);
-  }
-
-  // Initialize feature config (will always load from Firestore now)
-  // This will use defaults if encryption is not ready yet
-  await featureConfig.init();
-  
-  // Add a small delay to ensure features are fully loaded and processed
-  await new Promise(resolve => setTimeout(resolve, 200));
-
-  // Check if user is admin
-  const isAdmin = await checkIsAdmin();
-
-  // Generate and inject navigation
-  sidebarNav.innerHTML = generateQuickSearchHTML() + generateSidebarHTML(isAdmin);
-
-  // Setup section toggle handlers
+  // Step 1: Render immediately with defaults (no waiting)
+  sidebarNav.innerHTML = generateQuickSearchHTML() + generateSidebarHTML(false);
   setupSectionToggles();
-  
-  // Setup quick search
-  setupQuickSearch(isAdmin);
-  
-  // Setup sidebar toggle for mobile
+  setupQuickSearch(false);
   setupMobileSidebar();
-  
-  // Initialize global logout handler
   initLogoutHandler();
 
-  // Helper function to refresh sidebar
-  const refreshSidebar = async () => {
-    // Re-check admin status in case it changed
-    const currentIsAdmin = await checkIsAdmin();
-    sidebarNav.innerHTML = generateQuickSearchHTML() + generateSidebarHTML(currentIsAdmin);
-    setupSectionToggles();
-    setupQuickSearch(currentIsAdmin);
-  };
+  // Step 2: Load data in background and update when ready
+  loadSidebarDataAsync(sidebarNav);
+}
 
-  // Listen for feature changes and update navigation
-  window.addEventListener('featuresUpdated', refreshSidebar);
-  
-  // Listen for features reset
-  window.addEventListener('featuresReset', refreshSidebar);
-  
-  // Listen for feature toggle events
-  window.addEventListener('featureToggled', refreshSidebar);
-  
-  // Re-initialize features after encryption is ready (for page refresh scenarios)
-  // This handles the case where sidebar loads before encryption is initialized
-  window.addEventListener('encryptionReady', async () => {
-    // Reload features from Firestore now that encryption is ready
-    if (featureConfig.reloadFromFirestore) {
-      try {
-        await featureConfig.reloadFromFirestore();
-      } catch (error) {
-        console.error('[Sidebar] Error reloading features:', error);
+// Load sidebar data asynchronously without blocking UI
+// ENCRYPTION SAFETY: This function ensures encryption is properly initialized
+// before loading features, preventing any data corruption or decryption failures
+async function loadSidebarDataAsync(sidebarNav) {
+  try {
+    // STEP 1: Wait for auth first (required for encryption)
+    const userPromise = authService.waitForAuth().catch(() => null);
+    const user = await userPromise;
+    
+    if (!user) {
+      console.log('[Sidebar] No user found, using defaults');
+      return; // Stay with defaults if no user
+    }
+
+    // STEP 2: Ensure encryption is initialized before loading features
+    // This is CRITICAL - features may be encrypted and need decryption
+    console.log('[Sidebar] Waiting for encryption to be ready...');
+    
+    // Import encryption service dynamically to avoid circular deps
+    let encryptionService;
+    try {
+      const module = await import('../services/encryption-service.js');
+      encryptionService = module.default;
+    } catch (e) {
+      console.warn('[Sidebar] Could not load encryption service:', e);
+    }
+
+    // Wait for encryption with reasonable timeout
+    if (encryptionService) {
+      const encryptionReady = await Promise.race([
+        encryptionService.waitForInitialization(),
+        new Promise(resolve => setTimeout(() => resolve(false), 3000))
+      ]).catch(() => false);
+      
+      if (encryptionReady && encryptionService.isReady()) {
+        console.log('[Sidebar] ✅ Encryption ready');
+      } else {
+        console.warn('[Sidebar] ⚠️ Encryption not ready, features may use defaults');
       }
     }
+
+    // STEP 3: Now load features (they can be decrypted if needed)
+    // Start admin check in parallel with feature loading
+    const adminPromise = checkIsAdmin().catch(() => false);
+    const featurePromise = Promise.race([
+      featureConfig.init(),
+      new Promise(resolve => setTimeout(() => resolve(false), 3000)) // 3 second timeout
+    ]).catch(() => false);
+
+    const [isAdmin] = await Promise.all([
+      adminPromise,
+      featurePromise
+    ]);
+
+    // STEP 4: Update sidebar with loaded data
+    sidebarNav.innerHTML = generateQuickSearchHTML() + generateSidebarHTML(isAdmin);
+    setupSectionToggles();
+    setupQuickSearch(isAdmin);
+
+    // STEP 5: Setup refresh handler
+    const refreshSidebar = async () => {
+      const currentIsAdmin = await checkIsAdmin().catch(() => false);
+      sidebarNav.innerHTML = generateQuickSearchHTML() + generateSidebarHTML(currentIsAdmin);
+      setupSectionToggles();
+      setupQuickSearch(currentIsAdmin);
+    };
+
+    // Listen for feature changes
+    window.addEventListener('featuresUpdated', refreshSidebar);
+    window.addEventListener('featuresReset', refreshSidebar);
+    window.addEventListener('featureToggled', refreshSidebar);
     
-    // Refresh sidebar with newly loaded features
-    try {
-      await refreshSidebar();
-    } catch (error) {
-      console.error('[Sidebar] Error refreshing sidebar:', error);
-    }
-  });
+    // CRITICAL: Handle encryption ready event
+    // This ensures features are reloaded with proper decryption
+    window.addEventListener('encryptionReady', async () => {
+      console.log('[Sidebar] Encryption ready event received, reloading features');
+      if (featureConfig.reloadFromFirestore) {
+        await featureConfig.reloadFromFirestore().catch(console.error);
+      }
+      await refreshSidebar().catch(console.error);
+    });
+  } catch (error) {
+    console.error('[Sidebar] Error loading sidebar data:', error);
+    // Sidebar is already rendered with defaults, so errors don't break UI
+  }
 }
 
 // Setup collapsible section toggles
@@ -556,6 +591,12 @@ function autoInitSidebar() {
     console.error('[Sidebar] Error during auto-initialization:', error);
   });
 }
+
+// Listen for logout to clear caches
+window.addEventListener('userLoggedOut', () => {
+  clearAdminCache();
+  window._sidebarInitialized = false;
+});
 
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', autoInitSidebar);
