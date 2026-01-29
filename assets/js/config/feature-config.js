@@ -231,7 +231,7 @@ class FeatureConfigManager {
         try {
           user = await Promise.race([
             authService.waitForAuth(),
-            new Promise(resolve => setTimeout(() => resolve(null), 1000)) // Reduced from 3s to 1s
+            new Promise(resolve => setTimeout(() => resolve(null), 1000))
           ]);
         } catch (e) {
           // Ignore
@@ -245,23 +245,14 @@ class FeatureConfigManager {
 
       this.currentUserId = user.uid;
 
-      // ENCRYPTION SAFETY: Check if encryption is ready before loading encrypted data
-      const isEncryptionReady = encryptionService.isReady ? encryptionService.isReady() : false;
-      
-      if (!isEncryptionReady) {
-        console.log('[FeatureConfig] Encryption not ready yet, using defaults (will reload when ready)');
-        this.userFeatures = JSON.parse(JSON.stringify(DEFAULT_FEATURES));
-        return;
-      }
-
-      // OPTIMIZATION: Load features with aggressive timeout
+      // OPTIMIZATION: Load features with timeout, but wait for encryption if needed
       try {
         const docRef = doc(db, FEATURES_COLLECTION, user.uid);
         
         // Add timeout to Firestore call
         const docPromise = getDoc(docRef);
         const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Firestore timeout')), 2000) // 2 second timeout
+          setTimeout(() => reject(new Error('Firestore timeout')), 3000) // 3 second timeout
         );
         
         const docSnap = await Promise.race([docPromise, timeoutPromise]);
@@ -269,64 +260,101 @@ class FeatureConfigManager {
         if (docSnap.exists()) {
           let savedData = docSnap.data();
           
-          // ENCRYPTION SAFETY: Only decrypt if encryption is confirmed ready
-          let decryptedData = savedData;
-          
+          // Check if data is encrypted
           if (savedData._encrypted) {
-            if (!encryptionService.isReady()) {
-              console.warn('[FeatureConfig] Data is encrypted but encryption not ready, using defaults');
+            // ENCRYPTION SAFETY: Wait for encryption if data is encrypted
+            console.log('[FeatureConfig] Data is encrypted, waiting for encryption service...');
+            
+            // Wait for encryption with reasonable timeout
+            const encryptionReady = await Promise.race([
+              encryptionService.waitForInitialization(),
+              new Promise(resolve => setTimeout(() => resolve(false), 5000))
+            ]).catch(() => false);
+            
+            if (!encryptionReady || !encryptionService.isReady()) {
+              console.warn('[FeatureConfig] Encryption not ready, using defaults (will reload when ready)');
               this.userFeatures = JSON.parse(JSON.stringify(DEFAULT_FEATURES));
               return;
             }
             
+            // Decrypt the data
             try {
-              decryptedData = await Promise.race([
+              const decryptedData = await Promise.race([
                 encryptionService.decryptObject(savedData, FEATURES_COLLECTION),
-                new Promise((_, reject) => setTimeout(() => reject(new Error('Decrypt timeout')), 1000))
+                new Promise((_, reject) => setTimeout(() => reject(new Error('Decrypt timeout')), 2000))
               ]);
               console.log('[FeatureConfig] ✅ Features decrypted successfully');
+              
+              // Extract features
+              let savedFeatures = decryptedData?.features || null;
+              
+              if (savedFeatures && typeof savedFeatures === 'string') {
+                try {
+                  savedFeatures = JSON.parse(savedFeatures);
+                } catch (e) {
+                  savedFeatures = null;
+                }
+              }
+              
+              if (savedFeatures && typeof savedFeatures === 'object') {
+                // Merge with defaults
+                this.userFeatures = JSON.parse(JSON.stringify(DEFAULT_FEATURES));
+                Object.keys(savedFeatures).forEach(key => {
+                  if (this.userFeatures[key] && savedFeatures[key] !== undefined) {
+                    if (typeof savedFeatures[key] === 'object' && savedFeatures[key] !== null) {
+                      this.userFeatures[key].enabled = savedFeatures[key].enabled;
+                    } else if (typeof savedFeatures[key] === 'boolean') {
+                      this.userFeatures[key].enabled = savedFeatures[key];
+                    }
+                  }
+                });
+                console.log('[FeatureConfig] ✅ Features loaded successfully:', this.getEnabledCount(), 'enabled');
+              } else {
+                this.userFeatures = JSON.parse(JSON.stringify(DEFAULT_FEATURES));
+              }
             } catch (decryptErr) {
               console.warn('[FeatureConfig] Decryption failed, using defaults:', decryptErr.message);
               this.userFeatures = JSON.parse(JSON.stringify(DEFAULT_FEATURES));
               return;
             }
-          }
-          
-          // Extract features
-          let savedFeatures = decryptedData?.features || null;
-          
-          if (savedFeatures && typeof savedFeatures === 'string') {
-            try {
-              savedFeatures = JSON.parse(savedFeatures);
-            } catch (e) {
-              savedFeatures = null;
-            }
-          }
-          
-          if (savedFeatures && typeof savedFeatures === 'object') {
-            // Merge with defaults
-            this.userFeatures = JSON.parse(JSON.stringify(DEFAULT_FEATURES));
-            Object.keys(savedFeatures).forEach(key => {
-              if (this.userFeatures[key] && savedFeatures[key] !== undefined) {
-                if (typeof savedFeatures[key] === 'object' && savedFeatures[key] !== null) {
-                  this.userFeatures[key].enabled = savedFeatures[key].enabled;
-                } else if (typeof savedFeatures[key] === 'boolean') {
-                  this.userFeatures[key].enabled = savedFeatures[key];
-                }
-              }
-            });
-            console.log('[FeatureConfig] ✅ Features loaded successfully');
           } else {
-            this.userFeatures = JSON.parse(JSON.stringify(DEFAULT_FEATURES));
+            // Data is not encrypted, use as-is
+            console.log('[FeatureConfig] Data is not encrypted, loading directly');
+            let savedFeatures = savedData?.features || null;
+            
+            if (savedFeatures && typeof savedFeatures === 'string') {
+              try {
+                savedFeatures = JSON.parse(savedFeatures);
+              } catch (e) {
+                savedFeatures = null;
+              }
+            }
+            
+            if (savedFeatures && typeof savedFeatures === 'object') {
+              this.userFeatures = JSON.parse(JSON.stringify(DEFAULT_FEATURES));
+              Object.keys(savedFeatures).forEach(key => {
+                if (this.userFeatures[key] && savedFeatures[key] !== undefined) {
+                  if (typeof savedFeatures[key] === 'object' && savedFeatures[key] !== null) {
+                    this.userFeatures[key].enabled = savedFeatures[key].enabled;
+                  } else if (typeof savedFeatures[key] === 'boolean') {
+                    this.userFeatures[key].enabled = savedFeatures[key];
+                  }
+                }
+              });
+              console.log('[FeatureConfig] ✅ Features loaded successfully:', this.getEnabledCount(), 'enabled');
+            } else {
+              this.userFeatures = JSON.parse(JSON.stringify(DEFAULT_FEATURES));
+            }
           }
         } else {
           // First time user - use defaults
+          console.log('[FeatureConfig] No saved features found, using defaults');
           this.userFeatures = JSON.parse(JSON.stringify(DEFAULT_FEATURES));
           // Save in background (don't wait)
           this.saveFeatureConfig().catch(console.error);
         }
       } catch (error) {
-        console.warn('[FeatureConfig] Fast init failed:', error.message);
+        console.warn('[FeatureConfig] Init failed:', error.message);
         this.userFeatures = JSON.parse(JSON.stringify(DEFAULT_FEATURES));
       }
     } catch (error) {

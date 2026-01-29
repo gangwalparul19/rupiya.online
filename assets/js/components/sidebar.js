@@ -349,39 +349,19 @@ async function loadSidebarDataAsync(sidebarNav) {
       return; // Stay with defaults if no user
     }
 
-    // STEP 2: Ensure encryption is initialized before loading features
-    // This is CRITICAL - features may be encrypted and need decryption
-    console.log('[Sidebar] Waiting for encryption to be ready...');
+    // STEP 2: Start loading features (it will wait for encryption internally if needed)
+    console.log('[Sidebar] Loading features...');
     
-    // Import encryption service dynamically to avoid circular deps
-    let encryptionService;
-    try {
-      const module = await import('../services/encryption-service.js');
-      encryptionService = module.default;
-    } catch (e) {
-      console.warn('[Sidebar] Could not load encryption service:', e);
-    }
-
-    // Wait for encryption with reasonable timeout
-    if (encryptionService) {
-      const encryptionReady = await Promise.race([
-        encryptionService.waitForInitialization(),
-        new Promise(resolve => setTimeout(() => resolve(false), 3000))
-      ]).catch(() => false);
-      
-      if (encryptionReady && encryptionService.isReady()) {
-        console.log('[Sidebar] ✅ Encryption ready');
-      } else {
-        console.warn('[Sidebar] ⚠️ Encryption not ready, features may use defaults');
-      }
-    }
-
-    // STEP 3: Now load features (they can be decrypted if needed)
-    // Start admin check in parallel with feature loading
+    // Start admin check in parallel
     const adminPromise = checkIsAdmin().catch(() => false);
+    
+    // Load features with extended timeout
     const featurePromise = Promise.race([
       featureConfig.init(),
-      new Promise(resolve => setTimeout(() => resolve(false), 3000)) // 3 second timeout
+      new Promise(resolve => setTimeout(() => {
+        console.warn('[Sidebar] Feature loading timeout');
+        resolve(false);
+      }, 8000)) // 8 second timeout (increased to allow for encryption wait)
     ]).catch(() => false);
 
     const [isAdmin] = await Promise.all([
@@ -389,13 +369,15 @@ async function loadSidebarDataAsync(sidebarNav) {
       featurePromise
     ]);
 
-    // STEP 4: Update sidebar with loaded data
+    // STEP 3: Update sidebar with loaded data
+    console.log('[Sidebar] Updating sidebar with loaded features');
     sidebarNav.innerHTML = generateQuickSearchHTML() + generateSidebarHTML(isAdmin);
     setupSectionToggles();
     setupQuickSearch(isAdmin);
 
-    // STEP 5: Setup refresh handler
+    // STEP 4: Setup refresh handler
     const refreshSidebar = async () => {
+      console.log('[Sidebar] Refreshing sidebar');
       const currentIsAdmin = await checkIsAdmin().catch(() => false);
       sidebarNav.innerHTML = generateQuickSearchHTML() + generateSidebarHTML(currentIsAdmin);
       setupSectionToggles();
@@ -411,9 +393,15 @@ async function loadSidebarDataAsync(sidebarNav) {
     // This ensures features are reloaded with proper decryption
     window.addEventListener('encryptionReady', async () => {
       console.log('[Sidebar] Encryption ready event received, reloading features');
-      if (featureConfig.reloadFromFirestore) {
-        await featureConfig.reloadFromFirestore().catch(console.error);
+      
+      // Force re-initialization of features
+      featureConfig.initialized = false;
+      featureConfig.userFeatures = null;
+      
+      if (featureConfig.init) {
+        await featureConfig.init().catch(console.error);
       }
+      
       await refreshSidebar().catch(console.error);
     });
   } catch (error) {
