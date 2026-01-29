@@ -1,5 +1,83 @@
 /* Savings Page Styles */
 
+/* Form Section Visibility */
+.form-section {
+  display: none;
+}
+
+.form-section.show {
+  display: block;
+}
+
+/* Modal Visibility */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal.show {
+  display: flex;
+}
+
+.modal-content {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 500px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--text-primary);
+}
+
+.modal-body {
+  margin-bottom: 1.5rem;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.delete-details {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+}
+
+.delete-details p {
+  margin: 0.5rem 0;
+  font-size: 0.875rem;
+}
+
+.warning-text {
+  color: #E74C3C;
+  font-weight: 600;
+  margin-top: 1rem;
+}
+
 .savings-container {
   margin-top: 2rem;
 }
