@@ -161,9 +161,18 @@ class RecurringProcessor {
       // Get all recurring transactions
       const recurringTransactions = await firestoreService.getAll('recurringTransactions', 'startDate', 'asc');
       
+      // Get all active savings with auto-deduct enabled
+      const savings = await firestoreService.getSavings();
+      const activeSavings = savings.filter(s => 
+        s.status === 'active' && 
+        s.autoDeduct === true && 
+        s.frequency !== 'one-time'
+      );
+      
       let processedCount = 0;
       let createdTransactions = [];
 
+      // Process recurring transactions (expenses and income)
       for (const recurring of recurringTransactions) {
         // Skip paused or inactive recurring transactions
         if (recurring.status === 'paused' || recurring.status === 'inactive') {
@@ -221,6 +230,62 @@ class RecurringProcessor {
         await firestoreService.update('recurringTransactions', recurring.id, {
           lastProcessedDate: Timestamp.fromDate(lastDueDate),
           nextDueDate: Timestamp.fromDate(this.calculateNextDate(lastDueDate, recurring.frequency))
+        });
+      }
+
+      // Process recurring savings (auto-deduct)
+      for (const saving of activeSavings) {
+        const startDate = saving.startDate?.toDate ? saving.startDate.toDate() : new Date(saving.startDate);
+        const endDate = saving.maturityDate?.toDate ? saving.maturityDate.toDate() : null;
+        const lastProcessed = saving.lastProcessedDate?.toDate ? saving.lastProcessedDate.toDate() : null;
+        
+        // Get all due dates that need processing
+        const dueDates = this.getDueDates(startDate, saving.frequency, lastProcessed, endDate);
+        
+        if (dueDates.length === 0) {
+          continue;
+        }
+
+        // Create expense entries for each due date (savings = money going out)
+        for (const dueDate of dueDates) {
+          const expenseData = {
+            amount: saving.amount,
+            category: 'Savings',
+            description: `${saving.name} - ${saving.savingType}`,
+            date: dueDate,
+            paymentMethod: 'bank_transfer',
+            paymentMethodId: null,
+            paymentMethodName: null,
+            isRecurring: true,
+            recurringId: saving.id,
+            savingId: saving.id,
+            notes: `Auto-deducted from ${saving.name} (${saving.savingType})`
+          };
+
+          const result = await firestoreService.addExpense(expenseData);
+
+          if (result?.success) {
+            processedCount++;
+            createdTransactions.push({
+              type: 'savings',
+              description: saving.name,
+              amount: saving.amount,
+              date: dueDate
+            });
+            
+            // Update the current value of the saving
+            const newCurrentValue = (parseFloat(saving.currentValue) || 0) + parseFloat(saving.amount);
+            await firestoreService.updateSaving(saving.id, {
+              currentValue: newCurrentValue
+            });
+          }
+        }
+
+        // Update the saving with last processed date
+        const lastDueDate = dueDates[dueDates.length - 1];
+        await firestoreService.updateSaving(saving.id, {
+          lastProcessedDate: Timestamp.fromDate(lastDueDate),
+          nextDueDate: Timestamp.fromDate(this.calculateNextDate(lastDueDate, saving.frequency))
         });
       }
 
