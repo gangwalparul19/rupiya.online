@@ -216,7 +216,9 @@ function generateSidebarHTML(isAdmin = false) {
     // Determine if section should be expanded
     const isCurrentSection = section.id === currentSection;
     const savedState = sectionState[section.id];
-    const isExpanded = savedState !== undefined ? savedState : (section.expanded || isCurrentSection);
+    // Only expand if it's the current section (contains active page)
+    // Ignore the default section.expanded value for accordion behavior
+    const isExpanded = savedState !== undefined ? savedState : isCurrentSection;
     
     navHTML += `
       <div class="nav-section ${isExpanded ? 'expanded' : 'collapsed'}" data-section="${section.id}">
