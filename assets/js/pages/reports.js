@@ -316,7 +316,7 @@ function renderRecentReports() {
             </p>
           </div>
           <div class="report-actions">
-            <button class="report-action-btn" onclick="downloadReportFromList('${report.id}', 'html')" title="Download HTML">
+            <button class="report-action-btn" onclick="window.downloadReportFromList('${report.id}', 'html')" title="Download HTML">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                 <polyline points="7 10 12 15 17 10"></polyline>
@@ -324,7 +324,7 @@ function renderRecentReports() {
               </svg>
               HTML
             </button>
-            <button class="report-action-btn" onclick="downloadReportFromList('${report.id}', 'pdf')" title="Download PDF">
+            <button class="report-action-btn" onclick="window.downloadReportFromList('${report.id}', 'pdf')" title="Download PDF">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                 <polyline points="14 2 14 8 20 8"></polyline>
@@ -334,11 +334,12 @@ function renderRecentReports() {
               </svg>
               PDF
             </button>
-            <button class="report-action-btn delete-btn" onclick="deleteReport('${report.id}')" title="Delete Report">
+            <button class="report-action-btn delete-btn" onclick="window.deleteReport('${report.id}')" title="Delete Report">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="3 6 5 6 21 6"></polyline>
                 <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
               </svg>
+              Delete
             </button>
           </div>
           <div class="report-meta">
@@ -350,7 +351,7 @@ function renderRecentReports() {
     
     ${totalPages > 1 ? `
       <div class="pagination">
-        <button class="pagination-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="changePage(${currentPage - 1})">
+        <button class="pagination-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="window.changePage(${currentPage - 1})">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polyline points="15 18 9 12 15 6"></polyline>
           </svg>
@@ -359,7 +360,7 @@ function renderRecentReports() {
         <div class="pagination-info">
           Page ${currentPage} of ${totalPages}
         </div>
-        <button class="pagination-btn" ${currentPage === totalPages ? 'disabled' : ''} onclick="changePage(${currentPage + 1})">
+        <button class="pagination-btn" ${currentPage === totalPages ? 'disabled' : ''} onclick="window.changePage(${currentPage + 1})">
           Next
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polyline points="9 18 15 12 9 6"></polyline>
@@ -399,23 +400,34 @@ window.deleteReport = function(reportId) {
     return;
   }
   
+  // Filter out the report
+  const beforeLength = recentReports.length;
   recentReports = recentReports.filter(r => r.id !== reportId);
+  const afterLength = recentReports.length;
+  
+  // Check if report was actually deleted
+  if (beforeLength === afterLength) {
+    toast.show('Report not found', 'error');
+    return;
+  }
   
   // Adjust current page if needed
   const totalPages = Math.ceil(recentReports.length / reportsPerPage);
   if (currentPage > totalPages && totalPages > 0) {
     currentPage = totalPages;
+  } else if (recentReports.length === 0) {
+    currentPage = 1;
   }
   
   // Save to localStorage
   try {
     localStorage.setItem('recentReports', JSON.stringify(recentReports));
+    renderRecentReports();
+    toast.show('Report deleted successfully', 'success');
   } catch (error) {
     logger.error('Failed to save recent reports:', error);
+    toast.show('Failed to delete report', 'error');
   }
-  
-  renderRecentReports();
-  toast.show('Report deleted successfully', 'success');
 };
 
 // Format time ago

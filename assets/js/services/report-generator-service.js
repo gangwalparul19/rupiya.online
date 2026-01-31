@@ -320,7 +320,7 @@ class ReportGeneratorService {
 <body>
   <div class="report-wrapper">
     <div class="logo">
-      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" alt="Rupiya Logo" onerror="this.style.display='none'">
+      <img src="assets/images/logo.png" alt="Rupiya Logo" onerror="this.style.display='none'">
     </div>
     <div class="container">
       <div class="header">
@@ -637,19 +637,56 @@ class ReportGeneratorService {
       container.innerHTML = html;
       container.style.position = 'absolute';
       container.style.left = '-9999px';
+      container.style.top = '0';
       container.style.width = '1200px';
       document.body.appendChild(container);
 
-      // Wait for charts to render
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Wait for Chart.js to load if not already loaded
+      if (!window.Chart) {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
+        document.head.appendChild(script);
+        await new Promise((resolve) => {
+          script.onload = resolve;
+        });
+      }
+
+      // Execute the chart scripts in the container
+      const scripts = container.querySelectorAll('script');
+      for (const script of scripts) {
+        if (script.textContent) {
+          try {
+            // Create a function scope to execute the script
+            const func = new Function(script.textContent);
+            func();
+          } catch (e) {
+            logger.warn('Script execution warning:', e);
+          }
+        }
+      }
+
+      // Wait longer for charts to fully render
+      await new Promise(resolve => setTimeout(resolve, 3000));
 
       // Generate PDF
       const opt = {
-        margin: 10,
+        margin: [10, 10, 10, 10],
         filename: `${reportData.type}-report-${reportData.period.start.toISOString().split('T')[0]}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, logging: false },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        image: { type: 'jpeg', quality: 0.95 },
+        html2canvas: { 
+          scale: 2, 
+          useCORS: true, 
+          logging: false,
+          letterRendering: true,
+          allowTaint: true
+        },
+        jsPDF: { 
+          unit: 'mm', 
+          format: 'a4', 
+          orientation: 'portrait',
+          compress: true
+        },
+        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
       };
 
       await window.html2pdf().set(opt).from(container).save();
