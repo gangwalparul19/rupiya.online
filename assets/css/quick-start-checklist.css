@@ -23,6 +23,8 @@
 .quick-start-widget.minimized .quick-start-content,
 .quick-start-widget.minimized .quick-start-header h3,
 .quick-start-widget.minimized .quick-start-header p,
+.quick-start-widget.minimized .quick-start-progress,
+.quick-start-widget.minimized .quick-start-footer,
 .quick-start-widget.minimized .quick-start-close {
   display: none;
 }
