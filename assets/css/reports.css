@@ -40,10 +40,18 @@
   gap: 24px;
 }
 
-/* Mobile: 3 columns for report cards */
+/* Mobile: Show all 3 cards in a row or wrap to 2 rows if needed */
 @media (max-width: 768px) {
   .report-type-cards {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 12px;
+  }
+}
+
+/* Very small screens: 2 columns with third card on second row */
+@media (max-width: 480px) {
+  .report-type-cards {
+    grid-template-columns: repeat(2, 1fr);
     gap: 12px;
   }
 }
@@ -387,10 +395,18 @@
   gap: 24px;
 }
 
-/* Mobile: 3 columns for features */
+/* Mobile: 3 columns for features, allow wrapping */
 @media (max-width: 768px) {
   .features-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 12px;
+  }
+}
+
+/* Very small screens: 2 columns */
+@media (max-width: 480px) {
+  .features-grid {
+    grid-template-columns: repeat(2, 1fr);
     gap: 12px;
   }
 }

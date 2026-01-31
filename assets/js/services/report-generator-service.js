@@ -42,8 +42,8 @@ class ReportGeneratorService {
       
       // Fetch all necessary data in parallel
       const [expenses, income, budgets, investments, goals] = await Promise.all([
-        firestoreService.getExpensesByDateRange(userId, startDate, endDate),
-        firestoreService.getIncomeByDateRange(userId, startDate, endDate),
+        firestoreService.queryByDateRange('expenses', startDate, endDate),
+        firestoreService.queryByDateRange('income', startDate, endDate),
         firestoreService.getUserBudgets(userId),
         firestoreService.getUserInvestments(userId),
         firestoreService.getUserGoals(userId)
