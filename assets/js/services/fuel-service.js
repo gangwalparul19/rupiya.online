@@ -12,6 +12,7 @@ class FuelService {
   /**
    * Add a new fuel fill-up
    * Automatically calculates mileage and cost per km
+   * Note: Mileage represents fuel efficiency for distance traveled SINCE last fillup
    */
   async addFillup(fillupData) {
     try {
@@ -27,8 +28,12 @@ class FuelService {
 
       if (previousFillup && previousFillup.odometerReading < fillupData.odometerReading) {
         distanceTraveled = fillupData.odometerReading - previousFillup.odometerReading;
-        // Prevent division by zero
+        
+        // Mileage calculation: distance traveled / fuel added at current fillup
+        // This represents km/l for the fuel you're adding now
         mileage = fillupData.fuelQuantity > 0 ? distanceTraveled / fillupData.fuelQuantity : 0;
+        
+        // Cost per km: total cost of current fillup / distance traveled
         costPerKm = distanceTraveled > 0 ? fillupData.totalAmount / distanceTraveled : 0;
       }
 
@@ -193,14 +198,43 @@ class FuelService {
   }
 
   /**
-   * Calculate average mileage for a vehicle
+   * Calculate average mileage for a vehicle (weighted average)
+   * Uses total distance / total fuel for accurate calculation
    */
   calculateAverageMileage(fillups) {
-    const fillupsWithMileage = fillups.filter(f => f.mileage > 0);
-    if (fillupsWithMileage.length === 0) return 0;
+    if (!fillups || fillups.length === 0) return 0;
 
-    const totalMileage = fillupsWithMileage.reduce((sum, f) => sum + f.mileage, 0);
-    return Math.round((totalMileage / fillupsWithMileage.length) * 100) / 100;
+    // Sort by odometer reading
+    const sortedFillups = [...fillups].sort((a, b) => {
+      const odomA = parseFloat(a.odometerReading) || 0;
+      const odomB = parseFloat(b.odometerReading) || 0;
+      return odomA - odomB;
+    });
+
+    let totalDistance = 0;
+    let totalFuel = 0;
+
+    // Calculate distance and fuel between consecutive entries
+    if (sortedFillups.length >= 2) {
+      for (let i = 1; i < sortedFillups.length; i++) {
+        const prevFillup = sortedFillups[i - 1];
+        const currFillup = sortedFillups[i];
+
+        const prevOdometer = parseFloat(prevFillup.odometerReading) || 0;
+        const currOdometer = parseFloat(currFillup.odometerReading) || 0;
+        const distance = currOdometer - prevOdometer;
+        const fuelUsed = parseFloat(currFillup.fuelQuantity) || 0;
+
+        // Only count segments with positive distance and fuel
+        if (distance > 0 && fuelUsed > 0) {
+          totalDistance += distance;
+          totalFuel += fuelUsed;
+        }
+      }
+    }
+
+    const avgMileage = totalFuel > 0 ? totalDistance / totalFuel : 0;
+    return Math.round(avgMileage * 100) / 100;
   }
 
   /**
@@ -211,14 +245,48 @@ class FuelService {
   }
 
   /**
-   * Calculate average cost per km
+   * Calculate average cost per km (weighted average)
+   * Uses total cost / total distance for accurate calculation
    */
   calculateAverageCostPerKm(fillups) {
-    const fillupsWithCost = fillups.filter(f => f.costPerKm > 0);
-    if (fillupsWithCost.length === 0) return 0;
+    if (!fillups || fillups.length === 0) return 0;
 
-    const totalCost = fillupsWithCost.reduce((sum, f) => sum + f.costPerKm, 0);
-    return Math.round((totalCost / fillupsWithCost.length) * 100) / 100;
+    // Sort by odometer reading
+    const sortedFillups = [...fillups].sort((a, b) => {
+      const odomA = parseFloat(a.odometerReading) || 0;
+      const odomB = parseFloat(b.odometerReading) || 0;
+      return odomA - odomB;
+    });
+
+    let totalDistance = 0;
+    let totalCost = 0;
+
+    // Calculate total cost for all entries
+    sortedFillups.forEach(fillup => {
+      const fuelQty = parseFloat(fillup.fuelQuantity) || 0;
+      const fuelPrc = parseFloat(fillup.fuelPrice) || 0;
+      const cost = parseFloat(fillup.totalAmount) || (fuelQty * fuelPrc);
+      totalCost += cost;
+    });
+
+    // Calculate distance between consecutive entries
+    if (sortedFillups.length >= 2) {
+      for (let i = 1; i < sortedFillups.length; i++) {
+        const prevFillup = sortedFillups[i - 1];
+        const currFillup = sortedFillups[i];
+
+        const prevOdometer = parseFloat(prevFillup.odometerReading) || 0;
+        const currOdometer = parseFloat(currFillup.odometerReading) || 0;
+        const distance = currOdometer - prevOdometer;
+
+        if (distance > 0) {
+          totalDistance += distance;
+        }
+      }
+    }
+
+    const avgCostPerKm = totalDistance > 0 ? totalCost / totalDistance : 0;
+    return Math.round(avgCostPerKm * 100) / 100;
   }
 
   /**

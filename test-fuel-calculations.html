@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fuel Calculation Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+    }
+    .test-section {
+      margin: 20px 0;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    .test-section h3 {
+      margin-top: 0;
+      color: #333;
+    }
+    .result {
+      padding: 10px;
+      margin: 10px 0;
+      background: #f5f5f5;
+      border-radius: 3px;
+    }
+    .pass {
+      color: green;
+      font-weight: bold;
+    }
+    .fail {
+      color: red;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Fuel Calculation Test</h1>
+  <p>Testing the corrected weighted average mileage calculation</p>
+
+  <div id="results"></div>
+
+  <script>
+    // Test data: Sample fuel logs
+    const testFuelLogs = [
+      { odometerReading: 1000, fuelQuantity: 40, fuelPrice: 100, totalCost: 4000 },
+      { odometerReading: 1500, fuelQuantity: 50, fuelPrice: 100, totalCost: 5000 },
+      { odometerReading: 2100, fuelQuantity: 60, fuelPrice: 100, totalCost: 6000 },
+      { odometerReading: 2800, fuelQuantity: 70, fuelPrice: 100, totalCost: 7000 }
+    ];
+
+    // Corrected weighted average calculation
+    function calculateWeightedAverageMileage(fillups) {
+      if (!fillups || fillups.length === 0) return 0;
+
+      const sortedFillups = [...fillups].sort((a, b) => a.odometerReading - b.odometerReading);
+
+      let totalDistance = 0;
+      let totalFuel = 0;
+
+      if (sortedFillups.length >= 2) {
+        for (let i = 1; i < sortedFillups.length; i++) {
+          const prevFillup = sortedFillups[i - 1];
+          const currFillup = sortedFillups[i];
+
+          const distance = currFillup.odometerReading - prevFillup.odometerReading;
+          const fuelUsed = currFillup.fuelQuantity;
+
+          if (distance > 0 && fuelUsed > 0) {
+            totalDistance += distance;
+            totalFuel += fuelUsed;
+          }
+        }
+      }
+
+      return totalFuel > 0 ? totalDistance / totalFuel : 0;
+    }
+
+    // Old incorrect arithmetic mean calculation
+    function calculateArithmeticMean(fillups) {
+      if (!fillups || fillups.length === 0) return 0;
+
+      const sortedFillups = [...fillups].sort((a, b) => a.odometerReading - b.odometerReading);
+      const mileages = [];
+
+      if (sortedFillups.length >= 2) {
+        for (let i = 1; i < sortedFillups.length; i++) {
+          const prevFillup = sortedFillups[i - 1];
+          const currFillup = sortedFillups[i];
+
+          const distance = currFillup.odometerReading - prevFillup.odometerReading;
+          const fuelUsed = currFillup.fuelQuantity;
+
+          if (distance > 0 && fuelUsed > 0) {
+            mileages.push(distance / fuelUsed);
+          }
+        }
+      }
+
+      if (mileages.length === 0) return 0;
+      const sum = mileages.reduce((a, b) => a + b, 0);
+      return sum / mileages.length;
+    }
+
+    // Run tests
+    function runTests() {
+      const resultsDiv = document.getElementById('results');
+      let html = '';
+
+      // Test 1: Weighted average
+      html += '<div class="test-section">';
+      html += '<h3>Test 1: Weighted Average Mileage</h3>';
+      const weightedAvg = calculateWeightedAverageMileage(testFuelLogs);
+      html += `<div class="result">Weighted Average: <strong>${weightedAvg.toFixed(2)} km/l</strong></div>`;
+      
+      // Manual calculation
+      // Distance: (1500-1000) + (2100-1500) + (2800-2100) = 500 + 600 + 700 = 1800 km
+      // Fuel: 50 + 60 + 70 = 180 L
+      // Mileage: 1800 / 180 = 10 km/l
+      const expectedWeighted = 10.0;
+      const weightedPass = Math.abs(weightedAvg - expectedWeighted) < 0.01;
+      html += `<div class="result">Expected: <strong>${expectedWeighted.toFixed(2)} km/l</strong></div>`;
+      html += `<div class="result ${weightedPass ? 'pass' : 'fail'}">${weightedPass ? '✓ PASS' : '✗ FAIL'}</div>`;
+      html += '</div>';
+
+      // Test 2: Arithmetic mean (old incorrect method)
+      html += '<div class="test-section">';
+      html += '<h3>Test 2: Arithmetic Mean (Old Method - Incorrect)</h3>';
+      const arithmeticAvg = calculateArithmeticMean(testFuelLogs);
+      html += `<div class="result">Arithmetic Mean: <strong>${arithmeticAvg.toFixed(2)} km/l</strong></div>`;
+      
+      // Manual calculation
+      // Segment 1: 500 km / 50 L = 10 km/l
+      // Segment 2: 600 km / 60 L = 10 km/l
+      // Segment 3: 700 km / 70 L = 10 km/l
+      // Average: (10 + 10 + 10) / 3 = 10 km/l
+      html += `<div class="result">Note: In this example, both methods give same result because fuel consumption is proportional to distance</div>`;
+      html += '</div>';
+
+      // Test 3: Different scenario where methods differ
+      const testFuelLogs2 = [
+        { odometerReading: 1000, fuelQuantity: 40, fuelPrice: 100, totalCost: 4000 },
+        { odometerReading: 1400, fuelQuantity: 40, fuelPrice: 100, totalCost: 4000 }, // 10 km/l
+        { odometerReading: 2000, fuelQuantity: 60, fuelPrice: 100, totalCost: 6000 }  // 10 km/l
+      ];
+
+      html += '<div class="test-section">';
+      html += '<h3>Test 3: Scenario with Varying Fuel Amounts</h3>';
+      const weighted2 = calculateWeightedAverageMileage(testFuelLogs2);
+      const arithmetic2 = calculateArithmeticMean(testFuelLogs2);
+      
+      html += `<div class="result">Weighted Average: <strong>${weighted2.toFixed(2)} km/l</strong></div>`;
+      html += `<div class="result">Arithmetic Mean: <strong>${arithmetic2.toFixed(2)} km/l</strong></div>`;
+      
+      // Manual calculation
+      // Weighted: (400 + 600) / (40 + 60) = 1000 / 100 = 10 km/l
+      // Arithmetic: (10 + 10) / 2 = 10 km/l
+      html += `<div class="result">Both methods give 10 km/l in this case</div>`;
+      html += '</div>';
+
+      // Test 4: Scenario where methods significantly differ
+      const testFuelLogs3 = [
+        { odometerReading: 1000, fuelQuantity: 20, fuelPrice: 100, totalCost: 2000 },
+        { odometerReading: 1200, fuelQuantity: 20, fuelPrice: 100, totalCost: 2000 }, // 10 km/l
+        { odometerReading: 2000, fuelQuantity: 100, fuelPrice: 100, totalCost: 10000 } // 8 km/l
+      ];
+
+      html += '<div class="test-section">';
+      html += '<h3>Test 4: Scenario Where Methods Differ</h3>';
+      const weighted3 = calculateWeightedAverageMileage(testFuelLogs3);
+      const arithmetic3 = calculateArithmeticMean(testFuelLogs3);
+      
+      html += `<div class="result">Weighted Average: <strong>${weighted3.toFixed(2)} km/l</strong></div>`;
+      html += `<div class="result">Arithmetic Mean: <strong>${arithmetic3.toFixed(2)} km/l</strong></div>`;
+      
+      // Manual calculation
+      // Weighted: (200 + 800) / (20 + 100) = 1000 / 120 = 8.33 km/l
+      // Arithmetic: (10 + 8) / 2 = 9 km/l
+      const expectedWeighted3 = 8.33;
+      const expectedArithmetic3 = 9.0;
+      html += `<div class="result">Expected Weighted: <strong>${expectedWeighted3.toFixed(2)} km/l</strong></div>`;
+      html += `<div class="result">Expected Arithmetic: <strong>${expectedArithmetic3.toFixed(2)} km/l</strong></div>`;
+      html += `<div class="result">Difference: <strong>${Math.abs(weighted3 - arithmetic3).toFixed(2)} km/l</strong></div>`;
+      html += `<div class="result">✓ Weighted average is more accurate as it accounts for varying fuel amounts</div>`;
+      html += '</div>';
+
+      resultsDiv.innerHTML = html;
+    }
+
+    // Run tests on page load
+    runTests();
+  </script>
+</body>
+</html>

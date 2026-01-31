@@ -900,11 +900,12 @@ async function showMileageHistory(vehicleId, vehicleName) {
         <tbody>
           ${sortedLogs.map((log, index) => {
       // Calculate mileage for this entry
+      // Mileage = distance traveled TO this entry / fuel added at this entry
       let mileage = '--';
       if (index < sortedLogs.length - 1) {
-        const prevLog = sortedLogs[index + 1];
+        const prevLog = sortedLogs[index + 1]; // Previous entry (lower odometer)
         const distance = (log.odometerReading || 0) - (prevLog.odometerReading || 0);
-        const fuelQty = log.fuelQuantity || 0;
+        const fuelQty = log.fuelQuantity || 0; // Fuel added at current entry
         if (distance > 0 && fuelQty > 0) {
           mileage = (distance / fuelQty).toFixed(2) + ' km/l';
         }
