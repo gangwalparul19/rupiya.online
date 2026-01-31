@@ -73,6 +73,11 @@ class QuickStartChecklist {
     // Update task completion status
     await this.updateTaskStatus();
 
+    // Start minimized by default to not block the view
+    if (!localStorage.getItem('rupiya_quick_start_state')) {
+      this.isMinimized = true;
+    }
+
     // Render the widget
     this.render();
 
