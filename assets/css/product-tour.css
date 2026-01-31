@@ -8,7 +8,7 @@
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.7);
-  z-index: 9998;
+  z-index: 99998;
   animation: fadeIn 0.3s ease;
 }
 
@@ -18,7 +18,7 @@
   border: 3px solid #667eea;
   border-radius: 8px;
   box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7);
-  z-index: 9999;
+  z-index: 99999;
   pointer-events: none;
   transition: all 0.3s ease;
   animation: highlightFadeIn 0.3s ease;
@@ -54,7 +54,7 @@
   background: white;
   border-radius: 12px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-  z-index: 10000;
+  z-index: 100000;
   max-width: 400px;
   min-width: 300px;
   animation: tooltipSlideIn 0.3s ease;
