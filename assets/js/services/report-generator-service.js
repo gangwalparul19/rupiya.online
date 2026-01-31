@@ -44,9 +44,9 @@ class ReportGeneratorService {
       const [expenses, income, budgets, investments, goals] = await Promise.all([
         firestoreService.queryByDateRange('expenses', startDate, endDate),
         firestoreService.queryByDateRange('income', startDate, endDate),
-        firestoreService.getUserBudgets(userId),
-        firestoreService.getUserInvestments(userId),
-        firestoreService.getUserGoals(userId)
+        firestoreService.getBudgets(),
+        firestoreService.getInvestments(),
+        firestoreService.getGoals()
       ]);
 
       // Calculate aggregations
