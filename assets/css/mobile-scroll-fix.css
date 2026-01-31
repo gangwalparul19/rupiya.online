@@ -1,0 +1,79 @@
+/* ============================================
+   MOBILE SCROLL FIX
+   Ensures pages are scrollable on mobile devices
+   ============================================ */
+
+/* Ensure html and body allow vertical scrolling */
+html, body {
+  overflow-x: hidden;
+  overflow-y: auto !important;
+  height: auto !important;
+  min-height: 100vh;
+}
+
+/* Ensure dashboard layout doesn't restrict height */
+.dashboard-layout {
+  min-height: 100vh;
+  height: auto !important;
+  overflow: visible;
+}
+
+/* Ensure main content is scrollable */
+.main-content {
+  height: auto !important;
+  min-height: 100vh;
+  overflow-y: visible !important;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+}
+
+/* Mobile specific fixes */
+@media (max-width: 768px) {
+  html, body {
+    overflow-y: auto !important;
+    height: auto !important;
+    position: relative;
+  }
+
+  .dashboard-layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    height: auto;
+  }
+
+  .main-content {
+    flex: 1;
+    width: 100%;
+    margin-left: 0 !important;
+    padding-bottom: 80px; /* Space for FAB button */
+    overflow-y: visible;
+    height: auto !important;
+  }
+
+  /* Ensure page content doesn't get cut off */
+  .page-container,
+  .detail-tabs,
+  .tab-content {
+    height: auto !important;
+    overflow: visible;
+  }
+
+  /* Fix for sections that might have fixed heights */
+  .balances-section,
+  .expenses-list,
+  .settlements-list,
+  .members-grid,
+  .analytics-grid {
+    height: auto !important;
+    max-height: none !important;
+  }
+}
+
+/* Tablet specific */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .main-content {
+    margin-left: 0 !important;
+    padding-bottom: 40px;
+  }
+}

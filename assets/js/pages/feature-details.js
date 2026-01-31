@@ -662,6 +662,37 @@ const FEATURE_DETAILS = {
     ],
     whyEnable: 'Perfect for group travelers. Eliminates the hassle of tracking who paid what and makes settling expenses transparent.'
   },
+  flatGroups: {
+    label: 'Flat Groups',
+    icon: '🏠',
+    category: 'social',
+    shortDescription: 'Split rent and bills with flatmates',
+    longDescription: 'Manage shared living expenses with flatmates. Track rent, utilities, groceries, and other shared costs. Automatically calculate who owes what.',
+    benefits: [
+      'Split rent and bills fairly',
+      'Track shared household expenses',
+      'Automatically calculate balances',
+      'Reduce flatmate conflicts',
+      'Keep transparent expense records'
+    ],
+    useCases: [
+      'Share apartment rent with roommates',
+      'Split utility bills (electricity, water, internet)',
+      'Track shared grocery expenses',
+      'Manage cleaning and maintenance costs',
+      'Settle monthly expenses easily'
+    ],
+    features: [
+      'Flat group creation and management',
+      'Rent and bill tracking',
+      'Multiple split types (equal, custom, percentage)',
+      'Automatic balance calculation',
+      'Settlement tracking',
+      'Expense categorization (9 categories)',
+      'Monthly expense analytics'
+    ],
+    whyEnable: 'Essential for bachelors and shared living. Makes splitting rent and bills transparent and hassle-free.'
+  },
   notes: {
     label: 'Notes',
     icon: '📝',

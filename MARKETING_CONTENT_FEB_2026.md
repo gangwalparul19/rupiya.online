@@ -38,7 +38,7 @@ February 1st marks a fresh start - and what better way to begin than taking cont
 
 Introducing Rupiya - Your Complete Financial Management Solution! 🚀
 
-✨ 23 POWERFUL FEATURES:
+✨ 24 POWERFUL FEATURES:
 • 💸 Expense & Income Tracking
 • 💳 Credit Card Management
 • 🏦 Loan & EMI Tracker
@@ -51,6 +51,7 @@ Introducing Rupiya - Your Complete Financial Management Solution! 🚀
 • 🚗 Vehicle Tracking
 • 👨‍👩‍👧 Family Expense Splitting
 • 🏥 Healthcare & Insurance
+• 🏘️ Flat Groups - Split Rent & Bills
 • 📱 And 11 more amazing features!
 
 🆓 COMPLETELY FREE
@@ -66,7 +67,7 @@ Link in bio! 👆
 
 ### Post 2: Feature Highlight
 ```
-💡 WHY RUPIYA? 23 REASONS TO START TODAY! 💡
+💡 WHY RUPIYA? 24 REASONS TO START TODAY! 💡
 
 Your financial journey deserves the best tools. Here's what makes Rupiya special:
 
@@ -93,6 +94,7 @@ Your financial journey deserves the best tools. Here's what makes Rupiya special
 • Asset tracking (house, vehicle)
 • Investment returns analysis
 • Healthcare & insurance tracking
+• Flat groups for shared living expenses
 
 🔐 SECURITY FIRST
 • End-to-end encryption

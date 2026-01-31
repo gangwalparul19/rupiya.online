@@ -169,7 +169,7 @@ class TripGroupDetailPage {
       // Check if clicked element is a modal overlay
       if (e.target.classList.contains('modal-overlay')) {
         if (e.target.id === 'addExpenseModal') this.closeExpenseModal();
-        else if (e.target.id === 'settlementModal') this.closeSettlementModal();
+        else if (e.target.id === 'settlementModal') this.closeSettlementSection();
         else if (e.target.id === 'addMemberModal') this.closeMemberSection();
       }
     });
@@ -958,7 +958,7 @@ class TripGroupDetailPage {
       }
 
       this.showToast('Settlement recorded!', 'success');
-      this.closeSettlementModal();
+      this.closeSettlementSection();
       await this.loadGroupData();
     } catch (error) {
       console.error('Error recording settlement:', error);
