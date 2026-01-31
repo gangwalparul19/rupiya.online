@@ -303,9 +303,9 @@ class AuthService {
       'auth/operation-not-allowed': 'This operation is not allowed. Please contact support.',
       'auth/weak-password': 'Password should be at least 6 characters long.',
       'auth/user-disabled': 'This account has been disabled. Please contact support.',
-      'auth/user-not-found': 'No account found with this email. Please sign up.',
-      'auth/wrong-password': 'Incorrect password. Please try again.',
-      'auth/invalid-credential': 'Invalid email or password. Please try again.',
+      'auth/user-not-found': 'No account found with this email. Please sign up or try signing in with Google.',
+      'auth/wrong-password': 'Incorrect password. Please try again or use Google sign-in if you signed up with Google.',
+      'auth/invalid-credential': 'Invalid email or password. Please try again or use Google sign-in.',
       'auth/too-many-requests': 'Too many failed attempts. Please try again later.',
       'auth/network-request-failed': 'Network error. Please check your connection.',
       'auth/popup-closed-by-user': 'Sign-in popup was closed. Please try again.',
@@ -321,37 +321,38 @@ class AuthService {
 
   /**
    * Check what auth methods are available for an email
-   * Used during login to show appropriate auth options
-   * Uses Firebase Auth API (works without authentication)
+   * 
+   * SIMPLIFIED APPROACH: Always return both methods available
+   * Let Firebase Auth handle the actual validation during sign-in
+   * This avoids issues with fetchSignInMethodsForEmail being unreliable
    */
   async getAuthMethodsForEmail(email) {
     try {
-      const { fetchSignInMethodsForEmail } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js');
+      // Normalize email
+      const normalizedEmail = email.toLowerCase().trim();
       
-      // Use Firebase Auth API to check sign-in methods (works without authentication)
-      const signInMethods = await fetchSignInMethodsForEmail(auth, email);
-      
-      if (!signInMethods || signInMethods.length === 0) {
-        return { success: false, error: 'No account found with this email' };
-      }
-
-      // Convert Firebase Auth provider IDs to our format
-      // Firebase returns: 'password', 'google.com', etc.
-      return { 
-        success: true, 
-        authMethods: signInMethods,
-        user: null // We don't have user data yet (not authenticated)
-      };
-    } catch (error) {
-      logError('Error getting auth methods for email:', error);
-      
-      // Handle specific Firebase Auth errors
-      if (error.code === 'auth/invalid-email') {
+      // Validate email format
+      if (!normalizedEmail || !normalizedEmail.includes('@')) {
         return { success: false, error: 'Invalid email address' };
       }
       
-      // Return generic error - don't expose permission details
-      return { success: false, error: 'Unable to check account. Please try again.' };
+      // Always return both methods as available
+      // Firebase will handle the actual authentication and show appropriate errors
+      log('Returning both auth methods for email:', normalizedEmail);
+      
+      return { 
+        success: true, 
+        authMethods: ['password', 'google.com'],
+        method: 'both', // Always show both options
+        user: null
+      };
+      
+    } catch (error) {
+      logError('Error checking email:', error);
+      return { 
+        success: false, 
+        error: 'Unable to check account. Please try again.'
+      };
     }
   }
 

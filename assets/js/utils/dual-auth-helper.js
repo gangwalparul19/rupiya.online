@@ -49,6 +49,9 @@ class DualAuthHelper {
   /**
    * Handle login with email - shows available auth methods
    * Returns: { method: 'password' | 'google' | 'both', error?: string }
+   * 
+   * SIMPLIFIED: Always returns 'both' to show all login options
+   * Firebase will handle validation during actual sign-in
    */
   async checkEmailAuthMethods(email) {
     const methods = await this.getAvailableAuthMethods(email);
@@ -57,15 +60,9 @@ class DualAuthHelper {
       return { method: null, error: methods.error };
     }
 
-    if (methods.hasPassword && methods.hasGoogle) {
-      return { method: 'both', error: null };
-    } else if (methods.hasPassword) {
-      return { method: 'password', error: null };
-    } else if (methods.hasGoogle) {
-      return { method: 'google', error: null };
-    } else {
-      return { method: null, error: 'No account found with this email' };
-    }
+    // Always return 'both' to show all login options
+    // This is more user-friendly and avoids issues with auth method detection
+    return { method: 'both', error: null };
   }
 
   /**

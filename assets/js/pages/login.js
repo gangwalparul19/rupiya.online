@@ -89,17 +89,9 @@ continueEmailBtn.addEventListener('click', async () => {
   continueEmailBtn.disabled = false;
   continueEmailBtn.textContent = 'Continue';
   
-  if (check.error) {
-    // No account found - offer signup
-    toast.show('No account found with this email. Would you like to sign up?', 'info');
-    setTimeout(() => {
-      window.location.href = `signup.html?email=${encodeURIComponent(email)}`;
-    }, 1500);
-    return;
-  }
-  
-  // Show appropriate auth methods
-  showAuthMethods(check.method);
+  // Always show auth methods (both password and Google)
+  // Firebase will handle validation during actual sign-in
+  showAuthMethods(check.method || 'both');
 });
 
 function showAuthMethods(method) {
