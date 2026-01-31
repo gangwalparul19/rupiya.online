@@ -313,6 +313,12 @@ class FlatGroupDetailPage {
 
   renderBudget() {
     const budgetSection = document.getElementById('budgetSection');
+    
+    // Budget section is optional for flat groups
+    if (!budgetSection) {
+      return;
+    }
+    
     const budget = this.group.budget?.total || 0;
 
     if (budget <= 0) {
