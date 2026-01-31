@@ -320,7 +320,7 @@ class ReportGeneratorService {
 <body>
   <div class="report-wrapper">
     <div class="logo">
-      <img src="assets/images/logo.png" alt="Rupiya Logo" onerror="this.style.display='none'">
+      <img src="https://rupiya.online/assets/images/logo.png" alt="Rupiya Logo" style="max-width: 150px; height: auto;" onerror="this.style.display='none'">
     </div>
     <div class="container">
       <div class="header">
@@ -642,43 +642,27 @@ class ReportGeneratorService {
       // Generate HTML from report data
       const html = this.generateHTMLReport(data);
       
-      // Create temporary container
-      const container = document.createElement('div');
-      container.innerHTML = html;
-      container.style.position = 'absolute';
-      container.style.left = '-9999px';
-      container.style.top = '0';
-      container.style.width = '1200px';
-      document.body.appendChild(container);
+      // Create an iframe to render the report
+      const iframe = document.createElement('iframe');
+      iframe.style.position = 'absolute';
+      iframe.style.left = '-9999px';
+      iframe.style.width = '1200px';
+      iframe.style.height = '2000px';
+      document.body.appendChild(iframe);
 
-      // Wait for Chart.js to load if not already loaded
-      if (!window.Chart) {
-        const script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
-        document.head.appendChild(script);
-        await new Promise((resolve) => {
-          script.onload = resolve;
-        });
-      }
+      // Write HTML to iframe
+      iframe.contentDocument.open();
+      iframe.contentDocument.write(html);
+      iframe.contentDocument.close();
 
-      // Execute the chart scripts in the container
-      const scripts = container.querySelectorAll('script');
-      for (const script of scripts) {
-        if (script.textContent) {
-          try {
-            // Create a function scope to execute the script
-            const func = new Function(script.textContent);
-            func();
-          } catch (e) {
-            logger.warn('Script execution warning:', e);
-          }
-        }
-      }
+      // Wait for iframe to load and charts to render
+      await new Promise((resolve) => {
+        iframe.onload = () => {
+          setTimeout(resolve, 4000); // Increased wait time for charts
+        };
+      });
 
-      // Wait longer for charts to fully render
-      await new Promise(resolve => setTimeout(resolve, 3000));
-
-      // Generate PDF
+      // Generate PDF from iframe content
       const opt = {
         margin: [10, 10, 10, 10],
         filename: `${data.type}-report-${data.period.start.toISOString().split('T')[0]}.pdf`,
@@ -686,23 +670,22 @@ class ReportGeneratorService {
         html2canvas: { 
           scale: 2, 
           useCORS: true, 
-          logging: false,
-          letterRendering: true,
-          allowTaint: true
+          logging: true,
+          windowWidth: 1200,
+          windowHeight: iframe.contentDocument.body.scrollHeight
         },
         jsPDF: { 
           unit: 'mm', 
           format: 'a4', 
-          orientation: 'portrait',
-          compress: true
+          orientation: 'portrait'
         },
         pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
       };
 
-      await window.html2pdf().set(opt).from(container).save();
+      await window.html2pdf().set(opt).from(iframe.contentDocument.body).save();
       
       // Cleanup
-      document.body.removeChild(container);
+      document.body.removeChild(iframe);
       
       logger.info(`PDF report downloaded successfully`);
       return true;
