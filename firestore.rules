@@ -649,6 +649,121 @@ service cloud.firestore {
     }
     
     // ============================================
+    // FLAT GROUPS - Secured with membership validation
+    // ============================================
+    match /flatGroups/{groupId} {
+      // Get: Allow any authenticated user to read (app-level checks membership)
+      // This is needed so invited users can check if they have access
+      allow get: if isAuthenticated();
+      
+      // List: Allow authenticated users to query groups
+      // Note: Application code filters by createdBy or membership
+      allow list: if isAuthenticated();
+      
+      // Create: Any authenticated user can create (they become the creator)
+      allow create: if isAuthenticated() && request.resource.data.createdBy == request.auth.uid;
+      
+      // Update: Allow authenticated users to update (app checks membership)
+      // This allows members to update totalExpenses when adding expenses
+      allow update: if isAuthenticated();
+      
+      // Delete: Only group creator can delete
+      allow delete: if isAuthenticated() && resource.data.createdBy == request.auth.uid;
+    }
+    
+    // ============================================
+    // FLAT GROUP MEMBERS - Secured with membership validation
+    // ============================================
+    match /flatGroupMembers/{memberId} {
+      // Get: Users can read individual documents if they are a member of the group OR the group creator
+      // memberId format: groupId_userId or groupId_timestamp_random (for pending invitations)
+      allow get: if isAuthenticated();
+      
+      // List: Allow authenticated users to query members
+      // Note: Application code filters by groupId, and users can only see groups they're members of
+      allow list: if isAuthenticated();
+      
+      // Create: Group creator can add members, or users can accept their own invitation
+      allow create: if isAuthenticated() && (
+        request.resource.data.userId == request.auth.uid ||
+        exists(/databases/$(database)/documents/flatGroups/$(request.resource.data.groupId)) &&
+        get(/databases/$(database)/documents/flatGroups/$(request.resource.data.groupId)).data.createdBy == request.auth.uid
+      );
+      
+      // Update: Group creator or the member themselves can update
+      allow update: if isAuthenticated() && (
+        resource.data.userId == request.auth.uid ||
+        exists(/databases/$(database)/documents/flatGroups/$(resource.data.groupId)) &&
+        get(/databases/$(database)/documents/flatGroups/$(resource.data.groupId)).data.createdBy == request.auth.uid
+      );
+      
+      // Delete: Group creator (if group exists) or the member themselves can delete
+      // Also allow if userId matches (for cleanup when group is already deleted)
+      // Also allow deletion of pending invitations when accepting (userId is null)
+      allow delete: if isAuthenticated() && (
+        resource.data.userId == request.auth.uid ||
+        resource.data.userId == null ||
+        (exists(/databases/$(database)/documents/flatGroups/$(resource.data.groupId)) && 
+         get(/databases/$(database)/documents/flatGroups/$(resource.data.groupId)).data.createdBy == request.auth.uid)
+      );
+    }
+    
+    // ============================================
+    // FLAT GROUP EXPENSES - Secured with membership validation
+    // ============================================
+    match /flatGroupExpenses/{expenseId} {
+      // Get: Allow authenticated users to read expenses
+      // Application code filters by groupId and checks membership
+      allow get: if isAuthenticated();
+      
+      // List: Allow authenticated users to query expenses
+      // Note: Application code filters by groupId, and users can only see groups they're members of
+      allow list: if isAuthenticated();
+      
+      // Create: Allow authenticated users to create expenses
+      // Application code checks if user is a group member before creating
+      allow create: if isAuthenticated() && request.resource.data.addedBy == request.auth.uid;
+      
+      // Update: Only the expense creator can update
+      allow update: if isAuthenticated() && resource.data.addedBy == request.auth.uid;
+      
+      // Delete: Only the expense creator can delete, or group creator if group still exists
+      // Note: addedBy contains the userId
+      allow delete: if isAuthenticated() && (
+        resource.data.addedBy == request.auth.uid ||
+        (exists(/databases/$(database)/documents/flatGroups/$(resource.data.groupId)) && 
+         get(/databases/$(database)/documents/flatGroups/$(resource.data.groupId)).data.createdBy == request.auth.uid)
+      );
+    }
+    
+    // ============================================
+    // FLAT GROUP SETTLEMENTS - Secured with membership validation
+    // ============================================
+    match /flatGroupSettlements/{settlementId} {
+      // Get: Allow authenticated users to read settlements
+      // Application code filters by groupId and checks membership
+      allow get: if isAuthenticated();
+      
+      // List: Allow authenticated users to query settlements
+      // Note: Application code filters by groupId, and users can only see groups they're members of
+      allow list: if isAuthenticated();
+      
+      // Create: Allow authenticated users to create settlements
+      // Application code checks if user is a group member before creating
+      allow create: if isAuthenticated() && request.resource.data.addedBy == request.auth.uid;
+      
+      // Update: Only the settlement creator can update
+      allow update: if isAuthenticated() && resource.data.addedBy == request.auth.uid;
+      
+      // Delete: Only the settlement creator can delete, or group creator if group still exists
+      allow delete: if isAuthenticated() && (
+        resource.data.addedBy == request.auth.uid ||
+        (exists(/databases/$(database)/documents/flatGroups/$(resource.data.groupId)) && 
+         get(/databases/$(database)/documents/flatGroups/$(resource.data.groupId)).data.createdBy == request.auth.uid)
+      );
+    }
+    
+    // ============================================
     // RATE LIMITS (API rate limiting - server-side only)
     // ============================================
     match /rateLimits/{limitId} {

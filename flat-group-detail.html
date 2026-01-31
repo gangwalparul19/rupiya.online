@@ -1,72 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
-
-
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Rupiya Trip Group Details">
+  <meta name="description" content="Rupiya Flat Group Details">
   <meta name="theme-color" content="#4A90E2">
-  <title>Trip Group - Rupiya</title>
+  <title>Flat Group - Rupiya</title>
 
-  <!-- PWA Manifest -->
   <link rel="manifest" href="/manifest.json">
-
-  <!-- Favicon -->
   <link rel="icon" href="assets/images/logo.png" type="image/png">
-  <link rel="apple-touch-icon" href="/android-chrome-192x192.png">
-
-  <!-- Stylesheets -->
+  
   <link rel="stylesheet" href="assets/css/bundles/core.bundle.css">
   <link rel="stylesheet" href="assets/css/bundles/dashboard.bundle.css">
-  <!-- Page-specific styles -->
-  <link rel="stylesheet" href="assets/css/trip-group-detail.css">
-  <link rel="stylesheet" href="assets/css/trip-ux-enhancements.css">
-  <link rel="stylesheet" href="assets/css/sidebar.css">
-<!-- Page-specific styles -->
-  <link rel="stylesheet" href="assets/css/trip-group-detail.css">
-  <link rel="stylesheet" href="assets/css/trip-ux-enhancements.css">
-<!-- Page-specific styles -->
-  <link rel="stylesheet" href="assets/css/trip-group-detail.css">
-  <link rel="stylesheet" href="assets/css/trip-ux-enhancements.css">
-<!-- Page-specific styles -->
-  <link rel="stylesheet" href="assets/css/trip-group-detail.css">
-  <link rel="stylesheet" href="assets/css/trip-ux-enhancements.css">
-<!-- Page-specific styles -->
-  <link rel="stylesheet" href="assets/css/trip-group-detail.css">
-  <link rel="stylesheet" href="assets/css/trip-ux-enhancements.css">
-<!-- Page-specific styles -->
-  <link rel="stylesheet" href="assets/css/trip-group-detail.css">
-  <link rel="stylesheet" href="assets/css/trip-ux-enhancements.css">
-<!-- Page-specific styles -->
-  <link rel="stylesheet" href="assets/css/trip-group-detail.css">
-  <link rel="stylesheet" href="assets/css/trip-ux-enhancements.css">
-<!-- Page-specific styles -->
-  <link rel="stylesheet" href="assets/css/trip-group-detail.css">
-  <link rel="stylesheet" href="assets/css/trip-ux-enhancements.css">
-<!-- Page-specific styles -->
-  <link rel="stylesheet" href="assets/css/trip-group-detail.css">
-  <link rel="stylesheet" href="assets/css/trip-ux-enhancements.css">
-<!-- Page-specific styles -->
-  <link rel="stylesheet" href="assets/css/trip-group-detail.css">
-  <link rel="stylesheet" href="assets/css/trip-ux-enhancements.css">
-<!-- Page-specific styles -->
-  <link rel="stylesheet" href="assets/css/trip-group-detail.css">
-  <link rel="stylesheet" href="assets/css/trip-ux-enhancements.css">
-  
-<!-- Page-specific styles -->
   <link rel="stylesheet" href="assets/css/trip-group-detail.css">
   <link rel="stylesheet" href="assets/css/dashboard-common.css">
-  <link rel="stylesheet" href="assets/css/trip-ux-enhancements.css">
-<!-- Auth Guard -->
+  <link rel="stylesheet" href="assets/css/sidebar.css">
+  
   <script src="assets/js/utils/auth-guard.js"></script>
 </head>
 
 <body>
   <div class="dashboard-layout">
-    <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <div class="sidebar-logo">
@@ -99,9 +53,7 @@
 
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-    <!-- Main Content -->
     <main class="main-content">
-      <!-- Mobile Header -->
       <div class="mobile-header">
         <div class="mobile-brand">
           <img src="assets/images/logo.png" alt="Rupiya" style="height: 32px;">
@@ -115,17 +67,16 @@
         </div>
       </div>
 
-      <!-- Page Header -->
       <div class="page-header">
         <div class="page-header-back">
-          <a href="trip-groups.html" class="back-link">
+          <a href="flat-groups.html" class="back-link">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
             </svg>
           </a>
           <div>
             <h1 class="page-title" id="groupName">Loading...</h1>
-            <p class="page-subtitle" id="groupDates">-</p>
+            <p class="page-subtitle" id="groupAddress">-</p>
           </div>
         </div>
         <div class="page-actions">
@@ -140,7 +91,6 @@
         </div>
       </div>
 
-      <!-- Quick Actions -->
       <div class="quick-actions" id="quickActions">
         <button class="quick-action-btn" id="quickAddExpenseBtn">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -158,11 +108,10 @@
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
           </svg>
-          <span>Add Member</span>
+          <span>Add Flatmate</span>
         </button>
       </div>
 
-      <!-- Add Expense Application Section (Inline) -->
       <div class="create-group-section" id="addExpenseSection">
         <div class="create-group-header">
           <h2>Add Expense</h2>
@@ -174,14 +123,6 @@
         </div>
 
         <form id="expenseForm">
-          <!-- Quick Expense Templates -->
-          <div class="expense-templates" id="expenseTemplates">
-            <label class="expense-templates-label">Quick Templates</label>
-            <div class="expense-templates-grid" id="expenseTemplatesGrid">
-              <!-- Templates will be loaded here -->
-            </div>
-          </div>
-
           <div class="form-grid">
             <div class="form-group">
               <label for="expenseAmount">Amount *</label>
@@ -214,7 +155,6 @@
             </div>
           </div>
 
-          <!-- Split Section -->
           <div class="split-section">
             <h3 class="section-title">Split Between</h3>
 
@@ -233,9 +173,7 @@
               </label>
             </div>
 
-            <div class="split-members" id="splitMembers">
-              <!-- Split member checkboxes/inputs will be loaded here -->
-            </div>
+            <div class="split-members" id="splitMembers"></div>
 
             <div class="split-summary" id="splitSummary">
               <span>Total: ₹<span id="splitTotal">0.00</span></span>
@@ -249,7 +187,6 @@
         </form>
       </div>
 
-      <!-- Settlement Application Section (Inline) -->
       <div class="create-group-section" id="addSettlementSection" style="display: none;">
         <div class="create-group-header">
           <h2>Record Settlement</h2>
@@ -294,10 +231,9 @@
         </form>
       </div>
 
-      <!-- Add Member Application Section (Inline) -->
       <div class="create-group-section" id="addMemberSection" style="display: none;">
         <div class="create-group-header">
-          <h2>Add Member</h2>
+          <h2>Add Flatmate</h2>
           <button type="button" class="close-create-btn" id="closeMemberFormBtn">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -309,7 +245,7 @@
           <div class="form-grid">
             <div class="form-group">
               <label for="newMemberName">Name *</label>
-              <input type="text" id="newMemberName" required maxlength="100" placeholder="Member name">
+              <input type="text" id="newMemberName" required maxlength="100" placeholder="Flatmate name">
             </div>
 
             <div class="form-group">
@@ -325,91 +261,34 @@
 
           <div class="create-group-footer">
             <button type="button" class="btn btn-outline" id="cancelMemberBtn">Cancel</button>
-            <button type="submit" class="btn btn-primary" id="saveMemberBtn">Add Member</button>
+            <button type="submit" class="btn btn-primary" id="saveMemberBtn">Add Flatmate</button>
           </div>
         </form>
       </div>
 
-      <!-- Budget Progress (if set) -->
-      <div class="budget-section" id="budgetSection" style="display: none;">
-        <div class="budget-card">
-          <div class="budget-header">
-            <span class="budget-label">Trip Budget</span>
-            <span class="budget-amount" id="budgetAmount">₹0 / ₹0</span>
-          </div>
-          <div class="budget-progress-bar">
-            <div class="budget-progress-fill" id="budgetFill"></div>
-          </div>
-          <div class="budget-footer">
-            <span id="budgetRemaining">₹0 remaining</span>
-            <span id="budgetPercent">0%</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Balances Section -->
       <div class="balances-section">
         <div class="section-header">
           <h2 class="section-title">Balances</h2>
           <button class="btn btn-sm btn-outline" id="settleUpBtn">Settle Up</button>
         </div>
 
-        <div class="balances-grid" id="balancesGrid">
-          <!-- Balance cards will be loaded here -->
-        </div>
+        <div class="balances-grid" id="balancesGrid"></div>
 
-        <!-- Simplified Debts -->
         <div class="simplified-debts" id="simplifiedDebts">
           <h3 class="debts-title">Who Owes Whom</h3>
-          <div class="debts-list" id="debtsList">
-            <!-- Debt items will be loaded here -->
-          </div>
+          <div class="debts-list" id="debtsList"></div>
         </div>
       </div>
 
-      <!-- Tabs for Expenses/Settlements -->
       <div class="detail-tabs">
         <button class="tab-btn active" data-tab="expenses">Expenses</button>
         <button class="tab-btn" data-tab="settlements">Settlements</button>
-        <button class="tab-btn" data-tab="members">Members</button>
+        <button class="tab-btn" data-tab="members">Flatmates</button>
         <button class="tab-btn" data-tab="analytics">Analytics</button>
       </div>
 
-      <!-- Expenses Tab -->
       <div class="tab-content active" id="expensesTab">
-        <!-- Search Bar -->
-        <div class="expense-search-container">
-          <input type="text" class="expense-search-bar" id="expenseSearchBar" placeholder="Search expenses...">
-          <button class="expense-search-clear" id="expenseSearchClear">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-          <div class="expense-search-results-count" id="expenseSearchCount" style="display: none;"></div>
-        </div>
-
-        <!-- Filter Chips -->
-        <div class="expense-filters" id="expenseFilterChips">
-          <div class="filter-chip" data-filter="my-expenses">
-            <span class="filter-chip-icon">👤</span>
-            <span>My Expenses</span>
-          </div>
-          <div class="filter-chip" data-filter="last-7-days">
-            <span class="filter-chip-icon">📅</span>
-            <span>Last 7 Days</span>
-          </div>
-          <div class="filter-chip" data-filter="last-30-days">
-            <span class="filter-chip-icon">📆</span>
-            <span>Last 30 Days</span>
-          </div>
-          <!-- Category chips will be added dynamically -->
-          <button class="filter-clear-btn" id="filterClearBtn" style="display: none;">
-            Clear Filters
-          </button>
-        </div>
-
-        <!-- Old filters (keeping for backward compatibility) -->
-        <div class="expenses-filters" style="display: none;">
+        <div class="expenses-filters">
           <select id="categoryFilter" class="filter-select">
             <option value="">All Categories</option>
           </select>
@@ -418,29 +297,17 @@
           </select>
         </div>
 
-        <div class="expenses-list" id="expensesList">
-          <!-- Expenses will be loaded here -->
-        </div>
+        <div class="expenses-list" id="expensesList"></div>
 
         <div class="empty-state" id="expensesEmpty" style="display: none;">
           <div class="empty-state-icon">💸</div>
           <h3 class="empty-state-title">No expenses yet</h3>
           <p class="empty-state-text">Add your first expense to start tracking.</p>
         </div>
-
-        <!-- Empty state for search/filter with no results -->
-        <div class="expense-empty-state" id="expensesFilterEmpty" style="display: none;">
-          <div class="expense-empty-state-icon">🔍</div>
-          <h3 class="expense-empty-state-title">No expenses found</h3>
-          <p class="expense-empty-state-message">Try adjusting your search or filters</p>
-        </div>
       </div>
 
-      <!-- Settlements Tab -->
       <div class="tab-content" id="settlementsTab">
-        <div class="settlements-list" id="settlementsList">
-          <!-- Settlements will be loaded here -->
-        </div>
+        <div class="settlements-list" id="settlementsList"></div>
 
         <div class="empty-state" id="settlementsEmpty" style="display: none;">
           <div class="empty-state-icon">🤝</div>
@@ -449,34 +316,26 @@
         </div>
       </div>
 
-      <!-- Members Tab -->
       <div class="tab-content" id="membersTab">
-        <div class="members-grid" id="membersGrid">
-          <!-- Members will be loaded here -->
-        </div>
+        <div class="members-grid" id="membersGrid"></div>
 
         <button class="btn btn-outline btn-block" id="addMemberBtn">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
-          Add Member
+          Add Flatmate
         </button>
       </div>
 
-      <!-- Analytics Tab -->
       <div class="tab-content" id="analyticsTab">
         <div class="analytics-grid">
-          <!-- Category Breakdown -->
           <div class="analytics-card">
             <h3 class="analytics-title">Spending by Category</h3>
-            <div class="category-breakdown" id="categoryBreakdown">
-              <!-- Category bars will be loaded here -->
-            </div>
+            <div class="category-breakdown" id="categoryBreakdown"></div>
           </div>
 
-          <!-- Trip Stats -->
           <div class="analytics-card">
-            <h3 class="analytics-title">Trip Statistics</h3>
+            <h3 class="analytics-title">Flat Statistics</h3>
             <div class="trip-stats" id="tripStats">
               <div class="stat-item">
                 <span class="stat-label">Total Expenses</span>
@@ -491,8 +350,8 @@
                 <span class="stat-value" id="statAvgExpense">₹0</span>
               </div>
               <div class="stat-item">
-                <span class="stat-label">Daily Average</span>
-                <span class="stat-value" id="statDailyAvg">₹0</span>
+                <span class="stat-label">Monthly Average</span>
+                <span class="stat-value" id="statMonthlyAvg">₹0</span>
               </div>
               <div class="stat-item">
                 <span class="stat-label">Per Person Average</span>
@@ -507,70 +366,22 @@
         </div>
       </div>
 
-      <!-- Loading State -->
       <div id="loadingState" class="loading-state">
         <div class="spinner-lg"></div>
-        <p>Loading group details...</p>
+        <p>Loading flat details...</p>
       </div>
     </main>
   </div>
 
-  <!-- Floating Action Button -->
-  <button class="trip-fab" id="tripFab" title="Add Expense (E)">
+  <button class="trip-fab" id="tripFab" title="Add Expense">
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
     </svg>
   </button>
 
-  <!-- Keyboard Shortcuts Help Button -->
-  <button class="shortcuts-help-btn" id="shortcutsHelpBtn" title="Keyboard Shortcuts (?)">
-    ?
-  </button>
-
-  <!-- Keyboard Shortcuts Modal -->
-  <div class="shortcuts-modal" id="shortcutsModal">
-    <div class="shortcuts-modal-content">
-      <div class="shortcuts-modal-header">
-        <h3 class="shortcuts-modal-title">Keyboard Shortcuts</h3>
-        <button class="shortcuts-modal-close" id="shortcutsModalClose">×</button>
-      </div>
-      <ul class="shortcuts-list">
-        <li class="shortcut-item">
-          <span class="shortcut-action">Add Expense</span>
-          <kbd class="shortcut-key">E</kbd>
-        </li>
-        <li class="shortcut-item">
-          <span class="shortcut-action">Settle Up</span>
-          <kbd class="shortcut-key">S</kbd>
-        </li>
-        <li class="shortcut-item">
-          <span class="shortcut-action">Add Member</span>
-          <kbd class="shortcut-key">M</kbd>
-        </li>
-        <li class="shortcut-item">
-          <span class="shortcut-action">Close Form/Modal</span>
-          <kbd class="shortcut-key">Esc</kbd>
-        </li>
-        <li class="shortcut-item">
-          <span class="shortcut-action">Show Shortcuts</span>
-          <kbd class="shortcut-key">?</kbd>
-        </li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- Add Expense Modal -->
-
-
-
-
-  <!-- Scripts -->
-  
-  
   <script type="module" src="assets/js/components/sidebar.js"></script>
-  <script type="module" src="assets/js/pages/trip-group-detail.js"></script>
+  <script type="module" src="assets/js/pages/flat-group-detail.js"></script>
   <script type="module" src="assets/js/pwa-setup.js"></script>
   <script type="module" src="assets/js/utils/dashboard-common.js"></script>
 </body>
-
 </html>

@@ -52,7 +52,9 @@ const htmlFiles = [
   'spending-patterns.html',
   'user-guide-auth.html',
   'user-guide-public.html',
-  'generate-sample-data.html'
+  'generate-sample-data.html',
+  'flat-groups.html',
+  'flat-group-detail.html'
 ];
 
 // Pages that have the dashboard layout with sidebar
@@ -86,7 +88,9 @@ const pagesWithSidebar = [
   'credit-cards.html',
   'healthcare-insurance.html',
   'spending-patterns.html',
-  'user-guide-auth.html'
+  'user-guide-auth.html',
+  'flat-groups.html',
+  'flat-group-detail.html'
 ];
 
 // Environment variable injection script (only inject if values are present)

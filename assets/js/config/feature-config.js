@@ -145,6 +145,12 @@ const DEFAULT_FEATURES = {
     description: 'Manage group trips',
     category: 'social'
   },
+  flatGroups: {
+    enabled: false,
+    label: 'Flat Groups',
+    description: 'Track shared flat expenses',
+    category: 'social'
+  },
   notes: {
     enabled: true,
     label: 'Notes',

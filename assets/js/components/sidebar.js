@@ -112,7 +112,8 @@ const navigationConfig = {
       icon: '👥',
       expanded: false,
       items: [
-        { href: 'trip-groups.html', icon: '✈️', label: 'Trip Groups', featureKey: 'tripGroups' }
+        { href: 'trip-groups.html', icon: '✈️', label: 'Trip Groups', featureKey: 'tripGroups' },
+        { href: 'flat-groups.html', icon: '🏠', label: 'Flat Groups', featureKey: 'flatGroups' }
       ]
     },
     {

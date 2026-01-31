@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Primary Meta Tags -->
+  <title>Flat Expense Tracker - Shared Living Cost Management | Rupiya</title>
+  <meta name="title" content="Flat Expense Tracker - Shared Living Cost Management | Rupiya">
+  <meta name="description" content="Track flat expenses, manage shared living costs, split bills with flatmates. Perfect for roommate expense management and shared housing.">
+  <meta name="keywords" content="flat expense tracker, roommate expense tracker, shared living costs, flatmate bill splitter, rent expense tracker India">
+  <meta name="theme-color" content="#4A90E2">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="assets/images/logo.png" type="image/png">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="assets/css/bundles/core.bundle.css">
+  <link rel="stylesheet" href="assets/css/bundles/dashboard.bundle.css">
+  <link rel="stylesheet" href="assets/css/trip-groups.css">
+  <link rel="stylesheet" href="assets/css/dashboard-common.css">
+  <link rel="stylesheet" href="assets/css/sidebar.css">
+  
+  <!-- Auth Guard -->
+  <script src="assets/js/utils/auth-guard.js"></script>
+  <script src="assets/js/utils/button-reset-fix.js"></script>
+  <script src="assets/js/utils/privacy-mode-preload.js"></script>
+</head>
+
+<body>
+  <div class="dashboard-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <img src="assets/images/logo.png" alt="Rupiya">
+        </div>
+        <button class="sidebar-toggle" id="sidebarClose">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <nav class="sidebar-nav"></nav>
+
+      <div class="sidebar-footer">
+        <div class="user-profile" id="userProfile">
+          <div class="user-avatar" id="userAvatar">U</div>
+          <div class="user-info">
+            <div class="user-name" id="userName">Loading...</div>
+            <div class="user-email" id="userEmail">Loading...</div>
+          </div>
+        </div>
+        
+        <button class="btn btn-sm btn-outline w-100 mt-2" id="logoutBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- Sidebar Overlay (Mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Mobile Header -->
+      <div class="mobile-header">
+        <a href="dashboard.html" class="mobile-brand">
+          <img src="assets/images/logo.png" alt="Rupiya">
+        </a>
+        <div class="mobile-header-actions">
+          <button class="sidebar-toggle" id="sidebarOpen">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Page Header -->
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Flat Groups</h1>
+          <p class="page-subtitle">Track shared expenses with your flatmates</p>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-primary" id="createGroupBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            Create Flat Group
+          </button>
+        </div>
+      </div>
+
+      <!-- Summary Cards -->
+      <div class="trip-summary" id="flatSummary">
+        <div class="summary-card">
+          <div class="summary-icon">🏠</div>
+          <div class="summary-content">
+            <div class="summary-label">Active Flats</div>
+            <div class="summary-value" id="activeFlats">0</div>
+          </div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-icon">💰</div>
+          <div class="summary-content">
+            <div class="summary-label">This Month's Expenses</div>
+            <div class="summary-value" id="monthlyExpenses">₹0</div>
+          </div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-icon">📊</div>
+          <div class="summary-content">
+            <div class="summary-label">Your Balance</div>
+            <div class="summary-value" id="yourBalance">₹0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="trip-tabs">
+        <button class="tab-btn active" data-tab="active">Active</button>
+        <button class="tab-btn" data-tab="archived">Archived</button>
+        <button class="tab-btn" data-tab="all">All</button>
+      </div>
+
+      <!-- Inline Create Group Form -->
+      <div class="create-group-section" id="createGroupSection">
+        <div class="create-group-header">
+          <h2 id="inlineGroupTitle">Create Flat Group</h2>
+          <button type="button" class="close-create-btn" id="closeCreateSectionBtn">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <form id="inlineGroupForm">
+          <div class="form-grid">
+            <div class="form-group form-group-full">
+              <label for="inlineGroupName">Flat Name *</label>
+              <input type="text" id="inlineGroupName" required maxlength="100" placeholder="e.g., Koramangala Flat, 3BHK Apartment">
+            </div>
+
+            <div class="form-group form-group-full">
+              <label for="inlineGroupDescription">Description</label>
+              <textarea id="inlineGroupDescription" rows="2" maxlength="500"
+                placeholder="Describe your flat arrangement..."></textarea>
+            </div>
+
+            <div class="form-group form-group-full">
+              <label for="inlineAddress">Address</label>
+              <input type="text" id="inlineAddress" maxlength="200" placeholder="Flat address">
+            </div>
+
+            <div class="form-group">
+              <label for="inlineMonthlyRent">Monthly Rent (Optional)</label>
+              <input type="number" id="inlineMonthlyRent" step="0.01" min="0" placeholder="0.00">
+            </div>
+          </div>
+
+          <!-- Members Section -->
+          <div class="members-section">
+            <h3 class="section-title">Add Flatmates</h3>
+            <p class="section-subtitle">You'll be added as admin automatically</p>
+
+            <div class="add-member-form">
+              <div class="form-row">
+                <input type="text" id="inlineMemberName" placeholder="Name *" class="member-input">
+                <input type="email" id="inlineMemberEmail" placeholder="Email (optional)" class="member-input">
+                <input type="tel" id="inlineMemberPhone" placeholder="Phone (optional)" class="member-input">
+                <button type="button" class="btn btn-outline btn-sm" id="inlineAddMemberBtn">Add</button>
+              </div>
+            </div>
+
+            <div id="inlineMembersList" class="members-list"></div>
+          </div>
+
+          <div class="create-group-footer">
+            <button type="button" class="btn btn-outline" id="cancelCreateBtn">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="inlineSaveGroupBtn">Create Flat Group</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Groups List -->
+      <div class="trip-groups-container">
+        <div id="groupsList" class="groups-grid">
+          <!-- Group cards will be loaded here -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="empty-state" style="display: none;">
+          <div class="empty-state-icon">🏠</div>
+          <h3 class="empty-state-title">No flat groups yet</h3>
+          <p class="empty-state-text">Create a group to start tracking shared expenses with flatmates.</p>
+          <button class="btn btn-primary" onclick="document.getElementById('createGroupBtn').click()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            Create Your First Flat Group
+          </button>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="loading-state">
+          <div class="spinner-lg"></div>
+          <p>Loading flat groups...</p>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination-container" id="paginationContainer" style="display: none;">
+          <button class="btn btn-outline btn-pagination" id="prevPageBtn" disabled>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+            Prev
+          </button>
+          <div class="pagination-numbers" id="paginationNumbers"></div>
+          <button class="btn btn-outline btn-pagination" id="nextPageBtn">
+            Next
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="assets/js/utils/privacy-mode-auto-init.js"></script>
+  <script type="module" src="assets/js/components/sidebar.js"></script>
+  <script type="module" src="assets/js/pages/flat-groups.js"></script>
+  <script type="module" src="assets/js/pwa-setup.js"></script>
+  <script type="module" src="assets/js/utils/dashboard-common.js"></script>
+</body>
+</html>
