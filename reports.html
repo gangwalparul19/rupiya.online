@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Financial Reports - Rupiya</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- CSS Bundles -->
+  <link rel="stylesheet" href="assets/css/bundles/core.bundle.css">
+  <link rel="stylesheet" href="assets/css/bundles/dashboard.bundle.css">
+  <link rel="stylesheet" href="assets/css/reports.css">
+  <link rel="stylesheet" href="assets/css/sidebar.css">
+</head>
+<body>
+  <!-- Mobile Header -->
+  <div id="mobileHeader"></div>
+
+  <!-- Sidebar -->
+  <div id="sidebar"></div>
+  <div id="sidebarOverlay"></div>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Breadcrumbs -->
+    <div id="breadcrumbs"></div>
+
+    <div class="page-header">
+      <div class="page-title">
+        <i class="fas fa-file-chart-line"></i>
+        <h1>Financial Reports</h1>
+      </div>
+      <p class="page-description">Generate and download comprehensive financial reports with charts and insights</p>
+    </div>
+
+    <!-- Report Type Selection -->
+    <div class="report-selector">
+      <div class="report-type-cards">
+        <div class="report-type-card" data-type="weekly">
+          <div class="report-icon">
+            <i class="fas fa-calendar-week"></i>
+          </div>
+          <h3>Weekly Report</h3>
+          <p>Last 7 days financial summary with daily trends and category breakdown</p>
+          <button class="btn btn-primary generate-btn" data-type="weekly">
+            <i class="fas fa-chart-line"></i>
+            Generate Weekly Report
+          </button>
+        </div>
+
+        <div class="report-type-card" data-type="monthly">
+          <div class="report-icon">
+            <i class="fas fa-calendar-alt"></i>
+          </div>
+          <h3>Monthly Report</h3>
+          <p>Complete monthly analysis with budget comparison and spending patterns</p>
+          <button class="btn btn-primary generate-btn" data-type="monthly">
+            <i class="fas fa-chart-pie"></i>
+            Generate Monthly Report
+          </button>
+        </div>
+
+        <div class="report-type-card" data-type="custom">
+          <div class="report-icon">
+            <i class="fas fa-calendar-days"></i>
+          </div>
+          <h3>Custom Range</h3>
+          <p>Select your own date range for a personalized financial report</p>
+          <button class="btn btn-primary" id="customRangeBtn">
+            <i class="fas fa-sliders"></i>
+            Custom Date Range
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Custom Date Range Modal -->
+    <div id="customRangeModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Custom Date Range</h2>
+          <button class="modal-close" id="closeCustomRange">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="customStartDate">Start Date</label>
+            <input type="date" id="customStartDate" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label for="customEndDate">End Date</label>
+            <input type="date" id="customEndDate" class="form-control" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" id="cancelCustomRange">Cancel</button>
+          <button class="btn btn-primary" id="generateCustomReport">
+            <i class="fas fa-chart-line"></i>
+            Generate Report
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Report Preview Section -->
+    <div id="reportPreview" class="report-preview" style="display: none;">
+      <div class="preview-header">
+        <h2>Report Preview</h2>
+        <div class="preview-actions">
+          <button class="btn btn-secondary" id="downloadHTML">
+            <i class="fas fa-file-code"></i>
+            Download HTML
+          </button>
+          <button class="btn btn-primary" id="downloadPDF">
+            <i class="fas fa-file-pdf"></i>
+            Download PDF
+          </button>
+          <button class="btn btn-ghost" id="closePreview">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+      <div class="preview-container">
+        <iframe id="reportFrame" frameborder="0"></iframe>
+      </div>
+    </div>
+
+    <!-- Recent Reports -->
+    <div class="recent-reports">
+      <h2>
+        <i class="fas fa-history"></i>
+        Recent Reports
+      </h2>
+      <div id="recentReportsList" class="reports-list">
+        <div class="empty-state">
+          <i class="fas fa-file-chart-line"></i>
+          <p>No reports generated yet</p>
+          <p class="subtext">Generate your first report to see it here</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="features-section">
+      <h2>What's Included in Your Reports</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <i class="fas fa-chart-pie"></i>
+          <h3>Category Breakdown</h3>
+          <p>Visual pie charts showing spending distribution across categories</p>
+        </div>
+        <div class="feature-card">
+          <i class="fas fa-chart-line"></i>
+          <h3>Daily Trends</h3>
+          <p>Line graphs tracking your daily spending patterns</p>
+        </div>
+        <div class="feature-card">
+          <i class="fas fa-bullseye"></i>
+          <h3>Budget Performance</h3>
+          <p>Compare actual spending against your budgets</p>
+        </div>
+        <div class="feature-card">
+          <i class="fas fa-trophy"></i>
+          <h3>Top Expenses</h3>
+          <p>Identify your largest transactions and spending areas</p>
+        </div>
+        <div class="feature-card">
+          <i class="fas fa-coins"></i>
+          <h3>Income Analysis</h3>
+          <p>Breakdown of income sources with visual charts</p>
+        </div>
+        <div class="feature-card">
+          <i class="fas fa-chart-area"></i>
+          <h3>Investment Summary</h3>
+          <p>Track your investment performance and returns</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+    <div class="loading-spinner">
+      <i class="fas fa-spinner fa-spin"></i>
+      <p>Generating your report...</p>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="assets/js/components/sidebar.js"></script>
+  <script type="module" src="assets/js/pages/reports.js"></script>
+</body>
+</html>

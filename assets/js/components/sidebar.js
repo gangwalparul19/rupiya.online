@@ -63,7 +63,8 @@ const navigationConfig = {
         { href: 'dashboard.html', icon: '📊', label: 'Dashboard', featureKey: 'dashboard' },
         { href: 'predictive-analytics.html', icon: '🔮', label: 'Predictive Analytics', featureKey: 'predictiveAnalytics' },
         { href: 'ai-insights.html', icon: '🤖', label: 'AI Insights', featureKey: 'aiInsights' },
-        { href: 'spending-patterns.html', icon: '📊', label: 'Spending Patterns', featureKey: 'spendingPatterns' }
+        { href: 'spending-patterns.html', icon: '📊', label: 'Spending Patterns', featureKey: 'spendingPatterns' },
+        { href: 'reports.html', icon: '📄', label: 'Reports', featureKey: null }
       ]
     },
     {
