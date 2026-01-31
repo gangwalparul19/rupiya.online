@@ -101,8 +101,8 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
         .btn-outline { 
-            background: transparent; 
-            color: white; 
+             background: rgba(255, 255, 255, 0.1);
+              color: var(--primary); 
             border: 2px solid white; 
         }
         .btn-outline:hover {
@@ -602,8 +602,9 @@
             <a href="demo.html" class="btn btn-outline">Try Demo</a>
         </div>
     </section>
+</div>
 
-  <!-- Footer -->
+      <!-- Footer -->
   <footer class="landing-footer">
     <div class="container" style="text-align: center;">
       <div class="footer-bottom">
@@ -614,7 +615,7 @@
   </footer>
 
   <style>
-    /* Standardize footer to match index.html - Override landing.bundle.css */
+    /* Standardize footer to match index.html */
     .landing-footer {
       background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;
       color: white !important;
@@ -625,51 +626,29 @@
     .landing-footer .footer-section h4 {
       color: white !important;
       border-bottom-color: rgba(102, 126, 234, 0.3) !important;
-      margin-bottom: 1rem !important;
-      font-size: 1.2rem !important;
-      padding-bottom: 0 !important;
-    }
-    
-    .landing-footer .footer-section h4::before {
-      display: none !important;
     }
     
     .landing-footer .footer-section ul {
       list-style: none !important;
       padding: 0 !important;
       margin: 0 !important;
-      gap: 0 !important;
-      display: block !important;
     }
     
     .landing-footer .footer-section li {
       margin-bottom: 0.5rem !important;
-      margin: 0 0 0.5rem 0 !important;
     }
     
     .landing-footer .footer-section a {
       color: rgba(255, 255, 255, 0.7) !important;
-      font-size: 0.95rem !important;
-      padding: 0 !important;
-      text-decoration: none !important;
-      transition: color 0.3s !important;
-    }
-    
-    .landing-footer .footer-section a::before {
-      display: none !important;
     }
     
     .landing-footer .footer-section a:hover {
       color: white !important;
-      padding-left: 0 !important;
     }
     
     .landing-footer .footer-bottom {
       color: rgba(255, 255, 255, 0.6) !important;
       border-top-color: rgba(255, 255, 255, 0.1) !important;
-      padding-top: 1.5rem !important;
-      text-align: center !important;
-      border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
     }
     
     .landing-footer .footer-bottom p {
@@ -685,35 +664,14 @@
       display: grid !important;
       grid-template-columns: repeat(4, 1fr) !important;
       gap: 2rem !important;
-      margin-bottom: 1.5rem !important;
-      max-width: 1200px !important;
-      margin-left: auto !important;
-      margin-right: auto !important;
+      margin-bottom: 2rem !important;
     }
     
     @media (max-width: 768px) {
       .landing-footer .footer-content {
         display: grid !important;
-        grid-template-columns: repeat(4, 1fr) !important;
-        gap: 1.5rem !important;
-      }
-      
-      .landing-footer .footer-section h4 {
-        font-size: 1rem !important;
-        margin-bottom: 0.75rem !important;
-      }
-      
-      .landing-footer .footer-section a {
-        font-size: 0.85rem !important;
-      }
-      
-      .landing-footer .footer-section li {
-        margin-bottom: 0.4rem !important;
-      }
-      
-      .landing-footer .footer-bottom {
-        padding-top: 1.5rem !important;
-        font-size: 0.9rem !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 2rem !important;
       }
     }
     
@@ -724,26 +682,26 @@
       .landing-footer .footer-content {
         display: grid !important;
         grid-template-columns: repeat(2, 1fr) !important;
-        gap: 2rem !important;
-        margin-bottom: 1.5rem !important;
+        gap: 1.5rem !important;
+        margin-bottom: 2rem !important;
       }
       .landing-footer .footer-section {
         display: block !important;
       }
       .landing-footer .footer-section h4 {
         font-size: 0.95rem !important;
-        margin-bottom: 0.5rem !important;
+        margin-bottom: 0.75rem !important;
       }
       .landing-footer .footer-section ul {
         display: flex !important;
         flex-direction: column !important;
       }
       .landing-footer .footer-section a {
-        font-size: 0.8rem !important;
+        font-size: 0.85rem !important;
         word-break: break-word !important;
       }
       .landing-footer .footer-bottom {
-        padding-top: 1rem !important;
+        padding-top: 1.5rem !important;
       }
       .landing-footer .footer-bottom p {
         font-size: 0.85rem !important;
