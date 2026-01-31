@@ -329,7 +329,7 @@ class AuthService {
       const { fetchSignInMethodsForEmail } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js');
       
       // Use Firebase Auth API to check sign-in methods (works without authentication)
-      const signInMethods = await fetchSignInMethodsForEmail(this.auth, email);
+      const signInMethods = await fetchSignInMethodsForEmail(auth, email);
       
       if (!signInMethods || signInMethods.length === 0) {
         return { success: false, error: 'No account found with this email' };
