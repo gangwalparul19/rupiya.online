@@ -983,7 +983,45 @@ class FlatGroupDetailPage {
         throw new Error(result.error);
       }
 
-      this.showToast('Member added!', 'success');
+      // Send invitation email if email is provided
+      if (email && email.trim() !== '') {
+        try {
+          const currentUser = authService.getCurrentUser();
+          const emailPayload = {
+            members: [{ name, email, phone }],
+            flatName: this.group.name,
+            address: this.group.address,
+            description: this.group.description,
+            monthlyRent: this.group.monthlyRent,
+            creatorName: currentUser.displayName || currentUser.email,
+            creatorEmail: currentUser.email,
+            groupId: this.groupId
+          };
+
+          const emailResponse = await fetch('/api/send-flat-invitation', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(emailPayload)
+          });
+
+          if (emailResponse.ok) {
+            const emailResult = await emailResponse.json();
+            if (emailResult.success && emailResult.sent > 0) {
+              this.showToast(`✅ Member added and invitation sent to ${email}!`, 'success');
+            } else {
+              this.showToast('✅ Member added!', 'success');
+            }
+          } else {
+            this.showToast('✅ Member added (email sending failed)', 'success');
+          }
+        } catch (emailError) {
+          console.error('Error sending invitation email:', emailError);
+          this.showToast('✅ Member added (email sending failed)', 'success');
+        }
+      } else {
+        this.showToast('✅ Member added!', 'success');
+      }
+
       this.closeMemberSection();
       await this.loadGroupData();
     } catch (error) {
@@ -1660,7 +1698,7 @@ class FlatGroupDetailPage {
 // Initialize page
 document.addEventListener('DOMContentLoaded', () => {
   try {
-    window.tripGroupDetailPage = new TripGroupDetailPage();
+    window.flatGroupDetailPage = new FlatGroupDetailPage();
 
     // Safety check: specific fix for blank page issue
     // Ensure document is visible even if auth-guard failed to reveal it
@@ -1695,7 +1733,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <p>Failed to initialize page: ${error.message}</p>
         <pre style="text-align: left; background: #f0f0f0; padding: 10px; overflow: auto; max-width: 800px; margin: 20px auto;">${error.stack}</pre>
         <button onclick="window.location.reload()" style="padding: 10px 20px; cursor: pointer;">Reload Page</button>
-        <a href="trip-groups.html" style="display: block; margin-top: 10px;">Back to Trips</a>
+        <a href="flat-groups.html" style="display: block; margin-top: 10px;">Back to Flats</a>
       </div>
     `;
   }

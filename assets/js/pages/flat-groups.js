@@ -466,11 +466,58 @@ class FlatGroupsPage {
       }
 
       // Add pending members
+      const addedMembers = [];
       for (const member of this.pendingMembers) {
         const addResult = await flatGroupsService.addMember(result.groupId, member);
-        if (!addResult.success) {
+        if (addResult.success) {
+          addedMembers.push(member);
+        } else {
           console.error('Failed to add member:', member.name, addResult.error);
           this.showToast(`Failed to add ${member.name}: ${addResult.error}`, 'warning');
+        }
+      }
+
+      // Send invitation emails to members with valid emails
+      const membersWithEmail = addedMembers.filter(m => m.email && m.email.trim() !== '');
+
+      if (membersWithEmail.length > 0) {
+        try {
+          const emailPayload = {
+            members: membersWithEmail,
+            flatName: name,
+            address: address,
+            description: description,
+            monthlyRent: monthlyRent,
+            creatorName: currentUser.displayName || currentUser.email,
+            creatorEmail: currentUser.email,
+            groupId: result.groupId
+          };
+
+          const emailResponse = await fetch('/api/send-flat-invitation', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(emailPayload)
+          });
+
+          if (!emailResponse.ok) {
+            throw new Error(`HTTP error! status: ${emailResponse.status}`);
+          }
+
+          const emailResult = await emailResponse.json();
+
+          if (emailResult.success) {
+            if (emailResult.sent > 0) {
+              this.showToast(`✅ Invitations sent to ${emailResult.sent} flatmate(s)!`, 'success');
+            } else if (emailResult.sent === 0) {
+              this.showToast('⚠️ No valid emails to send invitations', 'info');
+            }
+          } else {
+            console.error('Email API error:', emailResult.error);
+            this.showToast(`⚠️ Failed to send emails: ${emailResult.error}`, 'warning');
+          }
+        } catch (emailError) {
+          console.error('Error sending invitation emails:', emailError);
+          this.showToast(`⚠️ Email sending failed: ${emailError.message}`, 'warning');
         }
       }
 
