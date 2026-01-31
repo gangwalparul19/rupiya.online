@@ -322,26 +322,34 @@ class AuthService {
   /**
    * Check what auth methods are available for an email
    * Used during login to show appropriate auth options
+   * Uses Firebase Auth API (works without authentication)
    */
   async getAuthMethodsForEmail(email) {
     try {
-      if (!this.userService) {
-        throw new Error('User service not initialized');
-      }
-
-      const user = await this.userService.getUserByEmail(email);
-      if (!user) {
+      const { fetchSignInMethodsForEmail } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js');
+      
+      // Use Firebase Auth API to check sign-in methods (works without authentication)
+      const signInMethods = await fetchSignInMethodsForEmail(this.auth, email);
+      
+      if (!signInMethods || signInMethods.length === 0) {
         return { success: false, error: 'No account found with this email' };
       }
 
-      const authMethods = user.authMethods || [];
+      // Convert Firebase Auth provider IDs to our format
+      // Firebase returns: 'password', 'google.com', etc.
       return { 
         success: true, 
-        authMethods: authMethods.map(m => m.providerId),
-        user 
+        authMethods: signInMethods,
+        user: null // We don't have user data yet (not authenticated)
       };
     } catch (error) {
       logError('Error getting auth methods for email:', error);
+      
+      // Handle specific Firebase Auth errors
+      if (error.code === 'auth/invalid-email') {
+        return { success: false, error: 'Invalid email address' };
+      }
+      
       // Return generic error - don't expose permission details
       return { success: false, error: 'Unable to check account. Please try again.' };
     }
