@@ -4,16 +4,6 @@
   "framework": null,
   "devCommand": null,
   "installCommand": "npm install",
-  "crons": [
-    {
-      "path": "/api/cron/weekly-reports",
-      "schedule": "30 12 * * *"
-    },
-    {
-      "path": "/api/cron/monthly-reports",
-      "schedule": "0 8 1 * *"
-    }
-  ],
   "headers": [
     {
       "source": "/(.*)",

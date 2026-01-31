@@ -84,7 +84,7 @@ class FlatGroupDetailPage {
           </p>
           <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
             <button onclick="navigator.clipboard.writeText(window.location.href).then(() => alert('Link copied! Now paste it in your browser.'))" class="btn btn-primary">Copy Link</button>
-            <a href="trip-groups.html" class="btn btn-outline">Go to Trips</a>
+            <a href="flat-groups.html" class="btn btn-outline">Go to Flats</a>
           </div>
         </div>
       `;
@@ -124,7 +124,7 @@ class FlatGroupDetailPage {
 
     // Add expense button (from quick actions and FAB)
     document.getElementById('quickAddExpenseBtn')?.addEventListener('click', () => this.toggleExpenseSection());
-    document.getElementById('tripFab')?.addEventListener('click', () => this.toggleExpenseSection());
+    document.getElementById('flatFab')?.addEventListener('click', () => this.toggleExpenseSection());
     document.getElementById('closeExpenseFormBtn')?.addEventListener('click', () => this.closeExpenseModal());
     document.getElementById('cancelExpenseBtn')?.addEventListener('click', () => this.closeExpenseModal());
     document.getElementById('expenseForm')?.addEventListener('submit', (e) => this.handleExpenseSubmit(e));
@@ -184,9 +184,9 @@ class FlatGroupDetailPage {
       if (!groupResult.success) {
         // Check if it's an access issue
         if (groupResult.error?.includes('permission') || groupResult.error?.includes('access')) {
-          this.showError('You don\'t have access to this trip. Please check your invitation link or contact the trip organizer.');
+          this.showError('You don\'t have access to this flat group. Please check your invitation link or contact the group organizer.');
         } else {
-          this.showError(`Failed to load trip: ${groupResult.error}`);
+          this.showError(`Failed to load flat group: ${groupResult.error}`);
         }
         return;
       }
@@ -197,7 +197,7 @@ class FlatGroupDetailPage {
       const isMember = await flatGroupsService.isGroupMember(this.groupId, this.currentUserId);
       
       if (!isMember) {
-        this.showError('You are not a member of this trip. Please check your invitation or contact the trip organizer.');
+        this.showError('You are not a member of this flat group. Please check your invitation or contact the group organizer.');
         return;
       }
       
@@ -244,7 +244,7 @@ class FlatGroupDetailPage {
       this.initializeKeyboardShortcuts();
     } catch (error) {
       console.error('Error loading group data:', error);
-      this.showError(`Failed to load trip details: ${error.message}`);
+      this.showError(`Failed to load flat group details: ${error.message}`);
     } finally {
       this.showLoading(false);
     }
@@ -258,7 +258,7 @@ class FlatGroupDetailPage {
           <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="color: #dc2626; margin-bottom: 1rem;">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
-          <h2 style="font-size: 1.5rem; font-weight: 600; color: #1f2937; margin-bottom: 0.5rem;">Unable to Load Trip</h2>
+          <h2 style="font-size: 1.5rem; font-weight: 600; color: #1f2937; margin-bottom: 0.5rem;">Unable to Load Flat Group</h2>
           <p style="color: #6b7280; margin-bottom: 1.5rem; max-width: 500px;">${message}</p>
           <div style="display: flex; gap: 1rem;">
             <a href="flat-groups.html" class="btn btn-primary">Back to Flats</a>
@@ -538,11 +538,11 @@ class FlatGroupDetailPage {
       }).join('');
     }
 
-    // Calculate trip statistics
+    // Calculate flat group statistics
     const expenseCount = this.expenses.length;
     const avgExpense = expenseCount > 0 ? totalExpenses / expenseCount : 0;
 
-    // Calculate trip duration for daily average
+    // Calculate monthly average based on flat duration
     let dailyAvg = 0;
     if (this.group.startDate && this.group.endDate) {
       const start = this.group.startDate.toDate ? this.group.startDate.toDate() : new Date(this.group.startDate);
@@ -1156,7 +1156,7 @@ class FlatGroupDetailPage {
    * Initialize Floating Action Button
    */
   initializeFAB() {
-    const fab = document.getElementById('tripFab');
+    const fab = document.getElementById('flatFab');
     if (!fab) return;
 
     // Click handler
