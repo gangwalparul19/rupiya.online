@@ -560,7 +560,7 @@
 }
 
 /* ============================================
-   MONTHLY SAVINGS TREND WIDGET
+   MONTHLY SAVINGS TREND WIDGET (WEEKLY)
    ============================================ */
 .monthly-savings-trend-widget {
   background: var(--white);
@@ -568,6 +568,8 @@
   border-radius: var(--border-radius-lg);
   padding: var(--spacing-lg);
   transition: all var(--transition-base);
+  display: flex;
+  flex-direction: column;
 }
 
 .monthly-savings-trend-widget:hover {
@@ -581,12 +583,15 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: var(--spacing-md);
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .monthly-savings-trend-title {
   font-size: var(--font-size-base);
   font-weight: 600;
   color: var(--text-primary);
+  white-space: nowrap;
 }
 
 .monthly-savings-trend-change {
@@ -595,6 +600,7 @@
   gap: 4px;
   font-size: var(--font-size-sm);
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .monthly-savings-trend-change.positive {
@@ -611,27 +617,42 @@
 
 .monthly-savings-trend-change .trend-arrow {
   font-size: var(--font-size-lg);
+  line-height: 1;
+}
+
+.monthly-savings-trend-change .trend-text {
+  font-size: var(--font-size-base);
+  font-weight: 700;
 }
 
 .monthly-savings-trend-chart {
   margin-bottom: var(--spacing-md);
   height: 80px;
+  position: relative;
+  width: 100%;
+}
+
+.monthly-savings-trend-chart canvas {
+  width: 100% !important;
+  height: 80px !important;
 }
 
 .monthly-savings-trend-details {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--spacing-md);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-sm);
+  width: 100%;
 }
 
 .savings-trend-detail {
   display: flex;
   flex-direction: column;
   align-items: center;
-  flex: 1;
+  justify-content: center;
   padding: var(--spacing-sm);
   background: var(--bg-secondary);
   border-radius: var(--border-radius);
+  min-height: 60px;
 }
 
 .savings-trend-detail .detail-label {
@@ -640,12 +661,97 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 4px;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .savings-trend-detail .detail-value {
   font-size: var(--font-size-base);
   font-weight: 600;
   color: var(--text-primary);
+  text-align: center;
+  word-break: break-word;
+}
+
+/* Mobile adjustments for Weekly Savings Trend */
+@media (max-width: 768px) {
+  .monthly-savings-trend-widget {
+    padding: 12px;
+  }
+  
+  .monthly-savings-trend-header {
+    margin-bottom: 10px;
+  }
+  
+  .monthly-savings-trend-title {
+    font-size: 14px;
+  }
+  
+  .monthly-savings-trend-change {
+    font-size: 12px;
+  }
+  
+  .monthly-savings-trend-chart {
+    height: 70px;
+    margin-bottom: 10px;
+  }
+  
+  .monthly-savings-trend-chart canvas {
+    height: 70px !important;
+  }
+  
+  .monthly-savings-trend-details {
+    gap: 6px;
+  }
+  
+  .savings-trend-detail {
+    padding: 8px 4px;
+    min-height: 50px;
+  }
+  
+  .savings-trend-detail .detail-label {
+    font-size: 9px;
+    margin-bottom: 2px;
+  }
+  
+  .savings-trend-detail .detail-value {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .monthly-savings-trend-widget {
+    padding: 10px;
+  }
+  
+  .monthly-savings-trend-title {
+    font-size: 13px;
+  }
+  
+  .monthly-savings-trend-change {
+    font-size: 11px;
+  }
+  
+  .monthly-savings-trend-chart {
+    height: 60px;
+  }
+  
+  .monthly-savings-trend-chart canvas {
+    height: 60px !important;
+  }
+  
+  .savings-trend-detail {
+    padding: 6px 3px;
+    min-height: 45px;
+  }
+  
+  .savings-trend-detail .detail-label {
+    font-size: 8px;
+  }
+  
+  .savings-trend-detail .detail-value {
+    font-size: 12px;
+  }
 }
 
 /* ============================================

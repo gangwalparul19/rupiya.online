@@ -80,19 +80,34 @@
       /* Savings Rate and Monthly Savings Trend - first row, 2 columns */
       .savings-rate-widget {
         grid-column: 1 / 2 !important;
+        grid-row: 1;
       }
       
       .monthly-savings-trend-widget {
         grid-column: 2 / 3 !important;
+        grid-row: 1;
+      }
+      
+      /* Remove inline mobile styles on desktop */
+      .widgets-row > * {
+        margin: 0 !important;
+        padding: var(--spacing-lg) !important;
+        border-radius: var(--border-radius-lg) !important;
+        border-left: 2px solid var(--primary-blue) !important;
+        border-right: 2px solid var(--primary-blue) !important;
+        width: auto !important;
+        max-width: none !important;
       }
       
       /* Top Categories and Upcoming Bills - second row, 2 columns */
       .top-categories-widget {
         grid-column: 1 / 2 !important;
+        grid-row: 2;
       }
       
       .upcoming-bills-widget {
         grid-column: 2 / 3 !important;
+        grid-row: 2;
       }
       
       /* Emergency Fund and Goal Progress - if exists */
@@ -643,7 +658,7 @@
         </div>
 
         <!-- Weekly Savings Trend Widget -->
-        <div class="monthly-savings-trend-widget" id="monthlySavingsTrendWidget" style="margin: 0 0 16px 0; padding: 16px; border-radius: 0; border-left: none; border-right: none; width: 100%; max-width: 100%; box-sizing: border-box;">
+        <div class="monthly-savings-trend-widget" id="monthlySavingsTrendWidget">
           <div class="monthly-savings-trend-header">
             <div class="monthly-savings-trend-title">📈 Weekly Savings Trend</div>
             <div class="monthly-savings-trend-change" id="savingsTrendChange">
@@ -652,7 +667,7 @@
             </div>
           </div>
           <div class="monthly-savings-trend-chart">
-            <canvas id="savingsTrendMiniChart" height="80"></canvas>
+            <canvas id="savingsTrendMiniChart"></canvas>
           </div>
           <div class="monthly-savings-trend-details">
             <div class="savings-trend-detail">
