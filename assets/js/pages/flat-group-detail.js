@@ -2,6 +2,7 @@
 import '../services/services-init.js'; // Initialize services first
 import flatGroupsService from '../services/flat-groups-service.js';
 import authService from '../services/auth-service.js';
+import confirmationModal from '../components/confirmation-modal.js';
 
 class FlatGroupDetailPage {
   constructor() {
@@ -168,7 +169,7 @@ class FlatGroupDetailPage {
       // Check if clicked element is a modal overlay
       if (e.target.classList.contains('modal-overlay')) {
         if (e.target.id === 'addExpenseModal') this.closeExpenseModal();
-        else if (e.target.id === 'settlementModal') this.closeSettlementModal();
+        else if (e.target.id === 'settlementModal') this.closeSettlementSection();
         else if (e.target.id === 'addMemberModal') this.closeMemberSection();
       }
     });
@@ -959,7 +960,7 @@ class FlatGroupDetailPage {
       }
 
       this.showToast('Settlement recorded!', 'success');
-      this.closeSettlementModal();
+      this.closeSettlementSection();
       await this.loadGroupData();
     } catch (error) {
       console.error('Error recording settlement:', error);
