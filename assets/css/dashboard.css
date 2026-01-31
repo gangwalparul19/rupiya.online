@@ -987,6 +987,9 @@
 .empty-state {
   text-align: center;
   padding: var(--spacing-2xl);
+  background: var(--white);
+  border-radius: var(--border-radius-lg);
+  margin: var(--spacing-lg) 0;
 }
 
 .empty-state-icon {
@@ -1006,6 +1009,16 @@
   font-size: var(--font-size-base);
   color: var(--text-secondary);
   margin-bottom: var(--spacing-lg);
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.empty-state-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 /* Mobile Responsive */
@@ -1321,6 +1334,13 @@
   /* PWA Install Banner Mobile Overrides */
   .pwa-install-banner-dashboard {
     padding: 1rem;
+    margin: 0 0 16px 0 !important;
+    border-radius: 0 !important;
+    border-left: none !important;
+    border-right: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
   
   .pwa-install-banner-dashboard .pwa-banner-content {
@@ -1507,6 +1527,65 @@
     width: 100%;
   }
   
+  /* Empty state mobile optimization */
+  .empty-state {
+    padding: var(--spacing-xl) var(--spacing-md);
+    margin: 0;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
+  
+  .empty-state-icon {
+    font-size: 48px;
+  }
+  
+  .empty-state-title {
+    font-size: var(--font-size-lg);
+  }
+  
+  .empty-state-text {
+    font-size: var(--font-size-sm);
+  }
+  
+  .empty-state-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .empty-state-actions .btn {
+    width: 100%;
+  }
+  
+  /* Spending alert mobile */
+  .spending-alert {
+    margin: 0 0 16px 0 !important;
+    padding: 12px 16px !important;
+    border-radius: 0 !important;
+    border-left: none !important;
+    border-right: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    flex-wrap: wrap;
+  }
+  
+  .spending-alert-icon {
+    font-size: 20px;
+  }
+  
+  .spending-alert-title {
+    font-size: var(--font-size-sm);
+  }
+  
+  .spending-alert-text {
+    font-size: var(--font-size-xs);
+  }
+  
+  .spending-alert-close {
+    font-size: 18px;
+  }
+  
   .charts-grid {
     grid-template-columns: 1fr;
     gap: var(--spacing-md);
@@ -1536,7 +1615,14 @@
   }
   
   .transactions-card {
-    padding: 12px;
+    margin: 0 0 16px 0 !important;
+    padding: 16px !important;
+    border-radius: 0 !important;
+    border-left: none !important;
+    border-right: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
   
   .transaction-item {
