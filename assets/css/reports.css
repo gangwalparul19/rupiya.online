@@ -87,6 +87,10 @@
   padding: 12px 24px;
   font-size: 16px;
   font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 /* Custom Range Modal */
@@ -246,10 +250,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-}
-
-.recent-reports h2 i {
-  color: var(--primary-color, #4F46E5);
+  font-size: 24px;
 }
 
 .reports-list {
@@ -352,9 +353,8 @@
   box-shadow: 0 4px 12px rgba(79, 70, 229, 0.1);
 }
 
-.feature-card i {
-  font-size: 36px;
-  color: var(--primary-color, #4F46E5);
+.feature-card span {
+  display: block;
   margin-bottom: 16px;
 }
 
@@ -406,12 +406,7 @@
   text-align: center;
   padding: 60px 20px;
   color: var(--text-secondary, #6b7280);
-}
-
-.empty-state i {
   font-size: 64px;
-  color: var(--text-tertiary, #9ca3af);
-  margin-bottom: 16px;
 }
 
 .empty-state p {

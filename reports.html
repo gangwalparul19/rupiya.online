@@ -3,37 +3,182 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Financial Reports - Rupiya</title>
+  
+  <!-- Primary Meta Tags -->
+  <title>Financial Reports - Generate Weekly & Monthly Reports | Rupiya</title>
+  <meta name="title" content="Financial Reports - Generate Weekly & Monthly Reports | Rupiya">
+  <meta name="description" content="Generate comprehensive financial reports with charts and insights. Download weekly and monthly reports in HTML or PDF format. Track income, expenses, budgets, and investments.">
+  <meta name="keywords" content="financial reports, expense reports, income reports, budget reports, financial summary, monthly report, weekly report">
+  <meta name="author" content="Rupiya">
+  <meta name="robots" content="index, follow">
+  <meta name="language" content="English">
+  <meta name="theme-color" content="#4A90E2">
+  
+  <!-- Content Security Policy -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.googleapis.com https://apis.google.com https://*.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com;
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com;
+    font-src 'self' https://fonts.gstatic.com;
+    img-src 'self' data: https: blob:;
+    connect-src 'self' 
+      https://rupiya.online
+      https://www.rupiya.online
+      https://*.googleapis.com 
+      https://apis.google.com
+      https://*.firebaseio.com 
+      https://*.cloudfunctions.net 
+      wss://*.firebaseio.com 
+      https://firestore.googleapis.com 
+      https://identitytoolkit.googleapis.com 
+      https://securetoken.googleapis.com 
+      https://nominatim.openstreetmap.org 
+      https://www.gstatic.com 
+      https://cdn.jsdelivr.net 
+      https://cdnjs.cloudflare.com
+      https://ipapi.co 
+      https://source.unsplash.com 
+      https://api.frankfurter.app 
+      https://docs.google.com 
+      https://sheets.googleapis.com;
+    frame-src 'self' https://*.google.com https://*.firebaseapp.com blob:;
+    object-src 'none';
+    base-uri 'self';
+  ">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://rupiya.online/reports.html">
+  <meta property="og:title" content="Financial Reports - Generate Reports">
+  <meta property="og:description" content="Generate comprehensive financial reports with charts and insights">
+  <meta property="og:image" content="https://rupiya.online/assets/images/og-image.png">
+  <meta property="og:site_name" content="Rupiya">
+  <meta property="og:locale" content="en_IN">
+  
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://rupiya.online/reports.html">
+  <meta property="twitter:title" content="Financial Reports">
+  <meta property="twitter:description" content="Generate comprehensive financial reports with charts and insights">
+  <meta property="twitter:image" content="https://rupiya.online/assets/images/og-image.png">
+  <meta property="twitter:site" content="@RupiyaApp">
+  
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://rupiya.online/reports.html">
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json">
   
   <!-- Favicon -->
-  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+  <link rel="icon" href="assets/images/logo.png" type="image/png">
+  <link rel="apple-touch-icon" href="/android-chrome-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
   
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
   
-  <!-- CSS Bundles -->
+  <!-- Stylesheets -->
   <link rel="stylesheet" href="assets/css/bundles/core.bundle.css">
   <link rel="stylesheet" href="assets/css/bundles/dashboard.bundle.css">
+  <link rel="stylesheet" href="assets/css/dashboard-common.css">
   <link rel="stylesheet" href="assets/css/reports.css">
   <link rel="stylesheet" href="assets/css/sidebar.css">
+  
+  <!-- Auth Guard -->
+  <script src="assets/js/utils/auth-guard.js"></script>
+  <script src="assets/js/utils/button-reset-fix.js"></script>
 </head>
 <body>
-  <!-- Mobile Header -->
-  <div id="mobileHeader"></div>
+  <div class="dashboard-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <img src="assets/images/logo.png" alt="Rupiya">
+        </div>
+        <button class="sidebar-toggle" id="sidebarClose">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
 
-  <!-- Sidebar -->
-  <div id="sidebar"></div>
-  <div id="sidebarOverlay"></div>
+      <nav class="sidebar-nav">
+        <!-- Navigation is dynamically generated by sidebar.js -->
+      </nav>
 
-  <!-- Main Content -->
-  <main class="main-content">
-    <!-- Breadcrumbs -->
-    <div id="breadcrumbs"></div>
+      <div class="sidebar-footer">
+        <div class="user-profile" id="userProfile">
+          <div class="user-avatar" id="userAvatar">U</div>
+          <div class="user-info">
+            <div class="user-name" id="userName">Loading...</div>
+            <div class="user-email" id="userEmail">Loading...</div>
+          </div>
+        </div>
+        
+        <!-- Buttons Container for Mobile Layout -->
+        <div class="sidebar-footer-buttons">
+          <!-- Sample Data Button -->
+          <a href="generate-sample-data.html" class="btn btn-sm btn-primary" id="sampleDataBtn" style="display: flex; align-items: center; justify-content: center; gap: 6px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+            Try Sample Data
+          </a>
+          
+          <button class="btn btn-sm btn-outline" id="logoutBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+            </svg>
+            Logout
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Sidebar Overlay (Mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Mobile Header -->
+      <div class="mobile-header">
+        <a href="dashboard.html" class="mobile-brand">
+          <img src="assets/images/logo.png" alt="Rupiya">
+        </a>
+        <div class="mobile-header-actions">
+          <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle theme">
+            <svg class="theme-icon-light" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <circle cx="12" cy="12" r="5"/>
+              <line x1="12" y1="1" x2="12" y2="3"/>
+              <line x1="12" y1="21" x2="12" y2="23"/>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+              <line x1="1" y1="12" x2="3" y2="12"/>
+              <line x1="21" y1="12" x2="23" y2="12"/>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+            </svg>
+            <svg class="theme-icon-dark" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="display: none;">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
+          </button>
+          <button class="sidebar-toggle" id="sidebarOpen">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Breadcrumbs -->
+      <div id="breadcrumbs"></div>
 
     <div class="page-header">
       <div class="page-title">
-        <i class="fas fa-file-chart-line"></i>
+        <span style="font-size: 32px;">📊</span>
         <h1>Financial Reports</h1>
       </div>
       <p class="page-description">Generate and download comprehensive financial reports with charts and insights</p>
@@ -44,36 +189,36 @@
       <div class="report-type-cards">
         <div class="report-type-card" data-type="weekly">
           <div class="report-icon">
-            <i class="fas fa-calendar-week"></i>
+            📅
           </div>
           <h3>Weekly Report</h3>
           <p>Last 7 days financial summary with daily trends and category breakdown</p>
           <button class="btn btn-primary generate-btn" data-type="weekly">
-            <i class="fas fa-chart-line"></i>
+            📈
             Generate Weekly Report
           </button>
         </div>
 
         <div class="report-type-card" data-type="monthly">
           <div class="report-icon">
-            <i class="fas fa-calendar-alt"></i>
+            📅
           </div>
           <h3>Monthly Report</h3>
           <p>Complete monthly analysis with budget comparison and spending patterns</p>
           <button class="btn btn-primary generate-btn" data-type="monthly">
-            <i class="fas fa-chart-pie"></i>
+            📊
             Generate Monthly Report
           </button>
         </div>
 
         <div class="report-type-card" data-type="custom">
           <div class="report-icon">
-            <i class="fas fa-calendar-days"></i>
+            📅
           </div>
           <h3>Custom Range</h3>
           <p>Select your own date range for a personalized financial report</p>
           <button class="btn btn-primary" id="customRangeBtn">
-            <i class="fas fa-sliders"></i>
+            ⚙️
             Custom Date Range
           </button>
         </div>
@@ -86,7 +231,7 @@
         <div class="modal-header">
           <h2>Custom Date Range</h2>
           <button class="modal-close" id="closeCustomRange">
-            <i class="fas fa-times"></i>
+            ✕
           </button>
         </div>
         <div class="modal-body">
@@ -102,7 +247,7 @@
         <div class="modal-footer">
           <button class="btn btn-secondary" id="cancelCustomRange">Cancel</button>
           <button class="btn btn-primary" id="generateCustomReport">
-            <i class="fas fa-chart-line"></i>
+            📈
             Generate Report
           </button>
         </div>
@@ -115,15 +260,15 @@
         <h2>Report Preview</h2>
         <div class="preview-actions">
           <button class="btn btn-secondary" id="downloadHTML">
-            <i class="fas fa-file-code"></i>
+            📄
             Download HTML
           </button>
           <button class="btn btn-primary" id="downloadPDF">
-            <i class="fas fa-file-pdf"></i>
+            📑
             Download PDF
           </button>
           <button class="btn btn-ghost" id="closePreview">
-            <i class="fas fa-times"></i>
+            ✕
           </button>
         </div>
       </div>
@@ -135,12 +280,12 @@
     <!-- Recent Reports -->
     <div class="recent-reports">
       <h2>
-        <i class="fas fa-history"></i>
+        🕐
         Recent Reports
       </h2>
       <div id="recentReportsList" class="reports-list">
         <div class="empty-state">
-          <i class="fas fa-file-chart-line"></i>
+          📊
           <p>No reports generated yet</p>
           <p class="subtext">Generate your first report to see it here</p>
         </div>
@@ -152,32 +297,32 @@
       <h2>What's Included in Your Reports</h2>
       <div class="features-grid">
         <div class="feature-card">
-          <i class="fas fa-chart-pie"></i>
+          <span style="font-size: 36px;">📊</span>
           <h3>Category Breakdown</h3>
           <p>Visual pie charts showing spending distribution across categories</p>
         </div>
         <div class="feature-card">
-          <i class="fas fa-chart-line"></i>
+          <span style="font-size: 36px;">📈</span>
           <h3>Daily Trends</h3>
           <p>Line graphs tracking your daily spending patterns</p>
         </div>
         <div class="feature-card">
-          <i class="fas fa-bullseye"></i>
+          <span style="font-size: 36px;">🎯</span>
           <h3>Budget Performance</h3>
           <p>Compare actual spending against your budgets</p>
         </div>
         <div class="feature-card">
-          <i class="fas fa-trophy"></i>
+          <span style="font-size: 36px;">🏆</span>
           <h3>Top Expenses</h3>
           <p>Identify your largest transactions and spending areas</p>
         </div>
         <div class="feature-card">
-          <i class="fas fa-coins"></i>
+          <span style="font-size: 36px;">💰</span>
           <h3>Income Analysis</h3>
           <p>Breakdown of income sources with visual charts</p>
         </div>
         <div class="feature-card">
-          <i class="fas fa-chart-area"></i>
+          <span style="font-size: 36px;">📈</span>
           <h3>Investment Summary</h3>
           <p>Track your investment performance and returns</p>
         </div>
@@ -188,7 +333,11 @@
   <!-- Loading Overlay -->
   <div id="loadingOverlay" class="loading-overlay" style="display: none;">
     <div class="loading-spinner">
-      <i class="fas fa-spinner fa-spin"></i>
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-dashoffset="0">
+          <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite"/>
+        </circle>
+      </svg>
       <p>Generating your report...</p>
     </div>
   </div>
