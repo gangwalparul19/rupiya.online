@@ -314,13 +314,20 @@ class ReportGeneratorService {
     .progress-bar { height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden; margin-top: 8px; }
     .progress-fill { height: 100%; background: #4f46e5; transition: width 0.3s; }
     .footer { text-align: center; margin-top: 40px; padding: 20px; color: #6b7280; font-size: 14px; }
-    @media print { body { background: white; } .container { padding: 20px; } }
+    @media print { 
+      body { background: white; padding: 0; } 
+      .report-wrapper { border: none; box-shadow: none; }
+      .container { padding: 20px; } 
+      .section { page-break-inside: avoid; }
+      .summary-card { page-break-inside: avoid; }
+      .chart-container { page-break-inside: avoid; }
+    }
   </style>
 </head>
 <body>
   <div class="report-wrapper">
     <div class="logo">
-      <img src="https://rupiya.online/assets/images/logo.png" alt="Rupiya Logo" style="max-width: 150px; height: auto;" onerror="this.style.display='none'">
+      <img src="https://www.rupiya.online/assets/images/logo.png" alt="Rupiya Logo" style="max-width: 150px; height: auto;" onerror="this.style.display='none'" crossorigin="anonymous">
     </div>
     <div class="container">
       <div class="header">
@@ -647,7 +654,8 @@ class ReportGeneratorService {
       iframe.style.position = 'absolute';
       iframe.style.left = '-9999px';
       iframe.style.width = '1200px';
-      iframe.style.height = '2000px';
+      iframe.style.height = '3000px';
+      iframe.style.border = 'none';
       document.body.appendChild(iframe);
 
       // Write HTML to iframe
@@ -658,31 +666,42 @@ class ReportGeneratorService {
       // Wait for iframe to load and charts to render
       await new Promise((resolve) => {
         iframe.onload = () => {
-          setTimeout(resolve, 4000); // Increased wait time for charts
+          setTimeout(resolve, 5000); // Increased wait time for charts and images
         };
       });
 
-      // Generate PDF from iframe content
+      // Get the report wrapper element for better formatting
+      const reportElement = iframe.contentDocument.querySelector('.report-wrapper') || iframe.contentDocument.body;
+
+      // Generate PDF with better options
       const opt = {
-        margin: [10, 10, 10, 10],
+        margin: [5, 5, 5, 5],
         filename: `${data.type}-report-${data.period.start.toISOString().split('T')[0]}.pdf`,
-        image: { type: 'jpeg', quality: 0.95 },
+        image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { 
-          scale: 2, 
-          useCORS: true, 
-          logging: true,
+          scale: 2,
+          useCORS: true,
+          logging: false,
           windowWidth: 1200,
-          windowHeight: iframe.contentDocument.body.scrollHeight
+          windowHeight: reportElement.scrollHeight,
+          backgroundColor: '#ffffff',
+          imageTimeout: 15000,
+          removeContainer: false
         },
         jsPDF: { 
           unit: 'mm', 
           format: 'a4', 
-          orientation: 'portrait'
+          orientation: 'portrait',
+          compress: true
         },
-        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+        pagebreak: { 
+          mode: ['avoid-all', 'css', 'legacy'],
+          before: '.section',
+          avoid: ['.summary-card', '.chart-container', 'table']
+        }
       };
 
-      await window.html2pdf().set(opt).from(iframe.contentDocument.body).save();
+      await window.html2pdf().set(opt).from(reportElement).save();
       
       // Cleanup
       document.body.removeChild(iframe);
