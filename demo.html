@@ -153,7 +153,7 @@
     
     .demo-stats {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 1.5rem;
       margin-bottom: 3rem;
     }
@@ -398,7 +398,7 @@
       
       /* Keep 3 columns for tablets */
       .demo-stats {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(2, 1fr);
         gap: 1rem;
       }
       
@@ -520,7 +520,7 @@
       
       /* Keep 3 columns for mobile */
       .demo-stats {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(2, 1fr);
         gap: 0.5rem;
       }
       
@@ -910,6 +910,11 @@
         <div class="demo-stat-value savings">₹32,660</div>
         <div class="demo-stat-label">Net Savings</div>
       </div>
+      <div class="demo-stat-card">
+        <div class="demo-stat-icon">📈</div>
+        <div class="demo-stat-value rate" style="color: #10b981;">38%</div>
+        <div class="demo-stat-label">Savings Rate</div>
+      </div>
     </div>
 
     <!-- Main Sections -->
@@ -1244,6 +1249,81 @@
         </ul>
       </div>
 
+      <!-- Flat Groups - NEW FEATURE -->
+      <div class="demo-section" style="background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%); border: 2px solid #fecaca; position: relative; overflow: hidden;">
+        <div style="position: absolute; top: 10px; right: 10px; background: linear-gradient(135deg, #ef4444, #dc2626); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);">🆕 NEW</div>
+        <div class="demo-section-header">
+          <span class="demo-section-icon">🏠</span>
+          <h3 class="demo-section-title">Flat Groups - Split Rent & Bills</h3>
+        </div>
+        <p style="color: #64748b; margin-bottom: 1rem; font-size: 0.95rem;">Perfect for bachelors! Split rent, utilities, and groceries with flatmates.</p>
+        <ul class="demo-list">
+          <li class="demo-list-item">
+            <div class="demo-item-info">
+              <div class="demo-item-icon" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">🏠</div>
+              <div class="demo-item-details">
+                <h4>A16-1103 Flat Group</h4>
+                <span>3 flatmates • Whitefield</span>
+              </div>
+            </div>
+            <span class="demo-item-amount" style="color: #3b82f6;">Active</span>
+          </li>
+          <li class="demo-list-item">
+            <div class="demo-item-info">
+              <div class="demo-item-icon" style="background: linear-gradient(135deg, #10b981, #059669);">💰</div>
+              <div class="demo-item-details">
+                <h4>Your Balance</h4>
+                <span>You get back from flatmates</span>
+              </div>
+            </div>
+            <span class="demo-item-amount" style="color: #10b981;">+₹1,933</span>
+          </li>
+          <li class="demo-list-item">
+            <div class="demo-item-info">
+              <div class="demo-item-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">⚡</div>
+              <div class="demo-item-details">
+                <h4>Electricity Bill</h4>
+                <span>Split equally • Paid by you</span>
+              </div>
+            </div>
+            <span class="demo-item-amount" style="color: #f59e0b;">₹2,000</span>
+          </li>
+          <li class="demo-list-item">
+            <div class="demo-item-info">
+              <div class="demo-item-icon" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">🛒</div>
+              <div class="demo-item-details">
+                <h4>Groceries</h4>
+                <span>Split equally • Paid by Avi</span>
+              </div>
+            </div>
+            <span class="demo-item-amount" style="color: #8b5cf6;">₹1,000</span>
+          </li>
+          <li class="demo-list-item">
+            <div class="demo-item-info">
+              <div class="demo-item-icon" style="background: linear-gradient(135deg, #ec4899, #db2777);">📡</div>
+              <div class="demo-item-details">
+                <h4>Internet Bill</h4>
+                <span>Split equally • Paid by Kukku</span>
+              </div>
+            </div>
+            <span class="demo-item-amount" style="color: #ec4899;">₹500</span>
+          </li>
+        </ul>
+        <div class="demo-emi-summary">
+          <div class="demo-emi-stat" style="background: linear-gradient(135deg, #f0fdf4, #dcfce7); border-color: #86efac;">
+            <span class="demo-emi-label">Monthly Rent</span>
+            <span class="demo-emi-value" style="color: #10b981;">₹25,000</span>
+          </div>
+          <div class="demo-emi-stat" style="background: linear-gradient(135deg, #fef3c7, #fde68a); border-color: #fcd34d;">
+            <span class="demo-emi-label">Your Share</span>
+            <span class="demo-emi-value" style="color: #f59e0b;">₹8,333</span>
+          </div>
+        </div>
+        <div style="margin-top: 1rem; padding: 1rem; background: linear-gradient(135deg, #eff6ff, #dbeafe); border-radius: 10px; border: 1px solid #93c5fd;">
+          <p style="margin: 0; color: #1e40af; font-size: 0.9rem; font-weight: 600;">💡 Pro Tip: Automatic balance calculation prevents flatmate conflicts!</p>
+        </div>
+      </div>
+
       <!-- House Help -->
       <div class="demo-section">
         <div class="demo-section-header">
@@ -1297,7 +1377,8 @@
 
     <!-- Features CTA -->
     <div class="demo-features">
-      <h2>✨ What You Can Do With Rupiya</h2>
+      <h2>✨ 24 Powerful Features to Master Your Money</h2>
+      <p style="color: rgba(255,255,255,0.9); font-size: 1.1rem; margin-bottom: 2rem;">Everything you need for complete financial control</p>
       <div class="demo-features-grid">
         <div class="demo-feature">
           <div class="demo-feature-icon">📊</div>
@@ -1305,7 +1386,7 @@
         </div>
         <div class="demo-feature">
           <div class="demo-feature-icon">💳</div>
-          <div class="demo-feature-text">Manage Payment Methods</div>
+          <div class="demo-feature-text">Credit Card Management</div>
         </div>
         <div class="demo-feature">
           <div class="demo-feature-icon">🎯</div>
@@ -1317,7 +1398,11 @@
         </div>
         <div class="demo-feature">
           <div class="demo-feature-icon">🏠</div>
-          <div class="demo-feature-text">Manage Properties</div>
+          <div class="demo-feature-text">Flat Groups - Split Bills</div>
+        </div>
+        <div class="demo-feature">
+          <div class="demo-feature-icon">✈️</div>
+          <div class="demo-feature-text">Trip Expense Sharing</div>
         </div>
         <div class="demo-feature">
           <div class="demo-feature-icon">🚗</div>
@@ -1333,24 +1418,24 @@
         </div>
         <div class="demo-feature">
           <div class="demo-feature-icon">📈</div>
-          <div class="demo-feature-text">Track Investments</div>
+          <div class="demo-feature-text">Investment Tracking</div>
         </div>
         <div class="demo-feature">
-          <div class="demo-feature-icon">🤝</div>
-          <div class="demo-feature-text">Split Bills</div>
-        </div>
-        <div class="demo-feature">
-          <div class="demo-feature-icon">💳</div>
-          <div class="demo-feature-text">Credit Cards</div>
+          <div class="demo-feature-icon">🏥</div>
+          <div class="demo-feature-text">Healthcare & Insurance</div>
         </div>
         <div class="demo-feature">
           <div class="demo-feature-icon">📱</div>
-          <div class="demo-feature-text">Works Offline</div>
+          <div class="demo-feature-text">Works Offline (PWA)</div>
         </div>
       </div>
-      <div class="demo-cta-buttons">
-        <a href="signup.html" class="btn-primary">Create Account</a>
+      <div style="background: rgba(255,255,255,0.15); padding: 1.5rem; border-radius: 12px; margin: 2rem 0; border: 1px solid rgba(255,255,255,0.2);">
+        <p style="color: white; font-size: 1.1rem; margin: 0; font-weight: 600;">🔒 100% Free • Bank-Level Security • No Ads • Your Data Stays Private</p>
       </div>
+      <div class="demo-cta-buttons">
+        <a href="signup.html" class="btn-primary" style="font-size: 1.2rem; padding: 1.25rem 3rem;">🚀 Start Free - No Credit Card Required</a>
+      </div>
+      <p style="color: rgba(255,255,255,0.8); margin-top: 1rem; font-size: 0.95rem;">Join 10,000+ Indians managing their money smarter</p>
     </div>
   </div>
 
