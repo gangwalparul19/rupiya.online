@@ -4,6 +4,7 @@
  */
 
 import firestoreService from './firestore-service.js';
+import authService from './auth-service.js';
 import analyticsService from './analytics-service.js';
 import dataAggregationService from './data-aggregation-service.js';
 import { formatCurrency } from '../utils/helpers.js';
@@ -34,7 +35,10 @@ class ReportGeneratorService {
     try {
       logger.info(`Generating ${type} report from ${startDate} to ${endDate}`);
 
-      const userId = firestoreService.getCurrentUserId();
+      const userId = authService.getCurrentUser()?.uid;
+      if (!userId) {
+        throw new Error('User not authenticated');
+      }
       
       // Fetch all necessary data in parallel
       const [expenses, income, budgets, investments, goals] = await Promise.all([
