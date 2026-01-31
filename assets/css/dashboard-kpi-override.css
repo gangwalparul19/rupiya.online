@@ -432,6 +432,7 @@
   }
 
   .savings-rate-widget,
+  .monthly-savings-trend-widget,
   .goal-progress-widget,
   .top-categories-widget,
   .upcoming-bills-widget {
@@ -516,6 +517,7 @@
   .widgets-row > *,
   .widgets-row [class*="-widget"],
   .savings-rate-widget,
+  .monthly-savings-trend-widget,
   .goal-progress-widget,
   .top-categories-widget,
   .upcoming-bills-widget,
@@ -533,6 +535,7 @@
   }
 
   .savings-rate-widget,
+  .monthly-savings-trend-widget,
   .goal-progress-widget,
   .top-categories-widget,
   .upcoming-bills-widget {

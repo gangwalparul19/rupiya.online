@@ -293,6 +293,9 @@ async function loadDashboardData() {
     // Update Savings Rate Widget
     updateSavingsRateWidget(currentMonthIncome, currentMonthExpenses, cashFlow, savingsRate);
     
+    // Load Monthly Savings Trend Widget
+    await loadMonthlySavingsTrendWidget(expenses, income);
+    
     // Check for spending alerts
     checkSpendingAlerts(currentMonthExpenses, lastMonthExpenses);
     
@@ -621,6 +624,189 @@ function updateSavingsRateWidget(income, expenses, saved, rate) {
   } else {
     tipEl.textContent = '⚠️ Try to reduce expenses to start saving';
   }
+}
+
+// Load Weekly Savings Trend Widget
+async function loadMonthlySavingsTrendWidget(expenses, income) {
+  const changeEl = document.getElementById('savingsTrendChange');
+  const currentWeekEl = document.getElementById('currentMonthSavings');
+  const lastWeekEl = document.getElementById('lastMonthSavings');
+  const avgEl = document.getElementById('avgSavings');
+  const chartCanvas = document.getElementById('savingsTrendMiniChart');
+  
+  if (!changeEl || !chartCanvas) return;
+  
+  // Calculate savings for last 8 weeks
+  const now = new Date();
+  const weeklyData = [];
+  
+  // Helper function to get week start (Monday) and end (Sunday)
+  function getWeekRange(date) {
+    const d = new Date(date);
+    const day = d.getDay();
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Adjust when day is Sunday
+    const monday = new Date(d.setDate(diff));
+    monday.setHours(0, 0, 0, 0);
+    
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+    sunday.setHours(23, 59, 59, 999);
+    
+    return { start: monday, end: sunday };
+  }
+  
+  // Get week label (e.g., "W1", "W2", etc. or "Jan 1-7")
+  function getWeekLabel(weekStart, index) {
+    if (index === 7) return 'This Week';
+    if (index === 6) return 'Last Week';
+    const month = weekStart.toLocaleDateString('en-US', { month: 'short' });
+    const day = weekStart.getDate();
+    return `${month} ${day}`;
+  }
+  
+  for (let i = 7; i >= 0; i--) {
+    const weekDate = new Date(now);
+    weekDate.setDate(now.getDate() - (i * 7));
+    
+    const { start: weekStart, end: weekEnd } = getWeekRange(weekDate);
+    
+    // Calculate income for this week
+    const weekIncome = income
+      .filter(item => {
+        const itemDate = item.date.toDate ? item.date.toDate() : new Date(item.date);
+        return itemDate >= weekStart && itemDate <= weekEnd;
+      })
+      .reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
+    
+    // Calculate expenses for this week
+    const weekExpenses = expenses
+      .filter(item => {
+        const itemDate = item.date.toDate ? item.date.toDate() : new Date(item.date);
+        return itemDate >= weekStart && itemDate <= weekEnd;
+      })
+      .reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
+    
+    const savings = weekIncome - weekExpenses;
+    
+    weeklyData.push({
+      week: getWeekLabel(weekStart, i),
+      savings: savings,
+      weekStart: weekStart
+    });
+  }
+  
+  // Get current week, last week, and 4-week average
+  const currentWeekSavings = weeklyData[7]?.savings || 0;
+  const lastWeekSavings = weeklyData[6]?.savings || 0;
+  const last4WeeksAvg = weeklyData.slice(4, 8).reduce((sum, w) => sum + w.savings, 0) / 4;
+  
+  // Calculate change percentage
+  let changePercent = 0;
+  let changeDirection = 'neutral';
+  let changeArrow = '→';
+  
+  if (lastWeekSavings !== 0) {
+    changePercent = ((currentWeekSavings - lastWeekSavings) / Math.abs(lastWeekSavings)) * 100;
+    if (changePercent > 0) {
+      changeDirection = 'positive';
+      changeArrow = '↑';
+    } else if (changePercent < 0) {
+      changeDirection = 'negative';
+      changeArrow = '↓';
+    }
+  } else if (currentWeekSavings > 0) {
+    changeDirection = 'positive';
+    changeArrow = '↑';
+    changePercent = 100;
+  } else if (currentWeekSavings < 0) {
+    changeDirection = 'negative';
+    changeArrow = '↓';
+    changePercent = 100;
+  }
+  
+  // Update UI
+  changeEl.className = `monthly-savings-trend-change ${changeDirection}`;
+  changeEl.innerHTML = `
+    <span class="trend-arrow">${changeArrow}</span>
+    <span class="trend-text">${Math.abs(changePercent).toFixed(0)}%</span>
+  `;
+  
+  currentWeekEl.textContent = formatCurrencyCompact(currentWeekSavings);
+  lastWeekEl.textContent = formatCurrencyCompact(lastWeekSavings);
+  avgEl.textContent = formatCurrencyCompact(last4WeeksAvg);
+  
+  // Create mini chart
+  const ctx = chartCanvas.getContext('2d');
+  
+  // Destroy existing chart if it exists
+  if (window.savingsTrendChart) {
+    window.savingsTrendChart.destroy();
+  }
+  
+  window.savingsTrendChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: weeklyData.map(w => w.week),
+      datasets: [{
+        label: 'Savings',
+        data: weeklyData.map(w => w.savings),
+        borderColor: currentWeekSavings >= 0 ? '#4ade80' : '#f87171',
+        backgroundColor: currentWeekSavings >= 0 ? 'rgba(74, 222, 128, 0.1)' : 'rgba(248, 113, 113, 0.1)',
+        borderWidth: 2,
+        fill: true,
+        tension: 0.4,
+        pointRadius: 3,
+        pointHoverRadius: 5,
+        pointBackgroundColor: '#fff',
+        pointBorderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return formatCurrency(context.parsed.y);
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          display: true,
+          grid: {
+            display: false
+          },
+          ticks: {
+            font: {
+              size: 10
+            },
+            maxRotation: 45,
+            minRotation: 0
+          }
+        },
+        y: {
+          display: true,
+          grid: {
+            color: 'rgba(0, 0, 0, 0.05)'
+          },
+          ticks: {
+            font: {
+              size: 10
+            },
+            callback: function(value) {
+              return formatCurrencyCompact(value);
+            }
+          }
+        }
+      }
+    }
+  });
 }
 
 // Load recent transactions

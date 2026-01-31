@@ -77,17 +77,17 @@
         margin-bottom: 1.5rem !important;
       }
       
-      /* Savings Rate and Top Categories - first row, 2 columns */
+      /* Savings Rate and Monthly Savings Trend - first row, 2 columns */
       .savings-rate-widget {
         grid-column: 1 / 2 !important;
       }
       
-      .top-categories-widget {
+      .monthly-savings-trend-widget {
         grid-column: 2 / 3 !important;
       }
       
-      /* Emergency Fund and Upcoming Bills - second row, 2 columns */
-      .emergency-fund-widget {
+      /* Top Categories and Upcoming Bills - second row, 2 columns */
+      .top-categories-widget {
         grid-column: 1 / 2 !important;
       }
       
@@ -95,9 +95,13 @@
         grid-column: 2 / 3 !important;
       }
       
-      /* Goal Progress - if exists, spans full width or shares row */
-      .goal-progress-widget {
+      /* Emergency Fund and Goal Progress - if exists */
+      .emergency-fund-widget {
         grid-column: 1 / 2 !important;
+      }
+      
+      .goal-progress-widget {
+        grid-column: 2 / 3 !important;
       }
       
       /* Charts Grid - 2 columns on desktop */
@@ -635,6 +639,34 @@
           <div class="goal-progress-details">
             <span id="goalCurrent">₹0</span>
             <span id="goalTarget">of ₹0</span>
+          </div>
+        </div>
+
+        <!-- Weekly Savings Trend Widget -->
+        <div class="monthly-savings-trend-widget" id="monthlySavingsTrendWidget" style="margin: 0 0 16px 0; padding: 16px; border-radius: 0; border-left: none; border-right: none; width: 100%; max-width: 100%; box-sizing: border-box;">
+          <div class="monthly-savings-trend-header">
+            <div class="monthly-savings-trend-title">📈 Weekly Savings Trend</div>
+            <div class="monthly-savings-trend-change" id="savingsTrendChange">
+              <span class="trend-arrow">↑</span>
+              <span class="trend-text">0%</span>
+            </div>
+          </div>
+          <div class="monthly-savings-trend-chart">
+            <canvas id="savingsTrendMiniChart" height="80"></canvas>
+          </div>
+          <div class="monthly-savings-trend-details">
+            <div class="savings-trend-detail">
+              <span class="detail-label">This Week</span>
+              <span class="detail-value" id="currentMonthSavings">₹0</span>
+            </div>
+            <div class="savings-trend-detail">
+              <span class="detail-label">Last Week</span>
+              <span class="detail-value" id="lastMonthSavings">₹0</span>
+            </div>
+            <div class="savings-trend-detail">
+              <span class="detail-label">Avg (4W)</span>
+              <span class="detail-value" id="avgSavings">₹0</span>
+            </div>
           </div>
         </div>
 

@@ -560,6 +560,95 @@
 }
 
 /* ============================================
+   MONTHLY SAVINGS TREND WIDGET
+   ============================================ */
+.monthly-savings-trend-widget {
+  background: var(--white);
+  border: 2px solid var(--primary-blue);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  transition: all var(--transition-base);
+}
+
+.monthly-savings-trend-widget:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+  border-color: var(--accent-cyan);
+}
+
+.monthly-savings-trend-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-md);
+}
+
+.monthly-savings-trend-title {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.monthly-savings-trend-change {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.monthly-savings-trend-change.positive {
+  color: var(--accent-green);
+}
+
+.monthly-savings-trend-change.negative {
+  color: var(--accent-red);
+}
+
+.monthly-savings-trend-change.neutral {
+  color: var(--text-secondary);
+}
+
+.monthly-savings-trend-change .trend-arrow {
+  font-size: var(--font-size-lg);
+}
+
+.monthly-savings-trend-chart {
+  margin-bottom: var(--spacing-md);
+  height: 80px;
+}
+
+.monthly-savings-trend-details {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+}
+
+.savings-trend-detail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  padding: var(--spacing-sm);
+  background: var(--bg-secondary);
+  border-radius: var(--border-radius);
+}
+
+.savings-trend-detail .detail-label {
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.savings-trend-detail .detail-value {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* ============================================
    GOAL PROGRESS WIDGET
    ============================================ */
 .goal-progress-widget {

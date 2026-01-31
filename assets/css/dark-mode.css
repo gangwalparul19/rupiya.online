@@ -271,6 +271,7 @@ textarea,
 
 /* Dashboard Widgets Dark Mode */
 [data-theme="dark"] .savings-rate-widget,
+[data-theme="dark"] .monthly-savings-trend-widget,
 [data-theme="dark"] .goal-progress-widget,
 [data-theme="dark"] .top-categories-widget,
 [data-theme="dark"] .upcoming-bills-widget,
@@ -280,6 +281,7 @@ textarea,
 }
 
 [data-theme="dark"] .savings-rate-widget:hover,
+[data-theme="dark"] .monthly-savings-trend-widget:hover,
 [data-theme="dark"] .goal-progress-widget:hover,
 [data-theme="dark"] .top-categories-widget:hover,
 [data-theme="dark"] .upcoming-bills-widget:hover {
@@ -292,7 +294,8 @@ textarea,
   background: var(--bg-hover);
 }
 
-[data-theme="dark"] .savings-detail {
+[data-theme="dark"] .savings-detail,
+[data-theme="dark"] .savings-trend-detail {
   background: var(--bg-hover);
 }
 
