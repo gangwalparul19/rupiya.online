@@ -466,7 +466,6 @@ function setupEventListeners() {
   if (addSavingBtn) {
     addSavingBtn.addEventListener('click', (e) => {
       e.preventDefault();
-      console.log('Add Saving button clicked');
       showAddForm();
     });
   }
@@ -519,8 +518,6 @@ function setupEventListeners() {
 
 // Show add form
 function showAddForm() {
-  console.log('showAddForm called');
-  console.log('addSavingSection:', addSavingSection);
   
   if (!addSavingSection) {
     console.error('addSavingSection element not found');
@@ -537,9 +534,7 @@ function showAddForm() {
   // Remove display: none and add show class
   addSavingSection.style.display = 'block';
   addSavingSection.classList.add('show');
-  
-  console.log('Form should be visible now');
-  
+    
   // Scroll to form
   setTimeout(() => {
     addSavingSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -698,8 +693,6 @@ async function handleSubmit(e) {
 
 // Show delete confirmation
 function showDeleteConfirmation(savingId) {
-  console.log('showDeleteConfirmation called with ID:', savingId);
-  console.log('deleteModal element:', deleteModal);
   
   const saving = state.savings.find(s => s.id === savingId);
   if (!saving) {
@@ -720,8 +713,6 @@ function showDeleteConfirmation(savingId) {
   // Remove inline style and add show class
   deleteModal.removeAttribute('style');
   deleteModal.classList.add('show');
-  
-  console.log('Modal should be visible now');
 }
 
 // Hide delete modal

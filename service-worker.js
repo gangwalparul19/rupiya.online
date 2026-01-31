@@ -2,7 +2,7 @@
 // Provides offline support and caching
 
 // CACHE_VERSION is injected by build.js during deployment
-const CACHE_VERSION = '1.2.400';
+const CACHE_VERSION = '1.2.401';
 const CACHE_NAME = `rupiya-v${CACHE_VERSION}`;
 const RUNTIME_CACHE = `rupiya-runtime-v${CACHE_VERSION}`;
 
@@ -402,7 +402,6 @@ async function updateCache(request) {
 
 // Background sync for offline actions
 self.addEventListener('sync', (event) => {
-  console.log('[Service Worker] Background sync triggered:', event.tag);
   
   if (event.tag === 'rupiya-sync') {
     event.waitUntil(syncPendingOperations());
@@ -412,17 +411,13 @@ self.addEventListener('sync', (event) => {
 // Sync pending operations when back online
 async function syncPendingOperations() {
   try {
-    console.log('[Service Worker] Starting sync...');
     
     // Get sync queue from IndexedDB or localStorage
     const syncQueue = await getSyncQueue();
     
     if (!syncQueue || syncQueue.length === 0) {
-      console.log('[Service Worker] No pending operations to sync');
       return;
     }
-
-    console.log(`[Service Worker] Syncing ${syncQueue.length} operations`);
 
     const results = {
       success: [],
@@ -453,7 +448,6 @@ async function syncPendingOperations() {
       });
     });
 
-    console.log(`[Service Worker] Sync complete: ${results.success.length} succeeded, ${results.failed.length} failed`);
   } catch (error) {
     console.error('[Service Worker] Sync failed:', error);
     
