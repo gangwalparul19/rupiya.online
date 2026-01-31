@@ -629,8 +629,18 @@ class ReportGeneratorService {
         await this.loadHtml2PdfLibrary();
       }
 
+      // Ensure dates are Date objects
+      const data = {
+        ...reportData,
+        period: {
+          ...reportData.period,
+          start: reportData.period.start instanceof Date ? reportData.period.start : new Date(reportData.period.start),
+          end: reportData.period.end instanceof Date ? reportData.period.end : new Date(reportData.period.end)
+        }
+      };
+
       // Generate HTML from report data
-      const html = this.generateHTMLReport(reportData);
+      const html = this.generateHTMLReport(data);
       
       // Create temporary container
       const container = document.createElement('div');
@@ -671,7 +681,7 @@ class ReportGeneratorService {
       // Generate PDF
       const opt = {
         margin: [10, 10, 10, 10],
-        filename: `${reportData.type}-report-${reportData.period.start.toISOString().split('T')[0]}.pdf`,
+        filename: `${data.type}-report-${data.period.start.toISOString().split('T')[0]}.pdf`,
         image: { type: 'jpeg', quality: 0.95 },
         html2canvas: { 
           scale: 2, 

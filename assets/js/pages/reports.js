@@ -203,12 +203,22 @@ async function downloadReportHTML(reportData) {
   try {
     showLoading();
     
-    const html = reportGeneratorService.generateHTMLReport(reportData);
+    // Ensure dates are Date objects
+    const data = {
+      ...reportData,
+      period: {
+        ...reportData.period,
+        start: reportData.period.start instanceof Date ? reportData.period.start : new Date(reportData.period.start),
+        end: reportData.period.end instanceof Date ? reportData.period.end : new Date(reportData.period.end)
+      }
+    };
+    
+    const html = reportGeneratorService.generateHTMLReport(data);
     const blob = new Blob([html], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${reportData.type}-report-${reportData.period.start.toISOString().split('T')[0]}.html`;
+    a.download = `${data.type}-report-${data.period.start.toISOString().split('T')[0]}.html`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -228,7 +238,17 @@ async function downloadReportPDF(reportData) {
   try {
     showLoading();
     
-    await reportGeneratorService.downloadPDFReport(reportData);
+    // Ensure dates are Date objects
+    const data = {
+      ...reportData,
+      period: {
+        ...reportData.period,
+        start: reportData.period.start instanceof Date ? reportData.period.start : new Date(reportData.period.start),
+        end: reportData.period.end instanceof Date ? reportData.period.end : new Date(reportData.period.end)
+      }
+    };
+    
+    await reportGeneratorService.downloadPDFReport(data);
     
     hideLoading();
     toast.show('PDF report downloaded successfully!', 'success');
@@ -387,10 +407,21 @@ window.downloadReportFromList = async function(reportId, format) {
     return;
   }
   
+  // Convert date strings back to Date objects
+  const reportData = {
+    ...report.data,
+    period: {
+      ...report.data.period,
+      start: new Date(report.data.period.start),
+      end: new Date(report.data.period.end)
+    },
+    generatedAt: new Date(report.data.generatedAt)
+  };
+  
   if (format === 'html') {
-    await downloadReportHTML(report.data);
+    await downloadReportHTML(reportData);
   } else if (format === 'pdf') {
-    await downloadReportPDF(report.data);
+    await downloadReportPDF(reportData);
   }
 };
 
