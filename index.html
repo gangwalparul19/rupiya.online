@@ -411,6 +411,7 @@
       .features, .security, .cta { padding: 4rem 1rem; }
       .cta .hero-buttons { flex-direction: row; max-width: 100%; gap: 0.75rem; }
       .cta .hero-buttons .btn { flex: 1; min-width: 0; font-size: 0.95rem; padding: 0.875rem 1rem; }
+      .cta-buttons-desktop { flex-direction: row !important; }
     }
     @media (max-width: 480px) {
       .hero { padding: 3.5rem 1rem 2rem; min-height: 75vh; }
@@ -421,6 +422,18 @@
       .cta .hero-buttons { gap: 0.5rem; }
       .cta .hero-buttons .btn { font-size: 0.85rem; padding: 0.75rem 0.75rem; }
       .cta .hero-buttons .btn svg { width: 16px; height: 16px; }
+    }
+    .cta-buttons-desktop {
+      display: flex;
+      flex-direction: row;
+      gap: 1rem;
+      justify-content: center;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .cta-buttons-desktop .btn {
+      flex: 1;
+      min-width: 0;
     }
   </style>
 </head>
@@ -635,7 +648,7 @@
       <p class="cta-description">
         Join thousands of Indians managing their money smarter with Rupiya
       </p>
-      <div class="hero-buttons">
+      <div class="hero-buttons cta-buttons-desktop">
         <a href="signup.html" class="btn btn-primary" style="font-size: 1.1rem; padding: 1rem 2rem;">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
@@ -683,8 +696,8 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <p style="margin-top: 0.5rem; font-size: 0.9rem;">Rupiya is a financial management tool. We do not provide investment advice. Always consult qualified financial professionals.</p>
-      <p style="margin-top: 0.75rem; font-size: 0.9rem;">Developed by <a href="https://www.weblithic.com" target="_blank" rel="noopener noreferrer" style="color: #4A90E2; font-weight: 600; text-decoration: none;">Weblithic</a></p>
+      <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; text-align: center;">Rupiya is a financial management tool. We do not provide investment advice. Always consult qualified financial professionals.</p>
+      <p style="margin: 0.75rem 0 0 0; font-size: 0.9rem; text-align: center;">Developed by <a href="https://www.weblithic.com" target="_blank" rel="noopener noreferrer" style="color: #4A90E2; font-weight: 600; text-decoration: none;">Weblithic</a></p>
     </div>
   </footer>
 
