@@ -225,74 +225,6 @@
   border-top: 1px solid var(--border-color, #e5e7eb);
 }
 
-/* Report Preview */
-.report-preview {
-  margin-bottom: 60px;
-  background: var(--card-bg, white);
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.preview-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px 24px;
-  background: var(--primary-color, #4F46E5);
-  color: white;
-}
-
-.preview-header h2 {
-  font-size: 20px;
-  font-weight: 700;
-  margin: 0;
-}
-
-.preview-actions {
-  display: flex;
-  gap: 12px;
-}
-
-.preview-actions .btn {
-  padding: 8px 16px;
-  font-size: 14px;
-}
-
-.preview-actions .btn-secondary {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-.preview-actions .btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.3);
-}
-
-.preview-actions .btn-ghost {
-  background: transparent;
-  color: white;
-  border: none;
-  padding: 8px;
-  width: 36px;
-  height: 36px;
-}
-
-.preview-actions .btn-ghost:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-.preview-container {
-  height: 600px;
-  background: #f9fafb;
-}
-
-.preview-container iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
-}
-
 /* Recent Reports */
 .recent-reports {
   margin-bottom: 60px;
@@ -316,14 +248,16 @@
 }
 
 .report-item {
-  display: flex;
-  align-items: center;
-  gap: 20px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-rows: auto auto;
+  gap: 12px 20px;
   padding: 20px;
   background: var(--card-bg, white);
   border: 1px solid var(--border-color, #e5e7eb);
   border-radius: 12px;
   transition: all 0.2s;
+  align-items: start;
 }
 
 .report-item:hover {
@@ -342,10 +276,12 @@
   font-size: 20px;
   color: white;
   flex-shrink: 0;
+  grid-row: 1 / 3;
 }
 
 .report-info {
-  flex: 1;
+  grid-column: 2;
+  grid-row: 1;
 }
 
 .report-info h4 {
@@ -367,13 +303,110 @@
   margin: 0;
 }
 
+.report-actions {
+  grid-column: 3;
+  grid-row: 1;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.report-action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  background: var(--card-bg, white);
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 8px;
+  color: var(--text-primary, #1f2937);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.report-action-btn:hover {
+  background: var(--primary-color, #4F46E5);
+  border-color: var(--primary-color, #4F46E5);
+  color: white;
+}
+
+.report-action-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.report-action-btn.delete-btn {
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+.report-action-btn.delete-btn:hover {
+  background: #ef4444;
+  color: white;
+}
+
 .report-meta {
-  text-align: right;
+  grid-column: 2 / 4;
+  grid-row: 2;
+  text-align: left;
 }
 
 .report-time {
   font-size: 13px;
   color: var(--text-secondary, #6b7280);
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 24px;
+  padding: 20px;
+  background: var(--card-bg, white);
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 12px;
+}
+
+.pagination-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: var(--card-bg, white);
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 8px;
+  color: var(--text-primary, #1f2937);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: var(--primary-color, #4F46E5);
+  border-color: var(--primary-color, #4F46E5);
+  color: white;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.pagination-info {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary, #1f2937);
 }
 
 /* Features Section */
@@ -563,34 +596,54 @@
     font-size: 14px;
   }
 
-  .preview-header {
-    flex-direction: column;
-    gap: 16px;
-    align-items: flex-start;
-  }
-
-  .preview-actions {
-    width: 100%;
-    flex-wrap: wrap;
-  }
-
-  .preview-actions .btn {
-    flex: 1;
-    font-size: 12px;
-    padding: 8px 12px;
-  }
-
-  .preview-container {
-    height: 400px;
-  }
-
   .report-item {
-    flex-direction: column;
-    text-align: center;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto auto;
+    gap: 12px;
+  }
+
+  .report-item .report-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+    grid-row: 1 / 2;
+  }
+
+  .report-info {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .report-actions {
+    grid-column: 1 / 3;
+    grid-row: 2;
+    justify-content: center;
+  }
+
+  .report-action-btn {
+    padding: 6px 10px;
+    font-size: 10px;
+  }
+
+  .report-action-btn svg {
+    width: 16px;
+    height: 16px;
   }
 
   .report-meta {
+    grid-column: 1 / 3;
+    grid-row: 3;
     text-align: center;
+  }
+
+  .pagination {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .pagination-btn {
+    width: 100%;
+    justify-content: center;
   }
 
   .features-section h2 {

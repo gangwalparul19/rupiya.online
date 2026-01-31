@@ -129,27 +129,6 @@ function setupEventListeners() {
     await generateReport('custom', startDate, endDate);
   });
 
-  // Preview actions
-  const downloadHTML = document.getElementById('downloadHTML');
-  const downloadPDF = document.getElementById('downloadPDF');
-  const closePreview = document.getElementById('closePreview');
-
-  downloadHTML?.addEventListener('click', async () => {
-    if (currentReportData) {
-      await downloadReportHTML();
-    }
-  });
-
-  downloadPDF?.addEventListener('click', async () => {
-    if (currentReportData) {
-      await downloadReportPDF();
-    }
-  });
-
-  closePreview?.addEventListener('click', () => {
-    document.getElementById('reportPreview').style.display = 'none';
-  });
-
   // Sidebar toggle
   const sidebarOpen = document.getElementById('sidebarOpen');
   const sidebarClose = document.getElementById('sidebarClose');
@@ -195,23 +174,23 @@ async function generateReport(type, customStart = null, customEnd = null) {
       endDate
     );
 
-    // Generate HTML
-    const html = reportGeneratorService.generateHTMLReport(currentReportData);
-
-    // Show preview
-    showPreview(html);
-
     // Save to recent reports
+    const reportId = Date.now().toString();
     saveToRecentReports({
+      id: reportId,
       type: type === 'custom' ? 'custom' : type,
       startDate,
       endDate,
       generatedAt: new Date(),
-      summary: currentReportData.summary
+      summary: currentReportData.summary,
+      data: currentReportData // Store full data for later download
     });
 
     hideLoading();
-    toast.show('Report generated successfully!', 'success');
+    toast.show('Report generated successfully! Click icons to download.', 'success');
+    
+    // Scroll to recent reports
+    document.querySelector('.recent-reports')?.scrollIntoView({ behavior: 'smooth' });
   } catch (error) {
     logger.error('Failed to generate report:', error);
     hideLoading();
@@ -219,40 +198,24 @@ async function generateReport(type, customStart = null, customEnd = null) {
   }
 }
 
-// Show preview
-function showPreview(html) {
-  const reportPreview = document.getElementById('reportPreview');
-  const reportFrame = document.getElementById('reportFrame');
-  
-  reportPreview.style.display = 'block';
-  
-  // Create blob URL for iframe
-  const blob = new Blob([html], { type: 'text/html' });
-  const url = URL.createObjectURL(blob);
-  reportFrame.src = url;
-  
-  // Scroll to preview
-  reportPreview.scrollIntoView({ behavior: 'smooth' });
-}
-
 // Download report as HTML
-async function downloadReportHTML() {
+async function downloadReportHTML(reportData) {
   try {
     showLoading();
     
-    const html = reportGeneratorService.generateHTMLReport(currentReportData);
+    const html = reportGeneratorService.generateHTMLReport(reportData);
     const blob = new Blob([html], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${currentReportData.type}-report-${currentReportData.period.start.toISOString().split('T')[0]}.html`;
+    a.download = `${reportData.type}-report-${reportData.period.start.toISOString().split('T')[0]}.html`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     
     hideLoading();
-    toast.show('Report downloaded successfully!', 'success');
+    toast.show('HTML report downloaded successfully!', 'success');
   } catch (error) {
     logger.error('Failed to download HTML report:', error);
     hideLoading();
@@ -261,15 +224,11 @@ async function downloadReportHTML() {
 }
 
 // Download report as PDF
-async function downloadReportPDF() {
+async function downloadReportPDF(reportData) {
   try {
     showLoading();
     
-    await reportGeneratorService.downloadPDFReport(
-      currentReportData.type,
-      currentReportData.period.start,
-      currentReportData.period.end
-    );
+    await reportGeneratorService.downloadPDFReport(reportData);
     
     hideLoading();
     toast.show('PDF report downloaded successfully!', 'success');
@@ -311,6 +270,10 @@ function loadRecentReports() {
   }
 }
 
+// Pagination state
+let currentPage = 1;
+const reportsPerPage = 5;
+
 // Render recent reports
 function renderRecentReports() {
   const container = document.getElementById('recentReportsList');
@@ -318,7 +281,7 @@ function renderRecentReports() {
   if (recentReports.length === 0) {
     container.innerHTML = `
       <div class="empty-state">
-        <i class="fas fa-file-chart-line"></i>
+        📊
         <p>No reports generated yet</p>
         <p class="subtext">Generate your first report to see it here</p>
       </div>
@@ -326,32 +289,134 @@ function renderRecentReports() {
     return;
   }
   
-  container.innerHTML = recentReports.map(report => {
-    const date = new Date(report.generatedAt);
-    const startDate = new Date(report.startDate);
-    const endDate = new Date(report.endDate);
+  // Calculate pagination
+  const totalPages = Math.ceil(recentReports.length / reportsPerPage);
+  const startIndex = (currentPage - 1) * reportsPerPage;
+  const endIndex = startIndex + reportsPerPage;
+  const paginatedReports = recentReports.slice(startIndex, endIndex);
+  
+  container.innerHTML = `
+    ${paginatedReports.map(report => {
+      const date = new Date(report.generatedAt);
+      const startDate = new Date(report.startDate);
+      const endDate = new Date(report.endDate);
+      
+      return `
+        <div class="report-item" data-report-id="${report.id}">
+          <div class="report-icon">
+            📅
+          </div>
+          <div class="report-info">
+            <h4>${report.type.charAt(0).toUpperCase() + report.type.slice(1)} Report</h4>
+            <p class="report-date">${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}</p>
+            <p class="report-summary">
+              Income: ₹${report.summary.totalIncome.toLocaleString()} | 
+              Expenses: ₹${report.summary.totalExpenses.toLocaleString()} | 
+              Savings: ₹${report.summary.netSavings.toLocaleString()}
+            </p>
+          </div>
+          <div class="report-actions">
+            <button class="report-action-btn" onclick="downloadReportFromList('${report.id}', 'html')" title="Download HTML">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              HTML
+            </button>
+            <button class="report-action-btn" onclick="downloadReportFromList('${report.id}', 'pdf')" title="Download PDF">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+              </svg>
+              PDF
+            </button>
+            <button class="report-action-btn delete-btn" onclick="deleteReport('${report.id}')" title="Delete Report">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+            </button>
+          </div>
+          <div class="report-meta">
+            <span class="report-time">${formatTimeAgo(date)}</span>
+          </div>
+        </div>
+      `;
+    }).join('')}
     
-    return `
-      <div class="report-item">
-        <div class="report-icon">
-          <i class="fas fa-${report.type === 'weekly' ? 'calendar-week' : report.type === 'monthly' ? 'calendar-alt' : 'calendar-days'}"></i>
+    ${totalPages > 1 ? `
+      <div class="pagination">
+        <button class="pagination-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="changePage(${currentPage - 1})">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+          Previous
+        </button>
+        <div class="pagination-info">
+          Page ${currentPage} of ${totalPages}
         </div>
-        <div class="report-info">
-          <h4>${report.type.charAt(0).toUpperCase() + report.type.slice(1)} Report</h4>
-          <p class="report-date">${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}</p>
-          <p class="report-summary">
-            Income: ₹${report.summary.totalIncome.toLocaleString()} | 
-            Expenses: ₹${report.summary.totalExpenses.toLocaleString()} | 
-            Savings: ₹${report.summary.netSavings.toLocaleString()}
-          </p>
-        </div>
-        <div class="report-meta">
-          <span class="report-time">${formatTimeAgo(date)}</span>
-        </div>
+        <button class="pagination-btn" ${currentPage === totalPages ? 'disabled' : ''} onclick="changePage(${currentPage + 1})">
+          Next
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
       </div>
-    `;
-  }).join('');
+    ` : ''}
+  `;
 }
+
+// Change page
+window.changePage = function(page) {
+  const totalPages = Math.ceil(recentReports.length / reportsPerPage);
+  if (page < 1 || page > totalPages) return;
+  currentPage = page;
+  renderRecentReports();
+};
+
+// Download report from list
+window.downloadReportFromList = async function(reportId, format) {
+  const report = recentReports.find(r => r.id === reportId);
+  if (!report || !report.data) {
+    toast.show('Report data not found', 'error');
+    return;
+  }
+  
+  if (format === 'html') {
+    await downloadReportHTML(report.data);
+  } else if (format === 'pdf') {
+    await downloadReportPDF(report.data);
+  }
+};
+
+// Delete report
+window.deleteReport = function(reportId) {
+  if (!confirm('Are you sure you want to delete this report?')) {
+    return;
+  }
+  
+  recentReports = recentReports.filter(r => r.id !== reportId);
+  
+  // Adjust current page if needed
+  const totalPages = Math.ceil(recentReports.length / reportsPerPage);
+  if (currentPage > totalPages && totalPages > 0) {
+    currentPage = totalPages;
+  }
+  
+  // Save to localStorage
+  try {
+    localStorage.setItem('recentReports', JSON.stringify(recentReports));
+  } catch (error) {
+    logger.error('Failed to save recent reports:', error);
+  }
+  
+  renderRecentReports();
+  toast.show('Report deleted successfully', 'success');
+};
 
 // Format time ago
 function formatTimeAgo(date) {

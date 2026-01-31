@@ -5,8 +5,6 @@
 
 import firestoreService from './firestore-service.js';
 import authService from './auth-service.js';
-import analyticsService from './analytics-service.js';
-import dataAggregationService from './data-aggregation-service.js';
 import { formatCurrency } from '../utils/helpers.js';
 import logger from '../utils/logger.js';
 
@@ -288,8 +286,11 @@ class ReportGeneratorService {
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f9fafb; color: #1f2937; line-height: 1.6; }
-    .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f9fafb; color: #1f2937; line-height: 1.6; padding: 20px; }
+    .report-wrapper { max-width: 1200px; margin: 0 auto; background: white; border: 3px solid #4F46E5; border-radius: 16px; padding: 40px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+    .logo { text-align: center; margin-bottom: 30px; }
+    .logo img { max-width: 150px; height: auto; }
+    .container { max-width: 1200px; margin: 0 auto; }
     .header { text-align: center; margin-bottom: 40px; padding: 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 12px; }
     .header h1 { font-size: 32px; margin-bottom: 8px; }
     .header p { font-size: 18px; opacity: 0.9; }
@@ -317,11 +318,15 @@ class ReportGeneratorService {
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <h1>${reportData.type === 'monthly' ? 'Monthly' : 'Weekly'} Financial Report</h1>
-      <p>${period.label}</p>
+  <div class="report-wrapper">
+    <div class="logo">
+      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" alt="Rupiya Logo" onerror="this.style.display='none'">
     </div>
+    <div class="container">
+      <div class="header">
+        <h1>${reportData.type === 'monthly' ? 'Monthly' : 'Weekly'} Financial Report</h1>
+        <p>${period.label}</p>
+      </div>
 
     <div class="summary-grid">
       <div class="summary-card">
@@ -507,6 +512,7 @@ class ReportGeneratorService {
       <p>Rupiya - Personal Finance Manager</p>
     </div>
   </div>
+  </div>
 
   <script>
     // Category Pie Chart
@@ -616,14 +622,14 @@ class ReportGeneratorService {
   /**
    * Download report as PDF (requires html2pdf library)
    */
-  async downloadPDFReport(type, startDate, endDate) {
+  async downloadPDFReport(reportData) {
     try {
       // Load html2pdf library dynamically
       if (!window.html2pdf) {
         await this.loadHtml2PdfLibrary();
       }
 
-      const reportData = await this.generateReportData(type, startDate, endDate);
+      // Generate HTML from report data
       const html = this.generateHTMLReport(reportData);
       
       // Create temporary container
@@ -631,17 +637,18 @@ class ReportGeneratorService {
       container.innerHTML = html;
       container.style.position = 'absolute';
       container.style.left = '-9999px';
+      container.style.width = '1200px';
       document.body.appendChild(container);
 
       // Wait for charts to render
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 2000));
 
       // Generate PDF
       const opt = {
         margin: 10,
-        filename: `${type}-report-${startDate.toISOString().split('T')[0]}.pdf`,
+        filename: `${reportData.type}-report-${reportData.period.start.toISOString().split('T')[0]}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
+        html2canvas: { scale: 2, useCORS: true, logging: false },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
       };
 
@@ -650,7 +657,7 @@ class ReportGeneratorService {
       // Cleanup
       document.body.removeChild(container);
       
-      logger.info(`${type} PDF report downloaded successfully`);
+      logger.info(`PDF report downloaded successfully`);
       return true;
     } catch (error) {
       logger.error('Failed to download PDF report:', error);
