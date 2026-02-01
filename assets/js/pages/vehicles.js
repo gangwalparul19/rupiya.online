@@ -151,9 +151,9 @@ function setupEventListeners() {
   cancelFuelLogBtn?.addEventListener('click', hideFuelLogModal);
   saveFuelLogBtn?.addEventListener('click', handleSaveFuelLog);
 
-  // Auto-calculate total cost
-  document.getElementById('fuelQuantity')?.addEventListener('input', calculateTotalCost);
-  document.getElementById('fuelPrice')?.addEventListener('input', calculateTotalCost);
+  // Auto-calculate price per liter
+  document.getElementById('fuelQuantity')?.addEventListener('input', calculatePricePerLiter);
+  document.getElementById('totalCost')?.addEventListener('input', calculatePricePerLiter);
 
   // Mileage History Modal Events
   closeMileageHistoryBtn?.addEventListener('click', hideMileageHistoryModal);
@@ -828,13 +828,16 @@ async function loadFuelLogs() {
   }
 }
 
-// Calculate total cost when quantity or price changes
-function calculateTotalCost() {
+// Calculate price per liter when quantity or total cost changes
+function calculatePricePerLiter() {
   const quantity = parseFloat(document.getElementById('fuelQuantity')?.value) || 0;
-  const price = parseFloat(document.getElementById('fuelPrice')?.value) || 0;
-  const totalCostInput = document.getElementById('totalCost');
-  if (totalCostInput) {
-    totalCostInput.value = (quantity * price).toFixed(2);
+  const totalCost = parseFloat(document.getElementById('totalCost')?.value) || 0;
+  const priceInput = document.getElementById('fuelPrice');
+  
+  if (priceInput && quantity > 0) {
+    priceInput.value = (totalCost / quantity).toFixed(2);
+  } else if (priceInput) {
+    priceInput.value = '';
   }
 }
 
@@ -884,14 +887,14 @@ async function handleSaveFuelLog() {
   const odometerReading = parseFloat(document.getElementById('odometerReading').value);
   const fuelQuantity = parseFloat(document.getElementById('fuelQuantity').value);
   const fuelPrice = parseFloat(document.getElementById('fuelPrice').value);
-  const totalCost = parseFloat(document.getElementById('totalCost').value) || (fuelQuantity * fuelPrice);
+  const totalCost = parseFloat(document.getElementById('totalCost').value);
   const fuelStation = document.getElementById('fuelStation').value.trim();
   const notes = document.getElementById('fuelNotes').value.trim();
   const paymentMethod = document.getElementById('fuelPaymentMethod').value;
   const specificPaymentMethod = document.getElementById('fuelSpecificPaymentMethod').value;
 
   // Validation
-  if (!fuelDate || !odometerReading || !fuelQuantity || !fuelPrice) {
+  if (!fuelDate || !odometerReading || !fuelQuantity || !totalCost) {
     showToast('Please fill all required fields', 'error');
     return;
   }
@@ -930,7 +933,7 @@ async function handleSaveFuelLog() {
 
     if (result.success) {
       // Update vehicle's current mileage - fetch full vehicle first to preserve all fields
-      const vehicleDoc = await firestoreService.getById('vehicles', vehicleId);
+      const vehicleDoc = await firestoreService.get('vehicles', vehicleId);
       if (vehicleDoc) {
         await firestoreService.update('vehicles', vehicleId, {
           ...vehicleDoc,

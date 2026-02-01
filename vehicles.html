@@ -425,13 +425,14 @@
             </div>
 
             <div class="form-group">
-              <label for="fuelPrice">Price per Liter (₹) *</label>
-              <input type="number" id="fuelPrice" step="0.01" min="0" required placeholder="e.g., 102.50">
+              <label for="totalCost">Total Cost (₹) *</label>
+              <input type="number" id="totalCost" step="0.01" min="0" required placeholder="e.g., 2562.50">
             </div>
 
             <div class="form-group">
-              <label for="totalCost">Total Cost (₹)</label>
-              <input type="number" id="totalCost" step="0.01" min="0" readonly placeholder="Auto-calculated">
+              <label for="fuelPrice">Price per Liter (₹)</label>
+              <input type="number" id="fuelPrice" step="0.01" min="0" readonly placeholder="Auto-calculated">
+              <small class="form-hint">Calculated automatically</small>
             </div>
 
             <div class="form-group">
