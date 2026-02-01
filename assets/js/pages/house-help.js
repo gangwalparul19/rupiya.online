@@ -688,22 +688,26 @@ async function loadPaymentMethods() {
   }
 }
 
-// Load dependents from user service
+// Load dependents from localStorage
 async function loadDependents() {
   try {
-    const userService = await import('../services/user-service.js');
-    const dependents = await userService.default.getDependents();
-    
     const dependentSelect = document.getElementById('paymentDependent');
     if (dependentSelect) {
       dependentSelect.innerHTML = '<option value="">Self</option>';
       
-      dependents.forEach(dependent => {
-        const option = document.createElement('option');
-        option.value = dependent.id;
-        option.textContent = dependent.name;
-        dependentSelect.appendChild(option);
-      });
+      // Get family members from localStorage
+      const stored = localStorage.getItem('familyMembers');
+      if (stored) {
+        const members = JSON.parse(stored);
+        const activeMembers = members.filter(m => m.active);
+        
+        activeMembers.forEach(member => {
+          const option = document.createElement('option');
+          option.value = member.id;
+          option.textContent = member.name || member.memberName;
+          dependentSelect.appendChild(option);
+        });
+      }
     }
   } catch (error) {
     console.error('Error loading dependents:', error);
