@@ -1119,10 +1119,19 @@ async function deleteFuelLog(logId) {
     const logToDelete = state.fuelLogs.find(l => l.id === logId);
     const vehicleId = logToDelete?.vehicleId;
 
-    // Find and delete the corresponding expense
+    // Find the corresponding expense
     const linkedExpense = await firestoreService.findExpenseByField('fuelLogId', logId);
 
     if (linkedExpense) {
+      // Update credit card balance if this was a credit card expense
+      if (linkedExpense.paymentMethod === 'card' && linkedExpense.specificPaymentMethodId) {
+        await creditCardService.updateCardBalanceOnExpenseDelete(
+          linkedExpense.specificPaymentMethodId,
+          linkedExpense.amount
+        );
+      }
+      
+      // Delete the expense
       await firestoreService.delete('expenses', linkedExpense.id);
     }
 
@@ -1336,9 +1345,17 @@ async function handleDelete() {
     // First, delete all fuel logs for this vehicle
     const vehicleFuelLogs = state.fuelLogs.filter(log => log.vehicleId === deleteVehicleId);
     for (const log of vehicleFuelLogs) {
-      // Find and delete the corresponding expense
+      // Find the corresponding expense
       const linkedExpense = await firestoreService.findExpenseByField('fuelLogId', log.id);
       if (linkedExpense) {
+        // Update credit card balance if this was a credit card expense
+        if (linkedExpense.paymentMethod === 'card' && linkedExpense.specificPaymentMethodId) {
+          await creditCardService.updateCardBalanceOnExpenseDelete(
+            linkedExpense.specificPaymentMethodId,
+            linkedExpense.amount
+          );
+        }
+        // Delete the expense
         await firestoreService.delete('expenses', linkedExpense.id);
       }
       // Delete the fuel log
@@ -1349,6 +1366,13 @@ async function handleDelete() {
     const allExpenses = await firestoreService.getAll('expenses', 'createdAt', 'desc');
     const vehicleExpenses = allExpenses.filter(exp => exp.linkedType === 'vehicle' && exp.linkedId === deleteVehicleId);
     for (const expense of vehicleExpenses) {
+      // Update credit card balance if this was a credit card expense
+      if (expense.paymentMethod === 'card' && expense.specificPaymentMethodId) {
+        await creditCardService.updateCardBalanceOnExpenseDelete(
+          expense.specificPaymentMethodId,
+          expense.amount
+        );
+      }
       await firestoreService.delete('expenses', expense.id);
     }
 

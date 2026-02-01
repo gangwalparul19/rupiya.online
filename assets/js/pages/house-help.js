@@ -928,10 +928,19 @@ async function handleDeletePayment() {
   confirmDeletePaymentBtn.textContent = 'Deleting...';
   
   try {
-    // Find and delete the corresponding expense (optimized - single query)
+    // Find the corresponding expense (optimized - single query)
     const linkedExpense = await firestoreService.findExpenseByField('houseHelpPaymentId', deletePaymentId);
     
     if (linkedExpense) {
+      // Update credit card balance if this was a credit card expense
+      if (linkedExpense.paymentMethod === 'card' && linkedExpense.specificPaymentMethodId) {
+        await creditCardService.updateCardBalanceOnExpenseDelete(
+          linkedExpense.specificPaymentMethodId,
+          linkedExpense.amount
+        );
+      }
+      
+      // Delete the expense
       await firestoreService.deleteExpense(linkedExpense.id);
     }
     
@@ -1018,9 +1027,17 @@ async function handleDelete() {
     // First, delete all payments for this staff member
     const staffPayments = state.staffPayments[deleteHelpId] || [];
     for (const payment of staffPayments) {
-      // Find and delete the corresponding expense
+      // Find the corresponding expense
       const linkedExpense = await firestoreService.findExpenseByField('houseHelpPaymentId', payment.id);
       if (linkedExpense) {
+        // Update credit card balance if this was a credit card expense
+        if (linkedExpense.paymentMethod === 'card' && linkedExpense.specificPaymentMethodId) {
+          await creditCardService.updateCardBalanceOnExpenseDelete(
+            linkedExpense.specificPaymentMethodId,
+            linkedExpense.amount
+          );
+        }
+        // Delete the expense
         await firestoreService.delete('expenses', linkedExpense.id);
       }
       // Delete the payment record
@@ -1031,6 +1048,13 @@ async function handleDelete() {
     const allExpenses = await firestoreService.getAll('expenses', 'createdAt', 'desc');
     const staffExpenses = allExpenses.filter(exp => exp.linkedType === 'houseHelp' && exp.linkedId === deleteHelpId);
     for (const expense of staffExpenses) {
+      // Update credit card balance if this was a credit card expense
+      if (expense.paymentMethod === 'card' && expense.specificPaymentMethodId) {
+        await creditCardService.updateCardBalanceOnExpenseDelete(
+          expense.specificPaymentMethodId,
+          expense.amount
+        );
+      }
       await firestoreService.delete('expenses', expense.id);
     }
     
