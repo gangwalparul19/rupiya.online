@@ -788,7 +788,7 @@ function showFuelLogModal(vehicleId, vehicleName, currentOdometer) {
 async function loadFuelPaymentMethods() {
   try {
     const paymentMethodsService = await import('../services/payment-methods-service.js');
-    const methods = await paymentMethodsService.default.getAllPaymentMethods();
+    const methods = await paymentMethodsService.default.getPaymentMethods();
     
     const specificMethodSelect = document.getElementById('fuelSpecificPaymentMethod');
     if (specificMethodSelect) {
@@ -1073,7 +1073,7 @@ function showMaintenanceModal(vehicleId, vehicleName) {
 async function loadMaintenancePaymentMethods() {
   try {
     const paymentMethodsService = await import('../services/payment-methods-service.js');
-    const methods = await paymentMethodsService.default.getAllPaymentMethods();
+    const methods = await paymentMethodsService.default.getPaymentMethods();
     
     const specificMethodSelect = document.getElementById('maintenanceSpecificPaymentMethod');
     if (specificMethodSelect) {

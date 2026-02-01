@@ -669,7 +669,7 @@ async function showPaymentModal(staffId) {
 async function loadPaymentMethods() {
   try {
     const paymentMethodsService = await import('../services/payment-methods-service.js');
-    const methods = await paymentMethodsService.default.getAllPaymentMethods();
+    const methods = await paymentMethodsService.default.getPaymentMethods();
     
     const specificMethodSelect = document.getElementById('specificPaymentMethod');
     if (specificMethodSelect) {
