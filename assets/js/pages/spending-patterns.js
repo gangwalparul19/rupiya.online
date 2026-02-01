@@ -8,6 +8,7 @@ import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
 import encryptionReauthModal from '../components/encryption-reauth-modal.js';
 import toast from '../components/toast.js';
+import timezoneService from '../utils/timezone.js';
 
 // Chart.js CDN
 const chartScript = document.createElement('script');
@@ -174,7 +175,7 @@ function updateKPIs() {
     } else {
       expDate = new Date(exp.date);
     }
-    const day = expDate.toLocaleDateString('en-US', { weekday: 'long' });
+    const day = expDate.toLocaleDateString('en-US', { weekday: 'long', timeZone: 'Asia/Kolkata' });
     dayCount[day] = (dayCount[day] || 0) + 1;
   });
   const mostActiveDay = Object.entries(dayCount).sort((a, b) => b[1] - a[1])[0];
@@ -187,7 +188,7 @@ function updateKPIs() {
     } else {
       expDate = new Date(exp.date);
     }
-    return expDate.toDateString();
+    return timezoneService.formatDateForInput(expDate); // Use IST date
   });
   const uniqueDates = [...new Set(dates)].sort();
   let streak = 1;
@@ -211,7 +212,7 @@ function updateKPIs() {
     } else {
       expDate = new Date(exp.date);
     }
-    const date = expDate.toDateString();
+    const date = timezoneService.formatDateForInput(expDate); // Use IST date
     dailySpending[date] = (dailySpending[date] || 0) + exp.amount;
   });
   const peakDay = Object.entries(dailySpending).sort((a, b) => b[1] - a[1])[0];
@@ -227,7 +228,7 @@ function generateCalendarHeatmap() {
   const container = document.getElementById('calendarHeatmap');
   container.innerHTML = '';
 
-  // Group expenses by date
+  // Group expenses by date (using IST timezone)
   const dailySpending = {};
   allExpenses.forEach(exp => {
     let expDate;
@@ -236,7 +237,8 @@ function generateCalendarHeatmap() {
     } else {
       expDate = new Date(exp.date);
     }
-    const date = expDate.toISOString().split('T')[0];
+    // Use timezone service to format date in IST
+    const date = timezoneService.formatDateForInput(expDate); // Returns YYYY-MM-DD in IST
     dailySpending[date] = (dailySpending[date] || 0) + exp.amount;
   });
 
@@ -256,7 +258,7 @@ function generateCalendarHeatmap() {
   const months = {};
   let currentDate = new Date(startDate);
   while (currentDate <= endDate) {
-    const monthKey = currentDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+    const monthKey = currentDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'Asia/Kolkata' });
     if (!months[monthKey]) {
       months[monthKey] = [];
     }
@@ -291,7 +293,8 @@ function generateCalendarHeatmap() {
       weekDiv.className = 'heatmap-week';
 
       weekDates.forEach(date => {
-        const dateStr = date.toISOString().split('T')[0];
+        // Use timezone service to get date string in IST
+        const dateStr = timezoneService.formatDateForInput(date); // Returns YYYY-MM-DD in IST
         const spending = dailySpending[dateStr] || 0;
         // Only assign level if there's actual spending
         const level = spending === 0 ? 0 : Math.max(1, Math.ceil((spending / maxSpending) * 4));
@@ -301,7 +304,7 @@ function generateCalendarHeatmap() {
         dayDiv.setAttribute('data-level', level);
         dayDiv.setAttribute('data-date', dateStr);
         dayDiv.setAttribute('data-amount', spending);
-        dayDiv.title = spending > 0 ? `${date.toLocaleDateString()}: ₹${spending.toFixed(0)}` : `${date.toLocaleDateString()}: No spending`;
+        dayDiv.title = spending > 0 ? `${timezoneService.formatDate(date)}: ₹${spending.toFixed(0)}` : `${timezoneService.formatDate(date)}: No spending`;
 
         weekDiv.appendChild(dayDiv);
       });
@@ -333,7 +336,7 @@ function generateDayOfWeekChart() {
       } else {
         expDate = new Date(exp.date);
       }
-      const day = expDate.toLocaleDateString('en-US', { weekday: 'long' });
+      const day = expDate.toLocaleDateString('en-US', { weekday: 'long', timeZone: 'Asia/Kolkata' });
       daySpending[day] += exp.amount;
     });
 
@@ -394,7 +397,7 @@ function generateCategoryHeatmap() {
     } else {
       expDate = new Date(exp.date);
     }
-    const month = expDate.toLocaleDateString('en-US', { month: 'short' });
+    const month = expDate.toLocaleDateString('en-US', { month: 'short', timeZone: 'Asia/Kolkata' });
     if (!categoryMonthly[exp.category]) {
       categoryMonthly[exp.category] = {};
     }
@@ -409,7 +412,7 @@ function generateCategoryHeatmap() {
     } else {
       expDate = new Date(exp.date);
     }
-    return expDate.toLocaleDateString('en-US', { month: 'short' });
+    return expDate.toLocaleDateString('en-US', { month: 'short', timeZone: 'Asia/Kolkata' });
   }))].sort();
 
   // Calculate global max for consistent scaling across all categories
@@ -466,7 +469,7 @@ function generateMonthlyTrendChart() {
       } else {
         expDate = new Date(exp.date);
       }
-      const month = expDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+      const month = expDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'Asia/Kolkata' });
       monthlySpending[month] = (monthlySpending[month] || 0) + exp.amount;
     });
 

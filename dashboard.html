@@ -110,13 +110,9 @@
         grid-row: 2;
       }
       
-      /* Emergency Fund and Goal Progress - if exists */
+      /* Emergency Fund - if exists */
       .emergency-fund-widget {
         grid-column: 1 / 2 !important;
-      }
-      
-      .goal-progress-widget {
-        grid-column: 2 / 3 !important;
       }
       
       /* Charts Grid - 2 columns on desktop */
@@ -249,7 +245,6 @@
       /* Force ALL widgets to full width edge-to-edge */
       .widgets-row > *,
       .widgets-row .savings-rate-widget,
-      .widgets-row .goal-progress-widget,
       .widgets-row .top-categories-widget,
       .widgets-row .upcoming-bills-widget,
       .widgets-row [class*="-widget"] {
@@ -543,7 +538,7 @@
         <div class="kpi-card" id="incomeKpi" data-tooltip="">
           <div class="kpi-header">
             <div>
-              <div class="kpi-title">Income</div>
+              <div class="kpi-title">Total Income</div>
             </div>
             <div class="kpi-icon income">💰</div>
           </div>
@@ -557,7 +552,7 @@
         <div class="kpi-card" id="expenseKpi" data-tooltip="">
           <div class="kpi-header">
             <div>
-              <div class="kpi-title">Expenses</div>
+              <div class="kpi-title">Total Expenses</div>
             </div>
             <div class="kpi-icon expense">💸</div>
           </div>
@@ -571,7 +566,7 @@
         <div class="kpi-card" id="cashflowKpi" data-tooltip="">
           <div class="kpi-header">
             <div>
-              <div class="kpi-title">Cash Flow</div>
+              <div class="kpi-title">Overall Cash Flow</div>
             </div>
             <div class="kpi-icon cashflow">📊</div>
           </div>
@@ -585,7 +580,7 @@
         <div class="kpi-card" id="savingsKpi" data-tooltip="">
           <div class="kpi-header">
             <div>
-              <div class="kpi-title">Savings Rate</div>
+              <div class="kpi-title">Overall Savings Rate</div>
             </div>
             <div class="kpi-icon networth">📈</div>
           </div>
@@ -639,21 +634,6 @@
           </div>
           <div class="savings-rate-tip" id="savingsRateTip">
             💡 Aim for 20%+ savings rate for financial security
-          </div>
-        </div>
-
-        <!-- Goal Progress Widget -->
-        <div class="goal-progress-widget" id="goalProgressWidget" style="display: none; margin: 0 0 16px 0; padding: 16px; border-radius: 0; border-left: none; border-right: none; width: 100%; max-width: 100%; box-sizing: border-box;">
-          <div class="goal-progress-header">
-            <div class="goal-progress-title">🎯 <span id="goalName">Savings Goal</span></div>
-            <div class="goal-progress-percent" id="goalPercent">0%</div>
-          </div>
-          <div class="goal-progress-bar">
-            <div class="goal-progress-fill" id="goalProgressFill" style="width: 0%;"></div>
-          </div>
-          <div class="goal-progress-details">
-            <span id="goalCurrent">₹0</span>
-            <span id="goalTarget">of ₹0</span>
           </div>
         </div>
 

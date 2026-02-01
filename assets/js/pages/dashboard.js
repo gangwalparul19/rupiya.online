@@ -217,12 +217,13 @@ async function loadDashboardData() {
     const currentMonth = now.getMonth();
     
     // Use optimized monthly summary queries (cached)
-    log.log('Fetching monthly summaries...');
-    const [currentSummary, lastSummary, goals, recurring] = await Promise.all([
+    log.log('Fetching monthly summaries and all-time data...');
+    const [currentSummary, lastSummary, recurring, allExpenses, allIncome] = await Promise.all([
       firestoreService.getMonthlySummary(currentYear, currentMonth),
       firestoreService.getMonthlySummary(currentYear, currentMonth - 1),
-      firestoreService.getGoals ? firestoreService.getGoals() : Promise.resolve([]),
-      firestoreService.getRecurring ? firestoreService.getRecurring() : Promise.resolve([])
+      firestoreService.getRecurring ? firestoreService.getRecurring() : Promise.resolve([]),
+      firestoreService.getExpenses(), // Get all expenses for overall KPIs
+      firestoreService.getIncome() // Get all income for overall KPIs
     ]);
     
     // Get limited expenses/income/splits for charts (last 6 months only)
@@ -238,17 +239,19 @@ async function loadDashboardData() {
     const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
     const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0, 23, 59, 59);
     
-    // Use pre-calculated summaries
+    // Calculate OVERALL (all-time) totals for KPIs
+    const overallIncome = allIncome.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
+    const overallExpenses = allExpenses.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
+    const overallCashFlow = overallIncome - overallExpenses;
+    const overallSavingsRate = overallIncome > 0 ? (overallCashFlow / overallIncome) * 100 : 0;
+    
+    // Use pre-calculated summaries for month-over-month comparison
     const currentMonthExpenses = currentSummary.totalExpenses;
     const currentMonthIncome = currentSummary.totalIncome;
     const lastMonthExpenses = lastSummary.totalExpenses;
     const lastMonthIncome = lastSummary.totalIncome;
     
-    // Calculate metrics
-    const cashFlow = currentMonthIncome - currentMonthExpenses;
-    const savingsRate = currentMonthIncome > 0 ? (cashFlow / currentMonthIncome) * 100 : 0;
-    
-    // Calculate changes
+    // Calculate changes (comparing current month vs last month)
     const incomeChangePercent = lastMonthIncome > 0 
       ? ((currentMonthIncome - lastMonthIncome) / lastMonthIncome) * 100 
       : 0;
@@ -256,11 +259,11 @@ async function loadDashboardData() {
       ? ((currentMonthExpenses - lastMonthExpenses) / lastMonthExpenses) * 100 
       : 0;
     
-    // Update KPIs with compact format
-    incomeValue.textContent = formatCurrencyCompact(currentMonthIncome);
-    expenseValue.textContent = formatCurrencyCompact(currentMonthExpenses);
-    cashflowValue.textContent = formatCurrencyCompact(cashFlow);
-    savingsValue.textContent = `${savingsRate.toFixed(1)}%`;
+    // Update KPIs with OVERALL amounts (compact format)
+    incomeValue.textContent = formatCurrencyCompact(overallIncome);
+    expenseValue.textContent = formatCurrencyCompact(overallExpenses);
+    cashflowValue.textContent = formatCurrencyCompact(overallCashFlow);
+    savingsValue.textContent = `${overallSavingsRate.toFixed(1)}%`;
     
     // Update tooltips with full amounts
     const incomeKpi = document.getElementById('incomeKpi');
@@ -268,10 +271,10 @@ async function loadDashboardData() {
     const cashflowKpi = document.getElementById('cashflowKpi');
     const savingsKpi = document.getElementById('savingsKpi');
     
-    if (incomeKpi) incomeKpi.setAttribute('data-tooltip', formatCurrency(currentMonthIncome));
-    if (expenseKpi) expenseKpi.setAttribute('data-tooltip', formatCurrency(currentMonthExpenses));
-    if (cashflowKpi) cashflowKpi.setAttribute('data-tooltip', formatCurrency(cashFlow));
-    if (savingsKpi) savingsKpi.setAttribute('data-tooltip', `${savingsRate.toFixed(2)}%`);
+    if (incomeKpi) incomeKpi.setAttribute('data-tooltip', `Overall: ${formatCurrency(overallIncome)}`);
+    if (expenseKpi) expenseKpi.setAttribute('data-tooltip', `Overall: ${formatCurrency(overallExpenses)}`);
+    if (cashflowKpi) cashflowKpi.setAttribute('data-tooltip', `Overall: ${formatCurrency(overallCashFlow)}`);
+    if (savingsKpi) savingsKpi.setAttribute('data-tooltip', `Overall: ${overallSavingsRate.toFixed(2)}%`);
     
     // Reinitialize tooltips after data is set
     if (window.kpiTooltipManager) {
@@ -284,14 +287,16 @@ async function loadDashboardData() {
     kpiEnhancer.initCard('cashflowKpi', { showSparkline: false, showDetails: true });
     kpiEnhancer.initCard('savingsKpi', { showSparkline: false, showDetails: false });
     
-    // Update changes
+    // Update changes (still showing month-over-month comparison)
     updateChange(incomeChange, incomeChangePercent, 'positive');
     updateChange(expenseChange, expenseChangePercent, 'negative');
-    updateCashflowChange(cashFlow);
-    updateSavingsChange(savingsRate);
+    updateCashflowChange(overallCashFlow);
+    updateSavingsChange(overallSavingsRate);
     
-    // Update Savings Rate Widget
-    updateSavingsRateWidget(currentMonthIncome, currentMonthExpenses, cashFlow, savingsRate);
+    // Update Savings Rate Widget (using current month data)
+    const currentMonthCashFlow = currentMonthIncome - currentMonthExpenses;
+    const currentMonthSavingsRate = currentMonthIncome > 0 ? (currentMonthCashFlow / currentMonthIncome) * 100 : 0;
+    updateSavingsRateWidget(currentMonthIncome, currentMonthExpenses, currentMonthCashFlow, currentMonthSavingsRate);
     
     // Load Monthly Savings Trend Widget
     await loadMonthlySavingsTrendWidget(expenses, income);
@@ -302,7 +307,6 @@ async function loadDashboardData() {
     // Load widgets
     loadTopCategoriesWidget(expenses, splits, firstDayOfMonth, lastDayOfMonth);
     loadUpcomingBillsWidget(recurring);
-    loadGoalProgressWidget(goals);
     
     // Load recent transactions (include splits)
     loadRecentTransactions(expenses, income, splits);
@@ -514,28 +518,6 @@ function calculateNextDueDate(recurring) {
   return nextDate;
 }
 
-// Load goal progress widget
-function loadGoalProgressWidget(goals) {
-  const widget = document.getElementById('goalProgressWidget');
-  if (!widget || !goals || goals.length === 0) return;
-  
-  // Get the first active goal
-  const activeGoal = goals.find(g => g.status !== 'completed') || goals[0];
-  if (!activeGoal) return;
-  
-  const current = parseFloat(activeGoal.currentAmount) || 0;
-  const target = parseFloat(activeGoal.targetAmount) || 1;
-  const percent = Math.min((current / target) * 100, 100);
-  
-  document.getElementById('goalName').textContent = activeGoal.name || 'Savings Goal';
-  document.getElementById('goalPercent').textContent = `${percent.toFixed(0)}%`;
-  document.getElementById('goalProgressFill').style.width = `${percent}%`;
-  document.getElementById('goalCurrent').textContent = formatCurrencyCompact(current);
-  document.getElementById('goalTarget').textContent = `of ${formatCurrencyCompact(target)}`;
-  
-  widget.style.display = 'block';
-}
-
 // Update change indicator
 function updateChange(element, percent, positiveClass) {
   const isPositive = percent > 0;
@@ -656,9 +638,9 @@ async function loadMonthlySavingsTrendWidget(expenses, income) {
   }
   
   // Get week label (e.g., "W1", "W2", etc. or "Jan 1-7")
-  function getWeekLabel(weekStart, index) {
-    if (index === 7) return 'This Week';
-    if (index === 6) return 'Last Week';
+  function getWeekLabel(weekStart, weeksAgo) {
+    if (weeksAgo === 0) return 'This Week';
+    if (weeksAgo === 1) return 'Last Week';
     const month = weekStart.toLocaleDateString('en-US', { month: 'short' });
     const day = weekStart.getDate();
     return `${month} ${day}`;
@@ -689,7 +671,7 @@ async function loadMonthlySavingsTrendWidget(expenses, income) {
     const savings = weekIncome - weekExpenses;
     
     weeklyData.push({
-      week: getWeekLabel(weekStart, i),
+      week: getWeekLabel(weekStart, i),  // i represents weeks ago (7 = 7 weeks ago, 0 = this week)
       savings: savings,
       weekStart: weekStart
     });
