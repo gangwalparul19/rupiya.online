@@ -870,7 +870,18 @@ function loadRecentTransactions(expenses, income, splits) {
           } else if (transaction.type === 'income') {
             await firestoreService.deleteIncome(transactionId);
           } else {
+            // Delete expense
             await firestoreService.deleteExpense(transactionId);
+            
+            // Delete linked fuel log if this expense is linked to a fuel entry
+            if (transaction.fuelLogId) {
+              try {
+                await firestoreService.delete('fuelLogs', transaction.fuelLogId);
+                console.log('[Dashboard] Deleted linked fuel log:', transaction.fuelLogId);
+              } catch (fuelLogError) {
+                console.error('[Dashboard] Error deleting linked fuel log:', fuelLogError);
+              }
+            }
           }
           toast.success('Transaction deleted');
           enhancer.removeTransaction(transactionId);

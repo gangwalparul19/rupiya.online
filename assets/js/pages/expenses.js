@@ -1265,9 +1265,30 @@ async function bulkDeleteExpenses() {
   if (!confirmed) return;
   
   try {
+    // Get expense data before deleting to check for linked fuel logs
+    const expensesToDelete = Array.from(state.selectedExpenses).map(id => 
+      state.expenses.find(e => e.id === id)
+    ).filter(e => e); // Filter out any undefined entries
+    
+    // Delete expenses
     const deleteResults = await Promise.allSettled(
       Array.from(state.selectedExpenses).map(id => firestoreService.deleteExpense(id))
     );
+    
+    // Delete linked fuel logs for successfully deleted expenses
+    const fuelLogDeletions = expensesToDelete
+      .filter(expense => expense.fuelLogId)
+      .map(async (expense) => {
+        try {
+          await firestoreService.delete('fuelLogs', expense.fuelLogId);
+          console.log('[Expenses] Deleted linked fuel log:', expense.fuelLogId);
+        } catch (error) {
+          console.error('[Expenses] Error deleting linked fuel log:', error);
+        }
+      });
+    
+    // Wait for all fuel log deletions to complete
+    await Promise.allSettled(fuelLogDeletions);
     
     const successCount = deleteResults.filter(r => r.status === 'fulfilled').length;
     const failCount = deleteResults.filter(r => r.status === 'rejected').length;
@@ -2433,6 +2454,17 @@ async function handleDelete() {
           expense.specificPaymentMethodId,
           expense.amount
         );
+      }
+      
+      // Delete linked fuel log if this expense is linked to a fuel entry
+      if (expense && expense.fuelLogId) {
+        try {
+          await firestoreService.delete('fuelLogs', expense.fuelLogId);
+          console.log('[Expenses] Deleted linked fuel log:', expense.fuelLogId);
+        } catch (fuelLogError) {
+          console.error('[Expenses] Error deleting linked fuel log:', fuelLogError);
+          // Don't fail the entire operation if fuel log deletion fails
+        }
       }
       
       toast.success('Expense deleted successfully');

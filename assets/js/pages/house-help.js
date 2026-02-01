@@ -850,7 +850,6 @@ async function handleSavePayment() {
       // Update credit card balance if payment method is a credit card AND expense was created successfully
       if (expenseResult.success && paymentMethodSelect.value === 'card' && specificPaymentMethodSelect && specificPaymentMethodSelect.value) {
         await creditCardService.updateCardBalanceOnExpense(
-          authService.getCurrentUser().uid,
           specificPaymentMethodSelect.value,
           amount
         );

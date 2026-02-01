@@ -968,7 +968,6 @@ async function handleSaveFuelLog() {
       // Update credit card balance if payment method is a credit card AND expense was created successfully
       if (expenseResult.success && paymentMethod === 'card' && specificPaymentMethod) {
         await creditCardService.updateCardBalanceOnExpense(
-          authService.getCurrentUser().uid,
           specificPaymentMethod,
           totalCost
         );
@@ -1225,7 +1224,6 @@ async function handleSaveMaintenance() {
       // Update credit card balance if payment method is a credit card
       if (paymentMethod === 'card' && specificPaymentMethod) {
         await creditCardService.updateCardBalanceOnExpense(
-          authService.getCurrentUser().uid,
           specificPaymentMethod,
           maintenanceAmount
         );

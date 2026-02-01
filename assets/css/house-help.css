@@ -880,9 +880,35 @@
   font-size: 0.875rem;
 }
 
-.btn-sm {
+/* Small icon buttons in payment history */
+.payment-history-item .btn-sm {
   width: 28px !important;
   height: 28px !important;
+  padding: 0 !important;
+  min-width: 28px !important;
+}
+
+/* Ensure sidebar footer buttons are not affected by btn-sm override */
+.sidebar-footer-buttons .btn-sm {
+  width: auto !important;
+  height: auto !important;
+  padding: 0.625rem 1rem !important;
+  min-width: auto !important;
+}
+
+/* Mobile responsive for sidebar footer buttons */
+@media (max-width: 768px) {
+  .sidebar-footer-buttons .btn-sm {
+    padding: 0.5rem 0.75rem !important;
+    font-size: 0.75rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .sidebar-footer-buttons .btn-sm {
+    padding: 0.5rem 0.625rem !important;
+    font-size: 0.6875rem !important;
+  }
 }
 
 /* Dark Mode Support */
