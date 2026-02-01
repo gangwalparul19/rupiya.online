@@ -932,14 +932,10 @@ async function handleSaveFuelLog() {
     const result = await firestoreService.add('fuelLogs', fuelLogData);
 
     if (result.success) {
-      // Update vehicle's current mileage - fetch full vehicle first to preserve all fields
-      const vehicleDoc = await firestoreService.get('vehicles', vehicleId);
-      if (vehicleDoc) {
-        await firestoreService.update('vehicles', vehicleId, {
-          ...vehicleDoc,
-          currentMileage: odometerReading
-        });
-      }
+      // Update vehicle's current mileage only (don't spread entire document to avoid encryption issues)
+      await firestoreService.update('vehicles', vehicleId, {
+        currentMileage: odometerReading
+      });
 
       // Use cross-feature integration to create expense
       await crossFeatureIntegrationService.createFuelExpense(
