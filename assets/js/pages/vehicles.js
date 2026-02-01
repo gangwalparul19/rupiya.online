@@ -506,7 +506,7 @@ function renderVehicles() {
 
     // Get vehicle mileage stats
     const vehicleFuelLogs = state.fuelLogs.filter(log => log.vehicleId === vehicle.id);
-    const mileageStats = calculateVehicleMileage(vehicleFuelLogs);
+    const mileageStats = calculateVehicleMileage(vehicleFuelLogs, vehicle.currentMileage || 0);
 
     // Escape user-provided data (handle undefined/null values from decryption failures)
     const vehicleName = vehicle.name || 'Unnamed Vehicle';
@@ -695,7 +695,7 @@ async function loadVehicleKPIData() {
 }
 
 // Calculate mileage for a specific vehicle
-function calculateVehicleMileage(vehicleFuelLogs) {
+function calculateVehicleMileage(vehicleFuelLogs, vehicleInitialMileage = 0) {
   if (!vehicleFuelLogs || vehicleFuelLogs.length === 0) {
     return { avgMileage: 0, totalDistance: 0, totalFuelCost: 0, totalFuel: 0 };
   }
@@ -721,9 +721,20 @@ function calculateVehicleMileage(vehicleFuelLogs) {
     totalFuel += fuelQty;
   });
 
-  // Calculate mileage between consecutive entries (need at least 2)
-  // For each segment, the fuel used is the fuel added at the END of that segment
-  if (sortedLogs.length >= 2) {
+  // Calculate mileage starting from vehicle's initial mileage
+  if (sortedLogs.length >= 1) {
+    // First entry: calculate from vehicle's initial mileage to first fuel log
+    const firstLog = sortedLogs[0];
+    const firstOdometer = parseFloat(firstLog.odometerReading) || 0;
+    const firstDistance = firstOdometer - vehicleInitialMileage;
+    const firstFuel = parseFloat(firstLog.fuelQuantity) || 0;
+    
+    if (firstDistance > 0 && firstFuel > 0) {
+      totalDistance += firstDistance;
+      fuelForMileage += firstFuel;
+    }
+    
+    // Subsequent entries: calculate between consecutive fuel logs
     for (let i = 1; i < sortedLogs.length; i++) {
       const prevLog = sortedLogs[i - 1];
       const currLog = sortedLogs[i];
@@ -759,7 +770,7 @@ function calculateOverallMileageStats() {
 
   state.vehicles.forEach(vehicle => {
     const vehicleLogs = state.fuelLogs.filter(log => log.vehicleId === vehicle.id);
-    const stats = calculateVehicleMileage(vehicleLogs);
+    const stats = calculateVehicleMileage(vehicleLogs, vehicle.currentMileage || 0);
     totalFuelCost += stats.totalFuelCost;
     totalDistance += stats.totalDistance;
     totalFuel += stats.totalFuel;
@@ -778,9 +789,12 @@ function calculateOverallMileageStats() {
 // Calculate total expenses for a specific vehicle (fuel + maintenance + income)
 async function calculateVehicleExpenses(vehicleId) {
   try {
+    // Get vehicle to access initial mileage
+    const vehicle = state.vehicles.find(v => v.id === vehicleId);
+    
     // Get fuel expenses for this vehicle
     const vehicleFuelLogs = state.fuelLogs.filter(log => log.vehicleId === vehicleId);
-    const fuelStats = calculateVehicleMileage(vehicleFuelLogs);
+    const fuelStats = calculateVehicleMileage(vehicleFuelLogs, vehicle?.currentMileage || 0);
     let totalExpense = fuelStats.totalFuelCost;
 
     // Get maintenance expenses for this vehicle
@@ -932,11 +946,9 @@ async function handleSaveFuelLog() {
     const result = await firestoreService.add('fuelLogs', fuelLogData);
 
     if (result.success) {
-      // Update vehicle's current mileage only (don't spread entire document to avoid encryption issues)
-      await firestoreService.update('vehicles', vehicleId, {
-        currentMileage: odometerReading
-      });
-
+      // Note: We don't update vehicle's currentMileage here to avoid encryption issues
+      // The fuel logs' odometer readings are sufficient for all mileage calculations
+      
       // Use cross-feature integration to create expense
       await crossFeatureIntegrationService.createFuelExpense(
         vehicleId,
@@ -999,9 +1011,12 @@ async function showMileageHistory(vehicleId, vehicleName) {
   // Refresh fuel logs to ensure we have latest data
   await loadFuelLogs();
 
+  // Get vehicle to access initial mileage
+  const vehicle = state.vehicles.find(v => v.id === vehicleId);
+  
   // Get fuel logs for this vehicle
   const vehicleFuelLogs = state.fuelLogs.filter(log => log.vehicleId === vehicleId);
-  const stats = calculateVehicleMileage(vehicleFuelLogs);
+  const stats = calculateVehicleMileage(vehicleFuelLogs, vehicle?.currentMileage || 0);
 
   // Calculate total expenses for this vehicle (fuel + maintenance + income)
   const vehicleExpenses = await calculateVehicleExpenses(vehicleId);
