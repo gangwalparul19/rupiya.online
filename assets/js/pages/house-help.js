@@ -3,6 +3,7 @@ import '../services/services-init.js'; // Initialize services first
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
 import crossFeatureIntegrationService from '../services/cross-feature-integration-service.js';
+import creditCardService from '../services/credit-card-service.js';
 import toast from '../components/toast.js';
 import { formatCurrency, formatDate } from '../utils/helpers.js';
 import encryptionReauthModal from '../components/encryption-reauth-modal.js';
@@ -711,13 +712,43 @@ function setupPaymentMethodHandler() {
         methodsOfType.map(method => {
           const icon = method.icon || '';
           const name = method.name || '';
-          return `<option value="${method.id}">${icon} ${name}</option>`;
+          return `<option value="${method.id}">${icon} ${getPaymentMethodDisplayName(method)}</option>`;
         }).join('');
       
       // Show the dropdown
       specificMethodGroup.style.display = 'block';
     });
   }
+}
+
+// Get payment method display name with details
+function getPaymentMethodDisplayName(method) {
+  let details = method.name;
+  
+  switch (method.type) {
+    case 'card':
+      if (method.cardNumber) {
+        details += ` (****${method.cardNumber})`;
+      }
+      break;
+    case 'upi':
+      if (method.upiId) {
+        details += ` (${method.upiId})`;
+      }
+      break;
+    case 'wallet':
+      if (method.walletNumber) {
+        details += ` (${method.walletNumber})`;
+      }
+      break;
+    case 'bank':
+      if (method.bankAccountNumber) {
+        details += ` (****${method.bankAccountNumber})`;
+      }
+      break;
+  }
+  
+  return details;
 }
 
 function hidePaymentModal() {
@@ -815,6 +846,15 @@ async function handleSavePayment() {
           specificPaymentMethod: specificPaymentMethodSelect ? specificPaymentMethodSelect.value : ''
         }
       );
+      
+      // Update credit card balance if payment method is a credit card
+      if (paymentMethodSelect.value === 'card' && specificPaymentMethodSelect && specificPaymentMethodSelect.value) {
+        await creditCardService.updateCardBalanceOnExpense(
+          authService.getCurrentUser().uid,
+          specificPaymentMethodSelect.value,
+          amount
+        );
+      }
       
       showToast('Payment recorded successfully', 'success');
       

@@ -3,6 +3,7 @@ import '../services/services-init.js'; // Initialize services first
 import authService from '../services/auth-service.js';
 import firestoreService from '../services/firestore-service.js';
 import crossFeatureIntegrationService from '../services/cross-feature-integration-service.js';
+import creditCardService from '../services/credit-card-service.js';
 import toast from '../components/toast.js';
 import confirmationModal from '../components/confirmation-modal.js';
 import { formatCurrency, formatCurrencyCompact, formatDate, escapeHtml, formatDateForInput } from '../utils/helpers.js';
@@ -197,8 +198,7 @@ function setupEventListeners() {
       fuelSpecificMethodSelect.innerHTML = '<option value="">Select...</option>' +
         methodsOfType.map(method => {
           const icon = method.icon || '';
-          const name = method.name || '';
-          return `<option value="${method.id}">${icon} ${name}</option>`;
+          return `<option value="${method.id}">${icon} ${getPaymentMethodDisplayName(method)}</option>`;
         }).join('');
       
       // Show the dropdown
@@ -235,14 +235,43 @@ function setupEventListeners() {
       maintenanceSpecificMethodSelect.innerHTML = '<option value="">Select...</option>' +
         methodsOfType.map(method => {
           const icon = method.icon || '';
-          const name = method.name || '';
-          return `<option value="${method.id}">${icon} ${name}</option>`;
+          return `<option value="${method.id}">${icon} ${getPaymentMethodDisplayName(method)}</option>`;
         }).join('');
       
       // Show the dropdown
       maintenanceSpecificMethodGroup.style.display = 'block';
     });
   }
+
+// Get payment method display name with details
+function getPaymentMethodDisplayName(method) {
+  let details = method.name;
+  
+  switch (method.type) {
+    case 'card':
+      if (method.cardNumber) {
+        details += ` (****${method.cardNumber})`;
+      }
+      break;
+    case 'upi':
+      if (method.upiId) {
+        details += ` (${method.upiId})`;
+      }
+      break;
+    case 'wallet':
+      if (method.walletNumber) {
+        details += ` (${method.walletNumber})`;
+      }
+      break;
+    case 'bank':
+      if (method.bankAccountNumber) {
+        details += ` (****${method.bankAccountNumber})`;
+      }
+      break;
+  }
+  
+  return details;
+}
 
   // Pagination buttons
   const prevPageBtn = document.getElementById('prevPageBtn');
@@ -900,10 +929,14 @@ async function handleSaveFuelLog() {
     const result = await firestoreService.add('fuelLogs', fuelLogData);
 
     if (result.success) {
-      // Update vehicle's current mileage
-      await firestoreService.update('vehicles', vehicleId, {
-        currentMileage: odometerReading
-      });
+      // Update vehicle's current mileage - fetch full vehicle first to preserve all fields
+      const vehicleDoc = await firestoreService.getById('vehicles', vehicleId);
+      if (vehicleDoc) {
+        await firestoreService.update('vehicles', vehicleId, {
+          ...vehicleDoc,
+          currentMileage: odometerReading
+        });
+      }
 
       // Use cross-feature integration to create expense
       await crossFeatureIntegrationService.createFuelExpense(
@@ -920,6 +953,15 @@ async function handleSaveFuelLog() {
           specificPaymentMethod
         }
       );
+
+      // Update credit card balance if payment method is a credit card
+      if (paymentMethod === 'card' && specificPaymentMethod) {
+        await creditCardService.updateCardBalanceOnExpense(
+          authService.getCurrentUser().uid,
+          specificPaymentMethod,
+          totalCost
+        );
+      }
 
       showToast('Fuel entry saved successfully', 'success');
       hideFuelLogModal();
@@ -1166,6 +1208,15 @@ async function handleSaveMaintenance() {
     );
 
     if (result.success) {
+      // Update credit card balance if payment method is a credit card
+      if (paymentMethod === 'card' && specificPaymentMethod) {
+        await creditCardService.updateCardBalanceOnExpense(
+          authService.getCurrentUser().uid,
+          specificPaymentMethod,
+          maintenanceAmount
+        );
+      }
+      
       showToast('Maintenance expense added', 'success');
       hideMaintenanceModal();
       await loadVehicleKPIData();
