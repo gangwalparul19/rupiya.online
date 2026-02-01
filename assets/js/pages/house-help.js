@@ -833,7 +833,7 @@ async function handleSavePayment() {
     
     if (result.success) {
       // Use cross-feature integration to create expense
-      await crossFeatureIntegrationService.createHouseHelpSalaryExpense(
+      const expenseResult = await crossFeatureIntegrationService.createHouseHelpSalaryExpense(
         currentPaymentStaffId,
         staffName,
         staffRole,
@@ -847,8 +847,8 @@ async function handleSavePayment() {
         }
       );
       
-      // Update credit card balance if payment method is a credit card
-      if (paymentMethodSelect.value === 'card' && specificPaymentMethodSelect && specificPaymentMethodSelect.value) {
+      // Update credit card balance if payment method is a credit card AND expense was created successfully
+      if (expenseResult.success && paymentMethodSelect.value === 'card' && specificPaymentMethodSelect && specificPaymentMethodSelect.value) {
         await creditCardService.updateCardBalanceOnExpense(
           authService.getCurrentUser().uid,
           specificPaymentMethodSelect.value,

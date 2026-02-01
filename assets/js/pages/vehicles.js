@@ -950,7 +950,7 @@ async function handleSaveFuelLog() {
       // The fuel logs' odometer readings are sufficient for all mileage calculations
       
       // Use cross-feature integration to create expense
-      await crossFeatureIntegrationService.createFuelExpense(
+      const expenseResult = await crossFeatureIntegrationService.createFuelExpense(
         vehicleId,
         vehicle?.name || 'Vehicle',
         {
@@ -965,8 +965,8 @@ async function handleSaveFuelLog() {
         }
       );
 
-      // Update credit card balance if payment method is a credit card
-      if (paymentMethod === 'card' && specificPaymentMethod) {
+      // Update credit card balance if payment method is a credit card AND expense was created successfully
+      if (expenseResult.success && paymentMethod === 'card' && specificPaymentMethod) {
         await creditCardService.updateCardBalanceOnExpense(
           authService.getCurrentUser().uid,
           specificPaymentMethod,
