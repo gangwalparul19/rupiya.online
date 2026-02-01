@@ -222,8 +222,8 @@ async function loadDashboardData() {
       firestoreService.getMonthlySummary(currentYear, currentMonth),
       firestoreService.getMonthlySummary(currentYear, currentMonth - 1),
       firestoreService.getRecurring ? firestoreService.getRecurring() : Promise.resolve([]),
-      firestoreService.getExpenses(), // Get all expenses for overall KPIs
-      firestoreService.getIncome() // Get all income for overall KPIs
+      firestoreService.getExpenses(10000), // Get all expenses with high limit for overall KPIs
+      firestoreService.getIncome(10000) // Get all income with high limit for overall KPIs
     ]);
     
     // Get limited expenses/income/splits for charts (last 6 months only)
@@ -725,13 +725,16 @@ async function loadMonthlySavingsTrendWidget(expenses, income) {
     window.savingsTrendChart.destroy();
   }
   
+  // Reverse the data so newest is on the right
+  const reversedData = [...weeklyData].reverse();
+  
   window.savingsTrendChart = new Chart(ctx, {
     type: 'line',
     data: {
-      labels: weeklyData.map(w => w.week),
+      labels: reversedData.map(w => w.week),
       datasets: [{
         label: 'Savings',
-        data: weeklyData.map(w => w.savings),
+        data: reversedData.map(w => w.savings),
         borderColor: currentWeekSavings >= 0 ? '#4ade80' : '#f87171',
         backgroundColor: currentWeekSavings >= 0 ? 'rgba(74, 222, 128, 0.1)' : 'rgba(248, 113, 113, 0.1)',
         borderWidth: 2,
