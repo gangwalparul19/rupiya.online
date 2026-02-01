@@ -165,6 +165,38 @@ function setupEventListeners() {
   document.getElementById('cancelVehicleIncomeBtn')?.addEventListener('click', hideVehicleIncomeModal);
   document.getElementById('saveVehicleIncomeBtn')?.addEventListener('click', handleSaveVehicleIncome);
 
+  // Payment method handlers for fuel modal
+  const fuelPaymentMethodSelect = document.getElementById('fuelPaymentMethod');
+  const fuelSpecificMethodGroup = document.getElementById('fuelSpecificPaymentMethodGroup');
+  
+  if (fuelPaymentMethodSelect && fuelSpecificMethodGroup) {
+    fuelPaymentMethodSelect.addEventListener('change', (e) => {
+      const value = e.target.value;
+      if (['card', 'upi', 'wallet', 'bank'].includes(value)) {
+        fuelSpecificMethodGroup.style.display = 'block';
+      } else {
+        fuelSpecificMethodGroup.style.display = 'none';
+        document.getElementById('fuelSpecificPaymentMethod').value = '';
+      }
+    });
+  }
+
+  // Payment method handlers for maintenance modal
+  const maintenancePaymentMethodSelect = document.getElementById('maintenancePaymentMethod');
+  const maintenanceSpecificMethodGroup = document.getElementById('maintenanceSpecificPaymentMethodGroup');
+  
+  if (maintenancePaymentMethodSelect && maintenanceSpecificMethodGroup) {
+    maintenancePaymentMethodSelect.addEventListener('change', (e) => {
+      const value = e.target.value;
+      if (['card', 'upi', 'wallet', 'bank'].includes(value)) {
+        maintenanceSpecificMethodGroup.style.display = 'block';
+      } else {
+        maintenanceSpecificMethodGroup.style.display = 'none';
+        document.getElementById('maintenanceSpecificPaymentMethod').value = '';
+      }
+    });
+  }
+
   // Pagination buttons
   const prevPageBtn = document.getElementById('prevPageBtn');
   const nextPageBtn = document.getElementById('nextPageBtn');
@@ -746,7 +778,55 @@ function showFuelLogModal(vehicleId, vehicleName, currentOdometer) {
   odometerInput.min = currentOdometer;
   odometerInput.placeholder = `Min: ${currentOdometer} km`;
 
+  // Load payment methods and dependents
+  loadFuelPaymentMethods();
+  loadFuelDependents();
+
   fuelLogModal.classList.add('show');
+}
+
+// Load payment methods for fuel modal
+async function loadFuelPaymentMethods() {
+  try {
+    const paymentMethodsService = await import('../services/payment-methods-service.js');
+    const methods = await paymentMethodsService.default.getAllPaymentMethods();
+    
+    const specificMethodSelect = document.getElementById('fuelSpecificPaymentMethod');
+    if (specificMethodSelect) {
+      specificMethodSelect.innerHTML = '<option value="">Select...</option>';
+      
+      methods.forEach(method => {
+        const option = document.createElement('option');
+        option.value = method.id;
+        option.textContent = `${method.icon || ''} ${method.name}`.trim();
+        specificMethodSelect.appendChild(option);
+      });
+    }
+  } catch (error) {
+    console.error('Error loading payment methods:', error);
+  }
+}
+
+// Load dependents for fuel modal
+async function loadFuelDependents() {
+  try {
+    const userService = await import('../services/user-service.js');
+    const dependents = await userService.default.getDependents();
+    
+    const dependentSelect = document.getElementById('fuelDependent');
+    if (dependentSelect) {
+      dependentSelect.innerHTML = '<option value="">Self</option>';
+      
+      dependents.forEach(dependent => {
+        const option = document.createElement('option');
+        option.value = dependent.id;
+        option.textContent = dependent.name;
+        dependentSelect.appendChild(option);
+      });
+    }
+  } catch (error) {
+    console.error('Error loading dependents:', error);
+  }
 }
 
 // Hide Fuel Log Modal
@@ -765,10 +845,18 @@ async function handleSaveFuelLog() {
   const totalCost = parseFloat(document.getElementById('totalCost').value) || (fuelQuantity * fuelPrice);
   const fuelStation = document.getElementById('fuelStation').value.trim();
   const notes = document.getElementById('fuelNotes').value.trim();
+  const paymentMethod = document.getElementById('fuelPaymentMethod').value;
+  const specificPaymentMethod = document.getElementById('fuelSpecificPaymentMethod').value;
+  const dependent = document.getElementById('fuelDependent').value;
 
   // Validation
   if (!fuelDate || !odometerReading || !fuelQuantity || !fuelPrice) {
     showToast('Please fill all required fields', 'error');
+    return;
+  }
+
+  if (!paymentMethod) {
+    showToast('Please select a payment method', 'error');
     return;
   }
 
@@ -791,7 +879,10 @@ async function handleSaveFuelLog() {
       fuelPrice,
       totalCost,
       fuelStation,
-      notes
+      notes,
+      paymentMethod,
+      specificPaymentMethod,
+      dependent
     };
 
     // Save fuel log
@@ -813,7 +904,10 @@ async function handleSaveFuelLog() {
           totalCost,
           fuelStation,
           date: new Date(fuelDate),
-          fuelLogId: result.id
+          fuelLogId: result.id,
+          paymentMethod,
+          specificPaymentMethod,
+          dependent
         }
       );
 
@@ -994,7 +1088,56 @@ function showMaintenanceModal(vehicleId, vehicleName) {
   document.getElementById('maintenanceVehicleName').textContent = vehicleName;
   document.getElementById('maintenanceForm').reset();
   document.getElementById('maintenanceDate').valueAsDate = new Date();
+  
+  // Load payment methods and dependents
+  loadMaintenancePaymentMethods();
+  loadMaintenanceDependents();
+  
   document.getElementById('maintenanceModal').classList.add('show');
+}
+
+// Load payment methods for maintenance modal
+async function loadMaintenancePaymentMethods() {
+  try {
+    const paymentMethodsService = await import('../services/payment-methods-service.js');
+    const methods = await paymentMethodsService.default.getAllPaymentMethods();
+    
+    const specificMethodSelect = document.getElementById('maintenanceSpecificPaymentMethod');
+    if (specificMethodSelect) {
+      specificMethodSelect.innerHTML = '<option value="">Select...</option>';
+      
+      methods.forEach(method => {
+        const option = document.createElement('option');
+        option.value = method.id;
+        option.textContent = `${method.icon || ''} ${method.name}`.trim();
+        specificMethodSelect.appendChild(option);
+      });
+    }
+  } catch (error) {
+    console.error('Error loading payment methods:', error);
+  }
+}
+
+// Load dependents for maintenance modal
+async function loadMaintenanceDependents() {
+  try {
+    const userService = await import('../services/user-service.js');
+    const dependents = await userService.default.getDependents();
+    
+    const dependentSelect = document.getElementById('maintenanceDependent');
+    if (dependentSelect) {
+      dependentSelect.innerHTML = '<option value="">Self</option>';
+      
+      dependents.forEach(dependent => {
+        const option = document.createElement('option');
+        option.value = dependent.id;
+        option.textContent = dependent.name;
+        dependentSelect.appendChild(option);
+      });
+    }
+  } catch (error) {
+    console.error('Error loading dependents:', error);
+  }
 }
 
 // Hide Maintenance Modal
@@ -1010,9 +1153,17 @@ async function handleSaveMaintenance() {
   const maintenanceAmount = parseFloat(document.getElementById('maintenanceAmount').value);
   const maintenanceDescription = document.getElementById('maintenanceDescription').value.trim();
   const serviceCenter = document.getElementById('serviceCenter').value.trim();
+  const paymentMethod = document.getElementById('maintenancePaymentMethod').value;
+  const specificPaymentMethod = document.getElementById('maintenanceSpecificPaymentMethod').value;
+  const dependent = document.getElementById('maintenanceDependent').value;
 
   if (!maintenanceDate || !maintenanceType || !maintenanceAmount) {
     showToast('Please fill all required fields', 'error');
+    return;
+  }
+
+  if (!paymentMethod) {
+    showToast('Please select a payment method', 'error');
     return;
   }
 
@@ -1033,7 +1184,10 @@ async function handleSaveMaintenance() {
         amount: maintenanceAmount,
         description: `${maintenanceType}${maintenanceDescription ? ': ' + maintenanceDescription : ''}${serviceCenter ? ' at ' + serviceCenter : ''}`,
         date: new Date(maintenanceDate),
-        maintenanceType: maintenanceType
+        maintenanceType: maintenanceType,
+        paymentMethod,
+        specificPaymentMethod,
+        dependent
       }
     );
 

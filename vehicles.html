@@ -437,6 +437,35 @@
               <input type="text" id="fuelStation" maxlength="100" placeholder="e.g., HP Petrol Pump">
             </div>
 
+            <div class="form-group">
+              <label for="fuelPaymentMethod">Payment Method *</label>
+              <select id="fuelPaymentMethod" required>
+                <option value="">Select payment method</option>
+                <option value="cash">💵 Cash</option>
+                <option value="card">💳 Card</option>
+                <option value="upi">📱 UPI</option>
+                <option value="wallet">👛 Wallet</option>
+                <option value="bank">🏦 Bank Account</option>
+              </select>
+              <span class="error-message" id="fuelPaymentMethodError"></span>
+            </div>
+
+            <div class="form-group" id="fuelSpecificPaymentMethodGroup" style="display: none;">
+              <label for="fuelSpecificPaymentMethod">Select from your saved methods</label>
+              <select id="fuelSpecificPaymentMethod">
+                <option value="">Select...</option>
+              </select>
+              <span class="error-message" id="fuelSpecificPaymentMethodError"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="fuelDependent">For Dependent (Optional)</label>
+              <select id="fuelDependent">
+                <option value="">Self</option>
+              </select>
+              <span class="error-message" id="fuelDependentError"></span>
+            </div>
+
             <div class="form-group form-group-full">
               <label for="fuelNotes">Notes</label>
               <textarea id="fuelNotes" rows="2" maxlength="200" placeholder="Any additional notes..."></textarea>
@@ -557,6 +586,35 @@
             <div class="form-group">
               <label for="serviceCenter">Service Center</label>
               <input type="text" id="serviceCenter" maxlength="100" placeholder="e.g., Authorized Service Center">
+            </div>
+
+            <div class="form-group">
+              <label for="maintenancePaymentMethod">Payment Method *</label>
+              <select id="maintenancePaymentMethod" required>
+                <option value="">Select payment method</option>
+                <option value="cash">💵 Cash</option>
+                <option value="card">💳 Card</option>
+                <option value="upi">📱 UPI</option>
+                <option value="wallet">👛 Wallet</option>
+                <option value="bank">🏦 Bank Account</option>
+              </select>
+              <span class="error-message" id="maintenancePaymentMethodError"></span>
+            </div>
+
+            <div class="form-group" id="maintenanceSpecificPaymentMethodGroup" style="display: none;">
+              <label for="maintenanceSpecificPaymentMethod">Select from your saved methods</label>
+              <select id="maintenanceSpecificPaymentMethod">
+                <option value="">Select...</option>
+              </select>
+              <span class="error-message" id="maintenanceSpecificPaymentMethodError"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="maintenanceDependent">For Dependent (Optional)</label>
+              <select id="maintenanceDependent">
+                <option value="">Self</option>
+              </select>
+              <span class="error-message" id="maintenanceDependentError"></span>
             </div>
 
             <div class="form-group form-group-full">

@@ -64,6 +64,9 @@ async function init() {
   setupEventListeners();
   loadUserProfile(user);
   
+  // Setup payment method handler
+  setupPaymentMethodHandler();
+  
   // Load data again after encryption is ready (fixes race condition)
   await loadStaff();
   
@@ -653,10 +656,77 @@ async function showPaymentModal(staffId) {
   paymentDate.valueAsDate = new Date();
   paymentNote.value = '';
   
+  // Load payment methods and dependents
+  await loadPaymentMethods();
+  await loadDependents();
+  
   // Render payment history
   renderPaymentHistory(payments);
   
   paymentModal.classList.add('show');
+}
+
+// Load payment methods from payment-methods-service
+async function loadPaymentMethods() {
+  try {
+    const paymentMethodsService = await import('../services/payment-methods-service.js');
+    const methods = await paymentMethodsService.default.getAllPaymentMethods();
+    
+    const specificMethodSelect = document.getElementById('specificPaymentMethod');
+    if (specificMethodSelect) {
+      specificMethodSelect.innerHTML = '<option value="">Select...</option>';
+      
+      methods.forEach(method => {
+        const option = document.createElement('option');
+        option.value = method.id;
+        option.textContent = `${method.icon || ''} ${method.name}`.trim();
+        specificMethodSelect.appendChild(option);
+      });
+    }
+  } catch (error) {
+    console.error('Error loading payment methods:', error);
+  }
+}
+
+// Load dependents from user service
+async function loadDependents() {
+  try {
+    const userService = await import('../services/user-service.js');
+    const dependents = await userService.default.getDependents();
+    
+    const dependentSelect = document.getElementById('paymentDependent');
+    if (dependentSelect) {
+      dependentSelect.innerHTML = '<option value="">Self</option>';
+      
+      dependents.forEach(dependent => {
+        const option = document.createElement('option');
+        option.value = dependent.id;
+        option.textContent = dependent.name;
+        dependentSelect.appendChild(option);
+      });
+    }
+  } catch (error) {
+    console.error('Error loading dependents:', error);
+  }
+}
+
+// Setup payment method change handler
+function setupPaymentMethodHandler() {
+  const paymentMethodSelect = document.getElementById('paymentMethod');
+  const specificMethodGroup = document.getElementById('specificPaymentMethodGroup');
+  
+  if (paymentMethodSelect && specificMethodGroup) {
+    paymentMethodSelect.addEventListener('change', (e) => {
+      const value = e.target.value;
+      // Show specific method dropdown for card, upi, wallet, bank
+      if (['card', 'upi', 'wallet', 'bank'].includes(value)) {
+        specificMethodGroup.style.display = 'block';
+      } else {
+        specificMethodGroup.style.display = 'none';
+        document.getElementById('specificPaymentMethod').value = '';
+      }
+    });
+  }
 }
 
 function hidePaymentModal() {
@@ -708,6 +778,16 @@ async function handleSavePayment() {
     return;
   }
   
+  // Get payment method
+  const paymentMethodSelect = document.getElementById('paymentMethod');
+  const specificPaymentMethodSelect = document.getElementById('specificPaymentMethod');
+  const paymentDependentSelect = document.getElementById('paymentDependent');
+  
+  if (!paymentMethodSelect || !paymentMethodSelect.value) {
+    showToast('Please select a payment method', 'error');
+    return;
+  }
+  
   const originalText = savePaymentBtn.textContent;
   savePaymentBtn.disabled = true;
   savePaymentBtn.textContent = 'Saving...';
@@ -722,7 +802,10 @@ async function handleSavePayment() {
       staffId: currentPaymentStaffId,
       amount: amount,
       date: new Date(paymentDate.value),
-      note: paymentNote.value.trim()
+      note: paymentNote.value.trim(),
+      paymentMethod: paymentMethodSelect.value,
+      specificPaymentMethod: specificPaymentMethodSelect ? specificPaymentMethodSelect.value : '',
+      dependent: paymentDependentSelect ? paymentDependentSelect.value : ''
     };
     
     // Save payment record
@@ -738,7 +821,10 @@ async function handleSavePayment() {
           amount: amount,
           date: new Date(paymentDate.value),
           note: paymentNote.value.trim(),
-          paymentId: result.id
+          paymentId: result.id,
+          paymentMethod: paymentMethodSelect.value,
+          specificPaymentMethod: specificPaymentMethodSelect ? specificPaymentMethodSelect.value : '',
+          dependent: paymentDependentSelect ? paymentDependentSelect.value : ''
         }
       );
       
@@ -763,6 +849,10 @@ async function handleSavePayment() {
       // Clear form
       paymentAmount.value = '';
       paymentNote.value = '';
+      paymentMethodSelect.value = '';
+      if (specificPaymentMethodSelect) specificPaymentMethodSelect.value = '';
+      if (paymentDependentSelect) paymentDependentSelect.value = '';
+      document.getElementById('specificPaymentMethodGroup').style.display = 'none';
       
       // Refresh staff list
       renderStaff();
