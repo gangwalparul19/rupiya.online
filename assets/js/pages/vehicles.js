@@ -778,9 +778,8 @@ function showFuelLogModal(vehicleId, vehicleName, currentOdometer) {
   odometerInput.min = currentOdometer;
   odometerInput.placeholder = `Min: ${currentOdometer} km`;
 
-  // Load payment methods and dependents
+  // Load payment methods
   loadFuelPaymentMethods();
-  loadFuelDependents();
 
   fuelLogModal.classList.add('show');
 }
@@ -807,32 +806,6 @@ async function loadFuelPaymentMethods() {
   }
 }
 
-// Load dependents for fuel modal
-async function loadFuelDependents() {
-  try {
-    const dependentSelect = document.getElementById('fuelDependent');
-    if (dependentSelect) {
-      dependentSelect.innerHTML = '<option value="">Self</option>';
-      
-      // Get family members from localStorage
-      const stored = localStorage.getItem('familyMembers');
-      if (stored) {
-        const members = JSON.parse(stored);
-        const activeMembers = members.filter(m => m.active);
-        
-        activeMembers.forEach(member => {
-          const option = document.createElement('option');
-          option.value = member.id;
-          option.textContent = member.name || member.memberName;
-          dependentSelect.appendChild(option);
-        });
-      }
-    }
-  } catch (error) {
-    console.error('Error loading dependents:', error);
-  }
-}
-
 // Hide Fuel Log Modal
 function hideFuelLogModal() {
   fuelLogModal.classList.remove('show');
@@ -851,7 +824,6 @@ async function handleSaveFuelLog() {
   const notes = document.getElementById('fuelNotes').value.trim();
   const paymentMethod = document.getElementById('fuelPaymentMethod').value;
   const specificPaymentMethod = document.getElementById('fuelSpecificPaymentMethod').value;
-  const dependent = document.getElementById('fuelDependent').value;
 
   // Validation
   if (!fuelDate || !odometerReading || !fuelQuantity || !fuelPrice) {
@@ -885,8 +857,7 @@ async function handleSaveFuelLog() {
       fuelStation,
       notes,
       paymentMethod,
-      specificPaymentMethod,
-      dependent
+      specificPaymentMethod
     };
 
     // Save fuel log
@@ -910,8 +881,7 @@ async function handleSaveFuelLog() {
           date: new Date(fuelDate),
           fuelLogId: result.id,
           paymentMethod,
-          specificPaymentMethod,
-          dependent
+          specificPaymentMethod
         }
       );
 
@@ -1093,9 +1063,8 @@ function showMaintenanceModal(vehicleId, vehicleName) {
   document.getElementById('maintenanceForm').reset();
   document.getElementById('maintenanceDate').valueAsDate = new Date();
   
-  // Load payment methods and dependents
+  // Load payment methods
   loadMaintenancePaymentMethods();
-  loadMaintenanceDependents();
   
   document.getElementById('maintenanceModal').classList.add('show');
 }
@@ -1122,32 +1091,6 @@ async function loadMaintenancePaymentMethods() {
   }
 }
 
-// Load dependents for maintenance modal
-async function loadMaintenanceDependents() {
-  try {
-    const dependentSelect = document.getElementById('maintenanceDependent');
-    if (dependentSelect) {
-      dependentSelect.innerHTML = '<option value="">Self</option>';
-      
-      // Get family members from localStorage
-      const stored = localStorage.getItem('familyMembers');
-      if (stored) {
-        const members = JSON.parse(stored);
-        const activeMembers = members.filter(m => m.active);
-        
-        activeMembers.forEach(member => {
-          const option = document.createElement('option');
-          option.value = member.id;
-          option.textContent = member.name || member.memberName;
-          dependentSelect.appendChild(option);
-        });
-      }
-    }
-  } catch (error) {
-    console.error('Error loading dependents:', error);
-  }
-}
-
 // Hide Maintenance Modal
 function hideMaintenanceModal() {
   document.getElementById('maintenanceModal').classList.remove('show');
@@ -1163,7 +1106,6 @@ async function handleSaveMaintenance() {
   const serviceCenter = document.getElementById('serviceCenter').value.trim();
   const paymentMethod = document.getElementById('maintenancePaymentMethod').value;
   const specificPaymentMethod = document.getElementById('maintenanceSpecificPaymentMethod').value;
-  const dependent = document.getElementById('maintenanceDependent').value;
 
   if (!maintenanceDate || !maintenanceType || !maintenanceAmount) {
     showToast('Please fill all required fields', 'error');
@@ -1194,8 +1136,7 @@ async function handleSaveMaintenance() {
         date: new Date(maintenanceDate),
         maintenanceType: maintenanceType,
         paymentMethod,
-        specificPaymentMethod,
-        dependent
+        specificPaymentMethod
       }
     );
 

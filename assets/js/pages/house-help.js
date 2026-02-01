@@ -656,9 +656,8 @@ async function showPaymentModal(staffId) {
   paymentDate.valueAsDate = new Date();
   paymentNote.value = '';
   
-  // Load payment methods and dependents
+  // Load payment methods
   await loadPaymentMethods();
-  await loadDependents();
   
   // Render payment history
   renderPaymentHistory(payments);
@@ -685,32 +684,6 @@ async function loadPaymentMethods() {
     }
   } catch (error) {
     console.error('Error loading payment methods:', error);
-  }
-}
-
-// Load dependents from localStorage
-async function loadDependents() {
-  try {
-    const dependentSelect = document.getElementById('paymentDependent');
-    if (dependentSelect) {
-      dependentSelect.innerHTML = '<option value="">Self</option>';
-      
-      // Get family members from localStorage
-      const stored = localStorage.getItem('familyMembers');
-      if (stored) {
-        const members = JSON.parse(stored);
-        const activeMembers = members.filter(m => m.active);
-        
-        activeMembers.forEach(member => {
-          const option = document.createElement('option');
-          option.value = member.id;
-          option.textContent = member.name || member.memberName;
-          dependentSelect.appendChild(option);
-        });
-      }
-    }
-  } catch (error) {
-    console.error('Error loading dependents:', error);
   }
 }
 
@@ -785,7 +758,6 @@ async function handleSavePayment() {
   // Get payment method
   const paymentMethodSelect = document.getElementById('paymentMethod');
   const specificPaymentMethodSelect = document.getElementById('specificPaymentMethod');
-  const paymentDependentSelect = document.getElementById('paymentDependent');
   
   if (!paymentMethodSelect || !paymentMethodSelect.value) {
     showToast('Please select a payment method', 'error');
@@ -808,8 +780,7 @@ async function handleSavePayment() {
       date: new Date(paymentDate.value),
       note: paymentNote.value.trim(),
       paymentMethod: paymentMethodSelect.value,
-      specificPaymentMethod: specificPaymentMethodSelect ? specificPaymentMethodSelect.value : '',
-      dependent: paymentDependentSelect ? paymentDependentSelect.value : ''
+      specificPaymentMethod: specificPaymentMethodSelect ? specificPaymentMethodSelect.value : ''
     };
     
     // Save payment record
@@ -827,8 +798,7 @@ async function handleSavePayment() {
           note: paymentNote.value.trim(),
           paymentId: result.id,
           paymentMethod: paymentMethodSelect.value,
-          specificPaymentMethod: specificPaymentMethodSelect ? specificPaymentMethodSelect.value : '',
-          dependent: paymentDependentSelect ? paymentDependentSelect.value : ''
+          specificPaymentMethod: specificPaymentMethodSelect ? specificPaymentMethodSelect.value : ''
         }
       );
       
@@ -855,7 +825,6 @@ async function handleSavePayment() {
       paymentNote.value = '';
       paymentMethodSelect.value = '';
       if (specificPaymentMethodSelect) specificPaymentMethodSelect.value = '';
-      if (paymentDependentSelect) paymentDependentSelect.value = '';
       document.getElementById('specificPaymentMethodGroup').style.display = 'none';
       
       // Refresh staff list
