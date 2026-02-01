@@ -12,6 +12,9 @@ import encryptionReauthModal from '../components/encryption-reauth-modal.js';
 // Helper function for toast
 const showToast = (message, type) => toast.show(message, type);
 
+// Store user's payment methods
+let userPaymentMethods = [];
+
 // State
 const state = {
   vehicles: [],
@@ -168,32 +171,76 @@ function setupEventListeners() {
   // Payment method handlers for fuel modal
   const fuelPaymentMethodSelect = document.getElementById('fuelPaymentMethod');
   const fuelSpecificMethodGroup = document.getElementById('fuelSpecificPaymentMethodGroup');
+  const fuelSpecificMethodSelect = document.getElementById('fuelSpecificPaymentMethod');
   
-  if (fuelPaymentMethodSelect && fuelSpecificMethodGroup) {
+  if (fuelPaymentMethodSelect && fuelSpecificMethodGroup && fuelSpecificMethodSelect) {
     fuelPaymentMethodSelect.addEventListener('change', (e) => {
-      const value = e.target.value;
-      if (['card', 'upi', 'wallet', 'bank'].includes(value)) {
-        fuelSpecificMethodGroup.style.display = 'block';
-      } else {
+      const selectedType = e.target.value;
+      
+      // Hide for cash or no selection
+      if (!selectedType || selectedType === 'cash') {
         fuelSpecificMethodGroup.style.display = 'none';
-        document.getElementById('fuelSpecificPaymentMethod').value = '';
+        fuelSpecificMethodSelect.value = '';
+        return;
       }
+      
+      // Filter payment methods by selected type
+      const methodsOfType = userPaymentMethods.filter(method => method.type === selectedType);
+      
+      if (methodsOfType.length === 0) {
+        fuelSpecificMethodGroup.style.display = 'none';
+        fuelSpecificMethodSelect.value = '';
+        return;
+      }
+      
+      // Populate specific payment method dropdown
+      fuelSpecificMethodSelect.innerHTML = '<option value="">Select...</option>' +
+        methodsOfType.map(method => {
+          const icon = method.icon || '';
+          const name = method.name || '';
+          return `<option value="${method.id}">${icon} ${name}</option>`;
+        }).join('');
+      
+      // Show the dropdown
+      fuelSpecificMethodGroup.style.display = 'block';
     });
   }
 
   // Payment method handlers for maintenance modal
   const maintenancePaymentMethodSelect = document.getElementById('maintenancePaymentMethod');
   const maintenanceSpecificMethodGroup = document.getElementById('maintenanceSpecificPaymentMethodGroup');
+  const maintenanceSpecificMethodSelect = document.getElementById('maintenanceSpecificPaymentMethod');
   
-  if (maintenancePaymentMethodSelect && maintenanceSpecificMethodGroup) {
+  if (maintenancePaymentMethodSelect && maintenanceSpecificMethodGroup && maintenanceSpecificMethodSelect) {
     maintenancePaymentMethodSelect.addEventListener('change', (e) => {
-      const value = e.target.value;
-      if (['card', 'upi', 'wallet', 'bank'].includes(value)) {
-        maintenanceSpecificMethodGroup.style.display = 'block';
-      } else {
+      const selectedType = e.target.value;
+      
+      // Hide for cash or no selection
+      if (!selectedType || selectedType === 'cash') {
         maintenanceSpecificMethodGroup.style.display = 'none';
-        document.getElementById('maintenanceSpecificPaymentMethod').value = '';
+        maintenanceSpecificMethodSelect.value = '';
+        return;
       }
+      
+      // Filter payment methods by selected type
+      const methodsOfType = userPaymentMethods.filter(method => method.type === selectedType);
+      
+      if (methodsOfType.length === 0) {
+        maintenanceSpecificMethodGroup.style.display = 'none';
+        maintenanceSpecificMethodSelect.value = '';
+        return;
+      }
+      
+      // Populate specific payment method dropdown
+      maintenanceSpecificMethodSelect.innerHTML = '<option value="">Select...</option>' +
+        methodsOfType.map(method => {
+          const icon = method.icon || '';
+          const name = method.name || '';
+          return `<option value="${method.id}">${icon} ${name}</option>`;
+        }).join('');
+      
+      // Show the dropdown
+      maintenanceSpecificMethodGroup.style.display = 'block';
     });
   }
 
@@ -788,21 +835,10 @@ function showFuelLogModal(vehicleId, vehicleName, currentOdometer) {
 async function loadFuelPaymentMethods() {
   try {
     const paymentMethodsService = await import('../services/payment-methods-service.js');
-    const methods = await paymentMethodsService.default.getPaymentMethods();
-    
-    const specificMethodSelect = document.getElementById('fuelSpecificPaymentMethod');
-    if (specificMethodSelect) {
-      specificMethodSelect.innerHTML = '<option value="">Select...</option>';
-      
-      methods.forEach(method => {
-        const option = document.createElement('option');
-        option.value = method.id;
-        option.textContent = `${method.icon || ''} ${method.name}`.trim();
-        specificMethodSelect.appendChild(option);
-      });
-    }
+    userPaymentMethods = await paymentMethodsService.default.getPaymentMethods();
   } catch (error) {
     console.error('Error loading payment methods:', error);
+    userPaymentMethods = [];
   }
 }
 
@@ -1073,21 +1109,10 @@ function showMaintenanceModal(vehicleId, vehicleName) {
 async function loadMaintenancePaymentMethods() {
   try {
     const paymentMethodsService = await import('../services/payment-methods-service.js');
-    const methods = await paymentMethodsService.default.getPaymentMethods();
-    
-    const specificMethodSelect = document.getElementById('maintenanceSpecificPaymentMethod');
-    if (specificMethodSelect) {
-      specificMethodSelect.innerHTML = '<option value="">Select...</option>';
-      
-      methods.forEach(method => {
-        const option = document.createElement('option');
-        option.value = method.id;
-        option.textContent = `${method.icon || ''} ${method.name}`.trim();
-        specificMethodSelect.appendChild(option);
-      });
-    }
+    userPaymentMethods = await paymentMethodsService.default.getPaymentMethods();
   } catch (error) {
     console.error('Error loading payment methods:', error);
+    userPaymentMethods = [];
   }
 }
 

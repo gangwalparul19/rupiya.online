@@ -11,6 +11,9 @@ import confirmationModal from '../components/confirmation-modal.js';
 // Helper function for toast
 const showToast = (message, type) => toast.show(message, type);
 
+// Store user's payment methods
+let userPaymentMethods = [];
+
 const state = {
   staff: [],
   filteredStaff: [],
@@ -669,21 +672,10 @@ async function showPaymentModal(staffId) {
 async function loadPaymentMethods() {
   try {
     const paymentMethodsService = await import('../services/payment-methods-service.js');
-    const methods = await paymentMethodsService.default.getPaymentMethods();
-    
-    const specificMethodSelect = document.getElementById('specificPaymentMethod');
-    if (specificMethodSelect) {
-      specificMethodSelect.innerHTML = '<option value="">Select...</option>';
-      
-      methods.forEach(method => {
-        const option = document.createElement('option');
-        option.value = method.id;
-        option.textContent = `${method.icon || ''} ${method.name}`.trim();
-        specificMethodSelect.appendChild(option);
-      });
-    }
+    userPaymentMethods = await paymentMethodsService.default.getPaymentMethods();
   } catch (error) {
     console.error('Error loading payment methods:', error);
+    userPaymentMethods = [];
   }
 }
 
@@ -691,17 +683,39 @@ async function loadPaymentMethods() {
 function setupPaymentMethodHandler() {
   const paymentMethodSelect = document.getElementById('paymentMethod');
   const specificMethodGroup = document.getElementById('specificPaymentMethodGroup');
+  const specificMethodSelect = document.getElementById('specificPaymentMethod');
   
-  if (paymentMethodSelect && specificMethodGroup) {
+  if (paymentMethodSelect && specificMethodGroup && specificMethodSelect) {
     paymentMethodSelect.addEventListener('change', (e) => {
-      const value = e.target.value;
-      // Show specific method dropdown for card, upi, wallet, bank
-      if (['card', 'upi', 'wallet', 'bank'].includes(value)) {
-        specificMethodGroup.style.display = 'block';
-      } else {
+      const selectedType = e.target.value;
+      
+      // Hide for cash or no selection
+      if (!selectedType || selectedType === 'cash') {
         specificMethodGroup.style.display = 'none';
-        document.getElementById('specificPaymentMethod').value = '';
+        specificMethodSelect.value = '';
+        return;
       }
+      
+      // Filter payment methods by selected type
+      const methodsOfType = userPaymentMethods.filter(method => method.type === selectedType);
+      
+      if (methodsOfType.length === 0) {
+        // No saved methods of this type
+        specificMethodGroup.style.display = 'none';
+        specificMethodSelect.value = '';
+        return;
+      }
+      
+      // Populate specific payment method dropdown
+      specificMethodSelect.innerHTML = '<option value="">Select...</option>' +
+        methodsOfType.map(method => {
+          const icon = method.icon || '';
+          const name = method.name || '';
+          return `<option value="${method.id}">${icon} ${name}</option>`;
+        }).join('');
+      
+      // Show the dropdown
+      specificMethodGroup.style.display = 'block';
     });
   }
 }
