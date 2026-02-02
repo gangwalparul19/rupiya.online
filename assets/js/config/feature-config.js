@@ -44,7 +44,7 @@ const DEFAULT_FEATURES = {
     required: true
   },
   income: {
-    enabled: false,
+    enabled: true,
     label: 'Income',
     description: 'Track your earnings',
     category: 'transactions'
@@ -56,7 +56,7 @@ const DEFAULT_FEATURES = {
     category: 'transactions'
   },
   recurring: {
-    enabled: false,
+    enabled: true,
     label: 'Recurring',
     description: 'Auto-track subscriptions & EMIs',
     category: 'transactions'
@@ -86,7 +86,7 @@ const DEFAULT_FEATURES = {
     category: 'planning'
   },
   loans: {
-    enabled: false,
+    enabled: true,
     label: 'Loans & EMI',
     description: 'Track loans and EMIs',
     category: 'planning'
@@ -110,19 +110,19 @@ const DEFAULT_FEATURES = {
     category: 'assets'
   },
   vehicles: {
-    enabled: false,
+    enabled: true,
     label: 'Vehicles',
     description: 'Track vehicles & maintenance',
     category: 'assets'
   },
   houseHelp: {
-    enabled: false,
+    enabled: true,
     label: 'House Help',
     description: 'Track staff payments',
     category: 'assets'
   },
   creditCards: {
-    enabled: false,
+    enabled: true,
     label: 'Credit Cards',
     description: 'Manage cards & track rewards',
     category: 'planning'
