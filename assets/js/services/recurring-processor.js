@@ -234,6 +234,9 @@ class RecurringProcessor {
       }
 
       // Process recurring savings (auto-deduct)
+      // NOTE: Savings should NOT be added as expenses
+      // Savings are transfers/allocations, not spending
+      // We only update the current value without creating expense entries
       for (const saving of activeSavings) {
         const startDate = saving.startDate?.toDate ? saving.startDate.toDate() : new Date(saving.startDate);
         const endDate = saving.maturityDate?.toDate ? saving.maturityDate.toDate() : null;
@@ -246,39 +249,21 @@ class RecurringProcessor {
           continue;
         }
 
-        // Create expense entries for each due date (savings = money going out)
+        // Update current value for each due date (without creating expenses)
         for (const dueDate of dueDates) {
-          const expenseData = {
+          // Update the current value of the saving
+          const newCurrentValue = (parseFloat(saving.currentValue) || 0) + parseFloat(saving.amount);
+          await firestoreService.updateSaving(saving.id, {
+            currentValue: newCurrentValue
+          });
+          
+          processedCount++;
+          createdTransactions.push({
+            type: 'savings',
+            description: saving.name,
             amount: saving.amount,
-            category: 'Savings',
-            description: `${saving.name} - ${saving.savingType}`,
-            date: dueDate,
-            paymentMethod: 'bank_transfer',
-            paymentMethodId: null,
-            paymentMethodName: null,
-            isRecurring: true,
-            recurringId: saving.id,
-            savingId: saving.id,
-            notes: `Auto-deducted from ${saving.name} (${saving.savingType})`
-          };
-
-          const result = await firestoreService.addExpense(expenseData);
-
-          if (result?.success) {
-            processedCount++;
-            createdTransactions.push({
-              type: 'savings',
-              description: saving.name,
-              amount: saving.amount,
-              date: dueDate
-            });
-            
-            // Update the current value of the saving
-            const newCurrentValue = (parseFloat(saving.currentValue) || 0) + parseFloat(saving.amount);
-            await firestoreService.updateSaving(saving.id, {
-              currentValue: newCurrentValue
-            });
-          }
+            date: dueDate
+          });
         }
 
         // Update the saving with last processed date

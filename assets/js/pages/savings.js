@@ -614,63 +614,30 @@ async function handleSubmit(e) {
       if (result.success) {
         toast.success('Saving added successfully');
         
-        // For one-time savings, create immediate expense entry
+        // NOTE: Savings should NOT be added as expenses
+        // Savings are transfers/allocations, not spending
+        // Removed automatic expense creation to prevent incorrect expense totals
+        
+        // For one-time savings, just update the current value
         if (formData.frequency === 'one-time' && formData.amount > 0) {
-          const expenseData = {
-            amount: formData.amount,
-            category: 'Savings',
-            description: `${formData.name} - ${formData.savingType}`,
-            date: formData.startDate,
-            paymentMethod: 'bank_transfer',
-            paymentMethodId: null,
-            paymentMethodName: null,
-            isRecurring: false,
-            savingId: result.id,
-            notes: `One-time deposit for ${formData.name} (${formData.savingType})`
-          };
-          
-          const expenseResult = await firestoreService.addExpense(expenseData);
-          if (expenseResult.success) {
-            // Update current value to match the amount
-            await firestoreService.updateSaving(result.id, {
-              currentValue: formData.amount
-            });
-            toast.success('Expense entry created for one-time savings');
-          }
+          await firestoreService.updateSaving(result.id, {
+            currentValue: formData.amount
+          });
         }
         
-        // For recurring savings with auto-deduct starting today, create first entry
+        // For recurring savings with auto-deduct starting today, update current value
         if (formData.frequency !== 'one-time' && formData.autoDeduct) {
           const startDate = formData.startDate instanceof Date ? formData.startDate : new Date(formData.startDate);
           const today = new Date();
           today.setHours(0, 0, 0, 0);
           startDate.setHours(0, 0, 0, 0);
           
-          // If start date is today or in the past, create first entry immediately
+          // If start date is today or in the past, update current value
           if (startDate <= today) {
-            const expenseData = {
-              amount: formData.amount,
-              category: 'Savings',
-              description: `${formData.name} - ${formData.savingType}`,
-              date: startDate,
-              paymentMethod: 'bank_transfer',
-              paymentMethodId: null,
-              paymentMethodName: null,
-              isRecurring: true,
-              recurringId: result.id,
-              savingId: result.id,
-              notes: `First installment for ${formData.name} (${formData.savingType})`
-            };
-            
-            const expenseResult = await firestoreService.addExpense(expenseData);
-            if (expenseResult.success) {
-              // Update current value and last processed date
-              await firestoreService.updateSaving(result.id, {
-                currentValue: formData.amount,
-                lastProcessedDate: formData.startDate
-              });
-              toast.success('First installment expense created');
-            }
+            await firestoreService.updateSaving(result.id, {
+              currentValue: formData.amount,
+              lastProcessedDate: formData.startDate
+            });
           }
         }
       }
