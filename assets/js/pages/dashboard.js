@@ -222,8 +222,8 @@ async function loadDashboardData() {
       firestoreService.getMonthlySummary(currentYear, currentMonth),
       firestoreService.getMonthlySummary(currentYear, currentMonth - 1),
       firestoreService.getRecurring ? firestoreService.getRecurring() : Promise.resolve([]),
-      firestoreService.getExpenses(10000), // Get all expenses with high limit for overall KPIs
-      firestoreService.getIncome(10000) // Get all income with high limit for overall KPIs
+      firestoreService.getExpenses(10000), // Get up to 10000 expenses for overall KPIs
+      firestoreService.getIncome(10000) // Get up to 10000 income for overall KPIs
     ]);
     
     // Get limited expenses/income/splits for charts (last 6 months only)

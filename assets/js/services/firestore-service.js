@@ -395,7 +395,7 @@ class FirestoreService {
         orderDirection = 'desc';
       }
       
-      if (typeof maxLimit !== 'number' || maxLimit < 1 || maxLimit > 1000) {
+      if (typeof maxLimit !== 'number' || maxLimit < 1 || maxLimit > 10000) {
         console.warn('Invalid maxLimit, using default 100');
         maxLimit = 100;
       }
