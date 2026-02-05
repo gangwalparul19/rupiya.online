@@ -367,32 +367,41 @@ function checkURLParameters() {
   const linkedName = urlParams.get('linkedName');
   const category = urlParams.get('category');
   
-  // Check if action=add to open form automatically
-  if (action === 'add') {
-    setTimeout(() => {
-      openAddForm();
-    }, 100);
-  }
+  // Only open form if there are linked parameters or category data
+  // Do NOT open just because action=add is present (user should click Add Expense button)
+  const hasLinkedData = linkedType && linkedId && linkedName;
+  const hasCategoryData = category;
   
-  if (linkedType && linkedId && linkedName) {
-    // Open add form with pre-filled data
+  // Only auto-open if there's actual data to pre-fill (linked data or category)
+  if (hasLinkedData || hasCategoryData) {
     setTimeout(() => {
       openAddForm();
       if (category) {
         categoryInput.value = category;
       }
-      // Store linked data in form (will be used on submit)
-      expenseForm.dataset.linkedType = linkedType;
-      expenseForm.dataset.linkedId = linkedId;
-      expenseForm.dataset.linkedName = linkedName;
       
-      // Show info message (escape user input to prevent XSS)
-      const infoDiv = document.createElement('div');
-      infoDiv.className = 'linked-info';
-      infoDiv.innerHTML = `<strong>Linked to:</strong> ${escapeHtml(linkedName)} (${escapeHtml(linkedType)})`;
-      infoDiv.style.cssText = 'padding: 12px; background: #E3F2FD; border: 1px solid #4A90E2; border-radius: 8px; margin-bottom: 1rem; color: #2C3E50;';
-      expenseForm.insertBefore(infoDiv, expenseForm.firstChild);
+      if (hasLinkedData) {
+        // Store linked data in form (will be used on submit)
+        expenseForm.dataset.linkedType = linkedType;
+        expenseForm.dataset.linkedId = linkedId;
+        expenseForm.dataset.linkedName = linkedName;
+        
+        // Show info message (escape user input to prevent XSS)
+        const infoDiv = document.createElement('div');
+        infoDiv.className = 'linked-info';
+        infoDiv.innerHTML = `<strong>Linked to:</strong> ${escapeHtml(linkedName)} (${escapeHtml(linkedType)})`;
+        infoDiv.style.cssText = 'padding: 12px; background: #E3F2FD; border: 1px solid #4A90E2; border-radius: 8px; margin-bottom: 1rem; color: #2C3E50;';
+        expenseForm.insertBefore(infoDiv, expenseForm.firstChild);
+      }
     }, 100);
+  }
+  
+  // If action=add but no data to pre-fill, just remove the parameter from URL
+  // This keeps the URL clean without opening the form
+  if (action === 'add' && !hasLinkedData && !hasCategoryData) {
+    // Clean up URL without reloading the page
+    const newUrl = window.location.pathname;
+    window.history.replaceState({}, document.title, newUrl);
   }
 }
 

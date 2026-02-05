@@ -356,12 +356,13 @@ function checkURLParameters() {
   const linkedName = urlParams.get('linkedName');
   const source = urlParams.get('source');
   
-  // Only open form if action=add AND there are linked parameters or source
-  // This prevents auto-opening for new users
+  // Only open form if there are linked parameters or source data
+  // Do NOT open just because action=add is present (user should click Add Income button)
   const hasLinkedData = linkedType && linkedId && linkedName;
   const hasSourceData = source;
   
-  if (action === 'add' && (hasLinkedData || hasSourceData)) {
+  // Only auto-open if there's actual data to pre-fill (linked data or source)
+  if (hasLinkedData || hasSourceData) {
     setTimeout(() => {
       openAddForm();
       if (source) {
@@ -382,6 +383,14 @@ function checkURLParameters() {
         incomeForm.insertBefore(infoDiv, incomeForm.firstChild);
       }
     }, 100);
+  }
+  
+  // If action=add but no data to pre-fill, just remove the parameter from URL
+  // This keeps the URL clean without opening the form
+  if (action === 'add' && !hasLinkedData && !hasSourceData) {
+    // Clean up URL without reloading the page
+    const newUrl = window.location.pathname;
+    window.history.replaceState({}, document.title, newUrl);
   }
 }
 

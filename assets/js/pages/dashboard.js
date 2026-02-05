@@ -245,6 +245,12 @@ async function loadDashboardData() {
     const overallCashFlow = overallIncome - overallExpenses;
     const overallSavingsRate = overallIncome > 0 ? (overallCashFlow / overallIncome) * 100 : 0;
     
+    // Log overall totals for debugging
+    log.log('Overall Income:', overallIncome, 'from', allIncome.length, 'income entries');
+    log.log('Overall Expenses:', overallExpenses, 'from', allExpenses.length, 'expense entries');
+    log.log('Overall Cash Flow:', overallCashFlow);
+    log.log('Overall Savings Rate:', overallSavingsRate.toFixed(2) + '%');
+    
     // Use pre-calculated summaries for month-over-month comparison
     const currentMonthExpenses = currentSummary.totalExpenses;
     const currentMonthIncome = currentSummary.totalIncome;
@@ -260,10 +266,17 @@ async function loadDashboardData() {
       : 0;
     
     // Update KPIs with OVERALL amounts (compact format)
-    incomeValue.textContent = formatCurrencyCompact(overallIncome);
-    expenseValue.textContent = formatCurrencyCompact(overallExpenses);
-    cashflowValue.textContent = formatCurrencyCompact(overallCashFlow);
-    savingsValue.textContent = `${overallSavingsRate.toFixed(1)}%`;
+    if (incomeValue) incomeValue.textContent = formatCurrencyCompact(overallIncome);
+    if (expenseValue) expenseValue.textContent = formatCurrencyCompact(overallExpenses);
+    if (cashflowValue) cashflowValue.textContent = formatCurrencyCompact(overallCashFlow);
+    if (savingsValue) savingsValue.textContent = `${overallSavingsRate.toFixed(1)}%`;
+    
+    log.log('KPI values updated:', {
+      income: incomeValue?.textContent,
+      expense: expenseValue?.textContent,
+      cashflow: cashflowValue?.textContent,
+      savings: savingsValue?.textContent
+    });
     
     // Update tooltips with full amounts
     const incomeKpi = document.getElementById('incomeKpi');
